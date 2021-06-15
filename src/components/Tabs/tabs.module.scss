@@ -1,0 +1,10 @@
+.tabs {
+  .wrap {
+    margin-bottom: -1px;
+  }
+}
+
+.is_active {
+  border-top-width: 3px;
+  @apply font-medium text-brand-G11 border-t-brand-G11 bg-white;
+}

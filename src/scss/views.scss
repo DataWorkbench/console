@@ -1,0 +1,21 @@
+.overview {
+  .feat {
+    background-repeat: no-repeat;
+    background-position: center;
+
+    &.feat_0 {
+      background-image: url('../assets/bench_feat_0.svg');
+      background-size: 120px;
+    }
+
+    &.feat_1 {
+      background-image: url('../assets/bench_feat_1.svg');
+      background-size: 100px;
+    }
+
+    &.feat_2 {
+      background-image: url('../assets/bench_feat_2.svg');
+      background-size: 140px;
+    }
+  }
+}
