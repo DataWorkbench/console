@@ -6,6 +6,23 @@
     "dev": "NODE_ENV=development webpack serve",
     "build": "NODE_ENV=production webpack"
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ],
+    "src/**/*.scss": [
+      "stylelint --syntax=scss --fix",
+      "git add"
+    ]
+  },
   "devDependencies": {
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.3",
@@ -14,6 +31,8 @@
     "@babel/plugin-transform-runtime": "^7.14.3",
     "@babel/preset-env": "^7.14.2",
     "@babel/preset-react": "^7.13.13",
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
     "autoprefixer": "^10.2.6",
     "babel-loader": "^8.2.2",
@@ -30,6 +49,8 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "html-webpack-plugin": "^5.3.1",
+    "husky": "^4.3.8",
+    "lint-staged": "^11.0.0",
     "mini-css-extract-plugin": "^1.6.0",
     "postcss": "^8.3.0",
     "postcss-loader": "^5.3.0",
