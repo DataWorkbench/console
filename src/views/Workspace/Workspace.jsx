@@ -57,8 +57,8 @@ const Workspace = () => {
           <TabPanel label="北京三区">
             <SpaceLists className="px-5 py-4" dataSource={workspacesData} />
           </TabPanel>
-          <TabPanel label="广东2区">广东</TabPanel>
-          <TabPanel label="广东2区">广东1</TabPanel>
+          <TabPanel label="广东1区">广东1</TabPanel>
+          <TabPanel label="广东2区">广东2</TabPanel>
         </Tabs>
       </Card>
     </div>
