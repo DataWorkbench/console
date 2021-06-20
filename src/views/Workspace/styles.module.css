@@ -1,0 +1,88 @@
+.workspace {
+  &:nth-child(odd) {
+    @apply pr-2;
+  }
+
+  &:nth-child(even) {
+    @apply pl-2;
+  }
+}
+
+.st_active {
+  @apply text-brand-G11 bg-brand-G0;
+  svg {
+    color: #00aa72;
+    fill: #dff7ed;
+  }
+}
+.st_forbidden {
+  color: #a16207;
+  background-color: #fffded;
+  svg {
+    color: #a48a19;
+    fill: rgba(255, 209, 39, 0.2);
+  }
+}
+
+.opbtn {
+  @apply font-semibold text-xs focus:outline-none rounded-sm text-neutral-N-13 mr-4 px-8 py-1 bg-neutral-N-2 border border-neutral-N-3 hover:bg-brand-G0 hover:border-brand-G11 hover:shadow hover:text-brand-G11 transition-colors;
+
+  &:last-child {
+    @apply mr-0;
+  }
+}
+
+.ws_0 {
+  @apply border-neutral-N-2;
+
+  border-top-color: #b3e7d6;
+
+  .profile {
+    color: #2fb788;
+    background-color: #b3e7d6;
+  }
+}
+
+.ws_1 {
+  @apply border-neutral-N-2;
+
+  border-top-color: #f2c0c3;
+
+  .profile {
+    background-color: #f2c0c3;
+    color: #d44e4b;
+  }
+}
+
+.ws_2 {
+  @apply border-neutral-N-2;
+
+  border-top-color: #cfafe9;
+
+  .profile {
+    background-color: #cfafe9;
+    color: #934bc5;
+  }
+}
+
+.ws_3 {
+  @apply border-neutral-N-2;
+
+  border-top-color: #b8def9;
+
+  .profile {
+    background-color: #b8def9;
+    color: #229ce9;
+  }
+}
+
+.ws_4 {
+  @apply border-neutral-N-2;
+
+  border-top-color: #fbdeb4;
+
+  .profile {
+    background-color: #fbdeb4;
+    color: #f59c2a;
+  }
+}

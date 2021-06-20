@@ -17,31 +17,80 @@ const tabs = [
 
 const workspacesData = [
   {
-    title: '第一个',
+    title: '工作空间test1',
+    id: 'spaceid-ienng01',
+    status: 'active',
+    subtitle: '这是一段很长的关于工作空间的描述信息。',
+    owner: '空间所有者',
+    members: ['1@yunify.com', '2@yunify.com', '3@yunify.com'],
+    opened: ['共享Flink、QingMR、Deep Learning'],
+    ctime: '2021-03-17 21:20:29',
   },
   {
-    title: '第一个',
+    title: '工作空间test2',
+    id: 'spaceid-ienng02',
+    status: 'active',
+    subtitle: '这是一段很长的关于工作空间的描述信息。',
+    owner: '空间所有者',
+    members: ['1@yunify.com', '2@yunify.com', '3@yunify.com'],
+    opened: ['共享Flink、QingMR、Deep Learning'],
+    ctime: '2021-03-17 21:20:29',
   },
   {
-    title: '第一个',
+    title: '测试数据迁移',
+    id: 'spaceid-ienng03',
+    status: 'inactive',
+    subtitle: '这是一段很长的关于工作空间的描述信息。',
+    owner: '空间所有者',
+    members: ['1@yunify.com', '2@yunify.com', '3@yunify.com'],
+    opened: ['共享Flink、QingMR、Deep Learning'],
+    ctime: '2021-03-17 21:20:29',
   },
   {
-    title: '第一个',
+    title: 'DataTest001',
+    id: 'spaceid-ienng04',
+    status: 'active',
+    subtitle: '这是一段很长的关于工作空间的描述信息。',
+    owner: '空间所有者',
+    members: ['1@yunify.com', '2@yunify.com', '3@yunify.com'],
+    opened: ['共享Flink、QingMR、Deep Learning'],
+    ctime: '2021-03-17 21:20:29',
   },
   {
-    title: '第一个',
+    title: 'DataTest002',
+    id: 'spaceid-ienng05',
+    status: 'active',
+    subtitle: '这是一段很长的关于工作空间的描述信息。',
+    owner: '空间所有者',
+    members: ['1@yunify.com', '2@yunify.com', '3@yunify.com'],
+    opened: ['共享Flink、QingMR、Deep Learning'],
+    ctime: '2021-03-17 21:20:29',
   },
   {
-    title: '第一个',
+    title: 'DataTest003',
+    id: 'spaceid-ienng06',
+    status: 'active',
+    subtitle: '这是一段很长的关于工作空间的描述信息。',
+    owner: '空间所有者',
+    members: ['1@yunify.com', '2@yunify.com', '3@yunify.com'],
+    opened: ['共享Flink、QingMR、Deep Learning'],
+    ctime: '2021-03-17 21:20:29',
   },
   {
-    title: '第一个',
+    title: 'DataTest004',
+    id: 'spaceid-ienng07',
+    status: 'active',
+    subtitle: '这是一段很长的关于工作空间的描述信息。',
+    owner: '空间所有者',
+    members: ['1@yunify.com', '2@yunify.com', '3@yunify.com'],
+    opened: ['共享Flink、QingMR、Deep Learning'],
+    ctime: '2021-03-17 21:20:29',
   },
 ]
 
 const Workspace = () => {
   return (
-    <div className="p-5 workspace">
+    <div className="p-5 text-xs">
       <PageTab tabs={tabs} />
       <Card className="pt-5">
         <Tabs
@@ -55,7 +104,7 @@ const Workspace = () => {
           }
         >
           <TabPanel label="北京三区">
-            <SpaceLists className="px-5 py-4" dataSource={workspacesData} />
+            <SpaceLists className="px-5 py-3" dataSource={workspacesData} />
           </TabPanel>
           <TabPanel label="广东1区">广东1</TabPanel>
           <TabPanel label="广东2区">广东2</TabPanel>

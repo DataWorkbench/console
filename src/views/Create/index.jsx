@@ -8,13 +8,13 @@ function Create() {
   const history = useHistory()
   if (!step || step === '0') {
     return (
-      <div className="flex flex-1 justify-center bg-neutral-N-2 h-full">
+      <div className="flex flex-1 justify-center bg-neutral-N2 h-full">
         <div className="m-3 flex-1 rounded-md bg-white">
           <div className={`${styles.infoIcon} w-8/12 m-auto mt-5 pt-9`}>
-            <div className="font-medium text-xl pb-3 text-text-primary">
+            <div className="font-medium text-xl pb-3 text-neutral-N19">
               您还未开通「大数据平台」
             </div>
-            <div className="text-xs pb-6 text-text-tertiary font-medium">
+            <div className="text-xs pb-6 text-neutral-N8 font-medium">
               大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。了解更多
             </div>
             <div>
@@ -33,7 +33,7 @@ function Create() {
   }
   if (step === '1') {
     return (
-      <div className="flex-1 bg-neutral-N-2">
+      <div className="flex-1 bg-neutral-N2">
         <div className="font-medium text-2xl py-7 leading-7 pl-32 bg-white">
           大数据平台
         </div>
@@ -58,7 +58,7 @@ function Create() {
                   元的用户可以直接开通，开通后按实际使用量计费。
                 </div>
               </div>
-              <div className="flex mb-8 border-t border-gray-200 pt-5">
+              <div className="flex mb-8 border-t border-neutral-N2 pt-5">
                 <div className="pr-9 text-sm">服务协议</div>
                 <div>
                   <Checkbox>
@@ -70,7 +70,7 @@ function Create() {
                 </div>
               </div>
             </div>
-            <div className="border-t border-gray-200 pt-6 pl-32 pr-14 flex justify-between items-center">
+            <div className="border-t border-neutral-N2 pt-6 pl-32 pr-14 flex justify-between items-center">
               <Button type="primary" onClick={() => history.push('/create/2')}>
                 确定开通
               </Button>
@@ -91,13 +91,13 @@ function Create() {
   }
   if (step === '2') {
     return (
-      <div className="flex-1 flex justify-center bg-neutral-N-2 h-full">
+      <div className="flex-1 flex justify-center bg-neutral-N2 h-full">
         <div className={` m-3 flex-1 rounded-md bg-white`}>
           <div className={`${styles.step2Icon} w-8/12 m-auto mt-28 pt-9`}>
-            <div className="font-medium text-xl pb-3 text-text-primary">
+            <div className="font-medium text-xl pb-3 text-neutral-N19">
               产品初始化配置中，请稍等…
             </div>
-            <div className="text-xs pb-6 text-text-tertiary font-medium">
+            <div className="text-xs pb-6 text-neutral-N8 font-medium">
               大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。了解更多
             </div>
           </div>

@@ -1,0 +1,13 @@
+@import '@QCFE/qingcloud-portal-ui/lib/scss/qingcloud-portal-ui.min.css';
+
+/* @import '~@QCFE/qingcloud-portal-ui/lib/scss/index.scss'; */
+@import 'tailwindcss/base';
+
+/* @import 'tailwindcss/components'; */
+@import 'tailwindcss/utilities';
+
+/* @import './views.css'; */
+
+html {
+  font-size: 1rem;
+}

@@ -1,9 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import clsx from 'clsx'
 import { Button, Input, Control, RadioButton, RadioGroup } from '@QCFE/lego-ui'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import Card from 'components/Card'
-import styles from './styles.module.scss'
+import styles from './styles.module.css'
+
+function getProfileName(str) {
+  const pattern = new RegExp('[\u4E00-\u9FA5]+')
+  const profileName = str.substr(0, 2)
+  if (pattern.test(profileName)) {
+    return str.substr(0, 1)
+  }
+  return profileName
+}
 
 const SpaceLists = ({ className, dataSource }) => {
   return (
@@ -25,7 +35,7 @@ const SpaceLists = ({ className, dataSource }) => {
           <Button className="mr-2">
             <Icon name="if-column" className="text-base" />
           </Button>
-          <div className="border-l border-neutral-N-3 mr-2" />
+          <div className="border-l border-neutral-N3 mr-2" />
           <RadioGroup name="states" defaultValue="ReadOnly">
             <RadioButton value="ReadOnly">卡片视图</RadioButton>
             <RadioButton value="Write">列表视图</RadioButton>
@@ -33,33 +43,44 @@ const SpaceLists = ({ className, dataSource }) => {
         </div>
       </div>
       <div className="flex flex-wrap">
-        {dataSource.map((ws) => {
+        {dataSource.map((ws, i) => {
           return (
-            <div className={`${styles.workspace} w-1/2`}>
-              <Card className="rounded border-neutral-N-6 border-t-4 border-t-brand-G3  text-neutral-N-8">
+            <div key={ws.id} className={`${styles.workspace} w-1/2`}>
+              <Card
+                className={clsx(
+                  styles[`ws_${i % 5}`],
+                  'rounded border border-t-4 text-neutral-N8'
+                )}
+              >
                 <div className="flex justify-between px-4 pt-5 mb-7 ">
                   <div className="flex-1 flex">
-                    <div className="w-11 h-11 flex justify-center items-center bg-brand-G1 text-brand-G11 text-base font-medium rounded-sm">
-                      {ws.title.substr(0, 1)}
+                    <div
+                      className={clsx(
+                        'w-11 h-11 flex justify-center items-center text-base font-medium rounded-sm',
+                        styles.profile
+                      )}
+                    >
+                      {getProfileName(ws.title)}
                     </div>
-                    <div className="ml-3 text-neutral-N-8">
-                      <div className="text-neutral-N-8 flex items-center">
-                        <span className="font-medium text-base text-neutral-N-15">
+                    <div className="ml-3">
+                      <div className="flex items-center">
+                        <span className="font-medium text-base text-neutral-N16">
                           {ws.title}
                         </span>
-                        <span>（spaceid-ienng87）</span>
-                        <span className="py-1 px-3 bg-brand-G0 text-brand-G11 rounded-2xl inline-flex items-center">
-                          <Icon
-                            name="radio"
-                            color={{
-                              primary: '#00AA72',
-                              secondary: '#DFF7ED',
-                            }}
-                          />
-                          已禁用
+                        <span>（{ws.id}）</span>
+                        <span
+                          className={clsx(
+                            'py-0.5 px-3 rounded-2xl inline-flex items-center',
+                            ws.status === 'active'
+                              ? styles.st_active
+                              : styles.st_forbidden
+                          )}
+                        >
+                          <Icon name="radio" />
+                          {ws.status === 'active' ? '活跃' : '已禁用'}
                         </span>
                       </div>
-                      <div>这是一段很长的关于工作空间的描述信息。</div>
+                      <div className="pt-1">{ws.subtitle}</div>
                     </div>
                   </div>
                   <div>
@@ -84,10 +105,16 @@ const SpaceLists = ({ className, dataSource }) => {
                     <span>创建时间：2021-03-17</span>
                   </div>
                 </div>
-                <div className="px-5 py-4 flex justify-center bg-neutral-N-1 border-t">
-                  <Button className="mr-4">数据上云</Button>
-                  <Button className="mr-4">数据上云</Button>
-                  <Button>数据上云</Button>
+                <div className="px-5 py-4 flex justify-center bg-neutral-N1 border-t border-neutral-N3">
+                  <button type="button" className={`${styles.opbtn}`}>
+                    数据上云
+                  </button>
+                  <button type="button" className={`${styles.opbtn}`}>
+                    数据上云
+                  </button>
+                  <button type="button" className={`${styles.opbtn}`}>
+                    数据上云
+                  </button>
                 </div>
               </Card>
             </div>

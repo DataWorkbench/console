@@ -6,11 +6,11 @@ const CardHeader = React.forwardRef((props, ref) => {
   const { className, title, subtitle, classes, ...other } = props
   return (
     <div className={clsx('pt-5 pb-3', className)} {...other} ref={ref}>
-      <div className="text-base font-semibold text-neutral-N-16 flex items-center">
-        <div className="h-4 w-1 bg-neutral-N-16" />
+      <div className="text-base font-semibold text-neutral-N16 flex items-center">
+        <div className="h-4 w-1 bg-neutral-N16" />
         <p className={clsx('pl-5', className)}>{title}</p>
       </div>
-      <div className="text-xs mt-1 text-neutral-N-8 pl-5">
+      <div className="text-xs mt-1 text-neutral-N8 pl-5">
         <p className={classes.subtitle}>{subtitle}</p>
       </div>
     </div>

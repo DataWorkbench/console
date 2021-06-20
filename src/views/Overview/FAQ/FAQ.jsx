@@ -18,8 +18,8 @@ const FAQ = ({ className }) => {
     <Card className={clsx(className, 'leading-5')}>
       <CardHeader title="常见问题" />
       <CardContent>
-        <div className="rounded-sm border border-neutral-N-2">
-          <ul className="text-neutral-N-15 px-5 py-4">
+        <div className="rounded-sm border border-neutral-N2">
+          <ul className="text-neutral-N15 px-5 py-4">
             {questions.map((quest) => (
               <li
                 key={quest.title}
@@ -30,7 +30,7 @@ const FAQ = ({ className }) => {
               </li>
             ))}
           </ul>
-          <div className="text-center bg-neutral-N-1 py-2 font-medium flex align-middle justify-center">
+          <div className="text-center bg-neutral-N1 py-2 font-medium flex align-middle justify-center">
             <span className="mr-2">更多帮助指引</span>
             <Icon name="next" />
           </div>

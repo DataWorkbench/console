@@ -14,7 +14,7 @@ const MainLayout = ({ route }) => {
 
   const match = useRouteMatch(menuLinks)
   return (
-    <div className="flex flex-col bg-neutral-N-2 min-h-screen">
+    <div className="flex flex-col bg-neutral-N2 min-h-screen">
       <nav>
         <GlobalNav />
       </nav>

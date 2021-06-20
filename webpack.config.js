@@ -39,13 +39,16 @@ let config = {
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 2,
+              importLoaders: 1,
               modules: {
-                auto: /\.module\.\w+$/i,
+                auto: true,
+                localIdentName: isDev
+                  ? '[local]-[hash:base64:5]'
+                  : '[hash:base64]',
               },
-              sourceMap: false,
+              sourceMap: isDev,
               url: (url) => {
-                if (url.includes('help-bg.svg')) {
+                if (url.includes('helpcenter/bg.svg')) {
                   return false
                 }
                 return true
@@ -53,13 +56,13 @@ let config = {
             },
           },
           'postcss-loader',
-          {
-            loader: 'sass-loader',
-            options: {
-              sourceMap: false,
-              webpackImporter: true,
-            },
-          },
+          // {
+          //   loader: 'sass-loader',
+          //   options: {
+          //     sourceMap: false,
+          //     webpackImporter: true,
+          //   },
+          // },
         ],
       },
       {

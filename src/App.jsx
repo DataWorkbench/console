@@ -29,7 +29,7 @@ const App = () => {
       handleGlobalData={handleGlobalData}
     >
       <StoreContext.Provider value={store}>
-        <Router basename="/dataworkbench">{renderRoutes(routes)}</Router>
+        <Router basename="/bigdata">{renderRoutes(routes)}</Router>
       </StoreContext.Provider>
     </PortalProvider>
   )
