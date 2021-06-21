@@ -24,18 +24,20 @@
   }
 }
 
-.opbtn {
-  @apply font-semibold text-xs focus:outline-none rounded-sm text-neutral-N-13 mr-4 px-8 py-1 bg-neutral-N-2 border border-neutral-N-3 hover:bg-brand-G0 hover:border-brand-G11 hover:shadow hover:text-brand-G11 transition-colors;
+.btn {
+  @apply font-semibold text-xs focus:outline-none rounded-sm text-neutral-N13 mr-4 px-8 py-1 bg-neutral-N2 border border-neutral-N3 hover:bg-brand-G0 hover:border-brand-G11 hover:shadow hover:text-brand-G11 transition-colors;
 
   &:last-child {
     @apply mr-0;
   }
 }
 
-.ws_0 {
-  @apply border-neutral-N-2;
+.moreMenuItem {
+  @apply py-1 pl-2 cursor-pointer hover:bg-neutral-N2;
+}
 
-  border-top-color: #b3e7d6;
+.ws_0 {
+  border-top-color: #b3e7d6 !important;
 
   .profile {
     color: #2fb788;
@@ -44,9 +46,7 @@
 }
 
 .ws_1 {
-  @apply border-neutral-N-2;
-
-  border-top-color: #f2c0c3;
+  border-top-color: #f2c0c3 !important;
 
   .profile {
     background-color: #f2c0c3;
@@ -55,9 +55,7 @@
 }
 
 .ws_2 {
-  @apply border-neutral-N-2;
-
-  border-top-color: #cfafe9;
+  border-top-color: #cfafe9 !important;
 
   .profile {
     background-color: #cfafe9;
@@ -66,9 +64,7 @@
 }
 
 .ws_3 {
-  @apply border-neutral-N-2;
-
-  border-top-color: #b8def9;
+  border-top-color: #b8def9 !important;
 
   .profile {
     background-color: #b8def9;
@@ -77,9 +73,7 @@
 }
 
 .ws_4 {
-  @apply border-neutral-N-2;
-
-  border-top-color: #fbdeb4;
+  border-top-color: #fbdeb4 !important;
 
   .profile {
     background-color: #fbdeb4;

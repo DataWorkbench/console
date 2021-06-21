@@ -6,8 +6,8 @@
 /* @import 'tailwindcss/components'; */
 @import 'tailwindcss/utilities';
 
-/* @import './views.css'; */
-
-html {
-  font-size: 1rem;
+@layer base {
+  html {
+    @apply text-base;
+  }
 }

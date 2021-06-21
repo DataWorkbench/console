@@ -48,11 +48,6 @@ module.exports = {
       blue: colors.blue,
       brand,
       neutral,
-      // text: {
-      //   primary: '#191919',
-      //   secondary: '#273849',
-      //   tertiary: '#94A3B8',
-      // },
       link: {
         DEFAULT: '#0366D6',
         dark: '#035CC1',

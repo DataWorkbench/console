@@ -31,7 +31,7 @@ export default function Tabs({ className, index, more, tabClick, children }) {
                   tabClick(i)
                 }}
               >
-                {label}
+                <span>{label}</span>
               </div>
             )
           })}
