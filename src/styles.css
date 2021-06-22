@@ -1,9 +1,7 @@
+/* @import '~@QCFE/qingcloud-portal-ui/lib/scss/index.scss'; */
 @import '@QCFE/qingcloud-portal-ui/lib/scss/qingcloud-portal-ui.min.css';
 
-/* @import '~@QCFE/qingcloud-portal-ui/lib/scss/index.scss'; */
 @import 'tailwindcss/base';
-
-/* @import 'tailwindcss/components'; */
 @import 'tailwindcss/utilities';
 
 @layer base {

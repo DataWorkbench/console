@@ -1,8 +1,10 @@
+const isDev = process.env.NODE_ENV !== 'production'
+
 module.exports = {
   plugins: [
     'postcss-import',
-    ['tailwindcss', {}],
+    'tailwindcss',
     'postcss-nested',
-    // autoprefixer: {},
-  ],
+    !isDev && 'autoprefixer',
+  ].filter(Boolean),
 }

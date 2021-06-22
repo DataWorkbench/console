@@ -1,6 +1,8 @@
 {
   "name": "pitrix-webconsole-dataworkbench",
   "version": "0.1.0",
+  "description": "QingCloud 大数据控制台",
+  "author": "QingCloud F2E Group",
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development webpack serve",
@@ -15,16 +17,13 @@
   "lint-staged": {
     "*.{js,jsx}": [
       "prettier --write",
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ],
-    "src/**/*.scss": [
-      "stylelint --syntax=scss --fix",
-      "git add"
+    "src/**/*.css": [
+      "stylelint --fix"
     ]
   },
   "devDependencies": {
-    "@QCFE/qingcloud-portal-ui": "^1.1.17",
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.3",
     "@babel/eslint-parser": "^7.14.4",
@@ -68,6 +67,7 @@
     "stylelint-prettier": "^1.2.0",
     "svg-sprite-loader": "^6.0.7",
     "svgo-loader": "^3.0.0",
+    "tailwindcss": "^2.2.2",
     "typescript": "^4.3.2",
     "webpack": "^5.37.1",
     "webpack-bundle-analyzer": "^4.4.2",
@@ -78,6 +78,7 @@
   },
   "dependencies": {
     "@QCFE/lego-ui": "^0.1.34",
+    "@QCFE/qingcloud-portal-ui": "^1.1.17",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/runtime": "^7.14.0",
     "@jsplumb/browser-ui": "^4.0.0",
@@ -92,8 +93,7 @@
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-router-config": "^5.1.1",
-    "react-router-dom": "^5.2.0",
-    "tailwindcss": "^2.1.2"
+    "react-router-dom": "^5.2.0"
   },
   "browserslist": [
     "> 1%",
