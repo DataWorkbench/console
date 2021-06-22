@@ -6,7 +6,9 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development webpack serve",
-    "build": "NODE_ENV=production webpack"
+    "build": "NODE_ENV=production webpack",
+    "eslint": "eslint --ext .js,.jsx src/",
+    "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix"
   },
   "husky": {
     "hooks": {
