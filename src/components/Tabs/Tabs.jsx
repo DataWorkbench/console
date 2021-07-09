@@ -12,19 +12,21 @@ export default function Tabs({ className, index, more, tabClick, children }) {
     <div>
       <div
         className={clsx(
-          'border-neutral-N3 border-b flex pl-5 align-middle',
+          'tw-border-neutral-N3 tw-border-b tw-flex tw-pl-5 tw-align-middle',
           styles.tabs,
           className
         )}
       >
-        <div className={`flex border-r border-neutral-N3  ${styles.wrap}`}>
+        <div
+          className={`tw-flex tw-border-r tw-border-neutral-N3  ${styles.wrap}`}
+        >
           {React.Children.map(children, (child, i) => {
             const { label } = child.props
             return (
               <div
                 className={clsx(
-                  'border-l px-5 border-neutral-N3  py-3 cursor-pointer',
-                  activeIndex === i ? styles.is_active : 'border-t'
+                  'tw-border-l tw-px-5 tw-border-neutral-N3  tw-py-3 tw-cursor-pointer',
+                  activeIndex === i ? styles.is_active : 'tw-border-t'
                 )}
                 onClick={() => {
                   setActiveIndex(i)
@@ -36,13 +38,13 @@ export default function Tabs({ className, index, more, tabClick, children }) {
             )
           })}
         </div>
-        <div className="flex items-center">{more}</div>
+        <div className="tw-flex tw-items-center">{more}</div>
       </div>
       {React.Children.map(children, (child, i) => {
         return (
           <div
             className={clsx({
-              hidden: activeIndex !== i,
+              'tw-hidden': activeIndex !== i,
             })}
           >
             {child}

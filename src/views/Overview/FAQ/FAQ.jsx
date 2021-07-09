@@ -15,23 +15,23 @@ const questions = [
 
 const FAQ = ({ className }) => {
   return (
-    <Card className={clsx(className, 'leading-5')}>
+    <Card className={clsx(className, 'tw-leading-5')}>
       <CardHeader title="常见问题" />
       <CardContent>
-        <div className="rounded-sm border border-neutral-N2">
-          <ul className="text-neutral-N15 px-5 py-4">
+        <div className="tw-rounded-sm tw-border tw-border-neutral-N2">
+          <ul className="tw-text-neutral-N15 tw-px-5 tw-py-4">
             {questions.map((quest) => (
               <li
                 key={quest.title}
-                className="flex align-middle mt-2 cursor-pointer hover:text-brand-G11 hover:font-medium"
+                className="tw-flex tw-align-middle tw-mt-2 tw-cursor-pointer hover:tw-text-brand-G11 hover:tw-font-medium"
               >
                 <Icon name="file" />
-                <div className="pl-3">{quest.title}</div>
+                <div className="tw-pl-3">{quest.title}</div>
               </li>
             ))}
           </ul>
-          <div className="text-center bg-neutral-N1 py-2 font-medium flex align-middle justify-center">
-            <span className="mr-2">更多帮助指引</span>
+          <div className="tw-text-center tw-bg-neutral-N1 tw-py-2 tw-font-medium tw-flex tw-align-middle tw-justify-center">
+            <span className="tw-mr-2">更多帮助指引</span>
             <Icon name="next" />
           </div>
         </div>

@@ -16,6 +16,7 @@ module.exports = {
     'react/forbid-prop-types': 0,
     'react/jsx-props-no-spreading': 0,
     'react/require-default-props': 0,
+    'react/static-property-placement': [2, 'static public field'],
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/no-static-element-interactions': 0,
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],

@@ -90,11 +90,11 @@ const workspacesData = [
 
 const Workspace = () => {
   return (
-    <div className="p-5 text-xs">
+    <div className="tw-p-5 tw-text-xs">
       <PageTab tabs={tabs} />
-      <Card className="pt-5">
+      <Card className="tw-pt-5">
         <Tabs
-          tabClick={(value) => console.log(value)}
+          // tabClick={(value) => console.log(value)}
           index={0}
           more={
             <Button type="text">
@@ -104,7 +104,10 @@ const Workspace = () => {
           }
         >
           <TabPanel label="北京三区">
-            <SpaceLists className="px-5 py-3" dataSource={workspacesData} />
+            <SpaceLists
+              className="tw-px-5 tw-py-3"
+              dataSource={workspacesData}
+            />
           </TabPanel>
           <TabPanel label="广东1区">广东1</TabPanel>
           <TabPanel label="广东2区">广东2</TabPanel>

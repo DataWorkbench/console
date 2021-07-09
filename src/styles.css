@@ -6,6 +6,6 @@
 
 @layer base {
   html {
-    @apply text-base;
+    @apply tw-text-base;
   }
 }

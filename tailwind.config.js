@@ -36,9 +36,10 @@ const brand = {
 }
 
 module.exports = {
-  // mode: 'jit',
+  mode: 'jit',
+  prefix: 'tw-',
   purge: ['./src/**/*.{js,jsx,css}'],
-  darkMode: false,
+  darkMode: 'class',
   theme: {
     colors: {
       transparent: 'transparent',

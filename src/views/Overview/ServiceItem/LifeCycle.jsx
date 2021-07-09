@@ -94,31 +94,31 @@ const LifeCycle = ({ className }) => {
   }, [])
   return (
     <div className={className}>
-      <div className="flex justify-between h-24 align-middle">
-        <div className="flex-1" ref={ltArrowEl} />
-        <div className="w-14">
+      <div className="tw-flex tw-justify-between tw-h-24 tw-align-middle">
+        <div className="tw-flex-1" ref={ltArrowEl} />
+        <div className="tw-w-14">
           <div>
             <Icon name={last(lifeCycleItems).xlink} width={56} height={56} />
-            <div className="pt-3">{last(lifeCycleItems).text}</div>
+            <div className="tw-pt-3">{last(lifeCycleItems).text}</div>
           </div>
         </div>
-        <div className="flex-1" ref={rtArrowEl} />
+        <div className="tw-flex-1" ref={rtArrowEl} />
       </div>
-      <div className="flex h-24">
+      <div className="tw-flex tw-h-24">
         {dropRight(lifeCycleItems).map((item, i) => (
           <React.Fragment key={item.text}>
-            <div className="text-center w-14">
-              <div className="flex">
+            <div className="tw-text-center tw-w-14">
+              <div className="tw-flex">
                 <Icon name={item.xlink} size={56} />
               </div>
-              <div className="pt-3">{item.text}</div>
+              <div className="tw-pt-3">{item.text}</div>
             </div>
             {i < 3 && (
               <div
                 ref={(el) => {
                   arrowEl.current[i] = el
                 }}
-                className="flex flex-1 pt-6"
+                className="tw-flex tw-flex-1 tw-pt-6"
               />
             )}
           </React.Fragment>

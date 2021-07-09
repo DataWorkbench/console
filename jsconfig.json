@@ -8,7 +8,8 @@
       "components/*": ["components/*"],
       "containers/*": ["containers/*"],
       "stores/*": ["stores/*"],
-      "scss/*": ["scss/*"]
+      "scss/*": ["scss/*"],
+      "hooks/*": ["hooks/*"]
     }
   }
 }

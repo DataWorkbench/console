@@ -30,16 +30,16 @@ function Overview() {
     globalStore: { user },
   } = store
   return (
-    <div className="p-5 overview h-full">
+    <div className="tw-p-5 tw-overview tw-h-full">
       <PageTab tabs={getTabs(user)} />
       <ServiceItem />
-      <div className="flex">
-        <PlatformFeat className="flex-1 mr-4" />
-        <FAQ className="w-4/12" />
+      <div className="tw-flex">
+        <PlatformFeat className="tw-flex-1 tw-mr-4" />
+        <FAQ className="tw-w-4/12" />
       </div>
-      <div className="flex">
-        <Practice className="flex-1 mr-4" />
-        <Card className="w-4/12 leading-5">
+      <div className="tw-flex">
+        <Practice className="tw-flex-1 tw-mr-4" />
+        <Card className="tw-w-4/12 tw-leading-5">
           <CardHeader title="视频介绍" />
           <CardContent>
             <IconCard

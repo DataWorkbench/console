@@ -1,10 +1,43 @@
 import Home from 'components/Home'
 import Create from 'views/Create'
 import Overview from 'views/Overview'
-import Layout from 'views/Layout'
+import Layout, { SpaceLayout } from 'views/Layout'
 import Workspace from 'views/Workspace'
+import Dm from 'views/Space/Dm'
+import Manage from 'views/Space/Manage'
+import Ops from 'views/Space/Ops'
+import Upcloud from 'views/Space/Upcloud'
+import RealTimeComputing from 'views/Space/Dm/RealTimeComuting'
 
 const routes = [
+  {
+    path: '/workspace/:space',
+    component: SpaceLayout,
+    routes: [
+      {
+        path: '/workspace/:space/upcloud/:mod?',
+        component: Upcloud,
+      },
+      {
+        path: '/workspace/:space/dm',
+        component: Dm,
+        routes: [
+          {
+            path: '/workspace/:space/dm/realtime_computing',
+            component: RealTimeComputing,
+          },
+        ],
+      },
+      {
+        path: '/workspace/:space/ops',
+        component: Ops,
+      },
+      {
+        path: '/workspace/:space/manage',
+        component: Manage,
+      },
+    ],
+  },
   {
     component: Layout,
     routes: [

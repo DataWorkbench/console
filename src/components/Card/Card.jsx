@@ -7,7 +7,7 @@ const Card = React.forwardRef((props, ref) => {
   return (
     <div
       ref={ref}
-      className={clsx('rounded-sm bg-white shadow mb-5', className)}
+      className={clsx('tw-rounded-sm tw-bg-white tw-shadow tw-mb-5', className)}
       {...others}
     />
   )

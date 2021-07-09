@@ -105,7 +105,9 @@ let config = {
       stores: resolve('src/stores'),
       scss: resolve('src/scss'),
       react: resolve('node_modules/react'),
+      'react-router-dom': resolve('node_modules/react-router-dom'),
       asserts: resolve('src/assets'),
+      hooks: resolve('src/hooks'),
     },
   },
   stats: {

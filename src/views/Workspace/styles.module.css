@@ -1,15 +1,15 @@
 .workspace {
   &:nth-child(odd) {
-    @apply pr-2;
+    @apply tw-pr-2;
   }
 
   &:nth-child(even) {
-    @apply pl-2;
+    @apply tw-pl-2;
   }
 }
 
 .st_active {
-  @apply text-brand-G11 bg-brand-G0;
+  @apply tw-text-brand-G11 tw-bg-brand-G0;
   svg {
     color: #00aa72;
     fill: #dff7ed;
@@ -25,15 +25,19 @@
 }
 
 .btn {
-  @apply font-semibold text-xs focus:outline-none rounded-sm text-neutral-N13 mr-4 px-8 py-1 bg-neutral-N2 border border-neutral-N3 hover:bg-brand-G0 hover:border-brand-G11 hover:shadow hover:text-brand-G11 transition-colors;
-
+  @apply tw-font-semibold tw-text-xs focus:tw-outline-none tw-rounded-sm tw-text-neutral-N13  tw-bg-neutral-N1 tw-border tw-border-neutral-N3 hover:tw-bg-brand-G0 hover:tw-border-brand-G11 hover:tw-shadow hover:tw-text-brand-G11 tw-transition-colors;
+  @apply tw-mr-4 tw-px-8 tw-py-1;
   &:last-child {
-    @apply mr-0;
+    @apply tw-mr-0;
   }
 }
 
+.gridBtn {
+  @apply tw-px-3 tw-mr-2;
+}
+
 .moreMenuItem {
-  @apply py-1 pl-2 cursor-pointer hover:bg-neutral-N2;
+  @apply tw-py-1 tw-pl-2 tw-cursor-pointer hover:tw-bg-neutral-N2;
 }
 
 .ws_0 {

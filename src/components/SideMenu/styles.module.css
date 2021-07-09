@@ -1,0 +1,24 @@
+.menuSelected {
+  @apply tw-text-brand-G11;
+
+  svg {
+    @apply tw-text-brand-G11;
+
+    fill: theme('colors.brand.G4');
+  }
+}
+
+.menuLink {
+  @apply tw-text-neutral-N13 hover:tw-text-brand-G11;
+
+  svg {
+    fill: rgba(255, 255, 255, 0.6);
+  }
+  &:hover {
+    svg {
+      @apply tw-text-brand-G11;
+
+      fill: theme('colors.brand.G4');
+    }
+  }
+}

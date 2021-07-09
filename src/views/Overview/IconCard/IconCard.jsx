@@ -5,13 +5,13 @@ import { Icon } from '@QCFE/qingcloud-portal-ui'
 const IconCard = ({ icon, title, subtitle, className }) => {
   return (
     <div className={className}>
-      <div className="bg-neutral-N1 cursor-pointer flex items-center px-3 py-3 rounded-sm border border-neutral-N2 group hover:border-brand-G4 hover:bg-brand-G0 transition-colors duration-300">
-        <div className="w-10 h-10 flex items-center justify-center mr-3  bg-gradient-to-tr from-neutral-N15 to-neutral-N10 shadow-md group-hover:from-brand-G11 group-hover:to-brand-G3">
+      <div className="tw-bg-neutral-N1 tw-cursor-pointer tw-flex tw-items-center tw-px-3 tw-py-3 tw-rounded-sm tw-border tw-border-neutral-N2 tw-group hover:tw-border-brand-G4 hover:tw-bg-brand-G0 tw-transition-colors tw-duration-300">
+        <div className="tw-w-10 tw-h-10 tw-flex tw-items-center tw-justify-center tw-mr-3  tw-bg-gradient-to-tr tw-from-neutral-N15 tw-to-neutral-N10 tw-shadow-md group-hover:tw-from-brand-G11 group-hover:tw-to-brand-G3">
           <Icon name={icon} type="light" size={28} />
         </div>
         <div className="flex-1">
-          <div className="font-medium text-neutral-N15">{title}</div>
-          <div className="text-neutral-N8">{subtitle}</div>
+          <div className="tw-font-medium tw-text-neutral-N15">{title}</div>
+          <div className="tw-text-neutral-N8">{subtitle}</div>
         </div>
       </div>
     </div>

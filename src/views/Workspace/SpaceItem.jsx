@@ -9,15 +9,15 @@ import styles from './styles.module.css'
 const optMenu = (
   <div>
     <ul>
-      <li className="flex items-center py-2 px-5 cursor-pointer hover:bg-neutral-N15 ">
+      <li className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15 ">
         <Icon name="blockchain" />
         数据源管理
       </li>
-      <li className="flex items-center py-2 px-5 cursor-pointer hover:bg-neutral-N15">
+      <li className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15">
         <Icon name="blockchain" />
         网络连通工具
       </li>
-      <li className="flex items-center py-2 px-5 cursor-pointer hover:bg-neutral-N15">
+      <li className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15">
         <Icon name="blockchain" />
         整库迁移
       </li>
@@ -40,29 +40,29 @@ function SpaceItem({ data, className }) {
   return (
     <Card
       className={clsx(
-        'rounded border border-t-4 text-neutral-N8 border-neutral-N2',
+        'tw-rounded tw-border tw-border-t-4 tw-text-neutral-N8 tw-border-neutral-N2',
         className
       )}
     >
-      <div className="flex justify-between px-4 pt-5 mb-7 ">
-        <div className="flex-1 flex">
+      <div className="tw-flex tw-justify-between tw-px-4 tw-pt-5 tw-mb-7 ">
+        <div className="tw-flex-1 tw-flex">
           <div
             className={clsx(
-              'w-11 h-11 flex justify-center items-center text-base font-medium rounded-sm',
+              'tw-w-11 tw-h-11 tw-flex tw-justify-center tw-items-center tw-text-base tw-font-medium tw-rounded-sm',
               styles.profile
             )}
           >
             {getProfileName(title)}
           </div>
-          <div className="ml-3">
-            <div className="flex items-center">
-              <span className="font-medium text-base text-neutral-N16">
+          <div className="tw-ml-3">
+            <div className="tw-flex tw-items-center">
+              <span className="tw-font-medium tw-text-base tw-text-neutral-N16">
                 {title}
               </span>
               <span>（{id}）</span>
               <span
                 className={clsx(
-                  'py-0.5 px-3 rounded-2xl inline-flex items-center',
+                  'tw-py-0.5 tw-px-3 tw-rounded-2xl tw-inline-flex tw-items-center',
                   status === 'active' ? styles.st_active : styles.st_forbidden
                 )}
               >
@@ -70,11 +70,11 @@ function SpaceItem({ data, className }) {
                 {status === 'active' ? '活跃' : '已禁用'}
               </span>
             </div>
-            <div className="pt-1">{subtitle}</div>
+            <div className="tw-pt-1">{subtitle}</div>
           </div>
         </div>
         <div
-          className="relative h-6"
+          className="tw-relative tw-h-6"
           onMouseEnter={() => setMoreMenuVisible(!moreMenuVisible)}
           onMouseLeave={() => setMoreMenuVisible(false)}
         >
@@ -83,10 +83,10 @@ function SpaceItem({ data, className }) {
           </span>
           <div
             className={clsx(
-              `absolute top-6 right-0 w-28 bg-white shadow border-neutral-N2 text-neutral-N15 border rounded-sm py-2 transition-all transform ease-out`,
+              `tw-absolute tw-top-6 tw-right-0 tw-w-28 tw-bg-white tw-shadow tw-border-neutral-N2 tw-text-neutral-N15 tw-border rounded-sm tw-py-2 tw-transition-all tw-transform tw-ease-out`,
               moreMenuVisible
-                ? 'opacity-1 scale-100'
-                : 'opacity-0 scale-95 invisible'
+                ? 'tw-opacity-1 tw-scale-100'
+                : 'tw-opacity-0 tw-scale-95 tw-invisible'
             )}
           >
             <ul>
@@ -98,32 +98,32 @@ function SpaceItem({ data, className }) {
           </div>
         </div>
       </div>
-      <div className="flex justify-between items-center px-4 mb-3">
+      <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
         <div>
           <span>我的角色：</span>
-          <span className="bg-neutral-N13 rounded-2xl text-white px-2 py-0.5 inline-block mr-1">
+          <span className="tw-bg-neutral-N13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
             {owner}
           </span>
-          <span className="bg-neutral-N2 text-neutral-N15 rounded-2xl px-2 py-0.5 inline-block">
+          <span className="tw-bg-neutral-N2 tw-text-neutral-N15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
             运维
           </span>
         </div>
-        <div className="flex items-center ">
+        <div className="tw-flex tw-items-center ">
           <div>空间成员</div>
-          <div className="flex items-center">
-            <div className="w-6 h-6 bg-neutral-N3 rounded-full flex items-center justify-center mx-1">
+          <div className="tw-flex tw-items-center">
+            <div className="tw-w-6 tw-h-6 tw-bg-neutral-N3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mx-1">
               <Icon name="human" size={18} />
             </div>
-            <div className="w-6 h-6 bg-neutral-N3 rounded-full flex items-center justify-center mr-1">
+            <div className="tw-w-6 tw-h-6 tw-bg-neutral-N3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1">
               <Icon name="human" size={18} />
             </div>
-            <div className="w-6 h-6 bg-neutral-N3 rounded-full flex items-center justify-center">
+            <div className="tw-w-6 tw-h-6 tw-bg-neutral-N3 tw-rounded-full tw-flex tw-items-center tw-justify-center">
               <Icon name="human" size={18} />
             </div>
           </div>
         </div>
       </div>
-      <div className="flex justify-between px-4 mb-3">
+      <div className="tw-flex tw-justify-between tw-px-4 tw-mb-3">
         <div>
           <span>开通引擎：</span>
           <span>共享Flink、QingMR、Deep Learning...查看</span>
@@ -131,12 +131,12 @@ function SpaceItem({ data, className }) {
         <div>
           <span>
             创建时间：
-            <span className="text-neutral-N16">2021-03-17</span>
+            <span className="tw-text-neutral-N16">2021-03-17</span>
           </span>
         </div>
       </div>
-      <div className="px-5 py-4 flex justify-center bg-neutral-N1 border-t border-neutral-N3">
-        <Tooltip className="p-0" content={optMenu} placement="bottomRight">
+      <div className="tw-px-5 tw-py-4 tw-flex tw-justify-center tw-bg-neutral-N1 tw-border-t tw-border-neutral-N3">
+        <Tooltip className="tw-p-0" content={optMenu} placement="bottomRight">
           <button type="button" className={styles.btn}>
             数据上云
           </button>

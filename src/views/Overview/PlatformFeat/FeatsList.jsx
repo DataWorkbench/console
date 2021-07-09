@@ -6,27 +6,27 @@ import styles from './styles.module.css'
 
 function FeatList({ feats }) {
   return (
-    <div className="flex justify-between">
+    <div className="tw-flex tw-justify-between">
       {feats.map((feat, i) => {
         return (
           <div
             key={feat.title}
             className={clsx(
-              'flex-1 border border-neutral-N2 rounded-sm cursor-pointer hover:border-brand-G4 group',
-              { 'mr-4': i < feats.length - 1 }
+              'tw-flex-1 tw-border tw-border-neutral-N2 tw-rounded-sm tw-cursor-pointer tw-hover:border-brand-G4 tw-group',
+              { 'tw-mr-4': i < feats.length - 1 }
             )}
           >
             <div
               className={clsx(
                 styles.feat,
                 styles[`feat_${i}`],
-                'h-32 bg-neutral-N1'
+                'tw-h-32 tw-bg-neutral-N1'
               )}
             />
-            <div className="px-3 py-4 leading-5 relative bg-brand-G0 overflow-hidden">
-              <div className="absolute left-0 top-0 w-full bottom-0 flex items-center  border-t border-brand-G4  bg-brand-G1 transform transition-transform duration-200 translate-y-full group-hover:translate-y-0">
-                <div className="flex  justify-center w-full mx-4">
-                  <div className="mr-5">
+            <div className="tw-px-3 tw-py-4 tw-leading-5 tw-relative tw-bg-brand-G0 tw-overflow-hidden">
+              <div className="tw-absolute tw-left-0 tw-top-0 tw-w-full tw-bottom-0 tw-flex tw-items-center  tw-border-t tw-border-brand-G4  tw-bg-brand-G1 tw-transform tw-transition-transform tw-duration-200 tw-translate-y-full group-hover:tw-translate-y-0">
+                <div className="tw-flex  tw-justify-center tw-w-full tw-mx-4">
+                  <div className="tw-mr-5">
                     <Button type="default">了解详情</Button>
                   </div>
                   <div>
@@ -34,8 +34,8 @@ function FeatList({ feats }) {
                   </div>
                 </div>
               </div>
-              <div className="font-semibold">{feat.title}</div>
-              <div className="text-neutral-N8 mt-1">{feat.subtitle}</div>
+              <div className="tw-font-semibold">{feat.title}</div>
+              <div className="tw-text-neutral-N8 tw-mt-1">{feat.subtitle}</div>
             </div>
           </div>
         )
