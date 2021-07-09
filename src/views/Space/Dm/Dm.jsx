@@ -46,7 +46,7 @@ function Dm({ route }) {
   return (
     <div className="tw-flex tw-h-full">
       <SideMenu title="" menus={menus} darkMode={darkMode} />
-      <div> {renderRoutes(route.routes)}</div>
+      <div className="tw-flex-1"> {renderRoutes(route.routes)}</div>
     </div>
   )
 }

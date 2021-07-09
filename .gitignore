@@ -2,8 +2,6 @@
 node_modules/
 dist/
 dlls/
-package-lock.json
-dev.server.config.js
 # test
 coverage
 __snapshots__
@@ -16,4 +14,3 @@ selenium-debug.log
 
 # Editor directories and files
 .idea
-.vscode

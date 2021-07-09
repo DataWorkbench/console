@@ -48,14 +48,14 @@ function MenuItem({
         className={clsx(
           // isSelected ? styles.menuSelected : styles.menuLink,
           isSubTitle && 'tw-cursor-default',
-          'tw-block tw-leading-6 tw-py-0 tw-pl-4  tw-pr-5 tw-cursor-pointer'
+          'tw-block tw-leading-6 tw-py-0 tw-pl-4 tw-pr-5 tw-cursor-pointer'
         )}
         onClick={handleClick}
       >
         <div
           className={clsx(
             'tw-flex tw-items-center tw-justify-between tw-py-1 tw-select-none',
-            'dark:tw-text-white dark:hover:tw-bg-neutral-N13 dark:tw-rounded-sm',
+            'dark:tw-text-white dark:hover:tw-bg-neutral-N13 dark:tw-rounded-sm dark:tw-font-medium',
             isSelected && 'dark:tw-bg-neutral-N13'
           )}
         >

@@ -1,7 +1,13 @@
 import React from 'react'
+import FlowMenu from './FlowMenu'
 
 function RealTimeComputing() {
-  return <div>RealTimeComputing</div>
+  return (
+    <div className="tw-flex tw-h-screen">
+      <FlowMenu />
+      <div>right</div>
+    </div>
+  )
 }
 
 RealTimeComputing.propTypes = {}

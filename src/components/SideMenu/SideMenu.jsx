@@ -27,12 +27,16 @@ function SideMenu({ title, menus, onClick, darkMode }) {
     onClick(menuName)
   }
   return (
-    <div className="tw-relative">
+    <div
+      className={clsx(
+        'tw-relative',
+        narrowMode ? 'tw-w-14 tw-text-center' : 'tw-w-56'
+      )}
+    >
       <div
         className={clsx(
           'tw-overflow-auto tw-pt-5 tw-bg-white dark:tw-bg-neutral-N17 tw-absolute tw-inset-0 tw-flex tw-flex-col shadow-md tw-transition-all',
-          'dark:tw-border-r dark:tw-border-neutral-N13',
-          narrowMode ? 'tw-w-14 tw-text-center' : 'tw-w-56'
+          'dark:tw-border-r dark:tw-border-neutral-N13'
         )}
       >
         {title && (
