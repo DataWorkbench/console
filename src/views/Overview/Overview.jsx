@@ -1,6 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
+import { get } from 'lodash'
 import Card, { CardHeader, CardContent } from 'components/Card'
 import { useStore } from 'stores'
 import ServiceItem from './ServiceItem'
@@ -12,9 +13,7 @@ import IconCard from './IconCard'
 function getTabs(user) {
   return [
     {
-      title: `上午好，${
-        user.user_name ? `${user.user_name}，` : ''
-      }欢迎您使用大数据平台`,
+      title: `上午好，${get(user, 'user_name', '')}欢迎您使用大数据平台`,
       description:
         '大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。',
       icon: 'dashboard',
@@ -25,10 +24,9 @@ function getTabs(user) {
 }
 
 function Overview() {
-  const store = useStore()
   const {
     globalStore: { user },
-  } = store
+  } = useStore()
   return (
     <div className="tw-p-5 tw-overview tw-h-full">
       <PageTab tabs={getTabs(user)} />

@@ -1,9 +1,10 @@
-import { makeObservable, observable, action } from 'mobx'
+import { get, isEmpty } from 'lodash'
+import { makeObservable, action, observable } from 'mobx'
 
 class GlobalStore {
   darkMode = false
 
-  user = {}
+  user = null
 
   constructor(rootStore) {
     this.rootStore = rootStore
@@ -12,6 +13,10 @@ class GlobalStore {
       updateUserInfo: action,
       setDarkMode: action,
     })
+    const user = get(window, 'USER')
+    if (!isEmpty(user)) {
+      this.user = user
+    }
   }
 
   updateUserInfo(user) {

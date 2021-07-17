@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useParams } from 'react-router-dom'
+import { useParams, Redirect } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
 // import { SideMenu } from '@QCFE/qingcloud-portal-ui'
 import SideMenu from 'components/SideMenu'
@@ -38,14 +38,21 @@ function Dm({ route }) {
   const {
     globalStore: { darkMode },
   } = store
-  const { space } = useParams()
+  const { space, submod } = useParams()
+  if (!submod) {
+    return <Redirect to={`/workspace/${space}/dm/realtime_computing`} />
+  }
   const menus = navMenus.map((menu) => ({
     ...menu,
     link: `/workspace/${space}/dm/${menu.name}`,
   }))
   return (
     <div className="tw-flex tw-h-full">
-      <SideMenu title="" menus={menus} darkMode={darkMode} />
+      <SideMenu
+        menus={menus}
+        darkMode={darkMode}
+        defaultSelectedMenu={submod}
+      />
       <div className="tw-flex-1"> {renderRoutes(route.routes)}</div>
     </div>
   )

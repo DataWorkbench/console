@@ -37,6 +37,8 @@ module.exports = {
     TH: true,
     CONFIG: true,
     USER: true,
+    GLOBAL_CONFIG: true,
     EMITTER: true,
+    getText: true,
   },
 }

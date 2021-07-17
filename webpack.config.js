@@ -108,6 +108,7 @@ let config = {
       'react-router-dom': resolve('node_modules/react-router-dom'),
       asserts: resolve('src/assets'),
       hooks: resolve('src/hooks'),
+      utils: resolve('src/utils'),
     },
   },
   stats: {

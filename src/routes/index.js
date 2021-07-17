@@ -19,7 +19,7 @@ const routes = [
         component: Upcloud,
       },
       {
-        path: '/workspace/:space/dm',
+        path: '/workspace/:space/dm/:submod?',
         component: Dm,
         routes: [
           {

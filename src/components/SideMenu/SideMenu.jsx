@@ -10,6 +10,7 @@ const propTypes = {
   menus: PropTypes.array,
   darkMode: PropTypes.bool,
   onClick: PropTypes.func,
+  defaultSelectedMenu: PropTypes.string,
 }
 
 const defaultProps = {
@@ -19,23 +20,24 @@ const defaultProps = {
   onClick() {},
 }
 
-function SideMenu({ title, menus, onClick, darkMode }) {
+function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
   const [narrowMode, toggleNarrowMode] = useToggle(false)
-  const [curSelectedMenu, setCurSelectedMenu] = useState(null)
+  const [curSelectedMenu, setCurSelectedMenu] = useState(defaultSelectedMenu)
   const handleMenuClick = (menuName) => {
     setCurSelectedMenu(menuName)
     onClick(menuName)
   }
+
   return (
     <div
       className={clsx(
-        'tw-relative',
+        'tw-relative tw-transition-all',
         narrowMode ? 'tw-w-14 tw-text-center' : 'tw-w-56'
       )}
     >
       <div
         className={clsx(
-          'tw-overflow-auto tw-pt-5 tw-bg-white dark:tw-bg-neutral-N17 tw-absolute tw-inset-0 tw-flex tw-flex-col shadow-md tw-transition-all',
+          'tw-overflow-auto tw-pt-5 tw-bg-white dark:tw-bg-neutral-N17 tw-absolute tw-inset-0 tw-flex tw-flex-col shadow-md',
           'dark:tw-border-r dark:tw-border-neutral-N13'
         )}
       >

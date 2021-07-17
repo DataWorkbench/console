@@ -9,7 +9,8 @@
       "containers/*": ["containers/*"],
       "stores/*": ["stores/*"],
       "scss/*": ["scss/*"],
-      "hooks/*": ["hooks/*"]
+      "hooks/*": ["hooks/*"],
+      "utils/*": ["utils/*"]
     }
   }
 }

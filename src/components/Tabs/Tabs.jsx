@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
+import { uniq } from 'lodash'
 import styles from './tabs.module.css'
 
 export default function Tabs({ className, index, more, tabClick, children }) {
   const [activeIndex, setActiveIndex] = useState(index)
+  const [renderedIdxs, setRenderedIdxs] = useState([index])
   useEffect(() => {
     setActiveIndex(index)
   }, [index])
@@ -30,6 +32,8 @@ export default function Tabs({ className, index, more, tabClick, children }) {
                 )}
                 onClick={() => {
                   setActiveIndex(i)
+                  renderedIdxs.push(i)
+                  setRenderedIdxs(uniq(renderedIdxs))
                   tabClick(i)
                 }}
               >
@@ -47,7 +51,7 @@ export default function Tabs({ className, index, more, tabClick, children }) {
               'tw-hidden': activeIndex !== i,
             })}
           >
-            {child}
+            {renderedIdxs.includes(i) && child}
           </div>
         )
       })}

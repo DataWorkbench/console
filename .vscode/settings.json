@@ -5,7 +5,10 @@
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": true
   },
-  "tailwindCSS.experimental.classRegex": [":(?:.|\n)*?[\"'`]([^\"'`]*).*?,"],
+  "tailwindCSS.experimental.classRegex": [
+    ":(?:.|\n)*?[\"'`]([^\"'`]*).*?,",
+    "\\w+ClassName=[\"']([^\"']*)[\"']"
+  ],
   "emmet.includeLanguages": {
     "postcss": "css"
   }

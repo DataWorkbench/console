@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { useToggle } from 'react-use'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
-import Card from 'components/Card'
+import dayjs from 'dayjs'
 import { Tooltip } from '@QCFE/lego-ui'
-import { Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon, Modal, Message } from '@QCFE/qingcloud-portal-ui'
+import { useStore } from 'stores'
+import Card from 'components/Card'
 import styles from './styles.module.css'
 
 const optMenu = (
@@ -34,9 +37,43 @@ function getProfileName(str) {
   return profileName
 }
 
-function SpaceItem({ data, className }) {
-  const { id, title, subtitle, status, owner } = data
-  const [moreMenuVisible, setMoreMenuVisible] = useState(false)
+const propTypes = {
+  space: PropTypes.object,
+  className: PropTypes.string,
+}
+function SpaceItem({ space, className }) {
+  const { id, name, desc, status, owner, created } = space
+  const [moreMenuVisible, setMoreMenuVisible] = useToggle(false)
+  const { workspaceStore } = useStore()
+  const handleDelete = () => {
+    const curModal = Modal.open(Modal, {
+      onAsyncOk: () => {
+        return workspaceStore.delete(id).then(
+          () => {
+            Message.open({
+              content: '操作成功',
+              type: 'success',
+              placement: 'bottomRight',
+            })
+            Modal.close(curModal)
+          },
+          (err) =>
+            Message.open({
+              content: `操作失败: ${err}`,
+              type: 'error',
+              placement: 'bottomRight',
+            })
+        )
+      },
+      title: '确定要删除吗',
+      content: `确定要删除${id}`,
+    })
+  }
+
+  const handleUpdate = () => {
+    workspaceStore.set({ showModal: true, curSpace: space, curOpt: 'update' })
+  }
+
   return (
     <Card
       className={clsx(
@@ -52,30 +89,30 @@ function SpaceItem({ data, className }) {
               styles.profile
             )}
           >
-            {getProfileName(title)}
+            {getProfileName(name)}
           </div>
           <div className="tw-ml-3">
             <div className="tw-flex tw-items-center">
               <span className="tw-font-medium tw-text-base tw-text-neutral-N16">
-                {title}
+                {name}
               </span>
               <span>（{id}）</span>
               <span
                 className={clsx(
                   'tw-py-0.5 tw-px-3 tw-rounded-2xl tw-inline-flex tw-items-center',
-                  status === 'active' ? styles.st_active : styles.st_forbidden
+                  status === 1 ? styles.st_active : styles.st_forbidden
                 )}
               >
                 <Icon name="radio" />
-                {status === 'active' ? '活跃' : '已禁用'}
+                {status === 1 ? '活跃' : '已禁用'}
               </span>
             </div>
-            <div className="tw-pt-1">{subtitle}</div>
+            <div className="tw-pt-1">{desc}</div>
           </div>
         </div>
         <div
           className="tw-relative tw-h-6"
-          onMouseEnter={() => setMoreMenuVisible(!moreMenuVisible)}
+          onMouseEnter={() => setMoreMenuVisible(true)}
           onMouseLeave={() => setMoreMenuVisible(false)}
         >
           <span>
@@ -89,12 +126,16 @@ function SpaceItem({ data, className }) {
                 : 'tw-opacity-0 tw-scale-95 tw-invisible'
             )}
           >
-            <ul>
-              <li className={styles.moreMenuItem}>修改工作空间</li>
-              <li className={styles.moreMenuItem}>禁用工作空间</li>
-              <li className={styles.moreMenuItem}>启动工作空间</li>
-              <li className={styles.moreMenuItem}>删除</li>
-            </ul>
+            <>
+              <div className={styles.moreMenuItem} onClick={handleUpdate}>
+                修改工作空间
+              </div>
+              <div className={styles.moreMenuItem}>禁用工作空间</div>
+              <div className={styles.moreMenuItem}>启动工作空间</div>
+              <div className={styles.moreMenuItem} onClick={handleDelete}>
+                删除
+              </div>
+            </>
           </div>
         </div>
       </div>
@@ -131,7 +172,9 @@ function SpaceItem({ data, className }) {
         <div>
           <span>
             创建时间：
-            <span className="tw-text-neutral-N16">2021-03-17</span>
+            <span className="tw-text-neutral-N16">
+              {dayjs.unix(created).format('YYYY-MM-DD hh:mm:ss')}
+            </span>
           </span>
         </div>
       </div>
@@ -152,9 +195,6 @@ function SpaceItem({ data, className }) {
   )
 }
 
-SpaceItem.propTypes = {
-  data: PropTypes.object,
-  className: PropTypes.string,
-}
+SpaceItem.propTypes = propTypes
 
 export default SpaceItem

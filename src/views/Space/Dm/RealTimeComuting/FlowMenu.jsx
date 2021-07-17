@@ -1,8 +1,17 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Icon, Input } from '@QCFE/qingcloud-portal-ui/lib/components'
 import clsx from 'clsx'
 
-function FlowMenu() {
+const propTypes = {
+  onCreateClick: PropTypes.func,
+}
+
+const defaultPropTypes = {
+  onCreateClick() {},
+}
+
+function FlowMenu({ onCreateClick }) {
   return (
     <div className="tw-w-56 tw-bg-neutral-N16 tw-m-3 tw-rounded dark:tw-text-white">
       <div
@@ -50,9 +59,11 @@ function FlowMenu() {
         <div className="tw-text-center tw-mt-3">
           <button
             type="button"
+            onClick={onCreateClick}
             className="tw-py-1 tw-rounded-sm tw-w-48 tw-bg-neutral-N13 focus:tw-outline-none hover:tw-bg-neutral-N10 tw-ring-opacity-50"
           >
-            创建业务流程
+            <Icon name="add" type="light" className="tw-align-middle" />
+            <span className="tw-align-middle">新建业务流程</span>
           </button>
         </div>
       </div>
@@ -60,6 +71,7 @@ function FlowMenu() {
   )
 }
 
-FlowMenu.propTypes = {}
+FlowMenu.propTypes = propTypes
+FlowMenu.defaultPropTypes = defaultPropTypes
 
 export default FlowMenu
