@@ -18,7 +18,10 @@ function DbList({ items, onChange }) {
   return (
     <div className="tw-flex tw-flex-wrap">
       {items.map(({ name, disp }, i) => (
-        <div className={clsx('tw-w-1/3 tw-pb-4', (i + 1) % 3 && 'tw-pr-4')}>
+        <div
+          key={name}
+          className={clsx('tw-w-1/3 tw-pb-4', (i + 1) % 3 && 'tw-pr-4')}
+        >
           <DbItem
             selected={selIdx === i}
             title={name}

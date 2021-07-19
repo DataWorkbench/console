@@ -20,14 +20,14 @@ function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
   return (
     <div
       className={clsx(
-        `tw-flex tw-h-20 tw-justify-center tw-items-center tw-bg-neutral-N1 dark:tw-bg-neutral-N17`,
-        textsLen > 2 ? 'tw-px-10' : 'tw-px-16'
+        `tw-flex tw-h-20 tw-justify-center tw-items-center tw-bg-neutral-N1 dark:tw-bg-neutral-N17`
+        // textsLen > 2 ? 'tw-px-10' : 'tw-px-16'
       )}
     >
       <div
         className={clsx(
           'tw-flex tw-justify-center tw-items-center',
-          stepClassName || 'tw-w-full'
+          stepClassName || 'tw-w-2/3'
         )}
       >
         {stepTexts.map((text, i) => (

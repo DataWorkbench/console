@@ -10,7 +10,3 @@
     }
   }
 }
-
-.guideNum {
-  @apply tw-inline-block tw-bg-brand-G13 tw-rounded-sm tw-w-5 tw-h-5 tw-leading-5 tw-text-center tw-text-white tw-mr-2;
-}

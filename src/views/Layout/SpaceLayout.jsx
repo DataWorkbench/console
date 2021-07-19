@@ -9,8 +9,8 @@ import { useStore } from 'stores'
 const SpaceLayout = ({ route }) => {
   const store = useStore()
   const darkMode = !!useRouteMatch([
-    '/workspace/:space/dm',
-    '/workspace/:space/ops',
+    '/:zone/workspace/:space/dm',
+    '/:zone/workspace/:space/ops',
   ])
   store.globalStore.setDarkMode(darkMode)
 

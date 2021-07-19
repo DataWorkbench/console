@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { observer } from 'mobx-react'
 import { Icon, Select } from '@QCFE/qingcloud-portal-ui'
-import { Link, useParams, useLocation } from 'react-router-dom'
+import { Link, useParams, useLocation, useHistory } from 'react-router-dom'
 import clsx from 'clsx'
+import { useMount } from 'react-use'
+import { useStore } from 'stores'
 import styles from './styles.module.css'
 
 const propTypes = {
@@ -11,29 +14,26 @@ const propTypes = {
 const defaultProps = {
   darkMode: false,
 }
-const navItems = [
-  {
-    title: '数据上云',
-    name: 'upcloud',
-  },
-  {
-    title: '云上加工',
-    name: 'dm',
-  },
-  {
-    title: '运维中心',
-    name: 'ops',
-  },
-  {
-    title: '空间管理',
-    name: 'manage',
-  },
-]
 function Header({ darkMode }) {
-  const { space } = useParams()
+  const [workspaces, setWorkspaces] = useState([])
+  const { zone, space } = useParams()
   const { pathname } = useLocation()
+  const history = useHistory()
+  const {
+    globalStore: { user },
+    workspaceStore,
+    workspaceStore: { funcList },
+  } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
+
+  useMount(async () => {
+    workspaceStore.loadAll(zone, true).then((infos) => {
+      if (infos) {
+        setWorkspaces(infos)
+      }
+    })
+  })
 
   return (
     <div
@@ -53,22 +53,16 @@ function Header({ darkMode }) {
           工
         </div>
         <Select
-          name="os"
-          value="CentOS"
-          options={[
-            { value: 'CentOS', label: 'CentOS 5.8 32bit' },
-            { value: 'Debian', label: 'Debian Jessie 8.1 64bit' },
-            {
-              value: 'Ubuntu',
-              label: 'Ubuntu Server 14.04.3 LTS 64bit',
-              disabled: true,
-            },
-            { value: 'Windows', label: 'Windows Server 2003 R2' },
-          ]}
+          defaultValue={space}
+          options={workspaces.map(({ id, name }) => ({
+            value: id,
+            label: name,
+          }))}
+          onChange={(v) => history.push(`/${zone}/workspace/${v}/${mod}`)}
         />
       </div>
       <div>
-        {navItems.map(({ title, name }) => (
+        {funcList.map(({ title, name }) => (
           <Link
             key={name}
             className={clsx(
@@ -76,7 +70,7 @@ function Header({ darkMode }) {
                 'tw-font-semibold tw-relative after:tw-absolute after:tw-content-[" "] after:tw-w-3/5 after:tw-h-0.5 after:tw-left-[20%] after:tw-bottom-0.5 after:tw-bg-brand-G11 dark:tw-text-white',
               'tw-inline-block tw-py-3 tw-mr-6 tw-text-sm dark:hover:tw-text-white'
             )}
-            to={`/workspace/${space}/${name}`}
+            to={`/${zone}/workspace/${space}/${name}`}
           >
             {title}
           </Link>
@@ -104,7 +98,7 @@ function Header({ darkMode }) {
           changeable
           className="tw-mr-2 tw-cursor-pointer"
         />
-        <span className="tw-mr-2 dark:tw-text-white">user.name</span>
+        <span className="tw-mr-2 dark:tw-text-white">{user?.user_name}</span>
         <span className="tw-mr-6 tw-inline-block tw-bg-neutral-N2 dark:tw-bg-neutral-N13 dark:tw-text-white tw-px-2 tw-py-0.5 tw-rounded-2xl">
           项目所有者
         </span>
@@ -116,4 +110,4 @@ function Header({ darkMode }) {
 Header.propTypes = propTypes
 Header.defaultProps = defaultProps
 
-export default Header
+export default observer(Header)

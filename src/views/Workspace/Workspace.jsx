@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { observer } from 'mobx-react'
-import { useUnmount } from 'react-use'
+import { useMount } from 'react-use'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { Button, Icon } from '@QCFE/lego-ui'
 import Card from 'components/Card'
@@ -25,7 +25,7 @@ const Workspace = () => {
     workspaceStore,
   } = useStore()
 
-  useUnmount(() => {
+  useMount(() => {
     workspaceStore.set({ zones: {} })
   })
   return (

@@ -47,6 +47,7 @@ module.exports = {
       black: colors.black,
       white: colors.white,
       blue: colors.blue,
+      red: colors.red,
       brand,
       neutral,
       link: {

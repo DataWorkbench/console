@@ -11,29 +11,29 @@ import RealTimeComputing from 'views/Space/Dm/RealTimeComuting'
 
 const routes = [
   {
-    path: '/workspace/:space',
+    path: '/:zone/workspace/:space',
     component: SpaceLayout,
     routes: [
       {
-        path: '/workspace/:space/upcloud/:mod?',
+        path: '/:zone/workspace/:space/upcloud/:mod?',
         component: Upcloud,
       },
       {
-        path: '/workspace/:space/dm/:submod?',
+        path: '/:zone/workspace/:space/dm/:submod?',
         component: Dm,
         routes: [
           {
-            path: '/workspace/:space/dm/realtime_computing',
+            path: '/:zone/workspace/:space/dm/realtime_computing',
             component: RealTimeComputing,
           },
         ],
       },
       {
-        path: '/workspace/:space/ops',
+        path: '/:zone/workspace/:space/ops',
         component: Ops,
       },
       {
-        path: '/workspace/:space/manage',
+        path: '/:zone/workspace/:space/manage',
         component: Manage,
       },
     ],

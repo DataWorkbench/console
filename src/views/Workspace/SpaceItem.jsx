@@ -1,5 +1,6 @@
 import React from 'react'
 import { useToggle } from 'react-use'
+import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
@@ -8,25 +9,6 @@ import { Icon, Modal, Message } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
 import Card from 'components/Card'
 import styles from './styles.module.css'
-
-const optMenu = (
-  <div>
-    <ul>
-      <li className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15 ">
-        <Icon name="blockchain" />
-        数据源管理
-      </li>
-      <li className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15">
-        <Icon name="blockchain" />
-        网络连通工具
-      </li>
-      <li className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15">
-        <Icon name="blockchain" />
-        整库迁移
-      </li>
-    </ul>
-  </div>
-)
 
 function getProfileName(str) {
   const pattern = new RegExp('[\u4E00-\u9FA5]+')
@@ -38,13 +20,17 @@ function getProfileName(str) {
 }
 
 const propTypes = {
+  zone: PropTypes.string,
   space: PropTypes.object,
   className: PropTypes.string,
 }
-function SpaceItem({ space, className }) {
+function SpaceItem({ zone, space, className }) {
   const { id, name, desc, status, owner, created } = space
   const [moreMenuVisible, setMoreMenuVisible] = useToggle(false)
-  const { workspaceStore } = useStore()
+  const {
+    workspaceStore,
+    workspaceStore: { funcList },
+  } = useStore()
   const handleDelete = () => {
     const curModal = Modal.open(Modal, {
       onAsyncOk: () => {
@@ -165,9 +151,13 @@ function SpaceItem({ space, className }) {
         </div>
       </div>
       <div className="tw-flex tw-justify-between tw-px-4 tw-mb-3">
-        <div>
-          <span>开通引擎：</span>
-          <span>共享Flink、QingMR、Deep Learning...查看</span>
+        <div className="tw-flex">
+          <div className="tw-w-60 2xl:tw-w-auto tw-overflow-hidden tw-break-all tw-whitespace-nowrap tw-overflow-ellipsis">
+            开通引擎：共享Flink、QingMR、Deep Learning
+          </div>
+          <a href="##" className="tw-text-link">
+            查看
+          </a>
         </div>
         <div>
           <span>
@@ -179,22 +169,44 @@ function SpaceItem({ space, className }) {
         </div>
       </div>
       <div className="tw-px-5 tw-py-4 tw-flex tw-justify-center tw-bg-neutral-N1 tw-border-t tw-border-neutral-N3">
-        <Tooltip className="tw-p-0" content={optMenu} placement="bottomRight">
-          <button type="button" className={styles.btn}>
-            数据上云
-          </button>
-        </Tooltip>
-        <button type="button" className={styles.btn}>
-          数据上云
-        </button>
-        <button type="button" className={styles.btn}>
-          数据上云
-        </button>
+        {funcList.map(({ name: funcName, title, subFuncList }, i) => (
+          <Tooltip
+            className="tw-p-0"
+            key={funcName}
+            content={subFuncList.map((subFunc) => (
+              <Link
+                key={subFunc.name}
+                to={`${zone}/workspace/${id}/${funcName}/${subFunc.name}`}
+                className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15 hover:tw-text-white"
+              >
+                <Icon name="blockchain" />
+                {subFunc.title}
+              </Link>
+            ))}
+            placement="bottomRight"
+          >
+            <Link
+              to={`${zone}/workspace/${id}/${funcName}`}
+              className="hover:tw-text-brand-G11"
+            >
+              <button
+                type="button"
+                className={clsx(
+                  'tw-font-semibold tw-text-xs tw-rounded-sm tw-text-neutral-N13  tw-bg-neutral-N1 tw-border tw-border-neutral-N3',
+                  'tw-px-4 2xl:tw-px-8 tw-py-1',
+                  i < funcList.length - 1 ? 'tw-mr-4' : 'tw-mr-0',
+                  'focus:tw-outline-none hover:tw-bg-brand-G0 hover:tw-border-brand-G11 hover:tw-shadow tw-transition-colors'
+                )}
+              >
+                {title}
+              </button>
+            </Link>
+          </Tooltip>
+        ))}
       </div>
     </Card>
   )
 }
-
 SpaceItem.propTypes = propTypes
 
 export default SpaceItem

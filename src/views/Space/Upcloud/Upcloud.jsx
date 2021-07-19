@@ -1,52 +1,34 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useParams } from 'react-router-dom'
 import { SideMenu } from '@QCFE/qingcloud-portal-ui'
+import { useStore } from 'stores'
 import DataSourceList from './DataSourceList'
 import styles from '../styles.module.css'
 
-const propTypes = {}
-
 function Upcloud() {
   const { space, mod } = useParams()
+  const {
+    workspaceStore: { funcList },
+  } = useStore()
+  const { subFuncList } = funcList.find(({ name }) => name === 'upcloud')
+  const navMenu = subFuncList.map((func) => ({
+    ...func,
+    link: `/workspace/${space}/upcloud/${func.name}`,
+  }))
 
-  const navMenu = useMemo(() => {
-    return [
-      {
-        name: 'datasource_list',
-        title: '数据源列表',
-        icon: 'blockchain',
-        link: `/workspace/${space}/upcloud/datasource_list`,
-      },
-      {
-        name: 'network_tool',
-        title: '网络连通工具',
-        icon: 'earth',
-        link: `/workspace/${space}/upcloud/network_tool`,
-      },
-      {
-        name: 'migration',
-        title: '整库迁移',
-        icon: 'loadbalancer-policies',
-        link: `/workspace/${space}/upcloud/migration`,
-      },
-    ]
-  }, [space])
+  const curFunc =
+    subFuncList.find((func) => func.name === mod) || subFuncList[0]
 
-  const tabName = navMenu.map((nav) => nav.name).includes(mod)
-    ? mod
-    : 'datasource_list'
   return (
     <div className="tw-flex">
       <div className={styles.sideMenu}>
-        <SideMenu menus={navMenu} defaultSelectedMenu={tabName} />
+        <SideMenu menus={navMenu} defaultSelectedMenu={curFunc.name} />
       </div>
-      <div className="tw-flex-1">
-        {tabName === 'datasource_list' && <DataSourceList />}
+      <div className="tw-flex-1 tw-flex tw-items-stretch">
+        {curFunc.name === 'dsl' && <DataSourceList />}
       </div>
     </div>
   )
 }
-
-Upcloud.propTypes = propTypes
 
 export default Upcloud

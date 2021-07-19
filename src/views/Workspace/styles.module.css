@@ -24,14 +24,6 @@
   }
 }
 
-.btn {
-  @apply tw-font-semibold tw-text-xs focus:tw-outline-none tw-rounded-sm tw-text-neutral-N13  tw-bg-neutral-N1 tw-border tw-border-neutral-N3 hover:tw-bg-brand-G0 hover:tw-border-brand-G11 hover:tw-shadow hover:tw-text-brand-G11 tw-transition-colors;
-  @apply tw-mr-4 tw-px-8 tw-py-1;
-  &:last-child {
-    @apply tw-mr-0;
-  }
-}
-
 .gridBtn {
   @apply tw-px-3 tw-mr-2;
 }

@@ -69,7 +69,7 @@ const SpaceLists = ({ zone, className, isCurrent }) => {
             <Icon
               name="if-refresh"
               className="tw-text-xl"
-              onClick={() => workspaceStore.reload(zone)}
+              onClick={() => workspaceStore.clean(zone)}
             />
           </Button>
         </div>
@@ -91,6 +91,7 @@ const SpaceLists = ({ zone, className, isCurrent }) => {
                     className={`${styles.workspace} tw-w-1/2`}
                   >
                     <SpaceItem
+                      zone={zone}
                       space={space}
                       className={styles[`ws_${i % 5}`]}
                     />

@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import Modal, { ModalStep, ModalContent } from 'components/Modal'
+import { Button } from '@QCFE/qingcloud-portal-ui'
 import DbList from './DbList'
 import ConfigForm from './ConfigForm'
 
@@ -36,30 +37,38 @@ const dbItems = [
 function DataSourceModal({ show, onHide }) {
   const [step, setStep] = useState(0)
   const [dbIndex, setDbIndex] = useState()
-  const handleStep = () => {
-    if (step === 0) {
-      setStep(1)
-    }
-  }
+  const form = useRef()
   const handleHide = () => {
     onHide()
   }
-  const handleCancel = () => {
-    if (step === 0) {
-      onHide()
-    } else {
-      setStep(0)
-    }
+  const handleDbSelect = (i) => {
+    setDbIndex(i)
+    setStep(1)
+  }
+  const handleSave = () => {
+    // console.log(form.current.getFieldsValue())
   }
   return (
     <Modal
       show={show}
       onHide={handleHide}
       title="新增数据源"
-      okText={step === 0 ? '下一步' : '确定'}
-      cancelText={step === 0 ? '取消' : '上一步'}
-      onOK={handleStep}
-      onCancel={handleCancel}
+      footer={
+        <div className="tw-flex tw-justify-end">
+          {step === 0 ? (
+            <Button>取消</Button>
+          ) : (
+            <>
+              <Button className="tw-mr-2" onClick={() => setStep(0)}>
+                上一步
+              </Button>
+              <Button type="primary" onClick={handleSave}>
+                确定
+              </Button>
+            </>
+          )}
+        </div>
+      }
     >
       <ModalStep step={step} stepTexts={stepTexts} />
       <ModalContent>
@@ -72,10 +81,10 @@ function DataSourceModal({ show, onHide }) {
               </a>
               进行查看配置
             </p>
-            <DbList items={dbItems} onChange={(i) => setDbIndex(i)} />
+            <DbList items={dbItems} onChange={handleDbSelect} />
           </>
         )}
-        {step === 1 && <ConfigForm db={dbItems[dbIndex]} />}
+        {step === 1 && <ConfigForm ref={form} db={dbItems[dbIndex]} />}
       </ModalContent>
     </Modal>
   )

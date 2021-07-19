@@ -18,7 +18,6 @@ const handleGlobalData = (data) => {
     globalStore.updateUserInfo(user)
   }
 }
-
 const App = () => {
   return (
     <PortalProvider

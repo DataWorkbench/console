@@ -38,13 +38,13 @@ function Dm({ route }) {
   const {
     globalStore: { darkMode },
   } = store
-  const { space, submod } = useParams()
+  const { zone, space, submod } = useParams()
   if (!submod) {
-    return <Redirect to={`/workspace/${space}/dm/realtime_computing`} />
+    return <Redirect to={`/${zone}/workspace/${space}/dm/realtime_computing`} />
   }
   const menus = navMenus.map((menu) => ({
     ...menu,
-    link: `/workspace/${space}/dm/${menu.name}`,
+    link: `/${zone}/workspace/${space}/dm/${menu.name}`,
   }))
   return (
     <div className="tw-flex tw-h-full">
