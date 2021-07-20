@@ -6,7 +6,6 @@ import { Link, useParams, useLocation, useHistory } from 'react-router-dom'
 import clsx from 'clsx'
 import { useMount } from 'react-use'
 import { useStore } from 'stores'
-import styles from './styles.module.css'
 
 const propTypes = {
   darkMode: PropTypes.bool,
@@ -82,7 +81,7 @@ function Header({ darkMode }) {
           size="medium"
           type={darkMode ? 'light' : 'dark'}
           changeable
-          className={clsx('tw-mr-2 tw-cursor-pointer', styles.menuBell)}
+          className={clsx('tw-mr-2 tw-cursor-pointer')}
         />
         <Icon
           name="cogwheel"

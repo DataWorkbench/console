@@ -37,8 +37,8 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
     >
       <div
         className={clsx(
-          'tw-overflow-auto tw-pt-5 tw-bg-white dark:tw-bg-neutral-N17 tw-absolute tw-inset-0 tw-flex tw-flex-col shadow-md',
-          'dark:tw-border-r dark:tw-border-neutral-N13'
+          'tw-overflow-auto tw-pt-5  tw-absolute tw-inset-0 tw-flex tw-flex-col shadow-md tw-border-r tw-border-neutral-N3',
+          'dark:tw-bg-neutral-N17 dark:tw-border-neutral-N13'
         )}
       >
         {title && (
@@ -95,13 +95,14 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
         </div>
         <div
           className={clsx(
-            'tw-flex tw-flex-none tw-h-10 tw-items-center tw-bg-neutral-N1 hover:tw-bg-neutral-N2 tw-cursor-pointer tw-pl-5',
-            'dark:tw-bg-neutral-N17 dark:tw-border-t dark:tw-border-neutral-N13'
+            'tw-flex tw-flex-none tw-h-10 tw-items-center tw-bg-neutral-N2 tw-border-t tw-border-neutral-N3 hover:tw-bg-neutral-N1 tw-pl-5',
+            'dark:tw-bg-neutral-N17 dark:tw-border-neutral-N13'
           )}
         >
           <Icon
             name={narrowMode ? 'expand' : 'collapse'}
             size={20}
+            clickable
             type={darkMode ? 'light' : 'dark'}
             onClick={toggleNarrowMode}
           />

@@ -10,7 +10,7 @@ const propTypes = {
   db: PropTypes.object,
 }
 
-function ConfigForm({ db }, ref) {
+const ConfigForm = forwardRef(({ db }, ref) => {
   return (
     <div>
       <Alert
@@ -26,10 +26,16 @@ function ConfigForm({ db }, ref) {
         closable
         className="tw-mb-3"
       />
-      <Form layout="vertical" ref={ref}>
+      <Form
+        layout="vertical"
+        ref={ref}
+        onFieldValueChange={(fieldValue) => {
+          console.log(JSON.stringify(fieldValue))
+        }}
+      >
         <Field>
           <Label>数据源类型</Label>
-          <Control>
+          <Control className="tw-w-60">
             <DbItem title={db.name} disp={db.disp} selected />
           </Control>
         </Field>
@@ -41,34 +47,63 @@ function ConfigForm({ db }, ref) {
             </>
           }
           placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
+          validateOnChange
+          schemas={[
+            {
+              rule: (v) => /^(?!_)(?!.*?_$)[a-zA-Z0-9_]{2,128}$/.test(v),
+              help: '允许包含字母、数字 及 "_"，长度 2-128',
+              status: 'error',
+            },
+          ]}
         />
         <TextAreaField
           name="desc"
+          validateOnChange
+          rows={3}
           label={
             <>
               <span className="tw-text-red-600 tw-mr-1">*</span>数据源描述
             </>
           }
           placeholder="请填写数据库的描述信息"
+          schemas={[
+            {
+              rule: { maxLength: 300 },
+              help: '',
+              status: 'error',
+            },
+          ]}
         />
         <TextField
           name="ip"
+          validateOnChange
           label={
             <>
               <span className="tw-text-red-600 tw-mr-1">*</span>IP 地址
             </>
           }
           defaultValue=""
-          placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
+          schemas={[
+            {
+              rule: {
+                matchRegex:
+                  /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+              },
+              help: '请输入 ip，如 1.1.1.1',
+              status: 'error',
+            },
+          ]}
+          placeholder="请输入 ip，如 1.1.1.1"
         />
         <TextField
           name="port"
+          validateOnChange
           label={
             <>
               <span className="tw-text-red-600 tw-mr-1">*</span>端口号
             </>
           }
-          placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
+          placeholder="请输入端口号信息"
         />
         <TextField
           name="db"
@@ -77,7 +112,7 @@ function ConfigForm({ db }, ref) {
               <span className="tw-text-red-600 tw-mr-1">*</span>Database
             </>
           }
-          placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
+          placeholder="请输入 database 信息"
         />
         <TextField
           name="user"
@@ -86,7 +121,7 @@ function ConfigForm({ db }, ref) {
               <span className="tw-text-red-600 tw-mr-1">*</span>用户名
             </>
           }
-          placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
+          placeholder="请输入用户名"
         />
         <PasswordField
           name="passwd"
@@ -97,7 +132,7 @@ function ConfigForm({ db }, ref) {
           }
           autoComplete="off"
           showPrefixIcon
-          placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
+          placeholder="请输入密码"
         />
         <Field>
           <Label>连通性测试</Label>
@@ -111,8 +146,8 @@ function ConfigForm({ db }, ref) {
       </Form>
     </div>
   )
-}
+})
 
 ConfigForm.propTypes = propTypes
 
-export default forwardRef(ConfigForm)
+export default ConfigForm

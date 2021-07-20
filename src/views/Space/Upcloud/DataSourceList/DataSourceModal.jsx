@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react'
 import PropTypes from 'prop-types'
+import { useMount, useToggle } from 'react-use'
 import Modal, { ModalStep, ModalContent } from 'components/Modal'
-import { Button } from '@QCFE/qingcloud-portal-ui'
+import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
+import { useStore } from 'stores'
 import DbList from './DbList'
 import ConfigForm from './ConfigForm'
 
@@ -17,19 +19,19 @@ const defaultProps = {
 const stepTexts = ['选择数据库', '配置数据库']
 
 const dbItems = [
-  { name: 'hBase', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
+  { name: 'MySql', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
   {
-    name: 'Postgresql',
+    name: 'PostgreSQL',
     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
   },
   { name: 'Kafka', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
+  { name: 'S3', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
   {
-    name: '对象存储',
+    name: 'ClickHouse',
     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
   },
-  { name: 'MySql', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
   {
-    name: 'Clickhouse',
+    name: 'Hbase',
     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
   },
 ]
@@ -37,7 +39,24 @@ const dbItems = [
 function DataSourceModal({ show, onHide }) {
   const [step, setStep] = useState(0)
   const [dbIndex, setDbIndex] = useState()
+  const [loading, toggleLoading] = useToggle(true)
   const form = useRef()
+  const { dataSourceStore } = useStore()
+
+  useMount(() => {
+    dataSourceStore
+      .loadEngineMap()
+      .then(() => {
+        // console.log(engines)
+      })
+      .catch(() => {
+        // console.warn(e.message)
+      })
+      .then(() => {
+        toggleLoading(false)
+      })
+  })
+
   const handleHide = () => {
     onHide()
   }
@@ -73,7 +92,7 @@ function DataSourceModal({ show, onHide }) {
       <ModalStep step={step} stepTexts={stepTexts} />
       <ModalContent>
         {step === 0 && (
-          <>
+          <Loading spinning={loading} delay={200}>
             <p>
               请选择一个数据库，您也可以参考
               <a href="##" className="tw-text-link">
@@ -82,7 +101,7 @@ function DataSourceModal({ show, onHide }) {
               进行查看配置
             </p>
             <DbList items={dbItems} onChange={handleDbSelect} />
-          </>
+          </Loading>
         )}
         {step === 1 && <ConfigForm ref={form} db={dbItems[dbIndex]} />}
       </ModalContent>

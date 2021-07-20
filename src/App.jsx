@@ -1,8 +1,9 @@
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
-import { PortalProvider } from '@QCFE/qingcloud-portal-ui'
+import { PortalProvider, Message } from '@QCFE/qingcloud-portal-ui'
 import store, { StoreContext } from 'stores'
+import emitter from 'utils/emitter'
 import locales from './locales'
 import routes from './routes'
 
@@ -10,6 +11,14 @@ const langMapping = {
   'zh-cn': 'zh-CN',
   en: 'en-US',
 }
+
+emitter.on('error:http_status', (msg) =>
+  Message.open({
+    content: msg,
+    placement: 'bottomRight',
+    type: 'error',
+  })
+)
 
 const handleGlobalData = (data) => {
   const { user } = data

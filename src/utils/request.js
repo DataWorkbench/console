@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { get, omit } from 'lodash'
+import emitter from 'utils/emitter'
 
 const baseConfig = {
   method: 'POST',
@@ -45,15 +46,24 @@ async function getOwnerLoop(n) {
 
 const client = axios.create(baseConfig)
 
-client.interceptors.response.use((response) => {
-  const { status } = response.data
-  if (status >= 400) {
-    response.data.message = getMessage(response.data)
-    omit(response.data, ['en_us', 'zh_cn'])
+client.interceptors.response.use(
+  (response) => {
+    const { status } = response.data
+    if (status >= 400) {
+      response.data.message = getMessage(response.data)
+      omit(response.data, ['en_us', 'zh_cn'])
+    }
+    return response
+  },
+  (error) => {
+    const {
+      response: { status },
+      message,
+    } = error
+    emitter.emit('error:http_status', `${status}: ${message}`)
+    return Promise.reject(error)
   }
-
-  return response
-})
+)
 
 const request = async (params, method = 'GET', url = '/portal_api') => {
   // 间隔200ms 循环300次获取user

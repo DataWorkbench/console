@@ -56,13 +56,6 @@ let config = {
             },
           },
           'postcss-loader',
-          // {
-          //   loader: 'sass-loader',
-          //   options: {
-          //     sourceMap: false,
-          //     webpackImporter: true,
-          //   },
-          // },
         ],
       },
       {

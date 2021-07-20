@@ -28,7 +28,7 @@ function DataSourceList() {
           </div>
         </div>
       </div>
-      <DataSourceModal show={show} onHide={() => toggleShow(false)} />
+      {show && <DataSourceModal show={show} onHide={() => toggleShow(false)} />}
     </div>
   )
 }

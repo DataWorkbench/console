@@ -54,9 +54,11 @@ function MenuItem({
       >
         <div
           className={clsx(
-            'tw-flex tw-items-center tw-justify-between tw-py-1 tw-select-none',
+            'tw-flex tw-items-center tw-justify-between tw-py-1 tw-select-none tw-rounded-sm',
             'dark:tw-text-white dark:hover:tw-bg-neutral-N13 dark:tw-rounded-sm dark:tw-font-medium',
-            isSelected && 'dark:tw-bg-neutral-N13'
+            isSelected &&
+              'tw-bg-neutral-N16 tw-text-white dark:tw-bg-neutral-N13'
+            // !isSelected && 'hover:tw-bg-neutral-N16 hover:tw-text-white'
           )}
         >
           <div className="tw-flex tw-items-center">
@@ -83,7 +85,8 @@ function MenuItem({
                 to={link}
                 className={clsx(
                   'tw-whitespace-nowrap tw-overflow-hidden tw-ml-2 first:tw-mr-2',
-                  'dark:hover:tw-text-white'
+                  'dark:hover:tw-text-white',
+                  isSelected && 'hover:tw-text-white'
                 )}
               >
                 {title}

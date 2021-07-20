@@ -8,8 +8,13 @@ const workspace = {
     request({ action: `v1/workspace/${id}`, ...params }, 'PUT'),
 }
 
+const datasource = {
+  loadEngineMap: () => request({ action: 'v1/enginemap/flink' }),
+}
+
 const api = {
   workspace,
+  datasource,
 }
 
 export default api
