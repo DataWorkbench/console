@@ -5,10 +5,9 @@ import { useDrag } from 'react-dnd'
 
 const propTypes = {
   item: PropTypes.object,
-  type: PropTypes.string,
 }
 
-function NodeMenuItem({ item, type }) {
+function NodeMenuItem({ item }) {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'box',
     options: {
@@ -35,10 +34,10 @@ function NodeMenuItem({ item, type }) {
         <span
           className={clsx(
             'tw-p-1 tw-rounded-sm',
-            type === 'datasource' ? 'tw-bg-[#229CE9]' : 'tw-bg-[#934BC5] '
+            item.type === 'table' ? 'tw-bg-[#229CE9]' : 'tw-bg-[#934BC5]'
           )}
         >
-          {type === 'datasource' ? 'ch' : item.iname}
+          {item.type === 'table' ? 'ch' : item.iname}
         </span>
       </div>
       <span className="tw-ml-2">{item.name}</span>

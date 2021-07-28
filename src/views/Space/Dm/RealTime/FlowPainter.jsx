@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useMount } from 'react-use'
-import { newInstance, ready } from '@jsplumb/browser-ui'
+import { jsPlumb } from 'jsplumb'
 import { useDrop } from 'react-dnd'
+import { nanoid } from 'nanoid'
 import clsx from 'clsx'
 
 function FlowPainter() {
@@ -11,8 +12,15 @@ function FlowPainter() {
   const [{ canDrop, isOver }, drop] = useDrop(
     () => ({
       accept: 'box',
-      drop: (item) => {
-        setElems([...elems, item])
+      drop: (item, monitor) => {
+        const rect = rootEl.current.getBoundingClientRect()
+        const offset = monitor.getSourceClientOffset()
+        const x = offset.x - rect.x
+        const y = offset.y - rect.y
+        setElems([
+          ...elems,
+          { ...item, x: x > 0 ? x : 0, y: y > 0 ? y : 0, id: nanoid() },
+        ])
       },
       collect: (monitor) => ({
         isOver: monitor.isOver(),
@@ -24,57 +32,38 @@ function FlowPainter() {
   const isActive = canDrop && isOver
 
   useMount(() => {
-    ready(() => {
-      const instance = newInstance({
-        dragOptions: { cursor: 'pointer', zIndex: 2000 },
-        Connector: ['Bezier', { curviness: 150 }],
-        Anchors: ['TopCenter', 'BottomCenter'],
-        connectionOverlays: [
-          {
-            type: 'Arrow',
-            options: {
-              location: 1,
-              visible: true,
-              width: 11,
-              length: 11,
-              id: 'ARROW',
-              events: {
-                click() {
-                  // alert('you clicked on the arrow overlay')
-                },
-              },
-            },
-          },
-          {
-            type: 'Label',
-            options: {
-              location: 0.3,
-              id: 'label',
-              cssClass: 'aLabel',
-              events: {
-                click() {
-                  // alert('hey')
-                },
-              },
-            },
-          },
-        ],
-        container: rootEl.current,
+    jsPlumb.ready(() => {
+      const instance = jsPlumb.getInstance({
+        DragOptions: { cursor: 'pointer', zIndex: 2000 },
+        Anchors: ['Top', 'Bottom'],
+        PaintStyle: {
+          stroke: '#4C5E70',
+          strokeWidth: 1,
+        },
+        EndpointStyle: {
+          fill: '#4C5E70',
+          stroke: '#939EA9',
+          radius: 3,
+        },
+        Container: rootEl.current,
+        Connector: ['Bezier', { curviness: 30 }],
       })
-
       setRjsp(instance)
-
-      // const curEl = document.getElementById('flowChart0')
-
-      // instance.addEndpoint(curEl)
-      // instance.setDraggable(curEl, true)
     })
   })
 
   useEffect(() => {
-    if (rjsp) {
-      elems.forEach((elem, i) => {
-        rjsp.addEndpoint(document.getElementById(`${elem.id}-${i}`))
+    if (rjsp && elems.length > 0) {
+      const { id } = elems[elems.length - 1]
+      rjsp.draggable(id, { force: true })
+      const anchors = ['Top', 'Bottom']
+      anchors.forEach((anchor) => {
+        rjsp.addEndpoint(id, {
+          anchor,
+          maxConnections: -1,
+          isSource: true,
+          isTarget: true,
+        })
       })
     }
   }, [elems, rjsp])
@@ -86,21 +75,35 @@ function FlowPainter() {
         isActive ? 'tw-bg-neutral-N13 tw-bg-opacity-30' : ''
       )}
     >
-      <div ref={rootEl} className="tw-relative  tw-h-full">
-        {elems.map((elem, idx) => (
+      <div ref={rootEl} className="tw-relative tw-h-full">
+        {elems.map((elem) => (
           <div
             key={elem.id}
-            id={`${elem.id}-${idx}`}
-            className="tw-flex tw-absolute tw-border tw-border-neutral-N13 tw-rounded tw-px-2 tw-bg-neutral-N16 tw-py-1.5 tw-cursor-pointer tw-w-20 tw-items-center"
+            id={elem.id}
+            style={{ left: elem.x, top: elem.y }}
+            className={clsx(
+              'tw-flex tw-h-8 tw-pl-2 tw-w-40 tw-border-l-4 tw-absolute tw-border tw-border-neutral-N13 tw-rounded  tw-bg-neutral-N16 tw-cursor-pointer tw-items-center',
+              elem.type === 'table'
+                ? 'tw-border-l-[#229CE9]'
+                : 'tw-border-l-[#934BC5]'
+            )}
           >
-            {elem.name}
+            <div className="tw-w-6">
+              <span
+                className={clsx(
+                  'tw-p-1 tw-rounded-sm',
+                  elem.type === 'table' ? 'tw-bg-[#229CE9]' : 'tw-bg-[#934BC5]'
+                )}
+              >
+                {elem.type === 'table' ? 'ch' : elem.iname}
+              </span>
+            </div>
+            <span className="tw-ml-2">{elem.name}</span>
           </div>
         ))}
       </div>
     </div>
   )
 }
-
-FlowPainter.propTypes = {}
 
 export default FlowPainter
