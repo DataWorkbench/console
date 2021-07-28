@@ -105,11 +105,11 @@ function OverView() {
           }}
         />
         <div className="tw-px-5 tw-pt-6 tw-pb-10">
-          <div className=" tw-mb-6 tw-flex tw-items-center">
+          <div className="tw-mb-6 tw-flex tw-items-center">
             <Icon name="dashboard" type="light" />
             资源概览<span className="tw-text-neutral-N8">（周期实例）</span>
           </div>
-          <div className="tw-flex tw-justify-between tw-items-center tw-w-4/5 tw-mx-auto">
+          <div className="tw-flex tw-justify-between tw-items-center 2xl:tw-w-4/5 tw-mx-auto">
             <div className="tw-flex tw-relative tw-border tw-border-neutral-N13 tw-rounded-lg tw-px-8 tw-py-5">
               <div
                 className="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
@@ -119,7 +119,7 @@ function OverView() {
                 }}
               />
               <MyIcon name="screen_failed" size={32} />
-              <div className="tw-ml-6">
+              <div className="tw-ml-3 2xl:tw-ml-6">
                 <div className="tw-pb-1">运行失败实例</div>
                 <div className="tw-text-2xl tw-font-mono">24</div>
               </div>
@@ -133,7 +133,7 @@ function OverView() {
                 }}
               />
               <MyIcon name="screen_running" size={32} />
-              <div className="tw-ml-6">
+              <div className="tw-ml-3 2xl:tw-ml-6">
                 <div className="tw-pb-1">运行中实例</div>
                 <div className="tw-text-2xl tw-font-mono">12</div>
               </div>
@@ -147,7 +147,7 @@ function OverView() {
                 }}
               />
               <MyIcon name="screen_success" size={32} />
-              <div className="tw-ml-6">
+              <div className="tw-ml-3 2xl:tw-ml-6">
                 <div className="tw-pb-1">运行成功实例</div>
                 <div className="tw-text-2xl tw-font-mono">36</div>
               </div>
@@ -161,7 +161,7 @@ function OverView() {
                 }}
               />
               <MyIcon name="screen_waiting" size={32} />
-              <div className="tw-ml-6">
+              <div className="tw-ml-3 2xl:tw-ml-6">
                 <div className="tw-pb-1">等资源实例</div>
                 <div className="tw-text-2xl tw-font-mono">26</div>
               </div>
@@ -175,7 +175,7 @@ function OverView() {
                 }}
               />
               <MyIcon name="screen_stoped" size={32} />
-              <div className="tw-ml-6">
+              <div className="tw-ml-3 2xl:tw-ml-6">
                 <div className="tw-pb-1">未运行实例</div>
                 <div className="tw-text-2xl tw-font-mono">2</div>
               </div>
