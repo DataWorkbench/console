@@ -7,6 +7,11 @@ require('assets/icons/icon_service_2.svg')
 require('assets/icons/icon_service_3.svg')
 require('assets/icons/icon_service_4.svg')
 require('assets/icons/icon_service_5.svg')
+require('assets/icons/screen_failed.svg')
+require('assets/icons/screen_running.svg')
+require('assets/icons/screen_stoped.svg')
+require('assets/icons/screen_success.svg')
+require('assets/icons/screen_waiting.svg')
 
 const Icon = (props) => {
   const { name, className, size, ...others } = props

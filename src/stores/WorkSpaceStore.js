@@ -36,7 +36,7 @@ class WorkspaceStore {
       name: 'ops',
       title: '运维中心',
       subFuncList: [
-        { name: 'screen', title: '运维大屏' },
+        { name: 'overview', title: '运维大屏' },
         { name: 'realtime', title: '实时任务运维' },
         { name: 'offline', title: '离线任务运维' },
         { name: 'monitor', title: '智能监控' },
