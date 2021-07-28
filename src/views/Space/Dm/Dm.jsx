@@ -1,63 +1,40 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { useParams, Redirect } from 'react-router-dom'
-import { renderRoutes } from 'react-router-config'
+import { useParams } from 'react-router-dom'
 // import { SideMenu } from '@QCFE/qingcloud-portal-ui'
 import SideMenu from 'components/SideMenu'
 import { useStore } from 'stores'
+import RealTime from './RealTime'
 
-const propTypes = {
-  route: PropTypes.object.isRequired,
-}
+function Dm() {
+  const { zone, space, mod } = useParams()
+  const {
+    workspaceStore: { funcList },
+  } = useStore()
+  const { subFuncList } = funcList.find(({ name }) => name === 'dm')
+  const navMenu = subFuncList.map((func) => ({
+    ...func,
+    link: `/${zone}/workspace/${space}/dm/${func.name}`,
+  }))
 
-const navMenus = [
-  {
-    name: 'realtime_computing',
-    title: '实时计算',
-    icon: 'cogwheel',
-  },
-  {
-    name: 'resource_manage',
-    title: '资源管理',
-    icon: 'resource',
-    link: '/security',
-  },
-  {
-    name: 'func_manage',
-    title: '函数管理',
-    icon: 'textarea',
-  },
-  {
-    name: 'taskrun_history',
-    title: '任务运行历史',
-    icon: 'paper',
-  },
-]
-function Dm({ route }) {
+  const curFunc =
+    subFuncList.find((func) => func.name === mod) || subFuncList[0]
+
   const store = useStore()
   const {
     globalStore: { darkMode },
   } = store
-  const { zone, space, submod } = useParams()
-  if (!submod) {
-    return <Redirect to={`/${zone}/workspace/${space}/dm/realtime_computing`} />
-  }
-  const menus = navMenus.map((menu) => ({
-    ...menu,
-    link: `/${zone}/workspace/${space}/dm/${menu.name}`,
-  }))
   return (
-    <div className="tw-flex tw-h-full">
+    <div className="tw-flex-1 tw-flex tw-h-full">
       <SideMenu
-        menus={menus}
+        menus={navMenu}
         darkMode={darkMode}
-        defaultSelectedMenu={submod}
+        defaultSelectedMenu={curFunc.name}
       />
-      <div className="tw-flex-1"> {renderRoutes(route.routes)}</div>
+      <div className="tw-flex-1 tw-overflow-y-auto">
+        {curFunc.name === 'realtime' && <RealTime />}
+      </div>
     </div>
   )
 }
-
-Dm.propTypes = propTypes
 
 export default Dm

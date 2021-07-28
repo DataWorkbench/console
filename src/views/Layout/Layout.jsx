@@ -14,15 +14,15 @@ const MainLayout = ({ route }) => {
 
   const match = useRouteMatch(menuLinks)
   return (
-    <div className="tw-flex tw-flex-col tw-bg-neutral-N2 tw-min-h-screen">
-      <nav>
-        <GlobalNav />
-      </nav>
-      <div className="tw-flex-1 tw-flex">
+    <div className="tw-bg-neutral-N2 tw-flex tw-flex-col tw-h-screen">
+      <GlobalNav />
+      <div className="tw-flex tw-flex-1 tw-overflow-y-auto">
         {match && (
           <SideMenu title={title} menus={menus} relationMenus={relationMenus} />
         )}
-        <div className="tw-flex-1">{renderRoutes(route.routes)}</div>
+        <div className="tw-flex-1 tw-overflow-y-auto">
+          {renderRoutes(route.routes)}
+        </div>
       </div>
     </div>
   )

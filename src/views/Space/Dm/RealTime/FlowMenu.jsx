@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { observer } from 'mobx-react'
+import { useParams } from 'react-router-dom'
 import { Icon, Input } from '@QCFE/qingcloud-portal-ui/lib/components'
 import clsx from 'clsx'
+import { useStore } from 'stores'
 
 const propTypes = {
   onCreateClick: PropTypes.func,
@@ -12,6 +15,20 @@ const defaultPropTypes = {
 }
 
 function FlowMenu({ onCreateClick }) {
+  const { space } = useParams()
+  const {
+    workFlowStore,
+    workFlowStore: { flows, curFlow },
+  } = useStore()
+
+  useEffect(() => {
+    workFlowStore.load({ space }, true)
+  }, [space, workFlowStore])
+
+  const handleItemClick = (flow) => {
+    workFlowStore.set({ curFlow: flow })
+  }
+
   return (
     <div className="tw-w-56 tw-bg-neutral-N16 tw-m-3 tw-rounded dark:tw-text-white">
       <div
@@ -48,24 +65,50 @@ function FlowMenu({ onCreateClick }) {
           <ul className="tw-pt-2">
             <li>
               <Icon name="file" className="tw-align-middle" />
-              <span className="tw-align-middle">业务流程是什么？</span>
+              <span className="tw-align-middle tw-text-neutral-N8">
+                业务流程是什么？
+              </span>
             </li>
             <li>
               <Icon name="file" className="tw-align-middle" />
-              <span className="tw-align-middle">业务流程是什么？</span>
+              <span className="tw-align-middle tw-text-neutral-N8">
+                业务流程的操作指南
+              </span>
             </li>
           </ul>
         </div>
-        <div className="tw-text-center tw-mt-3">
+        <div className="tw-text-center tw-my-3">
           <button
             type="button"
             onClick={onCreateClick}
             className="tw-py-1 tw-rounded-sm tw-w-48 tw-bg-neutral-N13 focus:tw-outline-none hover:tw-bg-neutral-N10 tw-ring-opacity-50"
           >
             <Icon name="add" type="light" className="tw-align-middle" />
-            <span className="tw-align-middle">新建业务流程</span>
+            <span className="tw-align-middle">创建业务流程</span>
           </button>
         </div>
+      </div>
+      <div className="tw-pt-4">
+        {flows.length > 0 &&
+          flows.map((flow) => (
+            <div
+              key={flow.id}
+              className={clsx(
+                'tw-leading-8 tw-pl-3 tw-cursor-pointer',
+                curFlow && curFlow.id === flow.id
+                  ? 'tw-bg-brand-G11'
+                  : 'hover:tw-bg-neutral-N13'
+              )}
+              onClick={() => handleItemClick(flow)}
+            >
+              <Icon
+                name="caret-right"
+                type="light"
+                className="tw-align-middle"
+              />
+              <span className="tw-ml-1">{flow.name}</span>
+            </div>
+          ))}
       </div>
     </div>
   )
@@ -74,4 +117,4 @@ function FlowMenu({ onCreateClick }) {
 FlowMenu.propTypes = propTypes
 FlowMenu.defaultPropTypes = defaultPropTypes
 
-export default FlowMenu
+export default observer(FlowMenu)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { observer } from 'mobx-react'
 import { useMount } from 'react-use'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
@@ -20,6 +20,8 @@ const tabs = [
 
 const Workspace = () => {
   const [curTabIdx, setCurTabIdx] = useState(0)
+  const scrollParentRef = useRef(null)
+
   const {
     globalStore: { user },
     workspaceStore,
@@ -29,7 +31,10 @@ const Workspace = () => {
     workspaceStore.set({ zones: {} })
   })
   return (
-    <div className="tw-p-5 tw-text-xs">
+    <div
+      className="tw-p-5 !tw-pb-0 tw-text-xs tw-h-full tw-overflow-auto"
+      ref={scrollParentRef}
+    >
       <PageTab tabs={tabs} />
       <Card className="tw-pt-5">
         {user && (
@@ -43,15 +48,17 @@ const Workspace = () => {
             }
             tabClick={(i) => setCurTabIdx(i)}
           >
-            {getUserZone().map((zone, i) => (
-              <TabPanel key={zone} label={user.zones_info[zone][user.lang]}>
-                <SpaceLists
-                  className="tw-px-5 tw-py-3"
-                  zone={zone}
-                  isCurrent={curTabIdx === i}
-                />
-              </TabPanel>
-            ))}
+            {scrollParentRef &&
+              getUserZone().map((zone, i) => (
+                <TabPanel key={zone} label={user.zones_info[zone][user.lang]}>
+                  <SpaceLists
+                    className="tw-px-5 tw-py-3"
+                    zone={zone}
+                    isCurrent={curTabIdx === i}
+                    scrollParent={scrollParentRef.current}
+                  />
+                </TabPanel>
+              ))}
           </Tabs>
         )}
       </Card>

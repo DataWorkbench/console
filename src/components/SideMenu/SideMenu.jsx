@@ -95,7 +95,7 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
         </div>
         <div
           className={clsx(
-            'tw-flex tw-flex-none tw-h-10 tw-items-center tw-bg-neutral-N2 tw-border-t tw-border-neutral-N3 hover:tw-bg-neutral-N1 tw-pl-5',
+            'tw-flex tw-h-10 tw-items-center tw-bg-neutral-N2 tw-border-t tw-border-neutral-N3 hover:tw-bg-neutral-N1 tw-pl-5',
             'dark:tw-bg-neutral-N17 dark:tw-border-neutral-N13'
           )}
         >

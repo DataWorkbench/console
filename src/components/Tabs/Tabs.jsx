@@ -4,14 +4,22 @@ import clsx from 'clsx'
 import { uniq } from 'lodash'
 import styles from './tabs.module.css'
 
-export default function Tabs({ className, index, more, tabClick, children }) {
+export default function Tabs({
+  rootClassName,
+  panelClassName,
+  className,
+  index,
+  more,
+  tabClick,
+  children,
+}) {
   const [activeIndex, setActiveIndex] = useState(index)
   const [renderedIdxs, setRenderedIdxs] = useState([index])
   useEffect(() => {
     setActiveIndex(index)
   }, [index])
   return (
-    <div>
+    <div className={rootClassName}>
       <div
         className={clsx(
           'tw-border-neutral-N3 tw-border-b tw-flex tw-pl-5 tw-align-middle',
@@ -19,9 +27,7 @@ export default function Tabs({ className, index, more, tabClick, children }) {
           className
         )}
       >
-        <div
-          className={`tw-flex tw-border-r tw-border-neutral-N3  ${styles.wrap}`}
-        >
+        <div className="tw-flex tw-border-r tw-border-neutral-N3">
           {React.Children.map(children, (child, i) => {
             const { label } = child.props
             return (
@@ -47,7 +53,7 @@ export default function Tabs({ className, index, more, tabClick, children }) {
       {React.Children.map(children, (child, i) => {
         return (
           <div
-            className={clsx({
+            className={clsx(panelClassName, {
               'tw-hidden': activeIndex !== i,
             })}
           >
@@ -61,6 +67,8 @@ export default function Tabs({ className, index, more, tabClick, children }) {
 
 Tabs.propTypes = {
   children: PropTypes.node,
+  rootClassName: PropTypes.string,
+  panelClassName: PropTypes.string,
   className: PropTypes.string,
   index: PropTypes.number,
   tabClick: PropTypes.func,

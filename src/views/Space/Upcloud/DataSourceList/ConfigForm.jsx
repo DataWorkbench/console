@@ -1,16 +1,10 @@
 import React, { forwardRef } from 'react'
-import PropTypes from 'prop-types'
 import { Field, Label, Control } from '@QCFE/lego-ui'
 import { Alert, Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
-import DbItem from './DbItem'
 
 const { TextField, TextAreaField, PasswordField } = Form
 
-const propTypes = {
-  db: PropTypes.object,
-}
-
-const ConfigForm = forwardRef(({ db }, ref) => {
+const ConfigForm = forwardRef((props, ref) => {
   return (
     <div>
       <Alert
@@ -26,17 +20,19 @@ const ConfigForm = forwardRef(({ db }, ref) => {
         closable
         className="tw-mb-3"
       />
-      <Form
-        layout="vertical"
-        ref={ref}
-        onFieldValueChange={(fieldValue) => {
-          console.log(JSON.stringify(fieldValue))
-        }}
-      >
+      <Form layout="vertical" ref={ref}>
         <Field>
           <Label>数据源类型</Label>
           <Control className="tw-w-60">
-            <DbItem title={db.name} disp={db.disp} selected />
+            <div className="tw-rounded-sm tw-border tw-border-brand-G11 tw-p-2">
+              <div className="tw-font-medium tw-flex tw-items-center">
+                <Icon name="container" className="tw-mr-1" />
+                <span className="tw-text-brand-G11">连接器模式</span>
+              </div>
+              <div className="tw-text-neutral-N8">
+                这是一个很长很长很长很长的关于模式的描述信息。
+              </div>
+            </div>
           </Control>
         </Field>
         <TextField
@@ -58,32 +54,38 @@ const ConfigForm = forwardRef(({ db }, ref) => {
         />
         <TextAreaField
           name="desc"
-          validateOnChange
           rows={3}
           label={
             <>
-              <span className="tw-text-red-600 tw-mr-1">*</span>数据源描述
+              <span className="tw-text-red-600 tw-mr-1" />
+              数据源描述
             </>
           }
           placeholder="请填写数据库的描述信息"
+          validateOnChange
           schemas={[
             {
               rule: { maxLength: 300 },
-              help: '',
+              help: '请填写数据库的描述信息',
               status: 'error',
             },
           ]}
         />
         <TextField
           name="ip"
-          validateOnChange
           label={
             <>
               <span className="tw-text-red-600 tw-mr-1">*</span>IP 地址
             </>
           }
           defaultValue=""
+          validateOnChange
           schemas={[
+            {
+              rule: { required: true },
+              help: '请输入ip',
+              status: 'error',
+            },
             {
               rule: {
                 matchRegex:
@@ -97,13 +99,24 @@ const ConfigForm = forwardRef(({ db }, ref) => {
         />
         <TextField
           name="port"
-          validateOnChange
           label={
             <>
               <span className="tw-text-red-600 tw-mr-1">*</span>端口号
             </>
           }
           placeholder="请输入端口号信息"
+          validateOnChange
+          schemas={[
+            {
+              rule: {
+                required: true,
+                matchRegex:
+                  /^([0-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$/,
+              },
+              help: '请输入端口号信息',
+              status: 'error',
+            },
+          ]}
         />
         <TextField
           name="db"
@@ -113,6 +126,17 @@ const ConfigForm = forwardRef(({ db }, ref) => {
             </>
           }
           placeholder="请输入 database 信息"
+          validateOnChange
+          schemas={[
+            {
+              rule: {
+                required: true,
+                matchRegex: /^[0-9a-zA-Z$_]+$/,
+              },
+              help: '请输入 database 信息',
+              status: 'error',
+            },
+          ]}
         />
         <TextField
           name="user"
@@ -122,6 +146,17 @@ const ConfigForm = forwardRef(({ db }, ref) => {
             </>
           }
           placeholder="请输入用户名"
+          validateOnChange
+          schemas={[
+            {
+              rule: {
+                required: true,
+                isEmpty: false,
+              },
+              help: '请输入用户名',
+              status: 'error',
+            },
+          ]}
         />
         <PasswordField
           name="passwd"
@@ -133,6 +168,17 @@ const ConfigForm = forwardRef(({ db }, ref) => {
           autoComplete="off"
           showPrefixIcon
           placeholder="请输入密码"
+          validateOnChange
+          schemas={[
+            {
+              rule: {
+                required: true,
+                isEmpty: false,
+              },
+              help: '请输入密码',
+              status: 'error',
+            },
+          ]}
         />
         <Field>
           <Label>连通性测试</Label>
@@ -147,7 +193,5 @@ const ConfigForm = forwardRef(({ db }, ref) => {
     </div>
   )
 })
-
-ConfigForm.propTypes = propTypes
 
 export default ConfigForm

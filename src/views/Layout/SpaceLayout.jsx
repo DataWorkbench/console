@@ -26,14 +26,14 @@ const SpaceLayout = ({ route }) => {
   return (
     <div
       className={clsx(
-        'tw-flex tw-flex-col tw-min-h-screen tw-bg-neutral-N2 dark:tw-bg-neutral-N17'
+        'tw-flex tw-flex-col tw-h-screen tw-bg-neutral-N2 dark:tw-bg-neutral-N17'
       )}
     >
       <Header darkMode={darkMode} />
-      <div className="tw-flex-1 tw-flex">
-        <div className="tw-flex-1 tw-justify-self-stretch">
-          {renderRoutes(route.routes)}
-        </div>
+      <div className="tw-flex-1 tw-flex tw-overflow-y-auto">
+        {renderRoutes(route.routes)}
+        {/* <div className="tw-flex-1 tw-justify-self-stretch">
+        </div> */}
       </div>
     </div>
   )

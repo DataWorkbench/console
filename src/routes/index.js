@@ -7,7 +7,6 @@ import Dm from 'views/Space/Dm'
 import Manage from 'views/Space/Manage'
 import Ops from 'views/Space/Ops'
 import Upcloud from 'views/Space/Upcloud'
-import RealTimeComputing from 'views/Space/Dm/RealTimeComuting'
 
 const routes = [
   {
@@ -19,21 +18,15 @@ const routes = [
         component: Upcloud,
       },
       {
-        path: '/:zone/workspace/:space/dm/:submod?',
+        path: '/:zone/workspace/:space/dm/:mod?',
         component: Dm,
-        routes: [
-          {
-            path: '/:zone/workspace/:space/dm/realtime_computing',
-            component: RealTimeComputing,
-          },
-        ],
       },
       {
-        path: '/:zone/workspace/:space/ops',
+        path: '/:zone/workspace/:space/ops/:mod?',
         component: Ops,
       },
       {
-        path: '/:zone/workspace/:space/manage',
+        path: '/:zone/workspace/:space/manage/:mod?',
         component: Manage,
       },
     ],

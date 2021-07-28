@@ -27,11 +27,14 @@ function Header({ darkMode }) {
   const mod = matched ? matched[1] : 'upcloud'
 
   useMount(async () => {
-    workspaceStore.loadAll(zone, true).then((infos) => {
-      if (infos) {
-        setWorkspaces(infos)
+    const infos = await workspaceStore.loadAll(zone, true)
+    if (infos) {
+      setWorkspaces(infos)
+      const curSpace = infos.find((info) => info.id === space)
+      if (curSpace) {
+        workspaceStore.set({ curSpace })
       }
-    })
+    }
   })
 
   return (

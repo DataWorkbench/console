@@ -18,25 +18,26 @@ const defaultProps = {
 
 const stepTexts = ['选择数据库', '配置数据库']
 
-const dbItems = [
-  { name: 'MySql', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
-  {
-    name: 'PostgreSQL',
-    disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
-  },
-  { name: 'Kafka', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
-  { name: 'S3', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
-  {
-    name: 'ClickHouse',
-    disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
-  },
-  {
-    name: 'Hbase',
-    disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
-  },
-]
+// const dbItems = [
+//   { name: 'MySql', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
+//   {
+//     name: 'PostgreSQL',
+//     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
+//   },
+//   { name: 'Kafka', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
+//   { name: 'S3', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
+//   {
+//     name: 'ClickHouse',
+//     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
+//   },
+//   {
+//     name: 'Hbase',
+//     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
+//   },
+// ]
 
 function DataSourceModal({ show, onHide }) {
+  const [dbItems, setDbItems] = useState([])
   const [step, setStep] = useState(0)
   const [dbIndex, setDbIndex] = useState()
   const [loading, toggleLoading] = useToggle(true)
@@ -46,7 +47,8 @@ function DataSourceModal({ show, onHide }) {
   useMount(() => {
     dataSourceStore
       .loadEngineMap()
-      .then(() => {
+      .then((dbl) => {
+        setDbItems(dbl)
         // console.log(engines)
       })
       .catch(() => {
@@ -65,7 +67,9 @@ function DataSourceModal({ show, onHide }) {
     setStep(1)
   }
   const handleSave = () => {
-    // console.log(form.current.getFieldsValue())
+    if (form.current.validateForm()) {
+      // const params = form.current.getFieldsValue()
+    }
   }
   return (
     <Modal

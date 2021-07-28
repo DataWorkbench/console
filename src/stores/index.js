@@ -5,6 +5,7 @@ import OverViewStore from 'stores/OverViewStore'
 import GlobalStore from 'stores/GlobalStore'
 import WorkspaceStore from 'stores/WorkSpaceStore'
 import DataSourceStore from 'stores/DataSourceStore'
+import WorkFlowStore from 'stores/WorkFlowStore'
 import api from './api'
 
 configure({
@@ -18,6 +19,7 @@ class RootStore {
     this.globalStore = new GlobalStore(this)
     this.workspaceStore = new WorkspaceStore(this)
     this.dataSourceStore = new DataSourceStore(this)
+    this.workFlowStore = new WorkFlowStore(this)
     this.api = api
   }
 }

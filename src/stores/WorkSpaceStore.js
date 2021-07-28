@@ -26,10 +26,10 @@ class WorkspaceStore {
       name: 'dm',
       title: '云上加工',
       subFuncList: [
-        { name: 'realtime', title: '实时计算' },
-        { name: 'resources', title: '资源管理' },
-        { name: 'funcs', title: '函数管理' },
-        { name: 'history', title: '任务运行历史' },
+        { name: 'realtime', title: '实时计算', icon: 'cogwheel' },
+        { name: 'resources', title: '资源管理', icon: 'resource' },
+        { name: 'funcs', title: '函数管理', icon: 'textarea' },
+        { name: 'history', title: '任务运行历史', icon: 'paper' },
       ],
     },
     {
@@ -132,10 +132,10 @@ class WorkspaceStore {
         curZone.workspaces = workspaces.concat(infos)
         curZone.hasMore = hasMore
         filter.offset = curZone.workspaces.length
-        this.zones[zoneName] = curZone
       } else {
-        curZone.hasMore = false
+        curZone.hasMore = hasMore
       }
+      this.zones[zoneName] = curZone
     }
   }
 

@@ -10,11 +10,35 @@ const workspace = {
 
 const datasource = {
   loadEngineMap: () => request({ action: 'v1/enginemap/flink' }),
+  create: ({ space, ...params }) =>
+    request(
+      { action: `v1/workspace/${space}/sourcemanager`, ...params },
+      'POST'
+    ),
+  load: ({ space, ...params }) =>
+    request(
+      { action: `v1/workspace/${space}/sourcemanager`, ...params },
+      'GET'
+    ),
+}
+
+const workflow = {
+  create: ({ space, ...params }) =>
+    request(
+      { action: `v1/workspace/${space}/workflow/stream`, ...params },
+      'POST'
+    ),
+  load: ({ space, ...params }) =>
+    request(
+      { action: `v1/workspace/${space}/workflow/stream`, ...params },
+      'GET'
+    ),
 }
 
 const api = {
   workspace,
   datasource,
+  workflow,
 }
 
 export default api

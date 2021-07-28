@@ -1,12 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-function TabPanel({ children }) {
-  return <div>{children}</div>
+function TabPanel({ className, children }) {
+  return <div className={className}>{children}</div>
 }
 
 TabPanel.propTypes = {
   children: PropTypes.node,
+  className: PropTypes.string,
 }
 
 export default TabPanel

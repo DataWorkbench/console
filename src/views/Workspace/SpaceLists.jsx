@@ -14,14 +14,14 @@ const propTypes = {
   className: PropTypes.string,
   zone: PropTypes.string,
   isCurrent: PropTypes.bool,
+  scrollParent: PropTypes.object,
 }
 
-const SpaceLists = ({ zone, className, isCurrent }) => {
+const SpaceLists = ({ zone, className, isCurrent, scrollParent }) => {
   const {
     workspaceStore,
     workspaceStore: { showModal, zones },
   } = useStore()
-
   const {
     hasMore = true,
     loadStatus = null,
@@ -43,7 +43,6 @@ const SpaceLists = ({ zone, className, isCurrent }) => {
   const toggleShowModal = (v) => {
     workspaceStore.set({ showModal: v, curOpt: 'create' })
   }
-
   return (
     <div className={className}>
       <div className="tw-flex tw-justify-between tw-mb-5 ">
@@ -81,6 +80,8 @@ const SpaceLists = ({ zone, className, isCurrent }) => {
           loadMore={loadFunc}
           hasMore={hasMore}
           loader={<div key={0}>数据加载中...</div>}
+          useWindow={false}
+          getScrollParent={() => scrollParent}
         >
           <div className="tw-flex tw-flex-wrap">
             {workspaces &&
