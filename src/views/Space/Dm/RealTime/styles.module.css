@@ -7,12 +7,12 @@
       }
     }
     .tabs.is-boxed {
-      @apply tw-bg-neutral-N17;
+      @apply tw-bg-neut-17;
 
       ul {
-        @apply tw-border-neutral-N17;
+        @apply tw-border-neut-17;
         li {
-          @apply !tw-bg-neutral-N16 !tw-border-neutral-N18 !tw-text-white;
+          @apply !tw-bg-neut-16 !tw-border-neut-18 !tw-text-white;
           svg {
             color: hsla(0, 0%, 100%, 0.9);
             fill: hsla(0, 0%, 100%, 0.4);
@@ -22,7 +22,7 @@
           @apply tw-text-white;
         }
         li.is-active {
-          @apply !tw-bg-neutral-N18;
+          @apply !tw-bg-neut-18;
         }
       }
     }
@@ -30,32 +30,32 @@
 }
 
 .btn {
-  @apply tw-border tw-rounded-sm tw-border-neutral-N13 tw-px-3 tw-h-8 tw-flex tw-items-center tw-outline-none;
-  @apply focus:tw-outline-none hover:tw-bg-neutral-N17 tw-mr-2;
+  @apply tw-border tw-rounded-sm tw-border-neut-13 tw-px-3 tw-h-8 tw-flex tw-items-center tw-outline-none;
+  @apply focus:tw-outline-none hover:tw-bg-neut-17 tw-mr-2;
   span:last-child {
     @apply tw-ml-1.5;
   }
 }
 
 .menu {
-  @apply !tw-bg-neutral-N16;
+  @apply !tw-bg-neut-16;
   :global {
     .menu-item {
       @apply tw-text-white;
       &:hover {
-        @apply tw-bg-neutral-N13 tw-text-white;
+        @apply tw-bg-neut-13 tw-text-white;
       }
     }
     .menu-inline-submenu-title {
-      @apply tw-bg-neutral-N13;
+      @apply tw-bg-neut-13;
       &:hover {
-        @apply tw-text-white tw-bg-neutral-N13;
+        @apply tw-text-white tw-bg-neut-13;
       }
     }
     .menu-item:active,
     .menu-item-selected,
     .menu-item-selected:hover {
-      @apply tw-bg-neutral-N16;
+      @apply tw-bg-neut-16;
     }
   }
 }

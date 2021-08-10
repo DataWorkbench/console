@@ -53,7 +53,7 @@ function FlowTabs() {
           type="card"
           activeName={curFlow.id}
           className={clsx(
-            'tw-bg-neutral-N18 tw-h-full tw-rounded-md tw-flex tw-flex-col',
+            'tw-bg-neut-18 tw-h-full tw-rounded-md tw-flex tw-flex-col',
             styles.tabWrapper
           )}
           onChange={(name) => workFlowStore.setCurFlow(name)}
@@ -96,7 +96,7 @@ function FlowTabs() {
                     type="button"
                     className={clsx(
                       styles.btn,
-                      'tw-bg-neutral-N13 hover:tw-bg-neutral-N15'
+                      'tw-bg-neut-13 hover:tw-bg-neut-15'
                     )}
                   >
                     <Icon name="data" type="dark" />

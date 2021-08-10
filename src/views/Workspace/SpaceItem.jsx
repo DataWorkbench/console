@@ -23,8 +23,9 @@ const propTypes = {
   zone: PropTypes.string,
   space: PropTypes.object,
   className: PropTypes.string,
+  isModal: PropTypes.bool,
 }
-function SpaceItem({ zone, space, className }) {
+function SpaceItem({ zone, space, className, isModal }) {
   const { id, name, desc, status, owner, created } = space
   const [moreMenuVisible, setMoreMenuVisible] = useToggle(false)
   const {
@@ -63,7 +64,7 @@ function SpaceItem({ zone, space, className }) {
   return (
     <Card
       className={clsx(
-        'tw-rounded tw-border tw-border-t-4 tw-text-neutral-N8 tw-border-neutral-N2',
+        'tw-rounded tw-border tw-border-t-4 tw-text-neut-8 tw-border-neut-2',
         className
       )}
     >
@@ -79,7 +80,7 @@ function SpaceItem({ zone, space, className }) {
           </div>
           <div className="tw-ml-3">
             <div className="tw-flex tw-items-center">
-              <span className="tw-font-medium tw-text-base tw-text-neutral-N16">
+              <span className="tw-font-medium tw-text-base tw-text-neut-16">
                 {name}
               </span>
               <span>（{id}）</span>
@@ -106,7 +107,7 @@ function SpaceItem({ zone, space, className }) {
           </span>
           <div
             className={clsx(
-              `tw-absolute tw-top-6 tw-right-0 tw-w-28 tw-bg-white tw-shadow tw-border-neutral-N2 tw-text-neutral-N15 tw-border rounded-sm tw-py-2 tw-transition-all tw-transform tw-ease-out`,
+              `tw-absolute tw-top-6 tw-right-0 tw-w-28 tw-bg-white tw-shadow tw-border-neut-2 tw-text-neut-15 tw-border rounded-sm tw-py-2 tw-transition-all tw-transform tw-ease-out`,
               moreMenuVisible
                 ? 'tw-opacity-1 tw-scale-100'
                 : 'tw-opacity-0 tw-scale-95 tw-invisible'
@@ -128,23 +129,23 @@ function SpaceItem({ zone, space, className }) {
       <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
         <div>
           <span>我的角色：</span>
-          <span className="tw-bg-neutral-N13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
+          <span className="tw-bg-neut-13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
             {owner}
           </span>
-          <span className="tw-bg-neutral-N2 tw-text-neutral-N15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
+          <span className="tw-bg-neut-2 tw-text-neut-15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
             运维
           </span>
         </div>
         <div className="tw-flex tw-items-center ">
           <div>空间成员</div>
           <div className="tw-flex tw-items-center">
-            <div className="tw-w-6 tw-h-6 tw-bg-neutral-N3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mx-1">
+            <div className="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mx-1">
               <Icon name="human" size={18} />
             </div>
-            <div className="tw-w-6 tw-h-6 tw-bg-neutral-N3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1">
+            <div className="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1">
               <Icon name="human" size={18} />
             </div>
-            <div className="tw-w-6 tw-h-6 tw-bg-neutral-N3 tw-rounded-full tw-flex tw-items-center tw-justify-center">
+            <div className="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center">
               <Icon name="human" size={18} />
             </div>
           </div>
@@ -162,48 +163,50 @@ function SpaceItem({ zone, space, className }) {
         <div>
           <span>
             创建时间：
-            <span className="tw-text-neutral-N16">
+            <span className="tw-text-neut-16">
               {dayjs.unix(created).format('YYYY-MM-DD hh:mm:ss')}
             </span>
           </span>
         </div>
       </div>
-      <div className="tw-px-5 tw-py-4 tw-flex tw-justify-center tw-bg-neutral-N1 tw-border-t tw-border-neutral-N3">
-        {funcList.map(({ name: funcName, title, subFuncList }, i) => (
-          <Tooltip
-            className="tw-p-0"
-            key={funcName}
-            content={subFuncList.map((subFunc) => (
-              <Link
-                key={subFunc.name}
-                to={`${zone}/workspace/${id}/${funcName}/${subFunc.name}`}
-                className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neutral-N15 hover:tw-text-white"
-              >
-                <Icon name="blockchain" />
-                {subFunc.title}
-              </Link>
-            ))}
-            placement="bottomRight"
-          >
-            <Link
-              to={`${zone}/workspace/${id}/${funcName}`}
-              className="hover:tw-text-brand-G11"
+      {!isModal && (
+        <div className="tw-px-5 tw-py-4 tw-flex tw-justify-center tw-bg-neut-1 tw-border-t tw-border-neut-3">
+          {funcList.map(({ name: funcName, title, subFuncList }, i) => (
+            <Tooltip
+              className="tw-p-0"
+              key={funcName}
+              content={subFuncList.map((subFunc) => (
+                <Link
+                  key={subFunc.name}
+                  to={`${zone}/workspace/${id}/${funcName}/${subFunc.name}`}
+                  className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neut-15 hover:tw-text-white"
+                >
+                  <Icon name="blockchain" />
+                  {subFunc.title}
+                </Link>
+              ))}
+              placement="bottomRight"
             >
-              <button
-                type="button"
-                className={clsx(
-                  'tw-font-semibold tw-text-xs tw-rounded-sm tw-text-neutral-N13  tw-bg-neutral-N1 tw-border tw-border-neutral-N3',
-                  'tw-px-4 2xl:tw-px-8 tw-py-1',
-                  i < funcList.length - 1 ? 'tw-mr-4' : 'tw-mr-0',
-                  'focus:tw-outline-none hover:tw-bg-brand-G0 hover:tw-border-brand-G11 hover:tw-shadow tw-transition-colors'
-                )}
+              <Link
+                to={`${zone}/workspace/${id}/${funcName}`}
+                className="hover:tw-text-green-11"
               >
-                {title}
-              </button>
-            </Link>
-          </Tooltip>
-        ))}
-      </div>
+                <button
+                  type="button"
+                  className={clsx(
+                    'tw-font-semibold tw-text-xs tw-rounded-sm tw-text-neut-13  tw-bg-neut-1 tw-border tw-border-neut-3',
+                    'tw-px-4 2xl:tw-px-8 tw-py-1',
+                    i < funcList.length - 1 ? 'tw-mr-4' : 'tw-mr-0',
+                    'focus:tw-outline-none hover:tw-bg-green-0 hover:tw-border-green-11 hover:tw-shadow tw-transition-colors'
+                  )}
+                >
+                  {title}
+                </button>
+              </Link>
+            </Tooltip>
+          ))}
+        </div>
+      )}
     </Card>
   )
 }

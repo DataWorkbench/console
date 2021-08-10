@@ -14,7 +14,7 @@ const MainLayout = ({ route }) => {
 
   const match = useRouteMatch(menuLinks)
   return (
-    <div className="tw-bg-neutral-N2 tw-flex tw-flex-col tw-h-screen">
+    <div className="tw-bg-neut-2 tw-flex tw-flex-col tw-h-screen">
       <GlobalNav />
       <div className="tw-flex tw-flex-1 tw-overflow-y-auto">
         {match && (

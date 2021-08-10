@@ -6,7 +6,7 @@
     "baseUrl": "./src",
     "paths": {
       "components/*": ["components/*"],
-      "containers/*": ["containers/*"],
+      "views/*": ["views/*"],
       "stores/*": ["stores/*"],
       "scss/*": ["scss/*"],
       "hooks/*": ["hooks/*"],

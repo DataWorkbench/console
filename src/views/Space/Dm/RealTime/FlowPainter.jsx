@@ -72,7 +72,7 @@ function FlowPainter() {
       ref={drop}
       className={clsx(
         'tw-h-full',
-        isActive ? 'tw-bg-neutral-N13 tw-bg-opacity-30' : ''
+        isActive ? 'tw-bg-neut-13 tw-bg-opacity-30' : ''
       )}
     >
       <div ref={rootEl} className="tw-relative tw-h-full">
@@ -82,7 +82,7 @@ function FlowPainter() {
             id={elem.id}
             style={{ left: elem.x, top: elem.y }}
             className={clsx(
-              'tw-flex tw-h-8 tw-pl-2 tw-w-40 tw-border-l-4 tw-absolute tw-border tw-border-neutral-N13 tw-rounded  tw-bg-neutral-N16 tw-cursor-pointer tw-items-center',
+              'tw-flex tw-h-8 tw-pl-2 tw-w-40 tw-border-l-4 tw-absolute tw-border tw-border-neut-13 tw-rounded  tw-bg-neut-16 tw-cursor-pointer tw-items-center',
               elem.type === 'table'
                 ? 'tw-border-l-[#229CE9]'
                 : 'tw-border-l-[#934BC5]'

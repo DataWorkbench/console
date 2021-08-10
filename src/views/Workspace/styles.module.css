@@ -9,7 +9,7 @@
 }
 
 .st_active {
-  @apply tw-text-brand-G11 tw-bg-brand-G0;
+  @apply tw-text-green-11 tw-bg-green-0;
   svg {
     color: #00aa72;
     fill: #dff7ed;
@@ -29,7 +29,7 @@
 }
 
 .moreMenuItem {
-  @apply tw-py-1 tw-pl-2 tw-cursor-pointer hover:tw-bg-neutral-N2;
+  @apply tw-py-1 tw-pl-2 tw-cursor-pointer hover:tw-bg-neut-2;
 }
 
 .ws_0 {

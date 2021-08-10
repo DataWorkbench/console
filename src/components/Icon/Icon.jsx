@@ -21,7 +21,7 @@ const Icon = (props) => {
   }
 
   return (
-    <svg {...wh} {...others}>
+    <svg {...wh} {...others} className={className}>
       <use xlinkHref={`#bdicon-${name}`} />
     </svg>
   )

@@ -2,9 +2,24 @@ import React, { useRef, useState } from 'react'
 import { useMount, useUnmount } from 'react-use'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import MyIcon from 'components/Icon'
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { LineChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+} from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 import screen0 from 'assets/screen_0.svg'
 import screen1 from 'assets/screen_1.svg'
+
+echarts.use([
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  LineChart,
+  CanvasRenderer,
+])
 
 function OverView() {
   const insRef = useRef()
@@ -96,7 +111,7 @@ function OverView() {
   })
   return (
     <div className="tw-p-5 tw-text-white">
-      <section className="tw-bg-neutral-N16 tw-rounded-b tw-text-sm tw-mb-5">
+      <section className="tw-bg-neut-16 tw-rounded-b tw-text-sm tw-mb-5">
         <div
           className="tw-h-2 "
           style={{
@@ -107,10 +122,10 @@ function OverView() {
         <div className="tw-px-5 tw-pt-6 tw-pb-10">
           <div className="tw-mb-6 tw-flex tw-items-center">
             <Icon name="dashboard" type="light" />
-            资源概览<span className="tw-text-neutral-N8">（周期实例）</span>
+            资源概览<span className="tw-text-neut-8">（周期实例）</span>
           </div>
           <div className="tw-flex tw-justify-between tw-items-center 2xl:tw-w-4/5 tw-mx-auto">
-            <div className="tw-flex tw-relative tw-border tw-border-neutral-N13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div className="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
               <div
                 className="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
                 style={{
@@ -124,7 +139,7 @@ function OverView() {
                 <div className="tw-text-2xl tw-font-mono">24</div>
               </div>
             </div>
-            <div className="tw-flex tw-relative tw-border tw-border-neutral-N13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div className="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
               <div
                 className="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
                 style={{
@@ -138,7 +153,7 @@ function OverView() {
                 <div className="tw-text-2xl tw-font-mono">12</div>
               </div>
             </div>
-            <div className="tw-flex tw-relative tw-border tw-border-neutral-N13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div className="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
               <div
                 className="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
                 style={{
@@ -152,7 +167,7 @@ function OverView() {
                 <div className="tw-text-2xl tw-font-mono">36</div>
               </div>
             </div>
-            <div className="tw-flex tw-relative tw-border tw-border-neutral-N13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div className="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
               <div
                 className="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
                 style={{
@@ -166,7 +181,7 @@ function OverView() {
                 <div className="tw-text-2xl tw-font-mono">26</div>
               </div>
             </div>
-            <div className="tw-flex tw-relative tw-border tw-border-neutral-N13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div className="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
               <div
                 className="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
                 style={{
@@ -184,7 +199,7 @@ function OverView() {
         </div>
       </section>
       <section
-        className="tw-bg-neutral-N16 tw-rounded-b tw-text-sm tw-mb-5 tw-h-72"
+        className="tw-bg-neut-16 tw-rounded-b tw-text-sm tw-mb-5 tw-h-72"
         ref={insRef}
       />
       <section className="tw-flex tw-justify-center tw-mb-5">

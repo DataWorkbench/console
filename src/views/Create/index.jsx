@@ -8,15 +8,15 @@ function Create() {
   const history = useHistory()
   if (!step || step === '0') {
     return (
-      <div className="tw-flex tw-flex-1 tw-justify-center tw-bg-neutral-N2 tw-h-full">
+      <div className="tw-flex tw-flex-1 tw-justify-center tw-bg-neut-2 tw-h-full">
         <div className="tw-m-3 tw-flex-1 tw-rounded-md tw-bg-white">
           <div
             className={`${styles.infoIcon} tw-w-8/12 tw-m-auto tw-mt-5 tw-pt-9`}
           >
-            <div className="tw-font-medium tw-text-xl tw-pb-3 tw-text-neutral-N19">
+            <div className="tw-font-medium tw-text-xl tw-pb-3 tw-text-neut-19">
               您还未开通「大数据平台」
             </div>
-            <div className="tw-text-xs tw-pb-6 tw-text-neutral-N8 tw-font-medium">
+            <div className="tw-text-xs tw-pb-6 tw-text-neut-8 tw-font-medium">
               大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。了解更多
             </div>
             <div>
@@ -35,7 +35,7 @@ function Create() {
   }
   if (step === '1') {
     return (
-      <div className="tw-flex-1 tw-bg-neutral-N2">
+      <div className="tw-flex-1 tw-bg-neut-2">
         <div className="tw-font-medium tw-text-2xl tw-py-7 tw-leading-7 tw-pl-32 tw-bg-white">
           大数据平台
         </div>
@@ -60,7 +60,7 @@ function Create() {
                   元的用户可以直接开通，开通后按实际使用量计费。
                 </div>
               </div>
-              <div className="tw-flex tw-mb-8 tw-border-t tw-border-neutral-N2 tw-pt-5">
+              <div className="tw-flex tw-mb-8 tw-border-t tw-border-neut-2 tw-pt-5">
                 <div className="tw-pr-9 tw-text-sm">服务协议</div>
                 <div>
                   <Checkbox>
@@ -72,7 +72,7 @@ function Create() {
                 </div>
               </div>
             </div>
-            <div className="tw-border-t tw-border-neutral-N2 tw-pt-6 tw-pl-32 tw-pr-14 tw-flex tw-justify-between tw-items-center">
+            <div className="tw-border-t tw-border-neut-2 tw-pt-6 tw-pl-32 tw-pr-14 tw-flex tw-justify-between tw-items-center">
               <Button type="primary" onClick={() => history.push('/create/2')}>
                 确定开通
               </Button>
@@ -93,15 +93,15 @@ function Create() {
   }
   if (step === '2') {
     return (
-      <div className="tw-flex-1 tw-flex tw-justify-center tw-bg-neutral-N2 tw-h-full">
+      <div className="tw-flex-1 tw-flex tw-justify-center tw-bg-neut-2 tw-h-full">
         <div className="tw-m-3 tw-flex-1 tw-rounded-md tw-bg-white">
           <div
             className={`${styles.step2Icon} tw-w-8/12 tw-m-auto tw-mt-28 tw-pt-9`}
           >
-            <div className="tw-font-medium tw-text-xl tw-pb-3 tw-text-neutral-N19">
+            <div className="tw-font-medium tw-text-xl tw-pb-3 tw-text-neut-19">
               产品初始化配置中，请稍等…
             </div>
-            <div className="tw-text-xs tw-pb-6 tw-text-neutral-N8 tw-font-medium">
+            <div className="tw-text-xs tw-pb-6 tw-text-neut-8 tw-font-medium">
               大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。了解更多
             </div>
           </div>

@@ -1,18 +1,14 @@
 import React, { useEffect, useRef } from 'react'
+import clsx from 'clsx'
 import PropTypes from 'prop-types'
-import { dropRight, last } from 'lodash'
+import { useMeasure } from 'react-use'
 import { SVG } from '@svgdotjs/svg.js'
-import Icon from 'components/Icon'
-
-const lifeCycleItems = [
-  { text: '数据上云', xlink: 'icon_service_0' },
-  { text: '云上加工', xlink: 'icon_service_1' },
-  { text: '数据仓库', xlink: 'icon_service_2' },
-  { text: '数据服务', xlink: 'icon_service_3' },
-  { text: '数据治理', xlink: 'icon_service_4' },
-]
+import FlowCell from './FlowCell'
 
 function renderBottomArrow(elem) {
+  if (!elem) {
+    return
+  }
   const el = elem
   el.innerHTML = ''
   const draw = SVG().addTo(el).size('100%', '18').fill('none')
@@ -39,7 +35,27 @@ function renderBottomArrow(elem) {
     .attr(attr)
 }
 
+function renderBottomUpArrow(elem) {
+  if (!elem) {
+    return
+  }
+  const el = elem
+  el.innerHTML = ''
+  const draw = SVG().addTo(el).size('100%', '100%').fill('none')
+  const attr = {
+    stroke: '#D5DEE7',
+    'stroke-width': '2',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+  }
+  draw.path(`M 28 6 v 60`).attr(attr)
+  draw.circle(10).move(23, 66).attr(attr)
+}
+
 function renderTlArrow(elem) {
+  if (!elem) {
+    return
+  }
   const el = elem
   el.innerHTML = ''
   const attr = {
@@ -48,17 +64,12 @@ function renderTlArrow(elem) {
     'stroke-linecap': 'round',
     'stroke-linejoin': 'round',
   }
-  const r = 5
-  const iconhw = 28
   const arcr = 8
   const len = el.offsetWidth
   const w = len - arcr * 2
   const draw = SVG().addTo(el).size('100%', '100%').fill('none')
-  draw.path(`M${iconhw} 80 v -50 a 8 8 0 0 1 8 -8 H ${len - arcr}`).attr(attr)
-  draw
-    .circle(r * 2)
-    .move(23, 80)
-    .attr(attr)
+  draw.path(`M28 80 v -50 a 8 8 0 0 1 8 -8 H ${len - arcr}`).attr(attr)
+  draw.circle(10).move(23, 80).attr(attr)
   draw.path(`M${w} 14 L ${w + 8} 22 L${w} 30 `).attr(attr)
 }
 
@@ -83,42 +94,55 @@ function renderTrArrow(elem) {
   draw.path(`M16 14 L 8 22 L16 30`).attr(attr)
 }
 
-const LifeCycle = ({ className }) => {
+const Flow = ({ items }) => {
   const arrowEl = useRef([])
-  const ltArrowEl = useRef(null)
-  const rtArrowEl = useRef(null)
+  const bmArrowEl = useRef([])
+  const tlArrowEl = useRef(null)
+  const trArrowEl = useRef(null)
+  const [rootRef, { width: rootWidth }] = useMeasure()
+  const flowItems = items.slice(0, -1)
+  const opsItem = items.slice(-1)[0]
+  const flowItemsLen = flowItems.length
+
   useEffect(() => {
     arrowEl.current.forEach((el) => renderBottomArrow(el))
-    renderTlArrow(ltArrowEl.current)
-    renderTrArrow(rtArrowEl.current)
-  }, [])
+    bmArrowEl.current.forEach((el) => renderBottomUpArrow(el))
+    renderTlArrow(tlArrowEl.current)
+    renderTrArrow(trArrowEl.current)
+  }, [rootWidth])
+
   return (
-    <div className={className}>
-      <div className="tw-flex tw-justify-between tw-h-24 tw-align-middle">
-        <div className="tw-flex-1" ref={ltArrowEl} />
-        <div className="tw-w-14">
-          <div>
-            <Icon name={last(lifeCycleItems).xlink} width={56} height={56} />
-            <div className="tw-pt-3">{last(lifeCycleItems).text}</div>
-          </div>
+    <div className="tw-w-full" ref={rootRef}>
+      <div className="tw-flex tw-justify-between tw-h-24">
+        <div className="tw-flex-1" ref={tlArrowEl} />
+        <div className="tw-relative">
+          <FlowCell item={opsItem} placement="top" />
         </div>
-        <div className="tw-flex-1" ref={rtArrowEl} />
+        <div className="tw-flex-1" ref={trArrowEl} />
       </div>
       <div className="tw-flex tw-h-24">
-        {dropRight(lifeCycleItems).map((item, i) => (
+        {flowItems.map((item, i) => (
           <React.Fragment key={item.text}>
-            <div className="tw-text-center tw-w-14">
-              <div className="tw-flex">
-                <Icon name={item.xlink} size={56} />
-              </div>
-              <div className="tw-pt-3">{item.text}</div>
+            <div className="tw-relative">
+              {i !== 0 && i < flowItemsLen - 1 && (
+                <div
+                  ref={(el) => {
+                    bmArrowEl.current.push(el)
+                  }}
+                  className="tw-absolute tw--top-20 tw-bottom-24 tw-left-0 tw-right-0"
+                />
+              )}
+              <FlowCell item={item} placement="bottom" />
             </div>
-            {i < 3 && (
+            {i < flowItemsLen - 1 && (
               <div
                 ref={(el) => {
                   arrowEl.current[i] = el
                 }}
-                className="tw-flex tw-flex-1 tw-pt-6"
+                className={clsx(
+                  'tw-flex tw-pt-6',
+                  i === 1 ? 'tw-flex-[2]' : 'tw-flex-1'
+                )}
               />
             )}
           </React.Fragment>
@@ -128,8 +152,8 @@ const LifeCycle = ({ className }) => {
   )
 }
 
-LifeCycle.propTypes = {
-  className: PropTypes.string,
+Flow.propTypes = {
+  items: PropTypes.array,
 }
 
-export default LifeCycle
+export default Flow

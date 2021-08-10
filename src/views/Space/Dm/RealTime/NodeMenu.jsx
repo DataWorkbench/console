@@ -46,13 +46,13 @@ function NodeMenu({ show }) {
   return (
     <div
       className={clsx(
-        'tw-bg-neutral-N16 tw-text-white tw-py-3 tw-w-40 tw-rounded-sm tw-shadow-sm',
+        'tw-bg-neut-16 tw-text-white tw-py-3 tw-w-40 tw-rounded-sm tw-shadow-sm',
         show ? 'tw-hidden' : ''
       )}
     >
       {menusData.map((menu, i) => (
         <div key={menu.name}>
-          <div className="tw-leading-7 tw-bg-neutral-N13 tw-flex tw-items-center tw-justify-between tw-px-2 tw-cursor-pointer">
+          <div className="tw-leading-7 tw-bg-neut-13 tw-flex tw-items-center tw-justify-between tw-px-2 tw-cursor-pointer">
             <div className="tw-flex tw-items-center">
               <Icon name={menu.icon} type="light" />
               <span className="tw-ml-1">{menu.name}</span>

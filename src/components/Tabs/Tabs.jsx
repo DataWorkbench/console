@@ -22,18 +22,18 @@ export default function Tabs({
     <div className={rootClassName}>
       <div
         className={clsx(
-          'tw-border-neutral-N3 tw-border-b tw-flex tw-pl-5 tw-align-middle',
+          'tw-border-neut-3 tw-border-b tw-flex tw-pl-5 tw-align-middle',
           styles.tabs,
           className
         )}
       >
-        <div className="tw-flex tw-border-r tw-border-neutral-N3">
+        <div className="tw-flex tw-border-r tw-border-neut-3">
           {React.Children.map(children, (child, i) => {
             const { label } = child.props
             return (
               <div
                 className={clsx(
-                  'tw-border-l tw-px-5 tw-border-neutral-N3  tw-py-3 tw-cursor-pointer',
+                  'tw-border-l tw-px-5 tw-border-neut-3  tw-py-3 tw-cursor-pointer',
                   activeIndex === i ? styles.is_active : 'tw-border-t'
                 )}
                 onClick={() => {

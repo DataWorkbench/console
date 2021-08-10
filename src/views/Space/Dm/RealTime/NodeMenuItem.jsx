@@ -26,7 +26,7 @@ function NodeMenuItem({ item }) {
     <li
       ref={drag}
       className={clsx(
-        'tw-pl-2 tw-flex tw-cursor-pointer hover:tw-bg-neutral-N13',
+        'tw-pl-2 tw-flex tw-cursor-pointer hover:tw-bg-neut-13',
         isDragging ? 'tw-opacity-50' : ''
       )}
     >

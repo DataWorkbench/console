@@ -20,7 +20,7 @@ function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
   return (
     <div
       className={clsx(
-        `tw-flex tw-h-20 tw-justify-center tw-items-center tw-bg-neutral-N1 dark:tw-bg-neutral-N17`
+        `tw-flex tw-h-20 tw-justify-center tw-items-center tw-bg-neut-1 dark:tw-bg-neut-17`
         // textsLen > 2 ? 'tw-px-10' : 'tw-px-16'
       )}
     >
@@ -42,8 +42,8 @@ function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
                 className={clsx(
                   'tw-inline-block tw-w-7 tw-h-7 tw-rounded-full ',
                   step === i
-                    ? 'tw-bg-brand-G11 tw-text-white tw-leading-7'
-                    : 'tw-border-2 tw-border-neutral-N3 dark:tw-border-neutral-N13 tw-leading-6 dark:tw-text-neutral-N8'
+                    ? 'tw-bg-green-11 tw-text-white tw-leading-7'
+                    : 'tw-border-2 tw-border-neut-3 dark:tw-border-neut-13 tw-leading-6 dark:tw-text-neut-8'
                 )}
               >
                 {i + 1}
@@ -51,7 +51,7 @@ function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
               <div
                 className={clsx(
                   'tw-font-medium ',
-                  step !== i && 'dark:tw-text-neutral-N8',
+                  step !== i && 'dark:tw-text-neut-8',
                   sameLine ? 'tw-ml-1' : 'tw-mt-1'
                 )}
               >
@@ -62,7 +62,7 @@ function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
               <div className="tw-flex-1">
                 <div
                   className={clsx(
-                    'tw-border-t-2 tw-border-neutral-N3 dark:tw-border-neutral-N13 tw-h-6',
+                    'tw-border-t-2 tw-border-neut-3 dark:tw-border-neut-13 tw-h-6',
                     sameLine ? 'tw-mt-5 tw-mx-2' : ''
                   )}
                 >

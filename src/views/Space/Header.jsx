@@ -40,18 +40,18 @@ function Header({ darkMode }) {
   return (
     <div
       className={clsx(
-        'tw-h-14 tw-flex tw-items-center tw-justify-between  tw-shadow-lg tw-bg-white dark:tw-bg-neutral-N16 dark:tw-text-neutral-N8'
+        'tw-h-14 tw-flex tw-items-center tw-justify-between  tw-shadow-lg tw-bg-white dark:tw-bg-neut-16 dark:tw-text-neut-8'
       )}
     >
       <div className="tw-flex tw-items-center">
-        <div className="tw-flex tw-justify-center tw-h-14 tw-items-center tw-w-14 tw-bg-neutral-N1 dark:tw-bg-neutral-N13 tw-cursor-pointer">
+        <div className="tw-flex tw-justify-center tw-h-14 tw-items-center tw-w-14 tw-bg-neut-1 dark:tw-bg-neut-13 tw-cursor-pointer">
           <Icon
             name="if-ninedot"
             style={{ fontSize: 32 }}
             className="dark:tw-text-white"
           />
         </div>
-        <div className="tw-text-sm tw-w-8 tw-h-8 tw-mx-3 tw-bg-neutral-N3 tw-rounded-sm tw-flex tw-justify-center tw-items-center">
+        <div className="tw-text-sm tw-w-8 tw-h-8 tw-mx-3 tw-bg-neut-3 tw-rounded-sm tw-flex tw-justify-center tw-items-center">
           工
         </div>
         <Select
@@ -69,7 +69,7 @@ function Header({ darkMode }) {
             key={name}
             className={clsx(
               mod === name &&
-                'tw-font-semibold tw-relative after:tw-absolute after:tw-content-[" "] after:tw-w-3/5 after:tw-h-0.5 after:tw-left-[20%] after:tw-bottom-0.5 after:tw-bg-brand-G11 dark:tw-text-white',
+                'tw-font-semibold tw-relative after:tw-absolute after:tw-content-[" "] after:tw-w-3/5 after:tw-h-0.5 after:tw-left-[20%] after:tw-bottom-0.5 after:tw-bg-green-11 dark:tw-text-white',
               'tw-inline-block tw-py-3 tw-mr-6 tw-text-sm dark:hover:tw-text-white'
             )}
             to={`/${zone}/workspace/${space}/${name}`}
@@ -101,7 +101,7 @@ function Header({ darkMode }) {
           className="tw-mr-2 tw-cursor-pointer"
         />
         <span className="tw-mr-2 dark:tw-text-white">{user?.user_name}</span>
-        <span className="tw-mr-6 tw-inline-block tw-bg-neutral-N2 dark:tw-bg-neutral-N13 dark:tw-text-white tw-px-2 tw-py-0.5 tw-rounded-2xl">
+        <span className="tw-mr-6 tw-inline-block tw-bg-neut-2 dark:tw-bg-neut-13 dark:tw-text-white tw-px-2 tw-py-0.5 tw-rounded-2xl">
           项目所有者
         </span>
       </div>

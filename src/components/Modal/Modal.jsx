@@ -91,7 +91,7 @@ const Modal = ({
       />
       <div
         className={clsx(
-          'tw-flex tw-flex-col tw-bg-white dark:tw-bg-neutral-N16 dark:tw-text-white tw-overflow-auto tw-z-20',
+          'tw-flex tw-flex-col tw-bg-white dark:tw-bg-neut-16 dark:tw-text-white tw-overflow-auto tw-z-20',
           get(Pos, placement, ''),
           contentClassName
         )}
@@ -108,7 +108,7 @@ const Modal = ({
           )}
         </div>
         <div className="tw-flex-1 tw-shadow-sm">{children}</div>
-        <div className="tw-px-5 tw-py-3 dark:tw-border-t dark:tw-border-neutral-N13">
+        <div className="tw-px-5 tw-py-3 dark:tw-border-t dark:tw-border-neut-13">
           {footer ||
             (footer !== null && (
               <div className="tw-flex tw-justify-end">

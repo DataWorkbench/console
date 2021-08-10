@@ -33,7 +33,7 @@ const columns = [
     render: (v, row) => (
       <div>
         <div>{row.name}</div>
-        <div className="tw-text-neutral-N8">{v}</div>
+        <div className="tw-text-neut-8">{v}</div>
       </div>
     ),
   },
@@ -147,7 +147,7 @@ function DataSourceList() {
               <div className="tw-mb-3 tw-font-medium tw-text-xl">
                 暂无数据源
               </div>
-              <p className="tw-mx-auto tw-mb-3 tw-w-3/5 tw-text-neutral-N8">
+              <p className="tw-mx-auto tw-mb-3 tw-w-3/5 tw-text-neut-8">
                 数据源主要用于数据集成过程中 Reader 和 Writer
                 的对象，您可以在数据源管理页面查看、新增及批量新增数据源。指定的整个数据库全部或者部分表一次性的全部同步至MySQL，并且支持后续的实时增量同步模式，将新增数据持续同步至
                 MySQL。

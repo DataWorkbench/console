@@ -18,7 +18,7 @@ function DbItem({ title, desc, image, onSelect }) {
     <div
       onClick={onSelect}
       className={clsx(
-        'tw-flex tw-p-3 tw-group tw-border tw-rounded-sm tw-border-neutral-N2 tw-cursor-pointer hover:tw-border-brand-G11'
+        'tw-flex tw-p-3 tw-group tw-border tw-rounded-sm tw-border-neut-2 tw-cursor-pointer hover:tw-border-green-11'
       )}
     >
       <div className="tw-w-10 tw-flex-shrink-0">
@@ -29,12 +29,10 @@ function DbItem({ title, desc, image, onSelect }) {
         />
       </div>
       <div className="tw-flex-1 tw-pl-2 tw-leading-5">
-        <div className="tw-font-medium group-hover:tw-text-brand-G11">
+        <div className="tw-font-medium group-hover:tw-text-green-11">
           {title}
         </div>
-        <div className="tw-text-neutral-N8 tw-h-10 tw-overflow-hidden">
-          {desc}
-        </div>
+        <div className="tw-text-neut-8 tw-h-10 tw-overflow-hidden">{desc}</div>
       </div>
     </div>
   )

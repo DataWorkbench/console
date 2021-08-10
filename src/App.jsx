@@ -30,7 +30,7 @@ const handleGlobalData = (data) => {
 const App = () => {
   return (
     <PortalProvider
-      service=""
+      service="bigdata"
       isPush={false}
       locales={locales}
       currentLocale={langMapping[USER.lang] || 'zh-CN'}

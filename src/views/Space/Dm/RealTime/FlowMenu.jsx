@@ -30,11 +30,11 @@ function FlowMenu({ onCreateClick }) {
   }
 
   return (
-    <div className="tw-w-56 tw-bg-neutral-N16 tw-m-3 tw-rounded dark:tw-text-white">
+    <div className="tw-w-56 tw-bg-neut-16 tw-m-3 tw-rounded dark:tw-text-white">
       <div
         className={clsx(
           'tw-flex tw-justify-between tw-items-center tw-h-11 tw-px-2 tw-border-b',
-          'dark:tw-border-neutral-N15'
+          'dark:tw-border-neut-15'
         )}
       >
         <span className="tw-text-xs tw-font-semibold">业务流程</span>
@@ -43,10 +43,10 @@ function FlowMenu({ onCreateClick }) {
           <Icon name="refresh" type="light" />
         </div>
       </div>
-      <div className={clsx('tw-border-b', 'dark:tw-border-neutral-N15')}>
+      <div className={clsx('tw-border-b', 'dark:tw-border-neut-15')}>
         <div className="tw-mt-3 tw-px-2 tw-flex tw-items-center">
           <Input
-            className="dark:tw-bg-neutral-N17 dark:tw-text-white dark:tw-border-neutral-N13 dark:hover:tw-border-neutral-N13"
+            className="dark:tw-bg-neut-17 dark:tw-text-white dark:tw-border-neut-13 dark:hover:tw-border-neut-13"
             type="text"
             placeholder="搜索任务关键词/创建人"
           />
@@ -57,21 +57,21 @@ function FlowMenu({ onCreateClick }) {
             type="light"
           />
         </div>
-        <div className="tw-mx-2 tw-mt-3 tw-bg-neutral-N17 tw-p-2">
-          <div className="tw-flex tw-items-center tw-justify-between tw-border-b tw-border-neutral-N13 tw-pb-1">
+        <div className="tw-mx-2 tw-mt-3 tw-bg-neut-17 tw-p-2">
+          <div className="tw-flex tw-items-center tw-justify-between tw-border-b tw-border-neut-13 tw-pb-1">
             <span>👋️ 快速上手文档</span>
             <Icon name="close" type="light" />
           </div>
           <ul className="tw-pt-2">
             <li>
               <Icon name="file" className="tw-align-middle" />
-              <span className="tw-align-middle tw-text-neutral-N8">
+              <span className="tw-align-middle tw-text-neut-8">
                 业务流程是什么？
               </span>
             </li>
             <li>
               <Icon name="file" className="tw-align-middle" />
-              <span className="tw-align-middle tw-text-neutral-N8">
+              <span className="tw-align-middle tw-text-neut-8">
                 业务流程的操作指南
               </span>
             </li>
@@ -81,7 +81,7 @@ function FlowMenu({ onCreateClick }) {
           <button
             type="button"
             onClick={onCreateClick}
-            className="tw-py-1 tw-rounded-sm tw-w-48 tw-bg-neutral-N13 focus:tw-outline-none hover:tw-bg-neutral-N10 tw-ring-opacity-50"
+            className="tw-py-1 tw-rounded-sm tw-w-48 tw-bg-neut-13 focus:tw-outline-none hover:tw-bg-neut-10 tw-ring-opacity-50"
           >
             <Icon name="add" type="light" className="tw-align-middle" />
             <span className="tw-align-middle">创建业务流程</span>
@@ -96,8 +96,8 @@ function FlowMenu({ onCreateClick }) {
               className={clsx(
                 'tw-leading-8 tw-pl-3 tw-cursor-pointer',
                 curFlow && curFlow.id === flow.id
-                  ? 'tw-bg-brand-G11'
-                  : 'hover:tw-bg-neutral-N13'
+                  ? 'tw-bg-green-11'
+                  : 'hover:tw-bg-neut-13'
               )}
               onClick={() => handleItemClick(flow)}
             >

@@ -1,3 +1,5 @@
+import React from 'react'
+import { Redirect } from 'react-router-dom'
 import Home from 'components/Home'
 import Create from 'views/Create'
 import Overview from 'views/Overview'
@@ -48,7 +50,8 @@ const routes = [
       },
       {
         path: '/',
-        component: Home,
+        exact: true,
+        component: () => <Redirect to="/overview" />,
       },
       {
         path: '/home',

@@ -26,7 +26,7 @@ const SpaceLayout = ({ route }) => {
   return (
     <div
       className={clsx(
-        'tw-flex tw-flex-col tw-h-screen tw-bg-neutral-N2 dark:tw-bg-neutral-N17'
+        'tw-flex tw-flex-col tw-h-screen tw-bg-neut-2 dark:tw-bg-neut-17'
       )}
     >
       <Header darkMode={darkMode} />

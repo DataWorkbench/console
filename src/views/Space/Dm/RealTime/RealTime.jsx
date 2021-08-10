@@ -68,7 +68,7 @@ function RealTime() {
       {curFlow ? (
         <FlowTabs />
       ) : (
-        <div className="tw-flex tw-flex-1 tw-items-center tw-justify-center tw-text-neutral-N8">
+        <div className="tw-flex tw-flex-1 tw-items-center tw-justify-center tw-text-neut-8">
           <div>
             <ul>
               <li>1. 新建业务流程</li>
@@ -113,21 +113,21 @@ function RealTime() {
                       className={clsx(
                         'tw-w-1/3 tw-cursor-pointer tw-border tw-shadow',
                         scheType === type
-                          ? 'tw-border-brand-G11'
-                          : 'tw-border-neutral-N17 hover:tw-border-brand-G11'
+                          ? 'tw-border-green-11'
+                          : 'tw-border-neut-17 hover:tw-border-green-11'
                       )}
                       onClick={() => setScheType(type)}
                     >
-                      <div className="tw-bg-neutral-N17 tw-h-60 tw-flex tw-justify-center tw-items-center">
+                      <div className="tw-bg-neut-17 tw-h-60 tw-flex tw-justify-center tw-items-center">
                         <Icon
                           name={icon}
                           className="tw-align-middle"
                           size={50}
                         />
                       </div>
-                      <div className="tw-bg-neutral-N13 tw-py-5 tw-pl-6 tw-text-base">
+                      <div className="tw-bg-neut-13 tw-py-5 tw-pl-6 tw-text-base">
                         <div className="tw-font-semibold ">{title}</div>
-                        <div className="tw-mt-2 tw-text-neutral-N8">{disp}</div>
+                        <div className="tw-mt-2 tw-text-neut-8">{disp}</div>
                       </div>
                     </div>
                   ))}
@@ -142,7 +142,7 @@ function RealTime() {
                     label="* 业务名称"
                     placeholder='允许包含字母、数字 及 "_"，长度2～128'
                     labelClassName="tw-text-white"
-                    controlClassName="dark:tw-text-white tw-bg-neutral-N16 tw-border-neutral-N13 hover:tw-border-neutral-N8"
+                    controlClassName="dark:tw-text-white tw-bg-neut-16 tw-border-neut-13 hover:tw-border-neut-8"
                     validateOnChange
                     schemas={[
                       {
@@ -162,7 +162,7 @@ function RealTime() {
                     label="描述"
                     placeholder="请输入业务描述"
                     labelClassName="tw-text-white"
-                    controlClassName="dark:tw-text-white tw-bg-neutral-N16 tw-border-neutral-N13 hover:tw-border-neutral-N8"
+                    controlClassName="dark:tw-text-white tw-bg-neut-16 tw-border-neut-13 hover:tw-border-neut-8"
                     validateOnChange
                     schemas={[
                       {

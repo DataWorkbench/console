@@ -2,7 +2,7 @@ const { merge } = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const WebpackBar = require('webpackbar')
 const path = require('path')
@@ -91,7 +91,7 @@ let config = {
   resolve: {
     extensions: ['.js', '.jsx'],
     modules: [resolve('src'), 'node_modules'],
-    symlinks: false,
+    // symlinks: false,
     alias: {
       components: resolve('src/components'),
       views: resolve('src/views'),

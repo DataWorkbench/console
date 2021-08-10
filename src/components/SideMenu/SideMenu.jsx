@@ -37,14 +37,14 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
     >
       <div
         className={clsx(
-          'tw-overflow-auto tw-pt-5  tw-absolute tw-inset-0 tw-flex tw-flex-col shadow-md tw-border-r tw-border-neutral-N3',
-          'dark:tw-bg-neutral-N17 dark:tw-border-neutral-N13'
+          'tw-overflow-auto tw-pt-5  tw-absolute tw-inset-0 tw-flex tw-flex-col shadow-md tw-border-r tw-border-neut-3',
+          'dark:tw-bg-neut-17 dark:tw-border-neut-13'
         )}
       >
         {title && (
           <div
             className={clsx(
-              'tw-pb-4 tw-font-medium tw-text-lg tw-text-neutral-N15 dark:tw-text-white',
+              'tw-pb-4 tw-font-medium tw-text-lg tw-text-neut-15 dark:tw-text-white',
               narrowMode ? '' : 'tw-pl-5'
             )}
           >
@@ -65,7 +65,7 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
               return (
                 <div className="tw-py-2" key={name}>
                   {isSubTitle && (
-                    <div className="tw-border-b tw-border-neutral-N3 tw-mx-4" />
+                    <div className="tw-border-b tw-border-neut-3 tw-mx-4" />
                   )}
                   {icon && (
                     <Icon
@@ -95,8 +95,8 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
         </div>
         <div
           className={clsx(
-            'tw-flex tw-h-10 tw-items-center tw-bg-neutral-N2 tw-border-t tw-border-neutral-N3 hover:tw-bg-neutral-N1 tw-pl-5',
-            'dark:tw-bg-neutral-N17 dark:tw-border-neutral-N13'
+            'tw-flex tw-h-10 tw-items-center tw-bg-neut-2 tw-border-t tw-border-neut-3 hover:tw-bg-neut-1 tw-pl-5',
+            'dark:tw-bg-neut-17 dark:tw-border-neut-13'
           )}
         >
           <Icon

@@ -55,17 +55,16 @@ function MenuItem({
         <div
           className={clsx(
             'tw-flex tw-items-center tw-justify-between tw-py-1 tw-select-none tw-rounded-sm',
-            'dark:tw-text-white dark:hover:tw-bg-neutral-N13 dark:tw-rounded-sm dark:tw-font-medium',
-            isSelected &&
-              'tw-bg-neutral-N16 tw-text-white dark:tw-bg-neutral-N13'
-            // !isSelected && 'hover:tw-bg-neutral-N16 hover:tw-text-white'
+            'dark:tw-text-white dark:hover:tw-bg-neut-13 dark:tw-rounded-sm dark:tw-font-medium',
+            isSelected && 'tw-bg-neut-16 tw-text-white dark:tw-bg-neut-13'
+            // !isSelected && 'hover:tw-bg-neut-16 hover:tw-text-white'
           )}
         >
           <div className="tw-flex tw-items-center">
             <div
               className={clsx(
                 'tw-w-0.5 tw-self-stretch  first:tw-mr-2',
-                isSelected ? 'tw-bg-brand-G11' : ''
+                isSelected ? 'tw-bg-green-11' : ''
               )}
             />
             {icon && (
@@ -77,7 +76,7 @@ function MenuItem({
               />
             )}
             {isSubTitle ? (
-              <div className="first:tw-mr-2 tw-whitespace-nowrap tw-overflow-hidden tw-text-xs tw-text-neutral-N8 tw-leading-8">
+              <div className="first:tw-mr-2 tw-whitespace-nowrap tw-overflow-hidden tw-text-xs tw-text-neut-8 tw-leading-8">
                 {title}
               </div>
             ) : (
@@ -108,7 +107,7 @@ function MenuItem({
               )}
               onClick={() => onClick(item.name)}
             >
-              <div className="tw-flex tw-items-center tw-border-l-2 tw-border-neutral-N2 tw-pl-3 tw-py-1">
+              <div className="tw-flex tw-items-center tw-border-l-2 tw-border-neut-2 tw-pl-3 tw-py-1">
                 {item.icon && (
                   <Icon
                     type={darkMode ? 'light' : 'dark'}

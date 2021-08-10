@@ -14,10 +14,11 @@ const propTypes = {
   className: PropTypes.string,
   zone: PropTypes.string,
   isCurrent: PropTypes.bool,
+  isModal: PropTypes.bool,
   scrollParent: PropTypes.object,
 }
 
-const SpaceLists = ({ zone, className, isCurrent, scrollParent }) => {
+const SpaceLists = ({ zone, className, isCurrent, scrollParent, isModal }) => {
   const {
     workspaceStore,
     workspaceStore: { showModal, zones },
@@ -45,34 +46,36 @@ const SpaceLists = ({ zone, className, isCurrent, scrollParent }) => {
   }
   return (
     <div className={className}>
-      <div className="tw-flex tw-justify-between tw-mb-5 ">
-        <div>
-          <Button
-            type="primary"
-            className="tw-font-medium tw-px-5"
-            onClick={() => toggleShowModal(true)}
-          >
-            创建工作空间
-          </Button>
+      {!isModal && (
+        <div className="tw-flex tw-justify-between tw-mb-5 ">
+          <div>
+            <Button
+              type="primary"
+              className="tw-font-medium tw-px-5"
+              onClick={() => toggleShowModal(true)}
+            >
+              创建工作空间
+            </Button>
+          </div>
+          <div className="tw-flex tw-items-stretch">
+            <Control className="has-icons-left tw-mr-2">
+              <Icon className="is-left" name="magnifier" />
+              <Input
+                type="text"
+                className="tw-w-64"
+                placeholder="请输入工作名称/ID"
+              />
+            </Control>
+            <Button className="tw-mr-2">
+              <Icon
+                name="if-refresh"
+                className="tw-text-xl"
+                onClick={() => workspaceStore.clean(zone)}
+              />
+            </Button>
+          </div>
         </div>
-        <div className="tw-flex tw-items-stretch">
-          <Control className="has-icons-left tw-mr-2">
-            <Icon className="is-left" name="magnifier" />
-            <Input
-              type="text"
-              className="tw-w-64"
-              placeholder="请输入工作名称/ID"
-            />
-          </Control>
-          <Button className="tw-mr-2">
-            <Icon
-              name="if-refresh"
-              className="tw-text-xl"
-              onClick={() => workspaceStore.clean(zone)}
-            />
-          </Button>
-        </div>
-      </div>
+      )}
 
       <div>
         <InfiniteScroll
@@ -94,6 +97,7 @@ const SpaceLists = ({ zone, className, isCurrent, scrollParent }) => {
                     <SpaceItem
                       zone={zone}
                       space={space}
+                      isModal
                       className={styles[`ws_${i % 5}`]}
                     />
                   </div>
