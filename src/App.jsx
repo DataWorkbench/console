@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
-import { PortalProvider, Message } from '@QCFE/qingcloud-portal-ui'
+import { PortalProvider, Notification } from '@QCFE/qingcloud-portal-ui'
 import RootStore, { StoreContext } from 'stores'
 import emitter from 'utils/emitter'
 import locales from './locales'
@@ -13,9 +13,10 @@ const langMapping = {
 }
 
 emitter.off('error')
-emitter.on('error', (msg) =>
-  Message.open({
-    content: msg,
+emitter.on('error', ({ title, content }) =>
+  Notification.open({
+    title,
+    content,
     placement: 'bottomRight',
     type: 'error',
   })

@@ -86,12 +86,14 @@ const WorkSpace = ({ isModal }) => {
       globalStore
         .loadRegions()
         .then((infos) => {
-          stateStore.set({ curRegionId: get(infos, '[0].id') })
-          workSpaceStore.fetchData({
-            regionId: stateStore.curRegionId,
-            cardView: stateStore.cardView,
-            offset: 0,
-          })
+          if (infos?.length > 0) {
+            stateStore.set({ curRegionId: get(infos, '[0].id') })
+            workSpaceStore.fetchData({
+              regionId: stateStore.curRegionId,
+              cardView: stateStore.cardView,
+              offset: 0,
+            })
+          }
         })
         .catch((err) => emitter.emit('error', `${err.message}`))
         .finally(() => setLoading(false))
@@ -115,14 +117,16 @@ const WorkSpace = ({ isModal }) => {
     setDelBtnEnable(true)
   }
 
-  const handleHide = () => {
-    const { curSpaceOpt, curRegionId: regionId, cardView } = stateStore
-    if (curSpaceOpt === 'create') {
-      workSpaceStore.fetchData({
-        regionId,
-        cardView,
-        offset: 0,
-      })
+  const handleHide = (ifRefresh) => {
+    if (ifRefresh) {
+      const { curSpaceOpt, curRegionId: regionId, cardView } = stateStore
+      if (curSpaceOpt === 'create') {
+        workSpaceStore.fetchData({
+          regionId,
+          cardView,
+          offset: 0,
+        })
+      }
     }
     handleModalClose()
   }

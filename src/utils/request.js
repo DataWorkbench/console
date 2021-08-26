@@ -39,7 +39,7 @@ async function getOwnerLoop(n) {
       const m = n - 1
       return getOwnerLoop(m)
     }
-    return null
+    throw new Error('获取用户ID出错')
   }
 }
 
@@ -47,38 +47,59 @@ const client = axios.create(baseConfig)
 
 client.interceptors.response.use(
   (response) => {
-    const { status } = response.data
-    if (status >= 400) {
+    const { status, ret_code: retCode } = response.data
+    if (status >= 400 || retCode !== 0) {
       const message = getMessage(response.data)
       response.data.message = message
-      emitter.emit('error', `[status]: ${status} [message]: ${message}`)
+      emitter.emit('error', {
+        title: `请求错误: [${status}]`,
+        content: message,
+      })
     }
     return response
   },
   (error) => {
-    const {
-      response: { status },
-      message,
-    } = error
-    emitter.emit('error', `[status]: ${status} [message]: ${message}`)
+    if (error.response) {
+      const {
+        response: { status },
+        message,
+      } = error
+      emitter.emit('error', {
+        title: `网络错误: [${status}]`,
+        content: message,
+      })
+    } else if (error.request) {
+      // console.log(error)
+    }
     return Promise.reject(error)
   }
 )
 
 const request = async (params, method = 'GET', url = '/portal_api') => {
   // 间隔200ms 循环300次获取user
-  const owner = await getOwnerLoop(300)
-  return client.request({
-    url,
-    data: {
-      params: {
-        service: 'bigdata',
-        owner,
-        ...params,
-      },
-      method,
-    },
+  const owner = await getOwnerLoop(300).catch((err) => {
+    emitter.emit('error', {
+      title: '请求错误',
+      content: err,
+    })
+    return null
   })
+  if (owner) {
+    return client
+      .request({
+        url,
+        data: {
+          params: {
+            service: 'bigdata',
+            owner,
+            ...params,
+          },
+          method,
+        },
+      })
+      .then((response) => response.data)
+  }
+  return null
 }
 
 export { getMessage }

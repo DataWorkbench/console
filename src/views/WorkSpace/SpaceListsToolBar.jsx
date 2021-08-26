@@ -93,14 +93,6 @@ function SpaceListsToolBar({ regionId }) {
                 <Icon name="caret-down" />
               </Button>
             </Dropdown>
-            <Button
-              type="primary"
-              disabled={curSpacesLen === 0}
-              className="tw-ml-2"
-            >
-              <Icon name="trash" />
-              删除
-            </Button>
           </>
         )}
       </div>

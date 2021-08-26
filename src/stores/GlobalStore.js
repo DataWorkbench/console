@@ -35,12 +35,10 @@ class GlobalStore {
   *loadRegions() {
     const { api } = this.rootStore
     const regionPromise = api.region.load()
-    const res = yield regionPromise
-    const ret = res.data
-    if (ret.ret_code !== 0) {
-      throw new Error(`message: ${ret.message} reqId: ${ret.request_id}`)
+    const ret = yield regionPromise
+    if (ret) {
+      this.regionInfos = parseI18n(ret.infos)
     }
-    this.regionInfos = parseI18n(ret.infos)
     return this.regionInfos
   }
 }

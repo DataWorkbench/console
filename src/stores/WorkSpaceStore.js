@@ -9,12 +9,6 @@ class WorkSpaceStore {
 
   loadStatus
 
-  // showSpaceModal = false
-
-  // curSpace
-
-  // curOpt = ''
-
   funcList = [
     {
       name: 'upcloud',
@@ -144,9 +138,9 @@ class WorkSpaceStore {
       regionId,
     })
     region.loadStatus = fromPromise(workspacesPromise)
-    const res = yield workspacesPromise
-    const ret = res.data
-    if (ret.ret_code === 0) {
+    const ret = yield workspacesPromise
+    // const ret = res.data
+    if (ret?.ret_code === 0) {
       // if (regionId === 'staging') {
       //   region.hasMore = false
       //   return
@@ -170,11 +164,7 @@ class WorkSpaceStore {
     const { api } = this.rootStore
     const workspacesPromise = api.workspace[op](params)
     this.loadStatus = fromPromise(workspacesPromise)
-    const res = yield workspacesPromise
-    const ret = res.data
-    if (ret.ret_code !== 0) {
-      throw new Error(ret.message)
-    }
+    return yield workspacesPromise
   }
 
   *create(params) {
@@ -182,59 +172,67 @@ class WorkSpaceStore {
   }
 
   *update(params) {
-    yield this.cud('update', params)
-    const { regionId, spaceId, name, desc } = params
-    const curRegion = this.regions[regionId]
-    curRegion.workspaces = curRegion.workspaces.map((space) => {
-      if (spaceId.includes(space.id)) {
-        return {
-          ...space,
-          name,
-          desc,
+    const ret = yield this.cud('update', params)
+    if (ret?.ret_code === 0) {
+      const { regionId, spaceId, name, desc } = params
+      const curRegion = this.regions[regionId]
+      curRegion.workspaces = curRegion.workspaces.map((space) => {
+        if (spaceId.includes(space.id)) {
+          return {
+            ...space,
+            name,
+            desc,
+          }
         }
-      }
-      return space
-    })
+        return space
+      })
+    }
   }
 
   *enable(params) {
-    yield this.cud('enable', params)
-    const { regionId, spaceIds } = params
-    const curRegion = this.regions[regionId]
-    curRegion.workspaces = curRegion.workspaces.map((space) => {
-      if (spaceIds.includes(space.id)) {
-        return {
-          ...space,
-          status: 1,
+    const ret = yield this.cud('enable', params)
+    if (ret?.ret_code === 0) {
+      const { regionId, spaceIds } = params
+      const curRegion = this.regions[regionId]
+      curRegion.workspaces = curRegion.workspaces.map((space) => {
+        if (spaceIds.includes(space.id)) {
+          return {
+            ...space,
+            status: 1,
+          }
         }
-      }
-      return space
-    })
+        return space
+      })
+    }
   }
 
   *disable(params) {
-    yield this.cud('disable', params)
-    const { regionId, spaceIds } = params
-    const curRegion = this.regions[regionId]
-    curRegion.workspaces = curRegion.workspaces.map((space) => {
-      if (spaceIds.includes(space.id)) {
-        return {
-          ...space,
-          status: 2,
+    const ret = yield this.cud('disable', params)
+    if (ret?.ret_code === 0) {
+      const { regionId, spaceIds } = params
+      const curRegion = this.regions[regionId]
+      curRegion.workspaces = curRegion.workspaces.map((space) => {
+        if (spaceIds.includes(space.id)) {
+          return {
+            ...space,
+            status: 2,
+          }
         }
-      }
-      return space
-    })
+        return space
+      })
+    }
   }
 
   *delete(params) {
-    yield this.cud('delete', params)
-    const { regionId, spaceIds } = params
-    const curRegion = this.regions[regionId]
-    const workspaces = curRegion.workspaces.filter((space) => {
-      return !spaceIds.includes(space.id)
-    })
-    curRegion.workspaces = workspaces
+    const ret = yield this.cud('delete', params)
+    if (ret?.ret_code === 0) {
+      const { regionId, spaceIds } = params
+      const curRegion = this.regions[regionId]
+      const workspaces = curRegion.workspaces.filter((space) => {
+        return !spaceIds.includes(space.id)
+      })
+      curRegion.workspaces = workspaces
+    }
   }
 }
 
