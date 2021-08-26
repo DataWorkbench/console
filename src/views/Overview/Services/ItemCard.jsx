@@ -7,8 +7,15 @@ const propTypes = {
   item: PropTypes.object,
 }
 
-function ItemCard({ item: { icon, text, desc, enabled, moreLink } }) {
+function ItemCard({ item: { name, icon, text, desc, enabled, moreLink } }) {
   const { overViewStore } = useStore()
+  const handleClick = () => {
+    overViewStore.set({
+      showSpaceModal: true,
+      curItemName: name,
+      curSpaceId: null,
+    })
+  }
   return (
     <div className="tw-h-full tw-bg-white tw-border-neut-1 tw-shadow tw-flex tw-flex-col">
       <div className="tw-border-t-4 tw-border-green-11 tw-bg-neut-1 tw-py-4 tw-flex tw-items-center tw-justify-center">
@@ -28,7 +35,7 @@ function ItemCard({ item: { icon, text, desc, enabled, moreLink } }) {
           type={enabled ? 'outlined' : 'default'}
           disabled={!enabled}
           className="tw-w-10/12"
-          onClick={() => overViewStore.set({ showSpaceModal: true })}
+          onClick={handleClick}
         >
           {enabled ? '开始使用' : '敬请期待'}
         </Button>

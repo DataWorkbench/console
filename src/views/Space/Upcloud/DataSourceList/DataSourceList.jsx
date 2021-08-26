@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useToggle } from 'react-use'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import clsx from 'clsx'
 import { useParams } from 'react-router-dom'
 import dayjs from 'dayjs'

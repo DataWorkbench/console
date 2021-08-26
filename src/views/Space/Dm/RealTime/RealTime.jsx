@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { useToggle } from 'react-use'
 import { useParams } from 'react-router-dom'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import Modal, { ModalStep, ModalContent } from 'components/Modal'
 import { Icon, Form } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
@@ -88,7 +88,6 @@ function RealTime() {
           show={showCreate}
           title="创建业务流程"
           placement="center"
-          dialogClassName=""
           contentClassName="tw-w-full tw-mx-5 tw-rounded-md tw-shadow-xl"
           onHide={handleCancel}
           onCancel={handleCancel}

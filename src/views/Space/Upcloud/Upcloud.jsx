@@ -8,7 +8,7 @@ import DataSourceList from './DataSourceList/DataSourceList'
 function Upcloud() {
   const { zone, space, mod } = useParams()
   const {
-    workspaceStore: { funcList },
+    workSpaceStore: { funcList },
   } = useStore()
   const { subFuncList } = funcList.find(({ name }) => name === 'upcloud')
   const navMenu = subFuncList.map((func) => ({

@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
 import { PortalProvider, Message } from '@QCFE/qingcloud-portal-ui'
-import store, { StoreContext } from 'stores'
+import RootStore, { StoreContext } from 'stores'
 import emitter from 'utils/emitter'
 import locales from './locales'
 import routes from './routes'
@@ -12,13 +12,16 @@ const langMapping = {
   en: 'en-US',
 }
 
-emitter.on('error:http_status', (msg) =>
+emitter.off('error')
+emitter.on('error', (msg) =>
   Message.open({
     content: msg,
     placement: 'bottomRight',
     type: 'error',
   })
 )
+
+const store = new RootStore()
 
 const handleGlobalData = (data) => {
   const { user } = data
@@ -27,6 +30,7 @@ const handleGlobalData = (data) => {
     globalStore.updateUserInfo(user)
   }
 }
+
 const App = () => {
   return (
     <PortalProvider

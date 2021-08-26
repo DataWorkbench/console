@@ -8,7 +8,7 @@ import RealTime from './RealTime'
 function Dm() {
   const { zone, space, mod } = useParams()
   const {
-    workspaceStore: { funcList },
+    workSpaceStore: { funcList },
   } = useStore()
   const { subFuncList } = funcList.find(({ name }) => name === 'dm')
   const navMenu = subFuncList.map((func) => ({

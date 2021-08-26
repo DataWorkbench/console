@@ -7,7 +7,7 @@ import OverView from './OverView'
 function Ops() {
   const { zone, space, mod } = useParams()
   const {
-    workspaceStore: { funcList },
+    workSpaceStore: { funcList },
   } = useStore()
   const { subFuncList } = funcList.find(({ name }) => name === 'ops')
   const navMenu = subFuncList.map((func) => ({

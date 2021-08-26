@@ -1,16 +1,19 @@
 import { makeObservable, observable, flow, action, set } from 'mobx'
 import { fromPromise } from 'mobx-utils'
+import { omitBy } from 'lodash'
 
-class WorkspaceStore {
-  zones = {}
+class WorkSpaceStore {
+  regions = {}
+
+  curRegionId = null
 
   loadStatus
 
-  showModal = false
+  // showSpaceModal = false
 
-  curSpace
+  // curSpace
 
-  curOpt = 'create'
+  // curOpt = ''
 
   funcList = [
     {
@@ -36,67 +39,64 @@ class WorkspaceStore {
       name: 'ops',
       title: '运维中心',
       subFuncList: [
-        { name: 'overview', title: '运维大屏' },
-        { name: 'realtime', title: '实时任务运维' },
-        { name: 'offline', title: '离线任务运维' },
-        { name: 'monitor', title: '智能监控' },
-        { name: 'logs', title: '操作日志' },
+        { name: 'overview', title: '运维大屏', icon: 'blockchain' },
+        { name: 'realtime', title: '实时任务运维', icon: 'blockchain' },
+        { name: 'offline', title: '离线任务运维', icon: 'blockchain' },
+        { name: 'monitor', title: '智能监控', icon: 'blockchain' },
+        { name: 'logs', title: '操作日志', icon: 'blockchain' },
       ],
     },
     {
       name: 'manage',
       title: '空间管理',
       subFuncList: [
-        { name: 'setting', title: '空间配置' },
-        { name: 'engine', title: '引擎管理' },
-        { name: 'users', title: '成员管理' },
-        { name: 'permissions', title: '列表权限' },
+        { name: 'setting', title: '空间配置', icon: 'blockchain' },
+        { name: 'engine', title: '引擎管理', icon: 'blockchain' },
+        { name: 'users', title: '成员管理', icon: 'blockchain' },
+        { name: 'permissions', title: '列表权限', icon: 'blockchain' },
       ],
     },
   ]
 
   constructor(rootStore) {
     makeObservable(this, {
-      zones: observable,
+      regions: observable,
       loadStatus: observable,
-      showModal: observable,
-      load: flow,
-      clean: action,
+      // showSpaceModal: observable,
+      // curOpt: observable,
+      curRegionId: observable,
+      fetchData: flow,
+      cud: flow,
       create: flow,
-      delete: flow,
       update: flow,
+      disable: flow,
+      enable: flow,
+      delete: flow,
       set: action,
     })
     this.rootStore = rootStore
   }
 
-  getZone(zoneName) {
-    const { zones } = this
-    const curZone = zones[zoneName]
-    if (!curZone) {
-      return {
+  getRegion(regionId) {
+    if (!this.regions[regionId]) {
+      this.regions[regionId] = {
         workspaces: [],
         hasMore: true,
+        total: 0,
         loadStatus: null,
         filter: {
           offset: 0,
-          limit: 5,
+          limit: 10,
+          sort_by: 'created',
+          reverse: true,
         },
       }
     }
-    return zones[zoneName]
+    return this.regions[regionId]
   }
 
   set(params) {
     set(this, { ...params })
-  }
-
-  clean(zoneName) {
-    const zone = this.zones[zoneName]
-    if (!zone) {
-      return
-    }
-    this.zones[zoneName] = null
   }
 
   async loadAll(zoneName) {
@@ -113,69 +113,129 @@ class WorkspaceStore {
     return null
   }
 
-  *load(zoneName, force = false) {
+  *fetchData(params) {
+    const { regionId, cardView, force, ...filter } = params
     const { api } = this.rootStore
-    const curZone = this.getZone(zoneName)
-    if (force) {
-      this.clean(zoneName)
+    const region = this.getRegion(regionId)
+    const newFilter = omitBy(
+      {
+        ...region.filter,
+        ...filter,
+      },
+      (v) => v === ''
+    )
+    region.filter = newFilter
+
+    if (cardView && force) {
+      region.hasMore = true
     }
-    const { workspaces, filter } = curZone
-
-    const workspacesPromise = api.workspace.load({ ...filter, zone: zoneName })
-    curZone.loadStatus = fromPromise(workspacesPromise)
-
+    if (
+      cardView &&
+      (region.loadStatus?.state === 'pending' || region.hasMore === false)
+    ) {
+      return
+    }
+    const isReFetch = !cardView || region.filter.offset === 0
+    if (isReFetch) {
+      region.workspaces = []
+    }
+    const workspacesPromise = api.workspace.load({
+      ...region.filter,
+      regionId,
+    })
+    region.loadStatus = fromPromise(workspacesPromise)
     const res = yield workspacesPromise
     const ret = res.data
     if (ret.ret_code === 0) {
-      const { infos, has_more: hasMore } = ret
+      // if (regionId === 'staging') {
+      //   region.hasMore = false
+      //   return
+      // }
+      const { infos, total } = ret
       if (infos && infos.length) {
-        curZone.workspaces = workspaces.concat(infos)
-        curZone.hasMore = hasMore
-        filter.offset = curZone.workspaces.length
-      } else {
-        curZone.hasMore = hasMore
+        // if (isReFetch) {
+        //   region.workspaces = []
+        // }
+        region.workspaces = region.workspaces.concat(infos)
+        if (cardView) {
+          region.filter.offset = region.workspaces.length
+        }
       }
-      this.zones[zoneName] = curZone
+      region.total = total
+      region.hasMore = ret.has_more || false
     }
   }
 
-  *create(params) {
-    const {
-      rootStore: { api },
-    } = this
-    const workspacesPromise = api.workspace.create(params)
+  *cud(op, params) {
+    const { api } = this.rootStore
+    const workspacesPromise = api.workspace[op](params)
     this.loadStatus = fromPromise(workspacesPromise)
     const res = yield workspacesPromise
     const ret = res.data
     if (ret.ret_code !== 0) {
       throw new Error(ret.message)
     }
-    return true
   }
 
-  *delete(id) {
-    const { api } = this.rootStore
-    const promise = api.workspace.delete(id)
-    this.loadStatus = fromPromise(promise)
-    const res = yield promise
-    const ret = res.data
-    if (ret.ret_code !== 0) {
-      throw new Error(ret.message)
-    }
-    return true
+  *create(params) {
+    yield this.cud('create', params)
   }
 
   *update(params) {
-    const { api } = this.rootStore
-    const promise = api.workspace.update(params)
-    this.loadStatus = fromPromise(promise)
-    const res = yield promise
-    const ret = res.data
-    if (ret.ret_code !== 0) {
-      throw new Error(ret.message)
-    }
-    return ret
+    yield this.cud('update', params)
+    const { regionId, spaceId, name, desc } = params
+    const curRegion = this.regions[regionId]
+    curRegion.workspaces = curRegion.workspaces.map((space) => {
+      if (spaceId.includes(space.id)) {
+        return {
+          ...space,
+          name,
+          desc,
+        }
+      }
+      return space
+    })
+  }
+
+  *enable(params) {
+    yield this.cud('enable', params)
+    const { regionId, spaceIds } = params
+    const curRegion = this.regions[regionId]
+    curRegion.workspaces = curRegion.workspaces.map((space) => {
+      if (spaceIds.includes(space.id)) {
+        return {
+          ...space,
+          status: 1,
+        }
+      }
+      return space
+    })
+  }
+
+  *disable(params) {
+    yield this.cud('disable', params)
+    const { regionId, spaceIds } = params
+    const curRegion = this.regions[regionId]
+    curRegion.workspaces = curRegion.workspaces.map((space) => {
+      if (spaceIds.includes(space.id)) {
+        return {
+          ...space,
+          status: 2,
+        }
+      }
+      return space
+    })
+  }
+
+  *delete(params) {
+    yield this.cud('delete', params)
+    const { regionId, spaceIds } = params
+    const curRegion = this.regions[regionId]
+    const workspaces = curRegion.workspaces.filter((space) => {
+      return !spaceIds.includes(space.id)
+    })
+    curRegion.workspaces = workspaces
   }
 }
 
-export default WorkspaceStore
+export default WorkSpaceStore

@@ -1,23 +1,48 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
-import { uniq } from 'lodash'
+import produce from 'immer'
 import styles from './tabs.module.css'
 
 export default function Tabs({
   rootClassName,
   panelClassName,
   className,
-  index,
+  activeName,
   more,
   tabClick,
   children,
 }) {
-  const [activeIndex, setActiveIndex] = useState(index)
-  const [renderedIdxs, setRenderedIdxs] = useState([index])
+  const [curPanelName, setCurPanelName] = useState(activeName)
+  const [panelNames, setPanelNames] = useState(() => {
+    if (activeName) {
+      return [activeName]
+    }
+    return []
+  })
+
+  const activeCurTab = useCallback((name) => {
+    setCurPanelName(name)
+    setPanelNames((prevNames) =>
+      produce(prevNames, (draft) => {
+        if (!draft.includes(name)) {
+          draft.push(name)
+        }
+      })
+    )
+  }, [])
+
   useEffect(() => {
-    setActiveIndex(index)
-  }, [index])
+    if (activeName) {
+      activeCurTab(activeName)
+    }
+  }, [activeName, activeCurTab])
+
+  const handleTabClick = (name) => {
+    activeCurTab(name, panelNames)
+    tabClick(name)
+  }
+
   return (
     <div className={rootClassName}>
       <div
@@ -28,36 +53,43 @@ export default function Tabs({
         )}
       >
         <div className="tw-flex tw-border-r tw-border-neut-3">
-          {React.Children.map(children, (child, i) => {
-            const { label } = child.props
+          {React.Children.map(children, (child) => {
+            const { label, name } = child.props
             return (
               <div
                 className={clsx(
-                  'tw-border-l tw-px-5 tw-border-neut-3  tw-py-3 tw-cursor-pointer',
-                  activeIndex === i ? styles.is_active : 'tw-border-t'
+                  'tw-border-l tw-px-5 tw-border-neut-3 tw-text-center tw-py-3 tw-cursor-pointer',
+                  curPanelName === name
+                    ? 'tw-font-medium tw-text-green-11 tw-bg-white tw--mb-px !tw-border-t-green-11 tw-border-t-[3px]'
+                    : 'tw-border-t'
                 )}
                 onClick={() => {
-                  setActiveIndex(i)
-                  renderedIdxs.push(i)
-                  setRenderedIdxs(uniq(renderedIdxs))
-                  tabClick(i)
+                  handleTabClick(name)
                 }}
               >
-                <span>{label}</span>
+                <span
+                  className={clsx(
+                    curPanelName === name &&
+                      'tw-inline-block tw-transform tw--translate-y-0.5'
+                  )}
+                >
+                  {label}
+                </span>
               </div>
             )
           })}
         </div>
         <div className="tw-flex tw-items-center">{more}</div>
       </div>
-      {React.Children.map(children, (child, i) => {
+      {React.Children.map(children, (child) => {
+        const chidName = child.props.name
         return (
           <div
             className={clsx(panelClassName, {
-              'tw-hidden': activeIndex !== i,
+              'tw-hidden': curPanelName !== chidName,
             })}
           >
-            {renderedIdxs.includes(i) && child}
+            {panelNames.includes(chidName) && child}
           </div>
         )
       })}
@@ -70,12 +102,12 @@ Tabs.propTypes = {
   rootClassName: PropTypes.string,
   panelClassName: PropTypes.string,
   className: PropTypes.string,
-  index: PropTypes.number,
+  activeName: PropTypes.string,
   tabClick: PropTypes.func,
   more: PropTypes.node,
 }
 
 Tabs.defaultProps = {
-  index: 0,
+  activeName: '',
   tabClick: () => {},
 }

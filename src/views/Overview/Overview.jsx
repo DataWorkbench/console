@@ -1,5 +1,5 @@
 import React from 'react'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash'
 import Card, { CardHeader, CardContent } from 'components/Card'
@@ -22,8 +22,8 @@ function getTabs(user) {
       description:
         '大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。',
       icon: 'dashboard',
-      newsLink: '/qingstor/price',
-      helpLink: '/qingstor/access_control',
+      newsLink: '/qingstor/price/',
+      helpLink: '/qingstor/access_control/',
     },
   ]
 }
@@ -31,6 +31,7 @@ function getTabs(user) {
 function Overview() {
   const {
     globalStore: { user },
+    overViewStore: { showSpaceModal },
   } = useStore()
   return (
     <div className="tw-p-5 tw-overview tw-h-full">
@@ -53,7 +54,7 @@ function Overview() {
           </CardContent>
         </Card>
       </div>
-      <SpaceListModal />
+      {showSpaceModal && <SpaceListModal />}
     </div>
   )
 }

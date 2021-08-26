@@ -5,14 +5,16 @@ module.exports = {
     browser: true,
     es2021: true,
     node: true,
+    'jest/globals': true,
   },
   extends: ['airbnb', 'airbnb/hooks', 'plugin:prettier/recommended'],
   parserOptions: {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: [],
+  plugins: ['jest'],
   rules: {
+    'no-param-reassign': ['error', { props: false }],
     'react/forbid-prop-types': 0,
     'react/jsx-props-no-spreading': 0,
     'react/require-default-props': 0,

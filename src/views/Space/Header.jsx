@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { Icon, Select } from '@QCFE/qingcloud-portal-ui'
 import { Link, useParams, useLocation, useHistory } from 'react-router-dom'
 import clsx from 'clsx'
@@ -20,19 +20,19 @@ function Header({ darkMode }) {
   const history = useHistory()
   const {
     globalStore: { user },
-    workspaceStore,
-    workspaceStore: { funcList },
+    workSpaceStore,
+    workSpaceStore: { funcList },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
 
   useMount(async () => {
-    const infos = await workspaceStore.loadAll(zone, true)
+    const infos = await workSpaceStore.loadAll(zone, true)
     if (infos) {
       setWorkspaces(infos)
       const curSpace = infos.find((info) => info.id === space)
       if (curSpace) {
-        workspaceStore.set({ curSpace })
+        workSpaceStore.set({ curSpace })
       }
     }
   })

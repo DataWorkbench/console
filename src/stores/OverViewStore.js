@@ -3,16 +3,23 @@ import { makeObservable, observable, set, action } from 'mobx'
 class OverViewStore {
   showSpaceModal = false
 
+  curItemName
+
+  curSpaceId
+
   constructor(rootStore) {
     this.rootStore = rootStore
     makeObservable(this, {
       showSpaceModal: observable,
+      curItemName: observable,
+      curSpaceId: observable,
       set: action,
     })
   }
 
   items = [
     {
+      name: 'upcloud',
       text: '数据上云',
       icon: 'edge-cloud',
       xlink: 'icon_service_0',
@@ -20,6 +27,7 @@ class OverViewStore {
       enabled: true,
     },
     {
+      name: 'dm',
       text: '云上加工',
       icon: 'smart-edge-configuration',
       xlink: 'icon_service_1',
@@ -52,6 +60,7 @@ class OverViewStore {
       moreLink: '##',
     },
     {
+      name: 'ops',
       text: '运维中心',
       icon: 'web-security',
       xlink: 'icon_service_5',

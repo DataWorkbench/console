@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Tabs, Icon } from '@QCFE/lego-ui'
 import { Button } from '@QCFE/qingcloud-portal-ui'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { useToggle } from 'react-use'
 import clsx from 'clsx'
 import { findIndex, get } from 'lodash'

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { observer } from 'mobx-react'
+import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
 import { Icon, Input } from '@QCFE/qingcloud-portal-ui/lib/components'
 import clsx from 'clsx'

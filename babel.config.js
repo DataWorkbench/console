@@ -1,15 +1,22 @@
 module.exports = (api) => {
+  const isTest = api.env('test')
   api.cache.forever()
   return {
     presets: [
       [
         '@babel/env',
-        {
-          useBuiltIns: 'usage',
-          corejs: '3.13.1',
-          loose: true,
-          modules: false,
-        },
+        isTest
+          ? {
+              targets: {
+                node: 'current',
+              },
+            }
+          : {
+              useBuiltIns: 'usage',
+              corejs: '3.13.1',
+              loose: true,
+              modules: false,
+            },
       ],
       '@babel/preset-react',
       '@babel/preset-typescript',

@@ -102,6 +102,7 @@ let config = {
       asserts: resolve('src/assets'),
       hooks: resolve('src/hooks'),
       utils: resolve('src/utils'),
+      contexts: resolve('src/contexts'),
     },
   },
   stats: {

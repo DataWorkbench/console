@@ -6,7 +6,7 @@ function GuideItem({ index, title, desc, link }) {
     <div className="tw-flex-1">
       <div className="tw-text-base tw-font-medium tw-flex">
         <div>
-          <span className="tw-inline-block tw-bg-green---11 tw-text-white tw-w-5 tw-h-5 tw-text-center tw-leading-5 tw-rounded-sm tw-mr-1.5">
+          <span className="tw-inline-block tw-bg-green-11 tw-text-white tw-w-5 tw-h-5 tw-text-center tw-leading-5 tw-rounded-sm tw-mr-1.5">
             {index}
           </span>
           {title}

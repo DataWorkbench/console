@@ -1,16 +1,30 @@
 import React from 'react'
-import { observer } from 'mobx-react'
-import { Modal, Button } from '@QCFE/qingcloud-portal-ui'
+import { observer } from 'mobx-react-lite'
+import { useHistory } from 'react-router-dom'
+import { Modal, Button, Message } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
-import Workspace from 'views/Workspace'
+import WorkSpace from 'views/WorkSpace'
 
 function SpaceListModal() {
+  const history = useHistory()
   const {
     overViewStore,
-    overViewStore: { showSpaceModal },
+    overViewStore: { showSpaceModal, curItemName, curSpaceId },
+    workSpaceStore: { curRegionId },
   } = useStore()
   const handleCancel = () => {
     overViewStore.set({ showSpaceModal: false })
+  }
+  const handleClick = () => {
+    if (!curSpaceId) {
+      Message.open({
+        content: '请先选择工作空间',
+        placement: 'bottomRight',
+        type: 'warning',
+      })
+      return
+    }
+    history.push(`/${curRegionId}/workspace/${curSpaceId}/${curItemName}`)
   }
   return (
     <Modal
@@ -30,12 +44,14 @@ function SpaceListModal() {
             <Button type="default" onClick={handleCancel}>
               取消
             </Button>
-            <Button type="primary">进入空间</Button>
+            <Button type="primary" onClick={handleClick}>
+              进入空间
+            </Button>
           </div>
         </div>
       }
     >
-      <Workspace isModal />
+      <WorkSpace isModal />
     </Modal>
   )
 }

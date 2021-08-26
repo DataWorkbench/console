@@ -4,7 +4,7 @@ import Home from 'components/Home'
 import Create from 'views/Create'
 import Overview from 'views/Overview'
 import Layout, { SpaceLayout } from 'views/Layout'
-import Workspace from 'views/Workspace'
+import WorkSpace from 'views/WorkSpace'
 import Dm from 'views/Space/Dm'
 import Manage from 'views/Space/Manage'
 import Ops from 'views/Space/Ops'
@@ -46,7 +46,7 @@ const routes = [
       },
       {
         path: '/workspace',
-        component: Workspace,
+        component: WorkSpace,
       },
       {
         path: '/',

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { get, omit } from 'lodash'
+import { get } from 'lodash'
 import emitter from 'utils/emitter'
 
 const baseConfig = {
@@ -15,9 +15,8 @@ const baseConfig = {
 }
 
 function getMessage(ret) {
-  const cookieLang = Cookies.get('lang')
-  const lang = cookieLang === 'en' ? 'en_us' : 'zh_cn'
-  return get(ret, lang)
+  const lang = Cookies.get('lang') === 'en' ? 'en_us' : 'zh_cn'
+  return get(ret, `detail.${lang}`)
 }
 
 function getOwner() {
@@ -50,8 +49,9 @@ client.interceptors.response.use(
   (response) => {
     const { status } = response.data
     if (status >= 400) {
-      response.data.message = getMessage(response.data)
-      omit(response.data, ['en_us', 'zh_cn'])
+      const message = getMessage(response.data)
+      response.data.message = message
+      emitter.emit('error', `[status]: ${status} [message]: ${message}`)
     }
     return response
   },
@@ -60,7 +60,7 @@ client.interceptors.response.use(
       response: { status },
       message,
     } = error
-    emitter.emit('error:http_status', `${status}: ${message}`)
+    emitter.emit('error', `[status]: ${status} [message]: ${message}`)
     return Promise.reject(error)
   }
 )
@@ -68,7 +68,6 @@ client.interceptors.response.use(
 const request = async (params, method = 'GET', url = '/portal_api') => {
   // 间隔200ms 循环300次获取user
   const owner = await getOwnerLoop(300)
-
   return client.request({
     url,
     data: {

@@ -19,7 +19,7 @@ function ServiceItem() {
         <div className="tw-border tw-border-green-4 tw-border-dashed tw-rounded-sm tw-bg-green-0 tw-px-12 2xl:tw-px-[68px] tw-flex tw-items-center tw-flex-1">
           <Flow items={flowItems} />
         </div>
-        <div className="tw-border tw-border-[#BAE6FD] tw-border-dashed tw-rounded-sm tw-bg-[#ECFBFF] tw-flex tw-justify-center tw-w-2/12">
+        <div className="tw-border tw-border-[#BAE6FD] tw-border-dashed tw-rounded-sm tw-bg-[#ECFBFF] tw-flex tw-justify-center tw-min-w-[200px] tw-w-2/12">
           <div className="tw-relative tw-mt-20 tw-w-full tw-flex tw-justify-center">
             <FlowCell item={opsItem} placement="right" />
           </div>

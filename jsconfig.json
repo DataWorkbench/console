@@ -10,7 +10,8 @@
       "stores/*": ["stores/*"],
       "scss/*": ["scss/*"],
       "hooks/*": ["hooks/*"],
-      "utils/*": ["utils/*"]
+      "utils/*": ["utils/*"],
+      "contexts/*": ["contexts/*"]
     }
   }
 }

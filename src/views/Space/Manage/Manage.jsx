@@ -8,7 +8,7 @@ import Setting from './Setting'
 function Manage() {
   const { zone, space, mod } = useParams()
   const {
-    workspaceStore: { funcList },
+    workSpaceStore: { funcList },
   } = useStore()
   const { subFuncList } = funcList.find(({ name }) => name === 'manage')
   const navMenu = subFuncList.map((func) => ({
