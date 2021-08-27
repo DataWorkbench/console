@@ -5,14 +5,11 @@ class OverViewStore {
 
   curItemName
 
-  curSpaceId
-
   constructor(rootStore) {
     this.rootStore = rootStore
     makeObservable(this, {
       showSpaceModal: observable,
       curItemName: observable,
-      curSpaceId: observable,
       set: action,
     })
   }

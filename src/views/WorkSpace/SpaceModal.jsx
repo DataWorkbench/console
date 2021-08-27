@@ -1,29 +1,56 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
-import { RadioButton, Form, Icon } from '@QCFE/lego-ui'
+import { RadioButton, Form, Icon, Input, Button, Modal } from '@QCFE/lego-ui'
 import { get } from 'lodash'
-import Modal, { ModalContent } from 'components/Modal'
+import FullModal, { ModalContent } from 'components/Modal'
 import { useStore } from 'stores'
 import { useWorkSpaceContext } from 'contexts'
+import styles from './styles.module.css'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
 
+const styleObj = {
+  error: {
+    icon: 'if-error-info',
+    color: '#cf3b37',
+    okType: 'danger',
+  },
+  warn: {
+    icon: 'if-exclamation',
+    color: '#FFD127',
+    okType: 'primary',
+  },
+}
+
 function SpaceModal({ region, onHide, ...otherProps }) {
   const stateStore = useWorkSpaceContext()
-  const { curSpaceOpt, optSpaces } = stateStore
-  const curSpace = get(optSpaces, '0')
+  const [delBtnEnable, setDelBtnEnable] = useState(true)
+  const { curSpaceOpt, optSpaces, optSpaceIds, optSpacesNames } = stateStore
+  const curSpace = optSpaces.length ? optSpaces[0] : null
   const form = useRef(null)
   const {
     workSpaceStore,
     workSpaceStore: { loadStatus },
   } = useStore()
-  const { id: regionId } = region
+  const regionId = region.id
+
+  useEffect(() => {
+    setDelBtnEnable(stateStore.curSpaceOpt !== 'delete')
+  }, [stateStore.curSpaceOpt])
+
+  const handleModalClose = (v) => {
+    setDelBtnEnable(true)
+    onHide(v)
+  }
+
   const handleOk = () => {
     if (form.current.validateForm()) {
       const fields = form.current.getFieldsValue()
       if (curSpaceOpt === 'create') {
-        workSpaceStore.create({ ...fields, regionId }).then(() => onHide(true))
+        workSpaceStore
+          .create({ ...fields, regionId })
+          .then(() => handleModalClose(true))
       } else {
         workSpaceStore
           .update({
@@ -31,18 +58,106 @@ function SpaceModal({ region, onHide, ...otherProps }) {
             regionId,
             spaceId: curSpace.id,
           })
-          .then(() => onHide(true))
+          .then(() => handleModalClose(true))
       }
     }
   }
 
+  if (['enable', 'disable', 'delete'].includes(curSpaceOpt)) {
+    const operateObj = {
+      enable: {
+        opName: '启动',
+        desc: '启用该工作空间，下属服务也将被启用，是否确认该工作空间进行启用操作？',
+        style: styleObj.warn,
+      },
+      disable: {
+        opName: '禁用',
+        desc: '工作空间内正在运行的任务不会强制停止，已发布调度未运行的任务将不会运行。成员无法登录，是否确认进行禁用操作？',
+        style: styleObj.warn,
+      },
+      delete: {
+        opName: '删除',
+        desc: (
+          <div className="tw-space-y-3">
+            <div>
+              该工作空间内工作流、成员等数据都将彻底删除，无法恢复，请谨慎操作。
+            </div>
+            <div className="tw-border-t tw-border-neut-2" />
+            <div>
+              *请在下方输入框中输入 “{get(optSpaceIds, '0')}” 以确认操作
+            </div>
+            <div>
+              <Input
+                type="text"
+                placeholder={get(optSpaceIds, '0')}
+                onChange={(e, value) =>
+                  setDelBtnEnable(value === stateStore.curSpaceId)
+                }
+              />
+            </div>
+          </div>
+        ),
+        style: styleObj.error,
+      },
+    }
+    const { style, opName, desc } = operateObj[curSpaceOpt]
+    return (
+      <Modal
+        visible
+        title=""
+        className={styles.modal}
+        width={450}
+        onCancel={() => handleModalClose(false)}
+        footer={
+          <>
+            <Button type="defalut" onClick={() => handleModalClose(false)}>
+              {getText('LEGO_UI_CANCEL')}
+            </Button>
+            <Button
+              type={style.okType}
+              disabled={!delBtnEnable}
+              loading={loadStatus?.state === 'pending'}
+              onClick={() => {
+                workSpaceStore[curSpaceOpt]({
+                  regionId,
+                  spaceIds: optSpaceIds,
+                }).then(() => {
+                  stateStore.set({ curSpaceOpt: '', optSpaces: [] })
+                })
+              }}
+            >
+              {getText('LEGO_UI_OK')}
+            </Button>
+          </>
+        }
+      >
+        <div className="tw-flex tw-items-start">
+          <Icon
+            name="if-exclamation"
+            className="tw-mr-3 tw-text-2xl tw-leading-6"
+            style={{ color: style.color }}
+          />
+          <div className="">
+            <div className="tw-font-semibold tw-text-base tw-text-neut-15">
+              {opName}工作空间: 工作空间{' '}
+              {optSpacesNames.length > 1
+                ? optSpacesNames.join(',')
+                : get(optSpacesNames, '0')}
+            </div>
+            <div className="tw-text-neut-13 tw-mt-2">{desc}</div>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
   return (
-    <Modal
+    <FullModal
       title={`${curSpaceOpt === 'create' ? '创建' : '修改'}工作空间`}
       closable
       placement="rightFull"
       onOK={handleOk}
-      onHide={() => onHide(false)}
+      onHide={() => handleModalClose(false)}
       {...otherProps}
       showConfirmLoading={loadStatus?.state === 'pending'}
       okText={curSpaceOpt === 'create' ? '创建' : '修改'}
@@ -101,7 +216,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
           />
         </Form>
       </ModalContent>
-    </Modal>
+    </FullModal>
   )
 }
 

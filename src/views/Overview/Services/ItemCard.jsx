@@ -13,7 +13,6 @@ function ItemCard({ item: { name, icon, text, desc, enabled, moreLink } }) {
     overViewStore.set({
       showSpaceModal: true,
       curItemName: name,
-      curSpaceId: null,
     })
   }
   return (

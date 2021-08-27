@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useLifecycles, useToggle } from 'react-use'
@@ -10,18 +10,15 @@ import {
   Loading,
   Icon,
   Button,
-  Input,
-  Modal,
+  InputSearch,
 } from '@QCFE/qingcloud-portal-ui'
 import { Control } from '@QCFE/lego-ui'
 import Card, { CardHeader, CardContent, IconCard } from 'components/Card'
 import Tabs, { TabPanel } from 'components/Tabs'
 import { useStore } from 'stores'
 import { WorkSpaceContext } from 'contexts'
-import emitter from 'utils/emitter'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
-import styles from './styles.module.css'
 
 const tabs = [
   {
@@ -33,13 +30,14 @@ const tabs = [
 ]
 
 const storageKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
-const WorkSpace = ({ isModal }) => {
+
+const WorkSpace = ({ isModal, onSpaceSelected }) => {
   const [curTabName, setCurTabName] = useState(null)
   const [loading, setLoading] = useToggle(true)
-  const [delBtnEnable, setDelBtnEnable] = useState(true)
   const scrollParentRef = useRef(null)
   const stateStore = useLocalObservable(() => ({
     isModal,
+    onSpaceSelected,
     cardView: true,
     storageKey,
     defaultColumns: [
@@ -61,6 +59,9 @@ const WorkSpace = ({ isModal }) => {
     optSpaces: [],
     get optSpaceIds() {
       return get(this, 'optSpaces', []).map(({ id }) => id)
+    },
+    get optSpacesNames() {
+      return get(this, 'optSpaces', []).map(({ name }) => name)
     },
     curSpaceOpt: '',
     set(params) {
@@ -95,7 +96,6 @@ const WorkSpace = ({ isModal }) => {
             })
           }
         })
-        .catch((err) => emitter.emit('error', `${err.message}`))
         .finally(() => setLoading(false))
     },
     () => {
@@ -103,18 +103,9 @@ const WorkSpace = ({ isModal }) => {
     }
   )
 
-  useEffect(() => {
-    setDelBtnEnable(stateStore.curSpaceOpt !== 'delete')
-  }, [stateStore.curSpaceOpt])
-
   const handleTabClick = (tabName) => {
     setCurTabName(tabName)
     stateStore.set({ curRegionId: tabName })
-  }
-
-  const handleModalClose = () => {
-    stateStore.set({ curSpaceOpt: '' })
-    setDelBtnEnable(true)
   }
 
   const handleHide = (ifRefresh) => {
@@ -128,15 +119,29 @@ const WorkSpace = ({ isModal }) => {
         })
       }
     }
-    handleModalClose()
-  }
-
-  const handleDelIptChange = (e, value) => {
-    setDelBtnEnable(value === stateStore.curSpaceId)
+    stateStore.set({ curSpaceOpt: '' })
   }
 
   const reloadSpace = () => {
-    workSpaceStore.load(curRegionId, true)
+    const { curRegionId: regionId, cardView } = stateStore
+    workSpaceStore.fetchData({
+      regionId,
+      cardView,
+      force: true,
+      offset: 0,
+    })
+  }
+
+  const handleQuery = (v) => {
+    const { curRegionId: regionId, cardView } = stateStore
+    const params = {
+      regionId,
+      cardView,
+      force: true,
+      search: v,
+      offset: 0,
+    }
+    workSpaceStore.fetchData(params)
   }
 
   const renderNoWorkSpaces = () => {
@@ -171,119 +176,6 @@ const WorkSpace = ({ isModal }) => {
     )
   }
 
-  const renderModal = () => {
-    const { curSpaceOpt: opt, optSpaceIds, optSpaces } = stateStore
-    const optSpacesNames = optSpaces.map(({ name }) => name)
-
-    if (['create', 'update'].includes(opt)) {
-      return (
-        <SpaceModal
-          region={regionInfos.find((info) => info.id === curRegionId)}
-          onHide={handleHide}
-        />
-      )
-    }
-    if (['enable', 'disable', 'delete'].includes(opt)) {
-      const styleObj = {
-        error: {
-          icon: 'if-error-info',
-          color: '#cf3b37',
-          okType: 'danger',
-        },
-        warn: {
-          icon: 'if-exclamation',
-          color: '#FFD127',
-          okType: 'primary',
-        },
-      }
-      const operateObj = {
-        enable: {
-          opName: '启动',
-          desc: '启用该工作空间，下属服务也将被启用，是否确认该工作空间进行启用操作？',
-          style: styleObj.warn,
-        },
-        disable: {
-          opName: '禁用',
-          desc: '工作空间内正在运行的任务不会强制停止，已发布调度未运行的任务将不会运行。成员无法登录，是否确认进行禁用操作？',
-          style: styleObj.warn,
-        },
-        delete: {
-          opName: '删除',
-          desc: (
-            <div className="tw-space-y-3">
-              <div>
-                该工作空间内工作流、成员等数据都将彻底删除，无法恢复，请谨慎操作。
-              </div>
-              <div className="tw-border-t tw-border-neut-2" />
-              <div>
-                *请在下方输入框中输入 “{get(optSpaceIds, '0')}” 以确认操作
-              </div>
-              <div>
-                <Input
-                  type="text"
-                  placeholder={get(optSpaceIds, '0')}
-                  onChange={handleDelIptChange}
-                />
-              </div>
-            </div>
-          ),
-          style: styleObj.error,
-        },
-      }
-      const { style, opName, desc } = operateObj[opt]
-      const state = get(workSpaceStore, 'loadStatus.state')
-      return (
-        <Modal
-          visible
-          title=""
-          className={styles.modal}
-          width={450}
-          onCancel={handleModalClose}
-          footer={
-            <>
-              <Button type="defalut" onClick={handleModalClose}>
-                {getText('LEGO_UI_CANCEL')}
-              </Button>
-              <Button
-                type={style.okType}
-                disabled={!delBtnEnable}
-                loading={state === 'pending'}
-                onClick={() => {
-                  workSpaceStore[opt]({
-                    regionId: curRegionId,
-                    spaceIds: optSpaceIds,
-                  }).then(() => {
-                    stateStore.set({ curSpaceOpt: '', optSpaces: [] })
-                  })
-                }}
-              >
-                {getText('LEGO_UI_OK')}
-              </Button>
-            </>
-          }
-        >
-          <div className="tw-flex tw-items-start">
-            <Icon
-              name="if-exclamation"
-              className="tw-mr-3 tw-text-2xl tw-leading-6"
-              style={{ color: style.color }}
-            />
-            <div className="">
-              <div className="tw-font-semibold tw-text-base tw-text-neut-15">
-                {opName}工作空间: 工作空间{' '}
-                {optSpacesNames.length > 1
-                  ? optSpacesNames.join(',')
-                  : get(optSpacesNames, '0')}
-              </div>
-              <div className="tw-text-neut-13 tw-mt-2">{desc}</div>
-            </div>
-          </div>
-        </Modal>
-      )
-    }
-    return null
-  }
-
   return (
     <WorkSpaceContext.Provider value={stateStore}>
       <div
@@ -309,11 +201,13 @@ const WorkSpace = ({ isModal }) => {
                 </Button>
                 <Control className="has-icons-left has-icons-right">
                   <i className="icon is-left if-magnifier" />
-                  <Input
+                  <InputSearch
                     type="text"
                     placeholder="工作空间、ID、角色"
                     name="search"
+                    onPressEnter={(e) => handleQuery(e.target.value)}
                     className="tw-w-52 tw-rounded-2xl"
+                    onClear={() => handleQuery('')}
                   />
                 </Control>
               </div>
@@ -345,7 +239,12 @@ const WorkSpace = ({ isModal }) => {
           </Card>
         </div>
         {!isModal && isNodata && renderNoWorkSpaces()}
-        {stateStore.curSpaceOpt !== '' && renderModal()}
+        {stateStore.curSpaceOpt !== '' && (
+          <SpaceModal
+            region={regionInfos.find((info) => info.id === curRegionId)}
+            onHide={handleHide}
+          />
+        )}
       </div>
     </WorkSpaceContext.Provider>
   )
@@ -353,10 +252,11 @@ const WorkSpace = ({ isModal }) => {
 
 WorkSpace.propTypes = {
   isModal: PropTypes.bool,
+  onSpaceSelected: PropTypes.func,
 }
 
 WorkSpace.defaultProps = {
-  isModal: false,
+  onSpaceSelected: () => {},
 }
 
 export default observer(WorkSpace)

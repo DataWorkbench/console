@@ -5,7 +5,7 @@ import emitter from 'utils/emitter'
 
 const baseConfig = {
   method: 'POST',
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     xsrfCookieName: 'csrftoken',
     xsrfHeaderName: 'X-CSRFToken',
@@ -59,7 +59,12 @@ client.interceptors.response.use(
     return response
   },
   (error) => {
-    if (error.response) {
+    if (axios.isCancel(error)) {
+      emitter.emit('error', {
+        title: `网络超时: [timeout]`,
+        content: error.message,
+      })
+    } else if (error.response) {
       const {
         response: { status },
         message,
@@ -68,8 +73,6 @@ client.interceptors.response.use(
         title: `网络错误: [${status}]`,
         content: message,
       })
-    } else if (error.request) {
-      // console.log(error)
     }
     return Promise.reject(error)
   }

@@ -22,10 +22,9 @@ function getProfileName(str) {
 
 function SpaceItem({ regionId, space, className }) {
   const stateStore = useWorkSpaceContext()
-  const { isModal, curSpaceId } = stateStore
+  const { isModal, curSpaceId, onSpaceSelected } = stateStore
   const {
     workSpaceStore: { funcList },
-    overViewStore,
   } = useStore()
   const [props, api] = useSpring(() => ({
     from: { scale: 1.03, opacity: 0.2 },
@@ -35,8 +34,8 @@ function SpaceItem({ regionId, space, className }) {
 
   const handleSelected = () => {
     if (isModal) {
-      stateStore.set({ curSpaceId: space.id })
-      overViewStore.set({ curSpaceId: space.id })
+      stateStore.set({ curSpace: space })
+      onSpaceSelected({ curSpaceId: space.id, curRegionId: regionId })
       api.start({ reset: true })
     }
   }
