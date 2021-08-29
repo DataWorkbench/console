@@ -90,19 +90,19 @@ const columns = [
 
 function DataSourceList() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [loading, toggleLoadding] = useState(true)
   const [show, toggleShow] = useToggle(false)
-  const [loading, toggleLoadding] = useToggle(true)
-  const { space } = useParams()
+  const { spaceId } = useParams()
   const {
     dataSourceStore,
     dataSourceStore: { sourceInfoList },
   } = useStore()
   useEffect(() => {
     toggleLoadding(true)
-    dataSourceStore.load(space, true).finally(() => {
+    dataSourceStore.load(spaceId, true).finally(() => {
       toggleLoadding(false)
     })
-  }, [space, dataSourceStore, toggleLoadding])
+  }, [spaceId, dataSourceStore])
   return (
     <div
       className={clsx(

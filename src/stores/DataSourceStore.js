@@ -53,15 +53,15 @@ class DataSourceStore {
     return false
   }
 
-  *load(space, force = false) {
+  *load(spaceId, force = false) {
     const { api } = this.rootStore
     if (force) {
       this.clean()
     }
-    const params = { space, ...this.filter }
+    const params = { spaceId, ...this.filter }
     const res = yield api.datasource.load(params)
     const ret = res.data
-    if (ret.ret_code === 0) {
+    if (ret?.ret_code === 0) {
       this.sourceInfoList = this.sourceInfoList.concat(ret.infos)
       return ret.infos
     }

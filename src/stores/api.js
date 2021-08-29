@@ -37,14 +37,14 @@ const workspace = {
 
 const datasource = {
   loadEngineMap: () => request({ action: 'v1/enginemap/flink' }),
-  create: ({ space, ...params }) =>
+  create: ({ spaceId, ...params }) =>
     request({
-      action: `v1/workspace/${space}/sourcemanager`,
+      action: `v1/workspace/${spaceId}/sourcemanager`,
       ...params,
       method: 'POST',
     }),
-  load: ({ space, ...params }) =>
-    request({ action: `v1/workspace/${space}/sourcemanager`, ...params }),
+  load: ({ spaceId, ...params }) =>
+    request({ action: `v1/workspace/${spaceId}/sourcemanager`, ...params }),
 }
 
 const workflow = {

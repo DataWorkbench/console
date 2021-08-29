@@ -6,14 +6,14 @@ import { useStore } from 'stores'
 import DataSourceList from './DataSourceList/DataSourceList'
 
 function Upcloud() {
-  const { zone, space, mod } = useParams()
+  const { regionId, spaceId, mod } = useParams()
   const {
     workSpaceStore: { funcList },
   } = useStore()
   const { subFuncList } = funcList.find(({ name }) => name === 'upcloud')
   const navMenu = subFuncList.map((func) => ({
     ...func,
-    link: `/${zone}/workspace/${space}/upcloud/${func.name}`,
+    link: `/${regionId}/workspace/${spaceId}/upcloud/${func.name}`,
   }))
 
   const curFunc =

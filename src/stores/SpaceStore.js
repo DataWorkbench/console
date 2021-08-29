@@ -9,10 +9,14 @@ class SpaceStore {
     total: 0,
   }
 
+  hasMore = true
+
   cancel = null
 
   constructor(rootStore) {
-    makeAutoObservable(this)
+    makeAutoObservable(this, {
+      cancel: false,
+    })
     this.rootStore = rootStore
   }
 
