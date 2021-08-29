@@ -76,14 +76,14 @@ let config = {
         type: 'asset/resource',
         exclude: resolve('src/assets/icons'),
         generator: {
-          filename: 'imgs/[name][ext]',
+          filename: 'static/imgs/[name][ext]',
         },
       },
       {
         test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
         type: 'asset/resource',
         generator: {
-          filename: 'fonts/[name][ext]',
+          filename: 'static/fonts/[name][ext]',
         },
       },
     ],
@@ -158,8 +158,8 @@ if (isDev) {
   config = merge(config, {
     plugins: [
       new MiniCssExtractPlugin({
-        filename: 'css/[name].[contenthash].css',
-        chunkFilename: 'css/[id].[contenthash].css',
+        filename: 'static/css/[name].[contenthash].css',
+        chunkFilename: 'static/css/[id].[contenthash].css',
       }),
     ],
     optimization: {
@@ -173,6 +173,13 @@ if (isDev) {
             name: 'vendor',
             priority: -10,
             test: /[\\/]node_modules[\\/]/,
+          },
+          'async-vendors': {
+            chunks: 'async',
+            minChunks: 1,
+            name: 'async-vendors',
+            priority: -20,
+            test: /[\\/]node_modules[\\/].*\.js$/,
           },
           default: {
             name: 'common',

@@ -1,14 +1,20 @@
-import React from 'react'
+import React, { lazy } from 'react'
 import { Redirect } from 'react-router-dom'
 import Home from 'components/Home'
 import Create from 'views/Create'
 import Overview from 'views/Overview'
 import Layout, { SpaceLayout } from 'views/Layout'
-import WorkSpace from 'views/WorkSpace'
-import Dm from 'views/Space/Dm'
-import Manage from 'views/Space/Manage'
-import Ops from 'views/Space/Ops'
-import Upcloud from 'views/Space/Upcloud'
+// import WorkSpace from 'views/WorkSpace'
+// import Dm from 'views/Space/Dm'
+// import Manage from 'views/Space/Manage'
+// import Ops from 'views/Space/Ops'
+// import Upcloud from 'views/Space/Upcloud'
+
+const WorkSpace = lazy(() => import('views/WorkSpace'))
+const Dm = lazy(() => import('views/Space/Dm'))
+const Manage = lazy(() => import('views/Space/Manage'))
+const Ops = lazy(() => import('views/Space/Ops'))
+const Upcloud = lazy(() => import('views/Space/Upcloud'))
 
 const routes = [
   {

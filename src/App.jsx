@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { renderRoutes } from 'react-router-config'
 import { PortalProvider, Notification } from '@QCFE/qingcloud-portal-ui'
@@ -42,7 +42,11 @@ const App = () => {
       handleGlobalData={handleGlobalData}
     >
       <StoreContext.Provider value={store}>
-        <Router basename="/bigdata">{renderRoutes(routes)}</Router>
+        <Router basename="/bigdata">
+          <Suspense fallback={<div>loading...</div>}>
+            {renderRoutes(routes)}
+          </Suspense>
+        </Router>
       </StoreContext.Provider>
     </PortalProvider>
   )
