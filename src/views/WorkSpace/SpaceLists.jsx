@@ -18,7 +18,7 @@ const SpaceLists = ({ region, className, scrollParent }) => {
   const isCurrent = curRegionId === region.id
 
   if (
-    isEqual(get(curRegion, 'filter') === { offset: 0, limit: 10 }) &&
+    isEqual(get(curRegion, 'params') === { offset: 0, limit: 10 }) &&
     get(curRegion, 'hasMore') === false &&
     get(curRegion, 'total') === 0
   ) {

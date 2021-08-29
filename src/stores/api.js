@@ -5,57 +5,57 @@ const region = {
 }
 
 const workspace = {
-  load: ({ regionId, ...filter }) =>
-    request({ action: `${regionId}/v1/workspace`, ...filter }),
+  load: ({ regionId, ...params }, options) =>
+    request({ action: `${regionId}/v1/workspace`, ...params }, options),
   create: ({ regionId, ...params }) =>
-    request({ action: `${regionId}/v1/workspace`, ...params }, 'POST'),
+    request({ action: `${regionId}/v1/workspace`, ...params, method: 'POST' }),
   update: ({ regionId, spaceId, ...params }) =>
-    request(
-      { action: `${regionId}/v1/workspace/${spaceId}`, ...params },
-      'PUT'
-    ),
+    request({
+      action: `${regionId}/v1/workspace/${spaceId}`,
+      ...params,
+      method: 'PUT',
+    }),
   delete: ({ regionId, spaceIds }) =>
-    request(
-      { action: `${regionId}/v1/workspace/deletes`, space_ids: spaceIds },
-      'POST'
-    ),
+    request({
+      action: `${regionId}/v1/workspace/deletes`,
+      space_ids: spaceIds,
+      method: 'POST',
+    }),
   enable: ({ regionId, spaceIds }) =>
-    request(
-      { action: `${regionId}/v1/workspace/enables`, space_ids: spaceIds },
-      'POST'
-    ),
+    request({
+      action: `${regionId}/v1/workspace/enables`,
+      space_ids: spaceIds,
+      method: 'POST',
+    }),
   disable: ({ regionId, spaceIds }) =>
-    request(
-      { action: `${regionId}/v1/workspace/disables`, space_ids: spaceIds },
-      'POST'
-    ),
+    request({
+      action: `${regionId}/v1/workspace/disables`,
+      space_ids: spaceIds,
+      method: 'POST',
+    }),
 }
 
 const datasource = {
   loadEngineMap: () => request({ action: 'v1/enginemap/flink' }),
   create: ({ space, ...params }) =>
-    request(
-      { action: `v1/workspace/${space}/sourcemanager`, ...params },
-      'POST'
-    ),
+    request({
+      action: `v1/workspace/${space}/sourcemanager`,
+      ...params,
+      method: 'POST',
+    }),
   load: ({ space, ...params }) =>
-    request(
-      { action: `v1/workspace/${space}/sourcemanager`, ...params },
-      'GET'
-    ),
+    request({ action: `v1/workspace/${space}/sourcemanager`, ...params }),
 }
 
 const workflow = {
   create: ({ space, ...params }) =>
-    request(
-      { action: `v1/workspace/${space}/workflow/stream`, ...params },
-      'POST'
-    ),
+    request({
+      action: `v1/workspace/${space}/workflow/stream`,
+      ...params,
+      method: 'POST',
+    }),
   load: ({ space, ...params }) =>
-    request(
-      { action: `v1/workspace/${space}/workflow/stream`, ...params },
-      'GET'
-    ),
+    request({ action: `v1/workspace/${space}/workflow/stream`, ...params }),
 }
 
 const api = {

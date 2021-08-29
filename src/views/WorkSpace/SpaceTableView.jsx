@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useWindowSize, useMount } from 'react-use'
+import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get } from 'lodash'
 import clsx from 'clsx'
@@ -117,7 +117,7 @@ function SpaceTableView({ regionId }) {
     workSpaceStore: { regions },
   } = useStore()
   const region = regions[regionId]
-  const offset = get(region, 'filter.offset', 0)
+  const offset = get(region, 'params.offset', 0)
   const workspaces = get(region, 'workspaces', [])
   const columns = utils.getTableColumnsBySetting(
     getDefaultColumns({ defaultColumns, regionId, winW, sort }),
@@ -125,16 +125,8 @@ function SpaceTableView({ regionId }) {
   )
 
   const total = get(region, 'total', 0)
-  const pageSize = get(region, 'filter.limit', 10)
-  const current = Math.floor(offset / pageSize) + 1
-
-  useMount(() => {
-    workSpaceStore.fetchData({
-      regionId,
-      cardView: false,
-      offset: 0,
-    })
-  })
+  const pageSize = get(region, 'params.limit', 10)
+  const current = offset + 1 < pageSize ? 1 : Math.floor(offset / pageSize) + 1
 
   useEffect(() => {
     if (optSpaces.length === 0) {
@@ -166,7 +158,7 @@ function SpaceTableView({ regionId }) {
   }
 
   const handlePageChange = (curPage) => {
-    const { limit } = get(region, 'filter')
+    const { limit } = get(region, 'params')
 
     workSpaceStore.fetchData({
       regionId,
@@ -192,12 +184,12 @@ function SpaceTableView({ regionId }) {
   return (
     <Table
       rowKey="id"
-      loading={get(region, 'loadStatus.state') === 'pending'}
+      loading={get(region, 'fetchPromise.state') === 'pending'}
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
       onSelect={handleSelect}
       className="tw-table-auto"
-      dataSource={workspaces}
+      dataSource={workspaces.slice(0, pageSize)}
       columns={columns}
       onFilterChange={handleFilterChange}
       onSort={handleSort}

@@ -16,8 +16,8 @@ function SpaceListsToolBar({ regionId }) {
     workSpaceStore.fetchData({
       regionId,
       cardView: isCardView,
-      force: true,
       offset: 0,
+      reload: isCardView,
     })
   }
 
@@ -34,14 +34,13 @@ function SpaceListsToolBar({ regionId }) {
   }
 
   const handleQuery = (v) => {
-    const params = {
+    workSpaceStore.fetchData({
       regionId,
       cardView,
-      force: true,
-      search: v,
+      reload: true,
       offset: 0,
-    }
-    workSpaceStore.fetchData(params)
+      search: v,
+    })
   }
 
   const handleMenuClick = (e, key, value) => {

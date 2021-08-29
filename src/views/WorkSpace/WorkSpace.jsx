@@ -4,7 +4,7 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useLifecycles, useToggle } from 'react-use'
 import PropTypes from 'prop-types'
 import clsx from 'clsx'
-import { get, isEqual } from 'lodash'
+import { get, isEqual, throttle } from 'lodash'
 import {
   PageTab,
   Loading,
@@ -40,6 +40,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
     onSpaceSelected,
     cardView: true,
     storageKey,
+    scrollElem: null,
     defaultColumns: [
       { title: '空间名称/id', dataIndex: 'id', fixedInSetting: true },
       { title: '空间状态', dataIndex: 'status' },
@@ -106,6 +107,13 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
   const handleTabClick = (tabName) => {
     setCurTabName(tabName)
     stateStore.set({ curRegionId: tabName })
+    if (!get(regions, tabName)) {
+      workSpaceStore.fetchData({
+        regionId: tabName,
+        cardView: stateStore.cardView,
+        offset: 0,
+      })
+    }
   }
 
   const handleHide = (ifRefresh) => {
@@ -143,6 +151,21 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
     }
     workSpaceStore.fetchData(params)
   }
+
+  const handleScroll = throttle(() => {
+    const { curRegionId: regionId, cardView } = stateStore
+    if (cardView) {
+      const el = scrollParentRef.current
+      const dist = el.scrollHeight - el.clientHeight - el.scrollTop
+      if (el.scrollTop > 0 && dist < 250) {
+        // console.log(dist)
+        workSpaceStore.fetchData({
+          regionId,
+          cardView,
+        })
+      }
+    }
+  }, 150)
 
   const renderNoWorkSpaces = () => {
     return (
@@ -183,6 +206,8 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
           'tw-text-xs tw-h-full tw-overflow-auto',
           isModal ? '' : 'tw-p-5'
         )}
+        onScroll={handleScroll}
+        // ref={(el) => stateStore.set({ scrollElem: el })}
         ref={scrollParentRef}
       >
         <div className={clsx('!tw-pb-0')}>
@@ -213,7 +238,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
               </div>
             )}
             <Loading size="large" spinning={loading} delay={150}>
-              {regionInfos.length > 0 && scrollParentRef && (
+              {regionInfos.length > 0 && (
                 <Tabs
                   name={curTabName}
                   tabClick={handleTabClick}
@@ -229,7 +254,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
                         className="tw-px-5 tw-py-3"
                         region={regionInfo}
                         isCurrent={regionInfo.id === curRegionId}
-                        scrollParent={scrollParentRef.current}
+                        // scrollParent={scrollParentRef.current}
                       />
                     </TabPanel>
                   ))}

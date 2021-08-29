@@ -31,7 +31,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
   const form = useRef(null)
   const {
     workSpaceStore,
-    workSpaceStore: { loadStatus },
+    workSpaceStore: { fetchPromise },
   } = useStore()
   const regionId = region.id
 
@@ -116,7 +116,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
             <Button
               type={style.okType}
               disabled={!delBtnEnable}
-              loading={loadStatus?.state === 'pending'}
+              loading={fetchPromise?.state === 'pending'}
               onClick={() => {
                 workSpaceStore[curSpaceOpt]({
                   regionId,
@@ -159,7 +159,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
       onOK={handleOk}
       onHide={() => handleModalClose(false)}
       {...otherProps}
-      showConfirmLoading={loadStatus?.state === 'pending'}
+      showConfirmLoading={fetchPromise?.state === 'pending'}
       okText={curSpaceOpt === 'create' ? '创建' : '修改'}
       cancelText="取消"
     >

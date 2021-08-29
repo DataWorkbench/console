@@ -1,13 +1,15 @@
-import { makeObservable, observable, flow, action, set } from 'mobx'
+import { makeAutoObservable, toJS, set } from 'mobx'
 import { fromPromise } from 'mobx-utils'
 import { omitBy } from 'lodash'
 
 class WorkSpaceStore {
   regions = {}
 
+  cancels = {}
+
   curRegionId = null
 
-  loadStatus
+  fetchPromise
 
   funcList = [
     {
@@ -53,109 +55,86 @@ class WorkSpaceStore {
   ]
 
   constructor(rootStore) {
-    makeObservable(this, {
-      regions: observable,
-      loadStatus: observable,
-      // showSpaceModal: observable,
-      // curOpt: observable,
-      curRegionId: observable,
-      fetchData: flow,
-      cud: flow,
-      create: flow,
-      update: flow,
-      disable: flow,
-      enable: flow,
-      delete: flow,
-      set: action,
+    makeAutoObservable(this, {
+      cancels: false,
+      getRegion: false,
     })
     this.rootStore = rootStore
-  }
-
-  getRegion(regionId) {
-    if (!this.regions[regionId]) {
-      this.regions[regionId] = {
-        workspaces: [],
-        hasMore: true,
-        total: 0,
-        loadStatus: null,
-        filter: {
-          offset: 0,
-          limit: 10,
-          sort_by: 'created',
-          reverse: true,
-        },
-      }
-    }
-    return this.regions[regionId]
   }
 
   set(params) {
     set(this, { ...params })
   }
 
-  async loadAll(zoneName) {
-    const { api } = this.rootStore
-    const workspacesPromise = api.workspace.load({ zone: zoneName })
-    const res = await workspacesPromise
-    const ret = res.data
-    if (ret.ret_code === 0) {
-      const { infos } = ret
-      if (infos && infos.length) {
-        return infos
+  getRegion(regionId, reload) {
+    let region = this.regions[regionId]
+    if (!region) {
+      region = {
+        workspaces: [],
+        hasMore: true,
+        total: 0,
+        fetchPromise: null,
+        params: {
+          offset: 0,
+          limit: 10,
+          sort_by: 'created',
+          reverse: true,
+        },
       }
+    } else if (reload) {
+      set(region, {
+        workspaces: [],
+        hasMore: true,
+        total: 0,
+        fetchPromise: null,
+      })
     }
-    return null
+    this.regions[regionId] = region
+    return this.regions[regionId]
   }
 
-  *fetchData(params) {
-    const { regionId, cardView, force, ...filter } = params
+  *fetchData(params, options = {}) {
+    const { cardView, reload, ...otherParams } = params
+    const { regionId } = params
     const { api } = this.rootStore
-    const region = this.getRegion(regionId)
-    const newFilter = omitBy(
+    const region = this.getRegion(regionId, reload)
+    const cancel = this.cancels[regionId]
+    const { fetchPromise, hasMore } = region
+    if ((cardView && !hasMore) || fetchPromise?.state === 'pending') {
+      return
+    }
+    const newParams = omitBy(
       {
-        ...region.filter,
-        ...filter,
+        ...toJS(region.params),
+        ...otherParams,
       },
       (v) => v === ''
     )
-    region.filter = newFilter
-
-    if (cardView && force) {
-      region.hasMore = true
+    // console.log(newParams)
+    options.cancel = (c) => {
+      this.cancels[regionId] = c
     }
-    if (
-      cardView &&
-      (region.loadStatus?.state === 'pending' || region.hasMore === false)
-    ) {
-      return
+    if (cancel) {
+      cancel()
     }
-    const isReFetch = !cardView || region.filter.offset === 0
-    if (isReFetch) {
-      region.workspaces = []
-    }
-    const workspacesPromise = api.workspace.load({
-      ...region.filter,
-      regionId,
-    })
-    region.loadStatus = fromPromise(workspacesPromise)
-    const ret = yield workspacesPromise
-    // const ret = res.data
+    region.fetchPromise = fromPromise(api.workspace.load(newParams, options))
+    const ret = yield region.fetchPromise
     if (ret?.ret_code === 0) {
       // if (regionId === 'staging') {
       //   region.hasMore = false
       //   return
       // }
+      region.params = newParams
       const { infos, total } = ret
       if (infos && infos.length) {
-        // if (isReFetch) {
-        //   region.workspaces = []
-        // }
-        region.workspaces = region.workspaces.concat(infos)
+        const { offset } = region.params
+        region.workspaces =
+          offset === 0 || !cardView ? infos : region.workspaces.concat(infos)
+        region.total = total
         if (cardView) {
-          region.filter.offset = region.workspaces.length
+          region.params.offset = region.workspaces.length
         }
       }
-      region.total = total
       region.hasMore = ret.has_more || false
     }
   }
@@ -163,7 +142,7 @@ class WorkSpaceStore {
   *cud(op, params) {
     const { api } = this.rootStore
     const workspacesPromise = api.workspace[op](params)
-    this.loadStatus = fromPromise(workspacesPromise)
+    this.fetchPromise = fromPromise(workspacesPromise)
     return yield workspacesPromise
   }
 

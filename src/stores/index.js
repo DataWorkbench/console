@@ -6,6 +6,7 @@ import GlobalStore from 'stores/GlobalStore'
 import WorkSpaceStore from 'stores/WorkSpaceStore'
 import DataSourceStore from 'stores/DataSourceStore'
 import WorkFlowStore from 'stores/WorkFlowStore'
+import SpaceStore from 'stores/SpaceStore'
 
 import api from './api'
 
@@ -21,6 +22,7 @@ class RootStore {
     this.workSpaceStore = new WorkSpaceStore(this)
     this.dataSourceStore = new DataSourceStore(this)
     this.workFlowStore = new WorkFlowStore(this)
+    this.spaceStore = new SpaceStore(this)
     this.api = api
   }
 }

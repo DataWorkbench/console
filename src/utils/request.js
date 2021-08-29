@@ -1,15 +1,15 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { get } from 'lodash'
+import { get, isFunction } from 'lodash'
 import emitter from 'utils/emitter'
 
 const baseConfig = {
   method: 'POST',
-  timeout: 15000,
+  timeout: 20000,
+  xsrfCookieName: 'csrftoken',
+  xsrfHeaderName: 'X-CSRFToken',
   headers: {
-    xsrfCookieName: 'csrftoken',
-    xsrfHeaderName: 'X-CSRFToken',
-    maxRedirects: 0,
+    'X-Requested-With': 'XMLHttpRequest',
     'X-CSRFToken': Cookies.get('csrftoken'),
   },
 }
@@ -52,7 +52,7 @@ client.interceptors.response.use(
       const message = getMessage(response.data)
       response.data.message = message
       emitter.emit('error', {
-        title: `请求错误: [${status}]`,
+        title: `请求错误: [${status || retCode}]`,
         content: message,
       })
     }
@@ -78,7 +78,10 @@ client.interceptors.response.use(
   }
 )
 
-const request = async (params, method = 'GET', url = '/portal_api') => {
+const request = async (data, options = {}) => {
+  const { method = 'GET', ...params } = data
+  const { cancel, ...config } = options
+
   // 间隔200ms 循环300次获取user
   const owner = await getOwnerLoop(300).catch((err) => {
     emitter.emit('error', {
@@ -90,7 +93,8 @@ const request = async (params, method = 'GET', url = '/portal_api') => {
   if (owner) {
     return client
       .request({
-        url,
+        url: '/portal_api',
+        cancelToken: isFunction(cancel) ? new axios.CancelToken(cancel) : null,
         data: {
           params: {
             service: 'bigdata',
@@ -99,12 +103,20 @@ const request = async (params, method = 'GET', url = '/portal_api') => {
           },
           method,
         },
+        ...config,
       })
       .then((response) => response.data)
+      .catch((e) => {
+        if (axios.isCancel(e)) {
+          return null
+        }
+        return {
+          ret_code: -1,
+          message: e.message,
+        }
+      })
   }
   return null
 }
-
-export { getMessage }
 
 export default request

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
 import { Icon, Select } from '@QCFE/qingcloud-portal-ui'
@@ -14,27 +14,41 @@ const defaultProps = {
   darkMode: false,
 }
 function Header({ darkMode }) {
-  const [workspaces, setWorkspaces] = useState([])
-  const { zone, space } = useParams()
+  const { regionId, spaceId } = useParams()
   const { pathname } = useLocation()
   const history = useHistory()
   const {
     globalStore: { user },
-    workSpaceStore,
+    spaceStore,
+    spaceStore: { workspaces },
     workSpaceStore: { funcList },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
 
+  const loadData = () =>
+    spaceStore.fetchSpaces({
+      regionId,
+    })
+
   useMount(async () => {
-    const infos = await workSpaceStore.loadAll(zone, true)
-    if (infos) {
-      setWorkspaces(infos)
-      const curSpace = infos.find((info) => info.id === space)
-      if (curSpace) {
-        workSpaceStore.set({ curSpace })
-      }
-    }
+    // spaceStore.reset()
+    // loadData()
+    spaceStore.fetchSpaces({
+      regionId,
+      reload: true,
+    })
+
+    // await workSpaceStore.fetchData({
+    //   regionId,
+    // })
+    // if (infos) {
+    //   setWorkspaces(infos)
+    //   const curSpace = infos.find((info) => info.id === spaceId)
+    //   if (curSpace) {
+    //     workSpaceStore.set({ curSpace })
+    //   }
+    // }
   })
 
   return (
@@ -55,12 +69,16 @@ function Header({ darkMode }) {
           工
         </div>
         <Select
-          defaultValue={space}
+          defaultValue={spaceId}
+          isLoadingAtBottom
+          searchable
+          onMenuScrollToBottom={loadData}
+          bottomTextVisible
           options={workspaces.map(({ id, name }) => ({
             value: id,
             label: name,
           }))}
-          onChange={(v) => history.push(`/${zone}/workspace/${v}/${mod}`)}
+          onChange={(v) => history.push(`/${regionId}/workspace/${v}/${mod}`)}
         />
       </div>
       <div>
@@ -72,7 +90,7 @@ function Header({ darkMode }) {
                 'tw-font-semibold tw-relative after:tw-absolute after:tw-content-[" "] after:tw-w-3/5 after:tw-h-0.5 after:tw-left-[20%] after:tw-bottom-0.5 after:tw-bg-green-11 dark:tw-text-white',
               'tw-inline-block tw-py-3 tw-mr-6 tw-text-sm dark:hover:tw-text-white'
             )}
-            to={`/${zone}/workspace/${space}/${name}`}
+            to={`/${regionId}/workspace/${spaceId}/${name}`}
           >
             {title}
           </Link>

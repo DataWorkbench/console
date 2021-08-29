@@ -12,23 +12,23 @@ import Upcloud from 'views/Space/Upcloud'
 
 const routes = [
   {
-    path: '/:zone/workspace/:space',
+    path: '/:regionId/workspace/:spaceId',
     component: SpaceLayout,
     routes: [
       {
-        path: '/:zone/workspace/:space/upcloud/:mod?',
+        path: '/:regionId/workspace/:spaceId/upcloud/:mod?',
         component: Upcloud,
       },
       {
-        path: '/:zone/workspace/:space/dm/:mod?',
+        path: '/:regionId/workspace/:spaceId/dm/:mod?',
         component: Dm,
       },
       {
-        path: '/:zone/workspace/:space/ops/:mod?',
+        path: '/:regionId/workspace/:spaceId/ops/:mod?',
         component: Ops,
       },
       {
-        path: '/:zone/workspace/:space/manage/:mod?',
+        path: '/:regionId/workspace/:spaceId/manage/:mod?',
         component: Manage,
       },
     ],

@@ -36,7 +36,7 @@ class GlobalStore {
     const { api } = this.rootStore
     const regionPromise = api.region.load()
     const ret = yield regionPromise
-    if (ret) {
+    if (ret?.ret_code === 0) {
       this.regionInfos = parseI18n(ret.infos)
     }
     return this.regionInfos
