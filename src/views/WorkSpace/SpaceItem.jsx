@@ -6,19 +6,10 @@ import clsx from 'clsx'
 import { useSpring, animated } from 'react-spring'
 import { Tooltip, Radio, Dropdown, Menu, Icon } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import { formatDate } from 'utils/convert'
+import { formatDate, getShortSpaceName } from 'utils/convert'
 import Card from 'components/Card'
 import { useWorkSpaceContext } from 'contexts'
 import styles from './styles.module.css'
-
-function getProfileName(str) {
-  const pattern = new RegExp('[\u4E00-\u9FA5]+')
-  const profileName = str.substr(0, 2)
-  if (pattern.test(profileName)) {
-    return str.substr(0, 1)
-  }
-  return profileName
-}
 
 function SpaceItem({ regionId, space, className }) {
   const stateStore = useWorkSpaceContext()
@@ -136,7 +127,7 @@ function SpaceItem({ regionId, space, className }) {
                 styles.profile
               )}
             >
-              {getProfileName(space.name)}
+              {getShortSpaceName(space.name)}
             </div>
             <div className="tw-ml-3">
               <div className="tw-flex tw-items-center">

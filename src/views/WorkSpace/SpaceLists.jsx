@@ -9,7 +9,7 @@ import SpaceListsEmpty from './SpaceListsEmpty'
 import SpaceListsToolBar from './SpaceListsToolBar'
 import SpaceCardView from './SpaceCardView'
 
-const SpaceLists = ({ region, className, scrollParent }) => {
+const SpaceLists = ({ region, className }) => {
   const { isModal, cardView, curRegionId } = useWorkSpaceContext()
   const {
     workSpaceStore: { regions },
@@ -30,7 +30,7 @@ const SpaceLists = ({ region, className, scrollParent }) => {
       {isCurrent && (
         <>
           {cardView ? (
-            <SpaceCardView regionId={region.id} scrollParent={scrollParent} />
+            <SpaceCardView regionId={region.id} />
           ) : (
             <SpaceTableView regionId={region.id} />
           )}
@@ -43,7 +43,6 @@ const SpaceLists = ({ region, className, scrollParent }) => {
 SpaceLists.propTypes = {
   className: PropTypes.string,
   region: PropTypes.object,
-  scrollParent: PropTypes.object,
 }
 
 export default observer(SpaceLists)

@@ -33,6 +33,7 @@ function Overview() {
     globalStore: { user },
     overViewStore: { showSpaceModal },
   } = useStore()
+
   return (
     <div className="tw-p-5 tw-overview tw-h-full">
       <PageTab tabs={getTabs(user)} />

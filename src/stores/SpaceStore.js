@@ -31,7 +31,7 @@ class SpaceStore {
   }
 
   *fetchSpaces({ reload, ...params }, options = {}) {
-    if (!this.hasMore) {
+    if (!this.hasMore || this.fetchPromise?.state === 'pending') {
       return
     }
     if (reload) {
@@ -57,8 +57,8 @@ class SpaceStore {
       limit,
       ...params,
     }
-
-    const ret = yield api.workspace.load(newParams, options)
+    this.fetchPromise = api.workspace.load(newParams, options)
+    const ret = yield this.fetchPromise
     if (ret?.ret_code === 0) {
       const { workspaces } = this
       const { infos } = ret

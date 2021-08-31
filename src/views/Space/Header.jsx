@@ -2,29 +2,34 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
 import { Icon, Select } from '@QCFE/qingcloud-portal-ui'
+import { Tooltip, Menu } from '@QCFE/lego-ui'
 import { Link, useParams, useLocation, useHistory } from 'react-router-dom'
 import clsx from 'clsx'
+import { getShortSpaceName } from 'utils/convert'
 import { useMount } from 'react-use'
 import { useStore } from 'stores'
+import styles from './styles.module.css'
 
-const propTypes = {
-  darkMode: PropTypes.bool,
-}
-const defaultProps = {
-  darkMode: false,
-}
+const { MenuItem, SubMenu } = Menu
+
 function Header({ darkMode }) {
   const { regionId, spaceId } = useParams()
   const { pathname } = useLocation()
   const history = useHistory()
   const {
-    globalStore: { user },
+    globalStore: {
+      user,
+      menuInfo: { menus },
+    },
     spaceStore,
     spaceStore: { workspaces },
     workSpaceStore: { funcList },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
+  const space = workspaces?.find(({ id }) => id === spaceId)
+  const workSpaceMenu = menus.find((m) => m.name === 'workspace')
+  const otherMenus = menus.filter((m) => m.name !== 'workspace')
 
   const loadData = () =>
     spaceStore.fetchSpaces({
@@ -32,24 +37,13 @@ function Header({ darkMode }) {
     })
 
   useMount(async () => {
-    // spaceStore.reset()
-    // loadData()
     spaceStore.fetchSpaces({
       regionId,
       reload: true,
     })
-
-    // await workSpaceStore.fetchData({
-    //   regionId,
-    // })
-    // if (infos) {
-    //   setWorkspaces(infos)
-    //   const curSpace = infos.find((info) => info.id === spaceId)
-    //   if (curSpace) {
-    //     workSpaceStore.set({ curSpace })
-    //   }
-    // }
   })
+
+  const handleMenuClick = (e, k) => history.push(`/${k}`)
 
   return (
     <div
@@ -58,28 +52,97 @@ function Header({ darkMode }) {
       )}
     >
       <div className="tw-flex tw-items-center">
-        <div className="tw-flex tw-justify-center tw-h-14 tw-items-center tw-w-14 tw-bg-neut-1 dark:tw-bg-neut-13 tw-cursor-pointer">
-          <Icon
-            name="if-ninedot"
-            style={{ fontSize: 32 }}
-            className="dark:tw-text-white"
+        <Tooltip
+          trigger="hover"
+          className="tw-px-0"
+          content={
+            <Menu
+              mode="inline"
+              className="tw-bg-neut-17 tw-text-xs tw-font-semibold"
+              onClick={handleMenuClick}
+              width={200}
+            >
+              <MenuItem
+                key={workSpaceMenu.name}
+                className="tw-text-white hover:tw-bg-neut-16 hover:tw-text-white"
+              >
+                <Icon name="return" type="light" />
+                返回{workSpaceMenu.title}列表
+              </MenuItem>
+              <div className="tw-border-t tw-border-neut-8 tw-my-3" />
+              {otherMenus.map((menu) => {
+                if (menu.items) {
+                  return (
+                    <SubMenu
+                      title={
+                        <div className="tw-flex tw-items-center">
+                          <Icon name={menu.icon} type="light" />
+                          {menu.title}
+                        </div>
+                      }
+                      key={menu.name}
+                      className={styles.headerSubMenu}
+                    >
+                      {menu.items.map(({ name, icon, title }) => (
+                        <MenuItem
+                          key={name}
+                          className="tw-text-white hover:tw-bg-neut-16 hover:tw-text-white"
+                        >
+                          <Icon name={icon} type="light" />
+                          {title}
+                        </MenuItem>
+                      ))}
+                    </SubMenu>
+                  )
+                }
+                return (
+                  <MenuItem
+                    className="tw-text-white hover:tw-bg-neut-16 hover:tw-text-white"
+                    key={menu.name}
+                  >
+                    <Icon name={menu.icon} />
+                    {menu.title}
+                  </MenuItem>
+                )
+              })}
+            </Menu>
+          }
+        >
+          <div
+            className={clsx(
+              'tw-flex tw-justify-center tw-h-14 tw-items-center tw-w-14 tw-bg-neut-1 dark:tw-bg-neut-13 tw-cursor-pointer',
+              'hover:tw-bg-green-11 hover:tw-text-white'
+            )}
+          >
+            <Icon
+              name="if-ninedot"
+              style={{ fontSize: 32 }}
+              className="dark:tw-text-white"
+            />
+          </div>
+        </Tooltip>
+        <div
+          className={clsx(
+            'tw-text-sm tw-w-8 tw-h-8 tw-mx-3 tw-bg-neut-3 tw-rounded-sm tw-flex tw-justify-center tw-items-center',
+            'tw-bg-[#cfafe9] tw-text-[#934bc5] tw-font-semibold'
+          )}
+        >
+          {getShortSpaceName(space?.name)}
+        </div>
+        <div className={styles.headerSelectWrapper}>
+          <Select
+            defaultValue={spaceId}
+            isLoadingAtBottom
+            searchable
+            onMenuScrollToBottom={loadData}
+            bottomTextVisible
+            options={workspaces.map(({ id, name }) => ({
+              value: id,
+              label: name,
+            }))}
+            onChange={(v) => history.push(`/${regionId}/workspace/${v}/${mod}`)}
           />
         </div>
-        <div className="tw-text-sm tw-w-8 tw-h-8 tw-mx-3 tw-bg-neut-3 tw-rounded-sm tw-flex tw-justify-center tw-items-center">
-          工
-        </div>
-        <Select
-          defaultValue={spaceId}
-          isLoadingAtBottom
-          searchable
-          onMenuScrollToBottom={loadData}
-          bottomTextVisible
-          options={workspaces.map(({ id, name }) => ({
-            value: id,
-            label: name,
-          }))}
-          onChange={(v) => history.push(`/${regionId}/workspace/${v}/${mod}`)}
-        />
       </div>
       <div>
         {funcList.map(({ title, name }) => (
@@ -127,7 +190,12 @@ function Header({ darkMode }) {
   )
 }
 
-Header.propTypes = propTypes
-Header.defaultProps = defaultProps
+Header.propTypes = {
+  darkMode: PropTypes.bool,
+}
+
+Header.defaultProps = {
+  darkMode: false,
+}
 
 export default observer(Header)

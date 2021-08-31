@@ -25,4 +25,16 @@ function parseI18n(obj, lang) {
 const formatDate = (timestamp, fmt) =>
   dayjs(timestamp * 1000).format(fmt || 'YYYY-MM-DD HH:mm:ss')
 
-export { parseI18n, formatDate }
+const getShortSpaceName = (str) => {
+  if (str) {
+    const pattern = new RegExp('[\u4E00-\u9FA5]+')
+    const profileName = str.substr(0, 2)
+    if (pattern.test(profileName)) {
+      return str.substr(0, 1)
+    }
+    return profileName
+  }
+  return str
+}
+
+export { parseI18n, formatDate, getShortSpaceName }

@@ -62,15 +62,32 @@ function SpaceListsToolBar({ regionId }) {
             <Dropdown
               content={
                 <Menu onClick={handleMenuClick}>
-                  <Menu.MenuItem value="update" disabled={curSpacesLen !== 1}>
+                  <Menu.MenuItem
+                    value="update"
+                    disabled={curSpacesLen !== 1 || optSpaces[0].status === 2}
+                  >
                     <Icon name="pen" />
                     修改工作空间
                   </Menu.MenuItem>
-                  <Menu.MenuItem value="disable" disabled={curSpacesLen === 0}>
+                  <Menu.MenuItem
+                    value="disable"
+                    disabled={
+                      curSpacesLen === 0 ||
+                      curSpacesLen ===
+                        optSpaces.filter((o) => o.status === 2).length
+                    }
+                  >
                     <i className="if if-minus-square tw-text-base tw-mr-2" />
                     禁用工作空间
                   </Menu.MenuItem>
-                  <Menu.MenuItem value="enable" disabled={curSpacesLen === 0}>
+                  <Menu.MenuItem
+                    value="enable"
+                    disabled={
+                      curSpacesLen === 0 ||
+                      curSpacesLen ===
+                        optSpaces.filter((o) => o.status === 1).length
+                    }
+                  >
                     <Icon name="start" />
                     启动工作空间
                   </Menu.MenuItem>

@@ -28,7 +28,7 @@ const handleGlobalData = (data) => {
   const { user } = data
   const { globalStore } = store
   if (user) {
-    globalStore.updateUserInfo(user)
+    globalStore.set({ user })
   }
 }
 

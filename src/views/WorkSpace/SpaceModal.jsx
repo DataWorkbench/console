@@ -1,11 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
-import { RadioButton, Form, Icon, Input, Button, Modal } from '@QCFE/lego-ui'
+import clsx from 'clsx'
+import { RadioButton, Form, Input, Button, Modal } from '@QCFE/lego-ui'
+import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash'
 import FullModal, { ModalContent } from 'components/Modal'
 import { useStore } from 'stores'
 import { useWorkSpaceContext } from 'contexts'
+import { formatDate } from 'utils/convert'
 import styles from './styles.module.css'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
@@ -23,10 +26,65 @@ const styleObj = {
   },
 }
 
+const columns = [
+  {
+    title: '空间名称/id',
+    width: 220,
+    dataIndex: 'id',
+    render: (field, row) => (
+      <div className="tw-flex tw-items-center">
+        <div className="tw-bg-neut-3 tw-rounded-full tw-p-1 tw-flex tw-items-center tw-justify-center">
+          <Icon name="project" size="small" />
+        </div>
+        <div className="tw-ml-2">
+          <div className="tw-font-semibold">{row.name}</div>
+          <div className="tw-text-neut-8">{field}</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: '空间状态',
+    width: 100,
+    dataIndex: 'status',
+    render: (field) => (
+      <div
+        className={clsx(
+          field === 1
+            ? 'tw-bg-green-0 tw-text-green-13'
+            : 'tw-bg-[#FFFDED] tw-text-[#A16207]',
+          'tw-px-2 tw-py-0.5 tw-rounded-[20px] tw-flex tw-items-center'
+        )}
+      >
+        <div
+          className={clsx(
+            field === 1 ? 'tw-bg-green-1' : 'tw-bg-[#FFD127]',
+            ' tw-w-3 tw-h-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1'
+          )}
+        >
+          <div
+            className={clsx(
+              field === 1 ? 'tw-bg-green-13' : 'tw-bg-[#A48A19]',
+              ' tw-w-1.5 tw-h-1.5 tw-rounded-full'
+            )}
+          />
+        </div>
+        {field === 1 ? '活跃' : '已禁用'}
+      </div>
+    ),
+  },
+  { title: '空间所有者', dataIndex: 'owner' },
+  {
+    title: '创建时间',
+    dataIndex: 'created',
+    render: (field) => formatDate(field),
+  },
+]
+
 function SpaceModal({ region, onHide, ...otherProps }) {
   const stateStore = useWorkSpaceContext()
   const [delBtnEnable, setDelBtnEnable] = useState(true)
-  const { curSpaceOpt, optSpaces, optSpaceIds, optSpacesNames } = stateStore
+  const { curSpaceOpt, optSpaces } = stateStore
   const curSpace = optSpaces.length ? optSpaces[0] : null
   const form = useRef(null)
   const {
@@ -34,6 +92,18 @@ function SpaceModal({ region, onHide, ...otherProps }) {
     workSpaceStore: { fetchPromise },
   } = useStore()
   const regionId = region.id
+  const filterOptSpaces = optSpaces.filter((o) => {
+    if (curSpaceOpt === 'enable' && o.status !== 2) {
+      return false
+    }
+    if (curSpaceOpt === 'disable' && o.status !== 1) {
+      return false
+    }
+    return true
+  })
+  const filterOptSpaceIds = filterOptSpaces.map((o) => o.id)
+  const modalWidth =
+    curSpaceOpt === 'delete' && filterOptSpaces.length > 1 ? 720 : 450
 
   useEffect(() => {
     setDelBtnEnable(stateStore.curSpaceOpt !== 'delete')
@@ -63,6 +133,19 @@ function SpaceModal({ region, onHide, ...otherProps }) {
     }
   }
 
+  const handleConfirm = () => {
+    if (filterOptSpaceIds.length > 0) {
+      workSpaceStore[curSpaceOpt]({
+        regionId,
+        spaceIds: filterOptSpaceIds,
+      }).then(() => {
+        stateStore.set({ curSpaceOpt: '', optSpaces: [] })
+      })
+    } else {
+      stateStore.set({ curSpaceOpt: '' })
+    }
+  }
+
   if (['enable', 'disable', 'delete'].includes(curSpaceOpt)) {
     const operateObj = {
       enable: {
@@ -78,24 +161,47 @@ function SpaceModal({ region, onHide, ...otherProps }) {
       delete: {
         opName: '删除',
         desc: (
-          <div className="tw-space-y-3">
-            <div>
-              该工作空间内工作流、成员等数据都将彻底删除，无法恢复，请谨慎操作。
-            </div>
-            <div className="tw-border-t tw-border-neut-2" />
-            <div>
-              *请在下方输入框中输入 “{get(optSpaceIds, '0')}” 以确认操作
-            </div>
-            <div>
-              <Input
-                type="text"
-                placeholder={get(optSpaceIds, '0')}
-                onChange={(e, value) =>
-                  setDelBtnEnable(value === stateStore.curSpaceId)
-                }
-              />
-            </div>
-          </div>
+          <>
+            {filterOptSpaces.length === 1 ? (
+              <div className="tw-space-y-3">
+                <div>
+                  该工作空间内工作流、成员等数据都将彻底删除，无法恢复，请谨慎操作。
+                </div>
+                <div className="tw-border-t tw-border-neut-2" />
+                <div>
+                  *请在下方输入框中输入 “{get(filterOptSpaceIds, '0')}”
+                  以确认操作
+                </div>
+                <div>
+                  <Input
+                    type="text"
+                    placeholder={get(filterOptSpaceIds, '0')}
+                    onChange={(e, value) =>
+                      setDelBtnEnable(value === stateStore.curSpaceId)
+                    }
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="tw-space-y-3">
+                <Table
+                  dataSource={filterOptSpaces}
+                  columns={columns}
+                  rowKey="id"
+                />
+                <div className="tw-border-t tw-border-neut-2" />
+                <div>*请在下方输入框中输入 “delete” 以确认操作</div>
+                <div>
+                  <Input
+                    type="text"
+                    className="tw-w-40"
+                    placeholder="delete"
+                    onChange={(e, value) => setDelBtnEnable(value === 'delete')}
+                  />
+                </div>
+              </div>
+            )}
+          </>
         ),
         style: styleObj.error,
       },
@@ -106,7 +212,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
         visible
         title=""
         className={styles.modal}
-        width={450}
+        width={modalWidth}
         onCancel={() => handleModalClose(false)}
         footer={
           <>
@@ -117,14 +223,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
               type={style.okType}
               disabled={!delBtnEnable}
               loading={fetchPromise?.state === 'pending'}
-              onClick={() => {
-                workSpaceStore[curSpaceOpt]({
-                  regionId,
-                  spaceIds: optSpaceIds,
-                }).then(() => {
-                  stateStore.set({ curSpaceOpt: '', optSpaces: [] })
-                })
-              }}
+              onClick={handleConfirm}
             >
               {getText('LEGO_UI_OK')}
             </Button>
@@ -139,10 +238,8 @@ function SpaceModal({ region, onHide, ...otherProps }) {
           />
           <div className="">
             <div className="tw-font-semibold tw-text-base tw-text-neut-15">
-              {opName}工作空间: 工作空间{' '}
-              {optSpacesNames.length > 1
-                ? optSpacesNames.join(',')
-                : get(optSpacesNames, '0')}
+              {opName}工作空间: 工作空间
+              {filterOptSpaces.map(({ name }) => name).join(',')}
             </div>
             <div className="tw-text-neut-13 tw-mt-2">{desc}</div>
           </div>

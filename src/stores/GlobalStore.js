@@ -1,5 +1,4 @@
-import { get, isEmpty } from 'lodash'
-import { makeObservable, action, observable, flow } from 'mobx'
+import { makeAutoObservable, set } from 'mobx'
 import { parseI18n } from 'utils/convert'
 
 class GlobalStore {
@@ -9,27 +8,73 @@ class GlobalStore {
 
   regionInfos = []
 
+  menuInfo = {
+    title: '大数据平台',
+    menus: [
+      {
+        name: 'overview',
+        title: '概览',
+        icon: 'dashboard',
+      },
+      {
+        name: 'workspace',
+        title: '工作空间',
+        icon: 'project',
+      },
+      {
+        name: 'access_control_policy',
+        title: '引擎管理',
+        icon: 'computing',
+        items: [
+          {
+            name: 'qingmr',
+            title: 'QingMR',
+            icon: 'image-object',
+          },
+          {
+            name: 'flink',
+            title: '实时计算 Flink',
+            icon: 'cron-job',
+          },
+        ],
+      },
+      {
+        name: 'logs',
+        title: '操作日志',
+        icon: 'paper',
+      },
+    ],
+    relationMenus: [
+      {
+        name: 'relations',
+        title: '关联服务',
+        isSubTitle: true,
+      },
+      {
+        name: 'relati',
+        title: '运维工具',
+        link: 'https://console.qingcloud.com/',
+        icon: 'desktop-group',
+      },
+      {
+        name: 'homepage',
+        title: '子账户管理',
+        icon: 'sub-account',
+        link: 'https://console.qingcloud.com/',
+      },
+    ],
+  }
+
   constructor(rootStore) {
     this.rootStore = rootStore
-    makeObservable(this, {
-      user: observable,
-      regionInfos: observable,
-      updateUserInfo: action,
-      setDarkMode: action,
-      loadRegions: flow,
+    this.user = window.USER || null
+    makeAutoObservable(this, {
+      menuInfo: false,
     })
-    const user = get(window, 'USER')
-    if (!isEmpty(user)) {
-      this.user = user
-    }
   }
 
-  updateUserInfo(user) {
-    this.user = user
-  }
-
-  setDarkMode(v) {
-    this.darkMode = v
+  set(params) {
+    set(this, { ...params })
   }
 
   *loadRegions() {

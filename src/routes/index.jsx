@@ -10,11 +10,19 @@ import Layout, { SpaceLayout } from 'views/Layout'
 // import Ops from 'views/Space/Ops'
 // import Upcloud from 'views/Space/Upcloud'
 
-const WorkSpace = lazy(() => import('views/WorkSpace'))
-const Dm = lazy(() => import('views/Space/Dm'))
-const Manage = lazy(() => import('views/Space/Manage'))
-const Ops = lazy(() => import('views/Space/Ops'))
-const Upcloud = lazy(() => import('views/Space/Upcloud'))
+const WorkSpace = lazy(() =>
+  import(/* webpackChunkName: "workspace" */ 'views/WorkSpace')
+)
+const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
+const Manage = lazy(() =>
+  import(/* webpackChunkName: "space" */ 'views/Space/Manage')
+)
+const Ops = lazy(() =>
+  import(/* webpackChunkName: "space" */ 'views/Space/Ops')
+)
+const Upcloud = lazy(() =>
+  import(/* webpackChunkName: "space" */ 'views/Space/Upcloud')
+)
 
 const routes = [
   {

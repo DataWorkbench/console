@@ -43,8 +43,12 @@ const datasource = {
       ...params,
       method: 'POST',
     }),
-  load: ({ spaceId, ...params }) =>
-    request({ action: `v1/workspace/${spaceId}/sourcemanager`, ...params }),
+  load: ({ regionId, spaceId, ...params }) =>
+    request({
+      // action: `${regionId}/v1/workspace/${spaceId}/sourcemanager`,
+      action: `v1/workspace/${spaceId}/sourcemanager`,
+      ...params,
+    }),
 }
 
 const workflow = {

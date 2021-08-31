@@ -1,6 +1,5 @@
 import { configure } from 'mobx'
 import { createContext, useContext } from 'react'
-import SideMenuStore from 'stores/SideMenuStore'
 import OverViewStore from 'stores/OverViewStore'
 import GlobalStore from 'stores/GlobalStore'
 import WorkSpaceStore from 'stores/WorkSpaceStore'
@@ -16,7 +15,6 @@ configure({
 
 class RootStore {
   constructor() {
-    this.sideMenuStore = new SideMenuStore(this)
     this.overViewStore = new OverViewStore(this)
     this.globalStore = new GlobalStore(this)
     this.workSpaceStore = new WorkSpaceStore(this)

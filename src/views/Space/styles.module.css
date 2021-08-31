@@ -1,0 +1,68 @@
+.headerSubMenu {
+  :global {
+    .menu-inline-submenu-title {
+      @apply hover:tw-bg-neut-16 hover:tw-text-white;
+      svg {
+        color: rgba(255, 255, 255, 0.9);
+        fill: rgba(255, 255, 255, 0.4);
+      }
+    }
+  }
+}
+
+:global(.tw-dark) .headerSelectWrapper {
+  :global {
+    .select-control {
+      @apply tw-bg-neut-16 tw-border-neut-13 tw-text-white;
+      &:hover {
+        @apply tw-bg-neut-16;
+      }
+
+      .select-arrow {
+        .icon {
+          &:hover {
+            @apply tw-bg-neut-16;
+          }
+          svg {
+            color: rgba(255, 255, 255, 0.9);
+            fill: rgba(255, 255, 255, 0.4);
+          }
+        }
+      }
+      .select-value {
+        span.select-value-label {
+          color: theme('colors.white') !important;
+        }
+      }
+    }
+
+    .is-open,
+    .is-focused {
+      .select-control {
+        @apply tw-bg-neut-16;
+      }
+    }
+    .select-option {
+      @apply tw-bg-neut-16 tw-text-white;
+      &.is-focused {
+        @apply tw-bg-neut-15;
+      }
+    }
+    .select--single .select-option {
+      &.is-selected {
+        @apply tw-bg-neut-13 tw-text-white;
+      }
+    }
+    .select-menu-outer {
+      @apply tw-border-neut-13 tw-bg-neut-16;
+
+      &.is-group-menu .select-menu {
+        & > .select-option {
+          &::after {
+            background-color: #e4ebf1;
+          }
+        }
+      }
+    }
+  }
+}

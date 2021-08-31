@@ -7,12 +7,12 @@ import Header from 'views/Space/Header'
 import { useStore } from 'stores'
 
 const SpaceLayout = ({ route }) => {
-  const store = useStore()
+  const { globalStore } = useStore()
   const darkMode = !!useRouteMatch([
     '/:zone/workspace/:space/dm',
     '/:zone/workspace/:space/ops',
   ])
-  store.globalStore.setDarkMode(darkMode)
+  globalStore.set({ darkMode })
 
   useEffect(() => {
     const htm = document.documentElement

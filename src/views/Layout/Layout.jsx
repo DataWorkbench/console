@@ -2,17 +2,25 @@ import React from 'react'
 import { renderRoutes } from 'react-router-config'
 import { useRouteMatch } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { flattenDeep } from 'lodash'
 import { GlobalNav, SideMenu } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'stores'
 
-const MainLayout = ({ route }) => {
-  const store = useStore()
-  const {
-    sideMenuStore: { title, menus, relationMenus, menuLinks },
-  } = store
+const getLinks = (items) => {
+  return items.map((item) => {
+    return item.items ? getLinks(item.items) : `/${item.name}`
+  })
+}
 
-  const match = useRouteMatch(menuLinks)
+const MainLayout = ({ route }) => {
+  const {
+    globalStore: {
+      menuInfo: { title, menus, relationMenus },
+    },
+  } = useStore()
+
+  const match = useRouteMatch(flattenDeep(getLinks(menus)))
   return (
     <div className="tw-bg-neut-2 tw-flex tw-flex-col tw-h-screen">
       <GlobalNav />

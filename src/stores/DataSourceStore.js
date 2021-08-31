@@ -1,22 +1,16 @@
-import { makeObservable, action, flow, observable, set } from 'mobx'
+import { makeAutoObservable, set } from 'mobx'
 
 class DataSourceStore {
-  sourceInfoList = []
+  sourceList = []
 
-  filter = {
+  params = {
     offset: 0,
-    limit: 15,
+    limit: 10,
   }
 
   constructor(rootStore) {
     this.rootStore = rootStore
-    makeObservable(this, {
-      sourceInfoList: observable,
-      clean: action,
-      loadEngineMap: flow,
-      create: flow,
-      load: flow,
-    })
+    makeAutoObservable(this, {})
   }
 
   set(params) {
@@ -25,10 +19,10 @@ class DataSourceStore {
 
   clean() {
     set(this, {
-      sourceInfoList: [],
-      filter: {
+      sourceList: [],
+      params: {
         offset: 0,
-        limit: 15,
+        limit: 10,
       },
     })
   }
@@ -53,16 +47,13 @@ class DataSourceStore {
     return false
   }
 
-  *load(spaceId, force = false) {
+  *load(params) {
     const { api } = this.rootStore
-    if (force) {
-      this.clean()
-    }
-    const params = { spaceId, ...this.filter }
-    const res = yield api.datasource.load(params)
+    const newParams = { ...this.params, ...params }
+    const res = yield api.datasource.load(newParams)
     const ret = res.data
     if (ret?.ret_code === 0) {
-      this.sourceInfoList = this.sourceInfoList.concat(ret.infos)
+      this.sourceList = ret.infos
       return ret.infos
     }
     return []

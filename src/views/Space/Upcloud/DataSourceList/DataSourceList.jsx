@@ -92,26 +92,27 @@ function DataSourceList() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [loading, toggleLoadding] = useState(true)
   const [show, toggleShow] = useToggle(false)
-  const { spaceId } = useParams()
+  const { regionId, spaceId } = useParams()
   const {
     dataSourceStore,
-    dataSourceStore: { sourceInfoList },
+    dataSourceStore: { sourceList },
   } = useStore()
   useEffect(() => {
     toggleLoadding(true)
-    dataSourceStore.load(spaceId, true).finally(() => {
+    const params = { regionId, spaceId, offset: 0 }
+    dataSourceStore.load(params).finally(() => {
       toggleLoadding(false)
     })
-  }, [spaceId, dataSourceStore])
+  }, [spaceId, regionId, dataSourceStore])
   return (
     <div
       className={clsx(
         'tw-rounded-sm tw-m-5 tw-flex-1',
-        sourceInfoList.length === 0 && 'tw-min-h-[400px] tw-bg-white'
+        sourceList.length === 0 && 'tw-min-h-[400px] tw-bg-white'
       )}
     >
       <Loading spinning={loading}>
-        {sourceInfoList.length ? (
+        {sourceList.length ? (
           <div className="tw-pb-3">
             <PageTab tabs={tabs} />
 
@@ -133,7 +134,7 @@ function DataSourceList() {
             </ToolBar>
             <Table
               selectType="checkbox"
-              dataSource={sourceInfoList}
+              dataSource={sourceList}
               columns={columns}
               rowKey="id"
               selectedRowKeys={selectedRowKeys}
