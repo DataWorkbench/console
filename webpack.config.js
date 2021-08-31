@@ -136,6 +136,7 @@ let config = {
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
+      inject: false,
       template: path.resolve(__dirname, 'index.html'),
     }),
     new WebpackBar({
@@ -174,13 +175,13 @@ if (isDev) {
             priority: -10,
             test: /[\\/]node_modules[\\/]/,
           },
-          'async-vendors': {
-            chunks: 'async',
-            minChunks: 1,
-            name: 'async-vendors',
-            priority: -20,
-            test: /[\\/]node_modules[\\/].*\.js$/,
-          },
+          // 'async-vendors': {
+          //   chunks: 'async',
+          //   minChunks: 1,
+          //   name: 'async-vendors',
+          //   priority: -20,
+          //   test: /[\\/]node_modules[\\/].*\.js$/,
+          // },
           default: {
             name: 'common',
             chunks: 'initial',

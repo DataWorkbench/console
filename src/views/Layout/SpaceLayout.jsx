@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react'
-import { renderRoutes } from 'react-router-config'
 import PropTypes from 'prop-types'
 import { useRouteMatch } from 'react-router-dom'
 import clsx from 'clsx'
-import Header from 'views/Space/Header'
+// import Header from 'views/Space/Header'
 import { useStore } from 'stores'
 
-const SpaceLayout = ({ route }) => {
+const Header = React.lazy(() =>
+  import(/* webpackChunkName: "space" */ 'views/Space/Header')
+)
+
+const SpaceLayout = ({ children }) => {
   const { globalStore } = useStore()
   const darkMode = !!useRouteMatch([
     '/:zone/workspace/:space/dm',
@@ -30,16 +33,12 @@ const SpaceLayout = ({ route }) => {
       )}
     >
       <Header darkMode={darkMode} />
-      <div className="tw-flex-1 tw-flex tw-overflow-y-auto">
-        {renderRoutes(route.routes)}
-        {/* <div className="tw-flex-1 tw-justify-self-stretch">
-        </div> */}
-      </div>
+      <div className="tw-flex-1 tw-flex tw-overflow-y-auto">{children}</div>
     </div>
   )
 }
 SpaceLayout.propTypes = {
-  route: PropTypes.object.isRequired,
+  children: PropTypes.object,
 }
 
 export default SpaceLayout

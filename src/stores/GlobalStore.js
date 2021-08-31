@@ -4,8 +4,6 @@ import { parseI18n } from 'utils/convert'
 class GlobalStore {
   darkMode = false
 
-  user = null
-
   regionInfos = []
 
   menuInfo = {
@@ -67,7 +65,6 @@ class GlobalStore {
 
   constructor(rootStore) {
     this.rootStore = rootStore
-    this.user = window.USER || null
     makeAutoObservable(this, {
       menuInfo: false,
     })

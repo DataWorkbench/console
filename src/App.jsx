@@ -1,11 +1,14 @@
-import React, { Suspense } from 'react'
+import React, { useState, Suspense } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { renderRoutes } from 'react-router-config'
-import { PortalProvider, Notification } from '@QCFE/qingcloud-portal-ui'
+import {
+  PortalProvider,
+  Notification,
+  Loading,
+} from '@QCFE/qingcloud-portal-ui'
 import RootStore, { StoreContext } from 'stores'
 import emitter from 'utils/emitter'
 import locales from './locales'
-import routes from './routes'
+import Routes from './routes'
 
 const langMapping = {
   'zh-cn': 'zh-CN',
@@ -24,15 +27,11 @@ emitter.on('error', ({ title, content }) =>
 
 const store = new RootStore()
 
-const handleGlobalData = (data) => {
-  const { user } = data
-  const { globalStore } = store
-  if (user) {
-    globalStore.set({ user })
-  }
-}
-
 const App = () => {
+  const [loading, setLoading] = useState(true)
+  const handleGlobalData = () => {
+    setLoading(false)
+  }
   return (
     <PortalProvider
       service="bigdata"
@@ -42,11 +41,23 @@ const App = () => {
       handleGlobalData={handleGlobalData}
     >
       <StoreContext.Provider value={store}>
-        <Router basename="/bigdata">
-          <Suspense fallback={<div>loading...</div>}>
-            {renderRoutes(routes)}
-          </Suspense>
-        </Router>
+        {loading ? (
+          <div className="tw-flex tw-justify-center tw-h-screen tw-items-center">
+            <Loading size="large" />
+          </div>
+        ) : (
+          <Router basename="/bigdata">
+            <Suspense
+              fallback={
+                <div className="tw-flex tw-justify-center tw-h-screen tw-items-center">
+                  <Loading />
+                </div>
+              }
+            >
+              <Routes />
+            </Suspense>
+          </Router>
+        )}
       </StoreContext.Provider>
     </PortalProvider>
   )

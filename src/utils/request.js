@@ -19,30 +19,6 @@ function getMessage(ret) {
   return get(ret, `detail.${lang}`)
 }
 
-function getOwner() {
-  return new Promise((resolve, reject) => {
-    const owner = get(window, 'USER.user_id', '')
-    if (owner) {
-      resolve(owner)
-    } else {
-      setTimeout(() => reject(), 250)
-    }
-  })
-}
-
-async function getOwnerLoop(n) {
-  try {
-    const owner = await getOwner()
-    return owner
-  } catch (e) {
-    if (n > -1) {
-      const m = n - 1
-      return getOwnerLoop(m)
-    }
-    throw new Error('获取用户ID出错')
-  }
-}
-
 const client = axios.create(baseConfig)
 
 client.interceptors.response.use(
@@ -81,42 +57,31 @@ client.interceptors.response.use(
 const request = async (data, options = {}) => {
   const { method = 'GET', ...params } = data
   const { cancel, ...config } = options
-
-  // 间隔200ms 循环300次获取user
-  const owner = await getOwnerLoop(300).catch((err) => {
-    emitter.emit('error', {
-      title: '请求错误',
-      content: err,
-    })
-    return null
-  })
-  if (owner) {
-    return client
-      .request({
-        url: '/portal_api',
-        cancelToken: isFunction(cancel) ? new axios.CancelToken(cancel) : null,
-        data: {
-          params: {
-            service: 'bigdata',
-            owner,
-            ...params,
-          },
-          method,
+  const owner = get(window, 'USER.user_id', '')
+  return client
+    .request({
+      url: '/portal_api',
+      cancelToken: isFunction(cancel) ? new axios.CancelToken(cancel) : null,
+      data: {
+        params: {
+          service: 'bigdata',
+          owner,
+          ...params,
         },
-        ...config,
-      })
-      .then((response) => response.data)
-      .catch((e) => {
-        if (axios.isCancel(e)) {
-          return null
-        }
-        return {
-          ret_code: -1,
-          message: e.message,
-        }
-      })
-  }
-  return null
+        method,
+      },
+      ...config,
+    })
+    .then((response) => response.data)
+    .catch((e) => {
+      if (axios.isCancel(e)) {
+        return null
+      }
+      return {
+        ret_code: -1,
+        message: e.message,
+      }
+    })
 }
 
 export default request

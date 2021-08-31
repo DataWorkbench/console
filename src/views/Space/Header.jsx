@@ -5,6 +5,7 @@ import { Icon, Select } from '@QCFE/qingcloud-portal-ui'
 import { Tooltip, Menu } from '@QCFE/lego-ui'
 import { Link, useParams, useLocation, useHistory } from 'react-router-dom'
 import clsx from 'clsx'
+import { get } from 'lodash'
 import { getShortSpaceName } from 'utils/convert'
 import { useMount } from 'react-use'
 import { useStore } from 'stores'
@@ -18,7 +19,7 @@ function Header({ darkMode }) {
   const history = useHistory()
   const {
     globalStore: {
-      user,
+      // user,
       menuInfo: { menus },
     },
     spaceStore,
@@ -181,7 +182,9 @@ function Header({ darkMode }) {
           changeable
           className="tw-mr-2 tw-cursor-pointer"
         />
-        <span className="tw-mr-2 dark:tw-text-white">{user?.user_name}</span>
+        <span className="tw-mr-2 dark:tw-text-white">
+          {get(window, 'USER.user_name', '')}
+        </span>
         <span className="tw-mr-6 tw-inline-block tw-bg-neut-2 dark:tw-bg-neut-13 dark:tw-text-white tw-px-2 tw-py-0.5 tw-rounded-2xl">
           项目所有者
         </span>
@@ -192,10 +195,6 @@ function Header({ darkMode }) {
 
 Header.propTypes = {
   darkMode: PropTypes.bool,
-}
-
-Header.defaultProps = {
-  darkMode: false,
 }
 
 export default observer(Header)

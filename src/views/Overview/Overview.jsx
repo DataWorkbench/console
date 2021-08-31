@@ -11,12 +11,12 @@ import FAQ from './FAQ'
 import Practice from './Practice'
 import IconCard from './IconCard'
 
-function getTabs(user) {
+function getTabs() {
   return [
     {
       title: (
         <span className="tw-font-semibold">
-          上午好，{get(user, 'user_name', '')}，欢迎您使用大数据平台
+          上午好，{get(window, 'USER.user_name', '')}，欢迎您使用大数据平台
         </span>
       ),
       description:
@@ -30,13 +30,12 @@ function getTabs(user) {
 
 function Overview() {
   const {
-    globalStore: { user },
     overViewStore: { showSpaceModal },
   } = useStore()
 
   return (
     <div className="tw-p-5 tw-overview tw-h-full">
-      <PageTab tabs={getTabs(user)} />
+      <PageTab tabs={getTabs()} />
       <Services />
       <div className="tw-flex">
         <PlatformFeat className="tw-flex-1 tw-mr-4" />

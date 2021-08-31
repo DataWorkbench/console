@@ -5,9 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>bigdata</title>
+    <% for (var css in htmlWebpackPlugin.files.css) { %>
+    <link
+      rel="preload"
+      type="text/css"
+      as="style"
+      onload="this.rel = 'stylesheet'"
+      href="<%=htmlWebpackPlugin.files.css[css] %>"
+    />
+    <% } %>
   </head>
   <body>
     <div id="root"></div>
-    <!-- built files will be auto injected -->
+    <% for (var js in htmlWebpackPlugin.files.js) { %>
+    <script defer="defer" src="<%=htmlWebpackPlugin.files.js[js] %>"></script>
+    <% } %>
   </body>
 </html>

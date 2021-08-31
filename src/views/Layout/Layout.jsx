@@ -1,5 +1,4 @@
 import React from 'react'
-import { renderRoutes } from 'react-router-config'
 import { useRouteMatch } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { flattenDeep } from 'lodash'
@@ -13,7 +12,7 @@ const getLinks = (items) => {
   })
 }
 
-const MainLayout = ({ route }) => {
+const MainLayout = ({ children }) => {
   const {
     globalStore: {
       menuInfo: { title, menus, relationMenus },
@@ -28,15 +27,13 @@ const MainLayout = ({ route }) => {
         {match && (
           <SideMenu title={title} menus={menus} relationMenus={relationMenus} />
         )}
-        <div className="tw-flex-1 tw-overflow-y-auto">
-          {renderRoutes(route.routes)}
-        </div>
+        <div className="tw-flex-1 tw-overflow-y-auto">{children}</div>
       </div>
     </div>
   )
 }
 MainLayout.propTypes = {
-  route: PropTypes.object.isRequired,
+  children: PropTypes.object,
 }
 
 export default observer(MainLayout)

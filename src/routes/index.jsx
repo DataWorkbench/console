@@ -1,17 +1,19 @@
 import React, { lazy } from 'react'
-import { Redirect } from 'react-router-dom'
-import Home from 'components/Home'
-import Create from 'views/Create'
-import Overview from 'views/Overview'
-import Layout, { SpaceLayout } from 'views/Layout'
-// import WorkSpace from 'views/WorkSpace'
-// import Dm from 'views/Space/Dm'
-// import Manage from 'views/Space/Manage'
-// import Ops from 'views/Space/Ops'
-// import Upcloud from 'views/Space/Upcloud'
+import { Redirect, Switch, Route } from 'react-router-dom'
 
+// home
+const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
+const Create = lazy(() => import(/* webpackChunkName: "home" */ 'views/Create'))
+const Overview = lazy(() =>
+  import(/* webpackChunkName: "home" */ 'views/Overview')
+)
 const WorkSpace = lazy(() =>
-  import(/* webpackChunkName: "workspace" */ 'views/WorkSpace')
+  import(/* webpackChunkName: "home" */ 'views/WorkSpace')
+)
+
+// space
+const SpaceLayout = lazy(() =>
+  import(/* webpackChunkName: "space" */ 'views/Layout/SpaceLayout')
 )
 const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
 const Manage = lazy(() =>
@@ -24,55 +26,38 @@ const Upcloud = lazy(() =>
   import(/* webpackChunkName: "space" */ 'views/Space/Upcloud')
 )
 
-const routes = [
-  {
-    path: '/:regionId/workspace/:spaceId',
-    component: SpaceLayout,
-    routes: [
-      {
-        path: '/:regionId/workspace/:spaceId/upcloud/:mod?',
-        component: Upcloud,
-      },
-      {
-        path: '/:regionId/workspace/:spaceId/dm/:mod?',
-        component: Dm,
-      },
-      {
-        path: '/:regionId/workspace/:spaceId/ops/:mod?',
-        component: Ops,
-      },
-      {
-        path: '/:regionId/workspace/:spaceId/manage/:mod?',
-        component: Manage,
-      },
-    ],
-  },
-  {
-    component: Layout,
-    routes: [
-      {
-        path: '/create/:step?',
-        component: Create,
-      },
-      {
-        path: '/overview',
-        component: Overview,
-      },
-      {
-        path: '/workspace',
-        component: WorkSpace,
-      },
-      {
-        path: '/',
-        exact: true,
-        component: () => <Redirect to="/overview" />,
-      },
-      {
-        path: '/home',
-        component: Home,
-      },
-    ],
-  },
-]
+const routes = () => (
+  <Switch>
+    <Route path="/:regionId/workspace/:spaceId">
+      <SpaceLayout>
+        <Switch>
+          <Route
+            path="/:regionId/workspace/:spaceId/upcloud/:mod?"
+            component={Upcloud}
+          />
+          <Route path="/:regionId/workspace/:spaceId/dm/:mod?" component={Dm} />
+          <Route
+            path="/:regionId/workspace/:spaceId/ops/:mod?"
+            component={Ops}
+          />
+          <Route
+            path="/:regionId/workspace/:spaceId/manage/:mod?"
+            component={Manage}
+          />
+        </Switch>
+      </SpaceLayout>
+    </Route>
+    <Route>
+      <Layout>
+        <Switch>
+          <Route path="/create/:step?" component={Create} />
+          <Route path="/overview" component={Overview} />
+          <Route path="/workspace" component={WorkSpace} />
+          <Route path="/" exact component={() => <Redirect to="/overview" />} />
+        </Switch>
+      </Layout>
+    </Route>
+  </Switch>
+)
 
 export default routes
