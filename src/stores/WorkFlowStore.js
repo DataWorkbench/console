@@ -46,7 +46,7 @@ class WorkFlowStore {
     const { api } = this.rootStore
     const res = yield api.workflow.load(params)
     const ret = res.data
-    if (ret.ret_code === 0 && ret.infos) {
+    if (ret?.ret_code === 0 && ret.infos) {
       this.flows = this.flows.concat(ret.infos)
       return ret.infos
     }

@@ -67,13 +67,7 @@ module.exports = {
     },
   },
   variants: {
-    extend: {
-      translate: ['group-hover'],
-      gradientColorStops: ['group-hover'],
-      fontWeight: ['hover'],
-      padding: ['first'],
-      borderWidth: ['last'],
-    },
+    extend: {},
   },
   plugins: [],
 }

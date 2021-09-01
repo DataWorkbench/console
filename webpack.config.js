@@ -121,15 +121,12 @@ let config = {
     proxy: {
       '/*_api': {
         target: 'http://localhost:8888',
-        // changeOrigin: true,
       },
       '/api': {
         target: 'http://localhost:8888',
-        // changeOrigin: true,
       },
       '/login': {
         target: 'http://localhost:8888',
-        // changeOrigin: true,
       },
     },
   },
@@ -172,21 +169,36 @@ if (isDev) {
           vendors: {
             chunks: 'initial',
             name: 'vendor',
-            priority: -10,
-            test: /[\\/]node_modules[\\/]/,
+            minChunks: 1,
+            priority: 3,
+            test: /[\\/]node_modules[\\/].*\.js$/,
           },
-          // 'async-vendors': {
-          //   chunks: 'async',
-          //   minChunks: 1,
-          //   name: 'async-vendors',
-          //   priority: -20,
-          //   test: /[\\/]node_modules[\\/].*\.js$/,
-          // },
+          'async-vendors': {
+            chunks: 'async',
+            minChunks: 1,
+            name: 'async-vendors',
+            priority: 2,
+            test: /[\\/]node_modules[\\/].*\.js$/,
+          },
+          lego: {
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/].*\.css$/,
+            name: 'common',
+            minChunks: 1,
+            priority: 3,
+          },
+          styles: {
+            type: 'css/mini-extract',
+            enforce: true,
+            name: 'main',
+            minChunks: 1,
+            priority: 1,
+          },
           default: {
             name: 'common',
-            chunks: 'initial',
+            chunks: 'all',
             minChunks: 2,
-            priority: -20,
+            priority: 1,
           },
         },
       },
