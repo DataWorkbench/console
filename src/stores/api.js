@@ -36,30 +36,33 @@ const workspace = {
 }
 
 const datasource = {
-  loadEngineMap: () => request({ action: 'v1/enginemap/flink' }),
-  create: ({ spaceId, ...params }) =>
+  loadEngineMap: ({ regionId, spaceId }) =>
+    request({ action: `${regionId}/v1/workspace/${spaceId}/source/kind` }),
+  create: ({ regionId, spaceId, ...params }) =>
     request({
-      action: `v1/workspace/${spaceId}/sourcemanager`,
+      action: `${regionId}/v1/workspace/${spaceId}/source`,
       ...params,
       method: 'POST',
     }),
   load: ({ regionId, spaceId, ...params }) =>
     request({
-      // action: `${regionId}/v1/workspace/${spaceId}/sourcemanager`,
-      action: `v1/workspace/${spaceId}/sourcemanager`,
+      action: `${regionId}/v1/workspace/${spaceId}/source`,
       ...params,
     }),
 }
 
 const workflow = {
-  create: ({ space, ...params }) =>
+  create: ({ regionId, spaceId, ...params }) =>
     request({
-      action: `v1/workspace/${space}/workflow/stream`,
+      action: `${regionId}/v1/workspace/${spaceId}/workflow/stream`,
       ...params,
       method: 'POST',
     }),
-  load: ({ space, ...params }) =>
-    request({ action: `v1/workspace/${space}/workflow/stream`, ...params }),
+  load: ({ regionId, spaceId, ...params }) =>
+    request({
+      action: `${regionId}/v1/workspace/${spaceId}/workflow/stream`,
+      ...params,
+    }),
 }
 
 const api = {

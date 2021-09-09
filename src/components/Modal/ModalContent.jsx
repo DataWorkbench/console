@@ -6,7 +6,7 @@ const propTypes = {
 }
 
 function ModalContent({ children }) {
-  return <div className="tw-pt-4 tw-px-5">{children}</div>
+  return <div tw="tw-pt-4 tw-px-5">{children}</div>
 }
 
 ModalContent.propTypes = propTypes

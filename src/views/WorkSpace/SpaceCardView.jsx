@@ -6,9 +6,22 @@ import { observer } from 'mobx-react-lite'
 import PropTypes from 'prop-types'
 import { Loading, Icon } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
-import clsx from 'clsx'
+import tw, { css } from 'twin.macro'
 import SpaceItem from './SpaceItem'
-import styles from './styles.module.css'
+// import styles from './styles.module.css'
+const itemVars = {
+  backColors: ['#b3e7d6', '#f2c0c3', '#cfafe9', '#b8def9', '#fbdeb4'],
+  fontColors: ['#2fb788', '#d44e4b', '#934bc5', '#229ce9', '#f59c2a'],
+}
+const styles = {
+  item: (i) => css`
+    border-top-color: ${itemVars.backColors[i]};
+    .profile {
+      background-color: #b8def9;
+      color: #229ce9;
+    }
+  `,
+}
 
 function SpaceCardView({ regionId }) {
   const {
@@ -50,23 +63,24 @@ function SpaceCardView({ regionId }) {
     // >
     // </InfiniteScroll>
     <>
-      <div className="tw-grid tw-grid-cols-2 tw-flex-wrap 2xl:tw-gap-x-4 tw-gap-x-2">
+      <div tw="tw-grid tw-grid-cols-2 tw-flex-wrap 2xl:tw-gap-x-4 tw-gap-x-2">
         {workspaces.map((space, i) => (
           <SpaceItem
             key={space.id}
             regionId={regionId}
             space={space}
-            className={styles[`ws_${i % 5}`]}
+            css={styles.item(i)}
+            // className={styles[`ws_${i % 5}`]}
           />
         ))}
       </div>
-      <div className={clsx('tw-h-40', !isFetch && 'tw-hidden')}>
+      <div css={[tw`tw-h-40`, !isFetch && tw`tw-hidden`]}>
         <Loading size="medium" />
       </div>
       {!isFetch && workspaces.length === 0 && (
-        <div className="tw-flex tw-justify-center tw-w-full tw-my-7">
-          <div className="tw-text-center tw-text-neut-8">
-            <Icon name="display" size={56} className="tw-mb-2" />
+        <div tw="tw-flex tw-justify-center tw-w-full tw-my-7">
+          <div tw="tw-text-center tw-text-neut-8">
+            <Icon name="display" size={56} tw="tw-mb-2" />
             <div>{getText('LEGO_UI_NO_AVAILABLE_DATA')}</div>
           </div>
         </div>

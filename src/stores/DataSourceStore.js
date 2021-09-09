@@ -27,11 +27,10 @@ class DataSourceStore {
     })
   }
 
-  *loadEngineMap() {
+  *loadEngineMap(params) {
     const { api } = this.rootStore
-    const res = yield api.datasource.loadEngineMap()
-    const ret = res.data
-    if (ret.ret_code === 0) {
+    const ret = yield api.datasource.loadEngineMap(params)
+    if (ret?.ret_code === 0) {
       return ret.SourceList
     }
     return []
@@ -39,9 +38,8 @@ class DataSourceStore {
 
   *create(params) {
     const { api } = this.rootStore
-    const res = yield api.datasource.create(params)
-    const ret = res.data
-    if (ret.ret_code === 0) {
+    const ret = yield api.datasource.create(params)
+    if (ret?.ret_code === 0) {
       return true
     }
     return false
@@ -50,8 +48,7 @@ class DataSourceStore {
   *load(params) {
     const { api } = this.rootStore
     const newParams = { ...this.params, ...params }
-    const res = yield api.datasource.load(newParams)
-    const ret = res.data
+    const ret = yield api.datasource.load(newParams)
     if (ret?.ret_code === 0) {
       this.sourceList = ret.infos
       return ret.infos

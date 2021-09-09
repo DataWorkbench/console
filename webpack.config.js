@@ -19,10 +19,9 @@ let config = {
   },
   output: {
     path: resolve('dist'),
-    publicPath: '/',
+    publicPath: '/bigdata/',
     filename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
     chunkFilename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
-    pathinfo: false,
     clean: true,
   },
   module: {
@@ -55,7 +54,7 @@ let config = {
               },
             },
           },
-          'postcss-loader',
+          // 'postcss-loader',
         ],
       },
       {
@@ -114,10 +113,17 @@ let config = {
   devServer: {
     host: 'localhost',
     hot: true,
-    overlay: true,
-    inline: true,
-    compress: true,
-    historyApiFallback: true,
+    historyApiFallback: {
+      index: '/bigdata/index.html',
+      // verbose: true,
+    },
+    devMiddleware: {},
+    static: {},
+    client: {
+      logging: 'info',
+      overlay: true,
+      progress: true,
+    },
     proxy: {
       '/*_api': {
         target: 'http://localhost:8888',
@@ -156,8 +162,8 @@ if (isDev) {
   config = merge(config, {
     plugins: [
       new MiniCssExtractPlugin({
-        filename: 'static/css/[name].[contenthash].css',
-        chunkFilename: 'static/css/[id].[contenthash].css',
+        filename: 'static/css/[name].[contenthash:7].css',
+        chunkFilename: 'static/css/[id].[contenthash:7].css',
       }),
     ],
     optimization: {
@@ -180,10 +186,10 @@ if (isDev) {
             priority: 2,
             test: /[\\/]node_modules[\\/].*\.js$/,
           },
-          lego: {
+          'css-vendor': {
             chunks: 'all',
             test: /[\\/]node_modules[\\/].*\.css$/,
-            name: 'common',
+            name: 'css-vendor',
             minChunks: 1,
             priority: 3,
           },

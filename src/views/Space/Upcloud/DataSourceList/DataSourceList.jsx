@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useToggle } from 'react-use'
 import { observer } from 'mobx-react-lite'
-import clsx from 'clsx'
+import tw from 'twin.macro'
+import { get, toLower } from 'lodash'
 import { useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import {
@@ -29,7 +30,7 @@ const tabs = [
 const columns = [
   {
     title: '数据源名称/id',
-    dataIndex: 'id',
+    dataIndex: 'info.sourceid',
     render: (v, row) => (
       <div>
         <div>{row.name}</div>
@@ -39,33 +40,32 @@ const columns = [
   },
   {
     title: '数据源类型',
-    dataIndex: 'enginetype',
+    dataIndex: 'info.sourcetype',
   },
   {
     title: 'url',
-    render: (v, row) => {
-      const {
-        url: { host, port },
-      } = row
+    render: (v, { info }) => {
+      const url = get(info, `url.${toLower(info.sourcetype)}`, {})
       return (
         <span>
-          {host}:{port}
+          {url.host}:{url.port}
         </span>
       )
     },
   },
   {
     title: '用户名',
-    dataIndex: 'creator',
+    dataIndex: 'info.name',
+    render: () => '',
   },
   {
     title: '数据源描述',
-    dataIndex: 'comment',
+    dataIndex: 'info.comment',
   },
   {
     title: '创建时间',
-    dataIndex: 'updatetime',
-    render: (field) => dayjs(field).format('YYYY-MM-DD HH:mm:ss'),
+    dataIndex: 'info.updatetime',
+    render: (field) => dayjs(field).format('YYYY-MM-DD HH:mm:ssZ'),
   },
   {
     title: '操作',
@@ -106,13 +106,13 @@ function DataSourceList() {
   }, [spaceId, regionId, dataSourceStore])
   return (
     <div
-      className={clsx(
-        'tw-rounded-sm tw-m-5 tw-flex-1',
-        sourceList.length === 0 && 'tw-min-h-[400px] tw-bg-white'
-      )}
+      css={[
+        tw`tw-rounded-sm tw-m-5 tw-flex-1`,
+        sourceList?.length === 0 && tw`tw-min-h-[400px] tw-bg-white`,
+      ]}
     >
       <Loading spinning={loading}>
-        {sourceList.length ? (
+        {sourceList?.length ? (
           <div className="tw-pb-3">
             <PageTab tabs={tabs} />
 
@@ -142,19 +142,17 @@ function DataSourceList() {
             />
           </div>
         ) : (
-          <div className=" tw-pt-20 tw-pb-20 ">
-            <div className="tw-text-center tw-mx-auto tw-w-9/12">
-              <Icon name="blockchain" size={60} className="tw-mb-3" />
-              <div className="tw-mb-3 tw-font-medium tw-text-xl">
-                暂无数据源
-              </div>
-              <p className="tw-mx-auto tw-mb-3 tw-w-3/5 tw-text-neut-8">
+          <div tw=" tw-pt-20 tw-pb-20 ">
+            <div tw="tw-text-center tw-mx-auto tw-w-9/12">
+              <Icon name="blockchain" size={60} tw="tw-mb-3" />
+              <div tw="tw-mb-3 tw-font-medium tw-text-xl">暂无数据源</div>
+              <p tw="tw-mx-auto tw-mb-3 tw-w-3/5 tw-text-neut-8">
                 数据源主要用于数据集成过程中 Reader 和 Writer
                 的对象，您可以在数据源管理页面查看、新增及批量新增数据源。指定的整个数据库全部或者部分表一次性的全部同步至MySQL，并且支持后续的实时增量同步模式，将新增数据持续同步至
                 MySQL。
               </p>
               <div>
-                <Button className="tw-mr-4">
+                <Button tw="tw-mr-4">
                   <Icon name="if-book" type="light" />
                   使用指南
                 </Button>

@@ -2,20 +2,21 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash'
-import Card, { CardHeader, CardContent } from 'components/Card'
+import Card, { CardHeader, CardContent, IconCard } from 'components/Card'
 import { useStore } from 'stores'
 import SpaceListModal from './SpaceListModal'
 import Services from './Services'
 import PlatformFeat from './PlatformFeat/PlatformFeat'
 import FAQ from './FAQ'
 import Practice from './Practice'
-import IconCard from './IconCard'
+// import IconCard from './IconCard'
+// import { IconCard } from 'components/Card'
 
 function getTabs() {
   return [
     {
       title: (
-        <span className="tw-font-semibold">
+        <span tw="tw-font-semibold">
           上午好，{get(window, 'USER.user_name', '')}，欢迎您使用大数据平台
         </span>
       ),
@@ -34,16 +35,16 @@ function Overview() {
   } = useStore()
 
   return (
-    <div className="tw-p-5 tw-overview tw-h-full">
+    <div tw="tw-p-5 tw-h-full">
       <PageTab tabs={getTabs()} />
       <Services />
-      <div className="tw-flex">
-        <PlatformFeat className="tw-flex-1 tw-mr-4" />
-        <FAQ className="tw-w-4/12" />
+      <div tw="tw-flex">
+        <PlatformFeat tw="tw-flex-1 tw-mr-4" />
+        <FAQ tw="tw-w-4/12 2xl:tw-w-[360px]" />
       </div>
-      <div className="tw-flex">
-        <Practice className="tw-flex-1 tw-mr-4" />
-        <Card className="tw-w-4/12 tw-leading-5">
+      <div tw="tw-flex">
+        <Practice tw="tw-flex-1 tw-mr-4" />
+        <Card tw="tw-w-4/12 tw-leading-5 2xl:tw-w-[360px]">
           <CardHeader title="视频介绍" />
           <CardContent>
             <IconCard

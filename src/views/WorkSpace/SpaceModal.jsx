@@ -9,7 +9,7 @@ import FullModal, { ModalContent } from 'components/Modal'
 import { useStore } from 'stores'
 import { useWorkSpaceContext } from 'contexts'
 import { formatDate } from 'utils/convert'
-import styles from './styles.module.css'
+// import styles from './styles.module.css'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
 
@@ -194,7 +194,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
                 <div>
                   <Input
                     type="text"
-                    className="tw-w-40"
+                    tw="tw-w-40"
                     placeholder="delete"
                     onChange={(e, value) => setDelBtnEnable(value === 'delete')}
                   />
@@ -211,7 +211,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
       <Modal
         visible
         title=""
-        className={styles.modal}
+        // className={styles.modal}
         width={modalWidth}
         onCancel={() => handleModalClose(false)}
         footer={
@@ -230,18 +230,18 @@ function SpaceModal({ region, onHide, ...otherProps }) {
           </>
         }
       >
-        <div className="tw-flex tw-items-start">
+        <div tw="tw-flex tw-items-start">
           <Icon
             name="if-exclamation"
-            className="tw-mr-3 tw-text-2xl tw-leading-6"
+            tw="tw-mr-3 tw-text-2xl tw-leading-6"
             style={{ color: style.color }}
           />
-          <div className="">
-            <div className="tw-font-semibold tw-text-base tw-text-neut-15">
+          <div>
+            <div tw="tw-font-semibold tw-text-base tw-text-neut-15">
               {opName}工作空间: 工作空间
               {filterOptSpaces.map(({ name }) => name).join(',')}
             </div>
-            <div className="tw-text-neut-13 tw-mt-2">{desc}</div>
+            <div tw="tw-text-neut-13 tw-mt-2">{desc}</div>
           </div>
         </div>
       </Modal>

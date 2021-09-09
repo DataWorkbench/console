@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useRouteMatch } from 'react-router-dom'
-import clsx from 'clsx'
 // import Header from 'views/Space/Header'
 import { useStore } from 'stores'
 
@@ -20,20 +19,16 @@ const SpaceLayout = ({ children }) => {
   useEffect(() => {
     const htm = document.documentElement
     if (darkMode) {
-      htm.classList.add('tw-dark')
+      htm.classList.add('dark')
     } else {
-      htm.classList.remove('tw-dark')
+      htm.classList.remove('dark')
     }
   }, [darkMode])
 
   return (
-    <div
-      className={clsx(
-        'tw-flex tw-flex-col tw-h-screen tw-bg-neut-2 dark:tw-bg-neut-17'
-      )}
-    >
+    <div tw="tw-flex tw-flex-col tw-h-screen tw-bg-neut-2 dark:tw-bg-neut-17">
       <Header darkMode={darkMode} />
-      <div className="tw-flex-1 tw-flex tw-overflow-y-auto">{children}</div>
+      <div tw="tw-flex-1 tw-flex tw-overflow-y-auto">{children}</div>
     </div>
   )
 }

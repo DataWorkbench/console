@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import PropTypes from 'prop-types'
+import { useParams } from 'react-router-dom'
 import { useMount, useToggle } from 'react-use'
 import Modal, { ModalStep, ModalContent } from 'components/Modal'
 import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
@@ -37,6 +38,7 @@ const stepTexts = ['选择数据库', '配置数据库']
 // ]
 
 function DataSourceModal({ show, onHide }) {
+  const { regionId, spaceId } = useParams()
   const [dbItems, setDbItems] = useState([])
   const [step, setStep] = useState(0)
   const [dbIndex, setDbIndex] = useState()
@@ -46,7 +48,7 @@ function DataSourceModal({ show, onHide }) {
 
   useMount(() => {
     dataSourceStore
-      .loadEngineMap()
+      .loadEngineMap({ regionId, spaceId })
       .then((dbl) => {
         setDbItems(dbl)
         // console.log(engines)

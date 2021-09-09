@@ -1,6 +1,6 @@
 import React from 'react'
-import clsx from 'clsx'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
+import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
 import Guide from 'components/Guide'
 
@@ -29,22 +29,20 @@ function SpaceListsEmpty() {
   const { isModal } = useWorkSpaceContext()
   return (
     <div>
-      <div className={clsx('tw-bg-white', !isModal && 'tw-pb-20')}>
-        <div className="tw-h-96 tw-border-b tw-border-neut-2 tw-flex tw-items-center tw-justify-center">
-          <div className="tw-w-[700px] tw-text-center">
+      <div css={[tw`tw-bg-white`, !isModal && tw`tw-pb-20`]}>
+        <div tw="tw-h-96 tw-border-b tw-border-neut-2 tw-flex tw-items-center tw-justify-center">
+          <div tw="tw-w-[700px] tw-text-center">
             <Icon name="project" size={48} />
-            <div className="tw-font-medium tw-text-xl tw-mt-5">
-              暂无工作空间
-            </div>
-            <div className="tw-mt-4 tw-text-neut-8">
+            <div tw="tw-font-medium tw-text-xl tw-mt-5">暂无工作空间</div>
+            <div tw="tw-mt-4 tw-text-neut-8">
               工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。
             </div>
-            <div className="tw-space-x-4 tw-mt-5">
+            <div tw="tw-space-x-4 tw-mt-5">
               <Button type="primary">
                 <Icon name="add" />
                 创建工作空间
               </Button>
-              <Button type="default" className={clsx({ 'tw-hidden': isModal })}>
+              <Button type="default" css={isModal && tw`tw-hidden`}>
                 <Icon name="documentation" />
                 使用指南
               </Button>
@@ -53,7 +51,7 @@ function SpaceListsEmpty() {
         </div>
         {!isModal && (
           <Guide
-            className="tw-mt-10 tw-mx-8 2xl:tw-mx-10"
+            tw="tw-mt-10 tw-mx-8 2xl:tw-mx-10"
             title={guideData.title}
             items={guideData.items}
           />

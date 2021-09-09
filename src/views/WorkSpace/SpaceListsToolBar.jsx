@@ -48,11 +48,11 @@ function SpaceListsToolBar({ regionId }) {
   }
 
   return (
-    <div className="tw-flex tw-justify-between tw-mb-5 ">
+    <div tw="tw-flex tw-justify-between tw-mb-5">
       <div>
         <Button
           type="primary"
-          className="tw-font-medium tw-px-5 tw-mr-2"
+          tw="tw-font-medium tw-px-5 tw-mr-2"
           onClick={() => toggleShowModal()}
         >
           创建工作空间
@@ -77,7 +77,10 @@ function SpaceListsToolBar({ regionId }) {
                         optSpaces.filter((o) => o.status === 2).length
                     }
                   >
-                    <i className="if if-minus-square tw-text-base tw-mr-2" />
+                    <i
+                      className="if if-minus-square"
+                      tw="tw-text-base tw-mr-2"
+                    />
                     禁用工作空间
                   </Menu.MenuItem>
                   <Menu.MenuItem
@@ -98,12 +101,9 @@ function SpaceListsToolBar({ regionId }) {
                 </Menu>
               }
             >
-              <Button className="tw-w-32 tw-inline-flex tw-justify-between tw-items-center">
-                <div className="tw-flex tw-items-center">
-                  <Icon
-                    name="if-layout-four"
-                    className="tw-text-base tw-mr-1"
-                  />
+              <Button tw="tw-w-32 tw-inline-flex tw-justify-between tw-items-center">
+                <div tw="tw-flex tw-items-center">
+                  <Icon name="if-layout-four" tw="tw-text-base tw-mr-1" />
                   更多操作
                 </div>
                 <Icon name="caret-down" />
@@ -112,9 +112,9 @@ function SpaceListsToolBar({ regionId }) {
           </>
         )}
       </div>
-      <div className="tw-flex tw-items-center tw-space-x-2">
+      <div tw="tw-flex tw-items-center tw-space-x-2">
         <InputSearch
-          className="tw-w-64"
+          tw="tw-w-64"
           placeholder="请输入工作名称/ID"
           onPressEnter={(e) => handleQuery(e.target.value)}
           onClear={() => handleQuery('')}
@@ -122,7 +122,7 @@ function SpaceListsToolBar({ regionId }) {
         <Button>
           <Icon
             name="if-refresh"
-            className="tw-text-xl"
+            tw="tw-text-xl"
             onClick={() => reloadWorkSpace(cardView)}
           />
         </Button>
@@ -133,7 +133,7 @@ function SpaceListsToolBar({ regionId }) {
             storageKey={storageKey}
           />
         )}
-        <div className="tw-border-l tw-h-full tw-border-neut-3" />
+        <div tw="tw-border-l tw-h-full tw-border-neut-3" />
         <RadioGroup
           value={cardView ? 'card' : 'table'}
           onChange={toggleViewMode}

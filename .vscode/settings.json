@@ -7,9 +7,29 @@
   },
   "tailwindCSS.experimental.classRegex": [
     ":(?:.|\n)*?[\"'`]([^\"'`]*).*?,",
-    "\\w+ClassName=[\"']([^\"']*)[\"']"
+    "\\w+ClassName=[\"']([^\"']*)[\"']",
+    "tw`([^`]*)", // tw`...`
+    "tw=\"([^\"]*)", // <div tw="..." />
+    "tw={\"([^\"}]*)", // <div tw={"..."} />
+    "tw\\.\\w+`([^`]*)", // tw.xxx`...`
+    "tw\\(.*?\\)`([^`]*)" // tw(Component)`...`
   ],
+  "tailwindCSS.includeLanguages": {
+    "typescript": "javascript",
+    "typescriptreact": "javascript"
+  },
+  "tailwindcss.jsxPropImportChecking": false,
   "emmet.includeLanguages": {
     "postcss": "css"
+  },
+  "workbench.colorCustomizations": {
+    "[One Dark Pro]": {
+      "editorHoverWidget.background": "#17202ee5",
+      "editorHoverWidget.border": "#6a7473",
+      "editorSuggestWidget.background": "#17202ee5",
+      "editorSuggestWidget.border": "#6a7473",
+      "editorSuggestWidget.selectedBackground": "#009c70d0",
+      "editor.wordHighlightBackground": "#0000"
+    }
   }
 }

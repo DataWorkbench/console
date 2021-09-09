@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get } from 'lodash'
-import clsx from 'clsx'
+// import clsx from 'clsx'
 import { useImmer } from 'use-immer'
+import tw from 'twin.macro'
 import { formatDate } from 'utils/convert'
 import { Icon, Table, utils } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
@@ -21,13 +22,13 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
           sortKey: 'name',
           sortOrder: sort.name,
           render: (field, row) => (
-            <div className="tw-flex tw-items-center">
-              <div className="tw-bg-neut-3 tw-rounded-full tw-p-1 tw-flex tw-items-center tw-justify-center">
+            <div tw="tw-flex tw-items-center">
+              <div tw="tw-bg-neut-3 tw-rounded-full tw-p-1 tw-flex tw-items-center tw-justify-center">
                 <Icon name="project" size="small" />
               </div>
-              <div className="tw-ml-2">
-                <div className="tw-font-semibold">{row.name}</div>
-                <div className="tw-text-neut-8">{field}</div>
+              <div tw="tw-ml-2">
+                <div tw="tw-font-semibold">{row.name}</div>
+                <div tw="tw-text-neut-8">{field}</div>
               </div>
             </div>
           ),
@@ -41,24 +42,24 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
           ],
           render: (field) => (
             <div
-              className={clsx(
+              css={[
                 field === 1
-                  ? 'tw-bg-green-0 tw-text-green-13'
-                  : 'tw-bg-[#FFFDED] tw-text-[#A16207]',
-                'tw-px-2 tw-py-0.5 tw-rounded-[20px] tw-flex tw-items-center'
-              )}
+                  ? tw`tw-bg-green-0 tw-text-green-13`
+                  : tw`tw-bg-[#FFFDED] tw-text-[#A16207]`,
+                tw`tw-px-2 tw-py-0.5 tw-rounded-[20px] tw-flex tw-items-center`,
+              ]}
             >
               <div
-                className={clsx(
-                  field === 1 ? 'tw-bg-green-1' : 'tw-bg-[#FFD127]',
-                  ' tw-w-3 tw-h-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1'
-                )}
+                css={[
+                  field === 1 ? tw`tw-bg-green-1` : tw`tw-bg-[#FFD127]`,
+                  tw`tw-w-3 tw-h-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1`,
+                ]}
               >
                 <div
-                  className={clsx(
-                    field === 1 ? 'tw-bg-green-13' : 'tw-bg-[#A48A19]',
-                    ' tw-w-1.5 tw-h-1.5 tw-rounded-full'
-                  )}
+                  css={[
+                    field === 1 ? tw`tw-bg-green-13` : tw`tw-bg-[#A48A19]`,
+                    tw`tw-w-1.5 tw-h-1.5 tw-rounded-full`,
+                  ]}
                 />
               </div>
               {field === 1 ? '活跃' : '已禁用'}
@@ -71,7 +72,7 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
           render: (field) => (
             <div>
               <div>xxx@test.com</div>
-              <div className="tw-text-neut-8">{field}</div>
+              <div tw="tw-text-neut-8">{field}</div>
             </div>
           ),
         }
@@ -188,7 +189,7 @@ function SpaceTableView({ regionId }) {
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
       onSelect={handleSelect}
-      className="tw-table-auto"
+      tw="tw-table-auto"
       dataSource={workspaces.slice(0, pageSize)}
       columns={columns}
       onFilterChange={handleFilterChange}

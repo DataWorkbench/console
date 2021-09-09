@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
 import produce from 'immer'
+import tw from 'twin.macro'
 import styles from './tabs.module.css'
 
 export default function Tabs({
@@ -46,32 +46,32 @@ export default function Tabs({
   return (
     <div className={rootClassName}>
       <div
-        className={clsx(
-          'tw-border-neut-3 tw-border-b tw-flex tw-pl-5 tw-align-middle',
+        className={className}
+        css={[
+          tw`tw-border-neut-3 tw-border-b tw-flex tw-pl-5 tw-align-middle`,
           styles.tabs,
-          className
-        )}
+        ]}
       >
-        <div className="tw-flex tw-border-r tw-border-neut-3">
+        <div tw="tw-flex tw-border-r tw-border-neut-3">
           {React.Children.map(children, (child) => {
             const { label, name } = child.props
             return (
               <div
-                className={clsx(
-                  'tw-border-l tw-px-5 tw-border-neut-3 tw-text-center tw-py-3 tw-cursor-pointer',
+                css={[
+                  tw`tw-border-l tw-px-5 tw-border-neut-3 tw-text-center tw-py-3 tw-cursor-pointer`,
                   curPanelName === name
-                    ? 'tw-font-medium tw-text-green-11 tw-bg-white tw--mb-px !tw-border-t-green-11 tw-border-t-[3px]'
-                    : 'tw-border-t'
-                )}
+                    ? tw`tw-font-medium tw-text-green-11 tw-bg-white tw--mb-px tw-border-t-[3px] (tw-border-t-green-11)!`
+                    : tw`tw-border-t`,
+                ]}
                 onClick={() => {
                   handleTabClick(name)
                 }}
               >
                 <span
-                  className={clsx(
+                  css={[
                     curPanelName === name &&
-                      'tw-inline-block tw-transform tw--translate-y-0.5'
-                  )}
+                      tw`tw-inline-block tw-transform tw--translate-y-0.5`,
+                  ]}
                 >
                   {label}
                 </span>
@@ -79,15 +79,13 @@ export default function Tabs({
             )
           })}
         </div>
-        <div className="tw-flex tw-items-center">{more}</div>
+        <div tw="tw-flex tw-items-center">{more}</div>
       </div>
       {React.Children.map(children, (child) => {
         const chidName = child.props.name
         return (
           <div
-            className={clsx(panelClassName, {
-              'tw-hidden': curPanelName !== chidName,
-            })}
+            css={[panelClassName, curPanelName !== chidName && tw`tw-hidden`]}
           >
             {panelNames.includes(chidName) && child}
           </div>

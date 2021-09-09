@@ -1,4 +1,4 @@
-.tabWrapper {
+/* .tabWrapper {
   :global {
     .tab-content {
       @apply tw-flex-1 !tw-py-0;
@@ -58,4 +58,4 @@
       @apply tw-bg-neut-16;
     }
   }
-}
+} */

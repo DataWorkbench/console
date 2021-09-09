@@ -12,7 +12,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['jest'],
+  plugins: ['@emotion', 'jest'],
   rules: {
     'no-param-reassign': ['error', { props: false }],
     'react/forbid-prop-types': 0,

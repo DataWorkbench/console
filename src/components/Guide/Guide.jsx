@@ -5,8 +5,8 @@ import GuideItem from './GuideItem'
 function Guide({ title, items, className }) {
   return (
     <div className={className}>
-      <div className="tw-text-xl tw-text-neut-15">{title}</div>
-      <div className="tw-flex tw-justify-center tw-mt-5 tw-space-x-6">
+      <div tw="tw-text-xl tw-text-neut-15">{title}</div>
+      <div tw="tw-flex tw-justify-center tw-mt-5 tw-space-x-6">
         {items.map(({ ...item }, i) => (
           <GuideItem {...item} key={item.title} index={i + 1} />
         ))}

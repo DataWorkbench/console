@@ -2,14 +2,13 @@ import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
+import tw, { css } from 'twin.macro'
 import { useSpring, animated } from 'react-spring'
 import { Tooltip, Radio, Dropdown, Menu, Icon } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import Card from 'components/Card'
 import { useWorkSpaceContext } from 'contexts'
-import styles from './styles.module.css'
 
 function SpaceItem({ regionId, space, className }) {
   const stateStore = useWorkSpaceContext()
@@ -37,20 +36,20 @@ function SpaceItem({ regionId, space, className }) {
   const renderGrid = () => {
     if (isModal) {
       return (
-        <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
+        <div tw="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
           <div>
             <span>我的角色：</span>
-            <span className="tw-bg-neut-13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
+            <span tw="tw-bg-neut-13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
               {space.owner}
             </span>
-            <span className="tw-bg-neut-2 tw-text-neut-15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
+            <span tw="tw-bg-neut-2 tw-text-neut-15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
               运维
             </span>
           </div>
           <div>
             <span>
               创建时间：
-              <span className="tw-text-neut-16">
+              <span tw="tw-text-neut-16">
                 {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
               </span>
             </span>
@@ -60,44 +59,44 @@ function SpaceItem({ regionId, space, className }) {
     }
     return (
       <>
-        <div className="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
+        <div tw="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
           <div>
             <span>我的角色：</span>
-            <span className="tw-bg-neut-13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
+            <span tw="tw-bg-neut-13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
               {space.owner}
             </span>
-            <span className="tw-bg-neut-2 tw-text-neut-15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
+            <span tw="tw-bg-neut-2 tw-text-neut-15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
               运维
             </span>
           </div>
-          <div className="tw-flex tw-items-center ">
+          <div tw="tw-flex tw-items-center ">
             <div>空间成员</div>
-            <div className="tw-flex tw-items-center">
-              <div className="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mx-1">
+            <div tw="tw-flex tw-items-center">
+              <div tw="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mx-1">
                 <Icon name="human" size={18} />
               </div>
-              <div className="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1">
+              <div tw="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1">
                 <Icon name="human" size={18} />
               </div>
-              <div className="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center">
+              <div tw="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center">
                 <Icon name="human" size={18} />
               </div>
             </div>
           </div>
         </div>
-        <div className="tw-flex tw-justify-between tw-px-4 tw-mb-3">
-          <div className="tw-flex">
-            <div className="tw-w-60 2xl:tw-w-auto tw-overflow-hidden tw-break-all tw-whitespace-nowrap tw-overflow-ellipsis">
+        <div tw="tw-flex tw-justify-between tw-px-4 tw-mb-3">
+          <div tw="tw-flex">
+            <div tw="tw-w-60 2xl:tw-w-auto tw-overflow-hidden tw-break-all tw-whitespace-nowrap tw-overflow-ellipsis">
               开通引擎：共享Flink、QingMR、Deep Learning
             </div>
-            <a href="##" className="tw-text-link">
+            <a href="##" tw="tw-text-link">
               查看
             </a>
           </div>
           <div>
             <span>
               创建时间：
-              <span className="tw-text-neut-16">
+              <span tw="tw-text-neut-16">
                 {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
               </span>
             </span>
@@ -106,46 +105,49 @@ function SpaceItem({ regionId, space, className }) {
       </>
     )
   }
-
   return (
-    <animated.div
-      style={props}
-      className={clsx(isModal && 'tw-cursor-pointer')}
-    >
+    <animated.div style={props} css={isModal && tw`tw-cursor-pointer`}>
       <Card
-        className={clsx(
-          'tw-rounded tw-border tw-border-t-4 tw-text-neut-8 tw-border-neut-2',
-          className
-        )}
+        className={className}
+        tw="tw-rounded tw-border tw-border-t-4 tw-text-neut-8 tw-border-neut-2"
         onClick={handleSelected}
       >
-        <div className="tw-flex tw-justify-between tw-px-4 tw-pt-5 tw-mb-7 ">
-          <div className="tw-flex-1 tw-flex">
+        <div tw="tw-flex tw-justify-between tw-px-4 tw-pt-5 tw-mb-7 ">
+          <div tw="tw-flex-1 tw-flex">
             <div
-              className={clsx(
-                'tw-w-11 tw-h-11 tw-flex tw-justify-center tw-items-center tw-text-base tw-font-medium tw-rounded-sm',
-                styles.profile
-              )}
+              className="profile"
+              tw="tw-w-11 tw-h-11 tw-flex tw-justify-center tw-items-center tw-text-base tw-font-medium tw-rounded-sm"
             >
               {getShortSpaceName(space.name)}
             </div>
-            <div className="tw-ml-3">
-              <div className="tw-flex tw-items-center">
-                <span className="tw-font-medium tw-text-base tw-text-neut-16">
+            <div tw="tw-ml-3">
+              <div tw="tw-flex tw-items-center">
+                <span tw="tw-font-medium tw-text-base tw-text-neut-16">
                   {space.name}
                 </span>
                 <span>（{space.id}）</span>
                 <span
-                  className={clsx(
-                    'tw-py-0.5 tw-px-3 tw-rounded-2xl tw-inline-flex tw-items-center',
-                    space.status === 1 ? styles.st_active : styles.st_forbidden
-                  )}
+                  css={[
+                    tw`tw-py-0.5 tw-px-3 tw-rounded-2xl tw-inline-flex tw-items-center`,
+                    // space.status === 1 ? styles.st_active : styles.st_forbidden
+                    space.status === 1 &&
+                      tw`
+                    tw-text-green-11 tw-bg-green-0
+                    `,
+                    space.status === 1 &&
+                      css`
+                        svg {
+                          color: #00aa72;
+                          fill: #dff7ed;
+                        }
+                      `,
+                  ]}
                 >
                   <Icon name="radio" />
                   {space.status === 1 ? '活跃' : '已禁用'}
                 </span>
               </div>
-              <div className="tw-pt-1">{space.desc}</div>
+              <div tw="tw-pt-1">{space.desc}</div>
             </div>
           </div>
           {!isModal ? (
@@ -157,7 +159,10 @@ function SpaceItem({ regionId, space, className }) {
                     修改工作空间
                   </Menu.MenuItem>
                   <Menu.MenuItem value="disable" disabled={space.status === 2}>
-                    <i className="if if-minus-square tw-text-base tw-mr-2" />
+                    <i
+                      className="if if-minus-square"
+                      tw="tw-text-base tw-mr-2"
+                    />
                     禁用工作空间
                   </Menu.MenuItem>
                   <Menu.MenuItem value="enable" disabled={space.status === 1}>
@@ -179,22 +184,18 @@ function SpaceItem({ regionId, space, className }) {
         </div>
         {renderGrid()}
         {!isModal && (
-          <div className="tw-px-5 tw-py-4 tw-flex tw-justify-center tw-bg-neut-1 tw-border-t tw-border-neut-3">
+          <div tw="tw-px-5 tw-py-4 tw-flex tw-justify-center tw-bg-neut-1 tw-border-t tw-border-neut-3">
             {funcList.map(({ name: funcName, title, subFuncList }, i) => (
               <Tooltip
-                className="tw-p-0"
+                tw="tw-p-0"
                 key={funcName}
                 content={subFuncList.map((subFunc) => (
                   <Link
                     key={subFunc.name}
                     to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                    className="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neut-15 hover:tw-text-white"
+                    tw="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neut-15 hover:tw-text-white"
                   >
-                    <Icon
-                      name={subFunc.icon}
-                      type="light"
-                      className="tw-mr-1"
-                    />
+                    <Icon name={subFunc.icon} type="light" tw="tw-mr-1" />
                     {subFunc.title}
                   </Link>
                 ))}
@@ -202,16 +203,16 @@ function SpaceItem({ regionId, space, className }) {
               >
                 <Link
                   to={`${regionId}/workspace/${space.id}/${funcName}`}
-                  className="hover:tw-text-green-11"
+                  tw="hover:tw-text-green-11 tw-h-full tw-inline-block"
                 >
                   <button
                     type="button"
-                    className={clsx(
-                      'tw-font-semibold tw-text-xs tw-rounded-sm tw-text-neut-13  tw-bg-neut-1 tw-border tw-border-neut-3',
-                      'tw-px-4 2xl:tw-px-8 tw-py-1',
-                      i < funcList.length - 1 ? 'tw-mr-4' : 'tw-mr-0',
-                      'focus:tw-outline-none hover:tw-bg-green-0 hover:tw-border-green-11 hover:tw-shadow tw-transition-colors'
-                    )}
+                    css={[
+                      tw`tw-font-semibold tw-text-xs tw-rounded-sm tw-text-neut-13  tw-bg-neut-1 tw-border tw-border-neut-3`,
+                      tw`tw-px-4 2xl:tw-px-8 tw-py-1`,
+                      i < funcList.length - 1 ? tw`tw-mr-4` : tw`tw-mr-0`,
+                      tw`focus:tw-outline-none hover:tw-bg-green-0 hover:tw-border-green-11 hover:tw-shadow tw-transition-colors`,
+                    ]}
                   >
                     {title}
                   </button>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
 import { Icon, Input } from '@QCFE/qingcloud-portal-ui/lib/components'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 import { useStore } from 'stores'
 
 const propTypes = {
@@ -15,98 +15,87 @@ const defaultPropTypes = {
 }
 
 function FlowMenu({ onCreateClick }) {
-  const { space } = useParams()
+  const { regionId, spaceId } = useParams()
   const {
     workFlowStore,
     workFlowStore: { flows, curFlow },
   } = useStore()
 
   useEffect(() => {
-    workFlowStore.load({ space }, true)
-  }, [space, workFlowStore])
+    workFlowStore.load({ regionId, spaceId }, true)
+  }, [spaceId, regionId, workFlowStore])
 
   const handleItemClick = (flow) => {
     workFlowStore.set({ curFlow: flow })
   }
 
   return (
-    <div className="tw-w-56 tw-bg-neut-16 tw-m-3 tw-rounded dark:tw-text-white">
-      <div
-        className={clsx(
-          'tw-flex tw-justify-between tw-items-center tw-h-11 tw-px-2 tw-border-b',
-          'dark:tw-border-neut-15'
-        )}
-      >
-        <span className="tw-text-xs tw-font-semibold">业务流程</span>
-        <div className="tw-flex tw-items-center">
+    <div tw="tw-w-56 tw-bg-neut-16 tw-m-3 tw-rounded dark:tw-text-white">
+      <div tw="tw-flex tw-justify-between tw-items-center tw-h-11 tw-px-2 tw-border-b dark:tw-border-neut-15">
+        <span tw="tw-text-xs tw-font-semibold">业务流程</span>
+        <div tw="tw-flex tw-items-center">
           <Icon name="add" type="light" />
           <Icon name="refresh" type="light" />
         </div>
       </div>
-      <div className={clsx('tw-border-b', 'dark:tw-border-neut-15')}>
-        <div className="tw-mt-3 tw-px-2 tw-flex tw-items-center">
+      <div tw="tw-border-b dark:tw-border-neut-15">
+        <div tw="tw-mt-3 tw-px-2 tw-flex tw-items-center">
           <Input
-            className="dark:tw-bg-neut-17 dark:tw-text-white dark:tw-border-neut-13 dark:hover:tw-border-neut-13"
+            tw="dark:tw-bg-neut-17 dark:tw-text-white dark:tw-border-neut-13 dark:hover:tw-border-neut-13"
             type="text"
             placeholder="搜索任务关键词/创建人"
           />
           <Icon
-            className="tw-ml-2 tw-cursor-pointer"
+            tw="tw-ml-2 tw-cursor-pointer"
             name="filter"
             changeable
             type="light"
           />
         </div>
-        <div className="tw-mx-2 tw-mt-3 tw-bg-neut-17 tw-p-2">
-          <div className="tw-flex tw-items-center tw-justify-between tw-border-b tw-border-neut-13 tw-pb-1">
+        <div tw="tw-mx-2 tw-mt-3 tw-bg-neut-17 tw-p-2">
+          <div tw="tw-flex tw-items-center tw-justify-between tw-border-b tw-border-neut-13 tw-pb-1">
             <span>👋️ 快速上手文档</span>
             <Icon name="close" type="light" />
           </div>
-          <ul className="tw-pt-2">
+          <ul tw="tw-pt-2">
             <li>
-              <Icon name="file" className="tw-align-middle" />
-              <span className="tw-align-middle tw-text-neut-8">
-                业务流程是什么？
-              </span>
+              <Icon name="file" tw="tw-align-middle" />
+              <span tw="tw-align-middle tw-text-neut-8">业务流程是什么？</span>
             </li>
             <li>
-              <Icon name="file" className="tw-align-middle" />
-              <span className="tw-align-middle tw-text-neut-8">
+              <Icon name="file" tw="tw-align-middle" />
+              <span tw="tw-align-middle tw-text-neut-8">
                 业务流程的操作指南
               </span>
             </li>
           </ul>
         </div>
-        <div className="tw-text-center tw-my-3">
+        <div tw="tw-text-center tw-my-3">
           <button
             type="button"
             onClick={onCreateClick}
-            className="tw-py-1 tw-rounded-sm tw-w-48 tw-bg-neut-13 focus:tw-outline-none hover:tw-bg-neut-10 tw-ring-opacity-50"
+            tw="tw-py-1 tw-rounded-sm tw-w-48 tw-bg-neut-13 focus:tw-outline-none hover:tw-bg-neut-10 tw-ring-opacity-50"
           >
-            <Icon name="add" type="light" className="tw-align-middle" />
-            <span className="tw-align-middle">创建业务流程</span>
+            <Icon name="add" type="light" tw="tw-align-middle" />
+            <span tw="tw-align-middle">创建业务流程</span>
           </button>
         </div>
       </div>
-      <div className="tw-pt-4">
+      <div tw="tw-pt-4">
         {flows.length > 0 &&
           flows.map((flow) => (
             <div
               key={flow.id}
-              className={clsx(
-                'tw-leading-8 tw-pl-3 tw-cursor-pointer',
+              css={[
+                tw`tw-leading-8 tw-pl-3 tw-cursor-pointer`,
                 curFlow && curFlow.id === flow.id
-                  ? 'tw-bg-green-11'
-                  : 'hover:tw-bg-neut-13'
-              )}
+                  ? tw`tw-bg-green-11`
+                  : tw`hover:tw-bg-neut-13`,
+              ]}
               onClick={() => handleItemClick(flow)}
             >
-              <Icon
-                name="caret-right"
-                type="light"
-                className="tw-align-middle"
-              />
-              <span className="tw-ml-1">{flow.name}</span>
+              <Icon name="caret-right" type="light" tw="tw-align-middle" />
+              <span tw="tw-ml-1">{flow.name}</span>
             </div>
           ))}
       </div>

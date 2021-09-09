@@ -1,9 +1,9 @@
 import React from 'react'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 import PropTypes from 'prop-types'
 
 const CardContent = ({ className, ...others }) => {
-  return <div className={clsx('tw-px-5 tw-pb-5', className)} {...others} />
+  return <div css={[tw`tw-px-5 tw-pb-5`, className]} {...others} />
 }
 CardContent.propTypes = {
   className: PropTypes.string,

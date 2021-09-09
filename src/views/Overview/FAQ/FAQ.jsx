@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
 import Card, { CardHeader, CardContent } from 'components/Card'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 
@@ -15,23 +14,23 @@ const questions = [
 
 const FAQ = ({ className }) => {
   return (
-    <Card className={clsx(className, 'tw-leading-5')}>
+    <Card className={className} tw="tw-leading-5">
       <CardHeader title="常见问题" />
       <CardContent>
-        <div className="tw-rounded-sm tw-border tw-border-neut-2">
-          <ul className="tw-text-neut-15 tw-px-5 tw-py-4">
+        <div tw="tw-rounded-sm tw-border tw-border-neut-2">
+          <ul tw="tw-text-neut-15 tw-px-5 tw-py-4">
             {questions.map((quest) => (
               <li
                 key={quest.title}
-                className="tw-flex tw-align-middle tw-mt-2 tw-cursor-pointer hover:tw-text-green-11 hover:tw-font-medium"
+                tw="tw-flex tw-align-middle tw-mt-2 tw-cursor-pointer hover:tw-text-green-11 hover:tw-font-medium"
               >
                 <Icon name="file" />
-                <div className="tw-pl-3">{quest.title}</div>
+                <div tw="tw-pl-3">{quest.title}</div>
               </li>
             ))}
           </ul>
-          <div className="tw-text-center tw-bg-neut-1 tw-py-2 tw-font-medium tw-flex tw-align-middle tw-justify-center">
-            <span className="tw-mr-2">更多帮助指引</span>
+          <div tw="tw-text-center tw-bg-neut-1 tw-py-2 tw-font-medium tw-flex tw-align-middle tw-justify-center">
+            <span tw="tw-mr-2">更多帮助指引</span>
             <Icon name="next" />
           </div>
         </div>

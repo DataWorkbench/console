@@ -1,4 +1,4 @@
-.headerSubMenu {
+/* .headerSubMenu {
   :global {
     .menu-inline-submenu-title {
       @apply hover:tw-bg-neut-16 hover:tw-text-white;
@@ -65,4 +65,4 @@
       }
     }
   }
-}
+} */

@@ -3,7 +3,7 @@ import { Tabs, Icon } from '@QCFE/lego-ui'
 import { Button } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import { useToggle } from 'react-use'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 import { findIndex, get } from 'lodash'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
@@ -48,33 +48,29 @@ function FlowTabs() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="tw-flex-1 tw-py-4 tw-relative">
+      <div tw="tw-flex-1 tw-py-4 tw-relative">
         <Tabs
           type="card"
           activeName={curFlow.id}
-          className={clsx(
-            'tw-bg-neut-18 tw-h-full tw-rounded-md tw-flex tw-flex-col',
-            styles.tabWrapper
-          )}
+          css={[
+            tw`tw-bg-neut-18 tw-h-full tw-rounded-md tw-flex tw-flex-col`,
+            styles.tabWrapper,
+          ]}
           onChange={(name) => workFlowStore.setCurFlow(name)}
           onClose={(name) => closePanel(name)}
         >
           {panels.map((flow) => (
             <TabPanel key={flow.id} name={flow.id} closable label={flow.id}>
-              <div className="tw-text-white tw-flex-1 tw-flex tw-flex-col">
-                <div className="tw-flex tw-px-2 tw-pt-3">
-                  <div className="tw-relative">
+              <div tw="tw-text-white tw-flex-1 tw-flex tw-flex-col">
+                <div tw="tw-flex tw-px-2 tw-pt-3">
+                  <div tw="tw-relative">
                     <button
                       type="button"
-                      className={clsx(styles.btn, 'tw-flex tw-justify-between')}
+                      css={[styles.btn, tw`tw-flex tw-justify-between`]}
                       onClick={toggleNodeMenu}
                     >
-                      <div className="tw-mr-2">
-                        <Icon
-                          name="apps"
-                          type="light"
-                          className="tw-align-middle"
-                        />
+                      <div tw="tw-mr-2">
+                        <Icon name="apps" type="light" tw="tw-align-middle" />
                         <span>节点库</span>
                       </div>
                       <Icon name="caret-down" type="light" />
@@ -94,10 +90,7 @@ function FlowTabs() {
                   </button>
                   <button
                     type="button"
-                    className={clsx(
-                      styles.btn,
-                      'tw-bg-neut-13 hover:tw-bg-neut-15'
-                    )}
+                    css={[styles.btn, tw`tw-bg-neut-13 hover:tw-bg-neut-15`]}
                   >
                     <Icon name="data" type="dark" />
                     <span>保存</span>
@@ -107,14 +100,14 @@ function FlowTabs() {
                     <span>发布</span>
                   </Button>
                 </div>
-                <div className="tw-flex-1">
+                <div tw="tw-flex-1">
                   <FlowPainter />
                 </div>
               </div>
             </TabPanel>
           ))}
         </Tabs>
-        <div className="tw-pt-2 tw-absolute tw-top-28 tw-left-2 tw-bottom-8 tw-min-h-[450px]  tw-overflow-y-auto">
+        <div tw="tw-pt-2 tw-absolute tw-top-28 tw-left-2 tw-bottom-8 tw-min-h-[450px]  tw-overflow-y-auto">
           <NodeMenu show={showNodeMenu} />
         </div>
       </div>

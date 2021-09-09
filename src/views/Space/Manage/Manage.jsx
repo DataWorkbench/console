@@ -6,14 +6,14 @@ import { useStore } from 'stores'
 import Setting from './Setting'
 
 function Manage() {
-  const { zone, space, mod } = useParams()
+  const { regionId, spaceId, mod } = useParams()
   const {
     workSpaceStore: { funcList },
   } = useStore()
   const { subFuncList } = funcList.find(({ name }) => name === 'manage')
   const navMenu = subFuncList.map((func) => ({
     ...func,
-    link: `/${zone}/workspace/${space}/manage/${func.name}`,
+    link: `/${regionId}/workspace/${spaceId}/manage/${func.name}`,
   }))
 
   const curFunc =
@@ -24,13 +24,13 @@ function Manage() {
     globalStore: { darkMode },
   } = store
   return (
-    <div className="tw-flex-1 tw-flex tw-h-full">
+    <div tw="tw-flex-1 tw-flex tw-h-full">
       <SideMenu
         menus={navMenu}
         darkMode={darkMode}
         defaultSelectedMenu={curFunc.name}
       />
-      <div className="tw-flex-1 tw-overflow-y-auto">
+      <div tw="tw-flex-1 tw-overflow-y-auto">
         {curFunc.name === 'setting' && <Setting />}
       </div>
     </div>

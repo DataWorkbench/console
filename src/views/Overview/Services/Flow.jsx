@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react'
-import clsx from 'clsx'
 import PropTypes from 'prop-types'
 import { useMeasure } from 'react-use'
 import { SVG } from '@svgdotjs/svg.js'
+import tw from 'twin.macro'
 import FlowCell from './FlowCell'
 
 function renderBottomArrow(elem) {
@@ -112,24 +112,24 @@ const Flow = ({ items }) => {
   }, [rootWidth])
 
   return (
-    <div className="tw-w-full" ref={rootRef}>
-      <div className="tw-flex tw-justify-between tw-h-24">
-        <div className="tw-flex-1" ref={tlArrowEl} />
-        <div className="tw-relative">
+    <div tw="tw-w-full" ref={rootRef}>
+      <div tw="tw-flex tw-justify-between tw-h-24">
+        <div tw="tw-flex-1" ref={tlArrowEl} />
+        <div tw="tw-relative">
           <FlowCell item={opsItem} placement="top" />
         </div>
-        <div className="tw-flex-1" ref={trArrowEl} />
+        <div tw="tw-flex-1" ref={trArrowEl} />
       </div>
-      <div className="tw-flex tw-h-24">
+      <div tw="tw-flex tw-h-24">
         {flowItems.map((item, i) => (
           <React.Fragment key={item.text}>
-            <div className="tw-relative">
+            <div tw="tw-relative">
               {i !== 0 && i < flowItemsLen - 1 && (
                 <div
                   ref={(el) => {
                     bmArrowEl.current.push(el)
                   }}
-                  className="tw-absolute tw--top-20 tw-bottom-24 tw-left-0 tw-right-0"
+                  tw="tw-absolute tw--top-20 tw-bottom-24 tw-left-0 tw-right-0"
                 />
               )}
               <FlowCell item={item} placement="bottom" />
@@ -139,10 +139,10 @@ const Flow = ({ items }) => {
                 ref={(el) => {
                   arrowEl.current[i] = el
                 }}
-                className={clsx(
-                  'tw-flex tw-pt-6',
-                  i === 1 ? 'tw-flex-[2]' : 'tw-flex-1'
-                )}
+                css={[
+                  tw`tw-flex tw-pt-6`,
+                  i === 1 ? tw`tw-flex-[2]` : tw`tw-flex-1`,
+                ]}
               />
             )}
           </React.Fragment>

@@ -18,10 +18,16 @@ module.exports = (api) => {
               modules: false,
             },
       ],
-      '@babel/preset-react',
+      [
+        '@babel/preset-react',
+        { runtime: 'automatic', importSource: '@emotion/react' },
+      ],
       '@babel/preset-typescript',
     ],
     plugins: [
+      '@emotion',
+      'babel-plugin-twin',
+      'babel-plugin-macros',
       '@babel/plugin-transform-runtime',
       ['@babel/plugin-proposal-class-properties', { loose: true }],
       // ['lodash'],

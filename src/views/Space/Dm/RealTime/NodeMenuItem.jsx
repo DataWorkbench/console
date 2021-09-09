@@ -1,5 +1,5 @@
 import React from 'react'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 import PropTypes from 'prop-types'
 import { useDrag } from 'react-dnd'
 
@@ -25,22 +25,22 @@ function NodeMenuItem({ item }) {
   return (
     <li
       ref={drag}
-      className={clsx(
-        'tw-pl-2 tw-flex tw-cursor-pointer hover:tw-bg-neut-13',
-        isDragging ? 'tw-opacity-50' : ''
-      )}
+      css={[
+        tw`tw-pl-2 tw-flex tw-cursor-pointer hover:tw-bg-neut-13`,
+        isDragging ? tw`tw-opacity-50` : '',
+      ]}
     >
-      <div className="tw-w-6">
+      <div tw="tw-w-6">
         <span
-          className={clsx(
-            'tw-p-1 tw-rounded-sm',
-            item.type === 'table' ? 'tw-bg-[#229CE9]' : 'tw-bg-[#934BC5]'
-          )}
+          css={[
+            tw`tw-p-1 tw-rounded-sm`,
+            item.type === 'table' ? tw`tw-bg-[#229CE9]` : tw`tw-bg-[#934BC5]`,
+          ]}
         >
           {item.type === 'table' ? 'ch' : item.iname}
         </span>
       </div>
-      <span className="tw-ml-2">{item.name}</span>
+      <span tw="tw-ml-2">{item.name}</span>
     </li>
   )
 }

@@ -1,13 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 
 const Card = React.forwardRef((props, ref) => {
   const { className, ...others } = props
   return (
     <div
       ref={ref}
-      className={clsx('tw-rounded-sm tw-bg-white tw-shadow tw-mb-5', className)}
+      className={className}
+      css={[tw`tw-rounded-sm tw-bg-white tw-shadow tw-mb-5`]}
       {...others}
     />
   )

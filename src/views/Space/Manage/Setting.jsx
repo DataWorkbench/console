@@ -12,11 +12,11 @@ const tabs = [
 ]
 function Setting() {
   return (
-    <div className="tw-p-5 !tw-pb-0 tw-text-xs tw-h-full tw-overflow-auto">
+    <div tw="tw-p-5 tw-pb-0 tw-text-xs tw-h-full tw-overflow-auto">
       <PageTab tabs={tabs} />
-      <div className="tw-bg-white tw-rounded">
-        <img src={tabsvg0} alt="" className="tw-mx-auto tw-w-full" />
-        <img src={tabsvg} alt="" className="tw-mx-auto tw-w-10/12" />
+      <div tw="tw-bg-white tw-rounded">
+        <img src={tabsvg0} alt="" tw="tw-mx-auto tw-w-full" />
+        <img src={tabsvg} alt="" tw="tw-mx-auto tw-w-10/12" />
       </div>
     </div>
   )

@@ -36,10 +36,14 @@
     "@babel/preset-react": "^7.13.13",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
+    "@emotion/babel-plugin": "^11.3.0",
+    "@emotion/eslint-plugin": "^11.2.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
     "autoprefixer": "^10.2.6",
     "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-plugin-twin": "^1.0.2",
     "css-loader": "^5.2.6",
     "css-minimizer-webpack-plugin": "^3.0.1",
     "eslint": "^7.27.0",
@@ -77,15 +81,17 @@
     "webpack": "^5.37.1",
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.7.0",
-    "webpack-dev-server": "^3.11.2",
+    "webpack-dev-server": "^4.1.0",
     "webpack-merge": "^5.8.0",
     "webpackbar": "^5.0.0-3"
   },
   "dependencies": {
-    "@QCFE/lego-ui": "^0.1.35",
+    "@QCFE/lego-ui": "^0.1.40",
     "@QCFE/qingcloud-portal-ui": "^1.1.43",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/runtime": "^7.14.0",
+    "@emotion/react": "^11.4.1",
+    "@emotion/styled": "^11.3.0",
     "@svgdotjs/svg.js": "^3.0.16",
     "axios": "^0.21.1",
     "clsx": "^1.1.1",
@@ -109,11 +115,17 @@
     "react-router-dom": "^5.2.0",
     "react-spring": "^9.2.4",
     "react-use": "^17.2.4",
+    "twin.macro": "^2.7.0",
     "use-immer": "^0.6.0"
   },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 10"
-  ]
+  ],
+  "babelMacros": {
+    "twin": {
+      "preset": "emotion"
+    }
+  }
 }

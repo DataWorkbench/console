@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import NodeMenuItem from './NodeMenuItem'
 
@@ -45,21 +45,21 @@ const menusData = [
 function NodeMenu({ show }) {
   return (
     <div
-      className={clsx(
-        'tw-bg-neut-16 tw-text-white tw-py-3 tw-w-40 tw-rounded-sm tw-shadow-sm',
-        show ? 'tw-hidden' : ''
-      )}
+      css={[
+        tw`tw-bg-neut-16 tw-text-white tw-py-3 tw-w-40 tw-rounded-sm tw-shadow-sm`,
+        show ? tw`tw-hidden` : '',
+      ]}
     >
       {menusData.map((menu, i) => (
         <div key={menu.name}>
-          <div className="tw-leading-7 tw-bg-neut-13 tw-flex tw-items-center tw-justify-between tw-px-2 tw-cursor-pointer">
-            <div className="tw-flex tw-items-center">
+          <div tw="tw-leading-7 tw-bg-neut-13 tw-flex tw-items-center tw-justify-between tw-px-2 tw-cursor-pointer">
+            <div tw="tw-flex tw-items-center">
               <Icon name={menu.icon} type="light" />
-              <span className="tw-ml-1">{menu.name}</span>
+              <span tw="tw-ml-1">{menu.name}</span>
             </div>
             <Icon name="caret-down" type="light" />
           </div>
-          <ul className="tw-py-3 tw-leading-7">
+          <ul tw="tw-py-3 tw-leading-7">
             {menu.items.map((item) => (
               <NodeMenuItem
                 key={item.name}

@@ -5,14 +5,14 @@ import { useStore } from 'stores'
 import OverView from './OverView'
 
 function Ops() {
-  const { zone, space, mod } = useParams()
+  const { regionId, spaceId, mod } = useParams()
   const {
     workSpaceStore: { funcList },
   } = useStore()
   const { subFuncList } = funcList.find(({ name }) => name === 'ops')
   const navMenu = subFuncList.map((func) => ({
     ...func,
-    link: `/${zone}/workspace/${space}/ops/${func.name}`,
+    link: `/${regionId}/workspace/${spaceId}/ops/${func.name}`,
   }))
 
   const curFunc =
@@ -23,13 +23,13 @@ function Ops() {
     globalStore: { darkMode },
   } = store
   return (
-    <div className="tw-flex-1 tw-flex tw-h-full">
+    <div tw="tw-flex-1 tw-flex tw-h-full">
       <SideMenu
         menus={navMenu}
         darkMode={darkMode}
         defaultSelectedMenu={curFunc.name}
       />
-      <div className="tw-flex-1 tw-overflow-y-auto">
+      <div tw="tw-flex-1 tw-overflow-y-auto">
         {curFunc.name === 'overview' && <OverView />}
       </div>
     </div>

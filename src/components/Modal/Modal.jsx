@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
 import { useUnmount, useToggle } from 'react-use'
+import tw from 'twin.macro'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import useScrollBlock from 'hooks/useScrollBlock'
 
@@ -40,15 +40,15 @@ const Modal = ({
 
   return (
     <div
-      className={clsx(
-        'tw-fixed tw-inset-0 tw-z-10',
-        isHide && 'tw-hidden',
-        placement === 'center' && 'tw-flex tw-items-center tw-justify-center',
-        rootClassName
-      )}
+      className={rootClassName}
+      css={[
+        tw`tw-fixed tw-inset-0 tw-z-10`,
+        isHide && tw`tw-hidden`,
+        placement === 'center' && tw`tw-flex tw-items-center tw-justify-center`,
+      ]}
     >
       <div
-        className="tw-opacity-70 tw-fixed tw-inset-0 tw-bg-black"
+        tw="tw-opacity-70 tw-fixed tw-inset-0 tw-bg-black"
         onClick={() => {
           if (closeOnOverlayClick) {
             handleClose()
@@ -56,32 +56,32 @@ const Modal = ({
         }}
       />
       <div
-        className={clsx(
-          'tw-flex tw-flex-col tw-bg-white dark:tw-bg-neut-16 dark:tw-text-white tw-overflow-auto tw-z-20',
+        className={contentClassName}
+        css={[
+          tw`tw-flex tw-flex-col tw-bg-white dark:tw-bg-neut-16 dark:tw-text-white tw-overflow-auto tw-z-20`,
           placement === 'rightFull' &&
-            'tw-fixed tw-top-0 tw-right-0 tw-bottom-0 tw-w-1/2',
-          placement === 'center' && 'tw-min-w-[600px] tw-h-auto',
-          contentClassName
-        )}
+            tw`tw-fixed tw-top-0 tw-right-0 tw-bottom-0 tw-w-1/2`,
+          placement === 'center' && tw`tw-min-w-[600px] tw-h-auto`,
+        ]}
       >
-        <div className="tw-flex tw-justify-between tw-px-5 tw-py-4 tw-shadow">
-          <div className="tw-font-medium tw-text-base">{title}</div>
+        <div tw="tw-flex tw-justify-between tw-px-5 tw-py-4 tw-shadow">
+          <div tw="tw-font-medium tw-text-base">{title}</div>
           {closable && (
             <Icon
               name="close"
               type={darkMode ? 'light' : 'dark'}
-              className="tw-cursor-pointer"
+              tw="tw-cursor-pointer"
               onClick={handleClose}
             />
           )}
         </div>
-        <div className="tw-flex-1 tw-shadow-sm">{children}</div>
-        <div className="tw-px-5 tw-py-3 dark:tw-border-t dark:tw-border-neut-13">
+        <div tw="tw-flex-1 tw-shadow-sm">{children}</div>
+        <div tw="tw-px-5 tw-py-3 dark:tw-border-t dark:tw-border-neut-13">
           {footer ||
             (footer !== null && (
-              <div className="tw-flex tw-justify-end">
+              <div tw="tw-flex tw-justify-end">
                 <div>
-                  <Button className="tw-mr-2" onClick={handleClose}>
+                  <Button tw="tw-mr-2" onClick={handleClose}>
                     {cancelText}
                   </Button>
                   <Button
