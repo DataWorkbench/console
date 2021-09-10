@@ -79,12 +79,12 @@ function DataSourceModal({ show, onHide }) {
       onHide={handleHide}
       title="新增数据源"
       footer={
-        <div className="tw-flex tw-justify-end">
+        <div className="flex justify-end">
           {step === 0 ? (
             <Button>取消</Button>
           ) : (
             <>
-              <Button className="tw-mr-2" onClick={() => setStep(0)}>
+              <Button className="mr-2" onClick={() => setStep(0)}>
                 上一步
               </Button>
               <Button type="primary" onClick={handleSave}>
@@ -101,7 +101,7 @@ function DataSourceModal({ show, onHide }) {
           <Loading spinning={loading} delay={200}>
             <p>
               请选择一个数据库，您也可以参考
-              <a href="##" className="tw-text-link">
+              <a href="##" className="text-link">
                 数据库文档
               </a>
               进行查看配置

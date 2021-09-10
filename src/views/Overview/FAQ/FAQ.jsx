@@ -14,23 +14,23 @@ const questions = [
 
 const FAQ = ({ className }) => {
   return (
-    <Card className={className} tw="tw-leading-5">
+    <Card className={className} tw="leading-5">
       <CardHeader title="常见问题" />
       <CardContent>
-        <div tw="tw-rounded-sm tw-border tw-border-neut-2">
-          <ul tw="tw-text-neut-15 tw-px-5 tw-py-4">
+        <div tw="rounded-sm border border-neut-2">
+          <ul tw="text-neut-15 px-5 py-4">
             {questions.map((quest) => (
               <li
                 key={quest.title}
-                tw="tw-flex tw-align-middle tw-mt-2 tw-cursor-pointer hover:tw-text-green-11 hover:tw-font-medium"
+                tw="flex align-middle mt-2 cursor-pointer hover:text-green-11 hover:font-medium"
               >
                 <Icon name="file" />
-                <div tw="tw-pl-3">{quest.title}</div>
+                <div tw="pl-3">{quest.title}</div>
               </li>
             ))}
           </ul>
-          <div tw="tw-text-center tw-bg-neut-1 tw-py-2 tw-font-medium tw-flex tw-align-middle tw-justify-center">
-            <span tw="tw-mr-2">更多帮助指引</span>
+          <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center">
+            <span tw="mr-2">更多帮助指引</span>
             <Icon name="next" />
           </div>
         </div>

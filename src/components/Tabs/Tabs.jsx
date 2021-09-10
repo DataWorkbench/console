@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import produce from 'immer'
 import tw from 'twin.macro'
-import styles from './tabs.module.css'
 
 export default function Tabs({
   rootClassName,
@@ -47,21 +46,18 @@ export default function Tabs({
     <div className={rootClassName}>
       <div
         className={className}
-        css={[
-          tw`tw-border-neut-3 tw-border-b tw-flex tw-pl-5 tw-align-middle`,
-          styles.tabs,
-        ]}
+        css={[tw`border-neut-3 border-b flex pl-5 align-middle`]}
       >
-        <div tw="tw-flex tw-border-r tw-border-neut-3">
+        <div tw="flex border-r border-neut-3">
           {React.Children.map(children, (child) => {
             const { label, name } = child.props
             return (
               <div
                 css={[
-                  tw`tw-border-l tw-px-5 tw-border-neut-3 tw-text-center tw-py-3 tw-cursor-pointer`,
+                  tw`border-l px-5 border-neut-3 text-center py-3 cursor-pointer`,
                   curPanelName === name
-                    ? tw`tw-font-medium tw-text-green-11 tw-bg-white tw--mb-px tw-border-t-[3px] (tw-border-t-green-11)!`
-                    : tw`tw-border-t`,
+                    ? tw`font-medium text-green-11 bg-white -mb-px border-t-[3px] (border-t-green-11)!`
+                    : tw`border-t`,
                 ]}
                 onClick={() => {
                   handleTabClick(name)
@@ -70,7 +66,7 @@ export default function Tabs({
                 <span
                   css={[
                     curPanelName === name &&
-                      tw`tw-inline-block tw-transform tw--translate-y-0.5`,
+                      tw`inline-block transform -translate-y-0.5`,
                   ]}
                 >
                   {label}
@@ -79,14 +75,12 @@ export default function Tabs({
             )
           })}
         </div>
-        <div tw="tw-flex tw-items-center">{more}</div>
+        <div tw="flex items-center">{more}</div>
       </div>
       {React.Children.map(children, (child) => {
         const chidName = child.props.name
         return (
-          <div
-            css={[panelClassName, curPanelName !== chidName && tw`tw-hidden`]}
-          >
+          <div css={[panelClassName, curPanelName !== chidName && tw`hidden`]}>
             {panelNames.includes(chidName) && child}
           </div>
         )

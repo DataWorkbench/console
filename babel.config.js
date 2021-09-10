@@ -30,7 +30,6 @@ module.exports = (api) => {
       'babel-plugin-macros',
       '@babel/plugin-transform-runtime',
       ['@babel/plugin-proposal-class-properties', { loose: true }],
-      // ['lodash'],
     ],
     env: {
       development: {

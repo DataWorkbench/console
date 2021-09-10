@@ -34,7 +34,7 @@ const columns = [
     render: (v, row) => (
       <div>
         <div>{row.name}</div>
-        <div className="tw-text-neut-8">{v}</div>
+        <div className="text-neut-8">{v}</div>
       </div>
     ),
   },
@@ -74,13 +74,13 @@ const columns = [
     width: 130,
     render: () => (
       <div>
-        <Button type="text" className="tw-px-1 !tw-text-link">
+        <Button type="text" className="px-1 !text-link">
           表
         </Button>
-        <Button type="text" className="tw-px-1 !tw-text-link">
+        <Button type="text" className="px-1 !text-link">
           编辑
         </Button>
-        <Button type="text" className="tw-px-1 !tw-text-link">
+        <Button type="text" className="px-1 !text-link">
           删除
         </Button>
       </div>
@@ -107,16 +107,16 @@ function DataSourceList() {
   return (
     <div
       css={[
-        tw`tw-rounded-sm tw-m-5 tw-flex-1`,
-        sourceList?.length === 0 && tw`tw-min-h-[400px] tw-bg-white`,
+        tw`rounded-sm m-5 flex-1`,
+        sourceList?.length === 0 && tw`min-h-[400px] bg-white`,
       ]}
     >
       <Loading spinning={loading}>
         {sourceList?.length ? (
-          <div className="tw-pb-3">
+          <div className="pb-3">
             <PageTab tabs={tabs} />
 
-            <ToolBar className="tw-bg-white">
+            <ToolBar className="bg-white">
               <ToolBarLeft>
                 <Button type="primary" onClick={() => toggleShow(true)}>
                   <Icon name="add" />
@@ -142,17 +142,17 @@ function DataSourceList() {
             />
           </div>
         ) : (
-          <div tw=" tw-pt-20 tw-pb-20 ">
-            <div tw="tw-text-center tw-mx-auto tw-w-9/12">
-              <Icon name="blockchain" size={60} tw="tw-mb-3" />
-              <div tw="tw-mb-3 tw-font-medium tw-text-xl">暂无数据源</div>
-              <p tw="tw-mx-auto tw-mb-3 tw-w-3/5 tw-text-neut-8">
+          <div tw=" pt-20 pb-20 ">
+            <div tw="text-center mx-auto w-9/12">
+              <Icon name="blockchain" size={60} tw="mb-3" />
+              <div tw="mb-3 font-medium text-xl">暂无数据源</div>
+              <p tw="mx-auto mb-3 w-3/5 text-neut-8">
                 数据源主要用于数据集成过程中 Reader 和 Writer
                 的对象，您可以在数据源管理页面查看、新增及批量新增数据源。指定的整个数据库全部或者部分表一次性的全部同步至MySQL，并且支持后续的实时增量同步模式，将新增数据持续同步至
                 MySQL。
               </p>
               <div>
-                <Button tw="tw-mr-4">
+                <Button tw="mr-4">
                   <Icon name="if-book" type="light" />
                   使用指南
                 </Button>

@@ -3,7 +3,7 @@ import { useMount } from 'react-use'
 import { jsPlumb } from 'jsplumb'
 import { useDrop } from 'react-dnd'
 import { nanoid } from 'nanoid'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 
 function FlowPainter() {
   const [rjsp, setRjsp] = useState(null)
@@ -70,35 +70,32 @@ function FlowPainter() {
   return (
     <div
       ref={drop}
-      className={clsx(
-        'tw-h-full',
-        isActive ? 'tw-bg-neut-13 tw-bg-opacity-30' : ''
-      )}
+      css={[tw`h-full`, isActive && tw`bg-neut-13 bg-opacity-30`]}
     >
-      <div ref={rootEl} className="tw-relative tw-h-full">
+      <div ref={rootEl} tw="relative h-full">
         {elems.map((elem) => (
           <div
             key={elem.id}
             id={elem.id}
             style={{ left: elem.x, top: elem.y }}
-            className={clsx(
-              'tw-flex tw-h-8 tw-pl-2 tw-w-40 tw-border-l-4 tw-absolute tw-border tw-border-neut-13 tw-rounded  tw-bg-neut-16 tw-cursor-pointer tw-items-center',
+            css={[
+              tw`flex h-8 pl-2 w-40 border-l-4 absolute border border-neut-13 rounded  bg-neut-16 cursor-pointer items-center`,
               elem.type === 'table'
-                ? 'tw-border-l-[#229CE9]'
-                : 'tw-border-l-[#934BC5]'
-            )}
+                ? tw`border-l-[#229CE9]`
+                : tw`border-l-[#934BC5]`,
+            ]}
           >
-            <div className="tw-w-6">
+            <div tw="w-6">
               <span
-                className={clsx(
-                  'tw-p-1 tw-rounded-sm',
-                  elem.type === 'table' ? 'tw-bg-[#229CE9]' : 'tw-bg-[#934BC5]'
-                )}
+                css={[
+                  tw`p-1 rounded-sm`,
+                  elem.type === 'table' ? tw`bg-[#229CE9]` : tw`bg-[#934BC5]`,
+                ]}
               >
                 {elem.type === 'table' ? 'ch' : elem.iname}
               </span>
             </div>
-            <span className="tw-ml-2">{elem.name}</span>
+            <span tw="ml-2">{elem.name}</span>
           </div>
         ))}
       </div>

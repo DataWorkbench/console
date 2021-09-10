@@ -42,14 +42,14 @@ const App = () => {
     >
       <StoreContext.Provider value={store}>
         {loading ? (
-          <div tw="tw-flex tw-justify-center tw-h-screen tw-items-center">
+          <div tw="flex justify-center h-screen items-center">
             <Loading size="large" />
           </div>
         ) : (
           <Router basename="/bigdata">
             <Suspense
               fallback={
-                <div tw="tw-flex tw-justify-center tw-h-screen tw-items-center">
+                <div tw="flex justify-center h-screen items-center">
                   <Loading />
                 </div>
               }

@@ -30,72 +30,70 @@ function FlowMenu({ onCreateClick }) {
   }
 
   return (
-    <div tw="tw-w-56 tw-bg-neut-16 tw-m-3 tw-rounded dark:tw-text-white">
-      <div tw="tw-flex tw-justify-between tw-items-center tw-h-11 tw-px-2 tw-border-b dark:tw-border-neut-15">
-        <span tw="tw-text-xs tw-font-semibold">业务流程</span>
-        <div tw="tw-flex tw-items-center">
+    <div tw="w-56 bg-neut-16 m-3 rounded dark:text-white">
+      <div tw="flex justify-between items-center h-11 px-2 border-b dark:border-neut-15">
+        <span tw="text-xs font-semibold">业务流程</span>
+        <div tw="flex items-center">
           <Icon name="add" type="light" />
           <Icon name="refresh" type="light" />
         </div>
       </div>
-      <div tw="tw-border-b dark:tw-border-neut-15">
-        <div tw="tw-mt-3 tw-px-2 tw-flex tw-items-center">
+      <div tw="border-b dark:border-neut-15">
+        <div tw="mt-3 px-2 flex items-center">
           <Input
-            tw="dark:tw-bg-neut-17 dark:tw-text-white dark:tw-border-neut-13 dark:hover:tw-border-neut-13"
+            tw="dark:bg-neut-17 dark:text-white dark:border-neut-13 dark:hover:border-neut-13"
             type="text"
             placeholder="搜索任务关键词/创建人"
           />
           <Icon
-            tw="tw-ml-2 tw-cursor-pointer"
+            tw="ml-2 cursor-pointer"
             name="filter"
             changeable
             type="light"
           />
         </div>
-        <div tw="tw-mx-2 tw-mt-3 tw-bg-neut-17 tw-p-2">
-          <div tw="tw-flex tw-items-center tw-justify-between tw-border-b tw-border-neut-13 tw-pb-1">
+        <div tw="mx-2 mt-3 bg-neut-17 p-2">
+          <div tw="flex items-center justify-between border-b border-neut-13 pb-1">
             <span>👋️ 快速上手文档</span>
             <Icon name="close" type="light" />
           </div>
-          <ul tw="tw-pt-2">
+          <ul tw="pt-2">
             <li>
-              <Icon name="file" tw="tw-align-middle" />
-              <span tw="tw-align-middle tw-text-neut-8">业务流程是什么？</span>
+              <Icon name="file" tw="align-middle" />
+              <span tw="align-middle text-neut-8">业务流程是什么？</span>
             </li>
             <li>
-              <Icon name="file" tw="tw-align-middle" />
-              <span tw="tw-align-middle tw-text-neut-8">
-                业务流程的操作指南
-              </span>
+              <Icon name="file" tw="align-middle" />
+              <span tw="align-middle text-neut-8">业务流程的操作指南</span>
             </li>
           </ul>
         </div>
-        <div tw="tw-text-center tw-my-3">
+        <div tw="text-center my-3">
           <button
             type="button"
             onClick={onCreateClick}
-            tw="tw-py-1 tw-rounded-sm tw-w-48 tw-bg-neut-13 focus:tw-outline-none hover:tw-bg-neut-10 tw-ring-opacity-50"
+            tw="py-1 rounded-sm w-48 bg-neut-13 focus:outline-none hover:bg-neut-10 ring-opacity-50"
           >
-            <Icon name="add" type="light" tw="tw-align-middle" />
-            <span tw="tw-align-middle">创建业务流程</span>
+            <Icon name="add" type="light" tw="align-middle" />
+            <span tw="align-middle">创建业务流程</span>
           </button>
         </div>
       </div>
-      <div tw="tw-pt-4">
+      <div tw="pt-4">
         {flows.length > 0 &&
           flows.map((flow) => (
             <div
               key={flow.id}
               css={[
-                tw`tw-leading-8 tw-pl-3 tw-cursor-pointer`,
+                tw`leading-8 pl-3 cursor-pointer`,
                 curFlow && curFlow.id === flow.id
-                  ? tw`tw-bg-green-11`
-                  : tw`hover:tw-bg-neut-13`,
+                  ? tw`bg-green-11`
+                  : tw`hover:bg-neut-13`,
               ]}
               onClick={() => handleItemClick(flow)}
             >
-              <Icon name="caret-right" type="light" tw="tw-align-middle" />
-              <span tw="tw-ml-1">{flow.name}</span>
+              <Icon name="caret-right" type="light" tw="align-middle" />
+              <span tw="ml-1">{flow.name}</span>
             </div>
           ))}
       </div>

@@ -8,32 +8,30 @@ const IconCard = ({ icon, title, subtitle, className, layout }) => {
     <div
       className={`${className} group`}
       css={[
-        tw`hover:(tw-border-green-4 tw-bg-green-0) tw-transition-colors tw-duration-300`,
-        tw`tw-bg-neut-1 tw-cursor-pointer tw-flex tw-items-center  tw-rounded-sm tw-border tw-border-neut-2`,
-        layout === 'vertical'
-          ? tw`tw-flex-col tw-px-8 tw-py-2`
-          : tw`tw-py-3 tw-px-3`,
+        tw`hover:(border-green-4 bg-green-0) transition-colors duration-300`,
+        tw`bg-neut-1 cursor-pointer flex items-center  rounded-sm border border-neut-2`,
+        layout === 'vertical' ? tw`flex-col px-8 py-2` : tw`py-3 px-3`,
       ]}
     >
       <div
         css={[
-          tw`group-hover:tw-from-green-11 group-hover:tw-to-green-3`,
-          tw`tw-w-10 tw-h-10 tw-flex tw-items-center tw-justify-center  tw-bg-gradient-to-tr tw-from-neut-15 tw-to-neut-10 tw-shadow-md`,
-          layout !== 'vertical' && tw`tw-mr-3`,
+          tw`group-hover:from-green-11 group-hover:to-green-3`,
+          tw`w-10 h-10 flex items-center justify-center  bg-gradient-to-tr from-neut-15 to-neut-10 shadow-md`,
+          layout !== 'vertical' && tw`mr-3`,
         ]}
       >
         <Icon name={icon} type="light" size={28} />
       </div>
-      <div tw="tw-flex-1">
+      <div tw="flex-1">
         <div
           css={[
-            tw`tw-text-neut-15`,
-            layout === 'vertical' ? tw`tw-pt-1` : tw`tw-font-medium`,
+            tw`text-neut-15`,
+            layout === 'vertical' ? tw`pt-1` : tw`font-medium`,
           ]}
         >
           {title}
         </div>
-        {subtitle && <div className="tw-text-neut-8">{subtitle}</div>}
+        {subtitle && <div className="text-neut-8">{subtitle}</div>}
       </div>
     </div>
   )

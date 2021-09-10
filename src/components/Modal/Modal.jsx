@@ -42,13 +42,13 @@ const Modal = ({
     <div
       className={rootClassName}
       css={[
-        tw`tw-fixed tw-inset-0 tw-z-10`,
-        isHide && tw`tw-hidden`,
-        placement === 'center' && tw`tw-flex tw-items-center tw-justify-center`,
+        tw`fixed inset-0 z-10`,
+        isHide && tw`hidden`,
+        placement === 'center' && tw`flex items-center justify-center`,
       ]}
     >
       <div
-        tw="tw-opacity-70 tw-fixed tw-inset-0 tw-bg-black"
+        tw="opacity-70 fixed inset-0 bg-black"
         onClick={() => {
           if (closeOnOverlayClick) {
             handleClose()
@@ -58,30 +58,29 @@ const Modal = ({
       <div
         className={contentClassName}
         css={[
-          tw`tw-flex tw-flex-col tw-bg-white dark:tw-bg-neut-16 dark:tw-text-white tw-overflow-auto tw-z-20`,
-          placement === 'rightFull' &&
-            tw`tw-fixed tw-top-0 tw-right-0 tw-bottom-0 tw-w-1/2`,
-          placement === 'center' && tw`tw-min-w-[600px] tw-h-auto`,
+          tw`flex flex-col bg-white dark:bg-neut-16 dark:text-white overflow-auto z-20`,
+          placement === 'rightFull' && tw`fixed top-0 right-0 bottom-0 w-1/2`,
+          placement === 'center' && tw`min-w-[600px] h-auto`,
         ]}
       >
-        <div tw="tw-flex tw-justify-between tw-px-5 tw-py-4 tw-shadow">
-          <div tw="tw-font-medium tw-text-base">{title}</div>
+        <div tw="flex justify-between px-5 py-4 shadow">
+          <div tw="font-medium text-base">{title}</div>
           {closable && (
             <Icon
               name="close"
               type={darkMode ? 'light' : 'dark'}
-              tw="tw-cursor-pointer"
+              tw="cursor-pointer"
               onClick={handleClose}
             />
           )}
         </div>
-        <div tw="tw-flex-1 tw-shadow-sm">{children}</div>
-        <div tw="tw-px-5 tw-py-3 dark:tw-border-t dark:tw-border-neut-13">
+        <div tw="flex-1 shadow-sm">{children}</div>
+        <div tw="px-5 py-3 dark:border-t dark:border-neut-13">
           {footer ||
             (footer !== null && (
-              <div tw="tw-flex tw-justify-end">
+              <div tw="flex justify-end">
                 <div>
-                  <Button tw="tw-mr-2" onClick={handleClose}>
+                  <Button tw="mr-2" onClick={handleClose}>
                     {cancelText}
                   </Button>
                   <Button

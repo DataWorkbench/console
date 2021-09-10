@@ -3,15 +3,12 @@ import { Tabs, Icon } from '@QCFE/lego-ui'
 import { Button } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import { useToggle } from 'react-use'
-import tw from 'twin.macro'
 import { findIndex, get } from 'lodash'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
-
 import { useStore } from 'stores'
 import FlowPainter from './FlowPainter'
 import NodeMenu from './NodeMenu'
-import styles from './styles.module.css'
 
 const { TabPanel } = Tabs
 
@@ -48,50 +45,44 @@ function FlowTabs() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div tw="tw-flex-1 tw-py-4 tw-relative">
+      <div tw="flex-1 py-4 relative">
         <Tabs
           type="card"
           activeName={curFlow.id}
-          css={[
-            tw`tw-bg-neut-18 tw-h-full tw-rounded-md tw-flex tw-flex-col`,
-            styles.tabWrapper,
-          ]}
+          tw="bg-neut-18 h-full rounded-md flex flex-col"
           onChange={(name) => workFlowStore.setCurFlow(name)}
           onClose={(name) => closePanel(name)}
         >
           {panels.map((flow) => (
             <TabPanel key={flow.id} name={flow.id} closable label={flow.id}>
-              <div tw="tw-text-white tw-flex-1 tw-flex tw-flex-col">
-                <div tw="tw-flex tw-px-2 tw-pt-3">
-                  <div tw="tw-relative">
+              <div tw="text-white flex-1 flex flex-col">
+                <div tw="flex px-2 pt-3">
+                  <div tw="relative">
                     <button
                       type="button"
-                      css={[styles.btn, tw`tw-flex tw-justify-between`]}
+                      tw="flex justify-between"
                       onClick={toggleNodeMenu}
                     >
-                      <div tw="tw-mr-2">
-                        <Icon name="apps" type="light" tw="tw-align-middle" />
+                      <div tw="mr-2">
+                        <Icon name="apps" type="light" tw="align-middle" />
                         <span>节点库</span>
                       </div>
                       <Icon name="caret-down" type="light" />
                     </button>
                   </div>
-                  <button type="button" className={styles.btn}>
+                  <button type="button">
                     <Icon name="eye" type="dark" />
                     <span>预览</span>
                   </button>
-                  <button type="button" className={styles.btn}>
+                  <button type="button">
                     <Icon name="remark" type="dark" />
                     <span>语法检查</span>
                   </button>
-                  <button type="button" className={styles.btn}>
+                  <button type="button">
                     <Icon name="start" type="light" />
                     <span>运行</span>
                   </button>
-                  <button
-                    type="button"
-                    css={[styles.btn, tw`tw-bg-neut-13 hover:tw-bg-neut-15`]}
-                  >
+                  <button type="button" tw="bg-neut-13 hover:bg-neut-15">
                     <Icon name="data" type="dark" />
                     <span>保存</span>
                   </button>
@@ -100,14 +91,14 @@ function FlowTabs() {
                     <span>发布</span>
                   </Button>
                 </div>
-                <div tw="tw-flex-1">
+                <div tw="flex-1">
                   <FlowPainter />
                 </div>
               </div>
             </TabPanel>
           ))}
         </Tabs>
-        <div tw="tw-pt-2 tw-absolute tw-top-28 tw-left-2 tw-bottom-8 tw-min-h-[450px]  tw-overflow-y-auto">
+        <div tw="pt-2 absolute top-28 left-2 bottom-8 min-h-[450px]  overflow-y-auto">
           <NodeMenu show={showNodeMenu} />
         </div>
       </div>

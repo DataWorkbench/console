@@ -26,9 +26,9 @@ const SpaceLayout = ({ children }) => {
   }, [darkMode])
 
   return (
-    <div tw="tw-flex tw-flex-col tw-h-screen tw-bg-neut-2 dark:tw-bg-neut-17">
+    <div tw="flex flex-col h-screen bg-neut-2 dark:bg-neut-17">
       <Header darkMode={darkMode} />
-      <div tw="tw-flex-1 tw-flex tw-overflow-y-auto">{children}</div>
+      <div tw="flex-1 flex overflow-y-auto">{children}</div>
     </div>
   )
 }

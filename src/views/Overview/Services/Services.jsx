@@ -12,15 +12,15 @@ function Services() {
   const opsItem = items.slice(-1)[0]
   return (
     <Card>
-      <div tw="tw-px-5 tw-py-3 tw-font-semibold tw-text-base">
-        &#127775;<span tw="tw-ml-2">服务内容</span>
+      <div tw="px-5 py-3 font-semibold text-base">
+        &#127775;<span tw="ml-2">服务内容</span>
       </div>
-      <div tw="tw-px-5 tw-py-2.5 tw-border-t tw-border-neut-2 tw-flex tw-font-medium tw-text-sm tw-text-neut-15 tw-h-80 tw-space-x-4">
-        <div tw="tw-border tw-border-green-4 tw-border-dashed tw-rounded-sm tw-bg-green-0 tw-px-12 2xl:tw-px-[68px] tw-flex tw-items-center tw-flex-1">
+      <div tw="px-5 py-2.5 border-t border-neut-2 flex font-medium text-sm text-neut-15 h-80 space-x-4">
+        <div tw="border border-green-4 border-dashed rounded-sm bg-green-0 px-12 2xl:px-[68px] flex items-center flex-1">
           <Flow items={flowItems} />
         </div>
-        <div tw="tw-border tw-border-[#BAE6FD] tw-border-dashed tw-rounded-sm tw-bg-[#ECFBFF] tw-flex tw-justify-center tw-min-w-[200px] tw-w-2/12">
-          <div tw="tw-relative tw-mt-20 tw-w-full tw-flex tw-justify-center">
+        <div tw="border border-[#BAE6FD] border-dashed rounded-sm bg-[#ECFBFF] flex justify-center min-w-[200px] w-2/12">
+          <div tw="relative mt-20 w-full flex justify-center">
             <FlowCell item={opsItem} placement="right" />
           </div>
         </div>

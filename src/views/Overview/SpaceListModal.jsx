@@ -38,8 +38,8 @@ function SpaceListModal() {
       bodyStyle={{ padding: 0 }}
       onCancel={handleHide}
       footer={
-        <div className="tw-w-full tw-flex tw-justify-between tw-items-center">
-          <div className="tw-text-neut-15">
+        <div tw="w-full flex justify-between items-center">
+          <div tw="text-neut-15">
             若无合适的工作空间，您也可以 创建新工作空间
           </div>
           <div>

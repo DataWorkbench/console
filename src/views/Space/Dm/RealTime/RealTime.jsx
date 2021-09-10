@@ -64,12 +64,12 @@ function RealTime() {
   }
 
   return (
-    <div tw="tw-flex tw-min-h-[600px] tw-h-full tw-overflow-auto">
+    <div tw="flex min-h-[600px] h-full overflow-auto">
       <FlowMenu onCreateClick={() => toggleCreate(true)} />
       {curFlow ? (
         <FlowTabs />
       ) : (
-        <div tw="tw-flex tw-flex-1 tw-items-center tw-justify-center tw-text-neut-8">
+        <div tw="flex flex-1 items-center justify-center text-neut-8">
           <div>
             <ul>
               <li>1. 新建业务流程</li>
@@ -89,7 +89,7 @@ function RealTime() {
           show={showCreate}
           title="创建业务流程"
           placement="center"
-          contentClassName={tw`tw-w-3/4 tw-mx-5 tw-rounded-md tw-shadow-xl`}
+          contentClassName={tw`w-3/4 mx-5 rounded-md shadow-xl`}
           onHide={handleCancel}
           onCancel={handleCancel}
           onOK={handleNext}
@@ -100,34 +100,30 @@ function RealTime() {
             step={step}
             sameLine
             stepTexts={['选择模式', '填写信息']}
-            stepClassName={tw`tw-w-80`}
+            stepClassName={tw`w-80`}
           />
           <ModalContent>
             {step === 0 && (
               <div>
-                <div tw="tw-mb-4">请选择要进行编排的形式</div>
-                <div tw="tw-flex tw-justify-between tw-space-x-9 tw-mb-10">
+                <div tw="mb-4">请选择要进行编排的形式</div>
+                <div tw="flex justify-between space-x-9 mb-10">
                   {scheduleTypes.map(({ type, title, disp, icon }) => (
                     <div
                       key={type}
                       css={[
-                        tw`tw-w-1/3 tw-cursor-pointer tw-border tw-shadow`,
+                        tw`w-1/3 cursor-pointer border shadow`,
                         scheType === type
-                          ? tw`tw-border-green-11`
-                          : tw`tw-border-neut-17 hover:tw-border-green-11`,
+                          ? tw`border-green-11`
+                          : tw`border-neut-17 hover:border-green-11`,
                       ]}
                       onClick={() => setScheType(type)}
                     >
-                      <div tw="tw-bg-neut-17 tw-h-60 tw-flex tw-justify-center tw-items-center">
-                        <Icon
-                          name={icon}
-                          className="tw-align-middle"
-                          size={50}
-                        />
+                      <div tw="bg-neut-17 h-60 flex justify-center items-center">
+                        <Icon name={icon} className="align-middle" size={50} />
                       </div>
-                      <div tw="tw-bg-neut-13 tw-py-5 tw-pl-6 tw-text-base">
-                        <div tw="tw-font-semibold ">{title}</div>
-                        <div tw="tw-mt-2 tw-text-neut-8">{disp}</div>
+                      <div tw="bg-neut-13 py-5 pl-6 text-base">
+                        <div tw="font-semibold ">{title}</div>
+                        <div tw="mt-2 text-neut-8">{disp}</div>
                       </div>
                     </div>
                   ))}
@@ -135,14 +131,14 @@ function RealTime() {
               </div>
             )}
             {step === 1 && (
-              <div tw="tw-flex tw-justify-center tw-mb-10">
+              <div tw="flex justify-center mb-10">
                 <Form layout="vertical" ref={form}>
                   <TextField
                     name="name"
                     label="* 业务名称"
                     placeholder='允许包含字母、数字 及 "_"，长度2～128'
-                    labelClassName={tw`tw-text-white`}
-                    controlClassName={tw`dark:tw-text-white tw-bg-neut-16 tw-border-neut-13 hover:tw-border-neut-8`}
+                    labelClassName={tw`text-white`}
+                    controlClassName={tw`dark:text-white bg-neut-16 border-neut-13 hover:border-neut-8`}
                     validateOnChange
                     schemas={[
                       {
@@ -161,8 +157,8 @@ function RealTime() {
                     name="desc"
                     label="描述"
                     placeholder="请输入业务描述"
-                    labelClassName={tw`tw-text-white`}
-                    controlClassName={tw`dark:tw-text-white tw-bg-neut-16 tw-border-neut-13 hover:tw-border-neut-8`}
+                    labelClassName={tw`text-white`}
+                    controlClassName={tw`dark:text-white bg-neut-16 border-neut-13 hover:border-neut-8`}
                     validateOnChange
                     schemas={[
                       {

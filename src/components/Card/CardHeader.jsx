@@ -4,12 +4,12 @@ import PropTypes from 'prop-types'
 
 const CardHeader = ({ className, title, subtitle, classes, ...other }) => {
   return (
-    <div css={[tw`tw-pt-5 tw-pb-3`, className]} {...other}>
-      <div tw="tw-text-base tw-font-semibold tw-text-neut-16 tw-flex tw-items-center">
-        <div tw="tw-h-4 tw-w-1 tw-bg-neut-16" />
-        <p css={[tw`tw-pl-5`, className]}>{title}</p>
+    <div css={[tw`pt-5 pb-3`, className]} {...other}>
+      <div tw="text-base font-semibold text-neut-16 flex items-center">
+        <div tw="h-4 w-1 bg-neut-16" />
+        <p css={[tw`pl-5`, className]}>{title}</p>
       </div>
-      <div tw="tw-text-xs tw-mt-1 tw-text-neut-8 tw-pl-5">
+      <div tw="text-xs mt-1 text-neut-8 pl-5">
         <p css={classes.subtitle}>{subtitle}</p>
       </div>
     </div>

@@ -36,20 +36,20 @@ function SpaceItem({ regionId, space, className }) {
   const renderGrid = () => {
     if (isModal) {
       return (
-        <div tw="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
+        <div tw="flex justify-between items-center px-4 mb-3">
           <div>
             <span>我的角色：</span>
-            <span tw="tw-bg-neut-13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
+            <span tw="bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block mr-1">
               {space.owner}
             </span>
-            <span tw="tw-bg-neut-2 tw-text-neut-15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
+            <span tw="bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block">
               运维
             </span>
           </div>
           <div>
             <span>
               创建时间：
-              <span tw="tw-text-neut-16">
+              <span tw="text-neut-16">
                 {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
               </span>
             </span>
@@ -59,44 +59,44 @@ function SpaceItem({ regionId, space, className }) {
     }
     return (
       <>
-        <div tw="tw-flex tw-justify-between tw-items-center tw-px-4 tw-mb-3">
+        <div tw="flex justify-between items-center px-4 mb-3">
           <div>
             <span>我的角色：</span>
-            <span tw="tw-bg-neut-13 tw-rounded-2xl tw-text-white tw-px-2 tw-py-0.5 tw-inline-block tw-mr-1">
+            <span tw="bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block mr-1">
               {space.owner}
             </span>
-            <span tw="tw-bg-neut-2 tw-text-neut-15 tw-rounded-2xl tw-px-2 tw-py-0.5 tw-inline-block">
+            <span tw="bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block">
               运维
             </span>
           </div>
-          <div tw="tw-flex tw-items-center ">
+          <div tw="flex items-center ">
             <div>空间成员</div>
-            <div tw="tw-flex tw-items-center">
-              <div tw="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mx-1">
+            <div tw="flex items-center">
+              <div tw="w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1">
                 <Icon name="human" size={18} />
               </div>
-              <div tw="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1">
+              <div tw="w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mr-1">
                 <Icon name="human" size={18} />
               </div>
-              <div tw="tw-w-6 tw-h-6 tw-bg-neut-3 tw-rounded-full tw-flex tw-items-center tw-justify-center">
+              <div tw="w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center">
                 <Icon name="human" size={18} />
               </div>
             </div>
           </div>
         </div>
-        <div tw="tw-flex tw-justify-between tw-px-4 tw-mb-3">
-          <div tw="tw-flex">
-            <div tw="tw-w-60 2xl:tw-w-auto tw-overflow-hidden tw-break-all tw-whitespace-nowrap tw-overflow-ellipsis">
+        <div tw="flex justify-between px-4 mb-3">
+          <div tw="flex">
+            <div tw="w-60 2xl:w-auto overflow-hidden break-all whitespace-nowrap overflow-ellipsis">
               开通引擎：共享Flink、QingMR、Deep Learning
             </div>
-            <a href="##" tw="tw-text-link">
+            <a href="##" tw="text-link">
               查看
             </a>
           </div>
           <div>
             <span>
               创建时间：
-              <span tw="tw-text-neut-16">
+              <span tw="text-neut-16">
                 {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
               </span>
             </span>
@@ -106,33 +106,33 @@ function SpaceItem({ regionId, space, className }) {
     )
   }
   return (
-    <animated.div style={props} css={isModal && tw`tw-cursor-pointer`}>
+    <animated.div style={props} css={isModal && tw`cursor-pointer`}>
       <Card
         className={className}
-        tw="tw-rounded tw-border tw-border-t-4 tw-text-neut-8 tw-border-neut-2"
+        tw="rounded border border-t-4 text-neut-8 border-neut-2"
         onClick={handleSelected}
       >
-        <div tw="tw-flex tw-justify-between tw-px-4 tw-pt-5 tw-mb-7 ">
-          <div tw="tw-flex-1 tw-flex">
+        <div tw="flex justify-between px-4 pt-5 mb-7 ">
+          <div tw="flex-1 flex">
             <div
               className="profile"
-              tw="tw-w-11 tw-h-11 tw-flex tw-justify-center tw-items-center tw-text-base tw-font-medium tw-rounded-sm"
+              tw="w-11 h-11 flex justify-center items-center text-base font-medium rounded-sm"
             >
               {getShortSpaceName(space.name)}
             </div>
-            <div tw="tw-ml-3">
-              <div tw="tw-flex tw-items-center">
-                <span tw="tw-font-medium tw-text-base tw-text-neut-16">
+            <div tw="ml-3">
+              <div tw="flex items-center">
+                <span tw="font-medium text-base text-neut-16">
                   {space.name}
                 </span>
                 <span>（{space.id}）</span>
                 <span
                   css={[
-                    tw`tw-py-0.5 tw-px-3 tw-rounded-2xl tw-inline-flex tw-items-center`,
+                    tw`py-0.5 px-3 rounded-2xl inline-flex items-center`,
                     // space.status === 1 ? styles.st_active : styles.st_forbidden
                     space.status === 1 &&
                       tw`
-                    tw-text-green-11 tw-bg-green-0
+                    text-green-11 bg-green-0
                     `,
                     space.status === 1 &&
                       css`
@@ -147,7 +147,7 @@ function SpaceItem({ regionId, space, className }) {
                   {space.status === 1 ? '活跃' : '已禁用'}
                 </span>
               </div>
-              <div tw="tw-pt-1">{space.desc}</div>
+              <div tw="pt-1">{space.desc}</div>
             </div>
           </div>
           {!isModal ? (
@@ -159,10 +159,7 @@ function SpaceItem({ regionId, space, className }) {
                     修改工作空间
                   </Menu.MenuItem>
                   <Menu.MenuItem value="disable" disabled={space.status === 2}>
-                    <i
-                      className="if if-minus-square"
-                      tw="tw-text-base tw-mr-2"
-                    />
+                    <i className="if if-minus-square" tw="text-base mr-2" />
                     禁用工作空间
                   </Menu.MenuItem>
                   <Menu.MenuItem value="enable" disabled={space.status === 1}>
@@ -184,18 +181,18 @@ function SpaceItem({ regionId, space, className }) {
         </div>
         {renderGrid()}
         {!isModal && (
-          <div tw="tw-px-5 tw-py-4 tw-flex tw-justify-center tw-bg-neut-1 tw-border-t tw-border-neut-3">
+          <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3">
             {funcList.map(({ name: funcName, title, subFuncList }, i) => (
               <Tooltip
-                tw="tw-p-0"
+                tw="p-0"
                 key={funcName}
                 content={subFuncList.map((subFunc) => (
                   <Link
                     key={subFunc.name}
                     to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                    tw="tw-flex tw-items-center tw-py-2 tw-px-5 tw-cursor-pointer hover:tw-bg-neut-15 hover:tw-text-white"
+                    tw="flex items-center py-2 px-5 cursor-pointer hover:bg-neut-15 hover:text-white"
                   >
-                    <Icon name={subFunc.icon} type="light" tw="tw-mr-1" />
+                    <Icon name={subFunc.icon} type="light" tw="mr-1" />
                     {subFunc.title}
                   </Link>
                 ))}
@@ -203,15 +200,15 @@ function SpaceItem({ regionId, space, className }) {
               >
                 <Link
                   to={`${regionId}/workspace/${space.id}/${funcName}`}
-                  tw="hover:tw-text-green-11 tw-h-full tw-inline-block"
+                  tw="hover:text-green-11 h-full inline-block"
                 >
                   <button
                     type="button"
                     css={[
-                      tw`tw-font-semibold tw-text-xs tw-rounded-sm tw-text-neut-13  tw-bg-neut-1 tw-border tw-border-neut-3`,
-                      tw`tw-px-4 2xl:tw-px-8 tw-py-1`,
-                      i < funcList.length - 1 ? tw`tw-mr-4` : tw`tw-mr-0`,
-                      tw`focus:tw-outline-none hover:tw-bg-green-0 hover:tw-border-green-11 hover:tw-shadow tw-transition-colors`,
+                      tw`font-semibold text-xs rounded-sm text-neut-13  bg-neut-1 border border-neut-3`,
+                      tw`px-4 2xl:px-8 py-1`,
+                      i < funcList.length - 1 ? tw`mr-4` : tw`mr-0`,
+                      tw`focus:outline-none hover:bg-green-0 hover:border-green-11 hover:shadow transition-colors`,
                     ]}
                   >
                     {title}

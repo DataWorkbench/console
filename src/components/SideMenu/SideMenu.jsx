@@ -31,45 +31,43 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
   return (
     <div
       css={[
-        tw`tw-relative tw-transition-all`,
-        narrowMode ? tw`tw-w-14 tw-text-center` : tw`tw-w-56`,
+        tw`relative transition-all`,
+        narrowMode ? tw`w-14 text-center` : tw`w-56`,
       ]}
     >
       <div
         tw="
-          tw-overflow-auto tw-pt-5  tw-absolute tw-inset-0 tw-flex tw-flex-col tw-shadow-md tw-border-r tw-border-neut-3 dark:tw-bg-neut-17 dark:tw-border-neut-13"
+          overflow-auto pt-5  absolute inset-0 flex flex-col shadow-md border-r border-neut-3 dark:bg-neut-17 dark:border-neut-13"
       >
         {title && (
           <div
             css={[
-              tw`tw-pb-4 tw-font-medium tw-text-lg tw-text-neut-15 dark:tw-text-white`,
-              narrowMode ? '' : tw`tw-pl-5`,
+              tw`pb-4 font-medium text-lg text-neut-15 dark:text-white`,
+              narrowMode ? '' : tw`pl-5`,
             ]}
           >
             {narrowMode ? (
               <Icon
                 name="if-menu"
                 type={darkMode ? 'light' : 'dark'}
-                className="tw-text-xl"
+                className="text-xl"
               />
             ) : (
               title
             )}
           </div>
         )}
-        <div tw="tw-flex-1 tw-text-sm">
+        <div tw="flex-1 text-sm">
           {menus.map(({ title: t, name, icon, isSubTitle, link, items }) => {
             if (narrowMode) {
               return (
-                <div tw="tw-py-2" key={name}>
-                  {isSubTitle && (
-                    <div tw="tw-border-b tw-border-neut-3 tw-mx-4" />
-                  )}
+                <div tw="py-2" key={name}>
+                  {isSubTitle && <div tw="border-b border-neut-3 mx-4" />}
                   {icon && (
                     <Icon
                       type={darkMode ? 'light' : 'dark'}
                       name={icon}
-                      tw="tw-text-xl"
+                      tw="text-xl"
                     />
                   )}
                 </div>
@@ -91,7 +89,7 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
             )
           })}
         </div>
-        <div tw="tw-flex tw-h-10 tw-items-center tw-bg-neut-2 tw-border-t tw-border-neut-3 hover:tw-bg-neut-1 tw-pl-5 dark:tw-bg-neut-17 dark:tw-border-neut-13">
+        <div tw="flex h-10 items-center bg-neut-2 border-t border-neut-3 hover:bg-neut-1 pl-5 dark:bg-neut-17 dark:border-neut-13">
           <Icon
             name={narrowMode ? 'expand' : 'collapse'}
             size={20}

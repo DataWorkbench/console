@@ -16,7 +16,7 @@ function getTabs() {
   return [
     {
       title: (
-        <span tw="tw-font-semibold">
+        <span tw="font-semibold">
           上午好，{get(window, 'USER.user_name', '')}，欢迎您使用大数据平台
         </span>
       ),
@@ -35,16 +35,16 @@ function Overview() {
   } = useStore()
 
   return (
-    <div tw="tw-p-5 tw-h-full">
+    <div tw="p-5 h-full">
       <PageTab tabs={getTabs()} />
       <Services />
-      <div tw="tw-flex">
-        <PlatformFeat tw="tw-flex-1 tw-mr-4" />
-        <FAQ tw="tw-w-4/12 2xl:tw-w-[360px]" />
+      <div tw="flex">
+        <PlatformFeat tw="flex-1 mr-4" />
+        <FAQ tw="w-4/12 2xl:w-[360px]" />
       </div>
-      <div tw="tw-flex">
-        <Practice tw="tw-flex-1 tw-mr-4" />
-        <Card tw="tw-w-4/12 tw-leading-5 2xl:tw-w-[360px]">
+      <div tw="flex">
+        <Practice tw="flex-1 mr-4" />
+        <Card tw="w-4/12 leading-5 2xl:w-[360px]">
           <CardHeader title="视频介绍" />
           <CardContent>
             <IconCard

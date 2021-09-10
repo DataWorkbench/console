@@ -7,21 +7,21 @@ const neut = {
   17: '#1d2b3a',
   16: '#273849',
   15: '#324558',
-  // N14: '#3e5265',
+  14: '#3e5265',
   13: '#4c5e70',
-  // N12: '#5d6b79',
-  // N11: '#697886',
+  12: '#5d6b79',
+  11: '#697886',
   10: '#778592',
-  // N9: '#86919c',
+  9: '#86919c',
   8: '#939ea9',
-  // N7: '#a1abb5',
-  // N6: '#aeb8c1',
+  7: '#a1abb5',
+  6: '#aeb8c1',
   5: '#b6c2cd',
-  // N4: '#c6d1dc',
+  4: '#c6d1dc',
   3: '#d5dee7',
   2: '#e4ebf1',
   1: '#f5f7fa',
-  // N0: '#fff',
+  0: '#fff',
 }
 
 const green = {
@@ -42,9 +42,6 @@ const red = {
 }
 
 module.exports = {
-  mode: 'jit',
-  prefix: 'tw-',
-  purge: ['./src/**/*.{js,jsx,css}'],
   darkMode: 'class',
   theme: {
     colors: {

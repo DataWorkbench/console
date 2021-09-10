@@ -54,7 +54,7 @@ function SpaceCardView({ regionId }) {
     //   initialLoad={false}
     //   hasMore={get(curRegion, 'hasMore', true)}
     //   loader={
-    //     <div key={0} className="tw-h-40">
+    //     <div key={0} className="h-40">
     //       <Loading size="medium" />
     //     </div>
     //   }
@@ -63,7 +63,7 @@ function SpaceCardView({ regionId }) {
     // >
     // </InfiniteScroll>
     <>
-      <div tw="tw-grid tw-grid-cols-2 tw-flex-wrap 2xl:tw-gap-x-4 tw-gap-x-2">
+      <div tw="grid grid-cols-2 flex-wrap 2xl:gap-x-4 gap-x-2">
         {workspaces.map((space, i) => (
           <SpaceItem
             key={space.id}
@@ -74,13 +74,13 @@ function SpaceCardView({ regionId }) {
           />
         ))}
       </div>
-      <div css={[tw`tw-h-40`, !isFetch && tw`tw-hidden`]}>
+      <div css={[tw`h-40`, !isFetch && tw`hidden`]}>
         <Loading size="medium" />
       </div>
       {!isFetch && workspaces.length === 0 && (
-        <div tw="tw-flex tw-justify-center tw-w-full tw-my-7">
-          <div tw="tw-text-center tw-text-neut-8">
-            <Icon name="display" size={56} tw="tw-mb-2" />
+        <div tw="flex justify-center w-full my-7">
+          <div tw="text-center text-neut-8">
+            <Icon name="display" size={56} tw="mb-2" />
             <div>{getText('LEGO_UI_NO_AVAILABLE_DATA')}</div>
           </div>
         </div>

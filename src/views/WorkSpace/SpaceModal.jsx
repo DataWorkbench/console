@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 import { RadioButton, Form, Input, Button, Modal } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash'
@@ -9,7 +9,6 @@ import FullModal, { ModalContent } from 'components/Modal'
 import { useStore } from 'stores'
 import { useWorkSpaceContext } from 'contexts'
 import { formatDate } from 'utils/convert'
-// import styles from './styles.module.css'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
 
@@ -32,13 +31,13 @@ const columns = [
     width: 220,
     dataIndex: 'id',
     render: (field, row) => (
-      <div className="tw-flex tw-items-center">
-        <div className="tw-bg-neut-3 tw-rounded-full tw-p-1 tw-flex tw-items-center tw-justify-center">
+      <div tw="flex items-center">
+        <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
           <Icon name="project" size="small" />
         </div>
-        <div className="tw-ml-2">
-          <div className="tw-font-semibold">{row.name}</div>
-          <div className="tw-text-neut-8">{field}</div>
+        <div tw="ml-2">
+          <div tw="font-semibold">{row.name}</div>
+          <div tw="text-neut-8">{field}</div>
         </div>
       </div>
     ),
@@ -49,24 +48,24 @@ const columns = [
     dataIndex: 'status',
     render: (field) => (
       <div
-        className={clsx(
+        css={[
           field === 1
-            ? 'tw-bg-green-0 tw-text-green-13'
-            : 'tw-bg-[#FFFDED] tw-text-[#A16207]',
-          'tw-px-2 tw-py-0.5 tw-rounded-[20px] tw-flex tw-items-center'
-        )}
+            ? tw`bg-green-0 text-green-13`
+            : tw`bg-[#FFFDED] text-[#A16207]`,
+          tw`px-2 py-0.5 rounded-[20px] flex items-center`,
+        ]}
       >
         <div
-          className={clsx(
-            field === 1 ? 'tw-bg-green-1' : 'tw-bg-[#FFD127]',
-            ' tw-w-3 tw-h-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1'
-          )}
+          css={[
+            field === 1 ? tw`bg-green-1` : tw`bg-[#FFD127]`,
+            tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`,
+          ]}
         >
           <div
-            className={clsx(
-              field === 1 ? 'tw-bg-green-13' : 'tw-bg-[#A48A19]',
-              ' tw-w-1.5 tw-h-1.5 tw-rounded-full'
-            )}
+            css={[
+              field === 1 ? tw`bg-green-13` : tw`bg-[#A48A19]`,
+              tw`w-1.5 h-1.5 rounded-full`,
+            ]}
           />
         </div>
         {field === 1 ? '活跃' : '已禁用'}
@@ -163,11 +162,11 @@ function SpaceModal({ region, onHide, ...otherProps }) {
         desc: (
           <>
             {filterOptSpaces.length === 1 ? (
-              <div className="tw-space-y-3">
+              <div className="space-y-3">
                 <div>
                   该工作空间内工作流、成员等数据都将彻底删除，无法恢复，请谨慎操作。
                 </div>
-                <div className="tw-border-t tw-border-neut-2" />
+                <div className="border-t border-neut-2" />
                 <div>
                   *请在下方输入框中输入 “{get(filterOptSpaceIds, '0')}”
                   以确认操作
@@ -183,18 +182,18 @@ function SpaceModal({ region, onHide, ...otherProps }) {
                 </div>
               </div>
             ) : (
-              <div className="tw-space-y-3">
+              <div className="space-y-3">
                 <Table
                   dataSource={filterOptSpaces}
                   columns={columns}
                   rowKey="id"
                 />
-                <div className="tw-border-t tw-border-neut-2" />
+                <div className="border-t border-neut-2" />
                 <div>*请在下方输入框中输入 “delete” 以确认操作</div>
                 <div>
                   <Input
                     type="text"
-                    tw="tw-w-40"
+                    tw="w-40"
                     placeholder="delete"
                     onChange={(e, value) => setDelBtnEnable(value === 'delete')}
                   />
@@ -230,18 +229,18 @@ function SpaceModal({ region, onHide, ...otherProps }) {
           </>
         }
       >
-        <div tw="tw-flex tw-items-start">
+        <div tw="flex items-start">
           <Icon
             name="if-exclamation"
-            tw="tw-mr-3 tw-text-2xl tw-leading-6"
+            tw="mr-3 text-2xl leading-6"
             style={{ color: style.color }}
           />
           <div>
-            <div tw="tw-font-semibold tw-text-base tw-text-neut-15">
+            <div tw="font-semibold text-base text-neut-15">
               {opName}工作空间: 工作空间
               {filterOptSpaces.map(({ name }) => name).join(',')}
             </div>
-            <div tw="tw-text-neut-13 tw-mt-2">{desc}</div>
+            <div tw="text-neut-13 mt-2">{desc}</div>
           </div>
         </div>
       </Modal>

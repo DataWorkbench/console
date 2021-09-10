@@ -23,13 +23,13 @@ function Ops() {
     globalStore: { darkMode },
   } = store
   return (
-    <div tw="tw-flex-1 tw-flex tw-h-full">
+    <div tw="flex-1 flex h-full">
       <SideMenu
         menus={navMenu}
         darkMode={darkMode}
         defaultSelectedMenu={curFunc.name}
       />
-      <div tw="tw-flex-1 tw-overflow-y-auto">
+      <div tw="flex-1 overflow-y-auto">
         {curFunc.name === 'overview' && <OverView />}
       </div>
     </div>

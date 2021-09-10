@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import clsx from 'clsx'
+import tw from 'twin.macro'
 
 const propTypes = {
   items: PropTypes.array,
@@ -9,32 +9,24 @@ const propTypes = {
 
 function DbList({ items, onChange }) {
   return (
-    <div className="tw-flex tw-flex-wrap">
+    <div className="flex flex-wrap">
       {items.map(({ name, desc, image }, i) => (
-        <div
-          key={name}
-          className={clsx('tw-w-1/3 tw-pb-4', (i + 1) % 3 && 'tw-pr-4')}
-        >
+        <div key={name} css={[tw`w-1/3 pb-4`, (i + 1) % 3 && tw`pr-4`]}>
           <div
             onClick={onChange}
-            className={clsx(
-              'tw-flex tw-p-3 tw-group tw-border tw-rounded-sm tw-border-neut-2 tw-cursor-pointer hover:tw-border-green-11'
-            )}
+            className="group"
+            tw="flex p-3 border rounded-sm border-neut-2 cursor-pointer hover:border-green-11"
           >
-            <div className="tw-w-10 tw-flex-shrink-0">
+            <div tw="w-10 flex-shrink-0">
               <img
-                className="tw-w-full tw-h-10"
+                tw="w-full h-10"
                 src={`data:image/gif;base64,${image}`}
                 alt=""
               />
             </div>
-            <div className="tw-flex-1 tw-pl-2 tw-leading-5">
-              <div className="tw-font-medium group-hover:tw-text-green-11">
-                {name}
-              </div>
-              <div className="tw-text-neut-8 tw-h-10 tw-overflow-hidden">
-                {desc}
-              </div>
+            <div tw="flex-1 pl-2 leading-5">
+              <div tw="font-medium group-hover:text-green-11">{name}</div>
+              <div tw="text-neut-8 h-10 overflow-hidden">{desc}</div>
             </div>
           </div>
         </div>

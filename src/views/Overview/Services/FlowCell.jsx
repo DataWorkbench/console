@@ -26,7 +26,7 @@ function FlowCell({ item, placement }) {
     config: { duraction: 150 },
   })
   return (
-    <div tw="tw-w-14">
+    <div tw="w-14">
       <animated.div
         onMouseEnter={() => {
           toggleOpen(true)
@@ -35,19 +35,19 @@ function FlowCell({ item, placement }) {
         onMouseLeave={() => toggleOpen(false)}
         style={props}
         css={[
-          tw`tw-absolute tw-z-20 tw-h-[300px] tw-opacity-0`,
-          placement === 'top' && tw`tw-top-[-54px] tw-left-[-68px] tw-w-48`,
+          tw`absolute z-20 h-[300px] opacity-0`,
+          placement === 'top' && tw`top-[-54px] left-[-68px] w-48`,
           placement === 'bottom' &&
-            tw`tw-top-[-150px] tw-left-[-60px] 2xl:tw-left-[-68px] tw-w-48`,
-          placement === 'right' && tw`tw-top-[-80px] tw-left-[0px] tw-w-full`,
-          isOpened ? tw`tw-cursor-text` : tw`tw-cursor-pointer`,
+            tw`top-[-150px] left-[-60px] 2xl:left-[-68px] w-48`,
+          placement === 'right' && tw`top-[-80px] left-[0px] w-full`,
+          isOpened ? tw`cursor-text` : tw`cursor-pointer`,
         ]}
       >
         <ItemCard item={item} />
       </animated.div>
-      <div css={!open && tw`tw-relative tw-z-10`}>
-        <Icon name={item.xlink} size={56} tw="tw-pointer-events-none" />
-        <div tw="tw-pt-3">{item.text}</div>
+      <div css={!open && tw`relative z-10`}>
+        <Icon name={item.xlink} size={56} tw="pointer-events-none" />
+        <div tw="pt-3">{item.text}</div>
       </div>
     </div>
   )

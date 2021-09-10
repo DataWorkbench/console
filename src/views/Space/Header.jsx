@@ -4,14 +4,47 @@ import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
 import { Tooltip, Menu } from '@QCFE/lego-ui'
 import { Icon, Select } from '@QCFE/qingcloud-portal-ui'
-import tw from 'twin.macro'
+import tw, { css, theme } from 'twin.macro'
 import { get } from 'lodash'
 import { getShortSpaceName } from 'utils/convert'
 import { useMount } from 'react-use'
 import { useStore } from 'stores'
-import styles from './styles.module.css'
 
-// const { MenuItem, SubMenu } = Menu
+const menuStyle = [
+  tw`bg-neut-17 text-xs text-white font-semibold`,
+  css`
+    .menu-inline-submenu-title {
+      svg {
+        color: rgba(255, 255, 255, 0.9);
+        fill: rgba(255, 255, 255, 0.4);
+      }
+    }
+    .menu-item,
+    .menu-inline-submenu-title {
+      color: ${theme('colors.white')};
+      &:hover {
+        background-color: ${theme('colors.neut.16')};
+      }
+    }
+  `,
+]
+
+const navStyle = (selected) => [
+  tw`inline-block py-3 mr-6 text-sm hover:(dark:text-white)`,
+  // after:content-[" "] after:absolute  after:w-3/5 after:h-0.5 after:left-[20%] after:bottom-0.5 after:bg-green-11
+  selected && tw`font-semibold relative dark:text-white`,
+  css`
+    &::after {
+      position: absolute;
+      content: ' ';
+      width: 60%;
+      height: 0.125rem;
+      left: 20%;
+      bottom: 1px;
+      background-color: ${theme('colors.green.11')};
+    }
+  `,
+]
 
 function Header({ darkMode }) {
   const { regionId, spaceId } = useParams()
@@ -47,47 +80,37 @@ function Header({ darkMode }) {
   const handleMenuClick = (e, k) => history.push(`/${k}`)
 
   return (
-    <div tw="tw-h-14 tw-flex tw-items-center tw-justify-between  tw-shadow-lg tw-bg-white dark:tw-bg-neut-16 dark:tw-text-neut-8">
-      <div tw="tw-flex tw-items-center">
+    <div tw="h-14 flex items-center justify-between  shadow-lg bg-white dark:bg-neut-16 dark:text-neut-8">
+      <div tw="flex items-center">
         <Tooltip
           trigger="hover"
-          tw="tw-px-0"
-          always
+          tw="px-0"
           content={
             <Menu
               mode="inline"
-              tw="tw-bg-neut-17 tw-text-xs tw-font-semibold"
+              css={menuStyle}
               onClick={handleMenuClick}
               width={200}
             >
-              <Menu.MenuItem
-                key={workSpaceMenu.name}
-                // onClick={(e, k) => console.log(k)}
-                // tw="tw-text-white hover:tw-bg-neut-16 hover:tw-text-white"
-                // className="tw-text-white hover:tw-bg-neut-16 hover:tw-text-white"
-              >
+              <Menu.MenuItem key={workSpaceMenu.name}>
                 <Icon name="return" type="light" />
                 返回{workSpaceMenu.title}列表
               </Menu.MenuItem>
-              <div className="tw-border-t tw-border-neut-8 tw-my-3" />
+              <div tw="border-t border-neut-8 my-3" />
               {otherMenus.map((menu) => {
                 if (menu.items) {
                   return (
                     <Menu.SubMenu
                       title={
-                        <div className="tw-flex tw-items-center">
+                        <div tw="flex items-center">
                           <Icon name={menu.icon} type="light" />
                           {menu.title}
                         </div>
                       }
                       key={menu.name}
-                      className={styles.headerSubMenu}
                     >
                       {menu.items.map(({ name, icon, title }) => (
-                        <Menu.MenuItem
-                          key={name}
-                          // className="tw-text-white hover:tw-bg-neut-16 hover:tw-text-white"
-                        >
+                        <Menu.MenuItem key={name}>
                           <Icon name={icon} type="light" />
                           {title}
                         </Menu.MenuItem>
@@ -96,10 +119,7 @@ function Header({ darkMode }) {
                   )
                 }
                 return (
-                  <Menu.MenuItem
-                    // className="tw-text-white hover:tw-bg-neut-16 hover:tw-text-white"
-                    key={menu.name}
-                  >
+                  <Menu.MenuItem key={menu.name}>
                     <Icon name={menu.icon} />
                     {menu.title}
                   </Menu.MenuItem>
@@ -108,18 +128,18 @@ function Header({ darkMode }) {
             </Menu>
           }
         >
-          <div tw="tw-flex tw-justify-center tw-h-14 tw-items-center tw-w-14 tw-bg-neut-1 dark:tw-bg-neut-13 tw-cursor-pointer hover:tw-bg-green-11 hover:tw-text-white">
+          <div tw="flex justify-center h-14 items-center w-14 bg-neut-1 dark:bg-neut-13 cursor-pointer hover:bg-green-11 hover:text-white">
             <Icon
               name="if-ninedot"
               style={{ fontSize: 32 }}
-              className="dark:tw-text-white"
+              className="dark:text-white"
             />
           </div>
         </Tooltip>
-        <div tw="tw-text-sm tw-w-8 tw-h-8 tw-mx-3 tw-bg-neut-3 tw-rounded-sm tw-flex tw-justify-center tw-items-center tw-bg-[#cfafe9] tw-text-[#934bc5] tw-font-semibold">
+        <div tw="text-sm w-8 h-8 mx-3 rounded-sm flex justify-center items-center bg-[#cfafe9] text-[#934bc5] font-semibold">
           {getShortSpaceName(space?.name)}
         </div>
-        <div className={styles.headerSelectWrapper}>
+        <div className="styles.headerSelectWrapper">
           <Select
             defaultValue={spaceId}
             isLoadingAtBottom
@@ -138,43 +158,44 @@ function Header({ darkMode }) {
         {funcList.map(({ title, name }) => (
           <Link
             key={name}
-            css={[
-              mod === name &&
-                'tw-font-semibold tw-relative after:tw-absolute after:tw-content-[" "] after:tw-w-3/5 after:tw-h-0.5 after:tw-left-[20%] after:tw-bottom-0.5 after:tw-bg-green-11 dark:tw-text-white',
-              tw`tw-inline-block tw-py-3 tw-mr-6 tw-text-sm hover:(dark:tw-text-white)`,
-            ]}
+            css={navStyle(mod === name)}
+            // css={[
+            //   mod === name &&
+            //     'font-semibold relative after:absolute after:content-[" "] after:w-3/5 after:h-0.5 after:left-[20%] after:bottom-0.5 after:bg-green-11 dark:text-white',
+            //   tw`inline-block py-3 mr-6 text-sm hover:(dark:text-white)`,
+            // ]}
             to={`/${regionId}/workspace/${spaceId}/${name}`}
           >
             {title}
           </Link>
         ))}
       </div>
-      <div tw="tw-flex tw-items-center">
+      <div tw="flex items-center">
         <Icon
           name="bell"
           size="medium"
           type={darkMode ? 'light' : 'dark'}
           changeable
-          tw="tw-mr-2 tw-cursor-pointer"
+          tw="mr-2 cursor-pointer"
         />
         <Icon
           name="cogwheel"
           type={darkMode ? 'light' : 'dark'}
           size="medium"
           changeable
-          tw="tw-mr-2 tw-cursor-pointer"
+          tw="mr-2 cursor-pointer"
         />
         <Icon
           name="documentation"
           type={darkMode ? 'light' : 'dark'}
           size="medium"
           changeable
-          tw="tw-mr-2 tw-cursor-pointer"
+          tw="mr-2 cursor-pointer"
         />
-        <span tw="tw-mr-2 dark:tw-text-white">
+        <span tw="mr-2 dark:text-white">
           {get(window, 'USER.user_name', '')}
         </span>
-        <span tw="tw-mr-6 tw-inline-block tw-bg-neut-2 dark:tw-bg-neut-13 dark:tw-text-white tw-px-2 tw-py-0.5 tw-rounded-2xl">
+        <span tw="mr-6 inline-block bg-neut-2 dark:bg-neut-13 dark:text-white px-2 py-0.5 rounded-2xl">
           项目所有者
         </span>
       </div>

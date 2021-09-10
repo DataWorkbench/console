@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get } from 'lodash'
-// import clsx from 'clsx'
 import { useImmer } from 'use-immer'
 import tw from 'twin.macro'
 import { formatDate } from 'utils/convert'
@@ -22,13 +21,13 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
           sortKey: 'name',
           sortOrder: sort.name,
           render: (field, row) => (
-            <div tw="tw-flex tw-items-center">
-              <div tw="tw-bg-neut-3 tw-rounded-full tw-p-1 tw-flex tw-items-center tw-justify-center">
+            <div tw="flex items-center">
+              <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
                 <Icon name="project" size="small" />
               </div>
-              <div tw="tw-ml-2">
-                <div tw="tw-font-semibold">{row.name}</div>
-                <div tw="tw-text-neut-8">{field}</div>
+              <div tw="ml-2">
+                <div tw="font-semibold">{row.name}</div>
+                <div tw="text-neut-8">{field}</div>
               </div>
             </div>
           ),
@@ -44,21 +43,21 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
             <div
               css={[
                 field === 1
-                  ? tw`tw-bg-green-0 tw-text-green-13`
-                  : tw`tw-bg-[#FFFDED] tw-text-[#A16207]`,
-                tw`tw-px-2 tw-py-0.5 tw-rounded-[20px] tw-flex tw-items-center`,
+                  ? tw`bg-green-0 text-green-13`
+                  : tw`bg-[#FFFDED] text-[#A16207]`,
+                tw`px-2 py-0.5 rounded-[20px] flex items-center`,
               ]}
             >
               <div
                 css={[
-                  field === 1 ? tw`tw-bg-green-1` : tw`tw-bg-[#FFD127]`,
-                  tw`tw-w-3 tw-h-3 tw-rounded-full tw-flex tw-items-center tw-justify-center tw-mr-1`,
+                  field === 1 ? tw`bg-green-1` : tw`bg-[#FFD127]`,
+                  tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`,
                 ]}
               >
                 <div
                   css={[
-                    field === 1 ? tw`tw-bg-green-13` : tw`tw-bg-[#A48A19]`,
-                    tw`tw-w-1.5 tw-h-1.5 tw-rounded-full`,
+                    field === 1 ? tw`bg-green-13` : tw`bg-[#A48A19]`,
+                    tw`w-1.5 h-1.5 rounded-full`,
                   ]}
                 />
               </div>
@@ -72,7 +71,7 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
           render: (field) => (
             <div>
               <div>xxx@test.com</div>
-              <div tw="tw-text-neut-8">{field}</div>
+              <div tw="text-neut-8">{field}</div>
             </div>
           ),
         }
@@ -189,7 +188,7 @@ function SpaceTableView({ regionId }) {
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
       onSelect={handleSelect}
-      tw="tw-table-auto"
+      tw="table-auto"
       dataSource={workspaces.slice(0, pageSize)}
       columns={columns}
       onFilterChange={handleFilterChange}

@@ -21,13 +21,13 @@ const MainLayout = ({ children }) => {
 
   const match = useRouteMatch(flattenDeep(getLinks(menus)))
   return (
-    <div tw="tw-bg-neut-2 tw-flex tw-flex-col tw-h-screen">
+    <div tw="bg-neut-2 flex flex-col h-screen">
       <GlobalNav />
-      <div tw="tw-flex tw-flex-1 tw-overflow-y-auto">
+      <div tw="flex flex-1 overflow-y-auto">
         {match && (
           <SideMenu title={title} menus={menus} relationMenus={relationMenus} />
         )}
-        <div tw="tw-flex-1 tw-overflow-y-auto">{children}</div>
+        <div tw="flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   )

@@ -112,24 +112,24 @@ const Flow = ({ items }) => {
   }, [rootWidth])
 
   return (
-    <div tw="tw-w-full" ref={rootRef}>
-      <div tw="tw-flex tw-justify-between tw-h-24">
-        <div tw="tw-flex-1" ref={tlArrowEl} />
-        <div tw="tw-relative">
+    <div tw="w-full" ref={rootRef}>
+      <div tw="flex justify-between h-24">
+        <div tw="flex-1" ref={tlArrowEl} />
+        <div tw="relative">
           <FlowCell item={opsItem} placement="top" />
         </div>
-        <div tw="tw-flex-1" ref={trArrowEl} />
+        <div tw="flex-1" ref={trArrowEl} />
       </div>
-      <div tw="tw-flex tw-h-24">
+      <div tw="flex h-24">
         {flowItems.map((item, i) => (
           <React.Fragment key={item.text}>
-            <div tw="tw-relative">
+            <div tw="relative">
               {i !== 0 && i < flowItemsLen - 1 && (
                 <div
                   ref={(el) => {
                     bmArrowEl.current.push(el)
                   }}
-                  tw="tw-absolute tw--top-20 tw-bottom-24 tw-left-0 tw-right-0"
+                  tw="absolute -top-20 bottom-24 left-0 right-0"
                 />
               )}
               <FlowCell item={item} placement="bottom" />
@@ -139,10 +139,7 @@ const Flow = ({ items }) => {
                 ref={(el) => {
                   arrowEl.current[i] = el
                 }}
-                css={[
-                  tw`tw-flex tw-pt-6`,
-                  i === 1 ? tw`tw-flex-[2]` : tw`tw-flex-1`,
-                ]}
+                css={[tw`flex pt-6`, i === 1 ? tw`flex-[2]` : tw`flex-1`]}
               />
             )}
           </React.Fragment>

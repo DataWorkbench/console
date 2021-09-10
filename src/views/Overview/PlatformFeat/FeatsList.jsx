@@ -13,27 +13,27 @@ const itemVars = {
 
 function FeatList({ feats }) {
   return (
-    <div tw="tw-flex tw-justify-between tw-space-x-4">
+    <div tw="flex justify-between space-x-4">
       {feats.map(({ title, subtitle }, i) => {
         return (
           <div
             key={title}
             className="group"
-            tw="tw-flex-1 tw-border tw-border-neut-2 tw-rounded-sm tw-cursor-pointer hover:tw-border-green-4"
+            tw="flex-1 border border-neut-2 rounded-sm cursor-pointer hover:border-green-4"
           >
             <div
               css={[
-                tw`tw-bg-no-repeat tw-bg-center tw-h-32 tw-bg-neut-1`,
+                tw`bg-no-repeat bg-center h-32 bg-neut-1`,
                 {
                   backgroundImage: `url(${itemVars.imgs[i]})`,
                   backgroundSize: itemVars.sizes[i],
                 },
               ]}
             />
-            <div tw="tw-px-3  tw-h-24 2xl:tw-py-4 tw-py-2 tw-leading-5 tw-relative tw-bg-green-0 tw-overflow-hidden">
-              <div tw="tw-absolute tw-left-0 tw-top-0 tw-w-full tw-bottom-0 tw-flex tw-items-center  tw-border-t tw-border-green-4  tw-bg-green-1 tw-transform tw-transition-transform tw-duration-200 tw-translate-y-full group-hover:tw-translate-y-0">
-                <div tw="tw-flex  tw-justify-center tw-w-full tw-mx-4">
-                  <div tw="tw-mr-5">
+            <div tw="px-3  h-24 2xl:py-4 py-2 leading-5 relative bg-green-0 overflow-hidden">
+              <div tw="absolute left-0 top-0 w-full bottom-0 flex items-center  border-t border-green-4  bg-green-1 transform transition-transform duration-200 translate-y-full group-hover:translate-y-0">
+                <div tw="flex  justify-center w-full mx-4">
+                  <div tw="mr-5">
                     <Button type="default">了解详情</Button>
                   </div>
                   <div>
@@ -41,8 +41,8 @@ function FeatList({ feats }) {
                   </div>
                 </div>
               </div>
-              <div tw="tw-font-semibold">{title}</div>
-              <div tw="tw-text-neut-8 tw-mt-1">{subtitle}</div>
+              <div tw="font-semibold">{title}</div>
+              <div tw="text-neut-8 mt-1">{subtitle}</div>
             </div>
           </div>
         )

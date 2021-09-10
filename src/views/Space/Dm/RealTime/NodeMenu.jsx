@@ -46,20 +46,20 @@ function NodeMenu({ show }) {
   return (
     <div
       css={[
-        tw`tw-bg-neut-16 tw-text-white tw-py-3 tw-w-40 tw-rounded-sm tw-shadow-sm`,
-        show ? tw`tw-hidden` : '',
+        tw`bg-neut-16 text-white py-3 w-40 rounded-sm shadow-sm`,
+        show ? tw`hidden` : '',
       ]}
     >
       {menusData.map((menu, i) => (
         <div key={menu.name}>
-          <div tw="tw-leading-7 tw-bg-neut-13 tw-flex tw-items-center tw-justify-between tw-px-2 tw-cursor-pointer">
-            <div tw="tw-flex tw-items-center">
+          <div tw="leading-7 bg-neut-13 flex items-center justify-between px-2 cursor-pointer">
+            <div tw="flex items-center">
               <Icon name={menu.icon} type="light" />
-              <span tw="tw-ml-1">{menu.name}</span>
+              <span tw="ml-1">{menu.name}</span>
             </div>
             <Icon name="caret-down" type="light" />
           </div>
-          <ul tw="tw-py-3 tw-leading-7">
+          <ul tw="py-3 leading-7">
             {menu.items.map((item) => (
               <NodeMenuItem
                 key={item.name}

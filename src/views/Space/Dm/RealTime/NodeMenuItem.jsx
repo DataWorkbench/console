@@ -26,21 +26,21 @@ function NodeMenuItem({ item }) {
     <li
       ref={drag}
       css={[
-        tw`tw-pl-2 tw-flex tw-cursor-pointer hover:tw-bg-neut-13`,
-        isDragging ? tw`tw-opacity-50` : '',
+        tw`pl-2 flex cursor-pointer hover:bg-neut-13`,
+        isDragging ? tw`opacity-50` : '',
       ]}
     >
-      <div tw="tw-w-6">
+      <div tw="w-6">
         <span
           css={[
-            tw`tw-p-1 tw-rounded-sm`,
-            item.type === 'table' ? tw`tw-bg-[#229CE9]` : tw`tw-bg-[#934BC5]`,
+            tw`p-1 rounded-sm`,
+            item.type === 'table' ? tw`bg-[#229CE9]` : tw`bg-[#934BC5]`,
           ]}
         >
           {item.type === 'table' ? 'ch' : item.iname}
         </span>
       </div>
-      <span tw="tw-ml-2">{item.name}</span>
+      <span tw="ml-2">{item.name}</span>
     </li>
   )
 }

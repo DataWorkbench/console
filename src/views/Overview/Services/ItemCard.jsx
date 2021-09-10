@@ -16,24 +16,24 @@ function ItemCard({ item: { name, icon, text, desc, enabled, moreLink } }) {
     })
   }
   return (
-    <div tw="tw-h-full tw-bg-white tw-border-neut-1 tw-shadow tw-flex tw-flex-col">
-      <div tw="tw-border-t-4 tw-border-green-11 tw-bg-neut-1 tw-py-4 tw-flex tw-items-center tw-justify-center">
+    <div tw="h-full bg-white border-neut-1 shadow flex flex-col">
+      <div tw="border-t-4 border-green-11 bg-neut-1 py-4 flex items-center justify-center">
         <Icon name={icon} />
-        <span tw="tw-ml-2">{text}</span>
+        <span tw="ml-2">{text}</span>
       </div>
-      <div tw="tw-flex-1 tw-font-normal tw-text-neut-8 tw-text-xs tw-text-left tw-pt-4 tw-px-3">
+      <div tw="flex-1 font-normal text-neut-8 text-xs text-left pt-4 px-3">
         {desc}
         {moreLink && (
-          <a href={moreLink} tw="tw-text-link">
+          <a href={moreLink} tw="text-link">
             了解更多
           </a>
         )}
       </div>
-      <div tw="tw-pb-5 tw-text-center ">
+      <div tw="pb-5 text-center ">
         <Button
           type={enabled ? 'outlined' : 'default'}
           disabled={!enabled}
-          tw="tw-w-10/12"
+          tw="w-10/12"
           onClick={handleClick}
         >
           {enabled ? '开始使用' : '敬请期待'}

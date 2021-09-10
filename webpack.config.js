@@ -32,29 +32,15 @@ let config = {
         loader: 'babel-loader',
       },
       {
-        test: /\.(sc|c)ss$/,
+        test: /\.css$/,
         use: [
           isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
             options: {
-              importLoaders: 1,
-              modules: {
-                auto: true,
-                localIdentName: isDev
-                  ? '[local]-[hash:base64:5]'
-                  : '[hash:base64]',
-              },
-              sourceMap: isDev,
-              url: (url) => {
-                if (url.includes('helpcenter/bg.svg')) {
-                  return false
-                }
-                return true
-              },
+              url: (url) => !url.includes('helpcenter/bg.svg'),
             },
           },
-          // 'postcss-loader',
         ],
       },
       {
@@ -90,14 +76,10 @@ let config = {
   resolve: {
     extensions: ['.js', '.jsx'],
     modules: [resolve('src'), 'node_modules'],
-    // symlinks: false,
     alias: {
       components: resolve('src/components'),
       views: resolve('src/views'),
       stores: resolve('src/stores'),
-      scss: resolve('src/scss'),
-      react: resolve('node_modules/react'),
-      'react-router-dom': resolve('node_modules/react-router-dom'),
       asserts: resolve('src/assets'),
       hooks: resolve('src/hooks'),
       utils: resolve('src/utils'),
@@ -112,16 +94,15 @@ let config = {
   optimization: {},
   devServer: {
     host: 'localhost',
+    compress: true,
     hot: true,
     historyApiFallback: {
       index: '/bigdata/index.html',
-      // verbose: true,
     },
     devMiddleware: {},
     static: {},
     client: {
       logging: 'info',
-      overlay: true,
       progress: true,
     },
     proxy: {
@@ -192,13 +173,6 @@ if (isDev) {
             name: 'css-vendor',
             minChunks: 1,
             priority: 3,
-          },
-          styles: {
-            type: 'css/mini-extract',
-            enforce: true,
-            name: 'main',
-            minChunks: 1,
-            priority: 1,
           },
           default: {
             name: 'common',

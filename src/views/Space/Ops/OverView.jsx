@@ -110,112 +110,109 @@ function OverView() {
     }
   })
   return (
-    <div tw="tw-p-5 tw-text-white">
-      <section tw="tw-bg-neut-16 tw-rounded-b tw-text-sm tw-mb-5">
+    <div tw="p-5 text-white">
+      <section tw="bg-neut-16 rounded-b text-sm mb-5">
         <div
-          tw="tw-h-2 "
+          tw="h-2 "
           style={{
             background:
               'linear-gradient(90deg, #9CB4FA 0.55%, #94E2D0 19.59%, #8CADC8 42.24%, #F3A784 60.25%, #E49695 81.35%, #7E90E5 99.36%)',
           }}
         />
-        <div tw="tw-px-5 tw-pt-6 tw-pb-10">
-          <div tw="tw-mb-6 tw-flex tw-items-center">
+        <div tw="px-5 pt-6 pb-10">
+          <div tw="mb-6 flex items-center">
             <Icon name="dashboard" type="light" />
-            资源概览<span tw="tw-text-neut-8">（周期实例）</span>
+            资源概览<span tw="text-neut-8">（周期实例）</span>
           </div>
-          <div tw="tw-flex tw-justify-between tw-items-center 2xl:tw-w-4/5 tw-mx-auto">
-            <div tw="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
+          <div tw="flex justify-between items-center 2xl:w-4/5 mx-auto">
+            <div tw="flex relative border border-neut-13 rounded-lg px-8 py-5">
               <div
-                tw="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
+                tw="absolute h-14 w-1 top-5  left-0 rounded"
                 style={{
                   background:
                     'linear-gradient(43.53deg, #D44E4B 0%, #E89A9B 91.47%)',
                 }}
               />
               <MyIcon name="screen_failed" size={32} />
-              <div tw="tw-ml-3 2xl:tw-ml-6">
-                <div tw="tw-pb-1">运行失败实例</div>
-                <div tw="tw-text-2xl tw-font-mono">24</div>
+              <div tw="ml-3 2xl:ml-6">
+                <div tw="pb-1">运行失败实例</div>
+                <div tw="text-2xl font-mono">24</div>
               </div>
             </div>
-            <div tw="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div tw="flex relative border border-neut-13 rounded-lg px-8 py-5">
               <div
-                tw="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
+                tw="absolute h-14 w-1 top-5  left-0 rounded"
                 style={{
                   background:
                     'linear-gradient(43.53deg, #D44E4B 0%, #E89A9B 91.47%)',
                 }}
               />
               <MyIcon name="screen_running" size={32} />
-              <div tw="tw-ml-3 2xl:tw-ml-6">
-                <div tw="tw-pb-1">运行中实例</div>
-                <div tw="tw-text-2xl tw-font-mono">12</div>
+              <div tw="ml-3 2xl:ml-6">
+                <div tw="pb-1">运行中实例</div>
+                <div tw="text-2xl font-mono">12</div>
               </div>
             </div>
-            <div tw="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div tw="flex relative border border-neut-13 rounded-lg px-8 py-5">
               <div
-                tw="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
+                tw="absolute h-14 w-1 top-5  left-0 rounded"
                 style={{
                   background:
                     'linear-gradient(43.53deg, #229CE9 0%, #79C0F3 91.47%)',
                 }}
               />
               <MyIcon name="screen_success" size={32} />
-              <div tw="tw-ml-3 2xl:tw-ml-6">
-                <div tw="tw-pb-1">运行成功实例</div>
-                <div tw="tw-text-2xl tw-font-mono">36</div>
+              <div tw="ml-3 2xl:ml-6">
+                <div tw="pb-1">运行成功实例</div>
+                <div tw="text-2xl font-mono">36</div>
               </div>
             </div>
-            <div tw="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div tw="flex relative border border-neut-13 rounded-lg px-8 py-5">
               <div
-                tw="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
+                tw="absolute h-14 w-1 top-5  left-0 rounded"
                 style={{
                   background:
                     'linear-gradient(43.53deg, #934BC5 0%, #C096E0 91.47%)',
                 }}
               />
               <MyIcon name="screen_waiting" size={32} />
-              <div tw="tw-ml-3 2xl:tw-ml-6">
-                <div tw="tw-pb-1">等资源实例</div>
-                <div tw="tw-text-2xl tw-font-mono">26</div>
+              <div tw="ml-3 2xl:ml-6">
+                <div tw="pb-1">等资源实例</div>
+                <div tw="text-2xl font-mono">26</div>
               </div>
             </div>
-            <div tw="tw-flex tw-relative tw-border tw-border-neut-13 tw-rounded-lg tw-px-8 tw-py-5">
+            <div tw="flex relative border border-neut-13 rounded-lg px-8 py-5">
               <div
-                tw="tw-absolute tw-h-14 tw-w-1 tw-top-5  tw-left-0 tw-rounded"
+                tw="absolute h-14 w-1 top-5  left-0 rounded"
                 style={{
                   background:
                     'linear-gradient(43.53deg, #939EA9 0%, #B6C2CD 91.47%)',
                 }}
               />
               <MyIcon name="screen_stoped" size={32} />
-              <div tw="tw-ml-3 2xl:tw-ml-6">
-                <div tw="tw-pb-1">未运行实例</div>
-                <div tw="tw-text-2xl tw-font-mono">2</div>
+              <div tw="ml-3 2xl:ml-6">
+                <div tw="pb-1">未运行实例</div>
+                <div tw="text-2xl font-mono">2</div>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <section
-        tw="tw-bg-neut-16 tw-rounded-b tw-text-sm tw-mb-5 tw-h-72"
-        ref={insRef}
-      />
-      <section tw="tw-flex tw-justify-center tw-mb-5">
-        <div tw="tw-w-1/2 ">
-          <img src={screen0} alt="" tw="tw-mx-auto tw-w-10/12" />
+      <section tw="bg-neut-16 rounded-b text-sm mb-5 h-72" ref={insRef} />
+      <section tw="flex justify-center mb-5">
+        <div tw="w-1/2 ">
+          <img src={screen0} alt="" tw="mx-auto w-10/12" />
         </div>
-        <div tw="tw-w-1/2">
-          <img src={screen1} alt="" tw="tw-mx-auto tw-w-10/12" />
+        <div tw="w-1/2">
+          <img src={screen1} alt="" tw="mx-auto w-10/12" />
         </div>
       </section>
-      <section tw="tw-flex tw-justify-center tw-mb-5">
-        <div tw="tw-w-1/2 ">
-          <img src={screen0} alt="" tw="tw-mx-auto tw-w-10/12" />
+      <section tw="flex justify-center mb-5">
+        <div tw="w-1/2 ">
+          <img src={screen0} alt="" tw="mx-auto w-10/12" />
         </div>
-        <div tw="tw-w-1/2">
-          <img src={screen1} alt="" tw="tw-mx-auto tw-w-10/12" />
+        <div tw="w-1/2">
+          <img src={screen1} alt="" tw="mx-auto w-10/12" />
         </div>
       </section>
     </div>

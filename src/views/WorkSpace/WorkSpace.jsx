@@ -169,30 +169,30 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
 
   const renderNoWorkSpaces = () => {
     return (
-      <div tw="tw-flex tw-mt-4">
-        <Card className={tw`tw-flex-1 tw-mr-4`}>
+      <div tw="flex mt-4">
+        <Card className={tw`flex-1 mr-4`}>
           <CardHeader title="最佳实践" />
           <CardContent
-            className={tw`tw-flex tw-justify-center tw-space-x-2 2xl:tw-space-x-5`}
+            className={tw`flex justify-center space-x-2 2xl:space-x-5`}
           >
             <IconCard
-              className="tw-flex-1"
+              className="flex-1"
               icon="templet"
               title="沧州银行大数据工作台+弹性存储最佳实践"
               subtitle="通用云上弹性服务器配合大数据处理的最佳实践"
             />
             <IconCard
               icon="templet"
-              className="tw-flex-1"
+              className="flex-1"
               title="大数据工作台流批一体最佳实践"
               subtitle="通过流批一体的方式，轻量化解决企业数据处理"
             />
           </CardContent>
         </Card>
-        <Card className={tw`tw-w-4/12 tw-leading-5`}>
+        <Card className={tw`w-4/12 leading-5`}>
           <CardHeader title="相关产品" />
           <CardContent
-            className={tw`tw-pb-3 tw-flex tw-justify-center tw-space-x-2 2xl:tw-space-x-5`}
+            className={tw`pb-3 flex justify-center space-x-2 2xl:space-x-5`}
           >
             <IconCard icon="laptop" title="QingMr" layout="vertical" />
             <IconCard icon="laptop" title="MySQL" layout="vertical" />
@@ -206,27 +206,24 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
   return (
     <WorkSpaceContext.Provider value={stateStore}>
       <div
-        css={[
-          tw`tw-text-xs tw-h-full tw-overflow-auto`,
-          isModal ? '' : tw`tw-p-5`,
-        ]}
+        css={[tw`text-xs h-full overflow-auto`, isModal ? '' : tw`p-5`]}
         onScroll={handleScroll}
         // ref={(el) => stateStore.set({ scrollElem: el })}
         ref={scrollParentRef}
       >
-        <div tw="tw-pb-0!">
+        <div tw="pb-0!">
           {!isModal && <PageTab tabs={tabs} />}
           <Card
             css={[
-              tw`tw-pt-5 tw-relative`,
-              loading && tw`tw-h-80`,
-              isModal && tw`tw-shadow-none tw-mb-0`,
+              tw`pt-5 relative`,
+              loading && tw`h-80`,
+              isModal && tw`shadow-none mb-0`,
             ]}
           >
             {isModal && (
-              <div tw="tw-absolute tw-top-6 tw-right-5 tw-flex tw-space-x-2 tw-z-10">
+              <div tw="absolute top-6 right-5 flex space-x-2 z-10">
                 <Button type="icon" onClick={reloadSpace}>
-                  <Icon name="if-refresh" className={tw`tw-text-xl`} />
+                  <Icon name="if-refresh" tw="text-xl" />
                 </Button>
                 <Control className="has-icons-left has-icons-right">
                   <i className="icon is-left if-magnifier" />
@@ -235,7 +232,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
                     placeholder="工作空间、ID、角色"
                     name="search"
                     onPressEnter={(e) => handleQuery(e.target.value)}
-                    className={tw`tw-w-52 tw-rounded-2xl`}
+                    tw="w-52 rounded-2xl"
                     onClear={() => handleQuery('')}
                   />
                 </Control>
@@ -255,7 +252,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
                       name={regionInfo.id}
                     >
                       <SpaceLists
-                        tw="tw-px-5 tw-py-3"
+                        tw="px-5 py-3"
                         region={regionInfo}
                         isCurrent={regionInfo.id === curRegionId}
                         // scrollParent={scrollParentRef.current}

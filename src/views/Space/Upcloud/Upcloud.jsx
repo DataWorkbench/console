@@ -22,7 +22,7 @@ function Upcloud() {
   return (
     <>
       <SideMenu menus={navMenu} defaultSelectedMenu={curFunc.name} />
-      <div className="tw-flex-1 tw-flex tw-items-stretch tw-overflow-auto">
+      <div className="flex-1 flex items-stretch overflow-auto">
         {curFunc.name === 'dsl' && <DataSourceList />}
       </div>
     </>
