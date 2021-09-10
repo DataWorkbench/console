@@ -74,7 +74,7 @@ let config = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     modules: [resolve('src'), 'node_modules'],
     alias: {
       components: resolve('src/components'),

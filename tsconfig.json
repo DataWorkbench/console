@@ -1,9 +1,12 @@
 {
-  "include": ["src/**/*"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
-    "jsx": "react",
     "baseUrl": "./src",
+    "noEmit": true,
+    "jsx": "react",
+    "target": "ESNext",
+    "moduleResolution": "Node",
     "paths": {
       "components/*": ["components/*"],
       "views/*": ["views/*"],

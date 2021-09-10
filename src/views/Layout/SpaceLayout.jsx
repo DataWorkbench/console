@@ -14,16 +14,16 @@ const SpaceLayout = ({ children }) => {
     '/:zone/workspace/:space/dm',
     '/:zone/workspace/:space/ops',
   ])
-  globalStore.set({ darkMode })
 
   useEffect(() => {
+    globalStore.set({ darkMode })
     const htm = document.documentElement
     if (darkMode) {
       htm.classList.add('dark')
     } else {
       htm.classList.remove('dark')
     }
-  }, [darkMode])
+  }, [darkMode, globalStore])
 
   return (
     <div tw="flex flex-col h-screen bg-neut-2 dark:bg-neut-17">
