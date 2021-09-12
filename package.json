@@ -20,7 +20,7 @@
   "lint-staged": {
     "src/*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "eslint src/ --fix"
+      "eslint --fix"
     ],
     "src/**/*.css": [
       "stylelint --fix"
