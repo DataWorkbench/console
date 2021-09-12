@@ -2,6 +2,8 @@ import { makeAutoObservable, set } from 'mobx'
 import { parseI18n } from 'utils/convert'
 
 class GlobalStore {
+  rootStore
+
   darkMode = false
 
   regionInfos = []

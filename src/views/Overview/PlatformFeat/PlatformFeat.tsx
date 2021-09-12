@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Card, { CardHeader, CardContent } from 'components/Card'
+import { Card, CardHeader, CardContent } from 'components'
 import { useStore } from 'stores'
 import FeatsList from './FeatsList'
 

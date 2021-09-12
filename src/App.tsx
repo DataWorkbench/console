@@ -1,8 +1,8 @@
-import React, { useState, Suspense } from 'react'
+import { useState, Suspense } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import {
   PortalProvider,
-  Notification,
+  Notification as notification,
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
 import RootStore, { StoreContext } from 'stores'
@@ -17,7 +17,7 @@ const langMapping = {
 
 emitter.off('error')
 emitter.on('error', ({ title, content }) =>
-  Notification.open({
+  notification.open({
     title,
     content,
     placement: 'bottomRight',
@@ -37,7 +37,7 @@ const App = () => {
       service="bigdata"
       isPush={false}
       locales={locales}
-      currentLocale={langMapping[USER.lang] || 'zh-CN'}
+      currentLocale={langMapping[window.USER.lang] || 'zh-CN'}
       handleGlobalData={handleGlobalData}
     >
       <StoreContext.Provider value={store}>

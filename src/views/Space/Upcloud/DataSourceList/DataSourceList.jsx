@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useToggle } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import tw from 'twin.macro'
-import { get, toLower } from 'lodash'
+import { get, toLower } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import {

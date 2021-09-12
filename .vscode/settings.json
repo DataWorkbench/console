@@ -6,7 +6,7 @@
     "source.fixAll.stylelint": true
   },
   "tailwindCSS.experimental.classRegex": [
-    ":(?:.|\n)*?[\"'`]([^\"'`]*).*?,",
+    // ":(?:.|\n)*?[\"'`]([^\"'`]*).*?,",
     "\\w+ClassName=[\"']([^\"']*)[\"']",
     "tw`([^`]*)", // tw`...`
     "tw=\"([^\"]*)", // <div tw="..." />

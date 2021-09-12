@@ -1,22 +1,9 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import tw from 'twin.macro'
 
-const Card = React.forwardRef((props, ref) => {
-  const { className, ...others } = props
-  return (
-    <div
-      ref={ref}
-      className={className}
-      css={[tw`rounded-sm bg-white shadow mb-5`]}
-      {...others}
-    />
-  )
-})
+const Card = tw.div`rounded-sm bg-white shadow`
 
-Card.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-}
+const CardContent = tw.div`px-5 pb-5`
 
 export default Card
+
+export { CardContent }

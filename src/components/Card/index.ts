@@ -1,6 +1,6 @@
+import Card, { CardContent } from './Card'
 import CardHeader from './CardHeader'
-import CardContent from './CardContent'
 import IconCard from './IconCard'
 
-export { default } from './Card'
+export default Card
 export { CardHeader, CardContent, IconCard }

@@ -1,4 +1,3 @@
-import React from 'react'
 import PropTypes from 'prop-types'
 import { Button } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'

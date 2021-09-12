@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "NODE_ENV=development webpack serve",
     "build": "NODE_ENV=production webpack",
-    "eslint": "eslint --ext .js,.jsx src/",
+    "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
     "test": "jest"
   },
@@ -18,9 +18,9 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx}": [
+    "src/*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "eslint --fix"
+      "eslint src/ --fix"
     ],
     "src/**/*.css": [
       "stylelint --fix"
@@ -40,6 +40,10 @@
     "@emotion/babel-plugin": "^11.3.0",
     "@emotion/eslint-plugin": "^11.2.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
+    "@types/lodash-es": "^4.17.4",
+    "@types/react": "^17.0.20",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
     "babel-jest": "^27.0.6",
     "babel-loader": "^8.2.2",
     "babel-plugin-macros": "^3.1.0",
@@ -48,6 +52,7 @@
     "css-minimizer-webpack-plugin": "^3.0.1",
     "eslint": "^7.27.0",
     "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-typescript": "^14.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-webpack": "^0.13.1",
     "eslint-plugin-import": "^2.23.3",
@@ -94,7 +99,7 @@
     "immer": "^9.0.5",
     "js-cookie": "^2.2.1",
     "jsplumb": "^2.15.6",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "mitt": "^3.0.0",
     "mobx": "^6.3.2",
     "mobx-react-lite": "^3.2.0",

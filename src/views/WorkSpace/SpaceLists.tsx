@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
-import { get, isEqual } from 'lodash'
+import { get, isEqual } from 'lodash-es'
 import { useWorkSpaceContext } from 'contexts'
 import { useStore } from 'stores'
 import SpaceTableView from './SpaceTableView'
@@ -18,7 +18,7 @@ const SpaceLists = ({ region, className }) => {
   const isCurrent = curRegionId === region.id
 
   if (
-    isEqual(get(curRegion, 'params') === { offset: 0, limit: 10 }) &&
+    isEqual(get(curRegion, 'params'), { offset: 0, limit: 10 }) &&
     get(curRegion, 'hasMore') === false &&
     get(curRegion, 'total') === 0
   ) {

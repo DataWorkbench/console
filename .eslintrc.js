@@ -1,20 +1,35 @@
 module.exports = {
   root: true,
-  parser: '@babel/eslint-parser',
+  parser: '@typescript-eslint/parser',
   env: {
     browser: true,
     es2021: true,
     node: true,
     'jest/globals': true,
   },
-  extends: ['airbnb', 'airbnb/hooks', 'plugin:prettier/recommended'],
+  extends: [
+    'airbnb',
+    'airbnb-typescript',
+    'airbnb/hooks',
+    'plugin:prettier/recommended',
+    // 'plugin:@typescript-eslint/recommended',
+    // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
+  ],
   parserOptions: {
-    ecmaVersion: 12,
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 'es2020',
     sourceType: 'module',
+    project: './tsconfig.json',
   },
-  plugins: ['@emotion', 'jest'],
+  plugins: ['@emotion', 'jest', '@typescript-eslint'],
   rules: {
     'no-param-reassign': ['error', { props: false }],
+    'react/jsx-uses-react': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
+    'react/require-default-props': 'off',
     'react/forbid-prop-types': 0,
     'react/jsx-props-no-spreading': 0,
     'react/require-default-props': 0,
@@ -24,6 +39,9 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
     'import/resolver': [
       'node',
       {

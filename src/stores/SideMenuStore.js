@@ -1,5 +1,5 @@
 import { makeObservable } from 'mobx'
-import { flattenDeep } from 'lodash'
+import { flattenDeep } from 'lodash-es'
 
 class SideMenuStore {
   constructor(rootStore) {

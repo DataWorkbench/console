@@ -1,6 +1,6 @@
 import { makeAutoObservable, toJS, set } from 'mobx'
 import { fromPromise } from 'mobx-utils'
-import { omitBy } from 'lodash'
+import { omitBy } from 'lodash-es'
 
 class WorkSpaceStore {
   regions = {}

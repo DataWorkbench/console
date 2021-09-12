@@ -18,14 +18,14 @@ module.exports = (api) => {
               modules: false,
             },
       ],
+      '@babel/preset-typescript',
       [
         '@babel/preset-react',
         { runtime: 'automatic', importSource: '@emotion/react' },
       ],
-      '@babel/preset-typescript',
     ],
     plugins: [
-      '@emotion',
+      '@emotion/babel-plugin',
       'babel-plugin-twin',
       'babel-plugin-macros',
       '@babel/plugin-transform-runtime',

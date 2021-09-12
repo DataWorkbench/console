@@ -72,4 +72,11 @@ const api = {
   workflow,
 }
 
+export interface API {
+  region: any
+  workspace: any
+  datasource: any
+  workflow: any
+}
+
 export default api

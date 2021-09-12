@@ -1,4 +1,4 @@
-import { indexOf } from 'lodash'
+import { indexOf } from 'lodash-es'
 
 function getUserZone(i) {
   if (USER) {

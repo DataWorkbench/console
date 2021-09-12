@@ -1,9 +1,8 @@
-import React, { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useLifecycles, useToggle } from 'react-use'
-import PropTypes from 'prop-types'
-import { get, isEqual, throttle } from 'lodash'
+import { get, isEqual, throttle } from 'lodash-es'
 import tw from 'twin.macro'
 import {
   PageTab,
@@ -31,8 +30,13 @@ const tabs = [
 
 const storageKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
 
-const WorkSpace = ({ isModal, onSpaceSelected }) => {
-  const [curTabName, setCurTabName] = useState(null)
+interface WorkSpaceProps {
+  isModal: boolean
+  onSpaceSelected: any
+}
+
+const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
+  // const [curTabName, setCurTabName] = useState(null)
   const [loading, setLoading] = useToggle(true)
   const scrollParentRef = useRef(null)
   const stateStore = useLocalObservable(() => ({
@@ -79,7 +83,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
   const { curRegionId } = stateStore
   const curRegion = get(regions, curRegionId)
   const isNodata =
-    isEqual(get(curRegion, 'filter') === { offset: 0, limit: 10 }) &&
+    isEqual(get(curRegion, 'filter'), { offset: 0, limit: 10 }) &&
     get(curRegion, 'hasMore') === false &&
     get(curRegion, 'total') === 0
 
@@ -105,7 +109,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
   )
 
   const handleTabClick = (tabName) => {
-    setCurTabName(tabName)
+    // setCurTabName(tabName)
     stateStore.set({ curRegionId: tabName })
     if (!get(regions, tabName)) {
       workSpaceStore.fetchData({
@@ -170,11 +174,9 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
   const renderNoWorkSpaces = () => {
     return (
       <div tw="flex mt-4">
-        <Card className={tw`flex-1 mr-4`}>
+        <Card tw="flex-1 mr-4">
           <CardHeader title="最佳实践" />
-          <CardContent
-            className={tw`flex justify-center space-x-2 2xl:space-x-5`}
-          >
+          <CardContent tw="flex justify-center space-x-2 2xl:space-x-5">
             <IconCard
               className="flex-1"
               icon="templet"
@@ -189,11 +191,9 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
             />
           </CardContent>
         </Card>
-        <Card className={tw`w-4/12 leading-5`}>
+        <Card tw="w-4/12 leading-5">
           <CardHeader title="相关产品" />
-          <CardContent
-            className={tw`pb-3 flex justify-center space-x-2 2xl:space-x-5`}
-          >
+          <CardContent tw="pb-3 flex justify-center space-x-2 2xl:space-x-5">
             <IconCard icon="laptop" title="QingMr" layout="vertical" />
             <IconCard icon="laptop" title="MySQL" layout="vertical" />
             <IconCard icon="laptop" title="Hbase" layout="vertical" />
@@ -241,7 +241,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
             <Loading size="large" spinning={loading} delay={150}>
               {regionInfos.length > 0 && (
                 <Tabs
-                  name={curTabName}
+                  // name={curTabName}
                   tabClick={handleTabClick}
                   activeName={curRegionId}
                 >
@@ -254,7 +254,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
                       <SpaceLists
                         tw="px-5 py-3"
                         region={regionInfo}
-                        isCurrent={regionInfo.id === curRegionId}
+                        // isCurrent={regionInfo.id === curRegionId}
                         // scrollParent={scrollParentRef.current}
                       />
                     </TabPanel>
@@ -274,15 +274,6 @@ const WorkSpace = ({ isModal, onSpaceSelected }) => {
       </div>
     </WorkSpaceContext.Provider>
   )
-}
-
-WorkSpace.propTypes = {
-  isModal: PropTypes.bool,
-  onSpaceSelected: PropTypes.func,
-}
-
-WorkSpace.defaultProps = {
-  onSpaceSelected: () => {},
 }
 
 export default observer(WorkSpace)

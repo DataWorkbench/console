@@ -3,6 +3,16 @@ import PropTypes from 'prop-types'
 import produce from 'immer'
 import tw from 'twin.macro'
 
+interface TabsProps {
+  rootClassName?: string
+  panelClassName?: string
+  className?: string
+  activeName: string
+  more?: React.ReactElement
+  tabClick?: any
+  children?: any
+}
+
 export default function Tabs({
   rootClassName,
   panelClassName,
@@ -11,7 +21,7 @@ export default function Tabs({
   more,
   tabClick,
   children,
-}) {
+}: TabsProps) {
   const [curPanelName, setCurPanelName] = useState(activeName)
   const [panelNames, setPanelNames] = useState(() => {
     if (activeName) {
@@ -38,7 +48,7 @@ export default function Tabs({
   }, [activeName, activeCurTab])
 
   const handleTabClick = (name) => {
-    activeCurTab(name, panelNames)
+    activeCurTab(name)
     tabClick(name)
   }
 
@@ -49,7 +59,7 @@ export default function Tabs({
         css={[tw`border-neut-3 border-b flex pl-5 align-middle`]}
       >
         <div tw="flex border-r border-neut-3">
-          {React.Children.map(children, (child) => {
+          {React.Children.map(children, (child: any) => {
             const { label, name } = child.props
             return (
               <div
@@ -77,7 +87,7 @@ export default function Tabs({
         </div>
         <div tw="flex items-center">{more}</div>
       </div>
-      {React.Children.map(children, (child) => {
+      {React.Children.map(children, (child: any) => {
         const chidName = child.props.name
         return (
           <div css={[panelClassName, curPanelName !== chidName && tw`hidden`]}>

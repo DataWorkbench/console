@@ -1,16 +1,14 @@
-import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
-import { get } from 'lodash'
-import Card, { CardHeader, CardContent, IconCard } from 'components/Card'
+import { get } from 'lodash-es'
+import { styled, theme } from 'twin.macro'
+import { FlexBox, Card, CardHeader, CardContent, IconCard } from 'components'
 import { useStore } from 'stores'
 import SpaceListModal from './SpaceListModal'
 import Services from './Services'
 import PlatformFeat from './PlatformFeat/PlatformFeat'
 import FAQ from './FAQ'
 import Practice from './Practice'
-// import IconCard from './IconCard'
-// import { IconCard } from 'components/Card'
 
 function getTabs() {
   return [
@@ -29,22 +27,30 @@ function getTabs() {
   ]
 }
 
+const Wrapper = styled.div`
+  & > div {
+    margin-bottom: ${theme('margin.4')};
+  }
+`
+
 function Overview() {
   const {
     overViewStore: { showSpaceModal },
   } = useStore()
 
   return (
-    <div tw="p-5 h-full">
+    <Wrapper>
       <PageTab tabs={getTabs()} />
       <Services />
-      <div tw="flex">
-        <PlatformFeat tw="flex-1 mr-4" />
+      <FlexBox>
+        <FlexBox flex="1" tw="mr-4">
+          <PlatformFeat />
+        </FlexBox>
         <FAQ tw="w-4/12 2xl:w-[360px]" />
-      </div>
-      <div tw="flex">
+      </FlexBox>
+      <FlexBox>
         <Practice tw="flex-1 mr-4" />
-        <Card tw="w-4/12 leading-5 2xl:w-[360px]">
+        <Card tw="w-4/12 2xl:w-[360px]">
           <CardHeader title="视频介绍" />
           <CardContent>
             <IconCard
@@ -54,9 +60,9 @@ function Overview() {
             />
           </CardContent>
         </Card>
-      </div>
+      </FlexBox>
       {showSpaceModal && <SpaceListModal />}
-    </div>
+    </Wrapper>
   )
 }
 

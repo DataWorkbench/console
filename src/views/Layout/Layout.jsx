@@ -1,9 +1,9 @@
-import React from 'react'
 import { useRouteMatch } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { flattenDeep } from 'lodash'
+import { flattenDeep } from 'lodash-es'
 import { GlobalNav, SideMenu } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
+import { FlexBox, ContentBox } from 'components'
 import { useStore } from 'stores'
 
 const getLinks = (items) => {
@@ -21,15 +21,15 @@ const MainLayout = ({ children }) => {
 
   const match = useRouteMatch(flattenDeep(getLinks(menus)))
   return (
-    <div tw="bg-neut-2 flex flex-col h-screen">
+    <FlexBox orient="column" tw="h-screen bg-neut-2">
       <GlobalNav />
-      <div tw="flex flex-1 overflow-y-auto">
+      <FlexBox flex="1" tw="overflow-y-auto">
         {match && (
           <SideMenu title={title} menus={menus} relationMenus={relationMenus} />
         )}
-        <div tw="flex-1 overflow-y-auto">{children}</div>
-      </div>
-    </div>
+        <ContentBox tw="flex-1 overflow-y-auto">{children}</ContentBox>
+      </FlexBox>
+    </FlexBox>
   )
 }
 MainLayout.propTypes = {

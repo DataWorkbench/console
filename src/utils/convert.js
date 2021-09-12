@@ -1,4 +1,4 @@
-import { mapValues, isPlainObject, has, isArray, keys } from 'lodash'
+import { mapValues, isPlainObject, has, isArray, keys } from 'lodash-es'
 import dayjs from 'dayjs'
 
 function parseI18n(obj, lang) {

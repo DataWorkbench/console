@@ -7,13 +7,27 @@ import DataSourceStore from 'stores/DataSourceStore'
 import WorkFlowStore from 'stores/WorkFlowStore'
 import SpaceStore from 'stores/SpaceStore'
 
-import api from './api'
+import api, { API } from './api'
 
 configure({
   enforceActions: 'always',
 })
 
 class RootStore {
+  overViewStore: OverViewStore
+
+  globalStore: GlobalStore
+
+  workSpaceStore: WorkSpaceStore
+
+  dataSourceStore: DataSourceStore
+
+  workFlowStore: WorkFlowStore
+
+  spaceStore: SpaceStore
+
+  api: API
+
   constructor() {
     this.overViewStore = new OverViewStore(this)
     this.globalStore = new GlobalStore(this)
@@ -26,5 +40,5 @@ class RootStore {
 }
 
 export const StoreContext = createContext(null)
-export const useStore = () => useContext(StoreContext)
+export const useStore = (): RootStore => useContext(StoreContext)
 export default RootStore

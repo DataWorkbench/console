@@ -1,6 +1,6 @@
 import React from 'react'
 // import InfiniteScroll from 'react-infinite-scroller'
-import { get } from 'lodash'
+import { get } from 'lodash-es'
 // import { useMount } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import PropTypes from 'prop-types'
@@ -81,7 +81,7 @@ function SpaceCardView({ regionId }) {
         <div tw="flex justify-center w-full my-7">
           <div tw="text-center text-neut-8">
             <Icon name="display" size={56} tw="mb-2" />
-            <div>{getText('LEGO_UI_NO_AVAILABLE_DATA')}</div>
+            <div>{window.getText('LEGO_UI_NO_AVAILABLE_DATA')}</div>
           </div>
         </div>
       )}

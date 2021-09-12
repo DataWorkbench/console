@@ -1,6 +1,6 @@
 import axios from 'axios'
 import Cookies from 'js-cookie'
-import { get, isFunction } from 'lodash'
+import { get, isFunction } from 'lodash-es'
 import emitter from 'utils/emitter'
 
 const baseConfig = {
