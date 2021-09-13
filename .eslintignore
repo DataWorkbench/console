@@ -1,0 +1,5 @@
+configs/
+node_modules/
+dist/
+webpack.config.js
+tailwind.config.js

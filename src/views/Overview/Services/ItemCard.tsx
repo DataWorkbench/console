@@ -1,13 +1,16 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import { FC } from 'react'
+import { Center } from 'components'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
 
-const propTypes = {
-  item: PropTypes.object,
+interface ItemCardTypes {
+  item: {
+    [propName: string]: any
+  }
 }
 
-function ItemCard({ item: { name, icon, text, desc, enabled, moreLink } }) {
+const ItemCard: FC<ItemCardTypes> = ({ item }) => {
+  const { name, icon, text, desc, enabled, moreLink } = item
   const { overViewStore } = useStore()
   const handleClick = () => {
     overViewStore.set({
@@ -17,10 +20,10 @@ function ItemCard({ item: { name, icon, text, desc, enabled, moreLink } }) {
   }
   return (
     <div tw="h-full bg-white border-neut-1 shadow flex flex-col">
-      <div tw="border-t-4 border-green-11 bg-neut-1 py-4 flex items-center justify-center">
+      <Center tw="border-t-4 border-green-11 bg-neut-1 py-4">
         <Icon name={icon} />
         <span tw="ml-2">{text}</span>
-      </div>
+      </Center>
       <div tw="flex-1 font-normal text-neut-8 text-xs text-left pt-4 px-3">
         {desc}
         {moreLink && (
@@ -29,7 +32,7 @@ function ItemCard({ item: { name, icon, text, desc, enabled, moreLink } }) {
           </a>
         )}
       </div>
-      <div tw="pb-5 text-center ">
+      <Center tw="pb-5">
         <Button
           type={enabled ? 'outlined' : 'default'}
           disabled={!enabled}
@@ -38,11 +41,9 @@ function ItemCard({ item: { name, icon, text, desc, enabled, moreLink } }) {
         >
           {enabled ? '开始使用' : '敬请期待'}
         </Button>
-      </div>
+      </Center>
     </div>
   )
 }
-
-ItemCard.propTypes = propTypes
 
 export default ItemCard

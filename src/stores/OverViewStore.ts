@@ -1,6 +1,8 @@
 import { makeObservable, observable, set, action } from 'mobx'
 
 class OverViewStore {
+  rootStore
+
   showSpaceModal = false
 
   curItemName

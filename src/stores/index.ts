@@ -42,3 +42,4 @@ class RootStore {
 export const StoreContext = createContext(null)
 export const useStore = (): RootStore => useContext(StoreContext)
 export default RootStore
+export type RootStoreType = RootStore

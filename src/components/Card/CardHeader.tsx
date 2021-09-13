@@ -1,12 +1,14 @@
-import React from 'react'
+import React, { FC } from 'react'
 import tw from 'twin.macro'
 
 interface CardHeaderProps {
   className?: string
-  title: string
+  title: React.ReactNode
   subtitle?: string
   hasPrex?: boolean
-  classes?: any
+  classes?: {
+    subtitle?: string
+  }
 }
 
 const Root = tw.div`pt-5 pb-3`
@@ -15,14 +17,13 @@ const HeaderPrex = tw.div`h-4 w-1 bg-neut-16`
 const Title = tw.div`pl-5`
 const SubTitle = tw.div`text-xs mt-1 text-neut-8 pl-5`
 
-const CardHeader = ({
-  className,
+const CardHeader: FC<CardHeaderProps> = ({
   title,
   subtitle,
-  classes,
-  hasPrex,
+  classes = {},
+  hasPrex = true,
   ...restProps
-}: CardHeaderProps) => {
+}) => {
   return (
     <Root {...restProps}>
       <TitleWrapper>
@@ -32,11 +33,6 @@ const CardHeader = ({
       {subtitle && <SubTitle className={classes.subtitle}>{subtitle}</SubTitle>}
     </Root>
   )
-}
-
-CardHeader.defaultProps = {
-  classes: {},
-  hasPrex: true,
 }
 
 export default CardHeader

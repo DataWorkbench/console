@@ -1,8 +1,11 @@
 import React from 'react'
-import Card, { CardHeader, CardContent, IconCard } from 'components/Card'
-import PropTypes from 'prop-types'
+import { Card, CardHeader, CardContent, IconCard } from 'components'
 
-const Practice = ({ className }) => {
+interface Props {
+  className?: string
+}
+
+const Practice: React.FC<Props> = ({ className }) => {
   return (
     <Card className={className}>
       <CardHeader title="最佳实践" />
@@ -24,10 +27,6 @@ const Practice = ({ className }) => {
       </CardContent>
     </Card>
   )
-}
-
-Practice.propTypes = {
-  className: PropTypes.string,
 }
 
 export default Practice

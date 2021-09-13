@@ -1,7 +1,7 @@
 export {}
 declare global {
   interface Window {
-    getText: any
-    USER: any
+    getText(text: string): string
+    USER: Record<string, unknown>
   }
 }

@@ -1,8 +1,8 @@
 {
-  "include": ["src/**/*", "types"],
-  "exclude": ["node_modules", "dist"],
+  "include": ["./**/*", "./**/.*"],
+  "exclude": ["node_modules", "dist", "configs"],
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "CommonJS",
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
     "jsx": "preserve",
@@ -11,9 +11,10 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "Node",
+    "esModuleInterop": true,
     "noErrorTruncation": true,
-    "allowJs": true,
-    "checkJs": true,
+    // "allowJs": true,
+    // "checkJs": true,
     "baseUrl": "./src",
     "paths": {
       "components/*": ["components/*"],

@@ -96,6 +96,7 @@
     "core-js": "^3.13.1",
     "dayjs": "^1.10.6",
     "echarts": "^5.1.2",
+    "framer-motion": "^4.1.17",
     "immer": "^9.0.5",
     "js-cookie": "^2.2.1",
     "jsplumb": "^2.15.6",
