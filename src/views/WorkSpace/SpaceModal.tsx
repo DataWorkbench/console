@@ -1,5 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { FC, useRef, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw from 'twin.macro'
 import { RadioButton, Form, Input, Button, Modal } from '@QCFE/lego-ui'
@@ -80,10 +79,19 @@ const columns = [
   },
 ]
 
-function SpaceModal({ region, onHide, ...otherProps }) {
+interface IProps {
+  region: {
+    id: string
+    name: string
+  }
+  onHide: (v: boolean) => void
+  [propName: string]: unknown
+}
+
+const SpaceModal: FC<IProps> = ({ region, onHide, ...otherProps }) => {
   const stateStore = useWorkSpaceContext()
   const [delBtnEnable, setDelBtnEnable] = useState(true)
-  const { curSpaceOpt, optSpaces } = stateStore
+  const { curSpaceOpt, optSpaces, cardView } = stateStore
   const curSpace = optSpaces.length ? optSpaces[0] : null
   const form = useRef(null)
   const {
@@ -108,7 +116,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
     setDelBtnEnable(stateStore.curSpaceOpt !== 'delete')
   }, [stateStore.curSpaceOpt])
 
-  const handleModalClose = (v) => {
+  const handleModalClose = (v: boolean) => {
     setDelBtnEnable(true)
     onHide(v)
   }
@@ -117,9 +125,15 @@ function SpaceModal({ region, onHide, ...otherProps }) {
     if (form.current.validateForm()) {
       const fields = form.current.getFieldsValue()
       if (curSpaceOpt === 'create') {
-        workSpaceStore
-          .create({ ...fields, regionId })
-          .then(() => handleModalClose(true))
+        workSpaceStore.create({ ...fields, regionId }).then(() => {
+          handleModalClose(true)
+          workSpaceStore.fetchData({
+            regionId,
+            cardView,
+            offset: 0,
+            reload: cardView,
+          })
+        })
       } else {
         workSpaceStore
           .update({
@@ -216,7 +230,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
         footer={
           <>
             <Button type="defalut" onClick={() => handleModalClose(false)}>
-              {getText('LEGO_UI_CANCEL')}
+              {window.getText('LEGO_UI_CANCEL')}
             </Button>
             <Button
               type={style.okType}
@@ -224,7 +238,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
               loading={fetchPromise?.state === 'pending'}
               onClick={handleConfirm}
             >
-              {getText('LEGO_UI_OK')}
+              {window.getText('LEGO_UI_OK')}
             </Button>
           </>
         }
@@ -264,7 +278,7 @@ function SpaceModal({ region, onHide, ...otherProps }) {
           <RadioGroupField name="regionId" label="区域" defaultValue={regionId}>
             <RadioButton value={regionId}>
               <Icon name="zone" />
-              {region.name}
+              {region?.name}
             </RadioButton>
           </RadioGroupField>
           <TextField
@@ -316,13 +330,13 @@ function SpaceModal({ region, onHide, ...otherProps }) {
   )
 }
 
-SpaceModal.propTypes = {
-  onHide: PropTypes.func,
-  region: PropTypes.object,
-  className: PropTypes.string,
-}
-SpaceModal.defaultProps = {
-  onHide() {},
-}
+// SpaceModal.propTypes = {
+//   onHide: PropTypes.func,
+//   region: PropTypes.object,
+//   className: PropTypes.string,
+// }
+// SpaceModal.defaultProps = {
+//   onHide() {},
+// }
 
 export default observer(SpaceModal)

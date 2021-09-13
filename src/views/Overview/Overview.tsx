@@ -39,7 +39,7 @@ function Overview() {
   } = useStore()
 
   return (
-    <Wrapper>
+    <Wrapper tw="p-5">
       <PageTab tabs={getTabs()} />
       <Services />
       <FlexBox>

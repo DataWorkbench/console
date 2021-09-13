@@ -21,7 +21,7 @@ const FlexBox = styled.div(({ orient, flex }: FlexBoxProps) => [
   () => flex && flexVariants[flex],
 ])
 
-const ContentBox = styled.div(() => [tw`p-5 h-full`])
+const ContentBox = styled.div(() => [tw`h-full`])
 
 export { FlexBox, ContentBox }
 

@@ -3,7 +3,7 @@ import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useLifecycles, useToggle } from 'react-use'
 import { get, isEqual, throttle } from 'lodash-es'
-import tw from 'twin.macro'
+import tw, { styled } from 'twin.macro'
 import {
   PageTab,
   Loading,
@@ -12,7 +12,7 @@ import {
   InputSearch,
 } from '@QCFE/qingcloud-portal-ui'
 import { Control } from '@QCFE/lego-ui'
-import Card, { CardHeader, CardContent, IconCard } from 'components/Card'
+import { Card, CardHeader, CardContent, IconCard } from 'components'
 import Tabs, { TabPanel } from 'components/Tabs'
 import { useStore } from 'stores'
 import { WorkSpaceContext } from 'contexts'
@@ -34,6 +34,17 @@ interface WorkSpaceProps {
   isModal: boolean
   onSpaceSelected: any
 }
+
+const Wrapper = styled('div')<{ isModal: boolean }>(({ isModal }) => [
+  tw`h-full overflow-auto`,
+  !isModal && tw`p-5`,
+])
+
+const Content = styled(Card)(({ showLoading, isModal }) => [
+  tw`pt-5 relative`,
+  showLoading && tw`h-80`,
+  isModal && tw`shadow-none mb-0`,
+])
 
 const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
   // const [curTabName, setCurTabName] = useState(null)
@@ -205,65 +216,53 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
 
   return (
     <WorkSpaceContext.Provider value={stateStore}>
-      <div
-        css={[tw`text-xs h-full overflow-auto`, isModal ? '' : tw`p-5`]}
-        onScroll={handleScroll}
-        // ref={(el) => stateStore.set({ scrollElem: el })}
-        ref={scrollParentRef}
-      >
-        <div tw="pb-0!">
-          {!isModal && <PageTab tabs={tabs} />}
-          <Card
-            css={[
-              tw`pt-5 relative`,
-              loading && tw`h-80`,
-              isModal && tw`shadow-none mb-0`,
-            ]}
-          >
-            {isModal && (
-              <div tw="absolute top-6 right-5 flex space-x-2 z-10">
-                <Button type="icon" onClick={reloadSpace}>
-                  <Icon name="if-refresh" tw="text-xl" />
-                </Button>
-                <Control className="has-icons-left has-icons-right">
-                  <i className="icon is-left if-magnifier" />
-                  <InputSearch
-                    type="text"
-                    placeholder="工作空间、ID、角色"
-                    name="search"
-                    onPressEnter={(e) => handleQuery(e.target.value)}
-                    tw="w-52 rounded-2xl"
-                    onClear={() => handleQuery('')}
-                  />
-                </Control>
-              </div>
+      <Wrapper isModal={isModal} onScroll={handleScroll} ref={scrollParentRef}>
+        {!isModal && <PageTab tabs={tabs} />}
+
+        <Content showLoading={loading} isModal={isModal}>
+          {isModal && (
+            <div tw="absolute top-6 right-5 flex space-x-2 z-10">
+              <Button type="icon" onClick={reloadSpace}>
+                <Icon name="if-refresh" tw="text-xl" />
+              </Button>
+              <Control className="has-icons-left has-icons-right">
+                <i className="icon is-left if-magnifier" />
+                <InputSearch
+                  type="text"
+                  placeholder="工作空间、ID、角色"
+                  name="search"
+                  onPressEnter={(e) => handleQuery(e.target.value)}
+                  tw="w-52 rounded-2xl"
+                  onClear={() => handleQuery('')}
+                />
+              </Control>
+            </div>
+          )}
+          <Loading size="large" spinning={loading} delay={150}>
+            {regionInfos.length > 0 && (
+              <Tabs
+                // name={curTabName}
+                tabClick={handleTabClick}
+                activeName={curRegionId}
+              >
+                {regionInfos.map((regionInfo) => (
+                  <TabPanel
+                    key={regionInfo.id}
+                    label={regionInfo.name}
+                    name={regionInfo.id}
+                  >
+                    <SpaceLists
+                      region={regionInfo}
+                      // isCurrent={regionInfo.id === curRegionId}
+                      // scrollParent={scrollParentRef.current}
+                    />
+                  </TabPanel>
+                ))}
+              </Tabs>
             )}
-            <Loading size="large" spinning={loading} delay={150}>
-              {regionInfos.length > 0 && (
-                <Tabs
-                  // name={curTabName}
-                  tabClick={handleTabClick}
-                  activeName={curRegionId}
-                >
-                  {regionInfos.map((regionInfo) => (
-                    <TabPanel
-                      key={regionInfo.id}
-                      label={regionInfo.name}
-                      name={regionInfo.id}
-                    >
-                      <SpaceLists
-                        tw="px-5 py-3"
-                        region={regionInfo}
-                        // isCurrent={regionInfo.id === curRegionId}
-                        // scrollParent={scrollParentRef.current}
-                      />
-                    </TabPanel>
-                  ))}
-                </Tabs>
-              )}
-            </Loading>
-          </Card>
-        </div>
+          </Loading>
+        </Content>
+
         {!isModal && isNodata && renderNoWorkSpaces()}
         {stateStore.curSpaceOpt !== '' && (
           <SpaceModal
@@ -271,7 +270,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
             onHide={handleHide}
           />
         )}
-      </div>
+      </Wrapper>
     </WorkSpaceContext.Provider>
   )
 }

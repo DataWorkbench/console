@@ -1,15 +1,23 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { get, isEqual } from 'lodash-es'
 import { useWorkSpaceContext } from 'contexts'
 import { useStore } from 'stores'
+import { Box } from 'components'
 import SpaceTableView from './SpaceTableView'
 import SpaceListsEmpty from './SpaceListsEmpty'
 import SpaceListsToolBar from './SpaceListsToolBar'
 import SpaceCardView from './SpaceCardView'
 
-const SpaceLists = ({ region, className }) => {
+interface SpaceListsProp {
+  region: {
+    id: string
+    [propName: string]: any
+  }
+  className?: string
+}
+
+const SpaceLists: FC<SpaceListsProp> = ({ region }) => {
   const { isModal, cardView, curRegionId } = useWorkSpaceContext()
   const {
     workSpaceStore: { regions },
@@ -25,7 +33,7 @@ const SpaceLists = ({ region, className }) => {
     return <SpaceListsEmpty />
   }
   return (
-    <div className={className}>
+    <Box tw="px-5 py-3">
       {!isModal && <SpaceListsToolBar regionId={region.id} />}
       {isCurrent && (
         <>
@@ -36,13 +44,8 @@ const SpaceLists = ({ region, className }) => {
           )}
         </>
       )}
-    </div>
+    </Box>
   )
-}
-
-SpaceLists.propTypes = {
-  className: PropTypes.string,
-  region: PropTypes.object,
 }
 
 export default observer(SpaceLists)

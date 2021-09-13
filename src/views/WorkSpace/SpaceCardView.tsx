@@ -1,79 +1,60 @@
-import React from 'react'
-// import InfiniteScroll from 'react-infinite-scroller'
+import { FC } from 'react'
 import { get } from 'lodash-es'
-// import { useMount } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import PropTypes from 'prop-types'
 import { Loading, Icon } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
-import tw, { css } from 'twin.macro'
+import tw, { css, styled, theme } from 'twin.macro'
 import SpaceItem from './SpaceItem'
-// import styles from './styles.module.css'
+
 const itemVars = {
   backColors: ['#b3e7d6', '#f2c0c3', '#cfafe9', '#b8def9', '#fbdeb4'],
   fontColors: ['#2fb788', '#d44e4b', '#934bc5', '#229ce9', '#f59c2a'],
 }
-const styles = {
-  item: (i) => css`
-    border-top-color: ${itemVars.backColors[i]};
-    .profile {
-      background-color: #b8def9;
-      color: #229ce9;
+
+const Content = styled('div')(() => [
+  tw`grid grid-cols-2 flex-wrap 2xl:gap-x-4 gap-x-2`,
+  css`
+    & > div {
+      margin-bottom: ${theme('margin.4')};
     }
   `,
+])
+
+const SpaceItemWrapper = styled(SpaceItem)<{ idx: number }>(({ idx }) => [
+  css`
+    border-top-color: ${itemVars.backColors[idx]};
+    .profile {
+      background-color: ${itemVars.backColors[idx]};
+      color: ${itemVars.fontColors[idx]};
+    }
+  `,
+])
+
+interface IProps {
+  regionId: string | number
 }
 
-function SpaceCardView({ regionId }) {
+const SpaceCardView: FC<IProps> = ({ regionId }) => {
   const {
-    // workSpaceStore,
     workSpaceStore: { regions },
   } = useStore()
   const curRegion = regions[regionId]
   const workspaces = get(curRegion, 'workspaces', [])
   const isFetch = get(curRegion, 'fetchPromise.state') === 'pending'
-  // console.log('isFetch', isFetch)
-  // useMount(() => {
-  //   workSpaceStore.fetchData({
-  //     regionId,
-  //     cardView: true,
-  //     force: true,
-  //     offset: 0,
-  //   })
-  // })
 
-  // const loadFunc = async () => {
-  //   workSpaceStore.fetchData({
-  //     regionId,
-  //     cardView: true,
-  //   })
-  // }
   return (
-    // <InfiniteScroll
-    //   pageStart={0}
-    //   loadMore={loadFunc}
-    //   initialLoad={false}
-    //   hasMore={get(curRegion, 'hasMore', true)}
-    //   loader={
-    //     <div key={0} className="h-40">
-    //       <Loading size="medium" />
-    //     </div>
-    //   }
-    //   useWindow={false}
-    //   getScrollParent={() => scrollParent}
-    // >
-    // </InfiniteScroll>
     <>
-      <div tw="grid grid-cols-2 flex-wrap 2xl:gap-x-4 gap-x-2">
-        {workspaces.map((space, i) => (
-          <SpaceItem
+      <Content>
+        {workspaces.map((space, i: number) => (
+          <SpaceItemWrapper
             key={space.id}
             regionId={regionId}
             space={space}
-            css={styles.item(i)}
-            // className={styles[`ws_${i % 5}`]}
+            idx={i}
           />
         ))}
-      </div>
+      </Content>
       <div css={[tw`h-40`, !isFetch && tw`hidden`]}>
         <Loading size="medium" />
       </div>
@@ -91,7 +72,6 @@ function SpaceCardView({ regionId }) {
 
 SpaceCardView.propTypes = {
   regionId: PropTypes.string,
-  // scrollParent: PropTypes.object,
 }
 
 export default observer(SpaceCardView)
