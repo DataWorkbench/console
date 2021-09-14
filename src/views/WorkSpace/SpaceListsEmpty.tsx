@@ -1,10 +1,10 @@
-import React from 'react'
+import { FC } from 'react'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
-import Guide from 'components/Guide'
+import { Guide, GuideProps } from 'components'
 
-const guideData = {
+const guideData: GuideProps = {
   title: '使用指引',
   items: [
     {
@@ -25,7 +25,7 @@ const guideData = {
   ],
 }
 
-function SpaceListsEmpty() {
+export const SpaceListsEmpty: FC = () => {
   const { isModal } = useWorkSpaceContext()
   return (
     <div>
@@ -49,13 +49,7 @@ function SpaceListsEmpty() {
             </div>
           </div>
         </div>
-        {!isModal && (
-          <Guide
-            tw="mt-10 mx-8 2xl:mx-10"
-            title={guideData.title}
-            items={guideData.items}
-          />
-        )}
+        {!isModal && <Guide title={guideData.title} items={guideData.items} />}
       </div>
     </div>
   )

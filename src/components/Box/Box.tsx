@@ -1,7 +1,5 @@
 import tw, { styled } from 'twin.macro'
 
-const Box = tw.div``
-
 const flexVariants = {
   1: tw`flex-1`,
   auto: tw`flex-auto`,
@@ -9,11 +7,12 @@ const flexVariants = {
   none: tw`flex-none`,
 }
 
-interface FlexBoxProps {
+export interface FlexBoxProps {
   orient?: 'row' | 'column'
   flex?: '1' | 'auto' | 'initial' | 'none'
 }
 
+const Box = tw.div``
 const FlexBox = styled.div(({ orient, flex }: FlexBoxProps) => [
   tw`flex`,
   orient === 'row' && tw`flex-row`,
@@ -23,6 +22,4 @@ const FlexBox = styled.div(({ orient, flex }: FlexBoxProps) => [
 
 const ContentBox = styled.div(() => [tw`h-full`])
 
-export { FlexBox, ContentBox }
-
-export default Box
+export { Box, FlexBox, ContentBox }

@@ -5,7 +5,7 @@ import { useWorkSpaceContext } from 'contexts'
 import { useStore } from 'stores'
 import { Box } from 'components'
 import SpaceTableView from './SpaceTableView'
-import SpaceListsEmpty from './SpaceListsEmpty'
+import { SpaceListsEmpty } from './SpaceListsEmpty'
 import SpaceListsToolBar from './SpaceListsToolBar'
 import SpaceCardView from './SpaceCardView'
 
@@ -24,7 +24,7 @@ const SpaceLists: FC<SpaceListsProp> = ({ region }) => {
   } = useStore()
   const curRegion = regions[region.id]
   const isCurrent = curRegionId === region.id
-
+  // return <SpaceListsEmpty />
   if (
     isEqual(get(curRegion, 'params'), { offset: 0, limit: 10 }) &&
     get(curRegion, 'hasMore') === false &&

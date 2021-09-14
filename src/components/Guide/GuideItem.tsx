@@ -1,7 +1,13 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import { FC } from 'react'
 
-function GuideItem({ index, title, desc, link }) {
+export interface GuideItemProps {
+  title: string
+  index?: number
+  desc?: string
+  link?: string
+}
+
+export const GuideItem: FC<GuideItemProps> = ({ index, title, desc, link }) => {
   return (
     <div tw="flex-1">
       <div tw="text-base font-medium flex">
@@ -22,12 +28,3 @@ function GuideItem({ index, title, desc, link }) {
     </div>
   )
 }
-
-GuideItem.propTypes = {
-  index: PropTypes.number,
-  title: PropTypes.string,
-  desc: PropTypes.string,
-  link: PropTypes.string,
-}
-
-export default GuideItem

@@ -1,13 +1,39 @@
 import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
-import tw, { css } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import { Tooltip, Radio, Dropdown, Menu, Icon } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import { FlexBox } from 'components'
+import { FlexBox, Center, Box, Card } from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
-import Card from 'components/Card'
 import { useWorkSpaceContext } from 'contexts'
+
+const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
+const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
+const RoleIconWrapper = tw.div`w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1`
+const RowWrapper = tw(Center)`justify-between px-4 mb-3`
+const StateTag = styled('span')(({ status }: { status: number }) => [
+  tw`py-0.5 px-3 rounded-2xl inline-flex items-center`,
+  status === 1
+    ? tw`text-green-11 bg-green-0`
+    : css`
+        color: #a16207;
+        background: #fffded;
+        svg {
+          color: #a48a19;
+          fill: rgba(255, 209, 39, 0.2);
+        }
+      `,
+  status === 1 &&
+    css`
+      svg {
+        color: #00aa72;
+        fill: #dff7ed;
+      }
+    `,
+])
+
+const Disp = tw.div`pt-0.5 h-7`
 
 interface IProps {
   regionId: string | number
@@ -38,63 +64,51 @@ const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
   const renderGrid = () => {
     if (isModal) {
       return (
-        <FlexBox tw="justify-between items-center px-4 mb-3">
-          <div>
+        <RowWrapper>
+          <Box tw="space-x-1">
             <span>我的角色：</span>
-            <span tw="bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block mr-1">
-              {space.owner}
+            <DarkTag>{space.owner}</DarkTag>
+            <GrayTag>运维</GrayTag>
+          </Box>
+          <Box>
+            创建时间：
+            <span tw="text-neut-16">
+              {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
             </span>
-            <span tw="bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block">
-              运维
-            </span>
-          </div>
-          <div>
-            <span>
-              创建时间：
-              <span tw="text-neut-16">
-                {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
-              </span>
-            </span>
-          </div>
-        </FlexBox>
+          </Box>
+        </RowWrapper>
       )
     }
     return (
       <>
-        <div tw="flex justify-between items-center px-4 mb-3">
-          <div>
+        <RowWrapper>
+          <Box tw="space-x-1">
             <span>我的角色：</span>
-            <span tw="bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block mr-1">
-              {space.owner}
-            </span>
-            <span tw="bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block">
-              运维
-            </span>
-          </div>
-          <div tw="flex items-center ">
-            <div>空间成员</div>
-            <div tw="flex items-center">
-              <div tw="w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1">
-                <Icon name="human" size={18} />
-              </div>
-              <div tw="w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mr-1">
-                <Icon name="human" size={18} />
-              </div>
-              <div tw="w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center">
-                <Icon name="human" size={18} />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div tw="flex justify-between px-4 mb-3">
-          <div tw="flex">
+            <DarkTag>{space.owner}</DarkTag>
+            <GrayTag>运维</GrayTag>
+          </Box>
+          <FlexBox>
+            <span>空间成员</span>
+            <RoleIconWrapper>
+              <Icon name="human" size={18} />
+            </RoleIconWrapper>
+            <RoleIconWrapper>
+              <Icon name="human" size={18} />
+            </RoleIconWrapper>
+            <RoleIconWrapper>
+              <Icon name="human" size={18} />
+            </RoleIconWrapper>
+          </FlexBox>
+        </RowWrapper>
+        <RowWrapper>
+          <FlexBox>
             <div tw="w-60 2xl:w-auto overflow-hidden break-all whitespace-nowrap overflow-ellipsis">
               开通引擎：共享Flink、QingMR、Deep Learning
             </div>
             <a href="##" tw="text-link">
               查看
             </a>
-          </div>
+          </FlexBox>
           <div>
             <span>
               创建时间：
@@ -103,7 +117,7 @@ const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
               </span>
             </span>
           </div>
-        </div>
+        </RowWrapper>
       </>
     )
   }
@@ -116,41 +130,27 @@ const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
       ]}
       onClick={handleSelected}
     >
-      <div tw="flex justify-between px-4 pt-5 mb-7 ">
-        <div tw="flex-1 flex">
-          <div
+      <RowWrapper tw="pt-5 mb-7 items-start">
+        <FlexBox tw="space-x-3">
+          <Center
+            size={44}
             className="profile"
-            tw="w-11 h-11 flex justify-center items-center text-base font-medium rounded-sm"
+            tw="text-base font-medium rounded-sm"
           >
             {getShortSpaceName(space.name)}
-          </div>
-          <div tw="ml-3">
-            <div tw="flex items-center">
+          </Center>
+          <Box>
+            <Center>
               <span tw="font-medium text-base text-neut-16">{space.name}</span>
               <span>（{space.id}）</span>
-              <span
-                css={[
-                  tw`py-0.5 px-3 rounded-2xl inline-flex items-center`,
-                  space.status === 1 &&
-                    tw`
-                    text-green-11 bg-green-0
-                    `,
-                  space.status === 1 &&
-                    css`
-                      svg {
-                        color: #00aa72;
-                        fill: #dff7ed;
-                      }
-                    `,
-                ]}
-              >
+              <StateTag status={space.status}>
                 <Icon name="radio" />
                 {space.status === 1 ? '活跃' : '已禁用'}
-              </span>
-            </div>
-            <div tw="pt-1">{space.desc}</div>
-          </div>
-        </div>
+              </StateTag>
+            </Center>
+            <Disp>{space.desc}</Disp>
+          </Box>
+        </FlexBox>
         {!isModal ? (
           <Dropdown
             content={
@@ -179,7 +179,7 @@ const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
         ) : (
           <Radio value={space.id} checked={space.id === curSpaceId} />
         )}
-      </div>
+      </RowWrapper>
       {renderGrid()}
       {!isModal && (
         <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3">

@@ -1,5 +1,14 @@
-import tw from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 
-const Center = tw.div`flex justify-center items-center`
+export interface CenterProps {
+  size?: number
+}
 
-export default Center
+export const Center = styled('div')(({ size }: CenterProps) => [
+  tw`flex justify-center items-center`,
+  size &&
+    css`
+      width: ${size}px;
+      height: ${size}px;
+    `,
+])

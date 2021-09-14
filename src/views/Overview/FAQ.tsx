@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types'
-import Card, { CardHeader, CardContent } from 'components/Card'
+import { FC } from 'react'
+import { Card, CardHeader, CardContent } from 'components'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 
 const questions = [
@@ -11,7 +11,7 @@ const questions = [
   { title: '大数据工作台的计费概述11', link: '' },
 ]
 
-const FAQ = ({ className }) => {
+const FAQ: FC = ({ className }) => {
   return (
     <Card className={className} tw="leading-5">
       <CardHeader title="常见问题" />
@@ -36,10 +36,6 @@ const FAQ = ({ className }) => {
       </CardContent>
     </Card>
   )
-}
-
-FAQ.propTypes = {
-  className: PropTypes.string,
 }
 
 export default FAQ

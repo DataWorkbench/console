@@ -1,14 +1,6 @@
+import { FC } from 'react'
 import tw, { styled } from 'twin.macro'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import Box from 'components/Box'
-
-interface IconCardProps {
-  icon: string
-  title: string
-  subtitle?: string
-  className?: string
-  layout?: 'vertical' | 'horizon'
-}
 
 const Root = styled.div(({ layout }: { layout: string }) => [
   tw`bg-neut-1 cursor-pointer flex items-center  rounded-sm border border-neut-2`,
@@ -26,23 +18,25 @@ const Title = styled.div(({ layout }: { layout: string }) => [
   layout === 'vertical' ? tw`pt-1` : tw`font-medium`,
 ])
 
-const IconCard = (props: IconCardProps) => {
-  const { icon, title, subtitle, layout, className } = props
+export interface IconCardProps {
+  icon: string
+  title: string
+  subtitle?: string
+  className?: string
+  layout?: 'vertical' | 'horizon'
+}
+
+export const IconCard: FC<IconCardProps> = (props) => {
+  const { icon, title, subtitle, layout = 'horizon', className } = props
   return (
     <Root className={`group ${className}`} layout={layout}>
       <IconWrapper layout={layout}>
         <Icon name={icon} type="light" size={28} />
       </IconWrapper>
-      <Box tw="flex-1">
+      <div tw="flex-1">
         <Title layout={layout}>{title}</Title>
-        {subtitle && <Box>{subtitle}</Box>}
-      </Box>
+        {subtitle && <div>{subtitle}</div>}
+      </div>
     </Root>
   )
 }
-
-IconCard.defaultProps = {
-  layout: 'horizon',
-}
-
-export default IconCard

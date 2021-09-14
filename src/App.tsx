@@ -37,7 +37,7 @@ const App = () => {
       service="bigdata"
       isPush={false}
       locales={locales}
-      currentLocale={langMapping[window.USER.lang] || 'zh-CN'}
+      currentLocale={langMapping[window.USER?.lang] || 'zh-CN'}
       handleGlobalData={handleGlobalData}
     >
       <StoreContext.Provider value={store}>

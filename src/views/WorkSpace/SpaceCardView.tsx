@@ -51,7 +51,7 @@ const SpaceCardView: FC<IProps> = ({ regionId }) => {
             key={space.id}
             regionId={regionId}
             space={space}
-            idx={i}
+            idx={i % 5}
           />
         ))}
       </Content>
