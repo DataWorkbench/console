@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import SideMenu from 'components/SideMenu'
 import { useStore } from 'stores'
 import RealTime from './RealTime'
+import Resource from './Resource'
 
 function Dm() {
   const { regionId, spaceId, mod } = useParams()
@@ -32,6 +33,7 @@ function Dm() {
       />
       <div tw="flex-1 overflow-y-auto">
         {curFunc.name === 'realtime' && <RealTime />}
+        {curFunc.name === 'resource' && <Resource />}
       </div>
     </div>
   )

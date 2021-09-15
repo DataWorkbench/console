@@ -1,12 +1,12 @@
-import React from 'react'
 import { useParams } from 'react-router-dom'
-// import { SideMenu } from '@QCFE/qingcloud-portal-ui'
 import SideMenu from 'components/SideMenu'
 import { useStore } from 'stores'
+import { ContentBox } from 'components'
 import DataSourceList from './DataSourceList/DataSourceList'
 
-function Upcloud() {
-  const { regionId, spaceId, mod } = useParams()
+const Upcloud = () => {
+  const { regionId, spaceId, mod } =
+    useParams<{ regionId: string; spaceId: string; mod: string }>()
   const {
     workSpaceStore: { funcList },
   } = useStore()
@@ -22,9 +22,11 @@ function Upcloud() {
   return (
     <>
       <SideMenu menus={navMenu} defaultSelectedMenu={curFunc.name} />
-      <div className="flex-1 flex items-stretch overflow-auto">
-        {curFunc.name === 'dsl' && <DataSourceList />}
-      </div>
+      <ContentBox tw="flex-1 overflow-y-auto ">
+        <ContentBox tw="m-5">
+          {curFunc.name === 'dsl' && <DataSourceList />}
+        </ContentBox>
+      </ContentBox>
     </>
   )
 }

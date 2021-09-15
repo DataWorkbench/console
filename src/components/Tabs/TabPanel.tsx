@@ -1,16 +1,12 @@
-/* eslint-disable react/no-unused-prop-types */
-import React from 'react'
-import PropTypes from 'prop-types'
+import { FC } from 'react'
 
-function TabPanel({ className, children }) {
+export interface TabPanelProps {
+  name: string
+  label: string
+  className?: string
+  children: React.ReactNode
+}
+
+export const TabPanel: FC<TabPanelProps> = ({ className, children }) => {
   return <div className={className}>{children}</div>
 }
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  label: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  className: PropTypes.string,
-}
-
-export default TabPanel

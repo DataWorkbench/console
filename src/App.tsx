@@ -8,7 +8,7 @@ import {
 import RootStore, { StoreContext } from 'stores'
 import emitter from 'utils/emitter'
 import locales from './locales'
-import Routes from './routes'
+import Routes from './Routes'
 
 const langMapping = {
   'zh-cn': 'zh-CN',

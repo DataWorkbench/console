@@ -32,7 +32,7 @@ const scheduleTypes = [
   },
 ]
 
-function RealTime() {
+const RealTime = observer(() => {
   const form = useRef(null)
   const { regionId, spaceId } = useParams()
   const [showCreate, toggleCreate] = useToggle(false)
@@ -176,6 +176,6 @@ function RealTime() {
       )}
     </div>
   )
-}
+})
 
-export default observer(RealTime)
+export default RealTime

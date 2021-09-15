@@ -1,5 +1,2 @@
-import Tabs from './Tabs'
-import TabPanel from './TabPanel'
-
-export { TabPanel }
-export default Tabs
+export * from './Tabs'
+export * from './TabPanel'

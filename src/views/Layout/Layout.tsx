@@ -1,5 +1,4 @@
 import { useRouteMatch } from 'react-router-dom'
-import PropTypes from 'prop-types'
 import { flattenDeep } from 'lodash-es'
 import { GlobalNav, SideMenu } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
@@ -12,7 +11,7 @@ const getLinks = (items) => {
   })
 }
 
-const MainLayout = ({ children }) => {
+const MainLayout = observer(({ children }) => {
   const {
     globalStore: {
       menuInfo: { title, menus, relationMenus },
@@ -31,9 +30,6 @@ const MainLayout = ({ children }) => {
       </FlexBox>
     </FlexBox>
   )
-}
-MainLayout.propTypes = {
-  children: PropTypes.object,
-}
+})
 
-export default observer(MainLayout)
+export default MainLayout

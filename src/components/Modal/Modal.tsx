@@ -1,30 +1,47 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { useUnmount, useToggle } from 'react-use'
 import tw from 'twin.macro'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import useScrollBlock from 'hooks/useScrollBlock'
 
+interface ModalProps {
+  placement?: string
+  title?: string
+  closable?: boolean
+  show?: boolean
+  okText?: string
+  cancelText?: string
+  onOK?: () => void
+  onHide?: (hide: boolean) => void
+  closeOnOverlayClick?: boolean
+  footer?: React.ReactNode
+  children: React.ReactNode
+  rootClassName?: string
+  contentClassName?: string
+  darkMode?: boolean
+  showConfirmLoading?: boolean
+}
+
 const Modal = ({
-  placement,
-  title,
-  closable,
-  okText,
-  cancelText,
-  show,
+  placement = 'rightFull',
+  title = '',
+  closable = true,
+  okText = '确定',
+  cancelText = '取消',
+  show = true,
   children,
-  onOK,
-  // onCancel,
-  onHide,
-  showConfirmLoading,
-  closeOnOverlayClick,
+  onOK = () => {},
+  onHide = () => {},
+  showConfirmLoading = false,
+  closeOnOverlayClick = true,
   footer,
   rootClassName,
   contentClassName,
   darkMode,
-}) => {
+}: ModalProps) => {
   const [isHide, toggleHide] = useToggle(!show)
   const [blockScroll, allowScroll] = useScrollBlock()
+
   if (show) {
     blockScroll()
   } else {
@@ -97,39 +114,6 @@ const Modal = ({
       </div>
     </div>
   )
-}
-
-Modal.propTypes = {
-  placement: PropTypes.string,
-  title: PropTypes.string,
-  closable: PropTypes.bool,
-  show: PropTypes.bool,
-  okText: PropTypes.string,
-  cancelText: PropTypes.string,
-  onOK: PropTypes.func,
-  // onCancel: PropTypes.func,
-  onHide: PropTypes.func,
-  closeOnOverlayClick: PropTypes.bool,
-  footer: PropTypes.node,
-  children: PropTypes.node,
-  rootClassName: PropTypes.string,
-  contentClassName: PropTypes.string,
-  darkMode: PropTypes.bool,
-  showConfirmLoading: PropTypes.bool,
-}
-
-Modal.defaultProps = {
-  title: '',
-  closable: true,
-  show: true,
-  okText: '确定',
-  cancelText: '取消',
-  onOK() {},
-  // onCancel() {},
-  onHide() {},
-  placement: 'rightFull',
-  closeOnOverlayClick: true,
-  showConfirmLoading: false,
 }
 
 export default Modal

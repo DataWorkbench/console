@@ -1,7 +1,5 @@
-import { FC } from 'react'
 import { get } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
-import PropTypes from 'prop-types'
 import { Loading, Icon } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
 import tw, { css, styled, theme } from 'twin.macro'
@@ -31,11 +29,11 @@ const SpaceItemWrapper = styled(SpaceItem)<{ idx: number }>(({ idx }) => [
   `,
 ])
 
-interface IProps {
+interface SpaceCardViewProps {
   regionId: string | number
 }
 
-const SpaceCardView: FC<IProps> = ({ regionId }) => {
+const SpaceCardView = observer(({ regionId }: SpaceCardViewProps) => {
   const {
     workSpaceStore: { regions },
   } = useStore()
@@ -59,7 +57,7 @@ const SpaceCardView: FC<IProps> = ({ regionId }) => {
         <Loading size="medium" />
       </div>
       {!isFetch && workspaces.length === 0 && (
-        <div tw="flex justify-center w-full my-7">
+        <div tw="flex justify-center w-full my-20">
           <div tw="text-center text-neut-8">
             <Icon name="display" size={56} tw="mb-2" />
             <div>{window.getText('LEGO_UI_NO_AVAILABLE_DATA')}</div>
@@ -68,10 +66,6 @@ const SpaceCardView: FC<IProps> = ({ regionId }) => {
       )}
     </>
   )
-}
+})
 
-SpaceCardView.propTypes = {
-  regionId: PropTypes.string,
-}
-
-export default observer(SpaceCardView)
+export default SpaceCardView

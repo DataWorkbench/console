@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useLifecycles, useToggle } from 'react-use'
-import { get, isEqual, throttle } from 'lodash-es'
+import { get, throttle } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
 import {
   PageTab,
@@ -12,12 +12,12 @@ import {
   InputSearch,
 } from '@QCFE/qingcloud-portal-ui'
 import { Control } from '@QCFE/lego-ui'
-import { Card, CardHeader, CardContent, IconCard } from 'components'
-import Tabs, { TabPanel } from 'components/Tabs'
+import { Card, Tabs, TabPanel } from 'components'
 import { useStore } from 'stores'
 import { WorkSpaceContext } from 'contexts'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
+import BestPractice from './BestPractice'
 
 const tabs = [
   {
@@ -30,24 +30,24 @@ const tabs = [
 
 const storageKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
 
-interface WorkSpaceProps {
-  isModal: boolean
-  onSpaceSelected: any
-}
-
 const Wrapper = styled('div')<{ isModal: boolean }>(({ isModal }) => [
   tw`h-full overflow-auto`,
   !isModal && tw`p-5`,
 ])
 
-const Content = styled(Card)(({ showLoading, isModal }) => [
-  tw`pt-5 relative`,
-  showLoading && tw`h-80`,
-  isModal && tw`shadow-none mb-0`,
-])
+const Content = styled(Card)(
+  ({ showLoading, isModal }: { showLoading: boolean; isModal: boolean }) => [
+    tw`pt-5 relative`,
+    showLoading && tw`h-80`,
+    isModal && tw`shadow-none mb-0`,
+  ]
+)
+interface WorkSpaceProps {
+  isModal: boolean
+  onSpaceSelected: any
+}
 
-const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
-  // const [curTabName, setCurTabName] = useState(null)
+const WorkSpace = observer(({ isModal, onSpaceSelected }: WorkSpaceProps) => {
   const [loading, setLoading] = useToggle(true)
   const scrollParentRef = useRef(null)
   const stateStore = useLocalObservable(() => ({
@@ -94,7 +94,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
   const { curRegionId } = stateStore
   const curRegion = get(regions, curRegionId)
   const isNodata =
-    isEqual(get(curRegion, 'filter'), { offset: 0, limit: 10 }) &&
+    get(curRegion, 'params.offset') === 0 &&
     get(curRegion, 'hasMore') === false &&
     get(curRegion, 'total') === 0
 
@@ -120,7 +120,6 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
   )
 
   const handleTabClick = (tabName) => {
-    // setCurTabName(tabName)
     stateStore.set({ curRegionId: tabName })
     if (!get(regions, tabName)) {
       workSpaceStore.fetchData({
@@ -157,14 +156,13 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
 
   const handleQuery = (v) => {
     const { curRegionId: regionId, cardView } = stateStore
-    const params = {
+    workSpaceStore.fetchData({
       regionId,
       cardView,
       force: true,
       search: v,
       offset: 0,
-    }
-    workSpaceStore.fetchData(params)
+    })
   }
 
   const handleScroll = throttle(() => {
@@ -182,43 +180,10 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
     }
   }, 150)
 
-  const renderNoWorkSpaces = () => {
-    return (
-      <div tw="flex mt-4">
-        <Card tw="flex-1 mr-4">
-          <CardHeader title="最佳实践" />
-          <CardContent tw="flex justify-center space-x-2 2xl:space-x-5">
-            <IconCard
-              className="flex-1"
-              icon="templet"
-              title="沧州银行大数据工作台+弹性存储最佳实践"
-              subtitle="通用云上弹性服务器配合大数据处理的最佳实践"
-            />
-            <IconCard
-              icon="templet"
-              className="flex-1"
-              title="大数据工作台流批一体最佳实践"
-              subtitle="通过流批一体的方式，轻量化解决企业数据处理"
-            />
-          </CardContent>
-        </Card>
-        <Card tw="w-4/12 leading-5">
-          <CardHeader title="相关产品" />
-          <CardContent tw="pb-3 flex justify-center space-x-2 2xl:space-x-5">
-            <IconCard icon="laptop" title="QingMr" layout="vertical" />
-            <IconCard icon="laptop" title="MySQL" layout="vertical" />
-            <IconCard icon="laptop" title="Hbase" layout="vertical" />
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
   return (
     <WorkSpaceContext.Provider value={stateStore}>
       <Wrapper isModal={isModal} onScroll={handleScroll} ref={scrollParentRef}>
         {!isModal && <PageTab tabs={tabs} />}
-
         <Content showLoading={loading} isModal={isModal}>
           {isModal && (
             <div tw="absolute top-6 right-5 flex space-x-2 z-10">
@@ -240,22 +205,14 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
           )}
           <Loading size="large" spinning={loading} delay={150}>
             {regionInfos.length > 0 && (
-              <Tabs
-                // name={curTabName}
-                tabClick={handleTabClick}
-                activeName={curRegionId}
-              >
+              <Tabs tabClick={handleTabClick} activeName={curRegionId}>
                 {regionInfos.map((regionInfo) => (
                   <TabPanel
                     key={regionInfo.id}
                     label={regionInfo.name}
                     name={regionInfo.id}
                   >
-                    <SpaceLists
-                      region={regionInfo}
-                      // isCurrent={regionInfo.id === curRegionId}
-                      // scrollParent={scrollParentRef.current}
-                    />
+                    <SpaceLists region={regionInfo} />
                   </TabPanel>
                 ))}
               </Tabs>
@@ -263,7 +220,7 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
           </Loading>
         </Content>
 
-        {!isModal && isNodata && renderNoWorkSpaces()}
+        {!isModal && isNodata && <BestPractice />}
         {stateStore.curSpaceOpt !== '' && (
           <SpaceModal
             region={regionInfos.find((info) => info.id === curRegionId)}
@@ -273,6 +230,6 @@ const WorkSpace = ({ isModal, onSpaceSelected }: WorkSpaceProps) => {
       </Wrapper>
     </WorkSpaceContext.Provider>
   )
-}
+})
 
-export default observer(WorkSpace)
+export default WorkSpace

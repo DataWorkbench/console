@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import PropTypes from 'prop-types'
+import React, { FC, useState, useEffect, useCallback } from 'react'
 import produce from 'immer'
 import tw from 'twin.macro'
 
-interface TabsProps {
+export interface TabsProps {
   rootClassName?: string
   panelClassName?: string
   className?: string
@@ -13,15 +12,15 @@ interface TabsProps {
   children?: any
 }
 
-export default function Tabs({
+export const Tabs: FC<TabsProps> = ({
   rootClassName,
   panelClassName,
   className,
-  activeName,
+  activeName = '',
   more,
-  tabClick,
+  tabClick = () => {},
   children,
-}: TabsProps) {
+}) => {
   const [curPanelName, setCurPanelName] = useState(activeName)
   const [panelNames, setPanelNames] = useState(() => {
     if (activeName) {
@@ -97,19 +96,4 @@ export default function Tabs({
       })}
     </div>
   )
-}
-
-Tabs.propTypes = {
-  children: PropTypes.node,
-  rootClassName: PropTypes.string,
-  panelClassName: PropTypes.string,
-  className: PropTypes.string,
-  activeName: PropTypes.string,
-  tabClick: PropTypes.func,
-  more: PropTypes.node,
-}
-
-Tabs.defaultProps = {
-  activeName: '',
-  tabClick: () => {},
 }

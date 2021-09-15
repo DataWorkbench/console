@@ -92,6 +92,7 @@
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@svgdotjs/svg.js": "^3.0.16",
+    "@types/react-router-dom": "^5.1.9",
     "axios": "^0.21.1",
     "core-js": "^3.13.1",
     "dayjs": "^1.10.6",

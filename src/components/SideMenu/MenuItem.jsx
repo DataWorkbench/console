@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import tw, { css, theme } from 'twin.macro'
 import { useToggle } from 'react-use'
 
@@ -49,12 +49,14 @@ function MenuItem({
   curSelectedMenu,
   onClick,
 }) {
+  const history = useHistory()
   const [expand, toggleExpand] = useToggle(false)
   const handleClick = () => {
     if (items && items.length) {
       toggleExpand()
     } else if (!isSubTitle) {
       onClick(name)
+      history.push(link)
     }
   }
   const isSelected = curSelectedMenu === name
@@ -96,8 +98,8 @@ function MenuItem({
                 {title}
               </div>
             ) : (
-              <Link
-                to={link}
+              <div
+                // to={link}
                 css={[
                   tw`whitespace-nowrap overflow-hidden ml-2 mr-2`,
                   tw`dark:hover:text-white`,
@@ -105,7 +107,7 @@ function MenuItem({
                 ]}
               >
                 {title}
-              </Link>
+              </div>
             )}
           </div>
           {items && <Icon name={expand ? 'caret-up' : 'caret-down'} />}
