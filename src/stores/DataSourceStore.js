@@ -31,7 +31,7 @@ class DataSourceStore {
     const { api } = this.rootStore
     const ret = yield api.datasource.loadEngineMap(params)
     if (ret?.ret_code === 0) {
-      return ret.SourceList
+      return ret.kinds
     }
     return []
   }

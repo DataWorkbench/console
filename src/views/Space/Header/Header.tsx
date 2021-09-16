@@ -38,7 +38,7 @@ export const Header = observer(() => {
   return (
     <Root>
       <Center tw="space-x-3">
-        <BackMenu darkMode={darkMode} />
+        <BackMenu />
         <Center
           size={32}
           tw="text-sm rounded-sm bg-[#cfafe9] text-[#934bc5] font-semibold"
@@ -49,9 +49,9 @@ export const Header = observer(() => {
           darkMode={darkMode}
           defaultValue={spaceId}
           isLoadingAtBottom
-          searchable
+          searchable={false}
           onMenuScrollToBottom={loadData}
-          bottomTextVisible
+          bottomTextVisible={false}
           options={workspaces.map(({ id, name }) => ({
             value: id,
             label: name,

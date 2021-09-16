@@ -31,11 +31,11 @@ class SpaceStore {
   }
 
   *fetchSpaces({ reload, ...params }, options = {}) {
-    if (!this.hasMore || this.fetchPromise?.state === 'pending') {
-      return
-    }
     if (reload) {
       this.reset()
+    }
+    if (!this.hasMore || this.fetchPromise?.state === 'pending') {
+      return
     }
     const {
       rootStore: { api },

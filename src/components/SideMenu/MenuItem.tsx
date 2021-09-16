@@ -1,25 +1,8 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useHistory } from 'react-router-dom'
 import tw, { css, theme } from 'twin.macro'
 import { useToggle } from 'react-use'
-
-const propTypes = {
-  name: PropTypes.string,
-  title: PropTypes.string,
-  icon: PropTypes.string,
-  link: PropTypes.string,
-  isSubTitle: PropTypes.bool,
-  items: PropTypes.array,
-  curSelectedMenu: PropTypes.string,
-  darkMode: PropTypes.bool,
-  onClick: PropTypes.func,
-}
-
-const defaultProps = {
-  onClick() {},
-}
 
 const styles = {
   link: [
@@ -38,17 +21,35 @@ const styles = {
   ],
 }
 
-function MenuItem({
-  name,
-  title,
-  icon,
-  link,
-  isSubTitle,
-  items,
-  darkMode,
-  curSelectedMenu,
-  onClick,
-}) {
+interface Item {
+  name: string
+  title: string
+  icon: string
+}
+
+interface MenuItemProps {
+  name: string
+  title: string
+  icon: string
+  link: string
+  isSubTitle: boolean
+  items: Item[]
+  darkMode: boolean
+  curSelectedMenu: string
+  onClick: (name: string) => void
+}
+
+const MenuItem = ({
+  name = '',
+  title = '',
+  icon = '',
+  link = '',
+  isSubTitle = false,
+  items = [],
+  darkMode = false,
+  curSelectedMenu = '',
+  onClick = () => {},
+}: MenuItemProps) => {
   const history = useHistory()
   const [expand, toggleExpand] = useToggle(false)
   const handleClick = () => {
@@ -110,10 +111,12 @@ function MenuItem({
               </div>
             )}
           </div>
-          {items && <Icon name={expand ? 'caret-up' : 'caret-down'} />}
+          {items.length > 0 && (
+            <Icon name={expand ? 'caret-up' : 'caret-down'} />
+          )}
         </div>
       </div>
-      {items && (
+      {items.length > 0 && (
         <div css={[tw`ml-8 py-2`, !expand && tw`hidden`]}>
           {items.map((item) => (
             <div
@@ -139,6 +142,4 @@ function MenuItem({
   )
 }
 
-MenuItem.propTypes = propTypes
-MenuItem.defaultProps = defaultProps
 export default MenuItem

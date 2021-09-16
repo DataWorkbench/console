@@ -8,7 +8,10 @@ const Header = React.lazy(
 
 export const SpaceLayout = observer(({ children }) => {
   return (
-    <FlexBox orient="column" tw="h-screen bg-neut-2 dark:bg-neut-17">
+    <FlexBox
+      orient="column"
+      tw="h-screen bg-neut-2 dark:bg-neut-17 transition-colors duration-500"
+    >
       <Header />
       <FlexBox flex="1" tw="overflow-y-auto">
         {children}

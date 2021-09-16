@@ -4,7 +4,7 @@ import { Center } from 'components'
 
 export const Root = tw(
   Center
-)`justify-between h-14 shadow-lg bg-white dark:bg-neut-16 dark:text-neut-8`
+)`justify-between h-14 shadow-lg dark:text-neut-8 dark:bg-neut-16 transition-colors duration-500`
 
 export const SelectWrapper = styled(Select)(
   ({ darkMode }: { darkMode: boolean }) => [

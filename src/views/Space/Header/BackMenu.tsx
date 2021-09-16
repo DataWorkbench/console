@@ -1,25 +1,19 @@
 import { useHistory } from 'react-router-dom'
-import tw, { css, styled, theme } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import { Tooltip, Menu } from '@QCFE/lego-ui'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
 import { Center } from 'components'
 
-interface BackMenuProp {
-  darkMode?: boolean
-}
-
-const Root = styled('div')(({ darkMode }: BackMenuProp) => [
-  darkMode &&
-    css`
-      .popper {
-        padding: 1px;
-        background: ${theme('colors.neut.13')};
-        .tooltip-arrow {
-          border-bottom-color: ${theme('colors.neut.13')};
-        }
+const Root = styled('div')(() => [
+  css`
+    .popper {
+      ${tw`p-px dark:(bg-neut-13)`};
+      .tooltip-arrow {
+        ${tw`dark:(border-b-neut-13)`};
       }
-    `,
+    }
+  `,
 ])
 const MenuWrapper = styled(Menu)(() => [
   tw`bg-neut-17 text-xs text-white font-semibold dark:border dark:border-neut-13`,
@@ -32,15 +26,15 @@ const MenuWrapper = styled(Menu)(() => [
     }
     .menu-item,
     .menu-inline-submenu-title {
-      color: ${theme('colors.white')};
+      ${tw`text-white`};
       &:hover {
-        background-color: ${theme('colors.neut.16')};
+        ${tw`bg-neut-16`};
       }
     }
   `,
 ])
 
-export const BackMenu = ({ darkMode }: BackMenuProp) => {
+export const BackMenu = () => {
   const history = useHistory()
   const {
     globalStore: {
@@ -51,10 +45,9 @@ export const BackMenu = ({ darkMode }: BackMenuProp) => {
   const otherMenus = menus.filter((m) => m.name !== 'workspace')
   const handleMenuClick = (e, k) => history.push(`/${k}`)
   return (
-    <Root darkMode={darkMode}>
+    <Root>
       <Tooltip
         trigger="hover"
-        tw="px-0 dark:bg-neut-17"
         placement="bottom"
         content={
           <MenuWrapper mode="inline" onClick={handleMenuClick} width={200}>

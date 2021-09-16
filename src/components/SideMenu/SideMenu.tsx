@@ -1,26 +1,24 @@
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import { useState } from 'react'
 import { useToggle } from 'react-use'
 import tw from 'twin.macro'
 import { Icon } from '@QCFE/qingcloud-portal-ui/lib/components'
 import MenuItem from './MenuItem'
 
-const propTypes = {
-  title: PropTypes.string,
-  menus: PropTypes.array,
-  darkMode: PropTypes.bool,
-  onClick: PropTypes.func,
-  defaultSelectedMenu: PropTypes.string,
+interface SideMenuProps {
+  title: string
+  menus: []
+  darkMode: boolean
+  onClick: (name: string) => void
+  defaultSelectedMenu: string
 }
 
-const defaultProps = {
-  title: '',
-  menus: [],
-  darkMode: false,
-  onClick() {},
-}
-
-function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
+const SideMenu = ({
+  title = '',
+  menus = [],
+  onClick = () => {},
+  darkMode = false,
+  defaultSelectedMenu = '',
+}: SideMenuProps) => {
   const [narrowMode, toggleNarrowMode] = useToggle(false)
   const [curSelectedMenu, setCurSelectedMenu] = useState(defaultSelectedMenu)
   const handleMenuClick = (menuName) => {
@@ -31,13 +29,13 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
   return (
     <div
       css={[
-        tw`relative transition-all`,
+        tw`relative transition-all `,
         narrowMode ? tw`w-14 text-center` : tw`w-56`,
       ]}
     >
       <div
         tw="
-          overflow-auto pt-5  absolute inset-0 flex flex-col shadow-md border-r border-neut-3 dark:bg-neut-17 dark:border-neut-13"
+          overflow-auto pt-5 absolute inset-0 flex flex-col shadow-md border-r border-neut-3  dark:border-neut-13"
       >
         {title && (
           <div
@@ -102,8 +100,5 @@ function SideMenu({ title, menus, onClick, darkMode, defaultSelectedMenu }) {
     </div>
   )
 }
-
-SideMenu.propTypes = propTypes
-SideMenu.defaultProps = defaultProps
 
 export default SideMenu

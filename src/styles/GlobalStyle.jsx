@@ -16,22 +16,16 @@ const customStyles = css`
     --text-primary: #cbd5e1;
     --text-secondary: #fff;
     --color-primary: #2563eb;
-    .input {
-      ${tw`bg-neut-16 text-white border-neut-13`}
-      &:not([readonly]):not([disabled]):hover {
-        ${tw`border-neut-8`}
-      }
-    }
     label {
       ${tw`text-white`};
     }
     a:hover {
       ${tw`text-white`};
     }
-    .select-control {
-      ${tw`bg-neut-16 border-neut-13`}
-      &:hover {
-        ${tw`bg-neut-13`}
+    .input {
+      ${tw`bg-neut-16 text-white border-neut-13`}
+      &:not([readonly]):not([disabled]):hover {
+        ${tw`border-neut-8`}
       }
     }
   }
@@ -39,6 +33,14 @@ const customStyles = css`
     ${tw`text-base`}
   }
 `
+/*   
+.select-control {
+  ${tw`bg-neut-16 border-neut-13`}
+  &:hover {
+    ${tw`bg-neut-13`}
+  }
+}
+*/
 
 const GlobalStyles = () => (
   <>

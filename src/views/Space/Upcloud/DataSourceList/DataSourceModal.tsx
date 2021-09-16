@@ -38,8 +38,9 @@ const stepTexts = ['选择数据库', '配置数据库']
 // ]
 
 function DataSourceModal({ show, onHide }) {
-  const { regionId, spaceId } = useParams()
-  const [dbItems, setDbItems] = useState([])
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const [kinds, setKinds] = useState([])
   const [step, setStep] = useState(0)
   const [dbIndex, setDbIndex] = useState()
   const [loading, toggleLoading] = useToggle(true)
@@ -49,8 +50,8 @@ function DataSourceModal({ show, onHide }) {
   useMount(() => {
     dataSourceStore
       .loadEngineMap({ regionId, spaceId })
-      .then((dbl) => {
-        setDbItems(dbl)
+      .then((items) => {
+        setKinds(items)
         // console.log(engines)
       })
       .catch(() => {
@@ -106,10 +107,10 @@ function DataSourceModal({ show, onHide }) {
               </a>
               进行查看配置
             </p>
-            <DbList items={dbItems} onChange={handleDbSelect} />
+            <DbList items={kinds} onChange={handleDbSelect} />
           </Loading>
         )}
-        {step === 1 && <ConfigForm ref={form} db={dbItems[dbIndex]} />}
+        {step === 1 && <ConfigForm ref={form} db={kinds[dbIndex]} />}
       </ModalContent>
     </Modal>
   )

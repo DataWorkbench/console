@@ -1,6 +1,7 @@
 import { lazy, useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
+import { useDarkMode } from 'hooks'
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
 const Create = lazy(() => import(/* webpackChunkName: "home" */ 'views/Create'))
@@ -28,20 +29,17 @@ const Upcloud = lazy(
 
 const Routes = () => {
   const { globalStore } = useStore()
-  const darkMode = !!useRouteMatch([
+
+  const matched = !!useRouteMatch([
     '/:zone/workspace/:space/dm',
     '/:zone/workspace/:space/ops',
   ])
+  const setDarkMode = useDarkMode()
 
   useEffect(() => {
-    const htm = document.documentElement
-    if (darkMode) {
-      htm.classList.add('dark')
-    } else {
-      htm.classList.remove('dark')
-    }
-    globalStore.set({ darkMode })
-  }, [darkMode, globalStore])
+    setDarkMode(matched)
+    globalStore.set({ darkMode: matched })
+  }, [matched, setDarkMode, globalStore])
 
   return (
     <Switch>

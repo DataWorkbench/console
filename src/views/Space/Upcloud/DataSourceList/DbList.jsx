@@ -9,7 +9,7 @@ const propTypes = {
 
 function DbList({ items, onChange }) {
   return (
-    <div className="flex flex-wrap">
+    <div tw="flex flex-wrap">
       {items.map(({ name, desc, image }, i) => (
         <div key={name} css={[tw`w-1/3 pb-4`, (i + 1) % 3 && tw`pr-4`]}>
           <div
