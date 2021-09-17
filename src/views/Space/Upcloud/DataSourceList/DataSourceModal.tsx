@@ -19,24 +19,6 @@ const defaultProps = {
 
 const stepTexts = ['选择数据库', '配置数据库']
 
-// const dbItems = [
-//   { name: 'MySql', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
-//   {
-//     name: 'PostgreSQL',
-//     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
-//   },
-//   { name: 'Kafka', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
-//   { name: 'S3', disp: '这是一个很长很长很长很长的关于数据源的描述信息。' },
-//   {
-//     name: 'ClickHouse',
-//     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
-//   },
-//   {
-//     name: 'Hbase',
-//     disp: '这是一个很长很长很长很长的关于数据源的描述信息。',
-//   },
-// ]
-
 function DataSourceModal({ show, onHide }) {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()

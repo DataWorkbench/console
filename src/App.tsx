@@ -5,18 +5,18 @@ import {
   Notification as notification,
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
-import RootStore, { StoreContext } from 'stores'
+import { RootStore, StoreContext } from 'stores'
 import emitter from 'utils/emitter'
 import locales from './locales'
 import Routes from './Routes'
 
-const langMapping = {
+const langMapping: { [key: string]: string | undefined } = {
   'zh-cn': 'zh-CN',
   en: 'en-US',
 }
 
 emitter.off('error')
-emitter.on('error', ({ title, content }) =>
+emitter.on('error', ({ title, content }: any) =>
   notification.open({
     title,
     content,

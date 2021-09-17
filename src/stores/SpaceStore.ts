@@ -1,7 +1,12 @@
 import { makeAutoObservable } from 'mobx'
+import type RootStore from './RootStore'
 
 class SpaceStore {
+  rootStore
+
   workspaces = []
+
+  fetchPromise: Promise<unknown> | undefined
 
   page = {
     limit: 10,
@@ -11,9 +16,9 @@ class SpaceStore {
 
   hasMore = true
 
-  cancel = null
+  cancel: null | (() => void) = null
 
-  constructor(rootStore) {
+  constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       cancel: false,
     })
@@ -30,11 +35,11 @@ class SpaceStore {
     }
   }
 
-  *fetchSpaces({ reload, ...params }, options = {}) {
+  *fetchSpaces({ reload, ...params }: { reload: boolean }, options = {}) {
     if (reload) {
       this.reset()
     }
-    if (!this.hasMore || this.fetchPromise?.state === 'pending') {
+    if (!this.hasMore) {
       return
     }
     const {
@@ -46,7 +51,7 @@ class SpaceStore {
     if (cancel !== null) {
       cancel()
     }
-    options.cancel = (c) => {
+    const cancelFn = (c: () => void) => {
       this.cancel = c
     }
 
@@ -57,8 +62,10 @@ class SpaceStore {
       limit,
       ...params,
     }
-    this.fetchPromise = api.workspace.load(newParams, options)
-    const ret = yield this.fetchPromise
+    const ret = yield* api.workspace.load(newParams, {
+      ...options,
+      cancel: cancelFn,
+    })
     if (ret?.ret_code === 0) {
       const { workspaces } = this
       const { infos } = ret

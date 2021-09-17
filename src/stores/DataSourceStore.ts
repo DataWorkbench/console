@@ -1,6 +1,9 @@
 import { makeAutoObservable, set } from 'mobx'
+import type RootStore from './RootStore'
 
 class DataSourceStore {
+  rootStore
+
   sourceList = []
 
   params = {
@@ -8,16 +11,16 @@ class DataSourceStore {
     limit: 10,
   }
 
-  constructor(rootStore) {
+  constructor(rootStore: RootStore) {
     this.rootStore = rootStore
     makeAutoObservable(this, {})
   }
 
-  set(params) {
+  set(params: { [key: string]: any }): void {
     set(this, { ...params })
   }
 
-  clean() {
+  clean(): void {
     set(this, {
       sourceList: [],
       params: {
@@ -27,28 +30,28 @@ class DataSourceStore {
     })
   }
 
-  *loadEngineMap(params) {
+  async loadEngineMap(params: { [key: string]: any }) {
     const { api } = this.rootStore
-    const ret = yield api.datasource.loadEngineMap(params)
+    const ret = await api.datasource.loadEngineMap(params)
     if (ret?.ret_code === 0) {
       return ret.kinds
     }
     return []
   }
 
-  *create(params) {
+  async create(params: { [key: string]: any }): Promise<boolean> {
     const { api } = this.rootStore
-    const ret = yield api.datasource.create(params)
+    const ret = await api.datasource.create(params)
     if (ret?.ret_code === 0) {
       return true
     }
     return false
   }
 
-  *load(params) {
+  *load(params: { [key: string]: any }) {
     const { api } = this.rootStore
     const newParams = { ...this.params, ...params }
-    const ret = yield api.datasource.load(newParams)
+    const ret = yield* api.datasource.load(newParams)
     if (ret?.ret_code === 0) {
       this.sourceList = ret.infos
       return ret.infos

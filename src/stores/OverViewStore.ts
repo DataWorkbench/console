@@ -1,13 +1,14 @@
 import { makeObservable, observable, set, action } from 'mobx'
+import type RootStore from './RootStore'
 
 class OverViewStore {
   rootStore
 
   showSpaceModal = false
 
-  curItemName
+  curItemName = ''
 
-  constructor(rootStore) {
+  constructor(rootStore: RootStore) {
     this.rootStore = rootStore
     makeObservable(this, {
       showSpaceModal: observable,
@@ -87,7 +88,7 @@ class OverViewStore {
     },
   ]
 
-  set(params) {
+  set(params: { [key: string]: any }) {
     set(this, { ...params })
   }
 }

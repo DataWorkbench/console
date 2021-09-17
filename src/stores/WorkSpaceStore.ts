@@ -1,15 +1,30 @@
 import { makeAutoObservable, toJS, set } from 'mobx'
-import { fromPromise } from 'mobx-utils'
+import { fromPromise, IPromiseBasedObservable } from 'mobx-utils'
 import { omitBy } from 'lodash-es'
+import type RootStore from './RootStore'
+
+interface SpaceModel {
+  created?: number
+  desc?: string
+  id: string
+  name: string
+  owner: string
+  status: number
+  updated: number
+}
 
 class WorkSpaceStore {
-  regions = {}
+  rootStore
 
-  cancels = {}
+  regions: {
+    [regionId: string]: { workspaces: SpaceModel[]; [key: string]: any }
+  } = {}
+
+  cancels: { [key: string]: () => void } = {}
 
   curRegionId = null
 
-  fetchPromise
+  fetchPromise: null | IPromiseBasedObservable<any> = null
 
   funcList = [
     {
@@ -54,7 +69,7 @@ class WorkSpaceStore {
     },
   ]
 
-  constructor(rootStore) {
+  constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       cancels: false,
       getRegion: false,
@@ -62,11 +77,11 @@ class WorkSpaceStore {
     this.rootStore = rootStore
   }
 
-  set(params) {
+  set(params: { [key: string]: any }) {
     set(this, { ...params })
   }
 
-  getRegion(regionId, reload) {
+  getRegion(regionId: string, reload: boolean) {
     let region = this.regions[regionId]
     if (!region) {
       region = {
@@ -93,7 +108,7 @@ class WorkSpaceStore {
     return this.regions[regionId]
   }
 
-  *fetchData(params, options = {}) {
+  *fetchData(params: { [key: string]: any }, options = {}) {
     const { cardView, reload, ...otherParams } = params
     const { regionId } = params
     const { api } = this.rootStore
@@ -111,14 +126,16 @@ class WorkSpaceStore {
       (v) => v === ''
     )
     // console.log(newParams)
-    options.cancel = (c) => {
+    const cancelFn = (c: () => void) => {
       this.cancels[regionId] = c
     }
     if (cancel) {
       cancel()
     }
-    region.fetchPromise = fromPromise(api.workspace.load(newParams, options))
-    const ret = yield region.fetchPromise
+    region.fetchPromise = fromPromise(
+      api.workspace.load(newParams, { ...options, cancelFn })
+    )
+    const ret = yield* region.fetchPromise
     if (ret?.ret_code === 0) {
       // if (regionId === 'staging') {
       //   region.hasMore = false
@@ -139,19 +156,22 @@ class WorkSpaceStore {
     }
   }
 
-  *cud(op, params) {
+  *cud(
+    op: 'create' | 'update' | 'enable' | 'disable' | 'delete',
+    params: { [key: string]: any }
+  ) {
     const { api } = this.rootStore
     const workspacesPromise = api.workspace[op](params)
     this.fetchPromise = fromPromise(workspacesPromise)
-    return yield workspacesPromise
+    return yield* workspacesPromise
   }
 
-  *create(params) {
+  *create(params: { [key: string]: any }) {
     yield this.cud('create', params)
   }
 
-  *update(params) {
-    const ret = yield this.cud('update', params)
+  *update(params: { [key: string]: any }) {
+    const ret = yield* this.cud('update', params)
     if (ret?.ret_code === 0) {
       const { regionId, spaceId, name, desc } = params
       const curRegion = this.regions[regionId]
@@ -168,8 +188,8 @@ class WorkSpaceStore {
     }
   }
 
-  *enable(params) {
-    const ret = yield this.cud('enable', params)
+  *enable(params: { [key: string]: any }) {
+    const ret = yield* this.cud('enable', params)
     if (ret?.ret_code === 0) {
       const { regionId, spaceIds } = params
       const curRegion = this.regions[regionId]
@@ -185,8 +205,8 @@ class WorkSpaceStore {
     }
   }
 
-  *disable(params) {
-    const ret = yield this.cud('disable', params)
+  *disable(params: { [key: string]: any }) {
+    const ret = yield* this.cud('disable', params)
     if (ret?.ret_code === 0) {
       const { regionId, spaceIds } = params
       const curRegion = this.regions[regionId]
@@ -202,8 +222,8 @@ class WorkSpaceStore {
     }
   }
 
-  *delete(params) {
-    const ret = yield this.cud('delete', params)
+  *delete(params: { [key: string]: any }) {
+    const ret = yield* this.cud('delete', params)
     if (ret?.ret_code === 0) {
       const { regionId, spaceIds } = params
       const curRegion = this.regions[regionId]

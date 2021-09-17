@@ -1,5 +1,6 @@
 import { makeAutoObservable, set } from 'mobx'
 import { parseI18n } from 'utils/convert'
+import type RootStore from './RootStore'
 
 class GlobalStore {
   rootStore
@@ -65,21 +66,21 @@ class GlobalStore {
     ],
   }
 
-  constructor(rootStore) {
+  constructor(rootStore: RootStore) {
     this.rootStore = rootStore
     makeAutoObservable(this, {
       menuInfo: false,
     })
   }
 
-  set(params) {
+  set(params: { [key: string]: any }) {
     set(this, { ...params })
   }
 
   *loadRegions() {
     const { api } = this.rootStore
     const regionPromise = api.region.load()
-    const ret = yield regionPromise
+    const ret = yield* regionPromise
     if (ret?.ret_code === 0) {
       this.regionInfos = parseI18n(ret.infos)
     }

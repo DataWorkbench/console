@@ -1,7 +1,7 @@
 import { mapValues, isPlainObject, has, isArray, keys } from 'lodash-es'
 import dayjs from 'dayjs'
 
-function parseI18n(obj, lang) {
+function parseI18n(obj: any, lang?: string): any {
   if (isArray(obj)) {
     return obj.map((o) => parseI18n(o, lang))
   }
@@ -22,10 +22,10 @@ function parseI18n(obj, lang) {
   return obj
 }
 
-const formatDate = (timestamp, fmt) =>
+const formatDate = (timestamp: number, fmt: string) =>
   dayjs(timestamp * 1000).format(fmt || 'YYYY-MM-DD HH:mm:ss')
 
-const getShortSpaceName = (str) => {
+const getShortSpaceName = (str: string) => {
   if (str) {
     const pattern = new RegExp('[\u4E00-\u9FA5]+')
     const profileName = str.substr(0, 2)
