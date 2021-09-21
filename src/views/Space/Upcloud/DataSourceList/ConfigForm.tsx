@@ -4,7 +4,7 @@ import { Alert, Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
 
 const { TextField, TextAreaField, PasswordField } = Form
 
-const ConfigForm = forwardRef((props, ref) => {
+const ConfigForm = forwardRef(({ db }, ref) => {
   return (
     <div>
       <Alert
@@ -18,18 +18,18 @@ const ConfigForm = forwardRef((props, ref) => {
         }
         type="warning"
         closable
-        className="mb-3"
+        tw="mb-3"
       />
       <Form layout="vertical" ref={ref}>
         <Field>
           <Label>数据源类型</Label>
-          <Control className="w-60">
-            <div className="rounded-sm border border-green-11 p-2">
-              <div className="font-medium flex items-center">
-                <Icon name="container" className="mr-1" />
-                <span className="text-green-11">连接器模式</span>
+          <Control tw="w-60">
+            <div tw="rounded-sm border border-green-11 p-2">
+              <div tw="font-medium flex items-center">
+                <Icon name="container" tw="mr-1" />
+                <span tw="text-green-11">{db?.name}</span>
               </div>
-              <div className="text-neut-8">
+              <div tw="text-neut-8">
                 这是一个很长很长很长很长的关于模式的描述信息。
               </div>
             </div>
@@ -39,7 +39,7 @@ const ConfigForm = forwardRef((props, ref) => {
           name="name"
           label={
             <>
-              <span className="text-red-10 mr-1">*</span>数据源名称
+              <span tw="text-red-10 mr-1">*</span>数据源名称
             </>
           }
           placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
@@ -57,7 +57,7 @@ const ConfigForm = forwardRef((props, ref) => {
           rows={3}
           label={
             <>
-              <span className="text-red-10 mr-1" />
+              <span tw="text-red-10 mr-1" />
               数据源描述
             </>
           }
@@ -75,7 +75,7 @@ const ConfigForm = forwardRef((props, ref) => {
           name="ip"
           label={
             <>
-              <span className="text-red-10 mr-1">*</span>IP 地址
+              <span tw="text-red-10 mr-1">*</span>IP 地址
             </>
           }
           defaultValue=""
@@ -101,7 +101,7 @@ const ConfigForm = forwardRef((props, ref) => {
           name="port"
           label={
             <>
-              <span className="text-red-10 mr-1">*</span>端口号
+              <span tw="text-red-10 mr-1">*</span>端口号
             </>
           }
           placeholder="请输入端口号信息"
@@ -122,7 +122,7 @@ const ConfigForm = forwardRef((props, ref) => {
           name="db"
           label={
             <>
-              <span className="text-red-10 mr-1">*</span>Database
+              <span tw="text-red-10 mr-1">*</span>Database
             </>
           }
           placeholder="请输入 database 信息"
@@ -142,7 +142,7 @@ const ConfigForm = forwardRef((props, ref) => {
           name="user"
           label={
             <>
-              <span className="text-red-10 mr-1">*</span>用户名
+              <span tw="text-red-10 mr-1">*</span>用户名
             </>
           }
           placeholder="请输入用户名"
@@ -162,7 +162,7 @@ const ConfigForm = forwardRef((props, ref) => {
           name="passwd"
           label={
             <>
-              <span className="text-red-10 mr-1">*</span>密码
+              <span tw="text-red-10 mr-1">*</span>密码
             </>
           }
           autoComplete="off"

@@ -1,5 +1,7 @@
 import { useState, Suspense } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
 import {
   PortalProvider,
   Notification as notification,
@@ -26,6 +28,13 @@ emitter.on('error', ({ title, content }: any) =>
 )
 
 const store = new RootStore()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 const App = () => {
   const [loading, setLoading] = useState(true)
@@ -41,23 +50,26 @@ const App = () => {
       handleGlobalData={handleGlobalData}
     >
       <StoreContext.Provider value={store}>
-        {loading ? (
-          <div tw="flex justify-center h-screen items-center">
-            <Loading size="large" />
-          </div>
-        ) : (
-          <Router basename="/bigdata">
-            <Suspense
-              fallback={
-                <div tw="flex justify-center h-screen items-center">
-                  <Loading />
-                </div>
-              }
-            >
-              <Routes />
-            </Suspense>
-          </Router>
-        )}
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} />
+          {loading ? (
+            <div tw="flex justify-center h-screen items-center">
+              <Loading size="large" />
+            </div>
+          ) : (
+            <Router basename="/bigdata">
+              <Suspense
+                fallback={
+                  <div tw="flex justify-center h-screen items-center">
+                    <Loading />
+                  </div>
+                }
+              >
+                <Routes />
+              </Suspense>
+            </Router>
+          )}
+        </QueryClientProvider>
       </StoreContext.Provider>
     </PortalProvider>
   )

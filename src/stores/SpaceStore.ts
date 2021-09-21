@@ -1,4 +1,5 @@
 import { makeAutoObservable } from 'mobx'
+import { loadWorkSpace, IWorkSpaceParams } from './api'
 import type RootStore from './RootStore'
 
 class SpaceStore {
@@ -21,6 +22,7 @@ class SpaceStore {
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       cancel: false,
+      rootStore: false,
     })
     this.rootStore = rootStore
   }
@@ -35,7 +37,13 @@ class SpaceStore {
     }
   }
 
-  *fetchSpaces({ reload, ...params }: { reload: boolean }, options = {}) {
+  *fetchSpaces(
+    {
+      reload,
+      ...params
+    }: { reload: boolean; regionId: string; [k: string]: any },
+    options = {}
+  ) {
     if (reload) {
       this.reset()
     }
@@ -43,7 +51,6 @@ class SpaceStore {
       return
     }
     const {
-      rootStore: { api },
       cancel,
       page: { offset, limit },
     } = this
@@ -55,17 +62,20 @@ class SpaceStore {
       this.cancel = c
     }
 
-    const newParams = {
+    const newParams: IWorkSpaceParams = {
       sort_by: 'created',
       reverse: true,
       offset,
       limit,
       ...params,
     }
-    const ret = yield* api.workspace.load(newParams, {
-      ...options,
-      cancel: cancelFn,
-    })
+    const ret: { ret_code: number; [p: string]: any } = yield loadWorkSpace(
+      newParams,
+      {
+        ...options,
+        cancel: cancelFn,
+      }
+    )
     if (ret?.ret_code === 0) {
       const { workspaces } = this
       const { infos } = ret

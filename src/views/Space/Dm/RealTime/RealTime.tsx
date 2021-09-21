@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useToggle } from 'react-use'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
@@ -137,8 +137,6 @@ const RealTime = observer(() => {
                     name="name"
                     label="* 业务名称"
                     placeholder='允许包含字母、数字 及 "_"，长度2～128'
-                    labelClassName={tw`text-white`}
-                    controlClassName={tw`dark:text-white bg-neut-16 border-neut-13 hover:border-neut-8`}
                     validateOnChange
                     schemas={[
                       {
@@ -157,8 +155,6 @@ const RealTime = observer(() => {
                     name="desc"
                     label="描述"
                     placeholder="请输入业务描述"
-                    labelClassName={tw`text-white`}
-                    controlClassName={tw`dark:text-white bg-neut-16 border-neut-13 hover:border-neut-8`}
                     validateOnChange
                     schemas={[
                       {

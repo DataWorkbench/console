@@ -1,5 +1,6 @@
 import { makeObservable, flow, action, observable, set } from 'mobx'
 import type RootStore from './RootStore'
+import { createWorkFlow, loadWorkFlow, IWorkFlowParams } from './api'
 
 class WorkFlowStore {
   rootStore
@@ -9,7 +10,6 @@ class WorkFlowStore {
   curFlow = null
 
   constructor(rootStore: RootStore) {
-    this.rootStore = rootStore
     makeObservable(this, {
       flows: observable,
       curFlow: observable,
@@ -18,6 +18,7 @@ class WorkFlowStore {
       create: flow,
       load: flow,
     })
+    this.rootStore = rootStore
   }
 
   set(params: { [key: string]: any }) {
@@ -25,15 +26,17 @@ class WorkFlowStore {
   }
 
   setCurFlow(id: string) {
-    const curFlow = this.flows.find((f) => f.id === id)
+    const curFlow = this.flows.find((f: { id: string }) => f.id === id)
     if (curFlow) {
       this.curFlow = curFlow
     }
   }
 
-  *create(params: { [key: string]: any }) {
-    const { api } = this.rootStore
-    const res = yield* api.workflow.create(params)
+  // eslint-disable-next-line class-methods-use-this
+  *create(params: IWorkFlowParams) {
+    const res: { ret_code: number; [p: string]: any } = yield createWorkFlow(
+      params
+    )
     const ret = res.data
     if (ret.ret_code === 0) {
       return true
@@ -41,13 +44,14 @@ class WorkFlowStore {
     return false
   }
 
-  *load(params: { [key: string]: any }, force = false) {
+  *load(params: IWorkFlowParams, force = false) {
     if (force) {
       this.curFlow = null
       this.flows = []
     }
-    const { api } = this.rootStore
-    const ret = yield* api.workflow.load(params)
+    const ret: { ret_code: number; [p: string]: any } = yield loadWorkFlow(
+      params
+    )
     if (ret?.ret_code === 0 && ret.infos) {
       this.flows = this.flows.concat(ret.infos)
       return ret.infos

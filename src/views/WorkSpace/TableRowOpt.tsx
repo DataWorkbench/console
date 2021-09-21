@@ -1,23 +1,22 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { useStore } from 'stores'
 import { Tooltip, Icon, Menu, Dropdown } from '@QCFE/lego-ui'
 import { useWorkSpaceContext } from 'contexts'
 
-function TableRowOpt({ space, regionId }) {
+const { MenuItem } = Menu
+
+const TableRowOpt = ({ space, regionId }) => {
   const stateStore = useWorkSpaceContext()
   const {
     workSpaceStore: { funcList },
   } = useStore()
-  const handleClick = (e, key, value) => {
+  const handleClick = (e, key, value: string) => {
     stateStore.set({ curSpaceOpt: value, optSpaces: [space] })
   }
   return (
     <div tw="flex justify-center items-center space-x-1 2xl:space-x-2">
       {funcList.map(({ name: funcName, title, subFuncList }) => (
         <Tooltip
-          // tw="p-0"
           trigger="hover"
           key={funcName}
           content={subFuncList.map((subFunc) => (
@@ -30,7 +29,7 @@ function TableRowOpt({ space, regionId }) {
               {subFunc.title}
             </Link>
           ))}
-          // placement="bottom"
+          placement="bottom"
         >
           <Link
             to={`${regionId}/workspace/${space.id}/${funcName}`}
@@ -49,22 +48,22 @@ function TableRowOpt({ space, regionId }) {
       <Dropdown
         content={
           <Menu onClick={handleClick}>
-            <Menu.MenuItem value="update">
+            <MenuItem value="update">
               <Icon name="pen" />
               修改工作空间
-            </Menu.MenuItem>
-            <Menu.MenuItem value="disable" disabled={space.status === 2}>
+            </MenuItem>
+            <MenuItem value="disable" disabled={space.status === 2}>
               <i className="if if-minus-square" tw="text-base mr-2" />
               禁用工作空间
-            </Menu.MenuItem>
-            <Menu.MenuItem value="enable" disabled={space.status === 1}>
+            </MenuItem>
+            <MenuItem value="enable" disabled={space.status === 1}>
               <Icon name="start" />
               启动工作空间
-            </Menu.MenuItem>
-            <Menu.MenuItem value="delete">
+            </MenuItem>
+            <MenuItem value="delete">
               <Icon name="trash" />
               删除
-            </Menu.MenuItem>
+            </MenuItem>
           </Menu>
         }
       >
@@ -72,11 +71,6 @@ function TableRowOpt({ space, regionId }) {
       </Dropdown>
     </div>
   )
-}
-
-TableRowOpt.propTypes = {
-  space: PropTypes.object,
-  regionId: PropTypes.string,
 }
 
 export default TableRowOpt

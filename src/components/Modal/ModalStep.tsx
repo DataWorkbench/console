@@ -1,21 +1,12 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import { Fragment } from 'react'
 import tw from 'twin.macro'
 
-const propTypes = {
-  step: PropTypes.number,
-  stepTexts: PropTypes.array,
-  sameLine: PropTypes.bool,
-  stepClassName: PropTypes.string,
-}
-
-const defaultProps = {
-  step: 0,
-  stepTexts: [],
-  sameLine: false,
-}
-
-function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
+const ModalStep = ({
+  step = 0,
+  stepTexts = [],
+  sameLine = false,
+  stepClassName,
+}) => {
   const textsLen = stepTexts.length
   return (
     <div tw="flex h-20 justify-center items-center bg-neut-1 dark:bg-neut-17">
@@ -23,7 +14,7 @@ function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
         css={[tw`flex justify-center items-center`, stepClassName || tw`w-2/3`]}
       >
         {stepTexts.map((text, i) => (
-          <React.Fragment key={text}>
+          <Fragment key={text}>
             <div css={[tw`text-center`, sameLine && tw`flex items-center`]}>
               <span
                 css={[
@@ -57,14 +48,11 @@ function ModalStep({ step, stepTexts, sameLine, stepClassName }) {
                 </div>
               </div>
             )}
-          </React.Fragment>
+          </Fragment>
         ))}
       </div>
     </div>
   )
 }
-
-ModalStep.propTypes = propTypes
-ModalStep.defaultProps = defaultProps
 
 export default ModalStep

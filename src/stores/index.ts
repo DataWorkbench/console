@@ -6,8 +6,6 @@ configure({
   enforceActions: 'always',
 })
 
-const rootStore = new RootStore()
-
-export const StoreContext = createContext(rootStore)
+export const StoreContext = createContext({} as RootStore)
 export const useStore = (): RootStore => useContext(StoreContext)
 export { RootStore }

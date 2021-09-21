@@ -1,6 +1,21 @@
 import { makeAutoObservable, set } from 'mobx'
-import { parseI18n } from 'utils/convert'
+// import { parseI18n } from 'utils/convert'
 import type RootStore from './RootStore'
+// import { loadRegion } from './api'
+
+export interface MenuType {
+  name: string
+  title: string
+  icon?: string
+  isSubTitle?: boolean
+  link?: string
+  items?: MenuType[]
+}
+export interface MenuInfoType {
+  title: string
+  menus: MenuType[]
+  relationMenus?: MenuType[]
+}
 
 class GlobalStore {
   rootStore
@@ -9,7 +24,7 @@ class GlobalStore {
 
   regionInfos = []
 
-  menuInfo = {
+  menuInfo: MenuInfoType = {
     title: '大数据平台',
     menus: [
       {
@@ -67,25 +82,25 @@ class GlobalStore {
   }
 
   constructor(rootStore: RootStore) {
-    this.rootStore = rootStore
     makeAutoObservable(this, {
       menuInfo: false,
+      rootStore: false,
     })
+    this.rootStore = rootStore
   }
 
   set(params: { [key: string]: any }) {
     set(this, { ...params })
   }
 
-  *loadRegions() {
-    const { api } = this.rootStore
-    const regionPromise = api.region.load()
-    const ret = yield* regionPromise
-    if (ret?.ret_code === 0) {
-      this.regionInfos = parseI18n(ret.infos)
-    }
-    return this.regionInfos
-  }
+  // *loadRegions() {
+  //   const regionPromise = loadRegion()
+  //   const ret: { ret_code: number; [p: string]: any } = yield regionPromise
+  //   if (ret?.ret_code === 0) {
+  //     this.regionInfos = parseI18n(ret.infos)
+  //   }
+  //   return this.regionInfos
+  // }
 }
 
 export default GlobalStore

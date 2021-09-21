@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
-import { styled, theme } from 'twin.macro'
+import tw, { styled, css } from 'twin.macro'
 import { FlexBox, Card, CardHeader, CardContent, IconCard } from 'components'
 import { useStore } from 'stores'
 import SpaceListModal from './SpaceListModal'
@@ -27,11 +27,13 @@ function getTabs() {
   ]
 }
 
-const Wrapper = styled.div`
-  & > div {
-    margin-bottom: ${theme('margin.4')};
-  }
-`
+const Wrapper = styled('div')(
+  () => css`
+    & > div {
+      ${tw`mb-4`};
+    }
+  `
+)
 
 function Overview() {
   const {

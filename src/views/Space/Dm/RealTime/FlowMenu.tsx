@@ -1,20 +1,24 @@
-import React, { useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { useEffect } from 'react'
+// import PropTypes from 'prop-types'
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
-import { Icon, Input } from '@QCFE/qingcloud-portal-ui/lib/components'
+import { Icon, Input } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useStore } from 'stores'
 
-const propTypes = {
-  onCreateClick: PropTypes.func,
+// const propTypes = {
+//   onCreateClick: PropTypes.func,
+// }
+
+// const defaultPropTypes = {
+//   onCreateClick() {},
+// }
+
+interface IFlowMenuProps {
+  onCreateClick: () => void
 }
 
-const defaultPropTypes = {
-  onCreateClick() {},
-}
-
-function FlowMenu({ onCreateClick }) {
+const FlowMenu = observer(({ onCreateClick = () => {} }: IFlowMenuProps) => {
   const { regionId, spaceId } = useParams()
   const {
     workFlowStore,
@@ -99,9 +103,6 @@ function FlowMenu({ onCreateClick }) {
       </div>
     </div>
   )
-}
+})
 
-FlowMenu.propTypes = propTypes
-FlowMenu.defaultPropTypes = defaultPropTypes
-
-export default observer(FlowMenu)
+export default FlowMenu

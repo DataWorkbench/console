@@ -1,12 +1,12 @@
-import React from 'react'
 import { observer } from 'mobx-react-lite'
 import { useHistory } from 'react-router-dom'
 import { Modal, Button } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import { useStore } from 'stores'
+import { Center } from 'components'
 import WorkSpace from 'views/WorkSpace'
 
-function SpaceListModal() {
+const SpaceListModal = observer(() => {
   const history = useHistory()
   const [state, setState] = useImmer({ curRegionId: '', curSpaceId: '' })
   const { curRegionId, curSpaceId } = state
@@ -21,10 +21,11 @@ function SpaceListModal() {
   const handleClick = () => {
     history.push(`/${curRegionId}/workspace/${curSpaceId}/${curItemName}`)
   }
-  const handleSelected = (data) => {
+
+  const handleItemCheck = (regionId: string, spaceId: string) => {
     setState((draft) => {
-      draft.curRegionId = data.curRegionId
-      draft.curSpaceId = data.curSpaceId
+      draft.curRegionId = regionId
+      draft.curSpaceId = spaceId
     })
   }
 
@@ -38,8 +39,8 @@ function SpaceListModal() {
       bodyStyle={{ padding: 0 }}
       onCancel={handleHide}
       footer={
-        <div tw="w-full flex justify-between items-center">
-          <div tw="text-neut-15">
+        <Center tw="w-full justify-end">
+          <div tw="text-neut-15 mr-4">
             若无合适的工作空间，您也可以 创建新工作空间
           </div>
           <div>
@@ -54,12 +55,12 @@ function SpaceListModal() {
               进入空间
             </Button>
           </div>
-        </div>
+        </Center>
       }
     >
-      <WorkSpace isModal onSpaceSelected={handleSelected} />
+      <WorkSpace isModal onItemCheck={handleItemCheck} />
     </Modal>
   )
-}
+})
 
-export default observer(SpaceListModal)
+export default SpaceListModal

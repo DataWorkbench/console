@@ -1,4 +1,3 @@
-import { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
@@ -7,6 +6,8 @@ import { useStore } from 'stores'
 import { FlexBox, Center, Box, Card } from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
+
+const { MenuItem } = Menu
 
 const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
 const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
@@ -36,7 +37,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
 const Disp = tw.div`pt-0.5 h-7`
 
 interface IProps {
-  regionId: string | number
+  regionId: string
   space: {
     id: string
     [propName: string]: any
@@ -44,9 +45,9 @@ interface IProps {
   className?: string
 }
 
-const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
+const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const stateStore = useWorkSpaceContext()
-  const { isModal, curSpaceId, onSpaceSelected } = stateStore
+  const { isModal, curSpaceId, onItemCheck } = stateStore
   const {
     workSpaceStore: { funcList },
   } = useStore()
@@ -54,12 +55,13 @@ const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
   const handleSelected = () => {
     if (isModal) {
       stateStore.set({ curSpace: space })
-      onSpaceSelected({ curSpaceId: space.id, curRegionId: regionId })
+      onItemCheck(space.id, regionId)
     }
   }
 
-  const handleSpaceOpt = (e, k, v) =>
+  const handleSpaceOpt = (e, k, v) => {
     stateStore.set({ curSpaceOpt: v, optSpaces: [space] })
+  }
 
   const renderGrid = () => {
     if (isModal) {
@@ -155,22 +157,22 @@ const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
           <Dropdown
             content={
               <Menu onClick={handleSpaceOpt}>
-                <Menu.MenuItem value="update">
+                <MenuItem value="update">
                   <Icon name="pen" />
                   修改工作空间
-                </Menu.MenuItem>
-                <Menu.MenuItem value="disable" disabled={space.status === 2}>
+                </MenuItem>
+                <MenuItem value="disable" disabled={space.status === 2}>
                   <i className="if if-minus-square" tw="text-base mr-2" />
                   禁用工作空间
-                </Menu.MenuItem>
-                <Menu.MenuItem value="enable" disabled={space.status === 1}>
+                </MenuItem>
+                <MenuItem value="enable" disabled={space.status === 1}>
                   <Icon name="start" />
                   启动工作空间
-                </Menu.MenuItem>
-                <Menu.MenuItem value="delete">
+                </MenuItem>
+                <MenuItem value="delete">
                   <Icon name="trash" />
                   删除
-                </Menu.MenuItem>
+                </MenuItem>
               </Menu>
             }
           >
@@ -221,6 +223,6 @@ const SpaceItem: FC<IProps> = ({ regionId, space, className }) => {
       )}
     </Card>
   )
-}
+})
 
-export default observer(SpaceItem)
+export default SpaceItem

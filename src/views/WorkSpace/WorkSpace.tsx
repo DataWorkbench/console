@@ -1,8 +1,7 @@
-import { useRef } from 'react'
+import { useEffect } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { useLifecycles, useToggle } from 'react-use'
-import { get, throttle } from 'lodash-es'
+import { get } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
 import {
   PageTab,
@@ -13,8 +12,8 @@ import {
 } from '@QCFE/qingcloud-portal-ui'
 import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
-import { useStore } from 'stores'
 import { WorkSpaceContext } from 'contexts'
+import { useQueryRegion } from 'hooks'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
 import BestPractice from './BestPractice'
@@ -28,34 +27,32 @@ const tabs = [
   },
 ]
 
-const storageKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
-
-const Wrapper = styled('div')<{ isModal: boolean }>(({ isModal }) => [
-  tw`h-full overflow-auto`,
-  !isModal && tw`p-5`,
-])
-
-const Content = styled(Card)(
-  ({ showLoading, isModal }: { showLoading: boolean; isModal: boolean }) => [
-    tw`pt-5 relative`,
+const Wrapper = styled('div')<{ showLoading?: boolean; isModal?: boolean }>(
+  ({ isModal, showLoading }) => [
+    tw`h-full overflow-auto`,
     showLoading && tw`h-80`,
-    isModal && tw`shadow-none mb-0`,
+    !isModal && tw`p-5`,
   ]
 )
-interface WorkSpaceProps {
-  isModal: boolean
-  onSpaceSelected: any
+
+const Content = styled(Card)(({ isModal }: { isModal?: boolean }) => [
+  tw`pt-5 relative`,
+  isModal && tw`shadow-none mb-0`,
+])
+
+interface IWrokSpaceProps {
+  isModal?: boolean
+  onItemCheck?: (regionId: string, spaceId: string) => void
 }
 
-const WorkSpace = observer(({ isModal, onSpaceSelected }: WorkSpaceProps) => {
-  const [loading, setLoading] = useToggle(true)
-  const scrollParentRef = useRef(null)
+const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
+  const { isLoading, data: regionInfos } = useQueryRegion()
   const stateStore = useLocalObservable(() => ({
     isModal,
-    onSpaceSelected,
-    cardView: true,
-    storageKey,
+    onItemCheck,
     scrollElem: null,
+    cardView: true,
+    storageKey: 'BIGDATA_SPACELISTS_COLUMN_SETTINGS',
     defaultColumns: [
       { title: '空间名称/id', dataIndex: 'id', fixedInSetting: true },
       { title: '空间状态', dataIndex: 'status' },
@@ -65,12 +62,16 @@ const WorkSpace = observer(({ isModal, onSpaceSelected }: WorkSpaceProps) => {
       { title: '创建时间', dataIndex: 'created' },
       { title: '操作', dataIndex: 'updated' },
     ],
-    columnSettings:
-      get(JSON.parse(localStorage.getItem(storageKey)), 'value') || [],
-    curRegionId: null,
+    get columnSettings() {
+      return (
+        get(JSON.parse(localStorage.getItem(this.storageKey) || ''), 'value') ||
+        []
+      )
+    },
+    curRegionId: get(regionInfos, '[0].id', ''),
     curSpace: null,
-    get curSpaceId() {
-      return get(this, 'curSpace.id', null)
+    get curSpaceId(): any {
+      return get(this, 'curSpace.id', '')
     },
     optSpaces: [],
     get optSpaceIds() {
@@ -80,155 +81,100 @@ const WorkSpace = observer(({ isModal, onSpaceSelected }: WorkSpaceProps) => {
       return get(this, 'optSpaces', []).map(({ name }) => name)
     },
     curSpaceOpt: '',
-    set(params) {
+    set(params: any) {
       set(this, { ...params })
     },
+    ifNoData: false,
+    queryRefetch: false,
+    queryKeyWord: '',
   }))
 
-  const {
-    globalStore,
-    globalStore: { regionInfos },
-    workSpaceStore,
-    workSpaceStore: { regions },
-  } = useStore()
-  const { curRegionId } = stateStore
-  const curRegion = get(regions, curRegionId)
-  const isNodata =
-    get(curRegion, 'params.offset') === 0 &&
-    get(curRegion, 'hasMore') === false &&
-    get(curRegion, 'total') === 0
-
-  useLifecycles(
-    () => {
-      globalStore
-        .loadRegions()
-        .then((infos) => {
-          if (infos?.length > 0) {
-            stateStore.set({ curRegionId: get(infos, '[0].id') })
-            workSpaceStore.fetchData({
-              regionId: stateStore.curRegionId,
-              cardView: stateStore.cardView,
-              offset: 0,
-            })
-          }
-        })
-        .finally(() => setLoading(false))
-    },
-    () => {
-      workSpaceStore.set({ regions: {}, curRegionId: null })
+  useEffect(() => {
+    if (regionInfos) {
+      stateStore.set({ curRegionId: get(regionInfos, '[0].id', '') })
     }
-  )
+  }, [regionInfos, stateStore])
 
-  const handleTabClick = (tabName) => {
+  const handleTabClick = (tabName: string) => {
     stateStore.set({ curRegionId: tabName })
-    if (!get(regions, tabName)) {
-      workSpaceStore.fetchData({
-        regionId: tabName,
-        cardView: stateStore.cardView,
-        offset: 0,
-      })
-    }
   }
 
-  const handleHide = (ifRefresh) => {
-    if (ifRefresh) {
-      const { curSpaceOpt, curRegionId: regionId, cardView } = stateStore
-      if (curSpaceOpt === 'create') {
-        workSpaceStore.fetchData({
-          regionId,
-          cardView,
-          offset: 0,
-        })
-      }
-    }
-    stateStore.set({ curSpaceOpt: '' })
+  const reloadWorkSpace = () => {
+    stateStore.set({ queryRefetch: true })
   }
 
-  const reloadSpace = () => {
-    const { curRegionId: regionId, cardView } = stateStore
-    workSpaceStore.fetchData({
-      regionId,
-      cardView,
-      force: true,
-      offset: 0,
-    })
+  const handleQuery = (v: string) => {
+    stateStore.set({ queryKeyWord: v })
   }
-
-  const handleQuery = (v) => {
-    const { curRegionId: regionId, cardView } = stateStore
-    workSpaceStore.fetchData({
-      regionId,
-      cardView,
-      force: true,
-      search: v,
-      offset: 0,
-    })
-  }
-
-  const handleScroll = throttle(() => {
-    const { curRegionId: regionId, cardView } = stateStore
-    if (cardView) {
-      const el = scrollParentRef.current
-      const dist = el.scrollHeight - el.clientHeight - el.scrollTop
-      if (el.scrollTop > 0 && dist < 250) {
-        // console.log(dist)
-        workSpaceStore.fetchData({
-          regionId,
-          cardView,
-        })
-      }
-    }
-  }, 150)
 
   return (
-    <WorkSpaceContext.Provider value={stateStore}>
-      <Wrapper isModal={isModal} onScroll={handleScroll} ref={scrollParentRef}>
-        {!isModal && <PageTab tabs={tabs} />}
-        <Content showLoading={loading} isModal={isModal}>
-          {isModal && (
-            <div tw="absolute top-6 right-5 flex space-x-2 z-10">
-              <Button type="icon" onClick={reloadSpace}>
-                <Icon name="if-refresh" tw="text-xl" />
-              </Button>
-              <Control className="has-icons-left has-icons-right">
-                <i className="icon is-left if-magnifier" />
-                <InputSearch
-                  type="text"
-                  placeholder="工作空间、ID、角色"
-                  name="search"
-                  onPressEnter={(e) => handleQuery(e.target.value)}
-                  tw="w-52 rounded-2xl"
-                  onClear={() => handleQuery('')}
-                />
-              </Control>
-            </div>
-          )}
-          <Loading size="large" spinning={loading} delay={150}>
-            {regionInfos.length > 0 && (
-              <Tabs tabClick={handleTabClick} activeName={curRegionId}>
-                {regionInfos.map((regionInfo) => (
+    <Wrapper
+      showLoading={isLoading}
+      isModal={isModal}
+      ref={(ref) => stateStore.set({ scrollElem: ref })}
+    >
+      {!isModal && <PageTab tabs={tabs} />}
+      {isLoading ? (
+        <Loading size="large" delay={150} />
+      ) : (
+        <WorkSpaceContext.Provider value={stateStore}>
+          <Content isModal={isModal}>
+            {isModal && (
+              <div tw="absolute top-6 right-5 flex space-x-2 z-10">
+                <Button
+                  type="icon"
+                  loading={stateStore.queryRefetch}
+                  onClick={reloadWorkSpace}
+                >
+                  <Icon name="if-refresh" tw="text-xl" />
+                </Button>
+                <Control className="has-icons-left has-icons-right">
+                  <i className="icon is-left if-magnifier" />
+                  <InputSearch
+                    type="text"
+                    placeholder="工作空间、ID、角色"
+                    name="search"
+                    onPressEnter={(e) =>
+                      handleQuery((e.target as HTMLInputElement).value)
+                    }
+                    tw="w-52 rounded-2xl"
+                    onClear={() => handleQuery('')}
+                  />
+                </Control>
+              </div>
+            )}
+
+            {regionInfos && regionInfos?.length > 0 && (
+              <Tabs
+                tabClick={handleTabClick}
+                activeName={stateStore.curRegionId}
+              >
+                {regionInfos?.map((regionInfo) => (
                   <TabPanel
                     key={regionInfo.id}
                     label={regionInfo.name}
                     name={regionInfo.id}
                   >
-                    <SpaceLists region={regionInfo} />
+                    {stateStore.curRegionId === regionInfo.id && (
+                      <SpaceLists region={regionInfo} />
+                    )}
                   </TabPanel>
                 ))}
               </Tabs>
             )}
-          </Loading>
-        </Content>
+          </Content>
 
-        {!isModal && isNodata && <BestPractice />}
-        {stateStore.curSpaceOpt !== '' && (
-          <SpaceModal
-            region={regionInfos.find((info) => info.id === curRegionId)}
-            onHide={handleHide}
-          />
-        )}
-      </Wrapper>
-    </WorkSpaceContext.Provider>
+          {!isModal && stateStore.ifNoData && <BestPractice />}
+          {stateStore.curSpaceOpt !== '' && (
+            <SpaceModal
+              region={regionInfos?.find(
+                (info) => info.id === stateStore.curRegionId
+              )}
+            />
+          )}
+        </WorkSpaceContext.Provider>
+      )}
+    </Wrapper>
   )
 })
 

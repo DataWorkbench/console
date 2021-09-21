@@ -4,8 +4,9 @@ import { GlobalNav, SideMenu } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import { FlexBox, ContentBox } from 'components'
 import { useStore } from 'stores'
+import { MenuType } from 'stores/GlobalStore'
 
-const getLinks = (items) => {
+const getLinks = (items: MenuType[]): any => {
   return items.map((item) => {
     return item.items ? getLinks(item.items) : `/${item.name}`
   })

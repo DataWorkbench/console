@@ -37,15 +37,21 @@ declare module '@QCFE/qingcloud-portal-ui' {
   export function PortalCollapsePanel(props: any): JSX.Element
   export function PortalLocaleProvider(props: any): JSX.Element
   export function GlobalNav(props: any): JSX.Element
+  export function SideMenu(props: any): JSX.Element
+  export function PageTab(props: any): JSX.Element
+  export function ToolBar(props: any): JSX.Element
 
   export interface ModalProps {
     css?: Record<string, Record<string, unknown>>
     width?: number
+    height?: number
     onCancel?: () => void
     onOk?: () => void
     title?: string
     visible?: boolean
     className?: string
+    appendToBody?: boolean
+    bodyStyle?: Record<string, string | number>
     children?: JSX.Element | JSX.Element[]
     footer?: React.ReactNode | string | null
   }

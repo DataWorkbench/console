@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { useState, useEffect } from 'react'
 import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import tw from 'twin.macro'
 import { formatDate } from 'utils/convert'
-import { Icon, Table, utils } from '@QCFE/qingcloud-portal-ui'
-import { useStore } from 'stores'
+import { Icon, Table, utils, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useWorkSpaceContext } from 'contexts'
+import { useQueryPageWorkSpace } from 'hooks'
 import TableRowOpt from './TableRowOpt'
 
 const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
@@ -39,7 +38,7 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
             { text: '活跃', value: '1' },
             { text: '已禁用', value: '2' },
           ],
-          render: (field) => (
+          render: (field: number) => (
             <div
               css={[
                 field === 1
@@ -68,7 +67,7 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
         break
       case 'owner':
         col = {
-          render: (field) => (
+          render: (field: string) => (
             <div>
               <div>xxx@test.com</div>
               <div tw="text-neut-8">{field}</div>
@@ -88,7 +87,7 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
           sortable: true,
           sortKey: 'created',
           sortOrder: sort.created,
-          render: (filed) => formatDate(filed),
+          render: (filed: number) => formatDate(filed),
         }
         break
       case 'updated':
@@ -106,27 +105,57 @@ const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
   })
 }
 
-function SpaceTableView({ regionId }) {
+const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
-  const { defaultColumns, columnSettings, optSpaces } = stateStore
+  const {
+    defaultColumns,
+    columnSettings,
+    optSpaces,
+    queryKeyWord,
+    queryRefetch,
+  } = stateStore
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const { width: winW } = useWindowSize()
-  const [sort, setSort] = useImmer({ name: 'asc', created: 'desc' })
-  const {
-    workSpaceStore,
-    workSpaceStore: { regions },
-  } = useStore()
-  const region = regions[regionId]
-  const offset = get(region, 'params.offset', 0)
-  const workspaces = get(region, 'workspaces', [])
+  const [sort, setSort] = useImmer<{
+    name: string
+    created: string
+    [p: string]: unknown
+  }>({
+    name: 'asc',
+    created: 'desc',
+  })
   const columns = utils.getTableColumnsBySetting(
     getDefaultColumns({ defaultColumns, regionId, winW, sort }),
     columnSettings
   )
+  const [filter, setFilter] = useImmer<{
+    regionId: string
+    offset: number
+    limit: number
+    [p: string]: unknown
+  }>({
+    regionId,
+    reverse: true,
+    offset: 0,
+    limit: 10,
+  })
+  const { isLoading, data, refetch } = useQueryPageWorkSpace(filter)
+  const workspaces = get(data, 'infos') || []
 
-  const total = get(region, 'total', 0)
-  const pageSize = get(region, 'params.limit', 10)
-  const current = offset + 1 < pageSize ? 1 : Math.floor(offset / pageSize) + 1
+  useEffect(() => {
+    if (queryRefetch) {
+      refetch().then(() => {
+        stateStore.set({ queryRefetch: false })
+      })
+    }
+  }, [queryRefetch, refetch, stateStore])
+
+  useEffect(() => {
+    setFilter((draft) => {
+      draft.offset = 0
+      draft.search = queryKeyWord
+    })
+  }, [queryKeyWord, setFilter])
 
   useEffect(() => {
     if (optSpaces.length === 0) {
@@ -134,45 +163,39 @@ function SpaceTableView({ regionId }) {
     }
   }, [optSpaces.length])
 
-  const handleFilterChange = ({ status }) => {
-    workSpaceStore.fetchData({
-      regionId,
-      cardView: false,
-      offset: 0,
-      status: status === 'all' ? '' : +status,
+  if (isLoading) {
+    return (
+      <div tw="h-72">
+        <Loading />
+      </div>
+    )
+  }
+
+  const handleFilterChange = ({ status }: { status: string }) => {
+    setFilter((draft) => {
+      draft.status = status === 'all' ? '' : +status
     })
   }
 
-  const handleSort = (sortKey, sortOrder) => {
+  const handleSort = (sortKey: string, sortOrder: 'asc' | 'desc') => {
+    setFilter((draft) => {
+      draft.reverse = sortOrder === 'desc'
+      draft.sort_by = sortKey
+    })
     setSort((draft) => {
       draft[sortKey] = sortOrder
     })
+  }
 
-    workSpaceStore.fetchData({
-      regionId,
-      cardView: false,
-      offset: 0,
-      sort_by: sortKey,
-      reverse: sortOrder === 'desc',
+  const handlePageChange = (page: number) => {
+    setFilter((draft) => {
+      draft.offset = (page - 1) * draft.limit
     })
   }
 
-  const handlePageChange = (curPage) => {
-    const { limit } = get(region, 'params')
-
-    workSpaceStore.fetchData({
-      regionId,
-      cardView: false,
-      offset: (curPage - 1) * limit,
-    })
-  }
-
-  const handleShowSizeChange = (limit) => {
-    workSpaceStore.fetchData({
-      regionId,
-      cardView: false,
-      limit,
-      offset: 0,
+  const handleShowSizeChange = (limit: number) => {
+    setFilter((draft) => {
+      draft.limit = limit
     })
   }
 
@@ -184,28 +207,24 @@ function SpaceTableView({ regionId }) {
   return (
     <Table
       rowKey="id"
-      loading={get(region, 'fetchPromise.state') === 'pending'}
+      loading={isLoading}
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
       onSelect={handleSelect}
       tw="table-auto"
-      dataSource={workspaces.slice(0, pageSize)}
+      dataSource={workspaces}
       columns={columns}
       onFilterChange={handleFilterChange}
       onSort={handleSort}
       pagination={{
-        total,
-        current,
-        pageSize,
+        total: get(data, 'total', 0),
+        current: Math.floor(filter.offset / filter.limit) + 1,
+        pageSize: filter.limit,
         onPageChange: handlePageChange,
         onShowSizeChange: handleShowSizeChange,
       }}
     />
   )
-}
+})
 
-SpaceTableView.propTypes = {
-  regionId: PropTypes.string,
-}
-
-export default observer(SpaceTableView)
+export default SpaceTableView

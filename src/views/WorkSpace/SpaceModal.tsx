@@ -5,9 +5,10 @@ import { RadioButton, Form, Input, Button, Modal } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
 import FullModal, { ModalContent } from 'components/Modal'
-import { useStore } from 'stores'
+import { useQueryClient } from 'react-query'
 import { useWorkSpaceContext } from 'contexts'
 import { formatDate } from 'utils/convert'
+import { useMutationWorkSpace, getWorkSpaceKey } from 'hooks'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
 
@@ -80,11 +81,7 @@ const columns = [
 ]
 
 interface SpaceModalProps {
-  region: {
-    id: string
-    name: string
-  }
-  onHide: (v: boolean) => void
+  onHide?: (v: boolean) => void
   [propName: string]: unknown
 }
 
@@ -94,11 +91,9 @@ const SpaceModal = observer(
     const [delBtnEnable, setDelBtnEnable] = useState(true)
     const { curSpaceOpt, optSpaces, cardView } = stateStore
     const curSpace = optSpaces.length ? optSpaces[0] : null
-    const form = useRef(null)
-    const {
-      workSpaceStore,
-      workSpaceStore: { fetchPromise },
-    } = useStore()
+    const form = useRef<Form>(null)
+    const mutation = useMutationWorkSpace()
+    const queryClient = useQueryClient()
     const regionId = region.id
     const filterOptSpaces = optSpaces.filter((o) => {
       if (curSpaceOpt === 'enable' && o.status !== 2) {
@@ -117,50 +112,50 @@ const SpaceModal = observer(
       setDelBtnEnable(stateStore.curSpaceOpt !== 'delete')
     }, [stateStore.curSpaceOpt])
 
-    const handleModalClose = (v: boolean) => {
+    const handleModalClose = () => {
       setDelBtnEnable(true)
-      onHide(v)
+      stateStore.set({ curSpaceOpt: '' })
     }
 
     const handleOk = () => {
-      if (form.current.validateForm()) {
-        const fields = form.current.getFieldsValue()
-        if (curSpaceOpt === 'create') {
-          workSpaceStore.create({ ...fields, regionId }).then(() => {
-            handleModalClose(true)
-            workSpaceStore.fetchData({
-              regionId,
-              cardView,
-              offset: 0,
-              reload: cardView,
-            })
-          })
+      let params
+      if (['create', 'update'].includes(curSpaceOpt)) {
+        if (form.current?.validateForm()) {
+          const fields = form.current.getFieldsValue()
+          params = {
+            regionId,
+            op: curSpaceOpt,
+            ...fields,
+          }
+          if (curSpaceOpt === 'update') {
+            params.spaceId = curSpace.id
+          }
+        }
+      } else if (['disable', 'enable', 'delete'].includes(curSpaceOpt)) {
+        if (filterOptSpaceIds.length > 0) {
+          params = {
+            regionId,
+            op: curSpaceOpt,
+            spaceIds: filterOptSpaceIds,
+          }
         } else {
-          workSpaceStore
-            .update({
-              ...fields,
-              regionId,
-              spaceId: curSpace.id,
-            })
-            .then(() => handleModalClose(true))
+          stateStore.set({ curSpaceOpt: '' })
         }
       }
-    }
-
-    const handleConfirm = () => {
-      if (filterOptSpaceIds.length > 0) {
-        workSpaceStore[curSpaceOpt]({
-          regionId,
-          spaceIds: filterOptSpaceIds,
-        }).then(() => {
-          stateStore.set({ curSpaceOpt: '', optSpaces: [] })
+      if (params) {
+        mutation.mutate(params, {
+          onSuccess: async () => {
+            stateStore.set({ curSpaceOpt: '' })
+            const queryKey = getWorkSpaceKey(cardView ? 'infinite' : 'page')
+            await queryClient.invalidateQueries(queryKey)
+            stateStore.set({ optSpaces: [] })
+          },
         })
-      } else {
-        stateStore.set({ curSpaceOpt: '' })
       }
     }
 
     if (['enable', 'disable', 'delete'].includes(curSpaceOpt)) {
+      const curOptSpaceId = get(filterOptSpaceIds, '0')
       const operateObj = {
         enable: {
           opName: '启动',
@@ -182,16 +177,13 @@ const SpaceModal = observer(
                     该工作空间内工作流、成员等数据都将彻底删除，无法恢复，请谨慎操作。
                   </div>
                   <div className="border-t border-neut-2" />
-                  <div>
-                    *请在下方输入框中输入 “{get(filterOptSpaceIds, '0')}”
-                    以确认操作
-                  </div>
+                  <div>*请在下方输入框中输入 “{curOptSpaceId}” 以确认操作</div>
                   <div>
                     <Input
                       type="text"
-                      placeholder={get(filterOptSpaceIds, '0')}
+                      placeholder={curOptSpaceId}
                       onChange={(e, value) =>
-                        setDelBtnEnable(value === stateStore.curSpaceId)
+                        setDelBtnEnable(value === curOptSpaceId)
                       }
                     />
                   </div>
@@ -229,17 +221,17 @@ const SpaceModal = observer(
           title=""
           // className={styles.modal}
           width={modalWidth}
-          onCancel={() => handleModalClose(false)}
+          onCancel={handleModalClose}
           footer={
             <>
-              <Button type="defalut" onClick={() => handleModalClose(false)}>
+              <Button onClick={handleModalClose}>
                 {window.getText('LEGO_UI_CANCEL')}
               </Button>
               <Button
                 type={style.okType}
                 disabled={!delBtnEnable}
-                loading={fetchPromise?.state === 'pending'}
-                onClick={handleConfirm}
+                loading={mutation.isLoading}
+                onClick={handleOk}
               >
                 {window.getText('LEGO_UI_OK')}
               </Button>
@@ -270,9 +262,9 @@ const SpaceModal = observer(
         closable
         placement="rightFull"
         onOK={handleOk}
-        onHide={() => handleModalClose(false)}
+        onHide={handleModalClose}
         {...otherProps}
-        showConfirmLoading={fetchPromise?.state === 'pending'}
+        showConfirmLoading={mutation.isLoading}
         okText={curSpaceOpt === 'create' ? '创建' : '修改'}
         cancelText="取消"
       >
@@ -285,7 +277,7 @@ const SpaceModal = observer(
             >
               <RadioButton value={regionId}>
                 <Icon name="zone" />
-                {region?.name}
+                {region.name}
               </RadioButton>
             </RadioGroupField>
             <TextField

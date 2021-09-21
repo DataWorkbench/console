@@ -17,7 +17,7 @@ interface ModalProps {
   footer?: React.ReactNode
   children: React.ReactNode
   rootClassName?: string
-  contentClassName?: string
+  contentClassName?: any
   darkMode?: boolean
   showConfirmLoading?: boolean
 }
@@ -73,8 +73,8 @@ const Modal = ({
         }}
       />
       <div
-        className={contentClassName}
         css={[
+          contentClassName,
           tw`flex flex-col bg-white dark:bg-neut-16 dark:text-white overflow-auto z-20`,
           placement === 'rightFull' && tw`fixed top-0 right-0 bottom-0 w-1/2`,
           placement === 'center' && tw`min-w-[600px] h-auto`,

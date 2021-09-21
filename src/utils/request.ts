@@ -1,9 +1,9 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import Cookies from 'js-cookie'
 import { get, isFunction } from 'lodash-es'
 import emitter from 'utils/emitter'
 
-const baseConfig = {
+const baseConfig: AxiosRequestConfig = {
   method: 'POST',
   timeout: 20000,
   xsrfCookieName: 'csrftoken',
@@ -14,7 +14,7 @@ const baseConfig = {
   },
 }
 
-function getMessage(ret) {
+function getMessage(ret: {}) {
   const lang = Cookies.get('lang') === 'en' ? 'en_us' : 'zh_cn'
   return get(ret, `detail.${lang}`)
 }
@@ -54,24 +54,31 @@ client.interceptors.response.use(
   }
 )
 
-const request = async (data, options = {}) => {
+const request = async (
+  data: { method?: string; [params: string]: unknown },
+  options: { cancel?: () => {}; [params: string]: unknown } = {}
+) => {
   const { method = 'GET', ...params } = data
   const { cancel, ...config } = options
   const owner = get(window, 'USER.user_id', '')
-  return client
-    .request({
-      url: '/portal_api',
-      cancelToken: isFunction(cancel) ? new axios.CancelToken(cancel) : null,
-      data: {
-        params: {
-          service: 'bigdata',
-          owner,
-          ...params,
-        },
-        method,
+  const axiosConfig: AxiosRequestConfig = {
+    url: '/portal_api',
+    data: {
+      params: {
+        service: 'bigdata',
+        owner,
+        ...params,
       },
-      ...config,
-    })
+      method,
+    },
+    ...config,
+  }
+  if (isFunction(cancel)) {
+    axiosConfig.cancelToken = new axios.CancelToken(cancel)
+  }
+
+  return client
+    .request(axiosConfig)
     .then((response) => response.data)
     .catch((e) => {
       if (axios.isCancel(e)) {

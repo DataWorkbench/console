@@ -1,5 +1,11 @@
 import { makeAutoObservable, set } from 'mobx'
 import type RootStore from './RootStore'
+import {
+  // loadSourceKind,
+  // createDataSource,
+  loadDataSource,
+  IDataSourceParams,
+} from './api'
 
 class DataSourceStore {
   rootStore
@@ -12,8 +18,10 @@ class DataSourceStore {
   }
 
   constructor(rootStore: RootStore) {
+    makeAutoObservable(this, {
+      rootStore: false,
+    })
     this.rootStore = rootStore
-    makeAutoObservable(this, {})
   }
 
   set(params: { [key: string]: any }): void {
@@ -30,28 +38,27 @@ class DataSourceStore {
     })
   }
 
-  async loadEngineMap(params: { [key: string]: any }) {
-    const { api } = this.rootStore
-    const ret = await api.datasource.loadEngineMap(params)
-    if (ret?.ret_code === 0) {
-      return ret.kinds
-    }
-    return []
-  }
+  // async loadEngineMap(params: IDataSourceParams) {
+  //   const ret = await loadSourceKind(params)
+  //   if (ret?.ret_code === 0) {
+  //     return ret.kinds
+  //   }
+  //   return []
+  // }
 
-  async create(params: { [key: string]: any }): Promise<boolean> {
-    const { api } = this.rootStore
-    const ret = await api.datasource.create(params)
-    if (ret?.ret_code === 0) {
-      return true
-    }
-    return false
-  }
+  // async create(params: IDataSourceParams) {
+  //   const ret = await createDataSource(params)
+  //   if (ret?.ret_code === 0) {
+  //     return true
+  //   }
+  //   return false
+  // }
 
-  *load(params: { [key: string]: any }) {
-    const { api } = this.rootStore
+  *load(params: IDataSourceParams) {
     const newParams = { ...this.params, ...params }
-    const ret = yield* api.datasource.load(newParams)
+    const ret: { ret_code: number; [p: string]: any } = yield loadDataSource(
+      newParams
+    )
     if (ret?.ret_code === 0) {
       this.sourceList = ret.infos
       return ret.infos

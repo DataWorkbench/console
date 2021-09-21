@@ -1,13 +1,13 @@
 import { createContext, useContext } from 'react'
 
-interface WorkSpaceState {
+export interface IWorkSpaceState {
   (): {
     set(o: Record<string, unknown>): void
     [propName: string]: any
   }
 }
 
-const WorkSpaceContext = createContext(null)
-const useWorkSpaceContext: WorkSpaceState = () => useContext(WorkSpaceContext)
+const WorkSpaceContext = createContext({} as any)
+const useWorkSpaceContext = () => useContext(WorkSpaceContext)
 
 export { WorkSpaceContext, useWorkSpaceContext }

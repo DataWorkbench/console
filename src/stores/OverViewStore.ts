@@ -9,12 +9,12 @@ class OverViewStore {
   curItemName = ''
 
   constructor(rootStore: RootStore) {
-    this.rootStore = rootStore
     makeObservable(this, {
       showSpaceModal: observable,
       curItemName: observable,
       set: action,
     })
+    this.rootStore = rootStore
   }
 
   items = [

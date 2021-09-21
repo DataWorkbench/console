@@ -1,4 +1,3 @@
-import { FC } from 'react'
 import { Center } from 'components'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
@@ -9,7 +8,7 @@ interface ItemCardTypes {
   }
 }
 
-const ItemCard: FC<ItemCardTypes> = ({ item }) => {
+const ItemCard = ({ item }: ItemCardTypes) => {
   const { name, icon, text, desc, enabled, moreLink } = item
   const { overViewStore } = useStore()
   const handleClick = () => {

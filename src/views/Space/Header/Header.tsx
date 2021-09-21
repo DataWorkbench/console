@@ -1,9 +1,11 @@
 import { useParams, useLocation, useHistory } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
+import { flatten } from 'lodash-es'
 import { getShortSpaceName } from 'utils/convert'
-import { useMount } from 'react-use'
 import { useStore } from 'stores'
 import { Center } from 'components'
+import { useImmer } from 'use-immer'
+import { useQueryWorkSpace } from 'hooks'
 import { Settings } from './Settings'
 import { Navs } from './Navs'
 import { BackMenu } from './BackMenu'
@@ -15,25 +17,30 @@ export const Header = observer(() => {
   const { pathname } = useLocation()
   const history = useHistory()
   const {
-    spaceStore,
-    spaceStore: { workspaces },
+    // spaceStore,
+    // spaceStore: { workspaces },
     globalStore: { darkMode },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
+  // const space = workspaces?.find(({ id }) => id === spaceId)
+  const [filter] = useImmer({
+    regionId,
+    offset: 0,
+    reverse: true,
+    limit: 10,
+    search: '',
+  })
+
+  const { status, data, fetchNextPage, hasNextPage } = useQueryWorkSpace(filter)
+  const workspaces = flatten(data?.pages.map((page) => page.infos || []))
   const space = workspaces?.find(({ id }) => id === spaceId)
 
-  const loadData = () =>
-    spaceStore.fetchSpaces({
-      regionId,
-    })
-
-  useMount(async () => {
-    spaceStore.fetchSpaces({
-      regionId,
-      reload: true,
-    })
-  })
+  const loadData = () => {
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }
 
   return (
     <Root>
@@ -48,10 +55,11 @@ export const Header = observer(() => {
         <SelectWrapper
           darkMode={darkMode}
           defaultValue={spaceId}
+          isLoading={status === 'loading'}
           isLoadingAtBottom
           searchable={false}
           onMenuScrollToBottom={loadData}
-          bottomTextVisible={false}
+          bottomTextVisible
           options={workspaces.map(({ id, name }) => ({
             value: id,
             label: name,

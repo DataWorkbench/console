@@ -22,7 +22,7 @@ function parseI18n(obj: any, lang?: string): any {
   return obj
 }
 
-const formatDate = (timestamp: number, fmt: string) =>
+const formatDate = (timestamp: number, fmt?: string) =>
   dayjs(timestamp * 1000).format(fmt || 'YYYY-MM-DD HH:mm:ss')
 
 const getShortSpaceName = (str: string) => {

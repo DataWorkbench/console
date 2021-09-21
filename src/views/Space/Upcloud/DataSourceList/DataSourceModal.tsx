@@ -1,73 +1,53 @@
-import React, { useState, useRef } from 'react'
-import PropTypes from 'prop-types'
+import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { useMount, useToggle } from 'react-use'
 import Modal, { ModalStep, ModalContent } from 'components/Modal'
 import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
-import { useStore } from 'stores'
+import { useQuerySourceKind } from 'hooks'
+import { useImmer } from 'use-immer'
 import DbList from './DbList'
 import ConfigForm from './ConfigForm'
 
-const propTypes = {
-  show: PropTypes.bool,
-  onHide: PropTypes.func,
-}
-
-const defaultProps = {
-  onHide() {},
-}
-
 const stepTexts = ['选择数据库', '配置数据库']
 
-function DataSourceModal({ show, onHide }) {
+function DataSourceModal({ show = false, onHide = () => {} }) {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
-  const [kinds, setKinds] = useState([])
-  const [step, setStep] = useState(0)
-  const [dbIndex, setDbIndex] = useState()
-  const [loading, toggleLoading] = useToggle(true)
-  const form = useRef()
-  const { dataSourceStore } = useStore()
 
-  useMount(() => {
-    dataSourceStore
-      .loadEngineMap({ regionId, spaceId })
-      .then((items) => {
-        setKinds(items)
-        // console.log(engines)
-      })
-      .catch(() => {
-        // console.warn(e.message)
-      })
-      .then(() => {
-        toggleLoading(false)
-      })
+  const [state, setState] = useImmer({
+    step: 0,
+    dbIndex: 0,
   })
+  const form = useRef()
+  const { isLoading, data: kinds } = useQuerySourceKind(regionId, spaceId)
 
-  const handleHide = () => {
-    onHide()
-  }
-  const handleDbSelect = (i) => {
-    setDbIndex(i)
-    setStep(1)
+  const handleDbSelect = (i: number) => {
+    setState((draft) => {
+      draft.step = 1
+      draft.dbIndex = i
+    })
   }
   const handleSave = () => {
     if (form.current.validateForm()) {
       // const params = form.current.getFieldsValue()
     }
   }
+  const goStep = (i: number) => {
+    setState((draft) => {
+      draft.step = i
+    })
+  }
   return (
     <Modal
       show={show}
-      onHide={handleHide}
+      onHide={onHide}
       title="新增数据源"
       footer={
-        <div className="flex justify-end">
-          {step === 0 ? (
-            <Button>取消</Button>
+        <div tw="flex justify-end space-x-2">
+          {state.step === 0 ? (
+            <Button onClick={onHide}>取消</Button>
           ) : (
             <>
-              <Button className="mr-2" onClick={() => setStep(0)}>
+              <Button className="mr-2" onClick={() => goStep(0)}>
                 上一步
               </Button>
               <Button type="primary" onClick={handleSave}>
@@ -78,10 +58,10 @@ function DataSourceModal({ show, onHide }) {
         </div>
       }
     >
-      <ModalStep step={step} stepTexts={stepTexts} />
+      <ModalStep step={state.step} stepTexts={stepTexts} />
       <ModalContent>
-        {step === 0 && (
-          <Loading spinning={loading} delay={200}>
+        {state.step === 0 && (
+          <Loading spinning={isLoading} delay={200}>
             <p>
               请选择一个数据库，您也可以参考
               <a href="##" className="text-link">
@@ -89,16 +69,15 @@ function DataSourceModal({ show, onHide }) {
               </a>
               进行查看配置
             </p>
-            <DbList items={kinds} onChange={handleDbSelect} />
+            {kinds && <DbList items={kinds} onChange={handleDbSelect} />}
           </Loading>
         )}
-        {step === 1 && <ConfigForm ref={form} db={kinds[dbIndex]} />}
+        {state.step === 1 && (
+          <ConfigForm ref={form} db={kinds[state.dbIndex]} />
+        )}
       </ModalContent>
     </Modal>
   )
 }
-
-DataSourceModal.propTypes = propTypes
-DataSourceModal.defaultProps = defaultProps
 
 export default DataSourceModal
