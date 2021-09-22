@@ -3,6 +3,7 @@ import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { get } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
+import { useLocalStorage } from 'react-use'
 import {
   PageTab,
   Loading,
@@ -45,14 +46,16 @@ interface IWrokSpaceProps {
   onItemCheck?: (regionId: string, spaceId: string) => void
 }
 
+const columnSettingsKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
+
 const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
   const { isLoading, data: regionInfos } = useQueryRegion()
+  const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
   const stateStore = useLocalObservable(() => ({
     isModal,
     onItemCheck,
     scrollElem: null,
     cardView: true,
-    storageKey: 'BIGDATA_SPACELISTS_COLUMN_SETTINGS',
     defaultColumns: [
       { title: '空间名称/id', dataIndex: 'id', fixedInSetting: true },
       { title: '空间状态', dataIndex: 'status' },
@@ -62,12 +65,8 @@ const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
       { title: '创建时间', dataIndex: 'created' },
       { title: '操作', dataIndex: 'updated' },
     ],
-    get columnSettings() {
-      return (
-        get(JSON.parse(localStorage.getItem(this.storageKey) || ''), 'value') ||
-        []
-      )
-    },
+    columnSettingsKey,
+    columnSettings: get(columnSettingsObj, 'value', []),
     curRegionId: get(regionInfos, '[0].id', ''),
     curSpace: null,
     get curSpaceId(): any {

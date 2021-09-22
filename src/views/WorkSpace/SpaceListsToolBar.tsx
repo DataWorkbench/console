@@ -12,7 +12,7 @@ const SpaceListsToolBar = observer(() => {
   const {
     defaultColumns,
     cardView,
-    storageKey,
+    columnSettingsKey,
     optSpaces,
     queryRefetch,
     queryKeyWord,
@@ -32,7 +32,7 @@ const SpaceListsToolBar = observer(() => {
     stateStore.set({ curSpaceOpt: 'create' })
   }
 
-  const handleSaveColumns = (columnSettings) => {
+  const handleSaveColumns = (columnSettings: []) => {
     stateStore.set({ columnSettings })
   }
 
@@ -127,7 +127,7 @@ const SpaceListsToolBar = observer(() => {
           <ToolBar.ColumnsSetting
             defaultColumns={defaultColumns}
             onSave={handleSaveColumns}
-            storageKey={storageKey}
+            storageKey={columnSettingsKey}
           />
         )}
         <div tw="border-l h-full border-neut-3" />

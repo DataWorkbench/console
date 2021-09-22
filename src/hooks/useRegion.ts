@@ -11,7 +11,7 @@ export const useQueryRegion = () => {
   return useQuery('regions', async () => {
     const ret = await loadRegion()
     if (!ret || ret.ret_code !== 0 || !ret.infos) {
-      throw new Error('no data')
+      return []
     }
     const regions: IRegion[] = parseI18n(ret.infos)
     return regions

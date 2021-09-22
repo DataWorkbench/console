@@ -60,6 +60,7 @@ const SpaceCardView = observer(() => {
   } = useQueryWorkSpace(filter)
 
   const workspaces = flatten(data?.pages.map((page) => page.infos || []))
+
   const ifNoData =
     status === 'success' &&
     filter.offset === 0 &&

@@ -28,9 +28,9 @@ export const useQueryWorkSpace = (filter: IListWorkSpaceParams) => {
     async ({ pageParam = filter }) => {
       // console.log(pageParam)
       const ret = await loadWorkSpace(pageParam)
-      if (!ret || ret.ret_code !== 0) {
-        throw new Error('no data')
-      }
+      // if (!ret || ret.ret_code !== 0) {
+      //   throw new Error('no data')
+      // }
       return ret
     },
     {
@@ -63,9 +63,9 @@ export const useQueryPageWorkSpace = (filter: IListWorkSpaceParams) => {
     queryKey,
     async () => {
       const ret = await loadWorkSpace(filter)
-      if (!ret || ret.ret_code !== 0) {
-        throw new Error('error')
-      }
+      // if (!ret || ret.ret_code !== 0) {
+      //   throw new Error('error')
+      // }
       return ret
     },
     {
@@ -99,9 +99,9 @@ export const useMutationWorkSpace = (options?: {}) => {
       } else if (op === 'delete') {
         ret = await deleteWorkSpaces(rest)
       }
-      if (!ret || ret.ret_code !== 0) {
-        throw new Error('no data')
-      }
+      // if (!ret || ret.ret_code !== 0) {
+      //   throw new Error('no data')
+      // }
       return ret
     }
     return undefined
