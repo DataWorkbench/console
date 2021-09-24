@@ -50,7 +50,7 @@ const columns = [
   {
     title: '状态',
     dataIndex: 'state',
-    width: 70,
+    width: 68,
     render: (v: string) => {
       if (v === 'enable') {
         return <div>活跃中</div>

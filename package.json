@@ -19,11 +19,11 @@
     }
   },
   "lint-staged": {
-    "src/*.{js,jsx,ts,tsx}": [
+    "src/**/*.{ts,tsx,js,jsx}": [
       "prettier --write",
       "eslint --fix"
     ],
-    "src/**/*.css": [
+    "**/*.css": [
       "stylelint --fix"
     ]
   },
