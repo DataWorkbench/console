@@ -1,7 +1,7 @@
 import React from 'react'
 import tw from 'twin.macro'
 import { motion } from 'framer-motion'
-import Icon from 'components/Icon'
+import { Icons } from 'components'
 import ItemCard from './ItemCard'
 
 interface FlowCellProps {
@@ -30,7 +30,7 @@ const FlowCell: React.FC<FlowCellProps> = ({ item, placement }) => {
         <ItemCard item={item} />
       </motion.div>
       <div>
-        <Icon name={item.xlink} size={56} tw="pointer-events-none" />
+        <Icons name={item.xlink} size={56} tw="pointer-events-none" />
         <div tw="pt-3">{item.text}</div>
       </div>
     </div>

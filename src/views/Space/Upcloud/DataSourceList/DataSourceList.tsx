@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useToggle } from 'react-use'
 import { observer } from 'mobx-react-lite'
-import { css, styled } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
+import Tippy from '@tippyjs/react'
 import dayjs from 'dayjs'
 import { useImmer } from 'use-immer'
 import {
@@ -16,11 +17,9 @@ import {
   ToolBarLeft,
 } from '@QCFE/qingcloud-portal-ui'
 import { useQuerySource } from 'hooks'
-import { Center, ContentBox, FlexBox } from 'components'
+import { Center, ContentBox, FlexBox, Icons, Menu, MenuItem } from 'components'
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
-
-const { TableActions } = Table
 
 const tabs = [
   {
@@ -31,18 +30,36 @@ const tabs = [
     helpLink: '/',
   },
 ]
+
+const Root = styled('div')(() => [
+  css`
+    .page-tab-container {
+      margin-bottom: 20px;
+    }
+  `,
+])
+
+const TableActions = styled(FlexBox)(() => [
+  css`
+    ${tw`items-center relative`}
+    button.is-text {
+      ${tw`text-link px-2 hover:text-link border-0`}
+    }
+  `,
+])
+
 const columns = [
   {
     title: '数据源名称/id',
     dataIndex: 'sourceid',
     render: (v: string, info: any) => (
-      <FlexBox tw="space-x-1">
+      <FlexBox tw="space-x-1 items-center">
         <Center tw="w-6 h-6 bg-neut-3 rounded-full">
           <Icon name="blockchain" size="small" />
         </Center>
         <div tw="flex-1">
           <div>{info.name}</div>
-          <div className="text-neut-8">{v}</div>
+          <div tw="text-neut-8">{v}</div>
         </div>
       </FlexBox>
     ),
@@ -50,12 +67,21 @@ const columns = [
   {
     title: '状态',
     dataIndex: 'state',
-    width: 68,
     render: (v: string) => {
       if (v === 'enable') {
-        return <div>活跃中</div>
+        return (
+          <Center tw="space-x-1">
+            <Icons name="circle_green" size={12} />
+            <span>活跃中</span>
+          </Center>
+        )
       }
-      return <div>已停用</div>
+      return (
+        <Center tw="space-x-1">
+          <Icons name="circle_green" size={12} />
+          <span>已停用</span>
+        </Center>
+      )
     },
   },
   {
@@ -84,27 +110,47 @@ const columns = [
   {
     title: '操作',
     key: 'table_actions',
-    render: () => (
-      <TableActions
-        items={[
-          { key: 'table', icon: 'if-eye', text: '表' },
-          { key: 'start', icon: 'if-start', text: '启动' },
-          { key: 'stop', icon: 'if-stop', text: '停止' },
-          { key: 'modify', icon: 'if-pen', text: '修改' },
-          { key: 'delete', icon: 'if-trash', text: '删除' },
-        ]}
-      />
+    render: (v: string, info: any) => (
+      <TableActions>
+        <Button type="text">表</Button>
+        <div tw="border-l border-neut-3 h-5" />
+        <Button type="text" disabled={info.state === 'enable'}>
+          启动
+        </Button>
+        <Button type="text" disabled={info.state === 'disable'}>
+          停用
+        </Button>
+        <Tippy
+          // hideOnClick={false}
+          theme="light"
+          animation="fade"
+          trigger="click"
+          arrow
+          interactive
+          delay={100}
+          offset={[0, 10]}
+          appendTo={() => document.body}
+          content={
+            <Menu>
+              <MenuItem>
+                <Icon name="pen" tw="mr-2" />
+                修改
+              </MenuItem>
+              <MenuItem disabled>
+                <Icon name="trash" tw="mr-2" />
+                删除
+              </MenuItem>
+            </Menu>
+          }
+        >
+          <Center>
+            <Icon name="more" clickable />
+          </Center>
+        </Tippy>
+      </TableActions>
     ),
   },
 ]
-
-const Root = styled('div')(() => [
-  css`
-    .page-tab-container {
-      margin-bottom: 20px;
-    }
-  `,
-])
 
 const DataSourceList = observer(() => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([])

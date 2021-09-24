@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { useMount, useUnmount } from 'react-use'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import MyIcon from 'components/Icon'
+import { Icons } from 'components'
 import * as echarts from 'echarts/core'
 import { LineChart } from 'echarts/charts'
 import {
@@ -133,7 +133,7 @@ function OverView() {
                     'linear-gradient(43.53deg, #D44E4B 0%, #E89A9B 91.47%)',
                 }}
               />
-              <MyIcon name="screen_failed" size={32} />
+              <Icons name="screen_failed" size={32} />
               <div tw="ml-3 2xl:ml-6">
                 <div tw="pb-1">运行失败实例</div>
                 <div tw="text-2xl font-mono">24</div>
@@ -147,7 +147,7 @@ function OverView() {
                     'linear-gradient(43.53deg, #D44E4B 0%, #E89A9B 91.47%)',
                 }}
               />
-              <MyIcon name="screen_running" size={32} />
+              <Icons name="screen_running" size={32} />
               <div tw="ml-3 2xl:ml-6">
                 <div tw="pb-1">运行中实例</div>
                 <div tw="text-2xl font-mono">12</div>
@@ -161,7 +161,7 @@ function OverView() {
                     'linear-gradient(43.53deg, #229CE9 0%, #79C0F3 91.47%)',
                 }}
               />
-              <MyIcon name="screen_success" size={32} />
+              <Icons name="screen_success" size={32} />
               <div tw="ml-3 2xl:ml-6">
                 <div tw="pb-1">运行成功实例</div>
                 <div tw="text-2xl font-mono">36</div>
@@ -175,7 +175,7 @@ function OverView() {
                     'linear-gradient(43.53deg, #934BC5 0%, #C096E0 91.47%)',
                 }}
               />
-              <MyIcon name="screen_waiting" size={32} />
+              <Icons name="screen_waiting" size={32} />
               <div tw="ml-3 2xl:ml-6">
                 <div tw="pb-1">等资源实例</div>
                 <div tw="text-2xl font-mono">26</div>
@@ -189,7 +189,7 @@ function OverView() {
                     'linear-gradient(43.53deg, #939EA9 0%, #B6C2CD 91.47%)',
                 }}
               />
-              <MyIcon name="screen_stoped" size={32} />
+              <Icons name="screen_stoped" size={32} />
               <div tw="ml-3 2xl:ml-6">
                 <div tw="pb-1">未运行实例</div>
                 <div tw="text-2xl font-mono">2</div>

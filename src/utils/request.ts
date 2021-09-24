@@ -5,7 +5,7 @@ import emitter from 'utils/emitter'
 
 const baseConfig: AxiosRequestConfig = {
   method: 'POST',
-  timeout: 20000,
+  timeout: 30000,
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken',
   headers: {
