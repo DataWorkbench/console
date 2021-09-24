@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useToggle } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { css, styled } from 'twin.macro'
-import { get, toLower } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
+import { useImmer } from 'use-immer'
 import {
   PageTab,
   Icon,
@@ -15,10 +15,12 @@ import {
   ToolBar,
   ToolBarLeft,
 } from '@QCFE/qingcloud-portal-ui'
-import { useStore } from 'stores'
-import { ContentBox, FlexBox } from 'components'
+import { useQuerySource } from 'hooks'
+import { Center, ContentBox, FlexBox } from 'components'
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
+
+const { TableActions } = Table
 
 const tabs = [
   {
@@ -32,11 +34,13 @@ const tabs = [
 const columns = [
   {
     title: '数据源名称/id',
-    dataIndex: 'info.sourceid',
-    render: (v, { info }) => (
-      <FlexBox>
-        <Icon name="blockchain" size="medium" />
-        <div>
+    dataIndex: 'sourceid',
+    render: (v: string, info: any) => (
+      <FlexBox tw="space-x-1">
+        <Center tw="w-6 h-6 bg-neut-3 rounded-full">
+          <Icon name="blockchain" size="small" />
+        </Center>
+        <div tw="flex-1">
           <div>{info.name}</div>
           <div className="text-neut-8">{v}</div>
         </div>
@@ -44,58 +48,59 @@ const columns = [
     ),
   },
   {
-    title: '数据源类型',
-    dataIndex: 'info.sourcetype',
-  },
-  {
-    title: 'url',
-    render: (v, { info }) => {
-      const url = get(info, `url.${toLower(info.sourcetype)}`, {})
-      return (
-        <span>
-          {url.host}:{url.port}
-        </span>
-      )
+    title: '状态',
+    dataIndex: 'state',
+    width: 70,
+    render: (v: string) => {
+      if (v === 'enable') {
+        return <div>活跃中</div>
+      }
+      return <div>已停用</div>
     },
   },
   {
-    title: '用户名',
-    dataIndex: 'info.name',
-    render: () => '',
+    title: '数据源类型',
+    dataIndex: 'sourcetype',
+  },
+  {
+    title: '连通性测试状态',
+    dataIndex: 'connected',
+    render: (v: string) => {
+      if (v === 'failed') {
+        return <div>不通过</div>
+      }
+      return <div>通过</div>
+    },
   },
   {
     title: '数据源描述',
-    dataIndex: 'info.comment',
+    dataIndex: 'comment',
   },
   {
     title: '创建时间',
-    dataIndex: 'info.updatetime',
-    render: (field) => dayjs(field).format('YYYY-MM-DD HH:mm:ssZ'),
+    dataIndex: 'updatetime',
+    render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
   },
   {
     title: '操作',
     key: 'table_actions',
-    dataIndex: '',
-    width: 130,
     render: () => (
-      <div>
-        <Button type="text" className="px-1 !text-link">
-          表
-        </Button>
-        <Button type="text" className="px-1 !text-link">
-          编辑
-        </Button>
-        <Button type="text" className="px-1 !text-link">
-          删除
-        </Button>
-      </div>
+      <TableActions
+        items={[
+          { key: 'table', icon: 'if-eye', text: '表' },
+          { key: 'start', icon: 'if-start', text: '启动' },
+          { key: 'stop', icon: 'if-stop', text: '停止' },
+          { key: 'modify', icon: 'if-pen', text: '修改' },
+          { key: 'delete', icon: 'if-trash', text: '删除' },
+        ]}
+      />
     ),
   },
 ]
 
 const Root = styled('div')(() => [
   css`
-    & > :first-child {
+    .page-tab-container {
       margin-bottom: 20px;
     }
   `,
@@ -103,28 +108,41 @@ const Root = styled('div')(() => [
 
 const DataSourceList = observer(() => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [loading, toggleLoadding] = useState(true)
   const [show, toggleShow] = useToggle(false)
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
-  const {
-    dataSourceStore,
-    dataSourceStore: { sourceList },
-  } = useStore()
-  useEffect(() => {
-    toggleLoadding(true)
-    const params = { regionId, spaceId, offset: 0 }
-    dataSourceStore.load(params).finally(() => {
-      toggleLoadding(false)
-    })
-  }, [spaceId, regionId, dataSourceStore])
-  if (loading) {
+
+  const [filter] = useImmer<{
+    regionId: string
+    spaceId: string
+    offset: number
+    limit: number
+    reverse: boolean
+  }>({
+    regionId,
+    spaceId,
+    reverse: true,
+    offset: 0,
+    limit: 10,
+  })
+
+  const { status, data } = useQuerySource(filter)
+
+  if (status === 'loading') {
     return (
-      <ContentBox tw="bg-white">
-        <Loading spinning={loading} />
-      </ContentBox>
+      <Root>
+        <PageTab tabs={tabs} />
+        <ContentBox tw="bg-white h-80">
+          <Loading />
+        </ContentBox>
+      </Root>
     )
   }
+
+  const sourceList = (data?.infos || []).map(({ connected, info }) => ({
+    ...info,
+    connected,
+  }))
 
   return (
     <>
@@ -151,9 +169,33 @@ const DataSourceList = observer(() => {
             selectType="checkbox"
             dataSource={sourceList}
             columns={columns}
-            rowKey="id"
+            rowKey="sourceid"
             selectedRowKeys={selectedRowKeys}
-            onSelect={(rowKeys) => setSelectedRowKeys(rowKeys)}
+            onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
+            // onContextMenus={(row) => {
+            //   return [
+            //     {
+            //       key: 'view',
+            //       icon: 'if-eye',
+            //       text: '查看信息',
+            //     },
+            //     {
+            //       key: 'start',
+            //       icon: 'if-start',
+            //       text: '启动',
+            //     },
+            //     {
+            //       key: 'stop',
+            //       icon: 'if-stop',
+            //       text: '停止',
+            //     },
+            //     {
+            //       key: 'trash',
+            //       icon: 'if-trash',
+            //       text: '删除',
+            //     },
+            //   ]
+            // }}
           />
         </Root>
       ) : (

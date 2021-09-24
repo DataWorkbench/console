@@ -1,37 +1,34 @@
-import { useEffect } from 'react'
-// import PropTypes from 'prop-types'
+import { useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
 import { Icon, Input } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useStore } from 'stores'
+import { useQueryFlow } from 'hooks'
 
-// const propTypes = {
-//   onCreateClick: PropTypes.func,
-// }
-
-// const defaultPropTypes = {
-//   onCreateClick() {},
-// }
-
-interface IFlowMenuProps {
-  onCreateClick: () => void
-}
-
-const FlowMenu = observer(({ onCreateClick = () => {} }: IFlowMenuProps) => {
-  const { regionId, spaceId } = useParams()
+const FlowMenu = observer(() => {
+  const { regionId, spaceId } = useParams<IUseParms>()
+  const { data } = useQueryFlow({ regionId, spaceId })
   const {
     workFlowStore,
-    workFlowStore: { flows, curFlow },
+    workFlowStore: { curFlow },
   } = useStore()
+  const flows = data?.infos || []
 
   useEffect(() => {
     workFlowStore.load({ regionId, spaceId }, true)
   }, [spaceId, regionId, workFlowStore])
 
-  const handleItemClick = (flow) => {
-    workFlowStore.set({ curFlow: flow })
-  }
+  const handleItemClick = useCallback(
+    (flow) => {
+      workFlowStore.set({ curFlow: flow })
+    },
+    [workFlowStore]
+  )
+
+  const handleCreateClick = useCallback(() => {
+    workFlowStore.set({ showFlowModal: true })
+  }, [workFlowStore])
 
   return (
     <div tw="w-56 bg-neut-16 m-3 rounded dark:text-white">
@@ -75,7 +72,7 @@ const FlowMenu = observer(({ onCreateClick = () => {} }: IFlowMenuProps) => {
         <div tw="text-center my-3">
           <button
             type="button"
-            onClick={onCreateClick}
+            onClick={handleCreateClick}
             tw="py-1 rounded-sm w-48 bg-neut-13 focus:outline-none hover:bg-neut-10 ring-opacity-50"
           >
             <Icon name="add" type="light" tw="align-middle" />

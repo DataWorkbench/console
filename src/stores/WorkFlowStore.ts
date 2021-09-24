@@ -1,4 +1,4 @@
-import { makeObservable, flow, action, observable, set } from 'mobx'
+import { makeAutoObservable, set } from 'mobx'
 import type RootStore from './RootStore'
 import { createWorkFlow, loadWorkFlow, IWorkFlowParams } from './api'
 
@@ -9,14 +9,11 @@ class WorkFlowStore {
 
   curFlow = null
 
+  showFlowModal = false
+
   constructor(rootStore: RootStore) {
-    makeObservable(this, {
-      flows: observable,
-      curFlow: observable,
-      set: action,
-      setCurFlow: action,
-      create: flow,
-      load: flow,
+    makeAutoObservable(this, {
+      rootStore: false,
     })
     this.rootStore = rootStore
   }

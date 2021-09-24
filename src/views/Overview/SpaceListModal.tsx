@@ -19,6 +19,7 @@ const SpaceListModal = observer(() => {
     overViewStore.set({ showSpaceModal: false })
   }
   const handleClick = () => {
+    handleHide()
     history.push(`/${curRegionId}/workspace/${curSpaceId}/${curItemName}`)
   }
 

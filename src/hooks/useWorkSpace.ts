@@ -27,11 +27,7 @@ export const useQueryWorkSpace = (filter: IListWorkSpaceParams) => {
     queryKey,
     async ({ pageParam = filter }) => {
       // console.log(pageParam)
-      const ret = await loadWorkSpace(pageParam)
-      // if (!ret || ret.ret_code !== 0) {
-      //   throw new Error('no data')
-      // }
-      return ret
+      return loadWorkSpace(pageParam)
     },
     {
       getNextPageParam: (lastPage, allPages) => {
@@ -59,19 +55,9 @@ export const useQueryPageWorkSpace = (filter: IListWorkSpaceParams) => {
   const queryKey = ['workspaces', filter]
   keys.page = queryKey
   // console.log(filter)
-  return useQuery(
-    queryKey,
-    async () => {
-      const ret = await loadWorkSpace(filter)
-      // if (!ret || ret.ret_code !== 0) {
-      //   throw new Error('error')
-      // }
-      return ret
-    },
-    {
-      keepPreviousData: true,
-    }
-  )
+  return useQuery(queryKey, async () => loadWorkSpace(filter), {
+    keepPreviousData: true,
+  })
 }
 // {IWorkSpaceParams, 'disable' | 'enable' | 'delete' | 'create'}
 interface MutationWorkSpaceParams {
@@ -99,9 +85,6 @@ export const useMutationWorkSpace = (options?: {}) => {
       } else if (op === 'delete') {
         ret = await deleteWorkSpaces(rest)
       }
-      // if (!ret || ret.ret_code !== 0) {
-      //   throw new Error('no data')
-      // }
       return ret
     }
     return undefined

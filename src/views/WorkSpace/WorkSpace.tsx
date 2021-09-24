@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { get } from 'lodash-es'
@@ -28,13 +28,10 @@ const tabs = [
   },
 ]
 
-const Wrapper = styled('div')<{ showLoading?: boolean; isModal?: boolean }>(
-  ({ isModal, showLoading }) => [
-    tw`h-full overflow-auto`,
-    showLoading && tw`h-80`,
-    !isModal && tw`p-5`,
-  ]
-)
+const Wrapper = styled('div')<{ isModal?: boolean }>(({ isModal }) => [
+  tw`h-full overflow-auto`,
+  !isModal && tw`p-5`,
+])
 
 const Content = styled(Card)(({ isModal }: { isModal?: boolean }) => [
   tw`pt-5 relative`,
@@ -49,7 +46,7 @@ interface IWrokSpaceProps {
 const columnSettingsKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
 
 const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
-  const { isLoading, data: regionInfos } = useQueryRegion()
+  const { status, refetch, data: regionInfos } = useQueryRegion()
   const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
   const stateStore = useLocalObservable(() => ({
     isModal,
@@ -89,7 +86,7 @@ const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
   }))
 
   useEffect(() => {
-    if (regionInfos) {
+    if (regionInfos?.length) {
       stateStore.set({ curRegionId: get(regionInfos, '[0].id', '') })
     }
   }, [regionInfos, stateStore])
@@ -106,15 +103,27 @@ const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
     stateStore.set({ queryKeyWord: v })
   }
 
+  const renderNoSuccess = useCallback(
+    (st: string) => {
+      if (st === 'loading') {
+        return <Loading size="large" delay={150} />
+      }
+      if (st === 'error') {
+        return <Button onClick={() => refetch()}>重试</Button>
+      }
+      return null
+    },
+    [refetch]
+  )
+
   return (
     <Wrapper
-      showLoading={isLoading}
       isModal={isModal}
       ref={(ref) => stateStore.set({ scrollElem: ref })}
     >
       {!isModal && <PageTab tabs={tabs} />}
-      {isLoading ? (
-        <Loading size="large" delay={150} />
+      {status !== 'success' ? (
+        <div tw="h-80">{renderNoSuccess(status)}</div>
       ) : (
         <WorkSpaceContext.Provider value={stateStore}>
           <Content isModal={isModal}>

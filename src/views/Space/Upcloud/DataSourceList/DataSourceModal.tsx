@@ -2,14 +2,14 @@ import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import Modal, { ModalStep, ModalContent } from 'components/Modal'
 import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
-import { useQuerySourceKind } from 'hooks'
+import { useQueryClient } from 'react-query'
+import { useQuerySourceKind, useMutationSource, getSourceKey } from 'hooks'
 import { useImmer } from 'use-immer'
+import { get } from 'lodash-es'
 import DbList from './DbList'
-import ConfigForm from './ConfigForm'
+import CreateForm from './CreateForm'
 
-const stepTexts = ['选择数据库', '配置数据库']
-
-function DataSourceModal({ show = false, onHide = () => {} }) {
+const DataSourceModal = ({ show = false, onHide = () => {} }) => {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
 
@@ -18,7 +18,9 @@ function DataSourceModal({ show = false, onHide = () => {} }) {
     dbIndex: 0,
   })
   const form = useRef()
-  const { isLoading, data: kinds } = useQuerySourceKind(regionId, spaceId)
+  const queryClient = useQueryClient()
+  const { status, data: kinds, refetch } = useQuerySourceKind(regionId, spaceId)
+  const mutation = useMutationSource()
 
   const handleDbSelect = (i: number) => {
     setState((draft) => {
@@ -27,8 +29,27 @@ function DataSourceModal({ show = false, onHide = () => {} }) {
     })
   }
   const handleSave = () => {
-    if (form.current.validateForm()) {
-      // const params = form.current.getFieldsValue()
+    const formElem = form.current
+    if (formElem.validateForm()) {
+      const { name, comment, ...rest } = formElem.getFieldsValue()
+      const sourcetype: string = get(kinds, `[${state.dbIndex}].name`)
+      const params = {
+        regionId,
+        spaceId,
+        name,
+        comment,
+        sourcetype,
+        url: {
+          [sourcetype.toLowerCase()]: rest,
+        },
+      }
+      mutation.mutate(params, {
+        onSuccess: () => {
+          onHide()
+          const queryKey = getSourceKey()
+          queryClient.invalidateQueries(queryKey)
+        },
+      })
     }
   }
   const goStep = (i: number) => {
@@ -50,7 +71,11 @@ function DataSourceModal({ show = false, onHide = () => {} }) {
               <Button className="mr-2" onClick={() => goStep(0)}>
                 上一步
               </Button>
-              <Button type="primary" onClick={handleSave}>
+              <Button
+                loading={mutation.isLoading}
+                type="primary"
+                onClick={handleSave}
+              >
                 确定
               </Button>
             </>
@@ -58,10 +83,10 @@ function DataSourceModal({ show = false, onHide = () => {} }) {
         </div>
       }
     >
-      <ModalStep step={state.step} stepTexts={stepTexts} />
+      <ModalStep step={state.step} stepTexts={['选择数据库', '配置数据库']} />
       <ModalContent>
         {state.step === 0 && (
-          <Loading spinning={isLoading} delay={200}>
+          <Loading spinning={status === 'loading'} delay={200}>
             <p>
               请选择一个数据库，您也可以参考
               <a href="##" className="text-link">
@@ -69,11 +94,14 @@ function DataSourceModal({ show = false, onHide = () => {} }) {
               </a>
               进行查看配置
             </p>
+            {status === 'error' && (
+              <Button onClick={() => refetch()}>重试</Button>
+            )}
             {kinds && <DbList items={kinds} onChange={handleDbSelect} />}
           </Loading>
         )}
         {state.step === 1 && (
-          <ConfigForm ref={form} db={kinds[state.dbIndex]} />
+          <CreateForm ref={form} db={kinds[state.dbIndex]} />
         )}
       </ModalContent>
     </Modal>

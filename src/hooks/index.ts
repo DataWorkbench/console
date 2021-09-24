@@ -5,5 +5,6 @@ import useScrollBlock from './useScrollBlock'
 export * from './useWorkSpace'
 export * from './useRegion'
 export * from './useSource'
+export * from './useFlow'
 
 export { useDarkMode, useScrollBlock, useStore }

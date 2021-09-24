@@ -140,7 +140,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     limit: 10,
   })
   const { isLoading, data, refetch } = useQueryPageWorkSpace(filter)
-  const workspaces = get(data, 'infos') || []
+  const workspaces = data?.infos || []
 
   useEffect(() => {
     if (queryRefetch) {

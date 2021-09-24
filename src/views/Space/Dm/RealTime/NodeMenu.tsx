@@ -1,12 +1,6 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import tw from 'twin.macro'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import NodeMenuItem from './NodeMenuItem'
-
-const propTypes = {
-  show: PropTypes.bool,
-}
 
 const menusData = [
   {
@@ -42,7 +36,7 @@ const menusData = [
   },
 ]
 
-function NodeMenu({ show }) {
+const NodeMenu = ({ show }: { show: boolean }) => {
   return (
     <div
       css={[
@@ -73,7 +67,5 @@ function NodeMenu({ show }) {
     </div>
   )
 }
-
-NodeMenu.propTypes = propTypes
 
 export default NodeMenu

@@ -55,7 +55,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const handleSelected = () => {
     if (isModal) {
       stateStore.set({ curSpace: space })
-      onItemCheck(space.id, regionId)
+      onItemCheck(regionId, space.id)
     }
   }
 

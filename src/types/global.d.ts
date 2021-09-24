@@ -4,4 +4,10 @@ declare global {
     getText(text: string): string
     USER: any
   }
+
+  interface IUseParms {
+    regionId: string
+    spaceId: string
+    [k: string]: string
+  }
 }

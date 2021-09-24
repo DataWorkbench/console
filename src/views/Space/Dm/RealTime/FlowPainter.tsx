@@ -1,11 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useMount } from 'react-use'
 import { jsPlumb } from 'jsplumb'
 import { useDrop } from 'react-dnd'
 import { nanoid } from 'nanoid'
 import tw from 'twin.macro'
 
-function FlowPainter() {
+const FlowPainter = () => {
   const [rjsp, setRjsp] = useState(null)
   const [elems, setElems] = useState([])
   const rootEl = useRef()

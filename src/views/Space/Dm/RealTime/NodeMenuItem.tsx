@@ -1,13 +1,7 @@
-import React from 'react'
 import tw from 'twin.macro'
-import PropTypes from 'prop-types'
 import { useDrag } from 'react-dnd'
 
-const propTypes = {
-  item: PropTypes.object,
-}
-
-function NodeMenuItem({ item }) {
+const NodeMenuItem = ({ item }: { item: any }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'box',
     options: {
@@ -44,7 +38,5 @@ function NodeMenuItem({ item }) {
     </li>
   )
 }
-
-NodeMenuItem.propTypes = propTypes
 
 export default NodeMenuItem

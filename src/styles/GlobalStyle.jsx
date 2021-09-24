@@ -22,7 +22,8 @@ const customStyles = css`
     a:hover {
       ${tw`text-white`};
     }
-    .input {
+    .input,
+    .textarea {
       ${tw`bg-neut-16 text-white border-neut-13`}
       &:not([readonly]):not([disabled]):hover {
         ${tw`border-neut-8`}

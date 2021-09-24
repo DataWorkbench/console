@@ -1,12 +1,19 @@
 import { Fragment } from 'react'
 import tw from 'twin.macro'
 
+interface ModalStepProps {
+  step: number
+  stepTexts: string[]
+  sameLine: boolean
+  stepClassName: any
+}
+
 const ModalStep = ({
   step = 0,
   stepTexts = [],
   sameLine = false,
   stepClassName,
-}) => {
+}: ModalStepProps) => {
   const textsLen = stepTexts.length
   return (
     <div tw="flex h-20 justify-center items-center bg-neut-1 dark:bg-neut-17">

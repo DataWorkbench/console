@@ -31,11 +31,12 @@ client.interceptors.response.use(
         title: `请求错误: [${status || retCode}]`,
         content: message,
       })
+      throw new Error(message)
     }
     return response
   },
   (error) => {
-    if (axios.isCancel(error)) {
+    if (axios.isCancel(error) || error.code === 'ECONNABORTED') {
       emitter.emit('error', {
         title: `网络超时: [timeout]`,
         content: error.message,
@@ -77,18 +78,16 @@ const request = async (
     axiosConfig.cancelToken = new axios.CancelToken(cancel)
   }
 
-  return client
-    .request(axiosConfig)
-    .then((response) => response.data)
-    .catch((e) => {
-      if (axios.isCancel(e)) {
-        return null
-      }
-      return {
-        ret_code: -1,
-        message: e.message,
-      }
-    })
+  return client.request(axiosConfig).then((response) => response.data)
+  // .catch((e) => {
+  //   if (axios.isCancel(e)) {
+  //     return null
+  //   }
+  //   return {
+  //     ret_code: -1,
+  //     message: e.message,
+  //   }
+  // })
 }
 
 export default request

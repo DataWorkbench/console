@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useUnmount, useToggle } from 'react-use'
 import tw from 'twin.macro'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
@@ -12,7 +12,7 @@ interface ModalProps {
   okText?: string
   cancelText?: string
   onOK?: () => void
-  onHide?: (hide: boolean) => void
+  onHide?: () => void
   closeOnOverlayClick?: boolean
   footer?: React.ReactNode
   children: React.ReactNode
@@ -42,26 +42,29 @@ const Modal = ({
   const [isHide, toggleHide] = useToggle(!show)
   const [blockScroll, allowScroll] = useScrollBlock()
 
-  if (show) {
+  if (!isHide) {
     blockScroll()
   } else {
     allowScroll()
   }
 
   useUnmount(() => allowScroll())
+  useEffect(() => {
+    toggleHide(!show)
+  }, [show, toggleHide])
 
   const handleClose = () => {
     toggleHide(true)
-    onHide(true)
+    onHide()
   }
 
   return (
     <div
-      className={rootClassName}
       css={[
         tw`fixed inset-0 z-10`,
-        isHide && tw`hidden`,
         placement === 'center' && tw`flex items-center justify-center`,
+        isHide && tw`hidden`,
+        rootClassName,
       ]}
     >
       <div
@@ -74,10 +77,10 @@ const Modal = ({
       />
       <div
         css={[
-          contentClassName,
           tw`flex flex-col bg-white dark:bg-neut-16 dark:text-white overflow-auto z-20`,
           placement === 'rightFull' && tw`fixed top-0 right-0 bottom-0 w-1/2`,
           placement === 'center' && tw`min-w-[600px] h-auto`,
+          contentClassName,
         ]}
       >
         <div tw="flex justify-between px-5 py-4 shadow">
