@@ -172,30 +172,6 @@ const DataSourceList = observer(() => {
             rowKey="sourceid"
             selectedRowKeys={selectedRowKeys}
             onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
-            // onContextMenus={(row) => {
-            //   return [
-            //     {
-            //       key: 'view',
-            //       icon: 'if-eye',
-            //       text: '查看信息',
-            //     },
-            //     {
-            //       key: 'start',
-            //       icon: 'if-start',
-            //       text: '启动',
-            //     },
-            //     {
-            //       key: 'stop',
-            //       icon: 'if-stop',
-            //       text: '停止',
-            //     },
-            //     {
-            //       key: 'trash',
-            //       icon: 'if-trash',
-            //       text: '删除',
-            //     },
-            //   ]
-            // }}
           />
         </Root>
       ) : (
