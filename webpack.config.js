@@ -136,7 +136,7 @@ if (process.env.npm_config_report) {
 }
 if (isDev) {
   config = merge(config, {
-    devtool: 'eval-cheap-module-source-map',
+    devtool: 'eval-source-map',
     plugins: [new ReactRefreshWebpackPlugin({ overlay: false })],
   })
 } else {

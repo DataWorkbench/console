@@ -1,7 +1,10 @@
-import { forwardRef } from 'react'
+import React from 'react'
 import { Field, Label, Control } from '@QCFE/lego-ui'
+import { observer } from 'mobx-react-lite'
 import tw from 'twin.macro'
+import { get } from 'lodash-es'
 import { Alert, Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
+import { useStore } from 'hooks'
 
 const { TextField, TextAreaField, PasswordField, NumberField } = Form
 
@@ -234,14 +237,19 @@ const getFieldsInfo = (type: string) => {
 }
 
 interface CreateFormProps {
-  db: {
+  kind: {
     name: string
     desc?: string
   }
 }
-const CreateForm = forwardRef<HTMLFormElement, CreateFormProps>(
-  ({ db }, ref) => {
-    const fields = getFieldsInfo(db.name.toLowerCase())
+const CreateForm = observer(
+  ({ kind }: CreateFormProps, ref) => {
+    const {
+      dataSourceStore: { op, opSourceList },
+    } = useStore()
+    const kindName =
+      op === 'create' ? kind.name : get(opSourceList, '[0].sourcetype')
+    const fields = getFieldsInfo(kindName.toLowerCase())
     return (
       <div>
         <Alert
@@ -264,7 +272,12 @@ const CreateForm = forwardRef<HTMLFormElement, CreateFormProps>(
               <div tw="rounded-sm border border-green-11 p-2">
                 <div tw="font-medium flex items-center">
                   <Icon name="container" tw="mr-1" />
-                  <span tw="text-green-11">{db?.name}</span>
+                  <span tw="text-green-11">
+                    {kindName}
+                    {/* {op === 'create'
+                      ? kind.name
+                      : get(opSourceList, '[0].sourcetype')} */}
+                  </span>
                 </div>
                 <div tw="text-neut-8">
                   这是一个很长很长很长很长的关于模式的描述信息。
@@ -348,6 +361,9 @@ const CreateForm = forwardRef<HTMLFormElement, CreateFormProps>(
         </Form>
       </div>
     )
+  },
+  {
+    forwardRef: true,
   }
 )
 

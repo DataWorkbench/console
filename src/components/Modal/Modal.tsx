@@ -57,7 +57,6 @@ const Modal = ({
     toggleHide(true)
     onHide()
   }
-
   return (
     <div
       css={[

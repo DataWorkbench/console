@@ -3,6 +3,10 @@ import {
   loadSourceKind,
   createDataSource,
   loadDataSource,
+  enableDataSource,
+  disableDataSource,
+  deleteDataSource,
+  updateDataSource,
   IDataSourceParams,
 } from 'stores/api'
 import { get } from 'lodash-es'
@@ -27,9 +31,25 @@ export const useQuerySource = (filter: IDataSourceParams) => {
   })
 }
 
+interface MutationSourceParams extends IDataSourceParams {
+  op: 'disable' | 'enable' | 'delete' | 'create' | 'update'
+  sourceIds?: string[]
+}
+
 export const useMutationSource = () => {
-  return useMutation(async (params: IDataSourceParams) => {
-    const ret = await createDataSource(params)
+  return useMutation(async ({ op, ...rest }: MutationSourceParams) => {
+    let ret = null
+    if (op === 'create') {
+      ret = await createDataSource(rest)
+    } else if (op === 'enable') {
+      ret = await enableDataSource(rest)
+    } else if (op === 'disable') {
+      ret = await disableDataSource(rest)
+    } else if (op === 'delete') {
+      ret = await deleteDataSource(rest)
+    } else if (op === 'update') {
+      ret = await updateDataSource(rest)
+    }
     return ret
   })
 }

@@ -4,8 +4,8 @@ import tw from 'twin.macro'
 interface ModalStepProps {
   step: number
   stepTexts: string[]
-  sameLine: boolean
-  stepClassName: any
+  sameLine?: boolean
+  stepClassName?: any
 }
 
 const ModalStep = ({

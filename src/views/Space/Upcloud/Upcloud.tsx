@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import SideMenu from 'components/SideMenu'
 import { useStore } from 'stores'
 import { ContentBox } from 'components'
-import DataSourceList from './DataSourceList/DataSourceList'
+import DataSourceList from './DataSourceList'
 
 const Upcloud = () => {
   const { regionId, spaceId, mod } =
