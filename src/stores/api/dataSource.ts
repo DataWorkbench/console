@@ -29,7 +29,7 @@ export const updateDataSource = ({
   request({
     action: `${regionId}/v1/workspace/${spaceId}/source/${sourceId}`,
     ...rest,
-    method: 'PUT',
+    method: 'POST',
   })
 
 export const loadDataSource = ({
@@ -50,18 +50,18 @@ export const disableDataSource = ({
   request({
     action: `${regionId}/v1/workspace/${spaceId}/source/disables`,
     sourceids: sourceIds,
-    method: 'PUT',
+    method: 'POST',
   })
 
 export const enableDataSource = ({
   regionId,
   spaceId,
-  ...sourceIds
+  sourceIds,
 }: IDataSourceParams) =>
   request({
     action: `${regionId}/v1/workspace/${spaceId}/source/enables`,
     sourceids: sourceIds,
-    method: 'PUT',
+    method: 'POST',
   })
 
 export const deleteDataSource = ({
@@ -72,5 +72,5 @@ export const deleteDataSource = ({
   request({
     action: `${regionId}/v1/workspace/${spaceId}/source/deletes`,
     sourceids: sourceIds,
-    method: 'DELETE',
+    method: 'POST',
   })

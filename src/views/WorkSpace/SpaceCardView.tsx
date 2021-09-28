@@ -119,7 +119,7 @@ const SpaceCardView = observer(() => {
   }
   return (
     <>
-      <Content tw="min-h-[300px]">
+      <Content>
         {workspaces.map((space, i: number) => (
           <SpaceItemWrapper
             key={space.id}

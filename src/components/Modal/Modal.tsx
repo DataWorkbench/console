@@ -60,7 +60,7 @@ const Modal = ({
   return (
     <div
       css={[
-        tw`fixed inset-0 z-10`,
+        tw`fixed inset-0 z-50`,
         placement === 'center' && tw`flex items-center justify-center`,
         isHide && tw`hidden`,
         rootClassName,

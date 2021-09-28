@@ -34,6 +34,7 @@ export const useQuerySource = (filter: IDataSourceParams) => {
 interface MutationSourceParams extends IDataSourceParams {
   op: 'disable' | 'enable' | 'delete' | 'create' | 'update'
   sourceIds?: string[]
+  sourceId?: string
 }
 
 export const useMutationSource = () => {

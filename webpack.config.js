@@ -57,11 +57,20 @@ let config = {
         ],
       },
       {
-        test: /\.(png|jpg|svg|jpeg|gif)$/i,
+        test: /\.svg$/i,
         type: 'asset/resource',
         exclude: resolve('src/assets/icons'),
         generator: {
-          filename: 'static/imgs/[name][ext]',
+          filename: 'static/imgs/[hash][ext][query]',
+        },
+        use: 'svgo-loader',
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
+        exclude: resolve('src/assets/icons'),
+        generator: {
+          filename: 'static/imgs/[hash][ext][query]',
         },
       },
       {

@@ -1,12 +1,20 @@
 import React from 'react'
 import { Field, Label, Control } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import tw from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import { get } from 'lodash-es'
 import { Alert, Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'hooks'
 
-const { TextField, TextAreaField, PasswordField, NumberField } = Form
+const { TextField, TextAreaField, NumberField } = Form
+
+const PasswordFieldWrapper = styled(TextField)(() => [
+  css`
+    input {
+      -webkit-text-security: disc;
+    }
+  `,
+])
 
 const compInfo = {
   database: {
@@ -42,7 +50,7 @@ const compInfo = {
     name: 'password',
     label: '密码',
     placeholder: '请输入密码',
-    component: PasswordField,
+    component: PasswordFieldWrapper,
     schemas: [
       { rule: { required: true }, help: '请输入密码', status: 'error' },
       {
@@ -243,20 +251,22 @@ interface CreateFormProps {
   }
 }
 const CreateForm = observer(
-  ({ kind }: CreateFormProps, ref) => {
+  ({ resInfo }: CreateFormProps, ref) => {
     const {
       dataSourceStore: { op, opSourceList },
     } = useStore()
-    const kindName =
-      op === 'create' ? kind.name : get(opSourceList, '[0].sourcetype')
-    const fields = getFieldsInfo(kindName.toLowerCase())
+    const sourceInfo =
+      op === 'update' && opSourceList.length > 0 && opSourceList[0]
+    const urlType = resInfo.name.toLowerCase()
+    const fields = getFieldsInfo(urlType)
+
     return (
       <div>
         <Alert
           message={
             <div>
               数据源使用需要保证对应的资源组和数据源之间是可以联通的。请参考
-              <a href="###" className="text-link">
+              <a href="###" tw="text-link">
                 网络解决方案。
               </a>
             </div>
@@ -272,21 +282,15 @@ const CreateForm = observer(
               <div tw="rounded-sm border border-green-11 p-2">
                 <div tw="font-medium flex items-center">
                   <Icon name="container" tw="mr-1" />
-                  <span tw="text-green-11">
-                    {kindName}
-                    {/* {op === 'create'
-                      ? kind.name
-                      : get(opSourceList, '[0].sourcetype')} */}
-                  </span>
+                  <span tw="text-green-11">{resInfo.name}</span>
                 </div>
-                <div tw="text-neut-8">
-                  这是一个很长很长很长很长的关于模式的描述信息。
-                </div>
+                <div tw="text-neut-8">{resInfo.desc}</div>
               </div>
             </Control>
           </Field>
           <TextField
             name="name"
+            defaultValue={get(sourceInfo, 'name', '')}
             label={
               <>
                 <span tw="text-red-10 mr-1">*</span>数据源名称
@@ -304,6 +308,7 @@ const CreateForm = observer(
           />
           <TextAreaField
             name="comment"
+            defaultValue={get(sourceInfo, 'comment', '')}
             rows={3}
             label={
               <>
@@ -335,6 +340,7 @@ const CreateForm = observer(
                 <FieldComponent
                   key={name}
                   name={name}
+                  defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
                   validateOnChange
                   schemas={schemas}
                   {...rest}
