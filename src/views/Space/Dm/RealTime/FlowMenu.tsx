@@ -1,14 +1,14 @@
 import { useEffect, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
-import { Icon, Input } from '@QCFE/qingcloud-portal-ui'
+import { Icon, Input, Loading } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useStore } from 'stores'
 import { useQueryFlow } from 'hooks'
 
 const FlowMenu = observer(() => {
   const { regionId, spaceId } = useParams<IUseParms>()
-  const { data } = useQueryFlow({ regionId, spaceId })
+  const { isLoading, data } = useQueryFlow({ regionId, spaceId })
   const {
     workFlowStore,
     workFlowStore: { curFlow },
@@ -31,7 +31,7 @@ const FlowMenu = observer(() => {
   }, [workFlowStore])
 
   return (
-    <div tw="w-56 bg-neut-16 m-3 rounded dark:text-white">
+    <div tw="w-56 bg-neut-16 rounded dark:text-white">
       <div tw="flex justify-between items-center h-11 px-2 border-b dark:border-neut-15">
         <span tw="text-xs font-semibold">业务流程</span>
         <div tw="flex items-center">
@@ -81,22 +81,33 @@ const FlowMenu = observer(() => {
         </div>
       </div>
       <div tw="pt-4">
-        {flows.length > 0 &&
-          flows.map((flow) => (
-            <div
-              key={flow.id}
-              css={[
-                tw`leading-8 pl-3 cursor-pointer`,
-                curFlow && curFlow.id === flow.id
-                  ? tw`bg-green-11`
-                  : tw`hover:bg-neut-13`,
-              ]}
-              onClick={() => handleItemClick(flow)}
-            >
-              <Icon name="caret-right" type="light" tw="align-middle" />
-              <span tw="ml-1">{flow.name}</span>
-            </div>
-          ))}
+        {(() => {
+          if (isLoading) {
+            return (
+              <div tw="h-48">
+                <Loading />
+              </div>
+            )
+          }
+          if (flows.length) {
+            return flows.map((flow) => (
+              <div
+                key={flow.id}
+                css={[
+                  tw`leading-8 pl-3 cursor-pointer`,
+                  curFlow && curFlow.id === flow.id
+                    ? tw`bg-green-11`
+                    : tw`hover:bg-neut-13`,
+                ]}
+                onClick={() => handleItemClick(flow)}
+              >
+                <Icon name="caret-right" type="light" tw="align-middle" />
+                <span tw="ml-1">{flow.name}</span>
+              </div>
+            ))
+          }
+          return null
+        })()}
       </div>
     </div>
   )

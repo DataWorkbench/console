@@ -41,7 +41,7 @@ const NodeMenu = ({ show }: { show: boolean }) => {
     <div
       css={[
         tw`bg-neut-16 text-white py-3 w-40 rounded-sm shadow-sm`,
-        show ? tw`hidden` : '',
+        !show ? tw`hidden` : '',
       ]}
     >
       {menusData.map((menu, i) => (

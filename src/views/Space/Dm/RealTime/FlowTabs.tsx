@@ -1,26 +1,31 @@
 import { useState, useEffect } from 'react'
-import { Tabs, Icon } from '@QCFE/lego-ui'
-import { Button } from '@QCFE/qingcloud-portal-ui'
+import { Tabs } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { useToggle } from 'react-use'
 import { findIndex, get } from 'lodash-es'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
 import { useStore } from 'stores'
 import tw, { css, styled } from 'twin.macro'
-import FlowPainter from './FlowPainter'
-import NodeMenu from './NodeMenu'
+import StreamOperator from './StreamOperator'
+import StreamSQL from './StreamSQL'
 
 const { TabPanel } = Tabs
-
-const DarkButton = styled('button')(() => [
-  tw`inline-flex items-center justify-center border border-neut-13 rounded-sm bg-neut-16 text-white`,
-  tw`space-x-2 px-3 h-8`,
-])
 
 const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full rounded-md flex flex-col`,
   css`
+    .tabs {
+      ${tw`bg-neut-17`};
+      ul {
+        border: 0;
+        li {
+          ${tw`bg-neut-18! border-0! text-white rounded py-1! text-xs`}
+          svg {
+            ${tw`text-white`}
+          }
+        }
+      }
+    }
     .tab-content {
       ${tw`flex-1 py-0!`}
       .tab-panel {
@@ -30,11 +35,8 @@ const TabWrapper = styled(Tabs)(() => [
   `,
 ])
 
-const propTypes = {}
-
-function FlowTabs() {
+const FlowTabs = observer(() => {
   const [panels, setPanels] = useState([])
-  const [showNodeMenu, toggleNodeMenu] = useToggle(false)
 
   const {
     workFlowStore,
@@ -63,7 +65,7 @@ function FlowTabs() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div tw="flex-1 py-4 relative">
+      <div tw="flex-1 relative">
         <TabWrapper
           type="card"
           activeName={curFlow.id}
@@ -72,53 +74,21 @@ function FlowTabs() {
         >
           {panels.map((flow) => (
             <TabPanel key={flow.id} name={flow.id} closable label={flow.id}>
-              <div tw="text-white flex-1 flex flex-col">
-                <div tw="flex px-2 pt-4 space-x-2">
-                  <div tw="relative">
-                    <DarkButton onClick={toggleNodeMenu}>
-                      <div tw="mr-2">
-                        <Icon name="apps" type="light" tw="align-middle" />
-                        <span>节点库</span>
-                      </div>
-                      <Icon name="caret-down" type="light" />
-                    </DarkButton>
-                  </div>
-                  <DarkButton>
-                    <Icon name="eye" type="dark" />
-                    <span>预览</span>
-                  </DarkButton>
-                  <DarkButton>
-                    <Icon name="remark" type="dark" />
-                    <span>语法检查</span>
-                  </DarkButton>
-                  <DarkButton>
-                    <Icon name="start" type="light" />
-                    <span>运行</span>
-                  </DarkButton>
-                  <DarkButton>
-                    <Icon name="data" type="dark" />
-                    <span>保存</span>
-                  </DarkButton>
-                  <Button type="primary">
-                    <Icon name="export" />
-                    <span>发布</span>
-                  </Button>
-                </div>
-                <div tw="flex-1">
-                  <FlowPainter />
-                </div>
-              </div>
+              {(() => {
+                if (curFlow.type === 1) {
+                  return <StreamSQL tw="flex-1 h-full" />
+                }
+                if (curFlow.type === 3) {
+                  return <StreamOperator tw="flex-1 h-full" />
+                }
+                return null
+              })()}
             </TabPanel>
           ))}
         </TabWrapper>
-        <div tw="pt-2 absolute top-28 left-2 bottom-8 min-h-[450px]  overflow-y-auto">
-          <NodeMenu show={showNodeMenu} />
-        </div>
       </div>
     </DndProvider>
   )
-}
+})
 
-FlowTabs.propTypes = propTypes
-
-export default observer(FlowTabs)
+export default FlowTabs

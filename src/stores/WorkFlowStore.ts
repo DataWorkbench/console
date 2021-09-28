@@ -1,6 +1,6 @@
 import { makeAutoObservable, set } from 'mobx'
 import type RootStore from './RootStore'
-import { createWorkFlow, loadWorkFlow, IWorkFlowParams } from './api'
+import { loadWorkFlow, IWorkFlowParams } from './api'
 
 class WorkFlowStore {
   rootStore
@@ -30,16 +30,16 @@ class WorkFlowStore {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  *create(params: IWorkFlowParams) {
-    const res: { ret_code: number; [p: string]: any } = yield createWorkFlow(
-      params
-    )
-    const ret = res.data
-    if (ret.ret_code === 0) {
-      return true
-    }
-    return false
-  }
+  // *create(params: IWorkFlowParams) {
+  //   const res: { ret_code: number; [p: string]: any } = yield createWorkFlow(
+  //     params
+  //   )
+  //   const ret = res.data
+  //   if (ret.ret_code === 0) {
+  //     return true
+  //   }
+  //   return false
+  // }
 
   *load(params: IWorkFlowParams, force = false) {
     if (force) {
