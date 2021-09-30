@@ -20,6 +20,7 @@ declare module '@QCFE/lego-ui' {
     | 'outlined'
     | 'static'
     | 'icon'
+    | 'dark'
   interface RadioGroupProps extends RFC {
     name?: string
     disabled?: boolean

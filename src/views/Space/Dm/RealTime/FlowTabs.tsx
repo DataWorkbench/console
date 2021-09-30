@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Tabs } from '@QCFE/lego-ui'
+import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { findIndex, get } from 'lodash-es'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -8,6 +8,7 @@ import { useStore } from 'stores'
 import tw, { css, styled } from 'twin.macro'
 import StreamOperator from './StreamOperator'
 import StreamSQL from './StreamSQL'
+import StreamJAR from './StreamJAR'
 
 const { TabPanel } = Tabs
 
@@ -36,7 +37,9 @@ const TabWrapper = styled(Tabs)(() => [
 ])
 
 const FlowTabs = observer(() => {
-  const [panels, setPanels] = useState([])
+  const [panels, setPanels] = useState<
+    { id: string; name: string; type: number }[]
+  >([])
 
   const {
     workFlowStore,
@@ -52,7 +55,7 @@ const FlowTabs = observer(() => {
     }
   }, [curFlow, panels])
 
-  const closePanel = (name) => {
+  const closePanel = (name: string) => {
     const filterPanels = panels.filter((panel) => panel.id !== name)
     setPanels(filterPanels)
     const len = filterPanels.length
@@ -68,17 +71,34 @@ const FlowTabs = observer(() => {
       <div tw="flex-1 relative">
         <TabWrapper
           type="card"
-          activeName={curFlow.id}
-          onChange={(name) => workFlowStore.setCurFlow(name)}
-          onClose={(name) => closePanel(name)}
+          activeName={curFlow?.id}
+          onChange={(name) =>
+            workFlowStore.set({
+              curFlow: panels.find((p) => p.id === name),
+            })
+          }
+          onClose={closePanel}
         >
           {panels.map((flow) => (
-            <TabPanel key={flow.id} name={flow.id} closable label={flow.id}>
+            <TabPanel
+              key={flow.id}
+              name={flow.id}
+              closable
+              label={
+                <span>
+                  <Icon name="name-space" />
+                  {flow.name}
+                </span>
+              }
+            >
               {(() => {
-                if (curFlow.type === 1) {
-                  return <StreamSQL tw="flex-1 h-full" />
+                if (flow.type === 1) {
+                  return <StreamSQL tw="flex-1 h-full" flow={flow} />
                 }
-                if (curFlow.type === 3) {
+                if (flow.type === 2) {
+                  return <StreamJAR tw="flex-1 h-full" flow={flow} />
+                }
+                if (flow.type === 3) {
                   return <StreamOperator tw="flex-1 h-full" />
                 }
                 return null

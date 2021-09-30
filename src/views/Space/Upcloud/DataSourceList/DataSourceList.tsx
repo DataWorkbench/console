@@ -415,6 +415,7 @@ const DataSourceList = observer(() => {
             dataSource={sourceList}
             columns={columns}
             rowKey="sourceid"
+            tw="pb-4"
             selectedRowKeys={selectedRowKeys}
             onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
             pagination={{
@@ -428,6 +429,7 @@ const DataSourceList = observer(() => {
               },
               onShowSizeChange: (limit: number) => {
                 setFilter((draft) => {
+                  draft.offset = 0
                   draft.limit = limit
                 })
               },

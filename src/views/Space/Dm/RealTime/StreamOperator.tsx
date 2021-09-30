@@ -1,17 +1,12 @@
 import { useRef, useState, useEffect } from 'react'
 import { useMount } from 'react-use'
 import { Icon } from '@QCFE/lego-ui'
-import { Button } from '@QCFE/qingcloud-portal-ui'
 import { jsPlumb } from 'jsplumb'
 import { useDrop } from 'react-dnd'
 import { nanoid } from 'nanoid'
-import tw, { styled } from 'twin.macro'
+import tw from 'twin.macro'
+import { DarkButton } from 'views/Space/styled'
 import NodeMenu from './NodeMenu'
-
-const DarkButton = styled('button')(() => [
-  tw`inline-flex items-center justify-center border border-neut-13 rounded-sm bg-neut-16 text-white`,
-  tw`space-x-2 px-3 h-8`,
-])
 
 const StreamOperator = ({ className }: { className?: string }) => {
   // console.log(props)
@@ -80,7 +75,7 @@ const StreamOperator = ({ className }: { className?: string }) => {
     <div className={className} tw="flex flex-col text-white relative">
       <div tw="flex px-2 pt-4 space-x-2">
         <div tw="relative">
-          <DarkButton>
+          <DarkButton type="dark">
             <div tw="mr-2">
               <Icon name="apps" type="light" tw="align-middle" />
               <span>节点库</span>
@@ -88,26 +83,26 @@ const StreamOperator = ({ className }: { className?: string }) => {
             <Icon name="caret-down" type="light" />
           </DarkButton>
         </div>
-        <DarkButton>
+        <DarkButton type="dark">
           <Icon name="eye" type="dark" />
           <span>预览</span>
         </DarkButton>
-        <DarkButton>
+        <DarkButton type="dark">
           <Icon name="remark" type="dark" />
           <span>语法检查</span>
         </DarkButton>
-        <DarkButton>
+        <DarkButton type="dark">
           <Icon name="start" type="light" />
           <span>运行</span>
         </DarkButton>
-        <DarkButton>
+        <DarkButton type="grey">
           <Icon name="data" type="dark" />
           <span>保存</span>
         </DarkButton>
-        <Button type="primary">
+        <DarkButton type="primary">
           <Icon name="export" />
           <span>发布</span>
-        </Button>
+        </DarkButton>
       </div>
       <div
         ref={drop}

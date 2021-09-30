@@ -6,7 +6,8 @@ import Modal, { ModalStep, ModalContent } from 'components/Modal'
 import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useStore } from 'stores'
-import { useMutationFlow } from 'hooks'
+import { useMutationFlow, getFlowKey } from 'hooks'
+import { useQueryClient } from 'react-query'
 
 const { TextField, TextAreaField } = Form
 
@@ -44,6 +45,7 @@ const FlowModal = observer(() => {
     workFlowStore: { showFlowModal },
   } = useStore()
   const mutation = useMutationFlow()
+  const queryClient = useQueryClient()
 
   const handleCancel = () => {
     setState((draft) => {
@@ -69,6 +71,7 @@ const FlowModal = observer(() => {
         {
           onSuccess: () => {
             handleCancel()
+            queryClient.invalidateQueries(getFlowKey())
           },
         }
       )

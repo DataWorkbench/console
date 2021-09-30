@@ -21,7 +21,7 @@ export const useQueryFlow = ({ regionId, spaceId }: IWorkFlowParams) => {
   }
   queryKey = ['flow', filter]
   return useQuery(queryKey, async () => loadWorkFlow(filter), {
-    keepPreviousData: true,
+    // keepPreviousData: true,
   })
 }
 

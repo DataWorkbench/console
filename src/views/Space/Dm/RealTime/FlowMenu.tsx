@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useParams } from 'react-router-dom'
 import { Icon, Input, Loading } from '@QCFE/qingcloud-portal-ui'
@@ -14,10 +14,6 @@ const FlowMenu = observer(() => {
     workFlowStore: { curFlow },
   } = useStore()
   const flows = data?.infos || []
-
-  useEffect(() => {
-    workFlowStore.load({ regionId, spaceId }, true)
-  }, [spaceId, regionId, workFlowStore])
 
   const handleItemClick = useCallback(
     (flow) => {
