@@ -1,7 +1,7 @@
 import React from 'react'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
-import tabsvg from 'assets/manage_setting.svg'
-import tabsvg0 from 'assets/manage_setting0.svg'
+import TabTopIcon from 'assets/manage_setting.svg'
+import TabIcon from 'assets/manage_setting0.svg'
 
 const tabs = [
   {
@@ -15,8 +15,8 @@ function Setting() {
     <div tw="p-5 pb-0 text-xs h-full overflow-auto">
       <PageTab tabs={tabs} />
       <div tw="bg-white rounded">
-        <img src={tabsvg0} alt="" tw="mx-auto w-full" />
-        <img src={tabsvg} alt="" tw="mx-auto w-10/12" />
+        <TabIcon tw="mx-auto w-full" />
+        <TabTopIcon tw="mx-auto w-10/12" />
       </div>
     </div>
   )

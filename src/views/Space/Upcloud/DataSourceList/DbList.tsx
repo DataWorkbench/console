@@ -1,3 +1,4 @@
+import { ReactElement } from 'react'
 import tw from 'twin.macro'
 
 const ItemWrapper = tw.div`flex p-3 border rounded-sm border-neut-2 cursor-pointer hover:border-green-11`
@@ -9,12 +10,13 @@ const DbList = ({ items, onChange }) => {
     desc,
   }: {
     name: string
-    img?: string
+    img?: ReactElement
     desc?: string
   }) => (
     <ItemWrapper className="group">
       <div tw="w-10 flex-shrink-0">
-        <img tw="w-full h-auto" src={img} alt="" />
+        {/* <img tw="w-full h-auto" src={img} alt="" /> */}
+        {img}
       </div>
       <div tw="flex-1 pl-2 leading-5">
         <div tw="font-medium group-hover:text-green-11">{name}</div>

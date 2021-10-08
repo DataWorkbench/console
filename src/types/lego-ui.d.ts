@@ -277,6 +277,8 @@ declare module '@QCFE/lego-ui' {
     ButtonField: (props: any) => JSX.Element
     SliderField: (props: any) => JSX.Element
     DatePickerField: (props: any) => JSX.Element
+    validateForm: () => boolean
+    getFieldsValue: () => any
   }
 
   export const Form: Form

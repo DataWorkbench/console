@@ -45,25 +45,40 @@ let config = {
       },
       {
         test: /\.svg$/i,
-        include: resolve('src/assets/icons'),
-        use: [
+        oneOf: [
           {
-            loader: 'svg-sprite-loader',
-            options: {
-              symbolId: 'bdicon-[name]',
+            include: resolve('src/assets/icons'),
+            use: [
+              {
+                loader: 'svg-sprite-loader',
+                options: {
+                  symbolId: 'bdicon-[name]',
+                },
+              },
+              { loader: 'svgo-loader', options: {} },
+            ],
+          },
+          {
+            include: resolve('src/assets'),
+            use: [
+              {
+                loader: '@svgr/webpack',
+                options: {
+                  svgo: true,
+                  svgoConfig: {
+                    plugins: [{ name: 'preset-default' }],
+                  },
+                },
+              },
+            ],
+          },
+          {
+            type: 'asset/resource',
+            generator: {
+              filename: 'static/imgs/[hash][ext][query]',
             },
           },
-          { loader: 'svgo-loader', options: {} },
         ],
-      },
-      {
-        test: /\.svg$/i,
-        type: 'asset/resource',
-        exclude: resolve('src/assets/icons'),
-        generator: {
-          filename: 'static/imgs/[hash][ext][query]',
-        },
-        use: 'svgo-loader',
       },
       {
         test: /\.(png|jpg|jpeg|gif)$/i,

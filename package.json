@@ -41,6 +41,7 @@
     "@emotion/babel-plugin": "^11.3.0",
     "@emotion/eslint-plugin": "^11.2.0",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
+    "@svgr/webpack": "^5.5.0",
     "@types/lodash-es": "^4.17.4",
     "@types/react": "^17.0.20",
     "@types/react-router-dom": "^5.1.9",

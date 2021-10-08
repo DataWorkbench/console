@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import Modal, { ModalStep, ModalContent } from 'components/Modal'
-import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
+import { Button, Form, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
 import {
   useQuerySourceKind,
@@ -13,52 +13,52 @@ import {
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
 
-import mysqlImg from 'assets/source/mysql.svg'
-import postgresqlImg from 'assets/source/postgresql.svg'
-import s3Img from 'assets/source/aws-s3.svg'
-import clickHouseImg from 'assets/source/clickhouse.svg'
-import hbaseImg from 'assets/source/hbase.svg'
-import kafkaImg from 'assets/source/kafka.svg'
-import ftpImg from 'assets/source/ftp.svg'
-import hdfsImg from 'assets/source/hadoop.svg'
+import MysqlImg from 'assets/sources/mysql.svg'
+import PostgresqlImg from 'assets/sources/postgresql.svg'
+import S3Img from 'assets/sources/aws-s3.svg'
+import ClickHouseImg from 'assets/sources/clickhouse.svg'
+import HbaseImg from 'assets/sources/hbase.svg'
+import KafkaImg from 'assets/sources/kafka.svg'
+import FtpImg from 'assets/sources/ftp.svg'
+import HdfsImg from 'assets/sources/hadoop.svg'
 import CreateForm from './CreateForm'
 import DbList from './DbList'
 
 const resInfos = [
   {
     name: 'MySQL',
-    img: mysqlImg,
+    img: <MysqlImg />,
     desc: '是一个完全托管的数据库服务，可使用世界上最受欢迎的开源数据库来部署云原生应用程序。',
   },
   {
     name: 'PostgreSQL',
-    img: postgresqlImg,
+    img: <PostgresqlImg />,
     desc: '开源的对象-关系数据库数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。 ',
   },
-  { name: 'S3', img: s3Img, desc: '是一种面向 Internet 的存储服务。' },
+  { name: 'S3', img: <S3Img />, desc: '是一种面向 Internet 的存储服务。' },
   {
     name: 'ClickHouse',
-    img: clickHouseImg,
+    img: <ClickHouseImg />,
     desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
   },
   {
     name: 'Hbase',
-    img: hbaseImg,
+    img: <HbaseImg />,
     desc: 'HBase 是一个开源的非关系型分布式数据库，实现的编程语言为 Java。它可以对稀疏文件提供极高的容错率。 ',
   },
   {
     name: 'Kafka',
-    img: kafkaImg,
+    img: <KafkaImg />,
     desc: '由Scala和Java编写，目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。',
   },
   {
     name: 'Ftp',
-    img: ftpImg,
+    img: <FtpImg />,
     desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
   },
   {
     name: 'HDFS',
-    img: hdfsImg,
+    img: <HdfsImg />,
     desc: '由Scala和Java编写，目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。',
   },
 ]
@@ -79,7 +79,7 @@ const DataSourceModal = observer(
       step: op === 'update' ? 1 : 0,
       dbIndex: 0,
     })
-    const form = useRef()
+    const form = useRef<Form>()
     const queryClient = useQueryClient()
     const {
       status,
@@ -96,7 +96,7 @@ const DataSourceModal = observer(
     }
     const handleSave = () => {
       const formElem = form.current
-      if (formElem.validateForm()) {
+      if (formElem?.validateForm()) {
         const { name, comment, ...rest } = formElem.getFieldsValue()
         const sourcetype: string = get(kinds, `[${state.dbIndex}].name`)
         const params = {
