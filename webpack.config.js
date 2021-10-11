@@ -59,7 +59,7 @@ let config = {
             ],
           },
           {
-            include: resolve('src/assets'),
+            include: resolve('src/assets/svgr'),
             use: [
               {
                 loader: '@svgr/webpack',

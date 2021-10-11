@@ -53,7 +53,7 @@
 <path d="M55.9724 27.5662C56.2089 27.5662 56.4006 27.3745 56.4006 27.1381C56.4006 26.9016 56.2089 26.71 55.9724 26.71C55.736 26.71 55.5443 26.9016 55.5443 27.1381C55.5443 27.3745 55.736 27.5662 55.9724 27.5662Z" fill="#56E090"/>
 <path d="M50.2355 20.804C50.6611 20.804 51.0061 20.459 51.0061 20.0333C51.0061 19.6077 50.6611 19.2627 50.2355 19.2627C49.8099 19.2627 49.4648 19.6077 49.4648 20.0333C49.4648 20.459 49.8099 20.804 50.2355 20.804Z" fill="#56E090"/>
 <defs>
-<linearGradient id="paint0_linear" x1="-nan" y1="-nan" x2="-nan" y2="-nan" gradientUnits="userSpaceOnUse">
+<linearGradient id="paint0_linear" gradientUnits="userSpaceOnUse">
 <stop stop-color="#51DFD4"/>
 <stop offset="1" stop-color="#1BE068"/>
 </linearGradient>

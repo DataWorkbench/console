@@ -33,6 +33,8 @@ const StreamSQL = () => {
     })
   }
 
+  const save = () => {}
+
   return (
     <FlexBox tw="flex-col flex-1">
       <StreamToolBar>

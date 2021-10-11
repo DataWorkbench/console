@@ -8,6 +8,7 @@ import {
   deleteDataSource,
   updateDataSource,
   IDataSourceParams,
+  pingDataSource,
 } from 'stores/api'
 import { get } from 'lodash-es'
 
@@ -50,6 +51,8 @@ export const useMutationSource = () => {
       ret = await deleteDataSource(rest)
     } else if (op === 'update') {
       ret = await updateDataSource(rest)
+    } else if (op === 'ping') {
+      ret = await pingDataSource(rest)
     }
     return ret
   })

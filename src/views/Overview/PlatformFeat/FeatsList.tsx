@@ -1,14 +1,11 @@
 import PropTypes from 'prop-types'
 import { Button } from '@QCFE/qingcloud-portal-ui'
-import tw from 'twin.macro'
-import img0 from 'assets/bench_feat_0.svg'
-import img1 from 'assets/bench_feat_1.svg'
-import img2 from 'assets/bench_feat_2.svg'
+import Feat0 from 'assets/svgr/bench_feat_0.svg'
+import Feat1 from 'assets/svgr/bench_feat_1.svg'
+import Feat2 from 'assets/svgr/bench_feat_2.svg'
+import { Center } from 'components/Center'
 
-const itemVars = {
-  imgs: [img0, img1, img2],
-  sizes: ['120px', '100px', '140px'],
-}
+const FeatComps = [Feat0, Feat1, Feat2]
 
 function FeatList({ feats }) {
   return (
@@ -20,7 +17,16 @@ function FeatList({ feats }) {
             className="group"
             tw="flex-1 border border-neut-2 rounded-sm cursor-pointer hover:border-green-4"
           >
-            <div
+            {(() => {
+              const FeatSVG = FeatComps[i]
+              return (
+                <Center tw="h-32">
+                  <FeatSVG />
+                </Center>
+              )
+            })()}
+
+            {/* <div
               css={[
                 tw`bg-no-repeat bg-center h-32 bg-neut-1`,
                 {
@@ -28,7 +34,7 @@ function FeatList({ feats }) {
                   backgroundSize: itemVars.sizes[i],
                 },
               ]}
-            />
+            /> */}
             <div tw="px-3  h-24 2xl:py-4 py-2 leading-5 relative bg-green-0 overflow-hidden">
               <div tw="absolute left-0 top-0 w-full bottom-0 flex items-center  border-t border-green-4  bg-green-1 transform transition-transform duration-200 translate-y-full group-hover:translate-y-0">
                 <div tw="flex  justify-center w-full mx-4">

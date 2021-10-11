@@ -1,7 +1,7 @@
 import React from 'react'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
-import TabTopIcon from 'assets/manage_setting.svg'
-import TabIcon from 'assets/manage_setting0.svg'
+import TabTopIcon from 'assets/svgr/manage_setting.svg'
+import TabIcon from 'assets/svgr/manage_setting0.svg'
 
 const tabs = [
   {

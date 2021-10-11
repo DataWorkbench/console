@@ -1,17 +1,26 @@
-import React from 'react'
 import { Field, Label, Control } from '@QCFE/lego-ui'
+import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get } from 'lodash-es'
-import { Alert, Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
-import { useStore } from 'hooks'
+import { get, omit } from 'lodash-es'
+import { useImmer } from 'use-immer'
+import dayjs from 'dayjs'
+import { Alert, Form, Button, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
+import { useStore, useMutationSource } from 'hooks'
+import { FlexBox } from 'components'
+import MutilField from './MutilFiled'
 
-const { TextField, TextAreaField, NumberField } = Form
+const { TextField, TextAreaField, NumberField, PasswordField } = Form
 
-const PasswordFieldWrapper = styled(TextField)(() => [
+const PingTable = styled('table')(() => [
+  tw`w-full border-l border-t border-neut-2 mb-2`,
   css`
-    input {
-      -webkit-text-security: disc;
+    th,
+    td {
+      ${tw`border-r border-b border-neut-2 px-4 py-3 `}
+    }
+    thead {
+      ${tw`bg-neut-1 `}
     }
   `,
 ])
@@ -50,7 +59,7 @@ const compInfo = {
     name: 'password',
     label: '密码',
     placeholder: '请输入密码',
-    component: PasswordFieldWrapper,
+    component: PasswordField,
     schemas: [
       { rule: { required: true }, help: '请输入密码', status: 'error' },
       {
@@ -108,36 +117,8 @@ const getFieldsInfo = (type: string) => {
     case 'hbase':
       fieldsInfo = [
         {
-          name: 'hosts',
-          label: 'hosts',
-          placeholder: 'The host lists of HBase',
-          schemas: [
-            { rule: { required: true }, help: '请输入hosts', status: 'error' },
-            {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-        {
-          name: 'znode',
-          label: 'znode',
-          placeholder: 'The hbase Zookeeper Node',
-          schemas: [
-            { rule: { required: true }, help: '请输入znode', status: 'error' },
-            {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-        {
           name: 'zookeeper',
-          label: 'zookeeper',
+          label: 'Zookeeper',
           placeholder: 'The hbase Zookeeper',
           schemas: [
             {
@@ -152,6 +133,24 @@ const getFieldsInfo = (type: string) => {
               status: 'error',
             },
           ],
+        },
+        {
+          name: 'znode',
+          label: 'Znode',
+          placeholder: 'The hbase Zookeeper Node',
+          schemas: [
+            { rule: { required: true }, help: '请输入znode', status: 'error' },
+            {
+              rule: (value: string) =>
+                value.length >= 1 && value.length <= 1024,
+              help: '最大长度: 1024, 最小长度: 1',
+              status: 'error',
+            },
+          ],
+        },
+        {
+          name: 'hosts',
+          label: 'Hosts',
         },
       ]
       break
@@ -245,13 +244,21 @@ const getFieldsInfo = (type: string) => {
 }
 
 interface CreateFormProps {
-  kind: {
+  resInfo: {
     name: string
     desc?: string
   }
 }
 const CreateForm = observer(
   ({ resInfo }: CreateFormProps, ref) => {
+    const { regionId, spaceId } =
+      useParams<{ regionId: string; spaceId: string }>()
+    const [pingState, setPingState] = useImmer({
+      state: '',
+      time: '',
+      msg: '',
+    })
+    const mutation = useMutationSource()
     const {
       dataSourceStore: { op, opSourceList },
     } = useStore()
@@ -259,6 +266,41 @@ const CreateForm = observer(
       op === 'update' && opSourceList.length > 0 && opSourceList[0]
     const urlType = resInfo.name.toLowerCase()
     const fields = getFieldsInfo(urlType)
+
+    const handlePing = () => {
+      const formElem = ref?.current
+      if (formElem?.validateForm()) {
+        const fieldsValue: { [k: string]: any } = formElem.getFieldsValue()
+        const params = {
+          op: 'ping',
+          regionId,
+          spaceId,
+          sourcetype: resInfo.name,
+          url: {
+            [urlType]: omit(fieldsValue, ['name', 'comment']),
+          },
+        }
+        setPingState((draft) => {
+          draft.time = dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss')
+          draft.state = 'loading'
+          draft.msg = ''
+        })
+        mutation.mutate(params, {
+          onSuccess: () => {
+            // console.log(data)
+            setPingState((draft) => {
+              draft.state = 'passed'
+            })
+          },
+          onError: (err) => {
+            setPingState((draft) => {
+              draft.state = 'failed'
+              draft.msg = err.message
+            })
+          },
+        })
+      }
+    }
 
     return (
       <div>
@@ -275,7 +317,7 @@ const CreateForm = observer(
           closable
           tw="mb-3"
         />
-        <Form layout="vertical" ref={ref}>
+        <Form tw="max-w-lg!" layout="vertical" ref={ref}>
           <Field>
             <Label>数据源类型</Label>
             <Control tw="w-60">
@@ -290,6 +332,7 @@ const CreateForm = observer(
           </Field>
           <TextField
             name="name"
+            tw="w-80"
             defaultValue={get(sourceInfo, 'name', '')}
             label={
               <>
@@ -326,45 +369,101 @@ const CreateForm = observer(
               },
             ]}
           />
-          {fields.map(
-            ({
+          {fields.map((field) => {
+            const {
               name,
               label,
               placeholder,
               component,
               schemas = [],
               ...rest
-            }) => {
-              const FieldComponent = component || TextField
-              return (
-                <FieldComponent
-                  key={name}
-                  name={name}
-                  defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
-                  validateOnChange
-                  schemas={schemas}
-                  {...rest}
-                  label={
-                    <>
-                      <span css={[{ color: '#CF3B37' }, tw`mr-1`]}>*</span>
-                      {label}
-                    </>
-                  }
-                  placeholder={placeholder}
-                />
-              )
+            } = field
+            const FieldComponent = component || TextField
+            if (name === 'hosts') {
+              return <MutilField key={name} field={field} />
             }
-          )}
+            return (
+              <FieldComponent
+                key={name}
+                name={name}
+                defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
+                validateOnChange
+                schemas={schemas}
+                css={['port'].includes(name) ? tw`w-28` : tw`w-80`}
+                {...rest}
+                label={
+                  <>
+                    <span css={[{ color: '#CF3B37' }, tw`mr-1`]}>*</span>
+                    {label}
+                  </>
+                }
+                placeholder={placeholder}
+              />
+            )
+          })}
           <Field>
             <Label>连通性测试</Label>
             <Control>
-              <Button type="outlined">
+              <Button
+                disabled={mutation.isLoading}
+                type="outlined"
+                onClick={handlePing}
+              >
                 <Icon name="changing-over" />
                 开始测试
               </Button>
             </Control>
           </Field>
         </Form>
+        {pingState.state !== '' && (
+          <PingTable>
+            <thead>
+              <tr>
+                <th tw="w-1/3">连通性状态</th>
+                <th tw="w-1/3">测试时间</th>
+                <th tw="w-1/3">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  {(() => {
+                    if (pingState.state === 'loading') {
+                      return (
+                        <FlexBox tw="space-x-1 items-center text-green-13">
+                          <Loading size="small" noWrapper />
+                          <span>测试中</span>
+                        </FlexBox>
+                      )
+                    }
+                    if (pingState.state === 'passed') {
+                      return (
+                        <FlexBox tw="space-x-1 items-center text-green-13">
+                          <Icon name="success" type="coloured" />
+                          <span>通过</span>
+                        </FlexBox>
+                      )
+                    }
+                    if (pingState.state === 'failed') {
+                      return (
+                        <FlexBox tw="space-x-1 items-center text-red-10">
+                          <Icon
+                            name="failure"
+                            color={{ primary: '#fff', secondary: '#CA2621' }}
+                          />
+                          <span>不通</span>
+                        </FlexBox>
+                      )
+                    }
+                    return null
+                  })()}
+                </td>
+                <td>{pingState.time}</td>
+                <td>{pingState.msg}</td>
+              </tr>
+            </tbody>
+          </PingTable>
+        )}
       </div>
     )
   },

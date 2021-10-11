@@ -74,3 +74,14 @@ export const deleteDataSource = ({
     sourceids: sourceIds,
     method: 'POST',
   })
+
+export const pingDataSource = ({
+  regionId,
+  spaceId,
+  ...rest
+}: IDataSourceParams) =>
+  request({
+    action: `${regionId}/v1/workspace/${spaceId}/source/ping`,
+    ...rest,
+    method: 'POST',
+  })
