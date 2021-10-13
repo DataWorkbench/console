@@ -77,7 +77,7 @@ const DataSourceModal = observer(
 
     const [state, setState] = useImmer({
       step: op === 'update' ? 1 : 0,
-      dbIndex: 0,
+      dbIndex: -1,
     })
     const form = useRef<Form>()
     const queryClient = useQueryClient()
@@ -128,10 +128,16 @@ const DataSourceModal = observer(
       })
     }
 
+    const curkind =
+      op === 'create'
+        ? get(kinds, `[${state.dbIndex}]`)
+        : kinds?.find((k) => k.name === opSourceList[0]?.sourcetype)
     return (
       <Modal
         onHide={onHide}
-        title={`${op === 'create' ? '新增' : '修改'}数据源`}
+        title={`${op === 'create' ? '新增' : '修改'}数据源: ${
+          curkind ? curkind.name : ''
+        }`}
         footer={
           <div tw="flex justify-end space-x-2">
             {state.step === 0 ? (
@@ -159,7 +165,6 @@ const DataSourceModal = observer(
         <ModalStep step={state.step} stepTexts={['选择数据库', '配置数据库']} />
         <ModalContent>
           {(() => {
-            let curkind = null
             switch (status) {
               case 'loading':
                 return (
@@ -183,14 +188,14 @@ const DataSourceModal = observer(
                         </a>
                         进行查看配置
                       </p>
-                      <DbList items={items} onChange={handleDbSelect} />
+                      <DbList
+                        current={curkind}
+                        items={items}
+                        onChange={handleDbSelect}
+                      />
                     </>
                   )
                 }
-                curkind =
-                  op === 'create'
-                    ? get(kinds, `[${state.dbIndex}]`)
-                    : kinds?.find((k) => k.name === opSourceList[0]?.sourcetype)
 
                 return (
                   curkind && (

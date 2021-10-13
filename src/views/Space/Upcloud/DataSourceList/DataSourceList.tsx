@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
@@ -98,6 +98,7 @@ const DataSourceList = observer(() => {
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
   const [isReFetching, setIsReFetching] = useState(false)
+  const [delText, setDelText] = useState('')
   const {
     dataSourceStore: { op, opSourceList, mutateOperation },
   } = useStore()
@@ -111,6 +112,7 @@ const DataSourceList = observer(() => {
     limit: number
     reverse: boolean
     search?: string
+    [k: string]: any
   }>({
     regionId,
     spaceId,
@@ -120,6 +122,12 @@ const DataSourceList = observer(() => {
     limit: 10,
   })
 
+  useEffect(() => {
+    setFilter((draft) => {
+      draft.regionId = regionId
+      draft.spaceId = spaceId
+    })
+  }, [regionId, spaceId, setFilter])
   const defaultColumns = useMemo(
     () => [
       {
@@ -188,6 +196,8 @@ const DataSourceList = observer(() => {
       {
         title: '创建时间',
         dataIndex: 'createtime',
+        sortable: true,
+        sortOrder: filter.reverse ? 'desc' : 'asc',
         render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
@@ -215,13 +225,13 @@ const DataSourceList = observer(() => {
             </Button>
             <Button
               type="text"
-              disabled={info.state === 'disable'}
               onClick={() => {
                 mutateOperation('update', [info])
               }}
             >
               修改
             </Button>
+
             <Tippy
               theme="light"
               animation="fade"
@@ -234,14 +244,14 @@ const DataSourceList = observer(() => {
               appendTo={() => document.body}
               content={
                 <Menu>
-                  <MenuItem
+                  {/* <MenuItem
                     onClick={() => {
                       mutateOperation('update', [info])
                     }}
                   >
                     <Icon name="pen" tw="mr-2" />
                     修改
-                  </MenuItem>
+                  </MenuItem> */}
                   <MenuItem
                     onClick={() => {
                       mutateOperation('delete', [info])
@@ -261,7 +271,7 @@ const DataSourceList = observer(() => {
         ),
       },
     ],
-    [mutateOperation]
+    [mutateOperation, filter.reverse]
   )
 
   const columns = useMemo(
@@ -322,6 +332,9 @@ const DataSourceList = observer(() => {
           onSuccess: () => {
             mutateOperation()
             refetch()
+            if (op === 'delete') {
+              setSelectedRowKeys([])
+            }
           },
         }
       )
@@ -332,6 +345,11 @@ const DataSourceList = observer(() => {
     setFilter((draft) => {
       draft.search = v
     })
+  }
+
+  const handleCancel = () => {
+    mutateOperation()
+    setDelText('')
   }
 
   if (isLoading) {
@@ -381,7 +399,7 @@ const DataSourceList = observer(() => {
               <InputSearch
                 placeholder="请输入关键词进行搜索"
                 value={searchName}
-                onChange={(e, v: string) => setSearchName(v)}
+                onChange={(e, v) => setSearchName(String(v))}
                 onPressEnter={() => handleQuery(searchName)}
                 onClear={() => {
                   setSearchName('')
@@ -418,6 +436,12 @@ const DataSourceList = observer(() => {
             tw="pb-4"
             selectedRowKeys={selectedRowKeys}
             onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
+            onSort={(sortKey: string, sortOrder: string) => {
+              setFilter((draft) => {
+                draft.order_by = sortKey
+                draft.reverse = sortOrder === 'desc'
+              })
+            }}
             pagination={{
               total: get(data, 'total', 0),
               current: Math.floor(filter.offset / filter.limit) + 1,
@@ -452,12 +476,21 @@ const DataSourceList = observer(() => {
           return (
             <ModalWrapper
               visible
-              okText={`确认${info.name}`}
-              okType={op === 'enable' ? 'primary' : 'danger'}
               width={ifTableMode ? 600 : 500}
-              onOk={handleOk}
-              confirmLoading={mutation.isLoading}
-              onCancel={mutateOperation}
+              onCancel={handleCancel}
+              footer={
+                <FlexBox tw="justify-end">
+                  <Button onClick={handleCancel}>取消</Button>
+                  <Button
+                    onClick={handleOk}
+                    disabled={op === 'delete' && delText !== 'delete'}
+                    loading={mutation.isLoading}
+                    type={op === 'enable' ? 'primary' : 'danger'}
+                  >
+                    确认{info.name}
+                  </Button>
+                </FlexBox>
+              }
             >
               <div tw="flex items-start space-x-2">
                 <Icon
@@ -498,7 +531,12 @@ const DataSourceList = observer(() => {
                         *请在下方输入框中输入&quot;delete&quot;以确认操作
                       </div>
                       <div>
-                        <Input type="text" placeholder="delete" tw="w-40" />
+                        <Input
+                          type="text"
+                          placeholder="delete"
+                          tw="w-40"
+                          onChange={(e, v) => setDelText(String(v))}
+                        />
                       </div>
                     </div>
                   )}

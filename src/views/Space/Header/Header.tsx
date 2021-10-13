@@ -17,13 +17,10 @@ export const Header = observer(() => {
   const { pathname } = useLocation()
   const history = useHistory()
   const {
-    // spaceStore,
-    // spaceStore: { workspaces },
     globalStore: { darkMode },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
-  // const space = workspaces?.find(({ id }) => id === spaceId)
   const [filter] = useImmer({
     regionId,
     offset: 0,

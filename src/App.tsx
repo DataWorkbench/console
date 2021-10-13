@@ -51,7 +51,10 @@ const App = () => {
     >
       <StoreContext.Provider value={store}>
         <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools initialIsOpen={false} />
+          <ReactQueryDevtools
+            initialIsOpen={false}
+            toggleButtonProps={{ style: { bottom: '32px' } }}
+          />
           {loading ? (
             <div tw="flex justify-center h-screen items-center">
               <Loading size="large" />

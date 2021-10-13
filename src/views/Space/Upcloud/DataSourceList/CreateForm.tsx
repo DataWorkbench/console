@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Field, Label, Control } from '@QCFE/lego-ui'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
@@ -8,7 +9,7 @@ import dayjs from 'dayjs'
 import { Alert, Form, Button, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useStore, useMutationSource } from 'hooks'
 import { FlexBox } from 'components'
-import MutilField from './MutilFiled'
+import MutilInputField from './MutilInputField'
 
 const { TextField, TextAreaField, NumberField, PasswordField } = Form
 
@@ -148,14 +149,15 @@ const getFieldsInfo = (type: string) => {
             },
           ],
         },
-        {
-          name: 'hosts',
-          label: 'Hosts',
-        },
       ]
       break
     case 'hdfs':
-      fieldsInfo = [host, port]
+      fieldsInfo = [
+        {
+          name: 'nodes',
+          label: 'Nodes',
+        },
+      ]
       break
     case 'kafka':
       fieldsInfo = [
@@ -180,62 +182,6 @@ const getFieldsInfo = (type: string) => {
       ]
       break
     case 's3':
-      fieldsInfo = [
-        {
-          name: 'accesskey',
-          label: 'accesskey',
-          placeholder: 'The s3 AccessKey',
-          schemas: [
-            {
-              rule: { required: true },
-              help: '请输入accesskey',
-              status: 'error',
-            },
-            {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-        {
-          name: 'endpoint',
-          label: 'endpoint',
-          placeholder: 'The s3 EndPoint',
-          schemas: [
-            {
-              rule: { required: true },
-              help: '请输入endpoint',
-              status: 'error',
-            },
-            {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-        {
-          name: 'secretkey',
-          label: 'secretkey',
-          placeholder: 'The s3 SecretKey',
-          schemas: [
-            {
-              rule: { required: true },
-              help: '请输入secretkey',
-              status: 'error',
-            },
-            {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-      ]
       break
     default:
       break
@@ -266,19 +212,31 @@ const CreateForm = observer(
       op === 'update' && opSourceList.length > 0 && opSourceList[0]
     const urlType = resInfo.name.toLowerCase()
     const fields = getFieldsInfo(urlType)
+    const multiFiledRef = useRef()
 
     const handlePing = () => {
       const formElem = ref?.current
       if (formElem?.validateForm()) {
         const fieldsValue: { [k: string]: any } = formElem.getFieldsValue()
+        let url = {}
+        if (urlType === 'hdfs') {
+          const nodes = multiFiledRef?.current.getValue()
+          url = {
+            [urlType]: {
+              nodes: nodes.map((n) => ({ namenode: n[0], port: +n[1] })),
+            },
+          }
+        } else {
+          url = {
+            [urlType]: omit(fieldsValue, ['name', 'comment']),
+          }
+        }
         const params = {
           op: 'ping',
           regionId,
           spaceId,
           sourcetype: resInfo.name,
-          url: {
-            [urlType]: omit(fieldsValue, ['name', 'comment']),
-          },
+          url,
         }
         setPingState((draft) => {
           draft.time = dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss')
@@ -287,7 +245,6 @@ const CreateForm = observer(
         })
         mutation.mutate(params, {
           onSuccess: () => {
-            // console.log(data)
             setPingState((draft) => {
               draft.state = 'passed'
             })
@@ -319,14 +276,16 @@ const CreateForm = observer(
         />
         <Form tw="max-w-lg!" layout="vertical" ref={ref}>
           <Field>
-            <Label>数据源类型</Label>
+            <Label>数据源连接方式</Label>
             <Control tw="w-60">
               <div tw="rounded-sm border border-green-11 p-2">
                 <div tw="font-medium flex items-center">
                   <Icon name="container" tw="mr-1" />
-                  <span tw="text-green-11">{resInfo.name}</span>
+                  <span tw="text-green-11">连接串模式</span>
                 </div>
-                <div tw="text-neut-8">{resInfo.desc}</div>
+                <div tw="text-neut-8">
+                  这是一个很长很长很长很长的关于模式的描述信息。
+                </div>
               </div>
             </Control>
           </Field>
@@ -379,8 +338,10 @@ const CreateForm = observer(
               ...rest
             } = field
             const FieldComponent = component || TextField
-            if (name === 'hosts') {
-              return <MutilField key={name} field={field} />
+            if (name === 'nodes') {
+              return (
+                <MutilInputField ref={multiFiledRef} key={name} field={field} />
+              )
             }
             return (
               <FieldComponent

@@ -88,7 +88,7 @@ export const BackMenu = () => {
         }
       >
         <Center
-          size={56}
+          size={60}
           tw="bg-neut-1 dark:bg-neut-13 cursor-pointer hover:bg-green-11 hover:text-white"
         >
           <Icon
