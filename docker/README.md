@@ -6,7 +6,7 @@
 
 ### 主要功能包括
 
-- 读取当前目录下的`web_console_settings.py`来作为 console 的配置
+- 读取当前目录下的`web_console_settings.py`来作为 console 的配置(web_console_settings.py 配置较敏感,可以找项目所有者来索取)
 - 启动一个 memcached 的容器来保存 session 状态(仅 dev 模式)
 - 默认 nginx 配置的宿主 PORT 为 8888
 - 映射 nginx、memcahed 配置信息到容器内,方便修改(一般默认就可以)
