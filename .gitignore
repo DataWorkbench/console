@@ -16,3 +16,4 @@ selenium-debug.log
 .idea
 
 docker/web_console_settings.py
+.env

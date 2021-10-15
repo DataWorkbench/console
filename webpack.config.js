@@ -6,10 +6,15 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const WebpackBar = require('webpackbar')
 const path = require('path')
+const dotenv = require('dotenv')
+dotenv.config()
 
 const resolve = (dir) => path.join(__dirname, dir)
 const { NODE_ENV } = process.env
 const isDev = process.env.NODE_ENV !== 'production'
+const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
+
+console.log('apiUrl----->', apiUrl)
 
 let config = {
   mode: NODE_ENV,
@@ -131,19 +136,19 @@ let config = {
     },
     proxy: {
       '/*_api': {
-        target: 'http://localhost:8888',
+        target: apiUrl,
       },
       '/api': {
-        target: 'http://localhost:8888',
+        target: apiUrl,
       },
       '/login': {
-        target: 'http://localhost:8888',
+        target: apiUrl,
       },
       '/static': {
-        target: 'http://localhost:8888',
+        target: apiUrl,
       },
       '/captcha': {
-        target: 'http://localhost:8888',
+        target: apiUrl,
       },
     },
   },

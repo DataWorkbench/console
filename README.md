@@ -18,7 +18,52 @@ npm i
 npm run dev
 ```
 
-## 项目向服务端发送请求经过 console 中转,需要启动 console 服务
+大数据工作台是 console 的子项目模式来开发的
+
+所以登录、接口转发是依赖于 console 项目的运行
+
+## console 远程环境
+
+推荐: 🌟🌟🌟🌟🌟
+
+优点: 快速方便,无需本地部署 console 本地环境,通过 devserver 的 proxy 配置来访问 api 接口
+
+缺点: 依赖远程开发服务器的稳定性
+
+### API Server URL 的配置
+
+具体请参考[子 Portal 开发文档](https://cwiki.yunify.com/pages/viewpage.action?pageId=63358627)
+
+```bash
+# 当前工作空间根目录下,配置devserver的proxy url
+# 未配置时默认为 http://localhost:8888
+echo 'PROXY_API_URL=http://139.198.116.233' > .env
+
+```
+
+## console docker 环境
+
+推荐: 🌟🌟🌟🌟
+
+优点: 快速方便,无需本地安装 django 依赖
+
+缺点: mac 机器运行 docker 性能不高,依赖机器性能
+
+在 mac 机器上安装 console 环境会比较麻烦,如果机器性能还行,可以尝试 docker 环境来安装
+
+详情安装方法见`docker/README`
+
+为了避免 mac 因为安全问题禁用 80 端口的问题, 默认容器提供对外端口为 8888
+
+## console 本地环境
+
+推荐: 🌟🌟🌟
+
+优点: 安装好之后,启动 django 内置服务器,占系统资源少,启动迅速
+
+缺点: 安装依赖繁琐,难度较大
+
+本地安装步骤详见`console`项目[本地搭建控制台开发环境](https://cwiki.yunify.com/pages/viewpage.action?pageId=23687305)
 
 ```bash
 git clone git@git.internal.yunify.com:Simon/pitrix-webconsole.git
