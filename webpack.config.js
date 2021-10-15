@@ -14,8 +14,6 @@ const { NODE_ENV } = process.env
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
-console.log('apiUrl----->', apiUrl)
-
 let config = {
   mode: NODE_ENV,
   target: 'web',

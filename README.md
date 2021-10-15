@@ -21,6 +21,7 @@ npm run dev
 大数据工作台是 console 的子项目模式来开发的
 
 所以登录、接口转发是依赖于 console 项目的运行
+具体请参考[子 Portal 开发文档](https://cwiki.yunify.com/pages/viewpage.action?pageId=63358627)
 
 ## console 远程环境
 
@@ -31,8 +32,6 @@ npm run dev
 缺点: 依赖远程开发服务器的稳定性
 
 ### API Server URL 的配置
-
-具体请参考[子 Portal 开发文档](https://cwiki.yunify.com/pages/viewpage.action?pageId=63358627)
 
 ```bash
 # 当前工作空间根目录下,配置devserver的proxy url
