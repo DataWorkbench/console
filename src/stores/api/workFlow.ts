@@ -12,13 +12,13 @@ export const createWorkFlow = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/workflow/stream`,
+    action: `${regionId}/v1/workspace/${spaceId}/stream/workflow`,
     ...rest,
     method: 'POST',
   })
 
 export const loadWorkFlow = ({ regionId, spaceId, ...rest }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/workflow/stream`,
+    action: `${regionId}/v1/workspace/${spaceId}/stream/workflow`,
     ...rest,
   })

@@ -1,19 +1,22 @@
-import { styled, css, theme } from 'twin.macro'
+import tw, { styled, css } from 'twin.macro'
 import { Modal } from '@QCFE/qingcloud-portal-ui'
 
-export const DarkModal = styled(Modal)(() => [
+interface IDarkModal {
+  orient?: 'fullright'
+}
+
+export const DarkModal = styled(Modal)(({ orient }: IDarkModal) => [
   css`
     .modal-card-head,
     .modal-card-foot,
     .modal-card-body {
-      background-color: ${theme('colors.neut.16')};
-      border-color: ${theme('colors.neut.13')};
+      ${tw`bg-neut-16 border-neut-13`}
     }
     .modal-card-title {
-      color: ${theme('colors.white')};
+      ${tw`text-white`}
     }
     .icon.icon-clickable:hover {
-      background: ${theme('colors.neut.16')};
+      ${tw`bg-neut-16`}
     }
     .modal-card-head {
       svg {
@@ -21,6 +24,15 @@ export const DarkModal = styled(Modal)(() => [
       }
     }
   `,
+  orient === 'fullright' &&
+    css`
+      .modal-card {
+        ${tw`fixed top-0 right-0 bottom-0 max-h-full text-white`}
+        .modal-card-body {
+          ${tw`p-0`}
+        }
+      }
+    `,
 ])
 
 export default DarkModal

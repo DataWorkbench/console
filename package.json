@@ -10,7 +10,9 @@
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
     "deploy:dev": "rsync -rlptDzvh --delete dist/* root@bigdata_dev:/data/webapp/pitrix-webconsole-bigdata",
-    "test": "jest"
+    "test": "jest",
+    "start:console": "./docker/start.sh start",
+    "stop:console": "./docker/start.sh stop"
   },
   "husky": {
     "hooks": {

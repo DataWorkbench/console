@@ -105,7 +105,7 @@ const FlowModal = observer(() => {
             loading={mutation.isLoading}
             onClick={handleNext}
           >
-            确定
+            {state.step === 0 ? '下一步' : '确定'}
           </Button>
         </div>
       }

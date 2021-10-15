@@ -13,7 +13,7 @@ import StreamJAR from './StreamJAR'
 const { TabPanel } = Tabs
 
 const TabWrapper = styled(Tabs)(() => [
-  tw`bg-neut-18 h-full rounded-md flex flex-col`,
+  tw`bg-neut-18 h-full flex flex-col`,
   css`
     .tabs {
       ${tw`bg-neut-17`};

@@ -87,6 +87,10 @@ const DataSourceModal = observer(
       refetch,
     } = useQuerySourceKind(regionId, spaceId)
     const mutation = useMutationSource()
+    const curkind =
+      op === 'create'
+        ? get(kinds, `[${state.dbIndex}]`)
+        : kinds?.find((k) => k.name === opSourceList[0]?.sourcetype)
 
     const handleDbSelect = (i: number) => {
       setState((draft) => {
@@ -98,7 +102,8 @@ const DataSourceModal = observer(
       const formElem = form.current
       if (formElem?.validateForm()) {
         const { name, comment, ...rest } = formElem.getFieldsValue()
-        const sourcetype: string = get(kinds, `[${state.dbIndex}].name`)
+        const sourcetype: string = curkind.name
+        // get(kinds, `[${state.dbIndex}].name`)
         const params = {
           op,
           regionId,
@@ -128,10 +133,6 @@ const DataSourceModal = observer(
       })
     }
 
-    const curkind =
-      op === 'create'
-        ? get(kinds, `[${state.dbIndex}]`)
-        : kinds?.find((k) => k.name === opSourceList[0]?.sourcetype)
     return (
       <Modal
         onHide={onHide}

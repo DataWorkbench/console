@@ -14,3 +14,5 @@ selenium-debug.log
 
 # Editor directories and files
 .idea
+
+docker/web_console_settings.py

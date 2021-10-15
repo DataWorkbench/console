@@ -139,6 +139,12 @@ let config = {
       '/login': {
         target: 'http://localhost:8888',
       },
+      '/static': {
+        target: 'http://localhost:8888',
+      },
+      '/captcha': {
+        target: 'http://localhost:8888',
+      },
     },
   },
   plugins: [
