@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { useToggle } from 'react-use'
 import tw from 'twin.macro'
-import { Icon } from '@QCFE/qingcloud-portal-ui/lib/components'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
+import { motion } from 'framer-motion'
 import MenuItem from './MenuItem'
 
 interface SideMenuProps {
-  title: string
-  menus: []
-  darkMode: boolean
-  onClick: (name: string) => void
-  defaultSelectedMenu: string
+  title?: string
+  menus?: any[]
+  darkMode?: boolean
+  onClick?: (name: string) => void
+  defaultSelectedMenu?: string
 }
 
-const SideMenu = ({
+export const SideMenu = ({
   title = '',
   menus = [],
   onClick = () => {},
@@ -21,17 +22,17 @@ const SideMenu = ({
 }: SideMenuProps) => {
   const [narrowMode, toggleNarrowMode] = useToggle(false)
   const [curSelectedMenu, setCurSelectedMenu] = useState(defaultSelectedMenu)
-  const handleMenuClick = (menuName) => {
+  const handleMenuClick = (menuName: string) => {
     setCurSelectedMenu(menuName)
     onClick(menuName)
   }
 
   return (
-    <div
-      css={[
-        tw`relative transition-all `,
-        narrowMode ? tw`w-14 text-center` : tw`w-56`,
-      ]}
+    <motion.div
+      animate={{ width: narrowMode ? 56 : 224 }}
+      transition={{ ease: 'easeOut', duration: 0.3 }}
+      initial={false}
+      css={[tw`relative`, narrowMode && tw`text-center`]}
     >
       <div
         tw="
@@ -97,7 +98,7 @@ const SideMenu = ({
           />
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 

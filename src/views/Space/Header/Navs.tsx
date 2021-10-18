@@ -30,15 +30,21 @@ export const Navs = ({ mod }: NavsProps) => {
     useParams<{ regionId: string; spaceId: string }>()
   const {
     workSpaceStore: { funcList },
+    globalStore,
   } = useStore()
   const setDarkMode = useDarkMode()
+  const handNavClick = (name: string) => {
+    const darkMode = ['dm', 'ops'].includes(name)
+    setDarkMode(darkMode)
+    globalStore.set({ darkMode })
+  }
   return (
     <div>
       {funcList.map(({ title, name }) => (
         <FuncWrapper key={name} current={mod === name}>
           <Link
             tw="inline-block py-3 "
-            onClick={() => setDarkMode(['dm', 'ops'].includes(name))}
+            onClick={() => handNavClick(name)}
             to={`/${regionId}/workspace/${spaceId}/${name}`}
           >
             {title}

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useMount, useUnmount } from 'react-use'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Icons } from 'components'
@@ -21,88 +21,90 @@ echarts.use([
   CanvasRenderer,
 ])
 
-function OverView() {
-  const insRef = useRef()
+export const OverView = () => {
+  const insRef = useRef<HTMLTableSectionElement>()
   const [chart, setChart] = useState(null)
   useMount(() => {
-    const mychart = echarts.init(insRef.current, 'dark')
-    const option = {
-      title: {
-        text: '实例完成情况',
-        left: '2%',
-        top: '2',
-        textStyle: { fontSize: 14 },
-      },
-      tooltip: {
-        trigger: 'axis',
-      },
-      legend: {
-        left: '130',
-        top: '2',
-        data: ['今天', '昨天', '历史平均'],
-      },
-      grid: {
-        left: '2%',
-        right: '2%',
-        bottom: '3%',
-        containLabel: true,
-      },
-      backgroundColor: '#273849',
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: Array.from({ length: 24 }, (v, k) => `${k}:00`),
-      },
-      yAxis: {
-        type: 'value',
-        splitLine: {
-          lineStyle: {
-            type: 'dashed',
-            color: '#4C5E70',
+    if (insRef.current) {
+      const mychart = echarts.init(insRef.current, 'dark')
+      const option = {
+        title: {
+          text: '实例完成情况',
+          left: '2%',
+          top: '2',
+          textStyle: { fontSize: 14 },
+        },
+        tooltip: {
+          trigger: 'axis',
+        },
+        legend: {
+          left: '130',
+          top: '2',
+          data: ['今天', '昨天', '历史平均'],
+        },
+        grid: {
+          left: '2%',
+          right: '2%',
+          bottom: '3%',
+          containLabel: true,
+        },
+        backgroundColor: '#273849',
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: Array.from({ length: 24 }, (v, k) => `${k}:00`),
+        },
+        yAxis: {
+          type: 'value',
+          splitLine: {
+            lineStyle: {
+              type: 'dashed',
+              color: '#4C5E70',
+            },
           },
         },
-      },
-      series: [
-        {
-          name: '今天',
-          data: [
-            2, 3, 5, 8, 10, 12, 14, 11, 13, 15, 16, 18, 20, 22, 20, 21, 23, 20,
-            24, 25, 26, 28, 26, 30,
-          ],
-          type: 'line',
-          smooth: true,
-          lineStyle: {
-            width: 1,
+        series: [
+          {
+            name: '今天',
+            data: [
+              2, 3, 5, 8, 10, 12, 14, 11, 13, 15, 16, 18, 20, 22, 20, 21, 23,
+              20, 24, 25, 26, 28, 26, 30,
+            ],
+            type: 'line',
+            smooth: true,
+            lineStyle: {
+              width: 1,
+            },
           },
-        },
-        {
-          name: '昨天',
-          data: [
-            1, 2, 3, 4, 6, 8, 10, 11, 9, 11, 12, 15, 11, 10, 13, 12, 16, 18, 20,
-            18, 19, 20, 21, 22,
-          ],
-          type: 'line',
-          smooth: true,
-          lineStyle: {
-            width: 1,
+          {
+            name: '昨天',
+            data: [
+              1, 2, 3, 4, 6, 8, 10, 11, 9, 11, 12, 15, 11, 10, 13, 12, 16, 18,
+              20, 18, 19, 20, 21, 22,
+            ],
+            type: 'line',
+            smooth: true,
+            lineStyle: {
+              width: 1,
+            },
           },
-        },
-        {
-          name: '历史平均',
-          data: [
-            3, 6, 7, 4, 8, 10, 8, 6, 9, 10, 12, 10, 11, 13, 15, 16, 17, 13, 19,
-            22, 20, 21, 23, 20,
-          ],
-          type: 'line',
-          smooth: true,
-          lineStyle: {
-            width: 1,
+          {
+            name: '历史平均',
+            data: [
+              3, 6, 7, 4, 8, 10, 8, 6, 9, 10, 12, 10, 11, 13, 15, 16, 17, 13,
+              19, 22, 20, 21, 23, 20,
+            ],
+            type: 'line',
+            smooth: true,
+            lineStyle: {
+              width: 1,
+            },
           },
-        },
-      ],
+        ],
+      }
+      mychart.setOption(option)
+      setChart(mychart)
     }
-    mychart.setOption(option)
-    setChart(mychart)
   })
   useUnmount(() => {
     if (chart) {

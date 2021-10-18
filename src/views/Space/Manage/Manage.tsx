@@ -1,20 +1,17 @@
 import { useParams } from 'react-router-dom'
-import RealTime from './RealTime'
-import Resource from './Resource'
+import Setting from './Setting'
 import { Sider } from '../Sider'
 
-function Dm() {
+function Manage() {
   const { mod } = useParams<{ mod: string }>()
-
   return (
     <div tw="flex-1 flex h-full">
-      <Sider funcMod="dm" />
+      <Sider funcMod="manage" />
       <div tw="flex-1 overflow-y-auto">
-        {(mod === 'realtime' || !mod) && <RealTime />}
-        {mod === 'resource' && <Resource />}
+        {(mod === 'setting' || !mod) && <Setting />}
       </div>
     </div>
   )
 }
 
-export default Dm
+export default Manage
