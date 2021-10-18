@@ -1,9 +1,18 @@
 import { useState } from 'react'
 import { useToggle } from 'react-use'
-import tw from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { motion } from 'framer-motion'
 import MenuItem from './MenuItem'
+
+const ToggleWrapper = styled('div')(() => [
+  tw`flex h-10 items-center bg-neut-2 border-t border-neut-3 hover:bg-neut-1 pl-5 dark:bg-neut-17 dark:border-neut-13 `,
+  css`
+    svg {
+      ${tw`dark:(text-white fill-current) cursor-pointer`}
+    }
+  `,
+])
 
 interface SideMenuProps {
   title?: string
@@ -30,7 +39,7 @@ export const SideMenu = ({
   return (
     <motion.div
       animate={{ width: narrowMode ? 56 : 224 }}
-      transition={{ ease: 'easeOut', duration: 0.3 }}
+      transition={{ ease: 'easeOut', duration: 0.2 }}
       initial={false}
       css={[tw`relative`, narrowMode && tw`text-center`]}
     >
@@ -88,15 +97,14 @@ export const SideMenu = ({
             )
           })}
         </div>
-        <div tw="flex h-10 items-center bg-neut-2 border-t border-neut-3 hover:bg-neut-1 pl-5 dark:bg-neut-17 dark:border-neut-13">
+        <ToggleWrapper>
           <Icon
             name={narrowMode ? 'expand' : 'collapse'}
             size={20}
-            clickable
-            type={darkMode ? 'light' : 'dark'}
+            type="dark"
             onClick={toggleNarrowMode}
           />
-        </div>
+        </ToggleWrapper>
       </div>
     </motion.div>
   )

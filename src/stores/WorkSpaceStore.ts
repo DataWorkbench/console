@@ -19,9 +19,9 @@ class WorkSpaceStore {
       title: '云上加工',
       subFuncList: [
         { name: 'realtime', title: '实时计算', icon: 'cogwheel' },
+        { name: 'table', title: '表管理', icon: 'listview' },
         { name: 'resource', title: '资源管理', icon: 'resource' },
-        { name: 'funcs', title: '函数管理', icon: 'textarea' },
-        { name: 'history', title: '任务运行历史', icon: 'paper' },
+        { name: 'history', title: '任务运行历史', icon: 'textarea' },
       ],
     },
     {

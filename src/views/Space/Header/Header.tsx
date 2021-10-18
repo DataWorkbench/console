@@ -40,7 +40,7 @@ export const Header = observer(() => {
   }
 
   return (
-    <Root>
+    <Root tw="z-[1000]">
       <Center tw="space-x-3">
         <BackMenu />
         <Center
