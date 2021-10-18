@@ -33,7 +33,10 @@ const SideMenuWrapper = styled('div')(() => [
       }
       .side-menu-pickup {
         box-shadow: none;
-        ${tw`border-r border-neut-3 bg-neut-2 shadow-none`}
+        ${tw`border-r border-neut-3 bg-neut-2 dark:(bg-neut-17 border-neut-15) shadow-none`}
+        .divider-horizon {
+          ${tw`dark:border-neut-15`}
+        }
       }
       .side-menu-footer {
         ${tw`border-t border-r bg-neut-2 dark:(bg-neut-17 border-neut-15) border-neut-3`}
