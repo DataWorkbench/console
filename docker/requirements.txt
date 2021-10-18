@@ -1,0 +1,14 @@
+python-memcached==1.48
+pylibmc==1.6.1
+django==1.6.2
+coffin==0.3.8
+simplejson==3.8.0
+Pillow==2.9.0
+PyYAML==3.11
+M2Crypto==0.22.3
+markupsafe==1.1.1
+Jinja2==2.7.2
+Hamlish-Jinja==0.3.2
+xlwt==1.1.2
+minio==6.0.0
+gunicorn==19.10.0
