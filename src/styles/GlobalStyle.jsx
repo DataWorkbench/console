@@ -25,8 +25,76 @@ const customStyles = css`
     .input,
     .textarea {
       ${tw`bg-neut-16 text-white border-neut-13`}
-      &:not([readonly]):not([disabled]):hover {
-        ${tw`border-neut-8`}
+    }
+    .input-number.is-mini {
+      & > .input-number-controls {
+        height: 30px;
+        & > button {
+          ${tw`bg-neut-13 border-neut-13`}
+          &:hover,
+          &:focus {
+            ${tw`bg-neut-13`}
+          }
+          svg.qicon {
+            ${tw`text-white`}
+          }
+        }
+      }
+    }
+    .field.date-picker-field .control {
+      .datepicker-input.input {
+        &[readonly='readonly'] {
+          ${tw`bg-neut-16 text-white border-neut-13`}
+          &:hover {
+            ${tw`border-neut-5`}
+          }
+        }
+      }
+      .icon {
+        &:hover {
+          ${tw`bg-neut-16`}
+        }
+        svg.qicon {
+          ${tw`text-white`}
+        }
+      }
+    }
+    .slider {
+      .slider-rail {
+        ${tw`bg-neut-13`}
+      }
+      .slider-dot {
+        ${tw`border-neut-13`}
+      }
+    }
+    .select {
+      > .select-control {
+        ${tw`bg-neut-16 border-neut-13`}
+        &:hover,
+        &:active {
+          ${tw`bg-neut-16 border-neut-8`}
+        }
+        &:focus {
+          ${tw`border-green-11`}
+        }
+        .select-value > .select-value-label {
+          ${tw`text-white!`}
+        }
+        & > .select-arrow-zone {
+          .qicon {
+            ${tw`text-white`}
+          }
+        }
+      }
+      & > .select-menu-outer {
+        ${tw`bg-neut-17 border-neut-13`}
+        .select-option {
+          ${tw`bg-neut-17 text-white`}
+          &.is-selected,
+          &:hover {
+            ${tw`bg-neut-16`}
+          }
+        }
       }
     }
   }
@@ -34,14 +102,6 @@ const customStyles = css`
     ${tw`text-base`}
   }
 `
-/*   
-.select-control {
-  ${tw`bg-neut-16 border-neut-13`}
-  &:hover {
-    ${tw`bg-neut-13`}
-  }
-}
-*/
 
 const GlobalStyles = () => (
   <>

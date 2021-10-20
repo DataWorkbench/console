@@ -92,15 +92,6 @@ class GlobalStore {
   set(params: { [key: string]: any }) {
     set(this, { ...params })
   }
-
-  // *loadRegions() {
-  //   const regionPromise = loadRegion()
-  //   const ret: { ret_code: number; [p: string]: any } = yield regionPromise
-  //   if (ret?.ret_code === 0) {
-  //     this.regionInfos = parseI18n(ret.infos)
-  //   }
-  //   return this.regionInfos
-  // }
 }
 
 export default GlobalStore

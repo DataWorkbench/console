@@ -26,7 +26,8 @@ const SideMenuWrapper = styled('div')(() => [
           .icon-title {
             ${tw`text-white border-green-11!`}
             svg.qicon {
-              ${tw`text-white fill-current`}
+              color: #fff;
+              fill: rgba(255, 255, 255, 0.4);
             }
           }
         }
@@ -34,8 +35,28 @@ const SideMenuWrapper = styled('div')(() => [
       .side-menu-pickup {
         box-shadow: none;
         ${tw`border-r border-neut-3 bg-neut-2 dark:(bg-neut-17 border-neut-15) shadow-none`}
+        .side-title,
         .divider-horizon {
-          ${tw`dark:border-neut-15`}
+          display: none;
+        }
+        .side-content {
+          ${tw`px-2`}
+          .icon-li {
+            ${tw`px-0 border-0 flex items-center h-10 `}
+            span.icon {
+              ${tw`border-l-2 border-neut-2 dark:(border-neut-17) pl-2 box-content`}
+              svg {
+                color: #fff;
+                fill: rgba(255, 255, 255, 0.4);
+              }
+            }
+            &.selected {
+              ${tw`bg-neut-2 dark:(bg-neut-13) rounded-sm`}
+              span.icon {
+                ${tw`border-l-2 border-green-11`}
+              }
+            }
+          }
         }
       }
       .side-menu-footer {

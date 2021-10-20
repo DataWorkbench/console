@@ -22,10 +22,9 @@ const StreamRightMenu = () => {
         <span onClick={() => setShowScheSetting(true)}>调 度 设 置</span>
         <span>操 作 记 录</span>
       </MenuRoot>
-      <ScheSettingModal
-        onCancel={() => setShowScheSetting(false)}
-        visible={showScheSetting}
-      />
+      {showScheSetting && (
+        <ScheSettingModal onCancel={() => setShowScheSetting(false)} visible />
+      )}
     </>
   )
 }
