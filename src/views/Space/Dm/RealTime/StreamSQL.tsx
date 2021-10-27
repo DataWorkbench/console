@@ -1,13 +1,20 @@
-import { FlexBox } from 'components'
-import { Icon } from '@QCFE/qingcloud-portal-ui'
+import { useState, useEffect } from 'react'
+import { FlexBox, DarkButton } from 'components'
+import { Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import AceEditor from 'react-ace'
+import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import 'ace-builds/src-noconflict/mode-sql'
 import 'ace-builds/src-noconflict/theme-solarized_dark'
 import 'ace-builds/src-noconflict/ext-language_tools'
 import 'ace-builds/src-noconflict/ext-spellcheck'
 import 'ace-builds/src-noconflict/snippets/sql'
-import { DarkButton, StreamToolBar } from 'views/Space/styled'
+import {
+  useMutationStreamJobCode,
+  useMutationReleaseStreamJob,
+  useQueryStreamJobCode,
+} from 'hooks'
+import { StreamToolBar } from 'views/Space/styled'
 import StreamRightMenu from './StreamRightMenu'
 
 const AceEditorWrapper = styled('div')(() => [
@@ -27,15 +34,19 @@ const AceEditorWrapper = styled('div')(() => [
     }
   `,
 ])
-// interface Iflow {
-//   id: string
-//   name: string
-//   type: number
-//   [k: string]: string | number
-// }
 
-// const StreamSQL = ({ flow }: { flow: Iflow }) => {
 const StreamSQL = () => {
+  const mutation = useMutationStreamJobCode()
+  const releaseMutation = useMutationReleaseStreamJob()
+  const [code, setCode] = useState()
+  const { data } = useQueryStreamJobCode()
+
+  useEffect(() => {
+    const sqlCode = get(data, 'sql.code')
+    if (sqlCode) {
+      setCode(sqlCode)
+    }
+  }, [data])
   const complete = (editor: any) => {
     const completers = [
       {
@@ -53,30 +64,61 @@ const StreamSQL = () => {
   }
 
   const save = () => {
-    // console.log(flow)
+    mutation.mutate(
+      {
+        sql: {
+          code,
+        },
+        type: 2,
+      },
+      {
+        onSuccess: () => {
+          Notify.success({
+            title: '操作提示',
+            content: '代码保存成功',
+            placement: 'bottomRight',
+          })
+        },
+      }
+    )
   }
 
+  const release = () => {
+    releaseMutation.mutate(null, {
+      onSuccess: () => {
+        Notify.success({
+          title: '操作提示',
+          content: '代码保存成功',
+          placement: 'bottomRight',
+        })
+      },
+    })
+  }
   return (
     <FlexBox tw="h-full flex-1">
       <FlexBox tw="flex-col flex-1">
         <StreamToolBar>
           <DarkButton type="dark">
-            <Icon name="listview" />
+            <Icon name="listview" type="light" />
             插入表
           </DarkButton>
           <DarkButton type="dark">
-            <Icon name="remark" />
+            <Icon name="remark" type="light" />
             语法检查
           </DarkButton>
           <DarkButton type="dark">
-            <Icon name="triangle-right" />
+            <Icon name="triangle-right" type="light" />
             运行
           </DarkButton>
-          <DarkButton type="grey" onClick={save}>
+          <DarkButton onClick={save} loading={mutation.isLoading}>
             <Icon name="data" />
             保存
           </DarkButton>
-          <DarkButton type="primary">
+          <DarkButton
+            type="primary"
+            onClick={release}
+            loading={releaseMutation.isLoading}
+          >
             <Icon name="export" />
             发布
           </DarkButton>
@@ -98,6 +140,7 @@ const StreamSQL = () => {
               useWorker: false,
               tabSize: 2,
             }}
+            onChange={(v) => setCode(v)}
             defaultValue={`-drop table if exists pd;
 create table pd
 (id bigint primary key NOT ENFORCED,id1 bigint) WITH (
@@ -107,6 +150,7 @@ create table pd
 'username' = 'root',
 'password' = '123456'
 );`}
+            value={code}
           />
         </AceEditorWrapper>
       </FlexBox>

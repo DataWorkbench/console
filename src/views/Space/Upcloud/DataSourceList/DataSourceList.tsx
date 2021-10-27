@@ -4,7 +4,7 @@ import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
 import Tippy from '@tippyjs/react'
 import dayjs from 'dayjs'
-import { get } from 'lodash-es'
+import { get, findKey } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input } from '@QCFE/lego-ui'
 import {
@@ -20,7 +20,7 @@ import {
   InputSearch,
   utils,
 } from '@QCFE/qingcloud-portal-ui'
-import { useQuerySource, useMutationSource, useStore } from 'hooks'
+import { useQuerySource, useMutationSource, sourceTypes, useStore } from 'hooks'
 import {
   Center,
   ContentBox,
@@ -128,11 +128,12 @@ const DataSourceList = observer(() => {
       draft.spaceId = spaceId
     })
   }, [regionId, spaceId, setFilter])
+
   const defaultColumns = useMemo(
     () => [
       {
         title: '数据源名称/id',
-        dataIndex: 'sourceid',
+        dataIndex: 'source_id',
         render: (v: string, info: any) => (
           <FlexBox tw="space-x-1 items-center">
             <Center tw="w-6 h-6 bg-neut-3 rounded-full">
@@ -147,9 +148,9 @@ const DataSourceList = observer(() => {
       },
       {
         title: '状态',
-        dataIndex: 'state',
-        render: (v: string) => {
-          if (v === 'enable') {
+        dataIndex: 'status',
+        render: (v: number) => {
+          if (v === 1) {
             return (
               <Center tw="space-x-1">
                 <Icons name="circle_enable" size={12} />
@@ -167,11 +168,14 @@ const DataSourceList = observer(() => {
       },
       {
         title: '数据源类型',
-        dataIndex: 'sourcetype',
+        dataIndex: 'source_type',
+        render: (v: number) => {
+          return findKey(sourceTypes, (o) => o === v)
+        },
       },
       {
         title: '连通性测试状态',
-        dataIndex: 'connected',
+        dataIndex: 'connection',
         render: (v: string) => {
           if (v === 'failed') {
             return (
@@ -195,7 +199,7 @@ const DataSourceList = observer(() => {
       },
       {
         title: '创建时间',
-        dataIndex: 'createtime',
+        dataIndex: 'created',
         sortable: true,
         sortOrder: filter.reverse ? 'desc' : 'asc',
         render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
@@ -363,10 +367,7 @@ const DataSourceList = observer(() => {
     )
   }
 
-  const sourceList = (data?.infos || []).map(({ connected, info }) => ({
-    ...info,
-    connected,
-  }))
+  const sourceList = data?.infos || []
 
   return (
     <>

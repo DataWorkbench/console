@@ -3,13 +3,12 @@ import { observer } from 'mobx-react-lite'
 import tw, { css } from 'twin.macro'
 import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
-import FlowMenu from './FlowMenu'
-import FlowTabs from './FlowTabs'
-import FlowModal from './FlowModal'
+import JobMenu from './JobMenu'
+import JobTabs from './JobTabs'
 
 const RealTime = observer(() => {
   const {
-    workFlowStore: { curFlow },
+    workFlowStore: { curJob },
   } = useStore()
 
   const steps = useMemo(
@@ -60,9 +59,9 @@ const RealTime = observer(() => {
 
   return (
     <div tw="flex min-h-[600px] h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
-      <FlowMenu />
-      {curFlow ? (
-        <FlowTabs />
+      <JobMenu />
+      {curJob ? (
+        <JobTabs />
       ) : (
         <Center tw="flex-1 text-neut-8 bg-neut-18 rounded">
           <div tw="space-y-2">
@@ -90,7 +89,6 @@ const RealTime = observer(() => {
           </div>
         </Center>
       )}
-      <FlowModal />
     </div>
   )
 })

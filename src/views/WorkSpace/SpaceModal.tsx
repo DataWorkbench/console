@@ -1,10 +1,10 @@
 import { useRef, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw from 'twin.macro'
-import { RadioButton, Form, Input, Button, Modal } from '@QCFE/lego-ui'
+import { RadioButton, Form, Input, Button } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
-import FullModal, { ModalContent } from 'components/Modal'
+import { Modal, ModalContent } from 'components'
 import { useQueryClient } from 'react-query'
 import { useWorkSpaceContext } from 'contexts'
 import { formatDate } from 'utils/convert'
@@ -257,14 +257,16 @@ const SpaceModal = observer(
     }
 
     return (
-      <FullModal
+      <Modal
         title={`${curSpaceOpt === 'create' ? '创建' : '修改'}工作空间`}
         closable
-        placement="rightFull"
-        onOK={handleOk}
-        onHide={handleModalClose}
+        visible
+        width={800}
+        orient="fullright"
+        onOk={handleOk}
+        onCancel={handleModalClose}
         {...otherProps}
-        showConfirmLoading={mutation.isLoading}
+        confirmLoading={mutation.isLoading}
         okText={curSpaceOpt === 'create' ? '创建' : '修改'}
         cancelText="取消"
       >
@@ -325,7 +327,7 @@ const SpaceModal = observer(
             />
           </Form>
         </ModalContent>
-      </FullModal>
+      </Modal>
     )
   }
 )

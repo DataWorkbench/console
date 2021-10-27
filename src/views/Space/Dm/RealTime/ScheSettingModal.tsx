@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import tw, { css, styled } from 'twin.macro'
+import { useState, useEffect, useRef } from 'react'
 import {
   Collapse,
   Icon,
@@ -8,118 +7,233 @@ import {
   Label,
   Control,
   Toggle,
+  RadioGroup,
+  InputNumber,
+  Radio,
+  Select,
+  Loading,
 } from '@QCFE/lego-ui'
 import { DarkModal, FlexBox } from 'components'
 import { useImmer } from 'use-immer'
-import { useWindowSize } from 'react-use'
+import { range } from 'lodash-es'
+import { useStore } from 'stores'
+import dayjs from 'dayjs'
+import { useMutationStreamJobSchedule, useQueryStreamJobSchedule } from 'hooks'
+import {
+  DarkCollapse,
+  ScheSettingForm,
+  SmallDatePickerField,
+  HorizonFiledsWrapper,
+} from './styled'
 
-const { TextField, DatePickerField, SliderField, NumberField, SelectField } =
-  Form
+const { TextField, DatePickerField, SliderField, SelectField } = Form
 const { CollapseItem } = Collapse
-
-const DarkCollapse = styled(Collapse)(() => [
-  css`
-    ${tw`text-white w-full border-0`}
-    .collapse-item-label {
-      ${tw`bg-neut-17 text-white border-neut-13 border-t-0`}
-      > span {
-        svg {
-          color: #fff;
-        }
-      }
-    }
-    .collapse-item-content {
-      ${tw`bg-neut-16`}
-    }
-  `,
-])
-
-const FormWrapper = styled(Form)(() => [
-  css`
-    &.is-horizon-layout {
-      ${tw`pl-5`}
-      > .field {
-        > .label {
-          width: 120px;
-        }
-        > .control {
-          ${tw`w-auto`}
-        }
-        > .help {
-          ${tw`ml-3 text-white`}
-        }
-
-        &.toggle-field {
-          ${tw`items-center`}
-        }
-        &.slider-field {
-          > div.control {
-            ${tw`max-w-none`}
-            .slider {
-              ${tw`w-96`}
-            }
-          }
-        }
-        &.select-field {
-          div.select {
-            ${tw`w-32`}
-          }
-        }
-      }
-    }
-  `,
-])
-
-const SmallDatePickerField = styled(DatePickerField)(() => [
-  css`
-    .control {
-      > input {
-        ${tw`w-32!`}
-      }
-    }
-  `,
-])
 
 interface IScheSettingModal {
   visible?: boolean
   onCancel?: () => void
 }
 
+type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+
 const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
-  const [params, setParams] = useImmer({
+  // const [period, setPeriod] = useState<TPeriodType>('minute')
+  const [defCurDate] = useState(dayjs().hour(0).minute(20).toDate())
+  // const { regionId, spaceId } = useParams<IUseParms>()
+  const [periodData, setPeriodData] = useImmer({
+    minute: {
+      startHour: 0,
+      stampMinu: 5,
+      endHour: 23,
+    },
+    hour: {
+      tp: 1,
+      startHour: 0,
+      stampMinu: 5,
+      endHour: 23,
+      hours: [0],
+    },
+    day: {
+      scheDate: defCurDate,
+    },
+    week: {
+      weekly: [1],
+      scheDate: defCurDate,
+    },
+    month: {
+      daily: [1],
+      scheDate: defCurDate,
+    },
+    year: {
+      monthly: [1],
+      daily: [1],
+      scheDate: defCurDate,
+    },
+  })
+  const [params, setParams] = useImmer<{
+    concurrencyPolicy: number | string
+    started: number
+    ended: number
+    express: string
+    retryLimit: number
+    retryInterval: number
+    retryPolicy: number
+    timeout: number
+    periodType: TPeriodType
+  }>({
     concurrencyPolicy: '',
     started: 0,
     ended: 0,
-    express: '',
+    express: '*/5 0-23 * * *',
     retryLimit: 2,
     retryInterval: 2,
     retryPolicy: 1,
     timeout: 0,
+    periodType: 'minute',
   })
-  const [period, setPeriod] = useState('day')
-  const { width } = useWindowSize()
 
-  const calcExpress = (d: Date[]) => {
-    if (period === 'day') {
-      if (d.length > 0) {
-        const h = d[0].getHours()
-        const m = d[0].getMinutes()
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  const { isFetching } = useQueryStreamJobSchedule({
+    onSuccess: (data: any) => {
+      // console.log(data)
+      if (data) {
+        const periodType = data.period_type
+        const { express } = data
         setParams((draft) => {
-          draft.express = `00 ${h > 9 ? h : `0${h}`} ${
-            m > 9 ? m : `0${m}`
-          } ** ?`
+          draft.concurrencyPolicy = data.concurrency_policy
+          draft.started = data.started
+          draft.ended = data.ended
+          draft.retryLimit = data.retry_limit
+          draft.retryInterval = data.retry_interval
+          draft.retryPolicy = data.retry_policy
+          draft.periodType = periodType || 'minute'
+          draft.timeout = data.timeout
         })
+        if (express !== '') {
+          setPeriodData((draft) => {
+            const [minute, hour, daily, monthly, week] = express.split(' ')
+            if (periodType === 'minute') {
+              ;[, draft.minute.stampMinu] = minute.split('/')
+              ;[draft.minute.startHour, draft.minute.endHour] = hour.split('-')
+            } else if (periodType === 'hour') {
+              if (hour.indexOf('-') > -1) {
+                let hourRange
+                ;[hourRange, draft.hour.stampMinu] = hour.split('/')
+                ;[draft.hour.startHour, draft.hour.endHour] =
+                  hourRange.split('-')
+              }
+            } else if (periodType === 'day') {
+              draft.day.scheDate = dayjs().hour(hour).minute(minute).toDate()
+            } else if (periodType === 'week') {
+              draft.week.scheDate = dayjs().hour(hour).minute(minute).toDate()
+              draft.week.weekly = week.split(',')
+            } else if (periodType === 'month') {
+              draft.month.scheDate = dayjs().hour(hour).minute(minute).toDate()
+              draft.month.daily = daily.split(',')
+            } else if (periodType === 'year') {
+              draft.year.scheDate = dayjs().hour(hour).minute(minute).toDate()
+              draft.year.daily = daily.split(',')
+              draft.year.monthly = monthly.split(',')
+            }
+          })
+        }
       }
+    },
+  })
+  const mutation = useMutationStreamJobSchedule()
+
+  const formRef = useRef<Form>()
+
+  const { periodType } = params
+
+  useEffect(() => {
+    let curPeriod = null
+    let express = ''
+    let scheDate = null
+    let daily = null
+    const sortFormatNum = (arr: number[]) =>
+      [...arr].sort((a, b) => a - b).join(',')
+    if (periodType === 'minute') {
+      curPeriod = periodData[periodType]
+      express = `*/${curPeriod.stampMinu} ${curPeriod.startHour}-${curPeriod.endHour} * * *`
+    } else if (periodType === 'hour') {
+      curPeriod = periodData[periodType]
+      if (curPeriod.tp === 1) {
+        express = `0 ${curPeriod.startHour}-${curPeriod.endHour}/${curPeriod.stampMinu} * * *`
+      } else if (curPeriod.hours.length > 0) {
+        express = `0 ${sortFormatNum(curPeriod.hours)} * * *`
+      }
+    } else if (periodType === 'day') {
+      curPeriod = periodData[periodType]
+      scheDate = curPeriod.scheDate
+      express = `${scheDate.getMinutes()} ${scheDate.getHours()} * * *`
+    } else if (periodType === 'week') {
+      curPeriod = periodData[periodType]
+      scheDate = curPeriod.scheDate
+      const { weekly } = curPeriod
+      express = `${scheDate.getMinutes()} ${scheDate.getHours()} * * ${sortFormatNum(
+        weekly
+      )}`
+    } else if (periodType === 'month') {
+      curPeriod = periodData[periodType]
+      scheDate = curPeriod.scheDate
+      daily = curPeriod.daily
+      express = `${scheDate.getMinutes()} ${scheDate.getHours()} ${sortFormatNum(
+        daily
+      )} * *`
+    } else if (periodType === 'year') {
+      curPeriod = periodData[periodType]
+      scheDate = curPeriod.scheDate
+      daily = curPeriod.daily
+      const { monthly } = curPeriod
+      express = `${scheDate.getMinutes()} ${scheDate.getHours()} ${sortFormatNum(
+        daily
+      )} ${sortFormatNum(monthly)} *`
+    }
+    if (express !== '') {
+      setParams((draft) => {
+        draft.express = express
+      })
+    }
+  }, [periodData, periodType, setParams])
+
+  const save = () => {
+    if (formRef.current?.validateForm()) {
+      mutation.mutate(
+        {
+          jobId: curJob?.id,
+          concurrency_policy: params.concurrencyPolicy,
+          ended: params.ended,
+          express: params.express,
+          retry_interval: params.retryInterval,
+          retry_limit: params.retryLimit,
+          retry_policy: params.retryPolicy,
+          period_type: params.periodType,
+          started: params.started,
+          timeout: params.timeout,
+        },
+        {
+          onSuccess: () => {
+            if (onCancel) {
+              onCancel()
+            }
+          },
+        }
+      )
     }
   }
+
   return (
     <DarkModal
       orient="fullright"
-      appendToBody
       onCancel={onCancel}
       title="运行参数配置"
-      width={width > 1600 ? 800 : width / 2}
+      width={800}
       visible={visible}
+      onOk={save}
+      confirmLoading={mutation.isLoading}
     >
       <div>
         <DarkCollapse defaultActiveKey={['p1', 'p2']}>
@@ -132,12 +246,26 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
               </FlexBox>
             }
           >
-            <FormWrapper layout="horizon">
-              <TextField name="name" label="业务名称" />
-              <TextField name="id" label="业务 ID" />
-              <TextField name="desc" label="业务描述" />
-              <TextField name="param" label="参数" />
-            </FormWrapper>
+            <ScheSettingForm layout="horizon">
+              <TextField
+                value={curJob?.name}
+                disabled
+                name="name"
+                label="业务名称"
+              />
+              <TextField
+                value={curJob?.id}
+                disabled
+                name="id"
+                label="业务 ID"
+              />
+              <TextField
+                value={curJob?.desc}
+                disabled
+                name="desc"
+                label="业务描述"
+              />
+            </ScheSettingForm>
           </CollapseItem>
           <CollapseItem
             key="p2"
@@ -148,155 +276,467 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
               </FlexBox>
             }
           >
-            <FormWrapper layout="horizon">
-              <DatePickerField
-                name="p0"
-                label="生效时间"
-                mode="range"
-                enableTime
-                dateFormat="Y-m-d H:i"
-                onChange={(d: Date[]) => {
-                  if (d.length > 0) {
+            <Loading spinning={isFetching}>
+              <ScheSettingForm layout="horizon" ref={formRef}>
+                <DatePickerField
+                  name="timeEffect"
+                  label="生效时间"
+                  mode="range"
+                  enableTime
+                  value={[
+                    params.started ? new Date(params.started * 1000) : '',
+                    params.ended ? new Date(params.ended * 1000) : '',
+                  ]}
+                  dateFormat="Y-m-d H:i"
+                  help="注：调度将在有效日期内生效并自动调度，反之，在有效期外的任务将不会自动调度。"
+                  onClear={() => {
                     setParams((draft) => {
-                      draft.started = d[0].getTime()
-                      if (d.length > 1) {
-                        draft.ended = d[1].getTime()
-                      }
+                      draft.started = 0
+                      draft.ended = 0
                     })
-                  }
-                }}
-              />
-              <SelectField
-                name="p0"
-                label="* 依赖策略"
-                value={params.concurrencyPolicy}
-                onChange={(v: string) => {
-                  setParams((draft) => {
-                    draft.concurrencyPolicy = v
-                  })
-                }}
-                options={[
-                  { value: '1', label: 'allow' },
-                  { value: '2', label: 'forbid' },
-                  { value: '3', label: 'replace' },
-                ]}
-              />
-              <Field>
-                <Label>* 重跑策略</Label>
-                <Control tw="w-auto!">
-                  <Toggle
-                    checked={params.retryPolicy === 2}
-                    onChange={(checked: boolean) => {
+                  }}
+                  onChange={(d: Date[]) => {
+                    if (d.length > 0) {
                       setParams((draft) => {
-                        draft.retryPolicy = checked ? 2 : 1
+                        draft.started = Math.floor(d[0].getTime() / 1000)
+                        draft.ended =
+                          d.length > 1 ? Math.floor(d[1].getTime() / 1000) : 0
                       })
-                    }}
-                  />
-                </Control>
-                <div tw="inline-flex items-center ml-3">出错自动重跑</div>
-              </Field>
-              <SliderField
-                name="p2"
-                label="出错重跑最大次数"
-                hasTooltip
-                value={params.retryLimit}
-                markDots
-                min={1}
-                max={99}
-                onChange={(v: string) => {
-                  setParams((draft) => {
-                    draft.retryLimit = +v
-                  })
-                }}
-                marks={{
-                  1: '1',
-                  20: '20',
-                  40: '40',
-                  60: '60',
-                  80: '80',
-                  99: '99',
-                }}
-                hasInput
-              />
-              <NumberField
-                isMini
-                name="p3"
-                label="* 出错重跑间隔"
-                value={params.retryInterval}
-                help="分钟"
-              />
-              <NumberField
-                isMini
-                name="p4"
-                label="超时时间"
-                value={params.timeout}
-                help="分钟"
-              />
-              <SelectField
-                name="p5"
-                label="* 调度周期"
-                value={period}
-                onChange={(v) => setPeriod(v)}
-                options={[
-                  { value: 'minute', label: '分钟' },
-                  { value: 'hour', label: '小时' },
-                  { value: 'day', label: '日' },
-                  { value: 'month', label: '月' },
-                  { value: 'year', label: '年' },
-                ]}
-              />
-              {(() => {
-                if (period === 'day') {
-                  return (
-                    <SmallDatePickerField
-                      name="p6"
-                      label="* 定时调度时间"
-                      dateFormat="H:i"
-                      noCalendar
-                      enableTime
-                      onChange={calcExpress}
+                    }
+                  }}
+                />
+                <SelectField
+                  name="concurrencyPolicy"
+                  label="* 依赖策略"
+                  value={params.concurrencyPolicy}
+                  validateOnChange
+                  onChange={(v: number) => {
+                    setParams((draft) => {
+                      draft.concurrencyPolicy = v
+                    })
+                  }}
+                  options={[
+                    { value: 1, label: 'allow' },
+                    { value: 2, label: 'forbid' },
+                    { value: 3, label: 'replace' },
+                  ]}
+                  schemas={[
+                    {
+                      rule: { required: true, isInteger: true },
+                      help: '请选择依赖策略',
+                      status: 'error',
+                    },
+                  ]}
+                />
+                <Field>
+                  <Label>* 重跑策略</Label>
+                  <Control>
+                    <Toggle
+                      checked={params.retryPolicy === 2}
+                      onChange={(checked: boolean) => {
+                        setParams((draft) => {
+                          draft.retryPolicy = checked ? 2 : 1
+                        })
+                      }}
                     />
-                  )
-                }
-                if (period === 'minute') {
-                  return (
-                    <>
-                      <SmallDatePickerField
-                        name="p6"
-                        label="* 开始时间"
-                        dateFormat="i"
-                        noCalendar
-                        enableTime
-                        onChange={calcExpress}
-                      />
-                      <SmallDatePickerField
-                        name="p7"
-                        label="* 时间间隔"
-                        dateFormat="i"
-                        noCalendar
-                        enableTime
-                        onChange={calcExpress}
-                        help="分钟"
-                      />
-                      <SmallDatePickerField
-                        name="p8"
-                        label="* 结束时间"
-                        dateFormat="i"
-                        noCalendar
-                        enableTime
-                        onChange={calcExpress}
-                      />
-                    </>
-                  )
-                }
-                return null
-              })()}
+                  </Control>
+                  <div tw="leading-6 ml-2">出错自动重跑</div>
+                </Field>
 
-              <Field>
-                <Label>cron 表达式</Label>
-                <Control>{params.express}</Control>
-              </Field>
-            </FormWrapper>
+                <SliderField
+                  name="p2"
+                  label="出错重跑最大次数"
+                  hasTooltip
+                  value={params.retryLimit}
+                  markDots
+                  min={1}
+                  max={99}
+                  onChange={(v: string) => {
+                    setParams((draft) => {
+                      draft.retryLimit = +v
+                    })
+                  }}
+                  marks={{
+                    1: '1',
+                    20: '20',
+                    40: '40',
+                    60: '60',
+                    80: '80',
+                    99: '99',
+                  }}
+                  hasInput
+                />
+                <Field>
+                  <Label>* 出错重跑间隔</Label>
+                  <Control>
+                    <InputNumber
+                      isMini
+                      min={1}
+                      max={30}
+                      value={params.retryInterval}
+                      onChange={(v: number) => {
+                        setParams((draft) => {
+                          draft.retryInterval = v
+                        })
+                      }}
+                    />
+                  </Control>
+                  <div tw="leading-8 ml-2">分钟</div>
+                </Field>
+                <Field>
+                  <Label>超时时间</Label>
+                  <Control>
+                    <InputNumber
+                      isMini
+                      min={0}
+                      max={4320}
+                      value={params.timeout}
+                      onChange={(v: number) => {
+                        setParams((draft) => {
+                          draft.timeout = v
+                        })
+                      }}
+                    />
+                  </Control>
+                  <div tw="leading-8 ml-2">分钟</div>
+                </Field>
+                <SelectField
+                  name="schePeriod"
+                  label="* 调度周期"
+                  value={params.periodType}
+                  onChange={(v: TPeriodType) => {
+                    setParams((draft) => {
+                      draft.periodType = v
+                    })
+                  }}
+                  options={[
+                    { value: 'minute', label: '分钟' },
+                    { value: 'hour', label: '小时' },
+                    { value: 'day', label: '日' },
+                    { value: 'week', label: '周' },
+                    { value: 'month', label: '月' },
+                    { value: 'year', label: '年' },
+                  ]}
+                />
+                {(() => {
+                  const hourOpts = range(0, 24).map((v) => ({
+                    value: v,
+                    label: `${v}时`,
+                  }))
+                  const minuOpts = range(5, 60, 5).map((v) => ({
+                    value: v,
+                    label: v,
+                  }))
+                  const monthOpts = range(1, 31).map((v) => ({
+                    value: v,
+                    label: `每月${v}号`,
+                  }))
+                  const yearOpts = range(1, 13).map((v) => ({
+                    value: v,
+                    label: `${v}月`,
+                  }))
+                  let curPeriodData = null
+                  if (periodType === 'minute') {
+                    curPeriodData = periodData[periodType]
+                    return (
+                      <>
+                        <Field>
+                          <Label>* 开始时间</Label>
+                          <Control>
+                            <Select
+                              options={hourOpts}
+                              value={curPeriodData.startHour}
+                              onChange={(v: number) => {
+                                setPeriodData((draft) => {
+                                  draft.minute.startHour = v
+                                })
+                              }}
+                            />
+                            <div tw="leading-8 ml-2">时</div>
+                          </Control>
+                        </Field>
+                        <Field>
+                          <Label>* 时间间隔</Label>
+                          <Control>
+                            <Select
+                              options={minuOpts}
+                              value={curPeriodData.stampMinu}
+                              onChange={(v: number) =>
+                                setPeriodData((draft) => {
+                                  draft.minute.stampMinu = v
+                                })
+                              }
+                            />
+                            <div tw="leading-8 ml-2">分钟</div>
+                          </Control>
+                        </Field>
+                        <Field>
+                          <Label>* 结束时间</Label>
+                          <Control>
+                            <Select
+                              options={hourOpts}
+                              value={curPeriodData.endHour}
+                              onChange={(v: number) =>
+                                setPeriodData((draft) => {
+                                  draft.minute.endHour = v
+                                })
+                              }
+                            />
+                            <div tw="leading-8 ml-2">时</div>
+                          </Control>
+                        </Field>
+                      </>
+                    )
+                  }
+                  if (periodType === 'hour') {
+                    curPeriodData = periodData[periodType]
+                    return (
+                      <HorizonFiledsWrapper>
+                        <RadioGroup
+                          direction="column"
+                          value={curPeriodData.tp}
+                          onChange={(v: number) => {
+                            setPeriodData((draft) => {
+                              draft.hour.tp = v
+                            })
+                          }}
+                        >
+                          <Radio value={1}>
+                            <>
+                              <Field>
+                                <Label>开始时间</Label>
+                                <Control>
+                                  <Select
+                                    options={hourOpts}
+                                    value={curPeriodData.startHour}
+                                    onChange={(v: number) => {
+                                      setPeriodData((draft) => {
+                                        draft.hour.startHour = v
+                                      })
+                                    }}
+                                  />
+                                </Control>
+                                <div tw="leading-8 ml-2">时</div>
+                              </Field>
+                              <Field>
+                                <Label>时间间隔</Label>
+                                <Control>
+                                  <Select
+                                    options={range(1, 24).map((v) => ({
+                                      value: v,
+                                      label: `${v}`,
+                                    }))}
+                                    value={curPeriodData.stampMinu}
+                                    onChange={(v: number) => {
+                                      setPeriodData((draft) => {
+                                        draft.hour.stampMinu = v
+                                      })
+                                    }}
+                                  />
+                                </Control>
+                                <div tw="leading-8 ml-2">小时</div>
+                              </Field>
+                              <Field>
+                                <Label>结束时间</Label>
+                                <Control>
+                                  <Select
+                                    options={hourOpts}
+                                    value={curPeriodData.endHour}
+                                    onChange={(v: number) => {
+                                      setPeriodData((draft) => {
+                                        draft.hour.endHour = v
+                                      })
+                                    }}
+                                  />
+                                </Control>
+                                <div tw="leading-8 ml-2">时</div>
+                              </Field>
+                            </>
+                          </Radio>
+                          <Radio value={2}>
+                            <SelectField
+                              multi
+                              closeOnSelect={false}
+                              label="指定时间"
+                              name="hourlys"
+                              value={curPeriodData.hours}
+                              options={hourOpts}
+                              onChange={(v: []) => {
+                                if (v.length > 0) {
+                                  setPeriodData((draft) => {
+                                    draft.hour.hours = v.sort((a, b) => a - b)
+                                  })
+                                }
+                              }}
+                            />
+                          </Radio>
+                        </RadioGroup>
+                      </HorizonFiledsWrapper>
+                    )
+                  }
+                  if (periodType === 'day') {
+                    curPeriodData = periodData[periodType]
+                    return (
+                      <SmallDatePickerField
+                        name="scheDate"
+                        label="* 定时调度时间"
+                        dateFormat="H:i"
+                        noCalendar
+                        enableTime
+                        value={curPeriodData.scheDate}
+                        onChange={([d]: Date[]) => {
+                          if (d) {
+                            setPeriodData((draft) => {
+                              draft.day.scheDate = d
+                            })
+                          }
+                        }}
+                      />
+                    )
+                  }
+                  if (periodType === 'week') {
+                    curPeriodData = periodData[periodType]
+                    return (
+                      <>
+                        <SelectField
+                          label="指定时间"
+                          name="weekly"
+                          multi
+                          closeOnSelect={false}
+                          value={curPeriodData.weekly}
+                          onChange={(v: number[]) => {
+                            if (v.length > 0) {
+                              setPeriodData((draft) => {
+                                draft.week.weekly = v
+                              })
+                            }
+                          }}
+                          options={[
+                            { label: '星期日', value: 0 },
+                            { label: '星期一', value: 1 },
+                            { label: '星期二', value: 2 },
+                            { label: '星期三', value: 3 },
+                            { label: '星期四', value: 4 },
+                            { label: '星期五', value: 5 },
+                            { label: '星期六', value: 6 },
+                          ]}
+                        />
+                        <SmallDatePickerField
+                          name="scheDate"
+                          label="* 定时调度时间"
+                          dateFormat="H:i"
+                          noCalendar
+                          enableTime
+                          value={curPeriodData.scheDate}
+                          onChange={([d]: Date[]) => {
+                            if (d) {
+                              setPeriodData((draft) => {
+                                draft.week.scheDate = d
+                              })
+                            }
+                          }}
+                        />
+                      </>
+                    )
+                  }
+                  if (periodType === 'month') {
+                    curPeriodData = periodData[periodType]
+                    return (
+                      <>
+                        <SelectField
+                          label="指定时间"
+                          name="monthDaily"
+                          multi
+                          closeOnSelect={false}
+                          value={curPeriodData.daily}
+                          options={monthOpts}
+                          onChange={(v: number[]) => {
+                            if (v.length > 0) {
+                              setPeriodData((draft) => {
+                                draft.month.daily = v
+                              })
+                            }
+                          }}
+                        />
+                        <SmallDatePickerField
+                          name="scheDate"
+                          label="* 定时调度时间"
+                          dateFormat="H:i"
+                          noCalendar
+                          enableTime
+                          value={curPeriodData.scheDate}
+                          onChange={([d]: Date[]) => {
+                            if (d) {
+                              setPeriodData((draft) => {
+                                draft.month.scheDate = d
+                              })
+                            }
+                          }}
+                        />
+                      </>
+                    )
+                  }
+                  if (periodType === 'year') {
+                    curPeriodData = periodData[periodType]
+                    return (
+                      <>
+                        <SelectField
+                          label="指定月份"
+                          name="monthly"
+                          multi
+                          closeOnSelect={false}
+                          value={curPeriodData.monthly}
+                          options={yearOpts}
+                          onChange={(v: number[]) => {
+                            if (v.length > 0) {
+                              setPeriodData((draft) => {
+                                draft.year.monthly = v
+                              })
+                            }
+                          }}
+                        />
+                        <SelectField
+                          label="指定时间"
+                          name="daily"
+                          multi
+                          closeOnSelect={false}
+                          value={curPeriodData.daily}
+                          options={monthOpts}
+                          onChange={(v: number[]) => {
+                            if (v.length > 0) {
+                              setPeriodData((draft) => {
+                                draft.year.daily = v
+                              })
+                            }
+                          }}
+                        />
+                        <SmallDatePickerField
+                          name="scheDate"
+                          label="* 定时调度时间"
+                          dateFormat="H:i"
+                          noCalendar
+                          enableTime
+                          value={curPeriodData.scheDate}
+                          onChange={([d]: Date[]) => {
+                            if (d) {
+                              setPeriodData((draft) => {
+                                draft.year.scheDate = d
+                              })
+                            }
+                          }}
+                        />
+                      </>
+                    )
+                  }
+                  return null
+                })()}
+
+                <Field>
+                  <Label>cron 表达式</Label>
+                  <Control>{params.express}</Control>
+                </Field>
+              </ScheSettingForm>
+            </Loading>
           </CollapseItem>
         </DarkCollapse>
       </div>

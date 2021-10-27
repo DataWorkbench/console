@@ -26,22 +26,12 @@ const customStyles = css`
     .textarea {
       ${tw`bg-neut-16 text-white border-neut-13`}
     }
-    .input-number.is-mini {
-      & > .input-number-controls {
-        height: 30px;
-        & > button {
-          ${tw`bg-neut-13 border-neut-13`}
-          &:hover,
-          &:focus {
-            ${tw`bg-neut-13`}
-          }
-          svg.qicon {
-            ${tw`text-white`}
-          }
-        }
-      }
+    .field .control input[type='text'][disabled],
+    .field .control input[type='password'][disabled],
+    .field .control input[type='number'][disabled] {
+      ${tw`opacity-100 bg-neut-13`}
     }
-    .field.date-picker-field .control {
+    .field .control {
       .datepicker-input.input {
         &[readonly='readonly'] {
           ${tw`bg-neut-16 text-white border-neut-13`}
@@ -57,6 +47,36 @@ const customStyles = css`
         svg.qicon {
           ${tw`text-white`}
         }
+      }
+    }
+    .input-number.is-mini {
+      & > .input-number-controls {
+        height: 30px;
+        & > button {
+          ${tw`bg-neut-13! border-neut-13!`}
+          &:hover,
+          &:focus {
+            ${tw`bg-neut-13`}
+          }
+          svg.qicon {
+            ${tw`text-white`}
+          }
+        }
+      }
+    }
+    .input-search {
+      input.is-default[value=''],
+      input.is-circle[value=''] {
+        ${tw`bg-neut-16 text-white border-neut-13!`}
+        &:hover {
+          ${tw`border-neut-11!`}
+        }
+        &:focus {
+          ${tw`border-green-13!`}
+        }
+      }
+      i.icon.is-left {
+        ${tw`text-white!`}
       }
     }
     .slider {
@@ -85,6 +105,11 @@ const customStyles = css`
             ${tw`text-white`}
           }
         }
+        & > .select-multi-value-wrapper {
+          .select-value > span.tag {
+            ${tw`bg-neut-13! text-white!`}
+          }
+        }
       }
       & > .select-menu-outer {
         ${tw`bg-neut-17 border-neut-13`}
@@ -93,6 +118,57 @@ const customStyles = css`
           &.is-selected,
           &:hover {
             ${tw`bg-neut-16`}
+          }
+        }
+      }
+    }
+    .page-tab-container {
+      ${tw`mb-5`}
+      .collapse-panel {
+        ${tw`bg-neut-16`}
+        .tab-title {
+          ${tw`text-white`}
+        }
+        button.is-text,
+        .tab-description {
+          ${tw`text-neut-8`}
+        }
+        svg {
+          color: hsla(0, 0%, 100%, 0.9);
+          fill: hsla(0, 0%, 100%, 0.4);
+        }
+      }
+    }
+    .icon.icon-clickable:hover {
+      ${tw`bg-neut-13`}
+    }
+    .modal.is-active {
+      .modal-card-head,
+      .modal-card-foot,
+      .modal-card-body {
+        ${tw`bg-neut-16 border-neut-13 text-white`}
+      }
+      .modal-card-title {
+        ${tw`text-white`}
+      }
+      .icon.icon-clickable:hover {
+        ${tw`bg-neut-16`}
+      }
+      .modal-card-head {
+        svg {
+          color: #fff;
+        }
+      }
+      .modal-card-foot {
+        button.button {
+          &.is-default {
+            ${tw`border-neut-13 bg-neut-13 text-white`}
+            &:hover {
+              ${tw`bg-neut-15 text-white border-neut-13`}
+            }
+            &:active {
+              ${tw`bg-neut-17 text-white border-neut-13`}
+            }
           }
         }
       }

@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import RealTime from './RealTime'
 import Resource from './Resource'
+import Udf from './Udf'
 import { Sider } from '../Sider'
 
 function Dm() {
@@ -12,6 +13,7 @@ function Dm() {
       <div tw="flex-1 overflow-y-auto">
         {(mod === 'realtime' || !mod) && <RealTime />}
         {mod === 'resource' && <Resource />}
+        {mod === 'udf' && <Udf />}
       </div>
     </div>
   )

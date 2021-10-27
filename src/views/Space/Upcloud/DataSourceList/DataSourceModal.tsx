@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
-import Modal, { ModalStep, ModalContent } from 'components/Modal'
+import { Modal, ModalStep, ModalContent } from 'components'
 import { Button, Form, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
 import {
@@ -90,7 +90,7 @@ const DataSourceModal = observer(
     const curkind =
       op === 'create'
         ? get(kinds, `[${state.dbIndex}]`)
-        : kinds?.find((k) => k.name === opSourceList[0]?.sourcetype)
+        : kinds?.find((k) => k.sourcetype === opSourceList[0]?.source_type)
 
     const handleDbSelect = (i: number) => {
       setState((draft) => {
@@ -102,7 +102,7 @@ const DataSourceModal = observer(
       const formElem = form.current
       if (formElem?.validateForm()) {
         const { name, comment, ...rest } = formElem.getFieldsValue()
-        const sourcetype: string = curkind.name
+        // const sourcetype: string = curkind.name
         // get(kinds, `[${state.dbIndex}].name`)
         const params = {
           op,
@@ -110,9 +110,9 @@ const DataSourceModal = observer(
           spaceId,
           name,
           comment,
-          sourcetype,
+          source_type: curkind.sourcetype,
           url: {
-            [sourcetype.toLowerCase()]: rest,
+            [curkind.name.toLowerCase()]: rest,
           },
         }
         if (op === 'update') {
@@ -135,7 +135,10 @@ const DataSourceModal = observer(
 
     return (
       <Modal
-        onHide={onHide}
+        visible
+        onCancel={onHide}
+        orient="fullright"
+        width={800}
         title={`${op === 'create' ? '新增' : '修改'}数据源: ${
           curkind ? curkind.name : ''
         }`}

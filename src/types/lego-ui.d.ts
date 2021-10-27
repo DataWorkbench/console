@@ -279,6 +279,8 @@ declare module '@QCFE/lego-ui' {
     DatePickerField: (props: any) => JSX.Element
     validateForm: () => boolean
     getFieldsValue: () => any
+    getFieldValue: (name: string) => any
+    validateFields: () => boolean
   }
 
   export const Form: Form
@@ -286,6 +288,7 @@ declare module '@QCFE/lego-ui' {
   export interface Collapse {
     (props: any): JSX.Element
     CollapsePanel: (props: any) => JSX.Element
+    CollapseItem: (props: any) => JSX.Element
   }
 
   export const Collapse: Collapse
@@ -300,6 +303,7 @@ declare module '@QCFE/lego-ui' {
     (props: any): JSX.Element
     error: (message?: string) => void
     open: (o: Record<string, unknown>) => void
+    success: (o: Record<string, unknown>) => void
   }
 
   export interface Locale {

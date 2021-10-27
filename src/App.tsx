@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import {
   PortalProvider,
-  Notification as notification,
+  Notification as Notify,
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
 import { RootStore, StoreContext } from 'stores'
@@ -19,7 +19,7 @@ const langMapping: { [key: string]: string | undefined } = {
 
 emitter.off('error')
 emitter.on('error', ({ title, content }: any) =>
-  notification.open({
+  Notify.open({
     title,
     content,
     placement: 'bottomRight',
