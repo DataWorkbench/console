@@ -3,7 +3,7 @@ import GlobalStore from 'stores/GlobalStore'
 import WorkSpaceStore from 'stores/WorkSpaceStore'
 import DataSourceStore from 'stores/DataSourceStore'
 import WorkFlowStore from 'stores/WorkFlowStore'
-import SpaceStore from 'stores/SpaceStore'
+import DmStore from 'stores/DmStore'
 
 class RootStore {
   overViewStore: OverViewStore
@@ -16,7 +16,7 @@ class RootStore {
 
   workFlowStore: WorkFlowStore
 
-  spaceStore: SpaceStore
+  dmStore: DmStore
 
   constructor() {
     this.overViewStore = new OverViewStore(this)
@@ -24,7 +24,7 @@ class RootStore {
     this.workSpaceStore = new WorkSpaceStore(this)
     this.dataSourceStore = new DataSourceStore(this)
     this.workFlowStore = new WorkFlowStore(this)
-    this.spaceStore = new SpaceStore(this)
+    this.dmStore = new DmStore(this)
   }
 }
 

@@ -6,26 +6,7 @@ interface IDarkModal {
   dark?: boolean
 }
 
-export const ModalWrapper = styled(Modal)(({ orient, dark }: IDarkModal) => [
-  dark &&
-    css`
-      .modal-card-head,
-      .modal-card-foot,
-      .modal-card-body {
-        ${tw`bg-neut-16 border-neut-13 text-white`}
-      }
-      .modal-card-title {
-        ${tw`text-white`}
-      }
-      .icon.icon-clickable:hover {
-        ${tw`bg-neut-16`}
-      }
-      .modal-card-head {
-        svg {
-          color: #fff;
-        }
-      }
-    `,
+export const ModalWrapper = styled(Modal)(({ orient }: IDarkModal) => [
   orient === 'fullright' &&
     css`
       .modal-card {

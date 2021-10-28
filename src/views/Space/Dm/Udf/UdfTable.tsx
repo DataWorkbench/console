@@ -1,6 +1,7 @@
-import { Table } from '@QCFE/qingcloud-portal-ui'
+import { Table, Alert } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import tw, { styled, css } from 'twin.macro'
+
 import TableToolBar from './TableToolBar'
 
 const dataSource = [
@@ -92,6 +93,7 @@ const UdfTable = ({ tp }: IUdfTable) => {
   })
   return (
     <div tw="w-full">
+      <Alert message="提示" type="info" tw="bg-neut-16! mb-4" />
       <TableToolBar />
       <DarkTable
         dataSource={dataSource}

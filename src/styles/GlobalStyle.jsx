@@ -188,6 +188,20 @@ const customStyles = css`
         }
       }
     }
+    .collapse {
+      ${tw`text-white border-neut-13`}
+      .collapse-item-label {
+        ${tw`bg-neut-17 text-white border-neut-13 border-t-0`}
+        > span {
+          svg {
+            color: #fff;
+          }
+        }
+      }
+      .collapse-item-content {
+        ${tw`bg-neut-16`}
+      }
+    }
   }
 `
 

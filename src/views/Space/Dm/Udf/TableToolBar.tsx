@@ -1,14 +1,19 @@
 import { Button, Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center } from 'components'
+import { useStore } from 'hooks'
 
 const TableToolBar = () => {
+  const {
+    dmStore: { setUdfOp, udfType },
+  } = useStore()
+
   return (
     <div tw="mb-3">
       <FlexBox tw="justify-between">
         <Center tw="space-x-3">
-          <Button type="primary">
+          <Button type="primary" onClick={() => setUdfOp('create')}>
             <Icon name="upload" />
-            新建UDF函数节点
+            新建{udfType}函数节点
           </Button>
           <Button>
             <Icon name="trash" type="light" />

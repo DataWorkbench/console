@@ -1,8 +1,11 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { Tabs } from '@QCFE/lego-ui'
-import tw, { css, styled } from 'twin.macro'
+import { observer } from 'mobx-react-lite'
 import { FlexBox } from 'components'
+import { useStore } from 'stores'
 import UdfTable from './UdfTable'
+import { HorizonTabs } from '../styled'
+import UdfModal from './UdfModal'
 
 const { TabPanel } = Tabs
 
@@ -16,35 +19,33 @@ const pageTabsData = [
   },
 ]
 
-const TabsWrapper = styled(Tabs)(
-  () => [tw`bg-neut-16 text-neut-8`],
-  css`
-    .tabs ul {
-      ${tw`border-neut-16`}
-      > li.is-active {
-        ${tw`border-white! text-white`}
-      }
-    }
-  `
-)
+const Udf = observer(() => {
+  const {
+    dmStore: { udfOp, setUdfType },
+  } = useStore()
 
-const Udf = () => {
   return (
     <FlexBox orient="column" tw="p-5 h-full">
       <PageTab tabs={pageTabsData} />
-      <TabsWrapper defaultActiveName="account">
-        <TabPanel label="UDF" name="account">
+      <HorizonTabs
+        defaultActiveName="UDF"
+        onChange={(name: any) => {
+          setUdfType(name)
+        }}
+      >
+        <TabPanel label="UDF" name="UDF">
           <UdfTable tp="udf" />
         </TabPanel>
-        <TabPanel label="UDTF" name="consumptions">
-          UDTF
+        <TabPanel label="UDTF" name="UDTF">
+          <UdfTable tp="udtf" />
         </TabPanel>
-        <TabPanel label="UDTTF" name="security">
-          UDTTF
+        <TabPanel label="UDTTF" name="UDTTF">
+          <UdfTable tp="udttf" />
         </TabPanel>
-      </TabsWrapper>
+      </HorizonTabs>
+      {(udfOp === 'create' || udfOp === 'edit') && <UdfModal />}
     </FlexBox>
   )
-}
+})
 
 export default Udf

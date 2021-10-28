@@ -1,13 +1,32 @@
 import { useRef, useMemo } from 'react'
 import { useImmer } from 'use-immer'
-import { DarkModal, ModalStep, ModalContent } from 'components'
+import { Modal, ModalStep, ModalContent } from 'components'
 import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, assign } from 'lodash-es'
-import tw from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import { useMutationStreamJob, getFlowKey } from 'hooks'
 import { useQueryClient } from 'react-query'
 
 const { TextField, TextAreaField, SelectField } = Form
+
+const ScheduleItem = styled('div')(({ selected }: { selected?: boolean }) => [
+  tw`w-1/3 rounded border-2 overflow-hidden border-neut-13 cursor-pointer transition-colors`,
+  selected &&
+    css`
+      ${tw`border-green-13`}
+      svg {
+        ${tw`text-green-13`}
+      }
+    `,
+  css`
+    &:hover {
+      ${tw`border-green-13`}
+      svg {
+        ${tw`text-green-13`}
+      }
+    }
+  `,
+])
 
 const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
   const form = useRef<Form>(null)
@@ -83,7 +102,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
   )
 
   return (
-    <DarkModal
+    <Modal
       visible
       title="创建作业流程"
       placement="center"
@@ -130,15 +149,12 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
             <div tw="flex justify-between space-x-5 2xl:space-x-9 mb-5 2xl:mb-10">
               {scheduleTypes.map(
                 ({ type, subType, title, disp, subItems, icon }) => (
-                  <div
+                  <ScheduleItem
                     key={type}
-                    css={[
-                      tw`w-1/3 flex flex-col border-2 rounded overflow-hidden transition-colors`,
+                    selected={
                       params.scheType === type ||
                       subType?.includes(params.scheType)
-                        ? tw`border-green-11`
-                        : tw`border-neut-13`,
-                    ]}
+                    }
                     onClick={() => {
                       if (type !== -1) {
                         setParams((draft) => {
@@ -156,6 +172,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                         {disp ||
                           subItems?.map((item) => (
                             <Button
+                              type="black"
                               key={item.type}
                               css={
                                 params.scheType === item.type &&
@@ -173,7 +190,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                           ))}
                       </div>
                     </div>
-                  </div>
+                  </ScheduleItem>
                 )
               )}
             </div>
@@ -233,7 +250,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
           </div>
         )}
       </ModalContent>
-    </DarkModal>
+    </Modal>
   )
 }
 
