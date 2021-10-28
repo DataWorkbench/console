@@ -1,20 +1,20 @@
 import { Form, Icon } from '@QCFE/lego-ui'
+import { Button } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components'
-import { DarkButton } from '../../styled'
 
 const { TextField } = Form
 const StreamJAR = () => {
   return (
     <div tw="pl-5">
       <FlexBox tw="pt-4 space-x-2">
-        <DarkButton type="grey">
+        <Button>
           <Icon name="data" type="dark" />
           保存
-        </DarkButton>
-        <DarkButton type="primary">
+        </Button>
+        <Button type="primary">
           <Icon name="export" />
           发布
-        </DarkButton>
+        </Button>
       </FlexBox>
       <Form tw="mt-5" layout="vertical">
         <TextField

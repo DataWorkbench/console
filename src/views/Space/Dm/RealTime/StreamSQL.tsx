@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { FlexBox, DarkButton } from 'components'
-import { Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+import { FlexBox } from 'components'
+import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import AceEditor from 'react-ace'
 import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
@@ -14,7 +14,7 @@ import {
   useMutationReleaseStreamJob,
   useQueryStreamJobCode,
 } from 'hooks'
-import { StreamToolBar } from 'views/Space/styled'
+import { StreamToolBar } from './styled'
 import StreamRightMenu from './StreamRightMenu'
 
 const AceEditorWrapper = styled('div')(() => [
@@ -98,30 +98,30 @@ const StreamSQL = () => {
     <FlexBox tw="h-full flex-1">
       <FlexBox tw="flex-col flex-1">
         <StreamToolBar>
-          <DarkButton type="dark">
+          <Button type="black">
             <Icon name="listview" type="light" />
             插入表
-          </DarkButton>
-          <DarkButton type="dark">
+          </Button>
+          <Button type="black">
             <Icon name="remark" type="light" />
             语法检查
-          </DarkButton>
-          <DarkButton type="dark">
+          </Button>
+          <Button type="black">
             <Icon name="triangle-right" type="light" />
             运行
-          </DarkButton>
-          <DarkButton onClick={save} loading={mutation.isLoading}>
+          </Button>
+          <Button onClick={save} loading={mutation.isLoading}>
             <Icon name="data" />
             保存
-          </DarkButton>
-          <DarkButton
+          </Button>
+          <Button
             type="primary"
             onClick={release}
             loading={releaseMutation.isLoading}
           >
             <Icon name="export" />
             发布
-          </DarkButton>
+          </Button>
         </StreamToolBar>
         <AceEditorWrapper tw="flex-1 pt-4 flex">
           <AceEditor

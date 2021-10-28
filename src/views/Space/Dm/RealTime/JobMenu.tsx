@@ -1,14 +1,40 @@
 import { useState, useCallback } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Tooltip, Modal } from '@QCFE/lego-ui'
-import { Icon, InputSearch, Loading } from '@QCFE/qingcloud-portal-ui'
-import tw from 'twin.macro'
+import { Tooltip, Modal, Menu } from '@QCFE/lego-ui'
+import { Icon, InputSearch, Loading, Button } from '@QCFE/qingcloud-portal-ui'
+import tw, { css, styled } from 'twin.macro'
 import { useStore } from 'stores'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import { useQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
-import { FlexBox, Menu, MenuItem, Center, DarkButton } from 'components'
+import { FlexBox, Center } from 'components'
 import JobModal from './JobModal'
+
+const { MenuItem } = Menu
+
+const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
+  tw`border border-neut-13 rounded-sm leading-6 px-1 text-neut-8 scale-75`,
+  tw`group-hover:(bg-white text-neut-13 border-white)`,
+  selected && tw`bg-white text-neut-13 border-white`,
+])
+
+const TooltipWrapper = styled(Tooltip)(() => [
+  tw`bg-neut-17 border! border-solid border-neut-13 p-0`,
+  css`
+    & > .tooltip-arrow {
+      ${tw`hidden`}
+    }
+    .menu {
+      ${tw`bg-neut-17 rounded-none py-1`}
+      .menu-item {
+        ${tw`text-white text-xs`}
+        &:hover {
+          ${tw`bg-neut-13`}
+        }
+      }
+    }
+  `,
+])
 
 const JobMenu = observer(() => {
   const [alterFlowId, setAlterFlowId] = useState(null)
@@ -89,9 +115,9 @@ const JobMenu = observer(() => {
             clickable
             onClick={() => setVisible(true)}
           />
-          <DarkButton onClick={refreshJobs} type="text" loading={isRefetching}>
+          <Button onClick={refreshJobs} type="text" loading={isRefetching}>
             <Icon name="refresh" type="light" />
-          </DarkButton>
+          </Button>
         </div>
       </div>
       <div tw="border-b dark:border-neut-15">
@@ -158,6 +184,7 @@ const JobMenu = observer(() => {
           return flows?.map((flow: any) => (
             <FlexBox
               key={flow.id}
+              className="group"
               css={[
                 tw`leading-8 px-2 cursor-pointer items-center justify-between`,
                 curJob?.id === flow.id ? tw`bg-green-11` : tw`hover:bg-neut-13`,
@@ -168,29 +195,55 @@ const JobMenu = observer(() => {
             >
               <FlexBox tw="items-center">
                 <Icon name="caret-right" type="light" />
+                <Tag selected={curJob?.id === flow.id}>
+                  {(() => {
+                    switch (flow.type) {
+                      case 1:
+                        return '算子'
+                      case 2:
+                        return 'Sql'
+                      case 3:
+                        return 'Jar'
+                      case 4:
+                        return 'Python'
+                      case 5:
+                        return 'Scala'
+                      default:
+                        return ''
+                    }
+                  })()}
+                </Tag>
                 <span tw="ml-1">{flow.name}</span>
               </FlexBox>
               {alterFlowId === flow.id && (
-                <Tooltip
+                <TooltipWrapper
                   content={
-                    <Menu>
-                      <MenuItem onClick={() => showEditModal(flow)}>
+                    <Menu
+                      onClick={(e: any, key: string) => {
+                        if (key === 'edit') {
+                          showEditModal(flow)
+                        } else {
+                          showDelModal(flow)
+                        }
+                      }}
+                    >
+                      <MenuItem key="edit">
                         <Icon name="pen" tw="mr-2" />
-                        修改
+                        编辑信息
                       </MenuItem>
-                      <MenuItem onClick={() => showDelModal(flow)}>
+                      <MenuItem key="delete">
                         <Icon name="trash" tw="mr-2" />
                         删除
                       </MenuItem>
                     </Menu>
                   }
-                  placement="right"
+                  placement="rightTop"
                   trigger="hover"
                 >
                   <Center>
-                    <Icon name="work-order" type="dark" />
+                    <Icon name="more" type="light" />
                   </Center>
-                </Tooltip>
+                </TooltipWrapper>
               )}
             </FlexBox>
           ))

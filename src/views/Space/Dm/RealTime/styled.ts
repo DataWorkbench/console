@@ -3,6 +3,15 @@ import { Collapse, Form } from '@QCFE/lego-ui'
 
 const { DatePickerField } = Form
 
+export const StreamToolBar = styled('div')(
+  () => [tw`flex px-2 pt-4 space-x-2`],
+  css`
+    button.button {
+      ${tw`h-7`}
+    }
+  `
+)
+
 export const DarkCollapse = styled(Collapse)(() => [
   css`
     ${tw`text-white w-full border-0`}

@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react'
 import { useImmer } from 'use-immer'
-import { DarkModal, ModalStep, ModalContent, DarkButton } from 'components'
-import { Icon, Form } from '@QCFE/qingcloud-portal-ui'
+import { DarkModal, ModalStep, ModalContent } from 'components'
+import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, assign } from 'lodash-es'
 import tw from 'twin.macro'
 import { useMutationStreamJob, getFlowKey } from 'hooks'
@@ -92,9 +92,9 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
       footer={
         <div tw="flex justify-end space-x-2">
           {params.step === 0 || job ? (
-            <DarkButton onClick={handleCancel}>取消</DarkButton>
+            <Button onClick={handleCancel}>取消</Button>
           ) : (
-            <DarkButton
+            <Button
               onClick={() =>
                 setParams((draft) => {
                   draft.step = 0
@@ -102,16 +102,16 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
               }
             >
               上一步
-            </DarkButton>
+            </Button>
           )}
-          <DarkButton
+          <Button
             type="primary"
             loading={mutation.isLoading}
             onClick={handleNext}
             disabled={params.scheType === 0}
           >
             {params.step === 0 ? '下一步' : '确定'}
-          </DarkButton>
+          </Button>
         </div>
       }
     >
@@ -155,9 +155,8 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                       <div tw="mt-2 text-neut-8 space-x-2">
                         {disp ||
                           subItems?.map((item) => (
-                            <DarkButton
+                            <Button
                               key={item.type}
-                              type="dark"
                               css={
                                 params.scheType === item.type &&
                                 tw`border-green-13! text-green-11! font-medium`
@@ -170,7 +169,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                             >
                               <Icon name={item.icon} type="light" />
                               {item.text}
-                            </DarkButton>
+                            </Button>
                           ))}
                       </div>
                     </div>

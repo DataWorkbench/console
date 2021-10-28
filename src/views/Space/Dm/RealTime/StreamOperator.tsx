@@ -1,11 +1,11 @@
 import { useRef, useState, useEffect } from 'react'
 import { useMount } from 'react-use'
 import { Icon } from '@QCFE/lego-ui'
+import { Button } from '@QCFE/qingcloud-portal-ui'
 import { jsPlumb } from 'jsplumb'
 import { useDrop } from 'react-dnd'
 import { nanoid } from 'nanoid'
 import tw from 'twin.macro'
-import { DarkButton } from 'views/Space/styled'
 import NodeMenu from './NodeMenu'
 
 const StreamOperator = ({ className }: { className?: string }) => {
@@ -75,34 +75,34 @@ const StreamOperator = ({ className }: { className?: string }) => {
     <div className={className} tw="flex flex-col text-white relative">
       <div tw="flex px-2 pt-4 space-x-2">
         <div tw="relative">
-          <DarkButton type="dark">
+          <Button type="black">
             <div tw="mr-2">
               <Icon name="apps" type="light" tw="align-middle" />
               <span>节点库</span>
             </div>
             <Icon name="caret-down" type="light" />
-          </DarkButton>
+          </Button>
         </div>
-        <DarkButton type="dark">
+        <Button type="black">
           <Icon name="eye" type="dark" />
           <span>预览</span>
-        </DarkButton>
-        <DarkButton type="dark">
+        </Button>
+        <Button type="black">
           <Icon name="remark" type="dark" />
           <span>语法检查</span>
-        </DarkButton>
-        <DarkButton type="dark">
+        </Button>
+        <Button type="black">
           <Icon name="start" type="light" />
           <span>运行</span>
-        </DarkButton>
-        <DarkButton type="grey">
+        </Button>
+        <Button>
           <Icon name="data" type="dark" />
           <span>保存</span>
-        </DarkButton>
-        <DarkButton type="primary">
+        </Button>
+        <Button type="primary">
           <Icon name="export" />
           <span>发布</span>
-        </DarkButton>
+        </Button>
       </div>
       <div
         ref={drop}
