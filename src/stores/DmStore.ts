@@ -12,6 +12,13 @@ class DmStore {
     makeAutoObservable(this, {})
   }
 
+  // 增、删、改操作状态
+  op: OP = ''
+
+  setOP = (op: OP) => {
+    this.op = op
+  }
+
   // 函数管理相关
 
   udfOp: OP = ''
@@ -25,8 +32,6 @@ class DmStore {
   setUdfType = (type: TUdf) => {
     this.udfType = type
   }
-
-  // 其他
 }
 
 export default DmStore

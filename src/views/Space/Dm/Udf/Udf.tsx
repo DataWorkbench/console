@@ -3,8 +3,8 @@ import { Tabs } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { FlexBox } from 'components'
 import { useStore } from 'stores'
+import { HorizonTabs } from 'views/Space/Dm/styled'
 import UdfTable from './UdfTable'
-import { HorizonTabs } from '../styled'
 import UdfModal from './UdfModal'
 
 const { TabPanel } = Tabs

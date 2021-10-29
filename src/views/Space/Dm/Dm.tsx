@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import RealTime from './RealTime'
 import Resource from './Resource'
+import Cluster from './Cluster'
 import Udf from './Udf'
 import { Sider } from '../Sider'
 
@@ -14,6 +15,7 @@ function Dm() {
         {(mod === 'realtime' || !mod) && <RealTime />}
         {mod === 'resource' && <Resource />}
         {mod === 'udf' && <Udf />}
+        {mod === 'cluster' && <Cluster />}
       </div>
     </div>
   )

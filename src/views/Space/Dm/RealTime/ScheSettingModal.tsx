@@ -427,7 +427,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                     value: v,
                     label: v,
                   }))
-                  const monthOpts = range(1, 31).map((v) => ({
+                  const monthOpts = range(1, 32).map((v) => ({
                     value: v,
                     label: `每月${v}号`,
                   }))
