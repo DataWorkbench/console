@@ -54,7 +54,7 @@ const columns = [
 
 const ClusterTable = () => {
   const {
-    dmStore: { setOP },
+    dmStore: { setOp },
   } = useStore()
   const [filter] = useImmer({
     current: 0,
@@ -65,7 +65,7 @@ const ClusterTable = () => {
       <div tw="mb-3">
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
-            <Button type="primary" onClick={() => setOP('create')}>
+            <Button type="primary" onClick={() => setOp('create')}>
               <Icon name="upload" />
               创建集群
             </Button>

@@ -47,7 +47,7 @@ const FormWrapper = styled('div')(() => [
 
 const UdfModal = observer(() => {
   const {
-    dmStore: { setUdfOp, udfType },
+    dmStore: { setOp, udfType },
   } = useStore()
   const [step, setStep] = useState(0)
   const [params, setParams] = useImmer({
@@ -73,7 +73,7 @@ const UdfModal = observer(() => {
   }
 
   const handleCancel = () => {
-    setUdfOp('')
+    setOp('')
   }
 
   return (

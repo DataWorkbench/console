@@ -21,7 +21,7 @@ const pageTabsData = [
 
 const Udf = observer(() => {
   const {
-    dmStore: { udfOp, setUdfType },
+    dmStore: { op, setUdfType },
   } = useStore()
 
   return (
@@ -43,7 +43,7 @@ const Udf = observer(() => {
           <UdfTable tp="udttf" />
         </TabPanel>
       </HorizonTabs>
-      {(udfOp === 'create' || udfOp === 'edit') && <UdfModal />}
+      {(op === 'create' || op === 'edit') && <UdfModal />}
     </FlexBox>
   )
 })

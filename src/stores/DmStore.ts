@@ -15,19 +15,13 @@ class DmStore {
   // 增、删、改操作状态
   op: OP = ''
 
-  setOP = (op: OP) => {
+  setOp = (op: OP) => {
     this.op = op
   }
 
   // 函数管理相关
 
-  udfOp: OP = ''
-
   udfType: TUdf = 'UDF'
-
-  setUdfOp = (op: OP) => {
-    this.udfOp = op
-  }
 
   setUdfType = (type: TUdf) => {
     this.udfType = type
