@@ -1,6 +1,6 @@
-import { Table, Alert } from '@QCFE/qingcloud-portal-ui'
+import { Alert } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
-import tw, { styled, css } from 'twin.macro'
+import { Table } from 'views/Space/styled'
 
 import TableToolBar from './TableToolBar'
 
@@ -56,36 +56,6 @@ interface IUdfTable {
   tp: 'udf' | 'udtf' | 'udttf'
 }
 
-const DarkTable = styled(Table)(
-  () => css`
-    ${tw`w-full text-white`}
-    .grid-table-header {
-      ${tw`bg-neut-17 border-b border-neut-13 rounded-none`}
-      .table-thead {
-        ${tw`text-white`}
-      }
-    }
-    .table-row {
-      ${tw`bg-neut-16 border-b border-neut-13`}
-    }
-    .grid-table-footer {
-      ${tw`bg-neut-16 rounded-none`}
-      > .portal-pagination {
-        ${tw`text-white`}
-        .pagination-number {
-          ${tw`text-white`}
-          a {
-            ${tw` text-white`}
-          }
-          svg {
-            ${tw`text-white`}
-          }
-        }
-      }
-    }
-  `
-)
-
 const UdfTable = ({ tp }: IUdfTable) => {
   const [filter] = useImmer({
     current: 0,
@@ -95,7 +65,7 @@ const UdfTable = ({ tp }: IUdfTable) => {
     <div tw="w-full">
       <Alert message="提示" type="info" tw="bg-neut-16! mb-4" />
       <TableToolBar />
-      <DarkTable
+      <Table
         dataSource={dataSource}
         columns={columns}
         rowKey="image_id"

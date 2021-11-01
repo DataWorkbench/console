@@ -66,7 +66,7 @@ const ClusterTable = () => {
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
             <Button type="primary" onClick={() => setOp('create')}>
-              <Icon name="upload" />
+              <Icon name="add" />
               创建集群
             </Button>
             <Button>
