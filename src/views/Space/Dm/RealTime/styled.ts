@@ -1,5 +1,5 @@
 import tw, { styled, css } from 'twin.macro'
-import { Collapse, Form } from '@QCFE/lego-ui'
+import { Form } from '@QCFE/lego-ui'
 
 const { DatePickerField } = Form
 
@@ -11,23 +11,6 @@ export const StreamToolBar = styled('div')(
     }
   `
 )
-
-export const DarkCollapse = styled(Collapse)(() => [
-  css`
-    ${tw`text-white w-full border-0`}
-    .collapse-item-label {
-      ${tw`bg-neut-17 text-white border-neut-13 border-t-0`}
-      > span {
-        svg {
-          color: #fff;
-        }
-      }
-    }
-    .collapse-item-content {
-      ${tw`bg-neut-16`}
-    }
-  `,
-])
 
 export const ScheForm = styled(Form)(() => [
   css`

@@ -20,7 +20,6 @@ import { useStore } from 'stores'
 import dayjs from 'dayjs'
 import { useMutationStreamJobSchedule, useQueryStreamJobSchedule } from 'hooks'
 import {
-  DarkCollapse,
   ScheSettingForm,
   SmallDatePickerField,
   HorizonFiledsWrapper,
@@ -236,12 +235,16 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
       confirmLoading={mutation.isLoading}
     >
       <div>
-        <DarkCollapse defaultActiveKey={['p1', 'p2']}>
+        <Collapse defaultActiveKey={['p1', 'p2']}>
           <CollapseItem
             key="p1"
             label={
               <FlexBox tw="items-center space-x-1">
-                <Icon name="record" tw="(relative top-0 left-0)!" type="dark" />
+                <Icon
+                  name="record"
+                  tw="(relative top-0 left-0)!"
+                  type="light"
+                />
                 <span>基础属性</span>
               </FlexBox>
             }
@@ -738,7 +741,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
               </ScheSettingForm>
             </Loading>
           </CollapseItem>
-        </DarkCollapse>
+        </Collapse>
       </div>
     </DarkModal>
   )

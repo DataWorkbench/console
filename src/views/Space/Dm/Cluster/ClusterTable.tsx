@@ -1,8 +1,10 @@
 import { useImmer } from 'use-immer'
+import { observer } from 'mobx-react-lite'
 import { Button, Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center } from 'components'
 import { useStore } from 'hooks'
 import { Table } from 'views/Space/styled'
+import ClusterModal from './ClusterModal'
 
 const dataSource = [
   {
@@ -52,9 +54,9 @@ const columns = [
   },
 ]
 
-const ClusterTable = () => {
+const ClusterTable = observer(() => {
   const {
-    dmStore: { setOp },
+    dmStore: { setOp, op },
   } = useStore()
   const [filter] = useImmer({
     current: 0,
@@ -92,8 +94,9 @@ const ClusterTable = () => {
           pageSize: filter.pageSize,
         }}
       />
+      {(op === 'create' || op === 'edit') && <ClusterModal />}
     </div>
   )
-}
+})
 
 export default ClusterTable

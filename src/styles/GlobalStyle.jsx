@@ -3,6 +3,9 @@ import { Global } from '@emotion/react'
 import tw, { css, GlobalStyles as BaseStyles } from 'twin.macro'
 
 const customStyles = css`
+  html {
+    ${tw`text-base`}
+  }
   .light {
     --bg-primary: #fff;
     --bg-secondary: #f1f5f9;
@@ -16,9 +19,7 @@ const customStyles = css`
     --text-primary: #cbd5e1;
     --text-secondary: #fff;
     --color-primary: #2563eb;
-    html {
-      ${tw`text-base`}
-    }
+
     label {
       ${tw`text-white`};
     }
@@ -189,7 +190,7 @@ const customStyles = css`
       }
     }
     .collapse {
-      ${tw`text-white border-neut-13`}
+      ${tw`text-white border-neut-13 border-0 w-full`}
       .collapse-item-label {
         ${tw`bg-neut-17 text-white border-neut-13 border-t-0`}
         > span {
@@ -200,6 +201,17 @@ const customStyles = css`
       }
       .collapse-item-content {
         ${tw`bg-neut-16`}
+      }
+    }
+    .radio-group {
+      .button.radio-button {
+        ${tw`bg-neut-16 border-neut-13`}
+        &:hover {
+          ${tw`bg-neut-15`}
+        }
+        &.checked {
+          ${tw`border-green-13 bg-neut-15`}
+        }
       }
     }
   }
