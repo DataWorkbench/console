@@ -4,7 +4,7 @@ import { Icon, Form, Collapse, Loading } from '@QCFE/lego-ui'
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
 import { useMutationStreamJobArgs, useQueryStreamJobArgs } from 'hooks'
-import { DarkCollapse, ScheForm } from './styled'
+import { ScheForm } from './styled'
 
 const { CollapseItem } = Collapse
 const { NumberField, SelectField } = Form
@@ -62,7 +62,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
       confirmLoading={mutation.isLoading}
     >
       <Loading spinning={isFetching}>
-        <DarkCollapse defaultActiveKey={['p1', 'p2']}>
+        <Collapse defaultActiveKey={['p1', 'p2']}>
           <CollapseItem
             key="p1"
             label={
@@ -111,7 +111,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
             key="p2"
             label={
               <FlexBox tw="items-center space-x-1">
-                <Icon name="clock" tw="(relative top-0 left-0)!" type="dark" />
+                <Icon name="clock" tw="(relative top-0 left-0)!" type="light" />
                 <span>函数配置</span>
               </FlexBox>
             }
@@ -143,7 +143,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
               />
             </ScheForm>
           </CollapseItem>
-        </DarkCollapse>
+        </Collapse>
       </Loading>
     </DarkModal>
   )
