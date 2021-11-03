@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import {
   Collapse,
   Control,
@@ -6,15 +7,13 @@ import {
   Icon,
   Label,
   InputNumber,
-  RadioButton,
 } from '@QCFE/lego-ui'
-import { Modal, FlexBox, Center } from 'components'
+import { Modal, FlexBox, Center, KVTextAreaField } from 'components'
 import tw, { styled, css } from 'twin.macro'
 import { useStore } from 'hooks'
-import KVTextArea from './KVTextArea'
 
 const { CollapseItem } = Collapse
-const { TextField, SelectField, NumberField, RadioGroupField } = Form
+const { TextField, SelectField, NumberField } = Form
 
 const FormWrapper = styled('div')(() => [
   css`
@@ -27,6 +26,9 @@ const FormWrapper = styled('div')(() => [
           .select-control {
             ${tw`w-[328px]`}
           }
+        }
+        > .help {
+          ${tw`w-[328px]`}
         }
       }
     }
@@ -43,14 +45,27 @@ const RestartWrapper = styled('div')(() => [
 ])
 
 const ClusterModal = () => {
+  const baseFormRef = useRef<Form>(null)
+  // const resForm = useRef(null)
+  // const logForm = useRef(null)
+  // const optForm = useRef(null)
   const {
     dmStore: { setOp },
   } = useStore()
+
+  const handleOk = () => {
+    const baseForm = baseFormRef.current
+    if (baseForm?.validateFields()) {
+      // console.log(baseForm?.getFieldsValue())
+    }
+  }
+
   return (
     <Modal
       title="创建计算集群"
       orient="fullright"
       visible
+      onOk={handleOk}
       onCancel={() => setOp('')}
       width={1000}
     >
@@ -73,15 +88,29 @@ const ClusterModal = () => {
                 </FlexBox>
               }
             >
-              <Form>
-                <TextField label="* 名称" placeholder="请输入计算集群名称" />
+              <Form ref={baseFormRef}>
+                <TextField
+                  label="* 名称"
+                  name="name"
+                  placeholder="请输入计算集群名称"
+                  validateOnBlur
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      status: 'error',
+                      help: '不能为空,验证的字符a~z,0-9,_且不能以_开始或者结束',
+                    },
+                  ]}
+                />
                 <SelectField
+                  name="status"
                   label="* 状态"
                   options={[{}]}
                   help="设置当前集群的期望运行状态"
                 />
                 <SelectField
                   label="* 版本"
+                  name="version"
                   options={[{}]}
                   css={[
                     css`
@@ -92,13 +121,18 @@ const ClusterModal = () => {
                   ]}
                 />
                 <SelectField
+                  name="sche"
                   label="* 重启策略"
                   options={[{}]}
                   help="重启策略是指在发生故障时. 如何处理(重启)任务作业"
                 />
                 <RestartWrapper>
-                  <NumberField label="* 尝试重启次数" isMini />
-                  <NumberField label="* 重启时间间隔" isMini />
+                  <NumberField name="retrytime" label="* 尝试重启次数" isMini />
+                  <NumberField
+                    name="retryinterval"
+                    label="* 重启时间间隔"
+                    isMini
+                  />
                 </RestartWrapper>
               </Form>
             </CollapseItem>
@@ -200,15 +234,20 @@ const ClusterModal = () => {
               }
             >
               <Form>
-                <RadioGroupField label="Host别名" defaultValue="batch">
-                  <RadioButton value="batch">批量输入</RadioButton>
-                  <RadioButton value="single">单条输入</RadioButton>
-                </RadioGroupField>
-                <KVTextArea type="batch" title="Hosts 信息" tw="ml-24" />
-                <RadioGroupField label="Flick参数" defaultValue="batch">
-                  <RadioButton value="batch">批量输入</RadioButton>
-                  <RadioButton value="single">单条输入</RadioButton>
-                </RadioGroupField>
+                <KVTextAreaField
+                  label="Host别名"
+                  title="Hosts 信息"
+                  kvs={['IP', 'Hostname']}
+                  value={`192.168.3.2 proxy.mgmt.pitrix.yunify.com
+                  192.168.2.8 pgpool.mgmt.pitrix.yunify.com
+                  
+                  `}
+                  placeholder={`|请输入 hostname IP，多条配置之间换行输入。例如：
+192.168.3.2 proxy.mgmt.pitrix.yunify.com
+192.168.2.8 pgpool.mgmt.pitrix.yunify.com`}
+                  // onChange={(v) => console.log(v)}
+                />
+                <KVTextAreaField label="Flick参数" />
               </Form>
             </CollapseItem>
           </Collapse>

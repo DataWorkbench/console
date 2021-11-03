@@ -167,6 +167,17 @@ const customStyles = css`
       }
     }
     button.button {
+      &.is-text {
+        .icon + span {
+          ${tw`text-white`}
+        }
+
+        &:hover {
+          .icon + span {
+            ${tw`text-green-11`}
+          }
+        }
+      }
       &.is-default {
         ${tw`border-neut-13 bg-neut-13 text-white`}
         &:hover {
@@ -211,6 +222,49 @@ const customStyles = css`
         }
         &.checked {
           ${tw`border-green-13 bg-neut-15`}
+        }
+      }
+    }
+    .portal-grid-table {
+      ${tw`w-full text-white`}
+      .empty-placeholder {
+        ${tw`text-white`}
+        .icon {
+          svg {
+            ${tw`text-neut-13`}
+          }
+        }
+      }
+      .grid-table-content {
+        .grid-table-header {
+          ${tw`bg-neut-17 border-b border-neut-13 rounded-none`}
+          .table-thead {
+            ${tw`text-white`}
+          }
+        }
+        .grid-table-block {
+          ${tw`bg-neut-17`}
+        }
+      }
+      .table-row {
+        ${tw`bg-neut-16 border-b border-neut-13`}
+        &:hover {
+          ${tw`bg-neut-17`}
+        }
+      }
+      .grid-table-footer {
+        ${tw`bg-neut-16 rounded-none`}
+        > .portal-pagination {
+          ${tw`text-white`}
+          .pagination-number {
+            ${tw`text-white`}
+            a {
+              ${tw` text-white`}
+            }
+            svg {
+              ${tw`text-white`}
+            }
+          }
         }
       }
     }

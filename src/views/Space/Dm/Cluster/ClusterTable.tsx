@@ -1,9 +1,9 @@
 import { useImmer } from 'use-immer'
 import { observer } from 'mobx-react-lite'
-import { Button, Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, InputSearch, Table } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center } from 'components'
 import { useStore } from 'hooks'
-import { Table } from 'views/Space/styled'
+// import { Table } from 'views/Space/styled'
 import ClusterModal from './ClusterModal'
 
 const dataSource = [
