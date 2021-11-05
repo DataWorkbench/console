@@ -6,5 +6,6 @@ export * from './useWorkSpace'
 export * from './useRegion'
 export * from './useSource'
 export * from './useFlow'
+export * from './useCluster'
 
 export { useDarkMode, useScrollBlock, useStore }

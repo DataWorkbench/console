@@ -61,7 +61,9 @@ export const Header = observer(() => {
             value: id,
             label: name,
           }))}
-          onChange={(v) => history.push(`/${regionId}/workspace/${v}/${mod}`)}
+          onChange={(v) =>
+            history.push(pathname.replace(/(?<=workspace\/)[^/]*/, String(v)))
+          }
         />
       </Center>
       <Navs mod={mod} />

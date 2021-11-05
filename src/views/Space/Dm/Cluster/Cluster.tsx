@@ -14,9 +14,9 @@ const pageTabsData = [
 
 const Cluster = () => {
   return (
-    <FlexBox orient="column" tw="p-5 h-full">
+    <FlexBox orient="column" tw="p-5 min-h-full">
       <PageTab tabs={pageTabsData} />
-      <div tw="flex-1 bg-neut-16 px-5 pt-3">
+      <div tw="flex flex-1 bg-neut-16 px-5 pt-3">
         <ClusterTable />
       </div>
     </FlexBox>

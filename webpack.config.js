@@ -18,7 +18,7 @@ let config = {
   mode: NODE_ENV,
   target: 'web',
   entry: {
-    main: './src/index.jsx',
+    main: './src/index.tsx',
   },
   output: {
     path: resolve('dist'),
