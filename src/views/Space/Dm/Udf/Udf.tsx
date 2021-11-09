@@ -21,7 +21,7 @@ const pageTabsData = [
 
 const Udf = observer(() => {
   const {
-    dmStore: { op, setUdfType },
+    dmStore: { op, setUdfType, udfType },
   } = useStore()
 
   return (
@@ -29,21 +29,23 @@ const Udf = observer(() => {
       <PageTab tabs={pageTabsData} />
       <HorizonTabs
         defaultActiveName="UDF"
+        activeName={udfType}
         onChange={(name: any) => {
+          // console.log(name)
           setUdfType(name)
         }}
       >
         <TabPanel label="UDF" name="UDF">
-          <UdfTable tp="udf" />
+          <UdfTable tp="UDF" />
         </TabPanel>
         <TabPanel label="UDTF" name="UDTF">
-          <UdfTable tp="udtf" />
+          <UdfTable tp="UDTF" />
         </TabPanel>
         <TabPanel label="UDTTF" name="UDTTF">
-          <UdfTable tp="udttf" />
+          <UdfTable tp="UDTTF" />
         </TabPanel>
       </HorizonTabs>
-      {(op === 'create' || op === 'edit') && <UdfModal />}
+      {['create', 'detail', 'edit'].includes(op) && <UdfModal />}
     </FlexBox>
   )
 })

@@ -14,6 +14,9 @@ export const Table = styled(LegoTable)(
       ${tw`bg-neut-16 border-b border-neut-13`}
       &:hover {
         ${tw`bg-neut-17`}
+        .column-name {
+          ${tw`text-green-11 font-medium`}
+        }
       }
     }
     .grid-table-footer {

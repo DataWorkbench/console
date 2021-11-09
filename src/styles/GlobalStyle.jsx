@@ -214,6 +214,9 @@ const customStyles = css`
         }
       }
     }
+    .label-required {
+      ${tw`label-required`}
+    }
   }
 `
 
