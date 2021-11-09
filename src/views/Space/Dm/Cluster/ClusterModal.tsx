@@ -291,6 +291,10 @@ const ClusterModal = observer(
                     }
                     options={[
                       {
+                        label: 'NoRestart:  不重启',
+                        value: 'none',
+                      },
+                      {
                         label: 'FixedDelay:  固定延迟',
                         value: 'fixed-delay',
                       },

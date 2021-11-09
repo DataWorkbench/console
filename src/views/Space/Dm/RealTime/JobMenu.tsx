@@ -107,7 +107,7 @@ const JobMenu = observer(() => {
   return (
     <div tw="w-56 bg-neut-16 rounded dark:text-white">
       <div tw="flex justify-between items-center h-11 px-2 border-b dark:border-neut-15">
-        <span tw="text-xs font-semibold">作业流程</span>
+        <span tw="text-xs font-semibold">作业</span>
         <div tw="flex items-center">
           <Icon
             name="add"
@@ -151,11 +151,11 @@ const JobMenu = observer(() => {
           <ul tw="pt-2">
             <li>
               <Icon name="file" tw="align-middle" />
-              <span tw="align-middle text-neut-8">作业流程是什么？</span>
+              <span tw="align-middle text-neut-8">作业是什么？</span>
             </li>
             <li>
               <Icon name="file" tw="align-middle" />
-              <span tw="align-middle text-neut-8">作业流程的操作指南</span>
+              <span tw="align-middle text-neut-8">作业的操作指南</span>
             </li>
           </ul>
         </div>
@@ -168,7 +168,7 @@ const JobMenu = observer(() => {
             tw="py-1 rounded-sm w-48 bg-neut-13 focus:outline-none hover:bg-neut-10 ring-opacity-50"
           >
             <Icon name="add" type="light" tw="align-middle" />
-            <span tw="align-middle">创建作业流程</span>
+            <span tw="align-middle">创建作业</span>
           </button>
         </div>
       </div>

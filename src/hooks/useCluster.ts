@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query'
+import { useQuery, useMutation } from 'react-query'
 import { useParams } from 'react-router-dom'
 import {
   listAvailableFlinkVersions,
@@ -42,11 +42,6 @@ export const useQueryFlinkClusters = (filter: any) => {
   return useQuery(queryKey, async () => listFlinkClusters(params), {
     keepPreviousData: true,
   })
-}
-
-export const useInvalidateQueriesCluster = () => {
-  const queryClient = useQueryClient()
-  queryClient.invalidateQueries(queryKey)
 }
 
 export const useMutationCluster = () => {

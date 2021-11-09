@@ -104,7 +104,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
   return (
     <Modal
       visible
-      title="创建作业流程"
+      title="创建作业"
       placement="center"
       width={job ? '800px' : '70%'}
       onCancel={handleCancel}
@@ -238,13 +238,13 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                 defaultValue={get(job, 'desc', '')}
                 placeholder="请输入作业描述"
                 validateOnChange
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请输入作业描述',
-                    status: 'error',
-                  },
-                ]}
+                // schemas={[
+                //   {
+                //     rule: { required: true },
+                //     help: '请输入作业描述',
+                //     status: 'error',
+                //   },
+                // ]}
               />
             </Form>
           </div>
