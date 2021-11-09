@@ -1,9 +1,13 @@
-import { useQuery, useMutation } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { useParams } from 'react-router-dom'
 import {
   listAvailableFlinkVersions,
   createFlinkCluster,
   listFlinkClusters,
+  updateFlinkCluster,
+  deleteFlinkClusters,
+  startFlinkClusters,
+  stopFlinkClusters,
 } from 'stores/api'
 import { get } from 'lodash-es'
 
@@ -40,19 +44,35 @@ export const useQueryFlinkClusters = (filter: any) => {
   })
 }
 
+export const useInvalidateQueriesCluster = () => {
+  const queryClient = useQueryClient()
+  queryClient.invalidateQueries(queryKey)
+}
+
 export const useMutationCluster = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  return useMutation(async ({ op, ...rest }: { op: 'create' | 'update' }) => {
-    let ret = null
-    if (op === 'create') {
-      ret = await createFlinkCluster({
+  return useMutation(
+    async ({ op, ...rest }: { op: OP; clusterIds?: string[] }) => {
+      let ret = null
+      const params = {
         ...rest,
         regionId,
         spaceId,
-      })
+      }
+      if (op === 'create') {
+        ret = await createFlinkCluster(params)
+      } else if (op === 'update') {
+        ret = await updateFlinkCluster(params)
+      } else if (op === 'delete') {
+        ret = await deleteFlinkClusters(params)
+      } else if (op === 'start') {
+        ret = await startFlinkClusters(params)
+      } else if (op === 'stop') {
+        ret = await stopFlinkClusters(params)
+      }
+      return ret
     }
-    return ret
-  })
+  )
 }
 
 export default {}
