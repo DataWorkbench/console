@@ -163,7 +163,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           break
         case 'delete':
           mutation.mutate(
-            { op: 'delete', udf_ids: [] },
+            { op: 'delete', udf_ids: [detail.udf_id] },
             { onSuccess: () => console.log('成功了') }
           )
           break

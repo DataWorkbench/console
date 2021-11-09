@@ -107,16 +107,19 @@ const UdfModal = observer(() => {
   const handleOk = () => {
     if (step === 0) {
       setStep(1)
-    } else if (form.current && (form.current as any).validateForm()) {
-      const data = {
-        ...formData.current,
-        udf_language: params.type,
-        udf_type: udfTypes[udfType],
+    } else {
+      console.log(5555, form.current && (form.current as any).validateForm())
+      if (form.current && (form.current as any).validateForm()) {
+        const data = {
+          ...formData.current,
+          udf_language: params.type,
+          udf_type: udfTypes[udfType],
+        }
+        mutation.mutate(
+          { op, ...data },
+          { onSuccess: () => console.log('成功了') }
+        )
       }
-      mutation.mutate(
-        { op, ...data },
-        { onSuccess: () => console.log('成功了') }
-      )
     }
   }
 
@@ -236,7 +239,7 @@ const UdfModal = observer(() => {
                 <Form
                   layout="horizon"
                   onFieldValueChange={handleFormChange}
-                  form={form}
+                  ref={form}
                 >
                   <Field>
                     <Label tw="label-required">函数类型</Label>
@@ -253,6 +256,13 @@ const UdfModal = observer(() => {
                     help="hahaha"
                     disabled={op === 'detail'}
                     defaultValue={modalData?.name}
+                    schemas={[
+                      {
+                        rule: { required: true },
+                        help: '请输入函数名',
+                        status: 'error',
+                      },
+                    ]}
                   />
                   <TextAreaField
                     name="desc"

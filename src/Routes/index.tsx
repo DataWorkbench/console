@@ -62,6 +62,7 @@ const Routes = () => {
               path="/:regionId/workspace/:spaceId/manage/:mod?"
               component={Manage}
             />
+            <Route component={Upcloud} />
           </Switch>
         </SpaceLayout>
       </Route>
