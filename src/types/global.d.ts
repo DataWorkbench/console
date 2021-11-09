@@ -10,4 +10,16 @@ declare global {
     spaceId: string
     [k: string]: string
   }
+
+  type OP =
+    | ''
+    | 'create'
+    | 'edit'
+    | 'delete'
+    | 'update'
+    | 'enable'
+    | 'disable'
+    | 'start'
+    | 'stop'
+    | 'view'
 }

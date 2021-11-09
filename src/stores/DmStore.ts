@@ -1,7 +1,6 @@
 import { makeAutoObservable } from 'mobx'
 import type RootStore from './RootStore'
 
-type OP = '' | 'create' | 'edit' | 'delete'
 type TUdf = 'UDF' | 'UDTF' | 'UDTTF'
 
 class DmStore {

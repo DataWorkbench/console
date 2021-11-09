@@ -79,6 +79,9 @@ const customStyles = css`
     }
 
     .radio-group {
+      .radio:hover {
+        ${tw`text-white`}
+      }
       .button.radio-button {
         ${tw`bg-neut-16 border-neut-13`}
         &:hover {
