@@ -25,7 +25,6 @@ export const ModalWrapper = styled(Modal)(
     noBorder &&
       css`
         .modal-content {
-          ${tw`w-[400px]!`}
           > .modal-card-head,
           > .modal-card-foot {
             ${tw`border-none`}

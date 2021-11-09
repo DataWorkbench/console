@@ -54,6 +54,10 @@ declare module '@QCFE/qingcloud-portal-ui' {
     bodyStyle?: Record<string, string | number>
     children?: JSX.Element | JSX.Element[]
     footer?: React.ReactNode | string | null
+    okType?: string
+    cancelType?: string
+    confirmLoading?: boolean
+    showConfirmLoading?: boolean
   }
 
   export interface Modal {
