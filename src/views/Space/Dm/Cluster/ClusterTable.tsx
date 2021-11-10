@@ -317,7 +317,7 @@ const ClusterTable = observer(() => {
           okType={op === 'start' ? 'primary' : 'danger'}
           confirmLoading={mutation.isLoading}
         >
-          <FlexBox tw="space-x-3">
+          <FlexBox tw="space-x-3 mb-3">
             <Icon
               name="if-exclamation"
               css={css`
