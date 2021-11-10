@@ -8,6 +8,9 @@ const buttonStyles = css`
         ${tw`bg-neut-13! border-neut-13!`}
       }
       &.is-text {
+        &[disabled] {
+          ${tw`bg-transparent! border-none!`}
+        }
         .icon + span {
           ${tw`text-white`}
         }

@@ -12,6 +12,7 @@ import {
   Radio,
   Select,
   Loading,
+  DatePicker,
 } from '@QCFE/lego-ui'
 import { DarkModal, FlexBox } from 'components'
 import { useImmer } from 'use-immer'
@@ -87,6 +88,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
     periodType: TPeriodType
     schedulePolicy: number
     executed: number | null
+    immediately: boolean
   }>({
     concurrencyPolicy: '',
     started: 0,
@@ -99,6 +101,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
     periodType: 'minute',
     schedulePolicy: 1,
     executed: null,
+    immediately: false,
   })
 
   const {
@@ -106,7 +109,6 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
   } = useStore()
   const { isFetching } = useQueryStreamJobSchedule({
     onSuccess: (data: any) => {
-      // console.log(data)
       if (data) {
         const periodType = data.period_type
         const { express } = data
@@ -119,6 +121,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
           draft.retryPolicy = data.retry_policy
           draft.periodType = periodType || 'minute'
           draft.timeout = data.timeout
+          draft.schedulePolicy = data.schedule_policy
+          draft.executed = data.executed
+          draft.immediately = data.immediately
         })
         if (express !== '') {
           setPeriodData((draft) => {
@@ -224,6 +229,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
           timeout: params.timeout,
           schedule_policy: params.schedulePolicy,
           executed: params.executed || dayjs().unix(),
+          immediately: params.immediately,
         },
         {
           onSuccess: () => {
@@ -746,21 +752,40 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                     const curDate = new Date()
                     return (
                       <>
-                        <DatePickerField
-                          label="执行时间"
-                          dateFormat="Y-m-d H:i:S"
-                          enableTime
-                          enableSeconds
-                          minDate={curDate}
-                          defaultValue={curDate}
-                          onChange={(d: Date[]) => {
-                            if (d.length) {
-                              setParams((draft) => {
-                                draft.executed = dayjs(d[0]).unix()
-                              })
-                            }
+                        <RadioGroupField
+                          label="* 执行时间"
+                          value={params.immediately}
+                          name="immediately"
+                          onChange={(v: boolean) => {
+                            setParams((draft) => {
+                              draft.immediately = v
+                            })
                           }}
-                        />
+                        >
+                          <Radio value>发布后立即执行</Radio>
+                          <Radio value={false}>指定时间</Radio>
+                        </RadioGroupField>
+                        {!params.immediately && (
+                          <Field>
+                            <Label />
+                            <Control>
+                              <DatePicker
+                                dateFormat="Y-m-d H:i:S"
+                                enableTime
+                                enableSeconds
+                                minDate={curDate}
+                                defaultValue={curDate}
+                                onChange={(d: Date[]) => {
+                                  if (d.length) {
+                                    setParams((draft) => {
+                                      draft.executed = dayjs(d[0]).unix()
+                                    })
+                                  }
+                                }}
+                              />
+                            </Control>
+                          </Field>
+                        )}
                       </>
                     )
                   }
