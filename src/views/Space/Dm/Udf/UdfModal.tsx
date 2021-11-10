@@ -6,7 +6,8 @@ import { Collapse, Field, Label, PopConfirm } from '@QCFE/lego-ui'
 import { useImmer } from 'use-immer'
 
 import { FlexBox, Center, Modal, ModalStep, ModalContent } from 'components'
-import { useMutationUdf, useStore } from 'hooks'
+import { getUdfKey, useMutationUdf, useStore } from 'hooks'
+import { useQueryClient } from 'react-query'
 import { ILanguageInterface, UdfActionType, UdfTypes } from './interfaces'
 
 const { TextField, TextAreaField, SelectField } = Form
@@ -90,13 +91,13 @@ const UdfModal = observer(() => {
 
   const [hasChange, setHasChange] = useState(false)
   const mutation = useMutationUdf()
-
+  const queryClient = useQueryClient()
   const langData = useMemo(
     () =>
       [
-        { text: 'Java', icon: 'java', type: 3, bit: 0b0011 },
-        { text: 'Python', icon: 'python', type: 4, bit: 0b0111 },
-        { text: 'Scala', icon: 'coding', type: 5, bit: 0b111 },
+        { text: 'Java', icon: 'java', type: 2, bit: 0b0011 },
+        { text: 'Python', icon: 'python', type: 3, bit: 0b0111 },
+        { text: 'Scala', icon: 'coding', type: 1, bit: 0b111 },
       ].filter((lang) => filterLanguage(lang, udfType)),
 
     [udfType]
@@ -104,27 +105,32 @@ const UdfModal = observer(() => {
 
   const curLangInfo = langData.find((item) => item.type === params.type)
 
+  const refetchUdf = () => {
+    queryClient.invalidateQueries(getUdfKey())
+  }
+  const handleCancel = () => {
+    setOp('')
+  }
+
   const handleOk = () => {
     if (step === 0) {
       setStep(1)
-    } else {
-      console.log(5555, form.current && (form.current as any).validateForm())
-      if (form.current && (form.current as any).validateForm()) {
-        const data = {
-          ...formData.current,
-          udf_language: params.type,
-          udf_type: udfTypes[udfType],
-        }
-        mutation.mutate(
-          { op, ...data },
-          { onSuccess: () => console.log('成功了') }
-        )
+    } else if (form.current && (form.current as any).validateForm()) {
+      const data = {
+        ...formData.current,
+        udf_language: params.type,
+        udf_type: udfTypes[udfType],
       }
+      mutation.mutate(
+        { op, ...data },
+        {
+          onSuccess: () => {
+            handleCancel()
+            refetchUdf()
+          },
+        }
+      )
     }
-  }
-
-  const handleCancel = () => {
-    setOp('')
   }
 
   const handleFormChange = (fieldValue: Record<string, any>) => {
@@ -265,16 +271,16 @@ const UdfModal = observer(() => {
                     ]}
                   />
                   <TextAreaField
-                    name="desc"
+                    name="comment"
                     label="描述"
                     disabled={op === 'detail'}
-                    defaultValue={modalData?.desc}
+                    defaultValue={modalData?.comment}
                   />
                   <TextAreaField
-                    name="example"
+                    name="usage_sample"
                     label="示例"
                     disabled={op === 'detail'}
-                    defaultValue={modalData?.example}
+                    defaultValue={modalData?.usage_sample}
                   />
                 </Form>
               </FormWrapper>
@@ -285,11 +291,12 @@ const UdfModal = observer(() => {
                   {(() => {
                     if (curLangInfo) {
                       const { type, text } = curLangInfo
-                      if (type === 3) {
+                      if (type === 2) {
                         return (
                           <SelectField
-                            name="jars"
+                            name="define"
                             label={`引用${text}包`}
+                            labelClassName="label-required"
                             help="如需选择新的 Jar 包资源，可以在资源管理中上传资源"
                             disabled={op === 'detail'}
                             defaultValue={modalData?.jars}
@@ -298,8 +305,9 @@ const UdfModal = observer(() => {
                       }
                       return (
                         <TextAreaField
-                          name="statement"
+                          name="define"
                           label={`${text}语句`}
+                          labelClassName="label-required"
                           disabled={op === 'detail'}
                           defaultValue={modalData?.statment}
                         />

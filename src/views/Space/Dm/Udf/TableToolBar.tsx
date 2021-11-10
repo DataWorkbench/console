@@ -20,6 +20,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
       udfType,
       udfSelectedRowKeys,
       setUdfColumnSettings,
+      setUdfSelectedRowKeys,
       udfStorageKey,
       // : columnSettings
     },
@@ -28,6 +29,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
   const mutation = useMutationUdf()
 
   const { defaultColumns, setFilter, refetch } = props
+
   return (
     <div tw="mb-3">
       <FlexBox tw="justify-between">
@@ -39,10 +41,18 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
           <Button
             disabled={!udfSelectedRowKeys.length}
             onClick={() =>
-              mutation.mutate({
-                op: 'delete',
-                udf_ids: udfSelectedRowKeys,
-              })
+              mutation.mutate(
+                {
+                  op: 'delete',
+                  udf_ids: udfSelectedRowKeys,
+                },
+                {
+                  onSuccess: () => {
+                    setUdfSelectedRowKeys([])
+                    refetch()
+                  },
+                }
+              )
             }
           >
             <Icon name="trash" type="light" />
@@ -56,6 +66,11 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
             onPressEnter={(evt) => {
               setFilter((_) => {
                 _.search = String((evt.target as HTMLInputElement).value)
+              })
+            }}
+            onClear={() => {
+              setFilter((_) => {
+                _.search = ''
               })
             }}
           />

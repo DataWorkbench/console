@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 import { Alert, Button, utils } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 
-import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import dayjs from 'dayjs'
 
@@ -12,31 +11,21 @@ import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
 
-const dataSource = [
-  {
-    name: 'reduce',
-    id: 'xxx_efafb4_sfvf_2323',
-    language: 4,
-    desc: '这是一段描述',
-    update_time: new Date().getTime() / 1000,
-    example: '// hello world',
-  },
-]
-
 const languageFilters = [
   {
     text: 'Java',
-    value: 3,
+    value: 2,
   },
   {
     text: 'Python',
-    value: 4,
+    value: 3,
   },
   {
     text: 'Scala',
-    value: 5,
+    value: 1,
   },
 ]
+
 const getDefaultColumns = (
   filter: Record<string, any>,
   actions: (type: UdfActionType, detail: Record<string, any>) => void
@@ -47,7 +36,7 @@ const getDefaultColumns = (
     sortable: true,
     sortOrder:
       // eslint-disable-next-line no-nested-ternary
-      filter.sort_by === 'name' ? (filter.reverse ? 'desc' : 'asc') : '',
+      filter.sort_by === 'name' ? (filter.reverse ? 'asc' : 'desc') : '',
 
     render: (value: string, row: Record<string, any>) => {
       return value ? (
@@ -87,7 +76,7 @@ const getDefaultColumns = (
     sortable: true,
     sortOrder:
       // eslint-disable-next-line no-nested-ternary
-      filter.sort_by === 'updated' ? (filter.reverse ? 'desc' : 'asc') : '',
+      filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
     render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
   },
   {
@@ -96,6 +85,7 @@ const getDefaultColumns = (
       <TableActions>
         <Button
           type="text"
+          className="column-action"
           onClick={() => {
             actions('edit', row)
           }}
@@ -104,6 +94,7 @@ const getDefaultColumns = (
         </Button>
         <Button
           type="text"
+          className="column-action"
           onClick={() => {
             actions('delete', row)
           }}
@@ -142,14 +133,14 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
     },
   } = useStore()
 
-  const { data, refetch, isLoading } = useQueryUdfList(filter)
-  console.log(data, isLoading, toJS(filter))
+  const { data, refetch, isFetching } = useQueryUdfList(filter)
 
   const mutation = useMutationUdf()
 
   useEffect(() => {
     setFilter((_) => {
       _.current = 1
+      _.offset = 0
     })
   }, [udfType, setFilter])
 
@@ -164,14 +155,18 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
         case 'delete':
           mutation.mutate(
             { op: 'delete', udf_ids: [detail.udf_id] },
-            { onSuccess: () => console.log('成功了') }
+            {
+              onSuccess: () => {
+                refetch()
+              },
+            }
           )
           break
         default:
           break
       }
     },
-    [setOp, setModalData, mutation]
+    [setOp, setModalData, refetch, mutation]
   )
 
   const defaultColumns = useMemo(() => {
@@ -216,16 +211,29 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
         onSelect={handleSelect}
         selectedRowKeys={selectedRowKeys}
         selectType="checkbox"
-        dataSource={dataSource}
+        loading={isFetching}
+        dataSource={data?.infos || []}
+        // dataSource={dataSource}
         columns={columns}
         onSort={handleSort}
         onFilterChange={handleFilterChange}
-        rowKey="id"
+        rowKey="udf_id"
         title={tp}
         pagination={{
-          total: 101,
-          current: filter.current,
-          pageSize: filter.pageSize,
+          total: data?.total || 0,
+          current: filter.offset / filter.limit + 1,
+          pageSize: filter.limit,
+          onPageChange: (current: number) => {
+            setFilter((draft) => {
+              draft.offset = (current - 1) * filter.limit
+            })
+          },
+          onShowSizeChange: (size: number) => {
+            setFilter((draft) => {
+              draft.offset = 0
+              draft.limit = size
+            })
+          },
         }}
       />
     </div>

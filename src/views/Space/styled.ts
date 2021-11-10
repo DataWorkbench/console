@@ -12,9 +12,12 @@ export const Table = styled(LegoTable)(
     }
     .table-row {
       ${tw`bg-neut-16 border-b border-neut-13`}
+      .column-action {
+        ${tw`text-white`}
+      }
       &:hover {
         ${tw`bg-neut-17`}
-        .column-name {
+        .column-name, .column-action {
           ${tw`text-green-11 font-medium`}
         }
       }

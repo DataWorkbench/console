@@ -39,6 +39,9 @@ const inputStyles = css`
         }
       }
     }
+    .label-required {
+      ${tw`label-required`}
+    }
   }
 `
 export default inputStyles

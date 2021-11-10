@@ -8,6 +8,10 @@ interface IRouteParams {
   mod?: string
 }
 
+let queryKey: any = ''
+
+export const getUdfKey = () => queryKey
+
 export const useQueryUdfList = (filter: Record<string, any>) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const { atomKey, ...rest } = filter
@@ -16,18 +20,18 @@ export const useQueryUdfList = (filter: Record<string, any>) => {
     spaceId,
     ...rest,
   }
-  const key = ['udf', params]
-  return useQuery(key, async () => loadUdfList(params), {})
+  queryKey = ['udf', params]
+  return useQuery(queryKey, async () => loadUdfList(params), {})
 }
 
 export const useMutationUdf = (options?: {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async ({ op, ...rest }: Record<string, any>) => {
-    if (['delete', 'create', 'update'].includes(op)) {
+    if (['edit', 'create', 'delete'].includes(op)) {
       let ret
       if (op === 'create') {
         ret = await createUdf({ ...rest, regionId, spaceId })
-      } else if (op === 'update') {
+      } else if (op === 'edit') {
         ret = await updateUdf({ ...rest, regionId, spaceId })
       } else if (op === 'delete') {
         ret = await deleteUdf({ ...rest, regionId, spaceId })
