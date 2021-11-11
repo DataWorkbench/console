@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import { Dropdown, Menu } from '@QCFE/lego-ui'
 import { Button, Icon, InputSearch, Table } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, Modal } from 'components'
+import { FlexBox, Center, Modal, Tooltip, AffixLabel } from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
 import Tippy from '@tippyjs/react'
@@ -12,12 +12,65 @@ import {
   getFlinkClusterKey,
   useMutationCluster,
 } from 'hooks'
-import { get } from 'lodash-es'
+import { get, omitBy } from 'lodash-es'
 import dayjs from 'dayjs'
 import { css } from 'twin.macro'
 import ClusterModal from './ClusterModal'
 
 const { MenuItem } = Menu
+
+const statusFilters = [
+  {
+    text: '运行中',
+    value: 1,
+    color: {
+      primary: '#15A675',
+      secondary: '#C6F4E4',
+    },
+  },
+  {
+    text: '停止',
+    value: 2,
+    color: {
+      primary: '#939EA9',
+      secondary: '#DEE7F1',
+    },
+  },
+  {
+    text: '启动中',
+    value: 3,
+    color: {
+      primary: '#2193D3',
+      secondary: '#C1E9FF',
+    },
+  },
+  {
+    text: '异常',
+    value: 4,
+    color: {
+      primary: '#CF3B37',
+      secondary: '#FEF2F2',
+    },
+  },
+  {
+    text: '欠费',
+    value: 5,
+    color: {
+      primary: '#A855F7',
+      secondary: '#F6EDFF',
+    },
+  },
+]
+
+interface IFilter {
+  name: string
+  offset: number
+  limit: number
+  reverse: boolean
+  search: string
+  sort_by: string
+  status: string | number
+}
 
 const ClusterTable = observer(() => {
   const {
@@ -25,7 +78,7 @@ const ClusterTable = observer(() => {
   } = useStore()
   const [opclusterList, setOpClusterList] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-  const [filter, setFilter] = useImmer({
+  const [filter, setFilter] = useImmer<IFilter>({
     name: '',
     offset: 0,
     limit: 10,
@@ -61,50 +114,51 @@ const ClusterTable = observer(() => {
         ),
       },
       {
-        title: '状态',
+        title: (
+          <FlexBox tw="items-center">
+            <span>状态</span>
+            <Tooltip
+              theme="dark"
+              trigger="click"
+              hideOnClick
+              delay={100}
+              offset={[0, 10]}
+              placement="bottom-start"
+              content={
+                <Menu
+                  selectedKey={String(filter.status || 'all')}
+                  onClick={(e: React.SyntheticEvent, k: string, v: number) => {
+                    setFilter((draft) => {
+                      draft.status = v
+                    })
+                  }}
+                >
+                  <MenuItem value="" key="all">
+                    全部
+                  </MenuItem>
+                  {statusFilters.map((st) => (
+                    <MenuItem value={st.value} key={st.value}>
+                      {st.text}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              }
+            >
+              <div>
+                <Icon name="filter" type="light" clickable tw="ml-1 block" />
+              </div>
+            </Tooltip>
+          </FlexBox>
+        ),
         dataIndex: 'status',
+        // filters: statusFilters,
+        // filteredValue: String(filter.status),
         render: (v: number) => {
-          const status = {
-            1: {
-              text: '运行中',
-              color: {
-                primary: '#15A675',
-                secondary: '#C6F4E4',
-              },
-            },
-            2: {
-              text: '停止',
-              color: {
-                primary: '#939EA9',
-                secondary: '#DEE7F1',
-              },
-            },
-            3: {
-              text: '启动中',
-              color: {
-                primary: '#2193D3',
-                secondary: '#C1E9FF',
-              },
-            },
-            4: {
-              text: '异常',
-              color: {
-                primary: '#CF3B37',
-                secondary: '#FEF2F2',
-              },
-            },
-            5: {
-              text: '欠费',
-              color: {
-                primary: '#A855F7',
-                secondary: '#F6EDFF',
-              },
-            },
-          }
+          const statusObj = statusFilters.find((o) => o.value === v)
           return (
             <FlexBox tw="items-center space-x-1">
-              <Icon name="radio" color={get(status, [v, 'color'])} />
-              <span>{get(status, [v, 'text'])}</span>
+              <Icon name="radio" color={statusObj?.color} />
+              <span>{statusObj?.text}</span>
             </FlexBox>
           )
         },
@@ -114,18 +168,34 @@ const ClusterTable = observer(() => {
         dataIndex: 'version',
       },
       {
-        title: 'TaskManager',
+        title: (
+          <AffixLabel
+            help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
+            required={false}
+          >
+            TaskManager
+          </AffixLabel>
+        ),
         dataIndex: 'task_cu',
-        render: (v) => `${v} CU`,
+        render: (v: number) => `${v} CU`,
       },
       {
-        title: 'JobManager',
+        title: (
+          <AffixLabel
+            help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8"
+            required={false}
+          >
+            JobManager
+          </AffixLabel>
+        ),
         dataIndex: 'job_cu',
-        render: (v) => `${v} CU`,
+        render: (v: number) => `${v} CU`,
       },
       {
         title: '最近更新时间',
         dataIndex: 'updated',
+        sortable: true,
+        sortOrder: filter.reverse ? 'asc' : 'desc',
         render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
@@ -176,7 +246,7 @@ const ClusterTable = observer(() => {
         ),
       },
     ]
-  }, [setOp, setOpClusterList])
+  }, [setOp, setOpClusterList, filter.reverse, filter.status, setFilter])
 
   const refetchData = () => {
     queryClient.invalidateQueries(getFlinkClusterKey())
@@ -198,13 +268,17 @@ const ClusterTable = observer(() => {
     )
   }
 
-  const { isFetching, isRefetching, data } = useQueryFlinkClusters(filter)
-  const filterClusterInfos = data?.infos.filter(
-    (info: any) =>
-      selectedRowKeys.includes(info.id) &&
-      info.status !== 1 &&
-      info.status !== 3
+  const { isFetching, isRefetching, data } = useQueryFlinkClusters(
+    omitBy(filter, (v) => v === '')
   )
+  const infos = get(data, 'infos', []) || []
+  const filterClusterInfos =
+    infos.filter(
+      (info: any) =>
+        selectedRowKeys.includes(info.id) &&
+        info.status !== 1 &&
+        info.status !== 3
+    ) || []
 
   return (
     <FlexBox tw="w-full flex-1" orient="column">
@@ -226,7 +300,7 @@ const ClusterTable = observer(() => {
               <div>
                 <Button
                   type="primary"
-                  disabled={data?.infos.length > 4}
+                  disabled={infos.length > 4}
                   onClick={() => setOp('create')}
                 >
                   <Icon name="add" />
@@ -279,7 +353,7 @@ const ClusterTable = observer(() => {
       </div>
       <Table
         selectType="checkbox"
-        dataSource={data?.infos || []}
+        dataSource={infos || []}
         loading={isFetching}
         columns={columns}
         rowKey="id"
@@ -303,6 +377,18 @@ const ClusterTable = observer(() => {
         onSelect={(keys: string[]) => {
           setSelectedRowKeys(keys)
         }}
+        onSort={(sortKey: any, order: string) => {
+          setFilter((draft) => {
+            draft.sort_by = sortKey
+            draft.reverse = order === 'asc'
+          })
+        }}
+        // onFilterChange={(filters: any) => {
+        //   const status = get(filters, 'status', '')
+        //   setFilter((draft) => {
+        //     draft.status = ['', 'all'].includes(status) ? '' : +status
+        //   })
+        // }}
       />
       {(op === 'create' || op === 'update' || op === 'view') && (
         <ClusterModal opCluster={opclusterList[0]} />
@@ -345,6 +431,16 @@ const ClusterTable = observer(() => {
                       {opText}以下{opclusterList.length}个计算集群
                     </>
                   )
+                if (op === 'start') {
+                  return (
+                    <>
+                      <div tw="font-medium mb-2 text-base">{clusterText}</div>
+                      <div className="modal-content-message">
+                        确定启动{clusterText}吗？
+                      </div>
+                    </>
+                  )
+                }
 
                 return (
                   <>

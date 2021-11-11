@@ -7,6 +7,8 @@ import buttonStyles from './buttonStyles'
 import modalStyles from './modalStyles'
 import sliderStyles from './sliderStyles'
 import inputStyles from './inputStyles'
+import menuStyles from './menuStyles'
+import tippyStyles from './tippyStyles'
 
 const customStyles = css`
   html {
@@ -130,6 +132,8 @@ const GlobalStyles = () => (
         modalStyles,
         sliderStyles,
         inputStyles,
+        menuStyles,
+        tippyStyles,
       ]}
     />
   </>
