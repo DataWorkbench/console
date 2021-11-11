@@ -13,6 +13,7 @@ import 'assets/icons/screen_running.svg'
 import 'assets/icons/screen_stoped.svg'
 import 'assets/icons/screen_success.svg'
 import 'assets/icons/screen_waiting.svg'
+import 'assets/icons/direct.svg'
 
 // function requireAll(r: any) {
 //   r.keys().forEach(r)
