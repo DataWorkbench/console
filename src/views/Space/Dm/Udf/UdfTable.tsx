@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { Alert, Button, utils } from '@QCFE/qingcloud-portal-ui'
+import { Level, LevelLeft, LevelRight } from '@QCFE/lego-ui'
 import { useImmer } from 'use-immer'
 
 import { observer } from 'mobx-react-lite'
@@ -10,21 +11,7 @@ import { useMutationUdf, useQueryUdfList, useStore } from 'hooks'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
-
-const languageFilters = [
-  {
-    text: 'Java',
-    value: 2,
-  },
-  {
-    text: 'Python',
-    value: 3,
-  },
-  {
-    text: 'Scala',
-    value: 1,
-  },
-]
+import { languageFilters, udfTypes } from './constants'
 
 const getDefaultColumns = (
   filter: Record<string, any>,
@@ -61,8 +48,8 @@ const getDefaultColumns = (
   {
     title: '语言类型',
     dataIndex: 'udf_language',
-    filters: languageFilters,
-    filterValue: filter.udf_language,
+    // filters: languageFilters, // 语言不用过滤
+    // filterValue: filter.udf_language,
     render: (val: number) =>
       languageFilters.find((i) => i.value === val)?.text || val,
   },
@@ -105,12 +92,6 @@ const getDefaultColumns = (
     ),
   },
 ]
-
-const udfTypes = {
-  UDF: 1,
-  UDTF: 2,
-  UDTTF: 3,
-}
 
 const UdfTable = observer(({ tp }: IUdfTable) => {
   const [filter, setFilter] = useImmer<IUdfFilterInterface>({
@@ -185,7 +166,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
   const handleSort = (sortKey: string, order: 'desc' | 'asc') => {
     setFilter((_filter) => {
       _filter.sort_by = sortKey
-      _filter.reverse = order === 'desc'
+      _filter.reverse = order !== 'desc'
     })
   }
 
@@ -201,7 +182,20 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
 
   return (
     <div tw="w-full">
-      <Alert message="提示" type="info" tw="bg-neut-16! mb-4" />
+      <Alert
+        message={
+          <Level as="nav">
+            <LevelLeft>提示</LevelLeft>
+            <LevelRight>
+              <a href="###" tw="text-link">
+                查看详情 →
+              </a>
+            </LevelRight>
+          </Level>
+        }
+        type="info"
+        tw="bg-neut-16! mb-4"
+      />
       <TableToolBar
         defaultColumns={defaultColumns}
         setFilter={setFilter}

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from 'react-query'
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import { createUdf, deleteUdf, loadUdfList, updateUdf } from 'stores/api'
 
@@ -12,7 +12,12 @@ let queryKey: any = ''
 
 export const getUdfKey = () => queryKey
 
-export const useQueryUdfList = (filter: Record<string, any>) => {
+export const useQueryUdfList = (
+  filter: Record<string, any>,
+  options = {},
+  isInfinite = false
+) => {
+  const action: any = !isInfinite ? useQuery : useInfiniteQuery
   const { regionId, spaceId } = useParams<IRouteParams>()
   const { atomKey, ...rest } = filter
   const params = {
@@ -21,7 +26,7 @@ export const useQueryUdfList = (filter: Record<string, any>) => {
     ...rest,
   }
   queryKey = ['udf', params]
-  return useQuery(queryKey, async () => loadUdfList(params), {})
+  return action(queryKey, async () => loadUdfList(params), options)
 }
 
 export const useMutationUdf = (options?: {}) => {

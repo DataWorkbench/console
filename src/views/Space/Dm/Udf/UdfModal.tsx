@@ -3,12 +3,26 @@ import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, Form } from '@QCFE/qingcloud-portal-ui'
 import { Collapse, Field, Label, PopConfirm } from '@QCFE/lego-ui'
+import { flatten } from 'lodash-es'
 import { useImmer } from 'use-immer'
-
-import { FlexBox, Center, Modal, ModalStep, ModalContent } from 'components'
-import { getUdfKey, useMutationUdf, useStore } from 'hooks'
 import { useQueryClient } from 'react-query'
+
+import {
+  FlexBox,
+  Center,
+  Modal,
+  ModalStep,
+  ModalContent,
+  Icons,
+} from 'components'
+import {
+  getUdfKey,
+  useMutationUdf,
+  useQueryResourceList,
+  useStore,
+} from 'hooks'
 import { ILanguageInterface, UdfActionType, UdfTypes } from './interfaces'
+import { javaType, languageData, udfHasLangBits, udfTypes } from './constants'
 
 const { TextField, TextAreaField, SelectField } = Form
 const { CollapseItem } = Collapse
@@ -48,15 +62,9 @@ const FormWrapper = styled('div')(() => [
   `,
 ])
 
-const udfTypeBits = {
-  UDF: /**  */ 0b0001,
-  UDTF: /** */ 0b0010,
-  UDTTF: /***/ 0b0100,
-}
-
 const filterLanguage = (language: ILanguageInterface, udfType: UdfTypes) => {
   // eslint-disable-next-line no-bitwise
-  return udfTypeBits[udfType] & language.bit
+  return udfHasLangBits[udfType] & language.bit
 }
 
 const getModalTitle = (op: UdfActionType, data?: Record<string, any>) => {
@@ -68,12 +76,6 @@ const getModalTitle = (op: UdfActionType, data?: Record<string, any>) => {
     default:
       return '新建函数节点'
   }
-}
-
-const udfTypes = {
-  UDF: 1,
-  UDTF: 2,
-  UDTTF: 3,
 }
 
 const UdfModal = observer(() => {
@@ -90,16 +92,57 @@ const UdfModal = observer(() => {
   const form = useRef()
 
   const [hasChange, setHasChange] = useState(false)
+
+  const [filter] = useImmer<{
+    limit: number
+    offset: number
+    // udf_type: number
+    resource_type: number
+  }>({
+    limit: 15,
+    offset: 0,
+    resource_type: 1,
+    // udf_type: 1,
+  })
+
   const mutation = useMutationUdf()
   const queryClient = useQueryClient()
-  const langData = useMemo(
-    () =>
-      [
-        { text: 'Java', icon: 'java', type: 2, bit: 0b0011 },
-        { text: 'Python', icon: 'python', type: 3, bit: 0b0111 },
-        { text: 'Scala', icon: 'coding', type: 1, bit: 0b111 },
-      ].filter((lang) => filterLanguage(lang, udfType)),
+  const { status, data, fetchNextPage, hasNextPage } = useQueryResourceList(
+    filter,
+    {
+      enabled: params.type === 2,
+      getNextPageParam: (lastPage: any, allPages: any) => {
+        if (lastPage.infos?.length === filter.limit) {
+          const nextOffset = allPages.reduce(
+            (acc: number, cur: Record<string, any>) => acc + cur.infos.length,
+            0
+          )
+          if (nextOffset < lastPage.total) {
+            const nextFilter = {
+              ...filter,
+              offset: nextOffset,
+            }
+            // console.log('nextOffset ===> . ', nextFilter)
+            return nextFilter
+          }
+        }
+        return undefined
+      },
+    },
+    true
+  )
+  const options = flatten(
+    data?.pages.map((page: Record<string, any>) => page.infos || [])
+  )
 
+  const loadData = () => {
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }
+
+  const langData = useMemo(
+    () => languageData.filter((lang) => filterLanguage(lang, udfType)),
     [udfType]
   )
 
@@ -116,13 +159,13 @@ const UdfModal = observer(() => {
     if (step === 0) {
       setStep(1)
     } else if (form.current && (form.current as any).validateForm()) {
-      const data = {
-        ...formData.current,
-        udf_language: params.type,
-        udf_type: udfTypes[udfType],
-      }
       mutation.mutate(
-        { op, ...data },
+        {
+          op,
+          ...formData.current,
+          udf_language: params.type,
+          udf_type: udfTypes[udfType],
+        },
         {
           onSuccess: () => {
             handleCancel()
@@ -291,15 +334,38 @@ const UdfModal = observer(() => {
                   {(() => {
                     if (curLangInfo) {
                       const { type, text } = curLangInfo
-                      if (type === 2) {
+                      if (type === javaType) {
                         return (
                           <SelectField
                             name="define"
                             label={`引用${text}包`}
                             labelClassName="label-required"
-                            help="如需选择新的 Jar 包资源，可以在资源管理中上传资源"
+                            options={options}
+                            isLoading={status === 'loading'}
+                            isLoadingAtBottom
+                            labelKey="name"
+                            onMenuScrollToBottom={loadData}
+                            bottomTextVisible
+                            valueKey="udf_id"
+                            help={
+                              <div>
+                                如需选择新的 Jar 包资源，可以在资源管理中
+                                <a
+                                  href="./resource"
+                                  target="_blank"
+                                  tw="text-green-11"
+                                >
+                                  上传资源
+                                  <Icons
+                                    name="direct"
+                                    size={14}
+                                    tw="inline-block"
+                                  />
+                                </a>
+                              </div>
+                            }
                             disabled={op === 'detail'}
-                            defaultValue={modalData?.jars}
+                            defaultValue={modalData?.define}
                           />
                         )
                       }
@@ -309,7 +375,7 @@ const UdfModal = observer(() => {
                           label={`${text}语句`}
                           labelClassName="label-required"
                           disabled={op === 'detail'}
-                          defaultValue={modalData?.statment}
+                          defaultValue={modalData?.define}
                         />
                       )
                     }
