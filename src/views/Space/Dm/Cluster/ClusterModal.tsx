@@ -8,19 +8,22 @@ import {
   Label,
   InputNumber,
   Slider,
+  RadioGroup,
+  RadioButton,
 } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { set, range, trim, filter, assign } from 'lodash-es'
 import { useQueryClient } from 'react-query'
+import Tippy from '@tippyjs/react'
 import {
   useStore,
   useQueryFlinkVersions,
   useMutationCluster,
   getFlinkClusterKey,
 } from 'hooks'
-import { Modal, FlexBox, Center, KVTextAreaField } from 'components'
+import { Modal, FlexBox, Center, KVTextAreaField, AffixLabel } from 'components'
 
 const { CollapseItem } = Collapse
 const { TextField, SelectField, NumberField } = Form
@@ -28,10 +31,13 @@ const splitReg = /\s*[=:]\s*|\s+/
 
 const FormWrapper = styled('div')(() => [
   css`
-    ${tw`w-[686px]`}
+    ${tw`w-[686px] overflow-auto `}
     form.is-horizon-layout {
       ${tw`pl-0`}
       > .field {
+        > .label {
+          ${tw`pr-2`}
+        }
         > .control {
           ${tw`w-auto`}
           .select-control {
@@ -51,6 +57,15 @@ const RestartWrapper = styled('div')(() => [
   css`
     .field > .label {
       ${tw`w-24 mb-0 mr-4 inline-flex items-center`}
+    }
+  `,
+])
+
+const InDemandTitle = styled('div')(() => [
+  tw`text-sm leading-6`,
+  css`
+    span {
+      ${tw`text-green-11 font-semibold text-xl`}
     }
   `,
 ])
@@ -191,9 +206,20 @@ const ClusterModal = observer(
       })
       return o
     }, [])
+
+    const viewMode = op === 'view'
+
     return (
       <Modal
-        title={`${op === 'create' ? '创建' : '修改'}计算集群`}
+        title={(() => {
+          let opTxt = '查看'
+          if (op === 'create') {
+            opTxt = '创建'
+          } else if (op === 'update') {
+            opTxt = '修改'
+          }
+          return `${opTxt}计算集群`
+        })()}
         orient="fullright"
         confirmLoading={mutation.isLoading}
         visible
@@ -201,7 +227,7 @@ const ClusterModal = observer(
         onCancel={() => setOp('')}
         width={1000}
       >
-        <FlexBox>
+        <FlexBox tw="h-full overflow-hidden">
           <FormWrapper>
             <Collapse
               defaultActiveKey={['p1', 'p2', 'p3', 'p4', 'p5']}
@@ -224,12 +250,13 @@ const ClusterModal = observer(
                   <TextField
                     label={
                       <span>
-                        <b tw="text-red-10">*</b> 名称
+                        <b tw="text-red-10 mr-2">*</b>名称
                       </span>
                     }
                     name="name"
                     placeholder="请输入计算集群名称"
                     validateOnBlur
+                    disabled={viewMode}
                     value={params.name}
                     onChange={(v: string) => {
                       setParams((draft) => {
@@ -248,10 +275,11 @@ const ClusterModal = observer(
                     ]}
                   />
                   <SelectField
-                    label="* 版本"
+                    label={<AffixLabel required>版本</AffixLabel>}
                     name="version"
                     validateOnBlur
                     placeholder="请选择版本"
+                    disabled={viewMode}
                     options={flinkVersions?.map((version: string) => ({
                       label: version,
                       value: version,
@@ -282,9 +310,17 @@ const ClusterModal = observer(
                   />
                   <SelectField
                     name="restart_strategy"
-                    label="重启策略"
+                    label={
+                      <AffixLabel
+                        required
+                        help="如果您没有配置该参数，则按Apache Flink默认的重启策略，即当有Task失败时，如果没有开启Checkpoint，JobManager进程不会重启。如果开启了Checkpoint，则JobManager进程会重启。"
+                      >
+                        重启策略
+                      </AffixLabel>
+                    }
                     placeholder="请选择重启策略"
                     clearable
+                    disabled={viewMode}
                     value={strategy.restart_strategy}
                     onChange={(v: any) =>
                       setStrategy('restart_strategy', v || 'none')
@@ -311,6 +347,7 @@ const ClusterModal = observer(
                         <Label>* 尝试重启次数</Label>
                         <Control>
                           <InputNumber
+                            disabled={viewMode}
                             isMini
                             min={1}
                             max={1000}
@@ -325,6 +362,7 @@ const ClusterModal = observer(
                         <Label>* 重启时间间隔</Label>
                         <Control>
                           <InputNumber
+                            disabled={viewMode}
                             isMini
                             min={1}
                             max={86400}
@@ -352,6 +390,7 @@ const ClusterModal = observer(
                         <Label>* 检测故障率时间间隔</Label>
                         <Control>
                           <InputNumber
+                            disabled={viewMode}
                             isMini
                             min={1}
                             max={86400}
@@ -367,6 +406,7 @@ const ClusterModal = observer(
                         <Label>* 时间间隔内最大失败次数</Label>
                         <Control>
                           <InputNumber
+                            disabled={viewMode}
                             isMini
                             min={1}
                             max={10800}
@@ -386,6 +426,7 @@ const ClusterModal = observer(
                         <Label>* 重启时间间隔</Label>
                         <Control>
                           <InputNumber
+                            disabled={viewMode}
                             isMini
                             min={1}
                             max={1440}
@@ -419,11 +460,16 @@ const ClusterModal = observer(
               >
                 <Form>
                   <NumberField
-                    label="* Task 数量"
+                    label={
+                      <AffixLabel help="Flink 的 TaskNumber 的数量">
+                        Task 数量
+                      </AffixLabel>
+                    }
                     name="task_num"
                     isMini
                     min={1}
                     max={24}
+                    disabled={viewMode}
                     value={params.task_num}
                     onChange={(v: number) => {
                       setParams((draft) => {
@@ -433,8 +479,10 @@ const ClusterModal = observer(
                   />
 
                   <Field>
-                    <Label>* Task CU</Label>
-                    <Control tw="pl-3 pt-3 w-80!">
+                    <AffixLabel help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8">
+                      Task CU
+                    </AffixLabel>
+                    <Control tw="pl-12 pt-3 w-80!">
                       <Slider
                         min={0.5}
                         max={8}
@@ -442,6 +490,7 @@ const ClusterModal = observer(
                         marks={marks}
                         hasTooltip
                         markDots
+                        disabled={viewMode}
                         value={params.task_cu}
                         onChange={(v: number) => {
                           setParams((draft) => {
@@ -457,6 +506,7 @@ const ClusterModal = observer(
                         max={8}
                         step={0.5}
                         tw="ml-3"
+                        disabled={viewMode}
                         value={params.task_cu}
                         onChange={(v: number) => {
                           setParams((draft) => {
@@ -468,8 +518,10 @@ const ClusterModal = observer(
                     <Center tw="ml-3 text-neut-8">（每 CU：1核 4G）</Center>
                   </Field>
                   <Field>
-                    <Label>* Job CU</Label>
-                    <Control tw="pl-3 pt-3 w-80!">
+                    <AffixLabel help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8">
+                      Job CU
+                    </AffixLabel>
+                    <Control tw="pl-12 pt-3 w-80!">
                       <Slider
                         min={0.5}
                         max={8}
@@ -477,6 +529,7 @@ const ClusterModal = observer(
                         marks={marks}
                         hasTooltip
                         markDots
+                        disabled={viewMode}
                         value={params.job_cu}
                         onChange={(v: number) => {
                           setParams((draft) => {
@@ -493,6 +546,7 @@ const ClusterModal = observer(
                         value={params.job_cu}
                         isMini
                         tw="ml-3"
+                        disabled={viewMode}
                         onChange={(v: number) => {
                           setParams((draft) => {
                             draft.job_cu = v
@@ -501,6 +555,15 @@ const ClusterModal = observer(
                       />
                     </Control>
                     <Center tw="ml-3 text-neut-8">（每 CU：1核 4G）</Center>
+                  </Field>
+                  <Field>
+                    <div>
+                      总计算资源 CU ={' '}
+                      {params.task_num * params.task_cu + params.job_cu}
+                      <span tw="text-neut-8">
+                        （ Task 数量 * Task CU + Job CU）
+                      </span>
+                    </div>
                   </Field>
                 </Form>
               </CollapseItem>
@@ -519,10 +582,11 @@ const ClusterModal = observer(
               >
                 <Form ref={networkFormRef}>
                   <SelectField
-                    label="*选择网络"
+                    label={<AffixLabel>选择网络</AffixLabel>}
                     name="network_id"
                     value={params.network_id}
                     validateOnBlur
+                    disabled={viewMode}
                     onChange={(v: string) => {
                       setParams((draft) => {
                         draft.network_id = v
@@ -563,8 +627,9 @@ const ClusterModal = observer(
               >
                 <Form>
                   <SelectField
-                    label="* 日志级别"
+                    label={<AffixLabel>日志级别</AffixLabel>}
                     name="root_log_level"
+                    disabled={viewMode}
                     value={params.config.logger.root_log_level}
                     onChange={(v: string) => {
                       setParams((draft) => {
@@ -597,6 +662,7 @@ const ClusterModal = observer(
               >
                 <Form ref={optFormRef}>
                   <KVTextAreaField
+                    disabled={viewMode}
                     label="Host别名"
                     title="Hosts 信息"
                     name="host_aliases"
@@ -605,7 +671,7 @@ const ClusterModal = observer(
                     defaultValue={params.host_aliases.items
                       ?.map(
                         (item: { hostname: string; ip: string }) =>
-                          `${item.hostname} ${item.ip}`
+                          `${item.ip} ${item.hostname}`
                       )
                       .join('\r\n')}
                     placeholder={`|请输入 IP hostname ，多条配置之间换行输入。例如：
@@ -621,7 +687,8 @@ const ClusterModal = observer(
                     onChange={sethostAliases}
                   />
                   <KVTextAreaField
-                    label="Flink参数"
+                    disabled={viewMode}
+                    label={<AffixLabel required={false}>Flink参数</AffixLabel>}
                     name="custom"
                     validateOnBlur
                     division=":"
@@ -646,8 +713,88 @@ const ClusterModal = observer(
               </CollapseItem>
             </Collapse>
           </FormWrapper>
-          <div tw="w-80">
-            <div>费用预览</div>
+          <div tw="w-80 px-5 pt-5 space-y-4">
+            <div tw="text-base font-semibold">费用预览</div>
+            <RadioGroup value={1}>
+              <RadioButton value={1}>按需计费</RadioButton>
+              <Tippy
+                theme="light"
+                animation="fade"
+                arrow
+                delay={100}
+                offset={[60, 10]}
+                content={
+                  <Center tw="h-9 px-3 text-neut-13">
+                    限时免费，预留合约敬请期待
+                  </Center>
+                }
+              >
+                <div>
+                  <RadioButton
+                    value={2}
+                    tw="bg-neut-13! text-neut-8! cursor-not-allowed"
+                  >
+                    预留合约
+                  </RadioButton>
+                </div>
+              </Tippy>
+            </RadioGroup>
+            <div>
+              <InDemandTitle tw="text-sm">
+                Task 数量：<span>{params.task_num}</span>
+              </InDemandTitle>
+              <div tw="text-neut-8">Flink 的 TaskNumber 的数量</div>
+            </div>
+            <div>
+              <InDemandTitle tw="text-sm">
+                Task CU：<span>{params.task_cu}</span>
+              </InDemandTitle>
+              <div tw="text-neut-8">Flink 的 TaskManager 的 CPU 和内存设置</div>
+            </div>
+            <div>
+              <InDemandTitle tw="text-sm">
+                Job CU：<span>{params.job_cu}</span>
+              </InDemandTitle>
+              <div tw="text-neut-8">Flink 的 JobManager 的 CPU 和内存设置</div>
+            </div>
+            <div>
+              <InDemandTitle tw="text-sm">
+                总计算资源 CU：
+                <span>{params.task_num * params.task_cu + params.job_cu}</span>
+              </InDemandTitle>
+              <div tw="text-neut-8">
+                总计算资源 CU =Task 数量 * Task CU + Job CU{' '}
+              </div>
+            </div>
+            <div tw="pt-4 pb-2 border-b border-neut-13">
+              收费标准详见
+              <a href="###" tw="text-green-11">
+                《大数据平台计费说明》
+              </a>
+            </div>
+            <div>
+              <FlexBox tw="justify-between">
+                <div tw="text-sm">总价</div>
+                <div tw="text-neut-8">
+                  <span tw="text-xl text-green-11">¥ 0</span>{' '}
+                  <del tw="">8.1245/小时</del>
+                </div>
+              </FlexBox>
+              <FlexBox tw="justify-between">
+                <div
+                  tw="rounded-sm px-1"
+                  css={css`
+                    background: #b34b06;
+                  `}
+                >
+                  限时免费，机不可失
+                </div>
+
+                <div tw="text-neut-8">
+                  (合 <span tw="text-green-11">¥0</span> <del>2718</del> 每月 )
+                </div>
+              </FlexBox>
+            </div>
           </div>
         </FlexBox>
       </Modal>
