@@ -1,4 +1,5 @@
 const colors = require('tailwindcss/colors')
+const plugin = require('tailwindcss/plugin')
 
 const neut = {
   20: '#020508',
@@ -66,5 +67,18 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addComponents }) {
+      addComponents({
+        '.label-required::before': {
+          display: 'inline-block',
+          marginRight: '4px',
+          color: '#CF3B37',
+          fontSize: '12px',
+          lineHeight: 1,
+          content: '"*"',
+        },
+      })
+    }),
+  ],
 }
