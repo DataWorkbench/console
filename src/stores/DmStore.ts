@@ -7,16 +7,6 @@ type TUdf = 'UDF' | 'UDTF' | 'UDTTF'
 
 type ColumnSettingsType = { key: string; checked: boolean }
 
-/**
- * UDF:   0b0001
- * UDTF:  0b0010
- * UDTTF: 0b0100
- *
- * ptyhon:  0b0011
- * java:    0b0111
- * scala:   0b0111
- */
-
 class DmStore {
   rootStore
 
