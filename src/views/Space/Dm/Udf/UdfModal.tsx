@@ -16,15 +16,17 @@ import {
   Icons,
 } from 'components'
 import {
+  getResourceKey,
   getUdfKey,
   useMutationUdf,
-  useQueryResourceList,
+  useQueryResource,
   useStore,
 } from 'hooks'
+import SelectWithRefresh from 'components/SelectWithRefresh'
 import { ILanguageInterface, UdfActionType, UdfTypes } from './interfaces'
 import { javaType, languageData, udfHasLangBits, udfTypes } from './constants'
 
-const { TextField, TextAreaField, SelectField } = Form
+const { TextField, TextAreaField } = Form
 const { CollapseItem } = Collapse
 
 const LangItem = styled('div')(({ selected }: { selected?: boolean }) => [
@@ -90,46 +92,30 @@ const UdfModal = observer(() => {
 
   const formData = useRef<Record<string, any>>(modalData || {})
   const form = useRef()
+  const form2 = useRef()
 
   const [hasChange, setHasChange] = useState(false)
 
   const [filter] = useImmer<{
     limit: number
     offset: number
-    // udf_type: number
-    resource_type: number
+    udf_type: number
+    // resource_type: number
   }>({
     limit: 15,
     offset: 0,
-    resource_type: 1,
-    // udf_type: 1,
+    // resource_type: 1,
+    udf_type: 1,
   })
 
   const mutation = useMutationUdf()
   const queryClient = useQueryClient()
-  const { status, data, fetchNextPage, hasNextPage } = useQueryResourceList(
+
+  const { status, data, fetchNextPage, hasNextPage } = useQueryResource(
     filter,
     {
       enabled: params.type === 2,
-      getNextPageParam: (lastPage: any, allPages: any) => {
-        if (lastPage.infos?.length === filter.limit) {
-          const nextOffset = allPages.reduce(
-            (acc: number, cur: Record<string, any>) => acc + cur.infos.length,
-            0
-          )
-          if (nextOffset < lastPage.total) {
-            const nextFilter = {
-              ...filter,
-              offset: nextOffset,
-            }
-            // console.log('nextOffset ===> . ', nextFilter)
-            return nextFilter
-          }
-        }
-        return undefined
-      },
-    },
-    true
+    }
   )
   const options = flatten(
     data?.pages.map((page: Record<string, any>) => page.infos || [])
@@ -151,6 +137,11 @@ const UdfModal = observer(() => {
   const refetchUdf = () => {
     queryClient.invalidateQueries(getUdfKey())
   }
+
+  const refetchResource = () => {
+    queryClient.invalidateQueries(getResourceKey('infinite'))
+  }
+
   const handleCancel = () => {
     setOp('')
   }
@@ -158,7 +149,12 @@ const UdfModal = observer(() => {
   const handleOk = () => {
     if (step === 0) {
       setStep(1)
-    } else if (form.current && (form.current as any).validateForm()) {
+    } else if (
+      form.current &&
+      (form.current as any).validateForm() &&
+      form2.current &&
+      (form2.current as any).validateForm()
+    ) {
       mutation.mutate(
         {
           op,
@@ -195,7 +191,11 @@ const UdfModal = observer(() => {
             ) : hasChange ? (
               <PopConfirm
                 type="warning"
-                content="若返回上一步，本次配置的信息将清空，确定返回上一步吗？"
+                content={
+                  <div tw="text-neut-16">
+                    若返回上一步，本次配置的信息将清空，确定返回上一步吗？
+                  </div>
+                }
                 onOk={() => setStep(0)}
                 closeAfterClick={false}
               >
@@ -211,13 +211,18 @@ const UdfModal = observer(() => {
         </div>
       )
     }
+    // TODO: 确定按钮的颜色
     if (_op === 'detail') {
       return (
         <div tw="">
           <PopConfirm
             className="popcanfirm-danger"
             type="warning"
-            content="若修改函数名称或属性，相关工作流、任务会出现问题，确认编辑吗？"
+            content={
+              <div tw="text-neut-16">
+                若修改函数名称或属性，相关工作流、任务会出现问题，确认编辑吗？
+              </div>
+            }
             onOk={() => setOp('edit')}
             closeAfterClick={false}
           >
@@ -232,7 +237,11 @@ const UdfModal = observer(() => {
         <PopConfirm
           className="popcanfirm-danger"
           type="warning"
-          content="更新内容会影响到相关工作流、任务，确认更新？"
+          content={
+            <div tw="text-neut-16">
+              更新内容会影响到相关工作流、任务，确认更新？
+            </div>
+          }
           onOk={handleOk}
           closeAfterClick={false}
         >
@@ -330,13 +339,18 @@ const UdfModal = observer(() => {
             </CollapseItem>
             <CollapseItem label="特有属性" key="p2">
               <FormWrapper>
-                <Form layout="horizon" onFieldValueChange={handleFormChange}>
+                <Form
+                  layout="horizon"
+                  ref={form2}
+                  onFieldValueChange={handleFormChange}
+                >
                   {(() => {
                     if (curLangInfo) {
                       const { type, text } = curLangInfo
                       if (type === javaType) {
                         return (
-                          <SelectField
+                          <SelectWithRefresh
+                            onRefresh={() => refetchResource()}
                             name="define"
                             label={`引用${text}包`}
                             labelClassName="label-required"
@@ -347,6 +361,13 @@ const UdfModal = observer(() => {
                             onMenuScrollToBottom={loadData}
                             bottomTextVisible
                             valueKey="udf_id"
+                            schemas={[
+                              {
+                                rule: { required: true },
+                                help: '请选择 jar',
+                                status: 'error',
+                              },
+                            ]}
                             help={
                               <div>
                                 如需选择新的 Jar 包资源，可以在资源管理中
@@ -376,6 +397,13 @@ const UdfModal = observer(() => {
                           labelClassName="label-required"
                           disabled={op === 'detail'}
                           defaultValue={modalData?.define}
+                          schemas={[
+                            {
+                              rule: { required: true },
+                              help: `请输入${text}语句`,
+                              status: 'error',
+                            },
+                          ]}
                         />
                       )
                     }
