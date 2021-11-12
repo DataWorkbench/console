@@ -14,14 +14,14 @@ const pageTabsData = [
     title: '函数管理',
     description:
       '用户在编辑函数代码时支持类似工程方式的管理，可以创建文件、文件夹并对其进行编辑。如果用户代码是上传zip包的方式，则前端进行相应解压展示，并支持用户在线编辑修改。',
-    icon: 'name-space',
+    icon: 'textarea',
     helpLink: '/compute/vm/',
   },
 ]
 
 const Udf = observer(() => {
   const {
-    dmStore: { op, setUdfType },
+    dmStore: { op, setUdfType, udfType },
   } = useStore()
 
   return (
@@ -29,21 +29,23 @@ const Udf = observer(() => {
       <PageTab tabs={pageTabsData} />
       <HorizonTabs
         defaultActiveName="UDF"
+        activeName={udfType}
         onChange={(name: any) => {
+          // console.log(name)
           setUdfType(name)
         }}
       >
         <TabPanel label="UDF" name="UDF">
-          <UdfTable tp="udf" />
+          <UdfTable tp="UDF" />
         </TabPanel>
         <TabPanel label="UDTF" name="UDTF">
-          <UdfTable tp="udtf" />
+          <UdfTable tp="UDTF" />
         </TabPanel>
         <TabPanel label="UDTTF" name="UDTTF">
-          <UdfTable tp="udttf" />
+          <UdfTable tp="UDTTF" />
         </TabPanel>
       </HorizonTabs>
-      {(op === 'create' || op === 'edit') && <UdfModal />}
+      {['create', 'detail', 'edit'].includes(op) && <UdfModal />}
     </FlexBox>
   )
 })

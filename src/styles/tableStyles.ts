@@ -52,6 +52,9 @@ const tableStyles = css`
         }
       }
     }
+    .columns-setting-container .panel-title:hover label {
+      ${tw`text-neut-15`};
+    }
   }
 `
 
