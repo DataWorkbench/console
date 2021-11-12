@@ -2,7 +2,6 @@ import { localstorage } from '@QCFE/qingcloud-portal-ui'
 import { makeAutoObservable, autorun } from 'mobx'
 import type RootStore from './RootStore'
 
-type OP = '' | 'create' | 'edit' | 'delete' | 'detail'
 type TUdf = 'UDF' | 'UDTF' | 'UDTTF'
 
 type ColumnSettingsType = { key: string; checked: boolean }

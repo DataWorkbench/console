@@ -5,7 +5,6 @@ import { Button, Icon, InputSearch, Table } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, Modal } from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
-import Tippy from '@tippyjs/react'
 import {
   useStore,
   useQueryNetworks,
@@ -177,29 +176,14 @@ const NetworkTable = observer(() => {
       <div tw="mb-3">
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
-            <Tippy
-              theme="light"
-              animation="fade"
-              arrow
-              delay={100}
-              offset={[120, 10]}
-              content={
-                <Center tw="h-9 px-3 text-neut-13">
-                  单个用户最多可创建 5 个集群，如需更多集群，请提交工单
-                </Center>
-              }
+            <Button
+              type="primary"
+              disabled={infos.length > 4}
+              onClick={() => setOp('create')}
             >
-              <div>
-                <Button
-                  type="primary"
-                  disabled={infos.length > 4}
-                  onClick={() => setOp('create')}
-                >
-                  <Icon name="add" />
-                  创建网络
-                </Button>
-              </div>
-            </Tippy>
+              <Icon name="add" />
+              创建网络
+            </Button>
             <Button
               disabled={
                 selectedRowKeys.length === 0 || filterClusterInfos.length === 0

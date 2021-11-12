@@ -218,7 +218,7 @@ const ClusterTable = observer(() => {
               <Dropdown
                 content={
                   <Menu
-                    onClick={(e: any, key: string) => {
+                    onClick={(e: any, key: any) => {
                       setOp(key)
                       setOpClusterList([row])
                     }}

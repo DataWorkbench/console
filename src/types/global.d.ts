@@ -22,4 +22,5 @@ declare global {
     | 'start'
     | 'stop'
     | 'view'
+    | 'detail'
 }
