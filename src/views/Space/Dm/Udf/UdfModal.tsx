@@ -14,6 +14,7 @@ import {
   ModalStep,
   ModalContent,
   Icons,
+  AffixLabel,
 } from 'components'
 import {
   getResourceKey,
@@ -224,6 +225,7 @@ const UdfModal = observer(() => {
               </div>
             }
             onOk={() => setOp('edit')}
+            okText="编辑"
             closeAfterClick={false}
           >
             <Button type="danger">编辑</Button>
@@ -310,8 +312,14 @@ const UdfModal = observer(() => {
                   <TextField
                     name="name"
                     labelClassName="label-required"
-                    label="函数名"
-                    help="hahaha"
+                    label={
+                      <AffixLabel
+                        required={false}
+                        help="函数名需与实现名保持一致"
+                      >
+                        函数名
+                      </AffixLabel>
+                    }
                     disabled={op === 'detail'}
                     defaultValue={modalData?.name}
                     schemas={[
