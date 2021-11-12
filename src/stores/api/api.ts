@@ -70,10 +70,3 @@ export const workflow = {
       ...rest,
     }),
 }
-
-export const udf = {
-  load: () => {},
-  create: () => {},
-  update: () => {},
-  delete: () => {},
-}
