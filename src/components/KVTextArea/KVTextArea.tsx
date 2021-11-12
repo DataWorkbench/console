@@ -48,6 +48,7 @@ interface IKVTextArea {
   value?: string
   placeholder?: string
   division?: string
+  disabled?: boolean
   onChange?: (v: string) => void
   onBlur?: (v: string) => void
 }
@@ -119,6 +120,7 @@ const KVTextArea = forwardRef(
       division = ' ',
       onBlur,
       onChange,
+      disabled = false,
     }: IKVTextArea,
     ref
   ) => {
@@ -193,6 +195,7 @@ const KVTextArea = forwardRef(
               <span>{title}</span>
             </div>
             <TextArea
+              disabled={disabled}
               tw="my-3 w-full!"
               resize
               placeholder={placeholder}
@@ -221,18 +224,21 @@ const KVTextArea = forwardRef(
                 onMouseLeave={() => setCurIptIdx(-1)}
               >
                 <Input
+                  disabled={disabled}
                   defaultValue={kv[0] || ''}
                   onChange={(e, v) => handleInputChange('k', String(v), i)}
                   onBlur={(e, v) => handleInputBlur(v)}
                 />
                 <div>{division}</div>
                 <Input
+                  disabled={disabled}
                   defaultValue={kv[1] || ''}
                   onChange={(e, v) => handleInputChange('v', String(v), i)}
                   onBlur={(e, v) => handleInputBlur(v)}
                 />
                 <div tw="px-2" css={[curIptIndex !== i && tw`invisible`]}>
                   <Icon
+                    disabled={disabled}
                     name="trash"
                     clickable
                     type="dark"
@@ -242,7 +248,7 @@ const KVTextArea = forwardRef(
               </InputRow>
             ))}
             <FlexBox tw="h-8 items-center">
-              <Button type="text" onClick={() => addRow()}>
+              <Button type="text" onClick={() => addRow()} disabled={disabled}>
                 <Icon name="add" type="light" />
                 添加参数
               </Button>

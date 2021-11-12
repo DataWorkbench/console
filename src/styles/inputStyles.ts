@@ -5,6 +5,9 @@ const inputStyles = css`
     .input,
     .textarea {
       ${tw`bg-neut-16 text-white border-neut-13`}
+      &[disabled] {
+        ${tw`bg-neut-13`}
+      }
     }
     .input-number.is-mini {
       & > .input-number-controls {
