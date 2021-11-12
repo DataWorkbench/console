@@ -77,6 +77,7 @@ const ClusterModal = observer(
         onOk={handleOk}
         onCancel={() => setOp('')}
         width={680}
+        draggable
       >
         <FlexBox tw="h-full overflow-hidden">
           <FormWrapper>
