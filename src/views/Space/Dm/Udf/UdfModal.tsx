@@ -100,13 +100,13 @@ const UdfModal = observer(() => {
   const [filter] = useImmer<{
     limit: number
     offset: number
-    udf_type: number
-    // resource_type: number
+    // udf_type: number
+    resource_type: number
   }>({
     limit: 15,
     offset: 0,
-    // resource_type: 1,
-    udf_type: 1,
+    resource_type: 1, //
+    // udf_type: 1,
   })
 
   const mutation = useMutationUdf()
