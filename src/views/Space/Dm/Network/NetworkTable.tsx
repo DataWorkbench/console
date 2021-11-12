@@ -1,7 +1,13 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import { Dropdown, Menu } from '@QCFE/lego-ui'
-import { Button, Icon, InputSearch, Table } from '@QCFE/qingcloud-portal-ui'
+import {
+  Button,
+  Icon,
+  InputSearch,
+  Table,
+  ToolBar,
+} from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, Modal } from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
@@ -27,12 +33,14 @@ interface IFilter {
   sort_by: string
 }
 
+const columnSettingsKey = 'BIGDATA_NETWORK_COLUMN_SETTINGS'
 const NetworkTable = observer(() => {
   const {
     dmStore: { setOp, op },
   } = useStore()
   const [opNetworkList, setOpNetworkList] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const [columnSettings, setColumnSettings] = useState([])
   const [filter, setFilter] = useImmer<IFilter>({
     name: '',
     offset: 0,
@@ -54,6 +62,7 @@ const NetworkTable = observer(() => {
     return [
       {
         title: '名称/ID',
+        fixedInSetting: true,
         dataIndex: 'name',
         render: (v: any, row: any) => (
           <FlexBox tw="items-center space-x-1">
@@ -171,6 +180,12 @@ const NetworkTable = observer(() => {
         info.status !== 3
     ) || []
 
+  const filterColumn = columnSettings
+    .map((o: { key: string; checked: boolean }) => {
+      return o.checked && columns.find((col) => col.dataIndex === o.key)
+    })
+    .filter((o) => o)
+
   return (
     <FlexBox tw="w-full flex-1" orient="column">
       <div tw="mb-3">
@@ -224,6 +239,11 @@ const NetworkTable = observer(() => {
                 }}
               />
             </Button>
+            <ToolBar.ColumnsSetting
+              defaultColumns={columns}
+              onSave={setColumnSettings}
+              storageKey={columnSettingsKey}
+            />
           </Center>
         </FlexBox>
       </div>
@@ -231,7 +251,7 @@ const NetworkTable = observer(() => {
         selectType="checkbox"
         dataSource={infos || []}
         loading={isFetching}
-        columns={columns}
+        columns={filterColumn.length > 0 ? filterColumn : columns}
         rowKey="id"
         pagination={{
           total: data?.total || 0,

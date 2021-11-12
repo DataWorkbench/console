@@ -52,8 +52,24 @@ const tableStyles = css`
         }
       }
     }
-    .columns-setting-container .panel-title:hover label {
-      ${tw`text-neut-15`};
+    .columns-setting-container {
+      .panel-header {
+        ${tw`text-white`}
+      }
+      .panel-title {
+        .icon > svg {
+          ${tw`text-white`}
+        }
+        &:hover {
+          ${tw`bg-neut-13`}
+        }
+        label {
+          ${tw`text-white`};
+        }
+      }
+      .panel-footer {
+        ${tw`border-t-neut-13`}
+      }
     }
   }
 `

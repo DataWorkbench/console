@@ -95,7 +95,7 @@ const customStyles = css`
       }
     }
     .popper.dropdown {
-      ${tw`border-neut-13`}
+      ${tw`border-neut-13 bg-transparent`}
       .dropdown-content {
         ${tw`bg-neut-17 `}
         .menu {
