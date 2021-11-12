@@ -39,7 +39,7 @@ export const AffixLabel = ({
     | 'rightTop'
     | 'rightBottom'
   trigger?: 'hover' | 'click' | 'focus'
-  disabled: boolean
+  disabled?: boolean
 }) => {
   return (
     <div tw="inline-flex items-center">

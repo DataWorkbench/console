@@ -1,6 +1,6 @@
 import { request } from 'utils'
 
-export interface IParams {
+interface IParams {
   regionId: string
   spaceId: string
   [k: string]: unknown
