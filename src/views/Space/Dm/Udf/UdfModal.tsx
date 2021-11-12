@@ -291,10 +291,18 @@ const UdfModal = observer(() => {
         )}
         {step === 1 && (
           <Collapse
-            tw="w-full border-l-0 border-r-0"
+            tw="w-full border-l-0 border-r-0 border-t-neut-13 border-t!"
             defaultActiveKey={['p1', 'p2']}
           >
-            <CollapseItem label="基础属性" key="p1">
+            <CollapseItem
+              label={
+                <div tw="inline-flex items-center">
+                  <Icon style={{ position: 'unset' }} tw="mr-2" name="record" />
+                  基础属性
+                </div>
+              }
+              key="p1"
+            >
               <FormWrapper>
                 <Form
                   layout="horizon"
@@ -345,7 +353,15 @@ const UdfModal = observer(() => {
                 </Form>
               </FormWrapper>
             </CollapseItem>
-            <CollapseItem label="特有属性" key="p2">
+            <CollapseItem
+              label={
+                <div tw="inline-flex items-center">
+                  <Icon style={{ position: 'unset' }} tw="mr-2" name="record" />
+                  特有属性
+                </div>
+              }
+              key="p2"
+            >
               <FormWrapper>
                 <Form
                   layout="horizon"
