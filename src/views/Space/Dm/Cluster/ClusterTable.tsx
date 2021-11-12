@@ -1,7 +1,13 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import { Dropdown, Menu } from '@QCFE/lego-ui'
-import { Button, Icon, InputSearch, Table } from '@QCFE/qingcloud-portal-ui'
+import {
+  Button,
+  Icon,
+  InputSearch,
+  Table,
+  ToolBar,
+} from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, Modal, Tooltip, AffixLabel } from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
@@ -72,12 +78,14 @@ interface IFilter {
   status: string | number
 }
 
+const columnSettingsKey = 'BIGDATA_CLUSTER_COLUMN_SETTINGS'
 const ClusterTable = observer(() => {
   const {
     dmStore: { setOp, op },
   } = useStore()
   const [opclusterList, setOpClusterList] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const [columnSettings, setColumnSettings] = useState([])
   const [filter, setFilter] = useImmer<IFilter>({
     name: '',
     offset: 0,
@@ -101,6 +109,7 @@ const ClusterTable = observer(() => {
       {
         title: '名称/ID',
         dataIndex: 'name',
+        fixedInSetting: true,
         render: (v: any, row: any) => (
           <FlexBox tw="items-center space-x-1">
             <Center tw="bg-neut-13 rounded-full w-6 h-6">
@@ -151,8 +160,6 @@ const ClusterTable = observer(() => {
           </FlexBox>
         ),
         dataIndex: 'status',
-        // filters: statusFilters,
-        // filteredValue: String(filter.status),
         render: (v: number) => {
           const statusObj = statusFilters.find((o) => o.value === v)
           return (
@@ -201,6 +208,7 @@ const ClusterTable = observer(() => {
       {
         title: '操作',
         dataIndex: 'id',
+        hiddenInSetting: true,
         render: (v: any, row: any) => (
           <FlexBox tw="items-center">
             <Button type="text">Flink UI</Button>
@@ -280,6 +288,12 @@ const ClusterTable = observer(() => {
         info.status !== 3
     ) || []
 
+  const filterColumn = columnSettings
+    .map((o: { key: string; checked: boolean }) => {
+      return o.checked && columns.find((col) => col.dataIndex === o.key)
+    })
+    .filter((o) => o)
+
   return (
     <FlexBox tw="w-full flex-1" orient="column">
       <div tw="mb-3">
@@ -348,6 +362,11 @@ const ClusterTable = observer(() => {
                 }}
               />
             </Button>
+            <ToolBar.ColumnsSetting
+              defaultColumns={columns}
+              onSave={setColumnSettings}
+              storageKey={columnSettingsKey}
+            />
           </Center>
         </FlexBox>
       </div>
@@ -355,7 +374,7 @@ const ClusterTable = observer(() => {
         selectType="checkbox"
         dataSource={infos || []}
         loading={isFetching}
-        columns={columns}
+        columns={filterColumn.length > 0 ? filterColumn : columns}
         rowKey="id"
         pagination={{
           total: data?.total || 0,
