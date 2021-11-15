@@ -125,6 +125,7 @@ const ClusterModal = observer(
     const queryClient = useQueryClient()
     const { data: flinkVersions } = useQueryFlinkVersions()
     const mutation = useMutationCluster()
+    const totalCU = params.task_num * params.task_cu + params.job_cu
 
     const handleOk = () => {
       const baseForm = baseFormRef.current
@@ -133,7 +134,8 @@ const ClusterModal = observer(
       if (
         baseForm?.validateFields() &&
         optForm?.validateFields() &&
-        networkForm?.validateFields()
+        networkForm?.validateFields() &&
+        totalCU <= 12
       ) {
         const paramsData = assign(
           {
@@ -553,12 +555,22 @@ const ClusterModal = observer(
                     <Center tw="ml-3 text-neut-8">（每 CU：1核 4G）</Center>
                   </Field>
                   <Field>
-                    <div>
-                      总计算资源 CU ={' '}
-                      {params.task_num * params.task_cu + params.job_cu}
-                      <span tw="text-neut-8">
-                        （ Task 数量 * Task CU + Job CU）
+                    <div tw="space-x-1">
+                      <span>总计算资源 CU =</span>
+                      <span css={[totalCU > 12 && tw`text-red-10`]}>
+                        {totalCU}
                       </span>
+                      <span tw="text-neut-8">
+                        （Task 数量 * Task CU + Job CU）
+                      </span>
+                    </div>
+                    <div
+                      css={[
+                        totalCU < 12 && tw`hidden`,
+                        tw`text-red-10 w-full ml-24 mt-1`,
+                      ]}
+                    >
+                      总计算资源 CU 不能超过 12，请重新调整资源配置
                     </div>
                   </Field>
                 </Form>
@@ -756,7 +768,7 @@ const ClusterModal = observer(
             <div>
               <InDemandTitle tw="text-sm">
                 总计算资源 CU：
-                <span>{params.task_num * params.task_cu + params.job_cu}</span>
+                <span css={[totalCU > 12 && tw`text-red-10!`]}>{totalCU}</span>
               </InDemandTitle>
               <div tw="text-neut-8">
                 总计算资源 CU =Task 数量 * Task CU + Job CU{' '}

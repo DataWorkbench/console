@@ -19,10 +19,10 @@ const StreamRightMenu = () => {
   return (
     <>
       <MenuRoot>
-        <span tw="cursor-default! hover:text-neut-5!">操 作 记 录</span>
+        <span tw="cursor-not-allowed! hover:text-neut-5!">操 作 记 录</span>
         <span onClick={() => setShowArgs(true)}>环 境 参 数</span>
         <span onClick={() => setShowSetting(true)}>调 度 设 置</span>
-        <span>操 作 记 录</span>
+        <span tw="cursor-not-allowed! hover:text-neut-5!">历 史 版 本</span>
       </MenuRoot>
       {showSetting && (
         <ScheSettingModal onCancel={() => setShowSetting(false)} visible />
