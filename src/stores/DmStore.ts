@@ -1,5 +1,5 @@
-import { localstorage } from '@QCFE/qingcloud-portal-ui'
-import { makeAutoObservable, autorun } from 'mobx'
+// import { localstorage } from '@QCFE/qingcloud-portal-ui'
+import { makeAutoObservable, set } from 'mobx'
 import type RootStore from './RootStore'
 
 type TUdf = 'UDF' | 'UDTF' | 'UDTTF'
@@ -11,13 +11,8 @@ class DmStore {
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
-    makeAutoObservable(this, {})
-    autorun(() => {
-      this.udfSelectedRowKeys = []
-      this.udfStorageKey = `DM_${this.udfType}_COLUMN_SETTINGS`
-      this.udfColumnSettings = localstorage.getItem(this.udfStorageKey) || []
-
-      return this.udfType
+    makeAutoObservable(this, {
+      rootStore: false,
     })
   }
 
@@ -35,6 +30,10 @@ class DmStore {
   udfStorageKey = 'DM_UDF_COLUMN_SETTINGS'
 
   modalData?: Record<string, any>
+
+  set = (params: { [key: string]: any }) => {
+    set(this, { ...params })
+  }
 
   setUdfType = (type: TUdf) => {
     this.udfType = type

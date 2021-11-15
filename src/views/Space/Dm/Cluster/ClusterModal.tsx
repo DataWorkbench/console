@@ -248,11 +248,7 @@ const ClusterModal = observer(
               >
                 <Form ref={baseFormRef}>
                   <TextField
-                    label={
-                      <span>
-                        <b tw="text-red-10 mr-2">*</b>名称
-                      </span>
-                    }
+                    label={<AffixLabel required>名称</AffixLabel>}
                     name="name"
                     placeholder="请输入计算集群名称"
                     validateOnBlur

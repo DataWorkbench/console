@@ -1,4 +1,5 @@
-import { PageTab } from '@QCFE/qingcloud-portal-ui'
+import { useEffect } from 'react'
+import { PageTab, localstorage } from '@QCFE/qingcloud-portal-ui'
 import { Tabs } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { FlexBox } from 'components'
@@ -21,8 +22,18 @@ const pageTabsData = [
 
 const Udf = observer(() => {
   const {
+    dmStore,
     dmStore: { op, setUdfType, udfType },
   } = useStore()
+
+  useEffect(() => {
+    const storageKey = `DM_${udfType}_COLUMN_SETTINGS`
+    dmStore.set({
+      udfSelectedRowKeys: [],
+      udfStorageKey: storageKey,
+      udfColumnSettings: localstorage.getItem(storageKey) || [],
+    })
+  }, [udfType, dmStore])
 
   return (
     <FlexBox orient="column" tw="p-5 h-full">
