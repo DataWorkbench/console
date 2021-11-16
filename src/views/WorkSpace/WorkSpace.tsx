@@ -3,13 +3,13 @@ import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { get } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
-import { useLocalStorage } from 'react-use'
 import {
   PageTab,
   Loading,
   Icon,
   Button,
   InputSearch,
+  localstorage,
 } from '@QCFE/qingcloud-portal-ui'
 import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
@@ -47,7 +47,7 @@ const columnSettingsKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
 
 const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
   const { status, refetch, data: regionInfos } = useQueryRegion()
-  const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
+  // const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
   const stateStore = useLocalObservable(() => ({
     isModal,
     onItemCheck,
@@ -63,7 +63,8 @@ const WorkSpace = observer(({ isModal, onItemCheck }: IWrokSpaceProps) => {
       { title: '操作', dataIndex: 'updated' },
     ],
     columnSettingsKey,
-    columnSettings: get(columnSettingsObj, 'value', []),
+    // columnSettings: get(columnSettingsObj, 'value', []),
+    columnSettings: localstorage.getItem(columnSettingsKey) || [],
     curRegionId: get(regionInfos, '[0].id', ''),
     curSpace: null,
     get curSpaceId(): any {

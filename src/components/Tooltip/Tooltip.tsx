@@ -1,30 +1,28 @@
+import { useState } from 'react'
+import { Instance } from 'tippy.js'
 import Tippy, { TippyProps } from '@tippyjs/react'
-import { Global } from '@emotion/react'
-import tw, { css } from 'twin.macro'
 
 export const Tooltip = (props: TippyProps) => {
+  const [instance, setInstance] = useState<Instance | null>(null)
+
+  const { content, ...rest } = props
   const combProps: TippyProps = {
-    // interactive: false,
+    interactive: true,
     theme: 'dark',
+    appendTo: () => document.body,
     animation: 'fade',
-    hideOnClick: true,
-    placement: 'top',
-    ...props,
+    ...rest,
+    content: (
+      <div
+        onClick={() => {
+          instance?.hide()
+        }}
+      >
+        {content}
+      </div>
+    ),
   }
-  return (
-    <>
-      {!combProps.interactive && (
-        <Global
-          styles={css`
-            [data-tippy-root] {
-              ${tw`pointer-events-auto!`}
-            }
-          `}
-        />
-      )}
-      <Tippy {...combProps} />
-    </>
-  )
+  return <Tippy {...combProps} onCreate={(o) => setInstance(o)} />
 }
 
 export default Tooltip

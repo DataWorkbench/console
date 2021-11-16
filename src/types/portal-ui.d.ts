@@ -32,6 +32,7 @@ declare module '@QCFE/qingcloud-portal-ui' {
   export const configUtils: ConfigUtils
   export const Modal: Modal
   export const HelpCenterModal: JSX.Element
+  export const localstorage
 
   export function PortalProvider(props: any): JSX.Element
   export function PortalCollapsePanel(props: any): JSX.Element

@@ -51,10 +51,9 @@ export const useQueryWorkSpace = (filter: IListWorkSpaceParams) => {
   )
 }
 
-export const useQueryPageWorkSpace = (filter: IListWorkSpaceParams) => {
+export const useQueryPageWorkSpace = (filter: any) => {
   const queryKey = ['workspaces', filter]
   keys.page = queryKey
-  // console.log(filter)
   return useQuery(queryKey, async () => loadWorkSpace(filter), {
     keepPreviousData: true,
   })

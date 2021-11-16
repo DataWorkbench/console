@@ -22,10 +22,23 @@ export interface IListWorkSpaceParams extends IWorkSpace {
 export const loadWorkSpace = (
   { regionId, ...rest }: IListWorkSpaceParams,
   options = {}
-) => request({ action: `${regionId}/v1/workspace`, ...rest }, options)
+) =>
+  request(
+    {
+      region: regionId,
+      uri: '/v1/workspace',
+      query: rest,
+    },
+    options
+  )
 
 export const createWorkSpace = ({ regionId, ...rest }: IWorkSpaceParams) =>
-  request({ action: `${regionId}/v1/workspace`, ...rest, method: 'POST' })
+  request({
+    region: regionId,
+    uri: '/v1/workspace',
+    method: 'POST',
+    body: rest,
+  })
 
 export const updateWorkSpace = ({
   regionId,
@@ -33,28 +46,32 @@ export const updateWorkSpace = ({
   ...rest
 }: IWorkSpaceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}`,
     method: 'PUT',
+    body: rest,
   })
 
 export const deleteWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
   request({
-    action: `${regionId}/v1/workspace/deletes`,
-    space_ids: spaceIds,
+    region: regionId,
+    uri: '/v1/workspace/deletes',
     method: 'POST',
+    body: { space_ids: spaceIds },
   })
 
 export const enableWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
   request({
-    action: `${regionId}/v1/workspace/enables`,
-    space_ids: spaceIds,
+    region: regionId,
+    uri: '/v1/workspace/enables',
+    body: { space_ids: spaceIds },
     method: 'POST',
   })
 
 export const disableWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
   request({
-    action: `${regionId}/v1/workspace/disables`,
-    space_ids: spaceIds,
+    region: regionId,
+    uri: '/v1/workspace/disables',
+    body: { space_ids: spaceIds },
     method: 'POST',
   })

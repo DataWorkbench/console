@@ -8,19 +8,22 @@ interface IParams {
 
 export const listAvailableFlinkVersions = ({ regionId, spaceId }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/cluster/flink/versions`,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink/versions`,
   })
 
 export const listFlinkClusters = ({ regionId, spaceId, ...rest }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/cluster/flink`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink`,
+    query: rest,
   })
 
 export const createFlinkCluster = ({ regionId, spaceId, ...rest }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/cluster/flink`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink`,
+    body: rest,
     method: 'POST',
   })
 
@@ -31,15 +34,17 @@ export const updateFlinkCluster = ({
   ...rest
 }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/cluster/flink/${clusterId}`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink/${clusterId}`,
+    body: rest,
     method: 'PUT',
   })
 
 export const stopFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/cluster/flink/stops`,
-    cluster_ids: clusterIds,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink/stops`,
+    body: { cluster_ids: clusterIds },
     method: 'POST',
   })
 
@@ -49,8 +54,9 @@ export const startFlinkClusters = ({
   clusterIds,
 }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/cluster/flink/starts`,
-    cluster_ids: clusterIds,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink/starts`,
+    body: { cluster_ids: clusterIds },
     method: 'POST',
   })
 
@@ -60,7 +66,8 @@ export const deleteFlinkClusters = ({
   clusterIds,
 }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/cluster/flink/deletes`,
-    cluster_ids: clusterIds,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink/deletes`,
+    body: { cluster_ids: clusterIds },
     method: 'POST',
   })

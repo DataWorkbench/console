@@ -8,14 +8,16 @@ interface IParams {
 
 export const listNetworks = ({ regionId, spaceId, ...rest }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/network`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/network`,
+    query: rest,
   })
 
 export const createNetwork = ({ regionId, spaceId, ...rest }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/network`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/network`,
+    body: rest,
     method: 'POST',
   })
 
@@ -26,14 +28,16 @@ export const updateNetwork = ({
   ...rest
 }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/network/${networkId}`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/network/${networkId}`,
+    body: rest,
     method: 'PUT',
   })
 
 export const deleteNetworks = ({ regionId, spaceId, networkIds }: IParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/network/deletes`,
-    network_ids: networkIds,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/network/deletes`,
+    body: { network_ids: networkIds },
     method: 'POST',
   })

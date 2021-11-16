@@ -59,18 +59,16 @@ const request = async (
   data: { method?: string; [params: string]: unknown },
   options: { cancel?: () => {}; [params: string]: unknown } = {}
 ) => {
-  const { method = 'GET', ...params } = data
+  const { method = 'GET', action = 'Forward', ...params } = data
   const { cancel, ...config } = options
-  const owner = get(window, 'USER.user_id', '')
+  const userId = get(window, 'USER.user_id', '')
   const axiosConfig: AxiosRequestConfig = {
-    url: '/portal_api',
+    url: '/data_api',
     data: {
-      params: {
-        service: 'bigdata',
-        owner,
-        ...params,
-      },
+      action,
+      userId,
       method,
+      ...params,
     },
     ...config,
   }
