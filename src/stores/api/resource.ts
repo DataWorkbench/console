@@ -12,6 +12,7 @@ export const loadResourceList = ({
   ...rest
 }: IResourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/resource`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/resource`,
+    query: rest,
   })

@@ -1,17 +1,17 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
-import { Dropdown, Menu } from '@QCFE/lego-ui'
+import { Menu } from '@QCFE/lego-ui'
 import {
   Button,
   Icon,
   InputSearch,
   Table,
   ToolBar,
+  localstorage,
 } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, Modal, Tooltip, AffixLabel } from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
-import Tippy from '@tippyjs/react'
 import {
   useStore,
   useQueryFlinkClusters,
@@ -85,7 +85,9 @@ const ClusterTable = observer(() => {
   } = useStore()
   const [opclusterList, setOpClusterList] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-  const [columnSettings, setColumnSettings] = useState([])
+  const [columnSettings, setColumnSettings] = useState(
+    localstorage.getItem(columnSettingsKey) || []
+  )
   const [filter, setFilter] = useImmer<IFilter>({
     name: '',
     offset: 0,
@@ -129,9 +131,6 @@ const ClusterTable = observer(() => {
             <Tooltip
               theme="dark"
               trigger="click"
-              hideOnClick
-              delay={100}
-              offset={[0, 10]}
               placement="bottom-start"
               content={
                 <Menu
@@ -223,7 +222,10 @@ const ClusterTable = observer(() => {
               修改
             </Button>
             <Center>
-              <Dropdown
+              <Tooltip
+                trigger="click"
+                placement="bottom"
+                arrow={false}
                 content={
                   <Menu
                     onClick={(e: any, key: any) => {
@@ -245,10 +247,10 @@ const ClusterTable = observer(() => {
                   </Menu>
                 }
               >
-                <Button type="text">
+                <div tw="flex items-center">
                   <Icon name="more" clickable type="light" />
-                </Button>
-              </Dropdown>
+                </div>
+              </Tooltip>
             </Center>
           </FlexBox>
         ),
@@ -299,12 +301,10 @@ const ClusterTable = observer(() => {
       <div tw="mb-3">
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
-            <Tippy
+            <Tooltip
               theme="light"
+              placement="top-start"
               animation="fade"
-              arrow
-              delay={100}
-              offset={[120, 10]}
               content={
                 <Center tw="h-9 px-3 text-neut-13">
                   单个用户最多可创建 5 个集群，如需更多集群，请提交工单
@@ -321,7 +321,7 @@ const ClusterTable = observer(() => {
                   创建集群
                 </Button>
               </div>
-            </Tippy>
+            </Tooltip>
             <Button
               disabled={
                 selectedRowKeys.length === 0 || filterClusterInfos.length === 0

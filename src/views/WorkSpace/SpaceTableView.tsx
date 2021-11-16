@@ -1,109 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
-import { get } from 'lodash-es'
+import { get, omitBy } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import tw from 'twin.macro'
 import { formatDate } from 'utils/convert'
-import { Icon, Table, utils, Loading } from '@QCFE/qingcloud-portal-ui'
+import { Menu } from '@QCFE/lego-ui'
+import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { useWorkSpaceContext } from 'contexts'
 import { useQueryPageWorkSpace } from 'hooks'
+import { Tooltip, FlexBox } from 'components'
 import TableRowOpt from './TableRowOpt'
 
-const getDefaultColumns = ({ defaultColumns, regionId, winW, sort }) => {
-  return defaultColumns.map(({ title, dataIndex }) => {
-    let col = {}
-    switch (dataIndex) {
-      case 'id':
-        col = {
-          sortable: true,
-          sortKey: 'name',
-          sortOrder: sort.name,
-          render: (field, row) => (
-            <div tw="flex items-center">
-              <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
-                <Icon name="project" size="small" />
-              </div>
-              <div tw="ml-2">
-                <div tw="font-semibold">{row.name}</div>
-                <div tw="text-neut-8">{field}</div>
-              </div>
-            </div>
-          ),
-        }
-        break
-      case 'status':
-        col = {
-          filters: [
-            { text: '活跃', value: '1' },
-            { text: '已禁用', value: '2' },
-          ],
-          render: (field: number) => (
-            <div
-              css={[
-                field === 1
-                  ? tw`bg-green-0 text-green-13`
-                  : tw`bg-[#FFFDED] text-[#A16207]`,
-                tw`px-2 py-0.5 rounded-[20px] flex items-center`,
-              ]}
-            >
-              <div
-                css={[
-                  field === 1 ? tw`bg-green-1` : tw`bg-[#FFD127]`,
-                  tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`,
-                ]}
-              >
-                <div
-                  css={[
-                    field === 1 ? tw`bg-green-13` : tw`bg-[#A48A19]`,
-                    tw`w-1.5 h-1.5 rounded-full`,
-                  ]}
-                />
-              </div>
-              {field === 1 ? '活跃' : '已禁用'}
-            </div>
-          ),
-        }
-        break
-      case 'owner':
-        col = {
-          render: (field: string) => (
-            <div>
-              <div>xxx@test.com</div>
-              <div tw="text-neut-8">{field}</div>
-            </div>
-          ),
-        }
-        break
-      case 'name':
-        col = {
-          render: () => {},
-        }
-        break
-      case 'desc':
-        break
-      case 'created':
-        col = {
-          sortable: true,
-          sortKey: 'created',
-          sortOrder: sort.created,
-          render: (filed: number) => formatDate(filed),
-        }
-        break
-      case 'updated':
-        col = {
-          width: winW >= 1536 ? 380 : 330,
-          render: (filed, row) => (
-            <TableRowOpt space={row} regionId={regionId} />
-          ),
-        }
-        break
-      default:
-        break
-    }
-    return { title, dataIndex, ...col }
-  })
-}
+const { MenuItem } = Menu
 
 const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
@@ -124,23 +33,200 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     name: 'asc',
     created: 'desc',
   })
-  const columns = utils.getTableColumnsBySetting(
-    getDefaultColumns({ defaultColumns, regionId, winW, sort }),
-    columnSettings
-  )
-  const [filter, setFilter] = useImmer<{
+  interface IFilter {
     regionId: string
-    offset: number
     limit: number
-    [p: string]: unknown
-  }>({
+    name: string
+    offset: number
+    reverse: boolean
+    search: string
+    sort_by: string
+    status: string | number
+  }
+  const [filter, setFilter] = useImmer<IFilter>({
     regionId,
-    reverse: true,
-    offset: 0,
     limit: 10,
+    name: '',
+    offset: 0,
+    reverse: true,
+    search: '',
+    sort_by: '',
+    status: '',
   })
-  const { isLoading, data, refetch } = useQueryPageWorkSpace(filter)
-  const workspaces = data?.infos || []
+
+  const ifExceedMaxWidth = winW > 1535
+
+  const columns = useMemo(() => {
+    return defaultColumns.map(
+      ({ title, dataIndex }: { title: string; dataIndex: string }) => {
+        if (dataIndex === 'id') {
+          return {
+            title,
+            dataIndex,
+            sortable: true,
+            sortKey: 'name',
+            sortOrder: sort.name,
+            render: (field: string, row: any) => (
+              <div tw="flex items-center">
+                <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
+                  <Icon name="project" size="small" />
+                </div>
+                <div tw="ml-2">
+                  <div tw="font-semibold">{row.name}</div>
+                  <div tw="text-neut-8">{field}</div>
+                </div>
+              </div>
+            ),
+          }
+        }
+        if (dataIndex === 'status') {
+          const filterMenus = [
+            { value: '', text: '全部' },
+            { value: 1, text: '活跃' },
+            { value: 2, text: '已禁用' },
+          ]
+          return {
+            title: (
+              <FlexBox tw="items-center">
+                <span>{title}</span>
+                <Tooltip
+                  theme="light"
+                  trigger="click"
+                  appendTo={() => document.body}
+                  offset={[-10, 5]}
+                  placement="bottom-start"
+                  content={
+                    <Menu
+                      selectedKey={String(filter.status || 'all')}
+                      onClick={(
+                        e: React.SyntheticEvent,
+                        k: string,
+                        v: number
+                      ) => {
+                        setFilter((draft) => {
+                          draft.status = k === 'all' ? '' : v
+                        })
+                      }}
+                    >
+                      <div />
+                      {filterMenus.map((o) => {
+                        return (
+                          <MenuItem value={o.value} key={o.value || 'all'}>
+                            <FlexBox tw="items-center w-full justify-between">
+                              <span>{o.text}</span>
+                              {o.value === filter.status && (
+                                <i
+                                  className="if if-check"
+                                  tw="text-green-11 text-sm"
+                                />
+                              )}
+                            </FlexBox>
+                          </MenuItem>
+                        )
+                      })}
+                    </Menu>
+                  }
+                >
+                  <div className="table-thead-filter">
+                    <Icon name="if-filter" type="dark" className="icon-dark" />
+                  </div>
+                </Tooltip>
+              </FlexBox>
+            ),
+            dataIndex,
+            render: (field: number) => (
+              <div
+                css={[
+                  field === 1
+                    ? tw`bg-green-0 text-green-13`
+                    : tw`bg-[#FFFDED] text-[#A16207]`,
+                  tw`px-2 py-0.5 rounded-[20px] flex items-center`,
+                ]}
+              >
+                <div
+                  css={[
+                    field === 1 ? tw`bg-green-1` : tw`bg-[#FFD127]`,
+                    tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`,
+                  ]}
+                >
+                  <div
+                    css={[
+                      field === 1 ? tw`bg-green-13` : tw`bg-[#A48A19]`,
+                      tw`w-1.5 h-1.5 rounded-full`,
+                    ]}
+                  />
+                </div>
+                {field === 1 ? '活跃' : '已禁用'}
+              </div>
+            ),
+          }
+        }
+        if (dataIndex === 'owner') {
+          return {
+            title,
+            dataIndex,
+            render: (field: string) => (
+              <div>
+                <div>xxx@test.com</div>
+                <div tw="text-neut-8">{field}</div>
+              </div>
+            ),
+          }
+        }
+        if (dataIndex === 'name') {
+          return {
+            title,
+            dataIndex,
+            render: () => {},
+          }
+        }
+        if (dataIndex === 'desc') {
+          return {
+            title,
+            dataIndex,
+          }
+        }
+        if (dataIndex === 'created') {
+          return {
+            title,
+            dataIndex,
+            sortable: true,
+            sortKey: 'created',
+            sortOrder: sort.created,
+            render: (filed: number) => formatDate(filed),
+          }
+        }
+        if (dataIndex === 'updated') {
+          return {
+            title,
+            dataIndex,
+            width: ifExceedMaxWidth ? 380 : 330,
+            render: (filed: any, row: any) => (
+              <TableRowOpt space={row} regionId={regionId} />
+            ),
+          }
+        }
+        return null
+      }
+    )
+  }, [
+    defaultColumns,
+    regionId,
+    ifExceedMaxWidth,
+    sort,
+    setFilter,
+    filter.status,
+  ])
+
+  const filterColumn = columnSettings
+    .map((o: { key: string; checked: boolean }) => {
+      return o.checked && columns.find((col: any) => col.dataIndex === o.key)
+    })
+    .filter((o: any) => o)
+
+  const { isFetching, data, refetch } = useQueryPageWorkSpace(
+    omitBy(filter, (v) => v === '')
+  )
 
   useEffect(() => {
     if (queryRefetch) {
@@ -162,20 +248,6 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
       setSelectedRowKeys([])
     }
   }, [optSpaces.length])
-
-  if (isLoading) {
-    return (
-      <div tw="h-72">
-        <Loading />
-      </div>
-    )
-  }
-
-  const handleFilterChange = ({ status }: { status: string }) => {
-    setFilter((draft) => {
-      draft.status = status === 'all' ? '' : +status
-    })
-  }
 
   const handleSort = (sortKey: string, sortOrder: 'asc' | 'desc') => {
     setFilter((draft) => {
@@ -207,14 +279,13 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   return (
     <Table
       rowKey="id"
-      loading={isLoading}
+      loading={isFetching}
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
       onSelect={handleSelect}
       tw="table-auto"
-      dataSource={workspaces}
-      columns={columns}
-      onFilterChange={handleFilterChange}
+      dataSource={data?.infos || []}
+      columns={filterColumn.length > 0 ? filterColumn : columns}
       onSort={handleSort}
       pagination={{
         total: get(data, 'total', 0),

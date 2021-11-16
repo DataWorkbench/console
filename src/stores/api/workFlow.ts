@@ -13,8 +13,9 @@ export const createStreamJob = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job`,
+    body: rest,
     method: 'POST',
   })
 
@@ -25,8 +26,9 @@ export const updateStreamJob = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}`,
+    body: rest,
     method: 'PUT',
   })
 
@@ -36,15 +38,17 @@ export const deleteStreamJobs = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/deletes`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/deletes`,
+    body: rest,
     method: 'POST',
   })
 
 export const loadWorkFlow = ({ regionId, spaceId, ...rest }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job`,
+    query: rest,
   })
 
 export const setStreamJobSchedule = ({
@@ -54,8 +58,9 @@ export const setStreamJobSchedule = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`,
+    body: rest,
     method: 'PUT',
   })
 
@@ -65,7 +70,8 @@ export const getStreamJobSchedule = ({
   jobId,
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`,
   })
 
 export const setStreamJobArgs = ({
@@ -75,8 +81,9 @@ export const setStreamJobArgs = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}/args`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/args`,
+    body: rest,
     method: 'PUT',
   })
 
@@ -86,7 +93,8 @@ export const getStreamJobArgs = ({
   jobId,
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}/args`,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/args`,
   })
 
 export const setStreamJobCode = ({
@@ -96,8 +104,9 @@ export const setStreamJobCode = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}/code`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/code`,
+    body: rest,
     method: 'PUT',
   })
 
@@ -107,7 +116,8 @@ export const getStreamJobCode = ({
   jobId,
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}/code`,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/code`,
   })
 
 export const releaseStreamJob = ({
@@ -117,7 +127,8 @@ export const releaseStreamJob = ({
   ...rest
 }: IWorkFlowParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/stream/job/${jobId}/release`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/release`,
+    body: rest,
     method: 'POST',
   })

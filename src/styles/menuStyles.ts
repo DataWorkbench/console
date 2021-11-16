@@ -1,9 +1,12 @@
 import tw, { css } from 'twin.macro'
 
 const menuStyles = css`
+  .menu {
+    ${tw`text-xs`}
+  }
   .dark {
     .menu {
-      ${tw`bg-neut-17 text-xs text-white`}
+      ${tw`bg-neut-17 text-white`}
       .menu-inline-submenu-title {
         svg {
           color: rgba(255, 255, 255, 0.9);

@@ -7,7 +7,7 @@ export interface IDataSourceParams {
 }
 
 export const loadSourceKind = ({ regionId, spaceId }: IDataSourceParams) =>
-  request({ action: `${regionId}/v1/workspace/${spaceId}/source/kind` })
+  request({ region: regionId, uri: `/v1/workspace/${spaceId}/source/kind` })
 
 export const createDataSource = ({
   regionId,
@@ -15,8 +15,9 @@ export const createDataSource = ({
   ...rest
 }: IDataSourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/source`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/source`,
+    body: rest,
     method: 'POST',
   })
 
@@ -27,8 +28,9 @@ export const updateDataSource = ({
   ...rest
 }: IDataSourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/source/${sourceId}`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/source/${sourceId}`,
+    body: rest,
     method: 'POST',
   })
 
@@ -38,8 +40,9 @@ export const loadDataSource = ({
   ...rest
 }: IDataSourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/source`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/source`,
+    query: rest,
   })
 
 export const disableDataSource = ({
@@ -48,8 +51,9 @@ export const disableDataSource = ({
   sourceIds,
 }: IDataSourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/source/disables`,
-    sourceids: sourceIds,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/source/disables`,
+    body: { sourceids: sourceIds },
     method: 'POST',
   })
 
@@ -59,8 +63,9 @@ export const enableDataSource = ({
   sourceIds,
 }: IDataSourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/source/enables`,
-    sourceids: sourceIds,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/source/enables`,
+    body: { sourceids: sourceIds },
     method: 'POST',
   })
 
@@ -70,8 +75,9 @@ export const deleteDataSource = ({
   sourceIds,
 }: IDataSourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/source/deletes`,
-    sourceids: sourceIds,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/source/deletes`,
+    body: { sourceids: sourceIds },
     method: 'POST',
   })
 
@@ -81,7 +87,8 @@ export const pingDataSource = ({
   ...rest
 }: IDataSourceParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/source/ping`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/source/ping`,
+    body: rest,
     method: 'POST',
   })

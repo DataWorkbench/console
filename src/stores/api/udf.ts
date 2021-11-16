@@ -8,14 +8,16 @@ export interface IUdfParams {
 
 export const loadUdfList = ({ regionId, spaceId, ...rest }: IUdfParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/udf`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/udf`,
+    query: rest,
   })
 
 export const createUdf = ({ regionId, spaceId, ...rest }: IUdfParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/udf`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/udf`,
+    body: rest,
     method: 'POST',
   })
 
@@ -26,14 +28,16 @@ export const updateUdf = ({
   ...rest
 }: IUdfParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/udf/${udfId}`,
-    ...rest,
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/udf/${udfId}`,
+    body: rest,
     method: 'PUT',
   })
 
 export const deleteUdf = ({ regionId, spaceId, ...rest }: IUdfParams) =>
   request({
-    action: `${regionId}/v1/workspace/${spaceId}/udf/deletes`,
-    ...rest,
+    region: regionId,
+    action: `/v1/workspace/${spaceId}/udf/deletes`,
+    body: rest,
     method: 'POST',
   })
