@@ -22,16 +22,16 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
       {funcList.map(({ name: funcName, title, subFuncList }) => (
         <Tooltip
           key={funcName}
-          theme="darker"
+          theme="light"
           disabled={disableStatus}
           placement="bottom-start"
           content={subFuncList.map((subFunc) => (
             <Link
               key={subFunc.name}
               to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-              tw="flex items-center space-x-1 py-2 px-5 (text-white no-underline)! hover:(bg-neut-15 )"
+              tw="flex items-center space-x-1 py-2 px-5 (text-neut-15 no-underline)! hover:(bg-neut-1 text-current)"
             >
-              <Icon name={subFunc.icon} type="light" />
+              <Icon name={subFunc.icon} />
               <span>{subFunc.title}</span>
             </Link>
           ))}

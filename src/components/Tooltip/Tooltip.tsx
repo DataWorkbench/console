@@ -11,6 +11,8 @@ export const Tooltip = (props: TippyProps) => {
     theme: 'dark',
     appendTo: () => document.body,
     animation: 'fade',
+    delay: 100,
+    // arrow: roundArrow,
     ...rest,
     content: (
       <div

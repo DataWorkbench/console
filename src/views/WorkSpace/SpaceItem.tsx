@@ -157,7 +157,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
         {!isModal ? (
           <Tooltip
             placement="bottom-end"
-            offset={[-6, -5]}
+            offset={[0, -5]}
             theme="light"
             trigger="click"
             arrow={false}
@@ -190,34 +190,39 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
       </RowWrapper>
       {renderGrid()}
       {!isModal && (
-        <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3">
-          {funcList.map(({ name: funcName, title, subFuncList }, i) => (
+        <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-2">
+          {funcList.map(({ name: funcName, title, subFuncList }) => (
             <Tooltip
-              theme="darker"
+              theme="light"
               key={funcName}
               disabled={space.status === 2}
-              content={subFuncList.map((subFunc) => (
-                <Link
-                  key={subFunc.name}
-                  to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                  tw="flex items-center py-2 px-5 cursor-pointer hover:bg-neut-15 hover:text-white"
-                >
-                  <Icon name={subFunc.icon} type="light" tw="mr-1" />
-                  {subFunc.title}
-                </Link>
-              ))}
+              content={
+                <Menu>
+                  {subFuncList.map((subFunc) => (
+                    <MenuItem key={subFunc.name}>
+                      <Link
+                        to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                        tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                      >
+                        <Icon name={subFunc.icon} type="dark" tw="mr-1" />
+                        {subFunc.title}
+                      </Link>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              }
               placement="bottom"
             >
               <Link
                 to={`${regionId}/workspace/${space.id}/${funcName}`}
-                css={space.status === 2 && tw`pointer-events-none`}
+                css={
+                  (space.status === 2 && tw`pointer-events-none`,
+                  tw`inline-block`)
+                }
               >
                 <OptButton
                   disabled={space.status === 2}
-                  css={[
-                    tw`px-4 2xl:px-8 py-1`,
-                    i < funcList.length - 1 ? tw`mr-4` : tw`mr-0`,
-                  ]}
+                  tw="px-4 2xl:px-8 py-1"
                 >
                   {title}
                 </OptButton>
