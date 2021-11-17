@@ -219,7 +219,7 @@ const SpaceModal = observer(
         <Modal
           visible
           title=""
-          // className={styles.modal}
+          noBorder
           width={modalWidth}
           onCancel={handleModalClose}
           footer={

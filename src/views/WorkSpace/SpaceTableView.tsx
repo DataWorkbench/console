@@ -92,7 +92,6 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                 <Tooltip
                   theme="light"
                   trigger="click"
-                  appendTo={() => document.body}
                   offset={[-10, 5]}
                   placement="bottom-start"
                   content={

@@ -1,11 +1,12 @@
 import { observer } from 'mobx-react-lite'
 import { Link } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
-import { Tooltip, Radio, Dropdown, Menu, Icon } from '@QCFE/lego-ui'
+import { Radio, Menu, Icon } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import { FlexBox, Center, Box, Card } from 'components'
+import { FlexBox, Center, Box, Card, Tooltip } from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
+import { OptButton } from './styled'
 
 const { MenuItem } = Menu
 
@@ -154,7 +155,12 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           </Box>
         </FlexBox>
         {!isModal ? (
-          <Dropdown
+          <Tooltip
+            placement="bottom-end"
+            offset={[-6, -5]}
+            theme="light"
+            trigger="click"
+            arrow={false}
             content={
               <Menu onClick={handleSpaceOpt}>
                 <MenuItem value="update">
@@ -177,7 +183,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             }
           >
             <Icon name="more" clickable size={24} />
-          </Dropdown>
+          </Tooltip>
         ) : (
           <Radio value={space.id} checked={space.id === curSpaceId} />
         )}
@@ -187,8 +193,9 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
         <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3">
           {funcList.map(({ name: funcName, title, subFuncList }, i) => (
             <Tooltip
-              tw="p-0"
+              theme="darker"
               key={funcName}
+              disabled={space.status === 2}
               content={subFuncList.map((subFunc) => (
                 <Link
                   key={subFunc.name}
@@ -199,23 +206,21 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                   {subFunc.title}
                 </Link>
               ))}
-              placement="bottomRight"
+              placement="bottom"
             >
               <Link
                 to={`${regionId}/workspace/${space.id}/${funcName}`}
-                tw="hover:text-green-11 h-full inline-block"
+                css={space.status === 2 && tw`pointer-events-none`}
               >
-                <button
-                  type="button"
+                <OptButton
+                  disabled={space.status === 2}
                   css={[
-                    tw`font-semibold text-xs rounded-sm text-neut-13  bg-neut-1 border border-neut-3`,
                     tw`px-4 2xl:px-8 py-1`,
                     i < funcList.length - 1 ? tw`mr-4` : tw`mr-0`,
-                    tw`focus:outline-none hover:bg-green-0 hover:border-green-11 hover:shadow transition-colors`,
                   ]}
                 >
                   {title}
-                </button>
+                </OptButton>
               </Link>
             </Tooltip>
           ))}

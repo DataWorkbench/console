@@ -129,7 +129,6 @@ const ClusterTable = observer(() => {
           <FlexBox tw="items-center">
             <span>状态</span>
             <Tooltip
-              theme="dark"
               trigger="click"
               placement="bottom-start"
               content={
@@ -152,9 +151,7 @@ const ClusterTable = observer(() => {
                 </Menu>
               }
             >
-              <div>
-                <Icon name="filter" type="light" clickable tw="ml-1 block" />
-              </div>
+              <Icon name="filter" type="light" clickable tw="ml-1 block" />
             </Tooltip>
           </FlexBox>
         ),
@@ -248,7 +245,7 @@ const ClusterTable = observer(() => {
                 }
               >
                 <div tw="flex items-center">
-                  <Icon name="more" clickable type="light" />
+                  <Icon name="more" clickable changeable type="light" />
                 </div>
               </Tooltip>
             </Center>
