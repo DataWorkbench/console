@@ -13,23 +13,22 @@ const tippyStyles = css`
       padding: 0;
     }
     &[data-placement^='top'] > .tippy-arrow::before {
-      border-top-color: #fff;
+      border-top-color: #cbd5e1;
     }
     &[data-placement^='bottom'] > .tippy-arrow::before {
-      border-bottom-color: #fff;
       border-bottom-color: #cbd5e1;
     }
     &[data-placement^='left'] > .tippy-arrow::before {
-      border-left-color: #fff;
+      border-left-color: #cbd5e1;
     }
     &[data-placement^='right'] > .tippy-arrow::before {
-      border-right-color: #fff;
+      border-right-color: #cbd5e1;
     }
     > .tippy-backdrop {
-      background-color: #fff;
+      background-color: #cbd5e1;
     }
     .tippy-svg-arrow {
-      fill: #fff;
+      fill: #cbd5e1;
     }
   }
 
@@ -41,27 +40,22 @@ const tippyStyles = css`
       padding: 0;
     }
     &[data-placement^='top'] > .tippy-arrow::before {
-      border-top-color: #fff;
-      ${tw`border-t-neut-17`}
+      ${tw`border-t-neut-13`}
     }
     &[data-placement^='bottom'] > .tippy-arrow::before {
-      border-bottom-color: #fff;
       ${tw`border-b-neut-13`}
     }
     &[data-placement^='left'] > .tippy-arrow::before {
-      border-left-color: #fff;
-      ${tw`border-l-neut-17`}
+      ${tw`border-l-neut-13`}
     }
     &[data-placement^='right'] > .tippy-arrow::before {
-      border-right-color: #fff;
-      ${tw`border-r-neut-17`}
+      ${tw`border-r-neut-13`}
     }
     > .tippy-backdrop {
-      background-color: #fff;
-      ${tw`bg-neut-17`}
+      ${tw`bg-neut-13`}
     }
     > .tippy-svg-arrow {
-      fill: #fff;
+      ${tw`fill-current text-neut-13`}
     }
   }
 
@@ -93,7 +87,7 @@ const tippyStyles = css`
       ${tw`bg-neut-17`}
     }
     > .tippy-svg-arrow {
-      fill: #fff;
+      ${tw`fill-current text-neut-17`}
     }
   }
 `

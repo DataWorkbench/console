@@ -61,23 +61,23 @@ class GlobalStore {
       },
     ],
     relationMenus: [
-      {
-        name: 'relations',
-        title: '关联服务',
-        isSubTitle: true,
-      },
-      {
-        name: 'relati',
-        title: '运维工具',
-        link: 'https://console.qingcloud.com/',
-        icon: 'desktop-group',
-      },
-      {
-        name: 'homepage',
-        title: '子账户管理',
-        icon: 'sub-account',
-        link: 'https://console.qingcloud.com/',
-      },
+      // {
+      //   name: 'relations',
+      //   title: '关联服务',
+      //   isSubTitle: true,
+      // },
+      // {
+      //   name: 'relati',
+      //   title: '运维工具',
+      //   link: 'https://console.qingcloud.com/',
+      //   icon: 'desktop-group',
+      // },
+      // {
+      //   name: 'homepage',
+      //   title: '子账户管理',
+      //   icon: 'sub-account',
+      //   link: 'https://console.qingcloud.com/',
+      // },
     ],
   }
 
