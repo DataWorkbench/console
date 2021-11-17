@@ -272,16 +272,18 @@ const SpaceModal = observer(
       >
         <ModalContent>
           <Form ref={form} layout="vertical" style={{ maxWidth: '450px' }}>
-            <RadioGroupField
-              name="regionId"
-              label="区域"
-              defaultValue={regionId}
-            >
-              <RadioButton value={regionId}>
-                <Icon name="zone" />
-                {region.name}
-              </RadioButton>
-            </RadioGroupField>
+            {curSpaceOpt === 'create' && (
+              <RadioGroupField
+                name="regionId"
+                label="区域"
+                defaultValue={regionId}
+              >
+                <RadioButton value={regionId}>
+                  <Icon name="zone" />
+                  {region.name}
+                </RadioButton>
+              </RadioGroupField>
+            )}
             <TextField
               name="name"
               label="工作空间名称"

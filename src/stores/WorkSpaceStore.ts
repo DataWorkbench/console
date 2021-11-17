@@ -10,8 +10,8 @@ class WorkSpaceStore {
       title: '数据上云',
       subFuncList: [
         { name: 'dsl', title: '数据源列表', icon: 'blockchain' },
-        { name: 'tools', title: '网络连通工具', icon: 'earth' },
-        { name: 'migration', title: '整库迁移', icon: 'loadbalancer-policies' },
+        // { name: 'tools', title: '网络连通工具', icon: 'earth' },
+        // { name: 'migration', title: '整库迁移', icon: 'loadbalancer-policies' },
       ],
     },
     {
@@ -21,7 +21,7 @@ class WorkSpaceStore {
         { name: 'realtime', title: '实时计算', icon: 'cogwheel' },
         { name: 'network', title: '网络配置', icon: 'earth' },
         { name: 'cluster', title: '计算集群', icon: 'pod' },
-        { name: 'table', title: '表管理', icon: 'listview' },
+        // { name: 'table', title: '表管理', icon: 'listview' },
         { name: 'resource', title: '资源管理', icon: 'resource' },
         { name: 'udf', title: '函数管理', icon: 'textarea' },
         { name: 'history', title: '任务运维', icon: 'paper' },
@@ -38,16 +38,16 @@ class WorkSpaceStore {
         { name: 'logs', title: '操作日志', icon: 'blockchain' },
       ],
     },
-    {
-      name: 'manage',
-      title: '空间管理',
-      subFuncList: [
-        { name: 'setting', title: '空间配置', icon: 'blockchain' },
-        { name: 'engine', title: '引擎管理', icon: 'blockchain' },
-        { name: 'users', title: '成员管理', icon: 'blockchain' },
-        { name: 'permissions', title: '列表权限', icon: 'blockchain' },
-      ],
-    },
+    // {
+    //   name: 'manage',
+    //   title: '空间管理',
+    //   subFuncList: [
+    //     { name: 'setting', title: '空间配置', icon: 'blockchain' },
+    //     { name: 'engine', title: '引擎管理', icon: 'blockchain' },
+    //     { name: 'users', title: '成员管理', icon: 'blockchain' },
+    //     { name: 'permissions', title: '列表权限', icon: 'blockchain' },
+    //   ],
+    // },
   ]
 
   constructor(rootStore: RootStore) {

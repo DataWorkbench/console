@@ -124,6 +124,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
       </>
     )
   }
+  const disableStatus = space.status === 2
   return (
     <Card
       className={className}
@@ -163,11 +164,11 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             arrow={false}
             content={
               <Menu onClick={handleSpaceOpt}>
-                <MenuItem value="update">
+                <MenuItem value="update" disabled={disableStatus}>
                   <Icon name="pen" />
                   修改工作空间
                 </MenuItem>
-                <MenuItem value="disable" disabled={space.status === 2}>
+                <MenuItem value="disable" disabled={disableStatus}>
                   <i className="if if-minus-square" tw="text-base mr-2" />
                   禁用工作空间
                 </MenuItem>
@@ -190,39 +191,48 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
       </RowWrapper>
       {renderGrid()}
       {!isModal && (
-        <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-2">
+        <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-2 xl:space-x-3 2xl:space-x-4">
           {funcList.map(({ name: funcName, title, subFuncList }) => (
             <Tooltip
-              theme="light"
               key={funcName}
-              disabled={space.status === 2}
+              theme={disableStatus ? 'darker' : 'light'}
+              placement={disableStatus ? 'top' : 'bottom'}
               content={
-                <Menu>
-                  {subFuncList.map((subFunc) => (
-                    <MenuItem key={subFunc.name}>
-                      <Link
-                        to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                        tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
-                      >
-                        <Icon name={subFunc.icon} type="dark" tw="mr-1" />
-                        {subFunc.title}
-                      </Link>
-                    </MenuItem>
-                  ))}
-                </Menu>
+                <>
+                  {disableStatus ? (
+                    <div tw="px-3 py-2">
+                      该工作空间已被禁用，暂时无法操作其工作项，如有需要请联系项目所有者（tuotuo@yunify.com）
+                    </div>
+                  ) : (
+                    <Menu>
+                      {subFuncList.map((subFunc) => (
+                        <MenuItem key={subFunc.name}>
+                          <Link
+                            to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                            tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                          >
+                            <Icon name={subFunc.icon} type="dark" tw="mr-1" />
+                            {subFunc.title}
+                          </Link>
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  )}
+                </>
               }
-              placement="bottom"
             >
               <Link
                 to={`${regionId}/workspace/${space.id}/${funcName}`}
-                css={
-                  (space.status === 2 && tw`pointer-events-none`,
-                  tw`inline-block`)
-                }
+                onClick={(e) => {
+                  if (disableStatus) {
+                    e.preventDefault()
+                  }
+                }}
+                tw="inline-block"
               >
                 <OptButton
-                  disabled={space.status === 2}
-                  tw="px-4 2xl:px-8 py-1"
+                  disabled={disableStatus}
+                  tw="px-4 xl:px-8 2xl:px-14 py-1"
                 >
                   {title}
                 </OptButton>

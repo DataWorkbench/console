@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useStore } from 'stores'
 import { Icon, Menu } from '@QCFE/lego-ui'
-import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
 import { Tooltip } from 'components'
 import { OptButton } from './styled'
@@ -22,23 +21,40 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
       {funcList.map(({ name: funcName, title, subFuncList }) => (
         <Tooltip
           key={funcName}
-          theme="light"
-          disabled={disableStatus}
-          placement="bottom-start"
-          content={subFuncList.map((subFunc) => (
-            <Link
-              key={subFunc.name}
-              to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-              tw="flex items-center space-x-1 py-2 px-5 (text-neut-15 no-underline)! hover:(bg-neut-1 text-current)"
-            >
-              <Icon name={subFunc.icon} />
-              <span>{subFunc.title}</span>
-            </Link>
-          ))}
+          theme={disableStatus ? 'darker' : 'light'}
+          placement={disableStatus ? 'top' : 'bottom'}
+          content={
+            <>
+              {disableStatus ? (
+                <div tw="px-3 py-2">
+                  该工作空间已被禁用，暂时无法操作其工作项，如有需要请联系项目所有者（tuotuo@yunify.com）
+                </div>
+              ) : (
+                <Menu>
+                  {subFuncList.map((subFunc) => (
+                    <MenuItem key={subFunc.name}>
+                      <Link
+                        to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                        tw="flex items-center space-x-1 py-2 px-5 (text-neut-15 no-underline)! hover:(bg-neut-1 text-current)"
+                      >
+                        <Icon name={subFunc.icon} />
+                        <span>{subFunc.title}</span>
+                      </Link>
+                    </MenuItem>
+                  ))}
+                </Menu>
+              )}
+            </>
+          }
         >
           <Link
             to={`${regionId}/workspace/${space.id}/${funcName}`}
-            css={disableStatus && tw`pointer-events-none`}
+            onClick={(e) => {
+              if (disableStatus) {
+                e.preventDefault()
+              }
+            }}
+            tw="inline-block"
           >
             <OptButton disabled={disableStatus}>{title}</OptButton>
           </Link>
@@ -51,11 +67,11 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
         arrow={false}
         content={
           <Menu onClick={handleClick}>
-            <MenuItem value="update">
+            <MenuItem value="update" disabled={disableStatus}>
               <Icon name="pen" />
               修改工作空间
             </MenuItem>
-            <MenuItem value="disable" disabled={space.status === 2}>
+            <MenuItem value="disable" disabled={disableStatus}>
               <i className="if if-minus-square" tw="text-base mr-2" />
               禁用工作空间
             </MenuItem>
