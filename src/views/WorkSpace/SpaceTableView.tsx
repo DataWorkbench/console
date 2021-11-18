@@ -66,13 +66,16 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             sortable: true,
             sortKey: 'name',
             sortOrder: sort.name,
+            width: 210,
             render: (field: string, row: any) => (
-              <div tw="flex items-center">
+              <div tw="flex items-center w-full">
                 <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
                   <Icon name="project" size="small" />
                 </div>
-                <div tw="ml-2">
-                  <div tw="font-semibold">{row.name}</div>
+                <div tw="ml-2 flex-1 overflow-hidden">
+                  <div tw="font-semibold truncate" title={row.name}>
+                    {row.name}
+                  </div>
                   <div tw="text-neut-8">{field}</div>
                 </div>
               </div>
@@ -183,6 +186,8 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
           return {
             title,
             dataIndex,
+            width: 200,
+            render: (field: string) => <div tw="h-10 truncate">{field}</div>,
           }
         }
         if (dataIndex === 'created') {
@@ -199,7 +204,8 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
           return {
             title,
             dataIndex,
-            width: ifExceedMaxWidth ? 380 : 330,
+            // width: ifExceedMaxWidth ? 380 : 330,
+            width: ifExceedMaxWidth ? 300 : 260,
             render: (filed: any, row: any) => (
               <TableRowOpt space={row} regionId={regionId} />
             ),
@@ -267,6 +273,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const handleShowSizeChange = (limit: number) => {
     setFilter((draft) => {
       draft.limit = limit
+      draft.offset = 0
     })
   }
 

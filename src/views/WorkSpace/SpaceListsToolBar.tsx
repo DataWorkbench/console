@@ -16,6 +16,7 @@ const SpaceListsToolBar = observer(() => {
     optSpaces,
     queryRefetch,
     queryKeyWord,
+    ifNoData,
   } = stateStore
   const [searchName, setSearchName] = useState(queryKeyWord)
   const curSpacesLen = optSpaces.length
@@ -47,13 +48,15 @@ const SpaceListsToolBar = observer(() => {
   return (
     <FlexBox tw="justify-between mb-5">
       <div>
-        <Button
-          type="primary"
-          tw="font-medium px-5 mr-2"
-          onClick={toggleShowModal}
-        >
-          创建工作空间
-        </Button>
+        {!ifNoData && (
+          <Button
+            type="primary"
+            tw="font-medium px-5 mr-2"
+            onClick={toggleShowModal}
+          >
+            创建工作空间
+          </Button>
+        )}
         {!cardView && (
           <Dropdown
             content={

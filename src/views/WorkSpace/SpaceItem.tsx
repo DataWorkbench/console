@@ -12,8 +12,8 @@ const { MenuItem } = Menu
 
 const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
 const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
-const RoleIconWrapper = tw.div`w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1`
-const RowWrapper = tw(Center)`justify-between px-4 mb-3`
+// const RoleIconWrapper = tw.div`w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1`
+// const RowWrapper = tw(Center)`justify-between px-4 mb-3`
 const StateTag = styled('span')(({ status }: { status: number }) => [
   tw`py-0.5 px-3 rounded-2xl inline-flex items-center`,
   status === 1
@@ -35,7 +35,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
     `,
 ])
 
-const Disp = tw.div`pt-0.5 h-7`
+// const Disp = tw.div`pt-0.5 pr-6 h-7 truncate`
 
 interface IProps {
   regionId: string
@@ -67,7 +67,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const renderGrid = () => {
     if (isModal) {
       return (
-        <RowWrapper>
+        <FlexBox>
           <Box tw="space-x-1">
             <span>我的角色：</span>
             <DarkTag>{space.owner}</DarkTag>
@@ -79,11 +79,12 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
               {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
             </span>
           </Box>
-        </RowWrapper>
+        </FlexBox>
       )
     }
     return (
       <>
+        {/*         
         <RowWrapper>
           <Box tw="space-x-1">
             <span>我的角色：</span>
@@ -102,16 +103,16 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
               <Icon name="human" size={18} />
             </RoleIconWrapper>
           </FlexBox>
-        </RowWrapper>
-        <RowWrapper>
-          <FlexBox>
+        </RowWrapper> */}
+        <FlexBox>
+          {/* <FlexBox>
             <div tw="w-60 2xl:w-auto overflow-hidden break-all whitespace-nowrap overflow-ellipsis">
               开通引擎：共享Flink、QingMR、Deep Learning
             </div>
             <a href="##" tw="text-link">
               查看
             </a>
-          </FlexBox>
+          </FlexBox> */}
           <div>
             <span>
               创建时间：
@@ -120,7 +121,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
               </span>
             </span>
           </div>
-        </RowWrapper>
+        </FlexBox>
       </>
     )
   }
@@ -130,66 +131,78 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
       className={className}
       css={[
         tw`rounded border border-t-4 text-neut-8 border-neut-2`,
+        css`
+          box-shadow: 0px 15px 30px rgba(3, 5, 7, 0.08);
+        `,
         isModal && tw`cursor-pointer`,
       ]}
       onClick={handleSelected}
     >
-      <RowWrapper tw="pt-5 mb-7 items-start">
-        <FlexBox tw="space-x-3">
-          <Center
-            size={44}
-            className="profile"
-            tw="text-base font-medium rounded-sm"
-          >
-            {getShortSpaceName(space.name)}
-          </Center>
-          <Box>
-            <Center>
-              <span tw="font-medium text-base text-neut-16">{space.name}</span>
-              <span>（{space.id}）</span>
-              <StateTag status={space.status}>
-                <Icon name="radio" />
-                {space.status === 1 ? '活跃' : '已禁用'}
-              </StateTag>
+      <div tw="px-5 pt-4">
+        <FlexBox tw="mb-7 items-center">
+          <FlexBox tw="space-x-3 w-full items-center">
+            <Center
+              size={44}
+              className="profile"
+              tw="text-base font-medium rounded-sm"
+            >
+              {getShortSpaceName(space.name)}
             </Center>
-            <Disp>{space.desc}</Disp>
-          </Box>
+            <Box tw="flex-1 overflow-hidden">
+              <FlexBox tw="items-center">
+                <span
+                  tw="font-medium text-base text-neut-16 truncate max-w-[80px]"
+                  title={space.name}
+                >
+                  {space.name}
+                </span>
+                <span>（{space.id}）</span>
+                <StateTag status={space.status}>
+                  <Icon name="radio" />
+                  {space.status === 1 ? '活跃' : '已禁用'}
+                </StateTag>
+              </FlexBox>
+              <div tw="pt-0.5 h-7 truncate">{space.desc}</div>
+            </Box>
+            {!isModal ? (
+              <Tooltip
+                twChild={tw`self-start`}
+                placement="bottom-end"
+                offset={[0, -5]}
+                theme="light"
+                trigger="click"
+                arrow={false}
+                content={
+                  <Menu onClick={handleSpaceOpt}>
+                    <MenuItem value="update" disabled={disableStatus}>
+                      <Icon name="pen" />
+                      修改工作空间
+                    </MenuItem>
+                    <MenuItem value="disable" disabled={disableStatus}>
+                      <i className="if if-minus-square" tw="text-base mr-2" />
+                      禁用工作空间
+                    </MenuItem>
+                    <MenuItem value="enable" disabled={space.status === 1}>
+                      <Icon name="start" />
+                      启动工作空间
+                    </MenuItem>
+                    <MenuItem value="delete">
+                      <Icon name="trash" />
+                      删除
+                    </MenuItem>
+                  </Menu>
+                }
+              >
+                <Icon name="more" clickable size={24} />
+              </Tooltip>
+            ) : (
+              <Radio value={space.id} checked={space.id === curSpaceId} />
+            )}
+          </FlexBox>
         </FlexBox>
-        {!isModal ? (
-          <Tooltip
-            placement="bottom-end"
-            offset={[0, -5]}
-            theme="light"
-            trigger="click"
-            arrow={false}
-            content={
-              <Menu onClick={handleSpaceOpt}>
-                <MenuItem value="update" disabled={disableStatus}>
-                  <Icon name="pen" />
-                  修改工作空间
-                </MenuItem>
-                <MenuItem value="disable" disabled={disableStatus}>
-                  <i className="if if-minus-square" tw="text-base mr-2" />
-                  禁用工作空间
-                </MenuItem>
-                <MenuItem value="enable" disabled={space.status === 1}>
-                  <Icon name="start" />
-                  启动工作空间
-                </MenuItem>
-                <MenuItem value="delete">
-                  <Icon name="trash" />
-                  删除
-                </MenuItem>
-              </Menu>
-            }
-          >
-            <Icon name="more" clickable size={24} />
-          </Tooltip>
-        ) : (
-          <Radio value={space.id} checked={space.id === curSpaceId} />
-        )}
-      </RowWrapper>
-      {renderGrid()}
+
+        {renderGrid()}
+      </div>
       {!isModal && (
         <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-2 xl:space-x-3 2xl:space-x-4">
           {funcList.map(({ name: funcName, title, subFuncList }) => (
@@ -201,7 +214,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 <>
                   {disableStatus ? (
                     <div tw="px-3 py-2">
-                      该工作空间已被禁用，暂时无法操作其工作项，如有需要请联系项目所有者（tuotuo@yunify.com）
+                      该工作空间已被禁用，暂时无法操作其工作项
                     </div>
                   ) : (
                     <Menu>
@@ -230,10 +243,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 }}
                 tw="inline-block"
               >
-                <OptButton
-                  disabled={disableStatus}
-                  tw="px-4 xl:px-8 2xl:px-14 py-1"
-                >
+                <OptButton disabled={disableStatus} tw="px-4 xl:px-8 py-1">
                   {title}
                 </OptButton>
               </Link>
