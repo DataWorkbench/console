@@ -27,7 +27,7 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
             <>
               {disableStatus ? (
                 <div tw="px-3 py-2">
-                  该工作空间已被禁用，暂时无法操作其工作项，如有需要请联系项目所有者（tuotuo@yunify.com）
+                  该工作空间已被禁用，暂时无法操作其工作项
                 </div>
               ) : (
                 <Menu>

@@ -1,11 +1,23 @@
 import { useState } from 'react'
 import { Instance } from 'tippy.js'
 import Tippy, { TippyProps } from '@tippyjs/react'
+import { TwStyle } from 'twin.macro'
 
-export const Tooltip = (props: TippyProps) => {
+export const Tooltip = (
+  props: TippyProps & {
+    haveComponentChildren?: boolean
+    twChild?: TwStyle
+  }
+) => {
   const [instance, setInstance] = useState<Instance | null>(null)
 
-  const { content, children, ...rest } = props
+  const {
+    content,
+    children,
+    haveComponentChildren = true,
+    twChild,
+    ...rest
+  } = props
   const combProps: TippyProps = {
     interactive: true,
     theme: 'dark',
@@ -26,7 +38,11 @@ export const Tooltip = (props: TippyProps) => {
   }
   return (
     <Tippy {...combProps} onCreate={(o) => setInstance(o)}>
-      <span>{children}</span>
+      {haveComponentChildren ? (
+        <div css={[twChild]}>{children}</div>
+      ) : (
+        <>{children}</>
+      )}
     </Tippy>
   )
 }

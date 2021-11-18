@@ -24,13 +24,15 @@ interface IconProps {
   name: string
   className?: string
   size?: number
+  width?: number
+  height?: number
 }
 
 const Icons = (props: IconProps) => {
-  const { name, className = '', size = 24, ...others } = props
+  const { name, className = '', size = 24, height, width, ...others } = props
   const wh = {
-    width: size,
-    height: size,
+    width: width || size,
+    height: height || size,
   }
 
   return (

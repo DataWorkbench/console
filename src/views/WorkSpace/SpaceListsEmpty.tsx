@@ -1,8 +1,8 @@
-import { FC } from 'react'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
 import { Guide, GuideProps } from 'components'
+import SexangleImg from 'assets/svgr/sexangle.svg'
 
 const guideData: GuideProps = {
   title: '使用指引',
@@ -25,20 +25,29 @@ const guideData: GuideProps = {
   ],
 }
 
-export const SpaceListsEmpty: FC = () => {
-  const { isModal } = useWorkSpaceContext()
+const SpaceListsEmpty = () => {
+  const stateStore = useWorkSpaceContext()
+  const { isModal } = stateStore
   return (
     <div>
       <div css={[tw`bg-white`, !isModal && tw`pb-20`]}>
         <div tw="h-96 border-b border-neut-2 flex items-center justify-center">
           <div tw="w-[700px] text-center">
-            <Icon name="project" size={48} />
+            <div tw="relative inline-block">
+              <SexangleImg />
+              <Icon name="project" size={40} tw="absolute left-4 top-5" />
+            </div>
             <div tw="font-medium text-xl mt-5">暂无工作空间</div>
             <div tw="mt-4 text-neut-8">
               工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。
             </div>
             <div tw="space-x-4 mt-5">
-              <Button type="primary">
+              <Button
+                type="primary"
+                onClick={() => {
+                  stateStore.set({ curSpaceOpt: 'create' })
+                }}
+              >
                 <Icon name="add" />
                 创建工作空间
               </Button>
@@ -47,6 +56,13 @@ export const SpaceListsEmpty: FC = () => {
                 使用指南
               </Button>
             </div>
+            {/* <div tw="space-x-3 mt-4">
+              <a href="###" tw="text-link">
+                使用指南
+              </a>
+              <span>|</span>
+             <a href="###">使用指南</a>
+            </div> */}
           </div>
         </div>
         {!isModal && <Guide title={guideData.title} items={guideData.items} />}

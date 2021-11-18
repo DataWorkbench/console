@@ -7,7 +7,7 @@ import { get } from 'lodash-es'
 import { Modal, ModalContent } from 'components'
 import { useQueryClient } from 'react-query'
 import { useWorkSpaceContext } from 'contexts'
-import { formatDate } from 'utils/convert'
+import { formatDate, strlen, nameMatchRegex } from 'utils/convert'
 import { useMutationWorkSpace, getWorkSpaceKey } from 'hooks'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
@@ -31,12 +31,12 @@ const columns = [
     width: 220,
     dataIndex: 'id',
     render: (field, row) => (
-      <div tw="flex items-center">
+      <div tw="flex items-center w-full">
         <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
           <Icon name="project" size="small" />
         </div>
-        <div tw="ml-2">
-          <div tw="font-semibold">{row.name}</div>
+        <div tw="ml-2 overflow-hidden">
+          <div tw="font-semibold truncate">{row.name}</div>
           <div tw="text-neut-8">{field}</div>
         </div>
       </div>
@@ -244,8 +244,8 @@ const SpaceModal = observer(
               tw="mr-3 text-2xl leading-6"
               style={{ color: style.color }}
             />
-            <div>
-              <div tw="font-semibold text-base text-neut-15">
+            <div tw="flex-1 overflow-hidden">
+              <div tw="font-semibold text-base text-neut-15 truncate">
                 {opName}工作空间: 工作空间
                 {filterOptSpaces.map(({ name }) => name).join(',')}
               </div>
@@ -288,21 +288,21 @@ const SpaceModal = observer(
               name="name"
               label="工作空间名称"
               validateOnChange
-              placeholder="中文、字母、数字或下划线（_）"
+              placeholder="字母、数字或下划线（_）"
               labelClassName="medium"
               schemas={[
                 {
                   rule: {
                     required: true,
-                    matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/,
+                    matchRegex: nameMatchRegex,
                   },
-                  help: '中文、字母、数字或下划线（_）,不能以（_）开结尾',
+                  help: '字母、数字或下划线（_）,不能以（_）开结尾',
                   status: 'error',
                 },
                 {
-                  rule: {
-                    minLength: 2,
-                    maxLength: 128,
+                  rule: (value: string) => {
+                    const l = strlen(value)
+                    return l >= 2 && l <= 128
                   },
                   help: '最小长度2,最大长度128',
                   status: 'error',
@@ -318,9 +318,7 @@ const SpaceModal = observer(
               validateOnChange
               schemas={[
                 {
-                  rule: {
-                    maxLength: 1024,
-                  },
+                  rule: (value: string) => strlen(value) <= 1024,
                   help: '超过最大长度1024字节',
                   status: 'error',
                 },

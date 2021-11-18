@@ -1,22 +1,24 @@
 import { useCallback, useEffect } from 'react'
 import { throttle, flatten } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
-import { Loading, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Loading } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled } from 'twin.macro'
 import { useEvent } from 'react-use'
 import { useImmer } from 'use-immer'
 import { useWorkSpaceContext } from 'contexts'
-import { Center } from 'components'
 import { useQueryWorkSpace } from 'hooks'
 import SpaceItem from './SpaceItem'
+import SpaceListsEmpty from './SpaceListsEmpty'
 
 const colorVars = {
-  backColors: ['#b3e7d6', '#f2c0c3', '#cfafe9', '#b8def9', '#fbdeb4'],
-  fontColors: ['#2fb788', '#d44e4b', '#934bc5', '#229ce9', '#f59c2a'],
+  // backColors: ['#b3e7d6', '#f2c0c3', '#cfafe9', '#b8def9', '#fbdeb4'],
+  backColors: ['#D9F4F1', '#FDEFD8', '#F1E4FE', '#E0EBFE', '#FEE9DA'],
+  // fontColors: ['#2fb788', '#d44e4b', '#934bc5', '#229ce9', '#f59c2a'],
+  fontColors: ['#14B8A6', '#F59E0B', '#A855F7', '#3B82F6', '#F97316'],
 }
 
 const Content = styled('div')(() => [
-  tw`grid grid-cols-2 flex-wrap 2xl:gap-x-4 gap-x-2`,
+  tw`grid grid-cols-2 flex-wrap 2xl:grid-cols-3 gap-x-2`,
   css`
     & > div {
       ${tw`mb-4`}
@@ -107,15 +109,8 @@ const SpaceCardView = observer(() => {
     )
   }
 
-  if (workspaces.length === 0) {
-    return (
-      <Center tw="h-80">
-        <div tw="text-center text-neut-8">
-          <Icon name="display" size={56} />
-          <div>{window.getText('LEGO_UI_NO_AVAILABLE_DATA')}</div>
-        </div>
-      </Center>
-    )
+  if (ifNoData) {
+    return <SpaceListsEmpty />
   }
   return (
     <>

@@ -127,6 +127,7 @@ const StreamSQL = () => {
           <AceEditor
             tw="h-full"
             mode="sql"
+            showPrintMargin={false}
             theme="solarized_dark"
             width="100%"
             height="100%"
