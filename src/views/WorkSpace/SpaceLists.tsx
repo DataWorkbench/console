@@ -9,7 +9,7 @@ import SpaceCardView from './SpaceCardView'
 const SpaceLists = ({ region }: { region: IRegion }) => {
   const { isModal, cardView } = useWorkSpaceContext()
   return (
-    <Box tw="px-5 py-3">
+    <Box tw="px-5 py-4">
       {!isModal && <SpaceListsToolBar />}
       {cardView ? <SpaceCardView /> : <SpaceTableView regionId={region.id} />}
     </Box>

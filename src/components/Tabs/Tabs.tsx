@@ -63,10 +63,10 @@ export const Tabs: FC<TabsProps> = ({
             return (
               <div
                 css={[
-                  tw`border-l px-5 border-neut-3 text-center py-3 cursor-pointer`,
+                  tw`border-l -mb-px text-xs px-5 border-neut-3 text-center pb-3 pt-[9px] cursor-pointer`,
                   curPanelName === name
-                    ? tw`font-medium text-green-11 bg-white -mb-px border-t-[3px] (border-t-green-11)!`
-                    : tw`border-t`,
+                    ? tw`font-medium text-green-11 bg-white  border-t-[3px] (border-t-green-11)!`
+                    : tw`border-t pt-[11px]`,
                 ]}
                 onClick={() => {
                   handleTabClick(name)

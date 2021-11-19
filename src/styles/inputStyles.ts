@@ -1,6 +1,9 @@
 import tw, { css } from 'twin.macro'
 
 const inputStyles = css`
+  .input-search {
+    ${tw`text-base`}
+  }
   .dark {
     .input,
     .textarea {

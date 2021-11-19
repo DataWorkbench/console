@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, ToolBar, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { RadioButton, RadioGroup, Dropdown, Menu } from '@QCFE/lego-ui'
@@ -107,42 +107,46 @@ const SpaceListsToolBar = observer(() => {
           </Dropdown>
         )}
       </div>
-      <div tw="flex items-center space-x-2">
-        <InputSearch
-          tw="w-64"
-          placeholder="请输入工作名称/ID"
-          value={searchName}
-          onChange={(e, v: string) => setSearchName(v)}
-          onPressEnter={handleQuery}
-          onClear={() => {
-            setSearchName('')
-            stateStore.set({ queryKeyWord: '' })
-          }}
-        />
-        <Button loading={queryRefetch}>
-          <Icon
-            name="if-refresh"
-            tw="text-xl"
-            onClick={() => reloadWorkSpace()}
+      {!ifNoData && (
+        <div tw="flex items-center space-x-2">
+          <InputSearch
+            tw="w-64"
+            placeholder="请输入工作空间名称/ID"
+            value={searchName}
+            onChange={(e, v: string | number) => {
+              setSearchName(v)
+            }}
+            onPressEnter={handleQuery}
+            onClear={() => {
+              setSearchName('')
+              stateStore.set({ queryKeyWord: '' })
+            }}
           />
-        </Button>
-        {!cardView && (
-          <ToolBar.ColumnsSetting
-            defaultColumns={defaultColumns}
-            onSave={handleSaveColumns}
-            storageKey={columnSettingsKey}
-          />
-        )}
-        <div tw="border-l h-full border-neut-3" />
-        <RadioGroup
-          value={cardView ? 'card' : 'table'}
-          onChange={toggleViewMode}
-          size="default"
-        >
-          <RadioButton value="card">卡片视图</RadioButton>
-          <RadioButton value="table">列表视图</RadioButton>
-        </RadioGroup>
-      </div>
+          <Button loading={queryRefetch} tw="px-1.5">
+            <Icon
+              name="if-refresh"
+              tw="text-xl"
+              onClick={() => reloadWorkSpace()}
+            />
+          </Button>
+          {!cardView && (
+            <ToolBar.ColumnsSetting
+              defaultColumns={defaultColumns}
+              onSave={handleSaveColumns}
+              storageKey={columnSettingsKey}
+            />
+          )}
+          <div tw="border-l h-full border-neut-3" />
+          <RadioGroup
+            value={cardView ? 'card' : 'table'}
+            onChange={toggleViewMode}
+            size="default"
+          >
+            <RadioButton value="card">卡片视图</RadioButton>
+            <RadioButton value="table">列表视图</RadioButton>
+          </RadioGroup>
+        </div>
+      )}
     </FlexBox>
   )
 })

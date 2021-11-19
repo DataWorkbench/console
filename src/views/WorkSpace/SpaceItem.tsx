@@ -162,7 +162,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                   {space.status === 1 ? '活跃' : '已禁用'}
                 </StateTag>
               </FlexBox>
-              <div tw="pt-0.5 h-7 truncate">{space.desc}</div>
+              <div tw="pt-0.5 h-7 truncate">{space.desc || '暂无描述'}</div>
             </Box>
             {!isModal ? (
               <Tooltip

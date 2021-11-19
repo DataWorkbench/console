@@ -9,6 +9,7 @@ import sliderStyles from './sliderStyles'
 import inputStyles from './inputStyles'
 import menuStyles from './menuStyles'
 import tippyStyles from './tippyStyles'
+import pageTabStyles from './pageTabStyles'
 
 const customStyles = css`
   html {
@@ -134,6 +135,7 @@ const GlobalStyles = () => (
         inputStyles,
         menuStyles,
         tippyStyles,
+        pageTabStyles,
       ]}
     />
   </>

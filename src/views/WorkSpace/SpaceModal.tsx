@@ -323,7 +323,9 @@ const SpaceModal = observer(
                   status: 'error',
                 },
               ]}
-              defaultValue={curSpaceOpt === 'create' ? '' : curSpace.desc}
+              defaultValue={
+                curSpaceOpt === 'create' ? '' : curSpace.desc || '暂无描述'
+              }
             />
           </Form>
         </ModalContent>
