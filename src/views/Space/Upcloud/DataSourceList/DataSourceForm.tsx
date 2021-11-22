@@ -1,15 +1,16 @@
-import { useRef } from 'react'
+import React, { useRef } from 'react'
 import { Field, Label, Control } from '@QCFE/lego-ui'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get, omit } from 'lodash-es'
+import { get, omit, trim } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import { Alert, Form, Button, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useStore, useMutationSource } from 'hooks'
-import { FlexBox } from 'components'
-import MutilInputField from './MutilInputField'
+import { FlexBox, AffixLabel } from 'components'
+import { nameMatchRegex, strlen } from 'utils/convert'
+import HdfsNodeField from './HdfsNodeField'
 
 const { TextField, TextAreaField, NumberField, PasswordField } = Form
 
@@ -101,7 +102,7 @@ const getFieldsInfo = (type: string) => {
   const { database, host, password, port, user } = compInfo
   let fieldsInfo: {
     name: string
-    label?: string
+    label?: string | React.ReactNode
     placeholder?: string
     schemas?: any
     component?: any
@@ -156,6 +157,45 @@ const getFieldsInfo = (type: string) => {
         {
           name: 'nodes',
           label: 'Nodes',
+          // schemas: [
+          // {
+          //   rule: (o) => {
+          //     console.log('in rule', o)
+          //     if (trim(o.name_node) === '') {
+          //       return false
+          //     }
+          //     return true
+          //   },
+          //   help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
+          //   status: 'error',
+          // },
+          // {
+          //   rule: (v: string) => {
+          //     const splitReg = /\s*[=:]\s*|\s+/
+          //     const str = trim(v)
+          //     if (str === '') {
+          //       return true
+          //     }
+          //     const rows = str.split(/[\r\n]/).filter((n) => n !== '')
+          //     let invalid = false
+          //     rows.forEach((row) => {
+          //       const r = filter(trim(row).split(splitReg), (o) => o !== '')
+          //       if (r.length < 2) {
+          //         invalid = true
+          //       } else if (
+          //         !/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
+          //           r[1]
+          //         )
+          //       ) {
+          //         invalid = true
+          //       }
+          //     })
+          //     return !invalid
+          //   },
+          //   help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
+          //   status: 'error',
+          // },
+          // ],
         },
       ]
       break
@@ -189,14 +229,14 @@ const getFieldsInfo = (type: string) => {
   return fieldsInfo
 }
 
-interface CreateFormProps {
+interface IFormProps {
   resInfo: {
     name: string
     desc?: string
   }
 }
-const CreateForm = observer(
-  ({ resInfo }: CreateFormProps, ref) => {
+const DataSourceForm = observer(
+  ({ resInfo }: IFormProps, ref) => {
     const { regionId, spaceId } =
       useParams<{ regionId: string; spaceId: string }>()
     const [pingState, setPingState] = useImmer({
@@ -231,6 +271,7 @@ const CreateForm = observer(
             [urlType]: omit(fieldsValue, ['name', 'comment']),
           }
         }
+
         const params = {
           op: 'ping',
           regionId,
@@ -276,7 +317,14 @@ const CreateForm = observer(
         />
         <Form tw="max-w-lg!" layout="vertical" ref={ref}>
           <Field>
-            <Label>数据源连接方式</Label>
+            <Label>
+              <AffixLabel
+                help="数据源是大数据工作台用于数据处理的出入口,数据源采用连接串和云实例两种模式, 目前暂时只支持连接串模式。"
+                required={false}
+              >
+                数据源连接方式
+              </AffixLabel>
+            </Label>
             <Control tw="w-60">
               <div tw="rounded-sm border border-green-11 p-2">
                 <div tw="font-medium flex items-center">
@@ -284,7 +332,7 @@ const CreateForm = observer(
                   <span tw="text-green-11">连接串模式</span>
                 </div>
                 <div tw="text-neut-8">
-                  这是一个很长很长很长很长的关于模式的描述信息。
+                  连接串模式是通过IP端口用户名密码进行连接的方式。
                 </div>
               </div>
             </Control>
@@ -293,17 +341,21 @@ const CreateForm = observer(
             name="name"
             tw="w-80"
             defaultValue={get(sourceInfo, 'name', '')}
-            label={
-              <>
-                <span tw="text-red-10 mr-1">*</span>数据源名称
-              </>
-            }
-            placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-128`}
+            label={<AffixLabel>数据源名称</AffixLabel>}
+            placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
             validateOnChange
             schemas={[
               {
-                rule: (v) => /^(?!_)(?!.*?_$)[a-zA-Z0-9_]{2,128}$/.test(v),
-                help: '允许包含字母、数字 及 "_"，长度 2-128',
+                rule: { matchRegex: nameMatchRegex },
+                help: '允许包含字母、数字 及 "_"，长度 2-64',
+                status: 'error',
+              },
+              {
+                rule: (value: string) => {
+                  const l = strlen(value)
+                  return l >= 2 && l <= 64
+                },
+                help: '最小长度2,最大长度64',
                 status: 'error',
               },
             ]}
@@ -312,17 +364,16 @@ const CreateForm = observer(
             name="comment"
             defaultValue={get(sourceInfo, 'comment', '')}
             rows={3}
-            label={
-              <>
-                <span css={[{ color: '#CF3B37' }, tw`mr-1`]} />
-                数据源描述
-              </>
-            }
+            label="数据源描述"
+            resize
             placeholder="请填写数据库的描述信息"
             validateOnChange
             schemas={[
               {
-                rule: { maxLength: 256 },
+                rule: (value: string) => {
+                  const l = strlen(value)
+                  return l <= 256
+                },
                 help: '请填写数据库的描述信息',
                 status: 'error',
               },
@@ -340,8 +391,57 @@ const CreateForm = observer(
             const FieldComponent = component || TextField
             if (name === 'nodes') {
               return (
-                <MutilInputField ref={multiFiledRef} key={name} field={field} />
+                <HdfsNodeField
+                  key={name}
+                  name={name}
+                  validateOnBlur
+                  label={<AffixLabel required>{label}</AffixLabel>}
+                  defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
+                  schemas={[
+                    {
+                      rule: (o) => {
+                        if (trim(o.name_node) === '') {
+                          return false
+                        }
+                        if (
+                          !/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
+                            o.port
+                          )
+                        ) {
+                          return false
+                        }
+                        return true
+                      },
+                      help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
+                      status: 'error',
+                    },
+                  ]}
+                />
               )
+              //               return (
+              //                 <KVTextAreaField
+              //                   key={name}
+              //                   label={<AffixLabel required>{label}</AffixLabel>}
+              //                   title="Name_node/Port 信息"
+              //                   name={name}
+              //                   kvs={['Name_node', 'Port']}
+              //                   theme="light"
+              //                   schemas={schemas}
+              //                   validateOnBlur
+              //                   placeholder={`|请输入 name_node port ，多条配置之间换行输入。例如：
+              // 192.168.3.2 1234
+              // 192.168.2.8 2234`}
+              //                   defaultValue={(
+              //                     get(sourceInfo, `url.${urlType}.${name}`, []) || []
+              //                   )
+              //                     .map(
+              //                       (item: { name_node: string; port: number }) =>
+              //                         `${item.name_node} ${item.port}`
+              //                     )
+              //                     .join('\r\n')}
+              //                 />
+              //                 // <MutilInputField ref={multiFiledRef} key={name} field={field} />
+              //               )
             }
             return (
               <FieldComponent
@@ -352,26 +452,25 @@ const CreateForm = observer(
                 schemas={schemas}
                 css={['port'].includes(name) ? tw`w-28` : tw`w-80`}
                 {...rest}
-                label={
-                  <>
-                    <span css={[{ color: '#CF3B37' }, tw`mr-1`]}>*</span>
-                    {label}
-                  </>
-                }
+                label={<AffixLabel required>{label}</AffixLabel>}
                 placeholder={placeholder}
               />
             )
           })}
           <Field>
-            <Label>连通性测试</Label>
+            <Label>
+              <AffixLabel help="连通性测试" required={false}>
+                连通性测试
+              </AffixLabel>
+            </Label>
             <Control>
               <Button
                 disabled={mutation.isLoading}
                 type="outlined"
                 onClick={handlePing}
               >
-                <Icon name="changing-over" />
-                开始测试
+                <Icon name="add" />
+                计算集群
               </Button>
             </Control>
           </Field>
@@ -433,4 +532,4 @@ const CreateForm = observer(
   }
 )
 
-export default CreateForm
+export default DataSourceForm

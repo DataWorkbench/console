@@ -187,7 +187,9 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             title,
             dataIndex,
             width: 200,
-            render: (field: string) => <div tw="h-10 truncate">{field}</div>,
+            render: (field: string) => (
+              <div tw="h-10 truncate">{field || '暂无描述'}</div>
+            ),
           }
         }
         if (dataIndex === 'created') {

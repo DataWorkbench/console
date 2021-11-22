@@ -175,6 +175,7 @@ const ClusterTable = observer(() => {
           <AffixLabel
             help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
             required={false}
+            theme="green"
           >
             TaskManager
           </AffixLabel>
@@ -187,6 +188,7 @@ const ClusterTable = observer(() => {
           <AffixLabel
             help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8"
             required={false}
+            theme="green"
           >
             JobManager
           </AffixLabel>
@@ -308,16 +310,14 @@ const ClusterTable = observer(() => {
                 </Center>
               }
             >
-              <div>
-                <Button
-                  type="primary"
-                  disabled={infos.length > 4}
-                  onClick={() => setOp('create')}
-                >
-                  <Icon name="add" />
-                  创建集群
-                </Button>
-              </div>
+              <Button
+                type="primary"
+                disabled={infos.length > 4}
+                onClick={() => setOp('create')}
+              >
+                <Icon name="add" />
+                创建集群
+              </Button>
             </Tooltip>
             <Button
               disabled={

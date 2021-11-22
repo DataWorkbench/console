@@ -54,11 +54,11 @@ class GlobalStore {
           },
         ],
       },
-      {
-        name: 'logs',
-        title: '操作日志',
-        icon: 'paper',
-      },
+      // {
+      //   name: 'logs',
+      //   title: '操作日志',
+      //   icon: 'paper',
+      // },
     ],
     relationMenus: [
       // {

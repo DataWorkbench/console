@@ -23,7 +23,7 @@ const Root = styled('div')(() => [
 const SignleRoot = styled('div')(() => [
   css`
     & > div {
-      ${tw`border-b border-neut-13`}
+      ${tw`border-b border-neut-1 dark:border-neut-13`}
     }
   `,
 ])
@@ -34,7 +34,7 @@ const InputRow = styled(FlexBox)(
     tw`px-3 py-1.5 items-center`,
     css`
       &:hover {
-        ${tw`bg-neut-17`}
+        ${tw`bg-neut-2 dark:bg-neut-17`}
       }
     `,
   ]
@@ -49,6 +49,7 @@ interface IKVTextArea {
   placeholder?: string
   division?: string
   disabled?: boolean
+  theme?: 'light' | 'dark'
   onChange?: (v: string) => void
   onBlur?: (v: string) => void
 }
@@ -118,6 +119,7 @@ const KVTextArea = forwardRef(
       value = '',
       placeholder = '',
       division = ' ',
+      theme = 'dark',
       onBlur,
       onChange,
       disabled = false,
@@ -191,7 +193,7 @@ const KVTextArea = forwardRef(
         </RadioGroup>
         {type === 'batch' ? (
           <div>
-            <div tw="flex pl-4 h-8  items-center bg-neut-17">
+            <div tw="flex pl-4 h-8  items-center border border-neut-2 bg-neut-1 dark:bg-neut-17 dark:border-none">
               <span>{title}</span>
             </div>
             <TextArea
@@ -212,7 +214,7 @@ const KVTextArea = forwardRef(
           </div>
         ) : (
           <SignleRoot>
-            <FlexBox tw="bg-neut-17 h-8 items-center space-x-1 px-3 py-1.5">
+            <FlexBox tw="bg-neut-1 dark:bg-neut-17 h-8 items-center space-x-1 px-3 py-1.5">
               <span tw="w-1/2">{kvs[0]}</span>
               <span tw="w-1/2">{kvs[1]}</span>
             </FlexBox>
@@ -249,7 +251,7 @@ const KVTextArea = forwardRef(
             ))}
             <FlexBox tw="h-8 items-center">
               <Button type="text" onClick={() => addRow()} disabled={disabled}>
-                <Icon name="add" type="light" />
+                <Icon name="add" type={theme === 'dark' ? 'light' : 'dark'} />
                 添加参数
               </Button>
             </FlexBox>

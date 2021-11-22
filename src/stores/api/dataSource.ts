@@ -31,7 +31,7 @@ export const updateDataSource = ({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/source/${sourceId}`,
     body: rest,
-    method: 'POST',
+    method: 'PUT',
   })
 
 export const loadDataSource = ({
