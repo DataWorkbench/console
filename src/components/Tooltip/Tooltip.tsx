@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { CSSProperties, useState } from 'react'
 import { Instance } from 'tippy.js'
 import Tippy, { TippyProps } from '@tippyjs/react'
-import { TwStyle } from 'twin.macro'
+import tw, { TwStyle } from 'twin.macro'
+import { omit } from 'lodash-es'
 
 export const Tooltip = (
   props: TippyProps & {
-    haveComponentChildren?: boolean
+    hasPadding?: boolean
+    childStyle?: CSSProperties
     twChild?: TwStyle
   }
 ) => {
@@ -14,10 +16,12 @@ export const Tooltip = (
   const {
     content,
     children,
-    haveComponentChildren = true,
+    hasPadding = false,
+    childStyle,
     twChild,
     ...rest
   } = props
+
   const combProps: TippyProps = {
     interactive: true,
     theme: 'dark',
@@ -25,9 +29,10 @@ export const Tooltip = (
     animation: 'fade',
     delay: 100,
     // arrow: roundArrow,
-    ...rest,
+    ...omit(rest, 'data-tw'),
     content: (
       <div
+        css={hasPadding && tw`px-2 py-3`}
         onClick={() => {
           instance?.hide()
         }}
@@ -38,11 +43,7 @@ export const Tooltip = (
   }
   return (
     <Tippy {...combProps} onCreate={(o) => setInstance(o)}>
-      {haveComponentChildren ? (
-        <div css={[twChild]}>{children}</div>
-      ) : (
-        <>{children}</>
-      )}
+      <div css={[tw`inline-block`, [twChild]]}>{children}</div>
     </Tippy>
   )
 }

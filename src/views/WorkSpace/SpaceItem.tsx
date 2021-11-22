@@ -144,11 +144,11 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             <Center
               size={44}
               className="profile"
-              tw="text-base font-medium rounded-sm"
+              tw="text-base font-medium rounded-sm min-w-[44px]"
             >
               {getShortSpaceName(space.name)}
             </Center>
-            <Box tw="flex-1 overflow-hidden">
+            <Box tw="flex-1 overflow-hidden min-w-[276px]">
               <FlexBox tw="items-center">
                 <span
                   tw="font-medium text-base text-neut-16 truncate max-w-[80px]"
@@ -204,7 +204,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
         {renderGrid()}
       </div>
       {!isModal && (
-        <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-2 xl:space-x-3 2xl:space-x-4">
+        <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-4 xl:space-x-4 2xl:space-x-4">
           {funcList.map(({ name: funcName, title, subFuncList }) => (
             <Tooltip
               key={funcName}
@@ -243,7 +243,10 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 }}
                 tw="inline-block"
               >
-                <OptButton disabled={disableStatus} tw="px-4 xl:px-8 py-1">
+                <OptButton
+                  disabled={disableStatus}
+                  tw="px-6 xl:px-9 2xl:px-7 py-1"
+                >
                   {title}
                 </OptButton>
               </Link>

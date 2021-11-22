@@ -311,6 +311,7 @@ const ClusterModal = observer(
                     label={
                       <AffixLabel
                         required
+                        theme="green"
                         help="如果您没有配置该参数，则按Apache Flink默认的重启策略，即当有Task失败时，如果没有开启Checkpoint，JobManager进程不会重启。如果开启了Checkpoint，则JobManager进程会重启。"
                       >
                         重启策略
@@ -459,7 +460,10 @@ const ClusterModal = observer(
                 <Form>
                   <NumberField
                     label={
-                      <AffixLabel help="Flink 的 TaskNumber 的数量">
+                      <AffixLabel
+                        help="Flink 的 TaskNumber 的数量"
+                        theme="green"
+                      >
                         Task 数量
                       </AffixLabel>
                     }
@@ -477,7 +481,10 @@ const ClusterModal = observer(
                   />
 
                   <Field>
-                    <AffixLabel help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8">
+                    <AffixLabel
+                      theme="green"
+                      help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
+                    >
                       Task CU
                     </AffixLabel>
                     <Control tw="pl-12 pt-3 w-80!">
@@ -516,7 +523,10 @@ const ClusterModal = observer(
                     <Center tw="ml-3 text-neut-8">（每 CU：1核 4G）</Center>
                   </Field>
                   <Field>
-                    <AffixLabel help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8">
+                    <AffixLabel
+                      theme="green"
+                      help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8"
+                    >
                       Job CU
                     </AffixLabel>
                     <Control tw="pl-12 pt-3 w-80!">

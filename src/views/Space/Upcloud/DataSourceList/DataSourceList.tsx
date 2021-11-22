@@ -433,7 +433,7 @@ const DataSourceList = observer(() => {
             selectType="checkbox"
             dataSource={sourceList}
             columns={columns}
-            rowKey="sourceid"
+            rowKey="source_id"
             tw="pb-4"
             selectedRowKeys={selectedRowKeys}
             onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}

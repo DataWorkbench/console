@@ -1,59 +1,71 @@
 import { ReactNode } from 'react'
-import { Tooltip, Icon } from '@QCFE/lego-ui'
-import tw, { css, styled } from 'twin.macro'
+import { Icon } from '@QCFE/lego-ui'
+import { Tooltip } from 'components/Tooltip'
+import { Center } from 'components/Center'
 
-const TooltipWrapper = styled(Tooltip)(() => [
-  css`
-    ${tw`bg-green-11`}
-    &[x-placement^=bottom] .tooltip-arrow {
-      ${tw`border-b-green-11!`}
-    }
-    &[x-placement^='top'] .tooltip-arrow {
-      ${tw`border-t-green-11!`}
-    }
-  `,
-])
+// const TooltipWrapper = styled(Tooltip)(() => [
+//   css`
+//     .dark {
+//       ${tw`bg-green-11`}
+//       &[x-placement^=bottom] .tooltip-arrow {
+//         ${tw`border-b-green-11!`}
+//       }
+//       &[x-placement^='top'] .tooltip-arrow {
+//         ${tw`border-t-green-11!`}
+//       }
+//     }
+//   `,
+// ])
 
 export const AffixLabel = ({
   required = true,
   help,
   children,
   placement = 'top',
-  trigger = 'hover',
+  trigger = 'mouseenter focus',
   disabled = false,
+  theme = 'darker',
 }: {
   required?: boolean
   help?: string
   children?: ReactNode
   placement?:
     | 'top'
-    | 'left'
+    | 'top-start'
+    | 'top-end'
     | 'right'
+    | 'right-start'
+    | 'right-end'
     | 'bottom'
-    | 'topLeft'
-    | 'topRight'
-    | 'leftTop'
-    | 'leftBottom'
-    | 'bottomLeft'
-    | 'bottomRight'
-    | 'rightTop'
-    | 'rightBottom'
-  trigger?: 'hover' | 'click' | 'focus'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'auto'
+    | 'auto-start'
+    | 'auto-end'
+  trigger?: string
   disabled?: boolean
+  theme?: 'light' | 'dark' | 'darker' | 'green'
 }) => {
   return (
-    <div tw="inline-flex items-center">
+    <div tw="flex items-center">
       {required && <b tw="text-red-10 mr-1">*</b>}
-      <span tw="mr-1">{children}</span>
+      <span tw="mr-1 font-medium">{children}</span>
       {help && (
-        <TooltipWrapper
+        <Tooltip
           content={help}
           placement={placement}
           trigger={trigger}
+          theme={theme}
           disabled={disabled}
+          hasPadding
         >
-          <Icon name="information" size={14} />
-        </TooltipWrapper>
+          <Center>
+            <Icon name="information" size={16} />
+          </Center>
+        </Tooltip>
       )}
     </div>
   )

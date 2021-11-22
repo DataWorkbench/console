@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import React, { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { Modal, ModalStep, ModalContent } from 'components'
@@ -21,10 +21,10 @@ import HbaseImg from 'assets/svgr/sources/hbase.svg'
 import KafkaImg from 'assets/svgr/sources/kafka.svg'
 import FtpImg from 'assets/svgr/sources/ftp.svg'
 import HdfsImg from 'assets/svgr/sources/hadoop.svg'
-import CreateForm from './CreateForm'
+import DataSourceForm from './DataSourceForm'
 import DbList from './DbList'
 
-const resInfos = [
+const resInfos: { name: string; img?: React.ReactNode; desc?: string }[] = [
   {
     name: 'MySQL',
     img: <MysqlImg />,
@@ -102,8 +102,7 @@ const DataSourceModal = observer(
       const formElem = form.current
       if (formElem?.validateForm()) {
         const { name, comment, ...rest } = formElem.getFieldsValue()
-        // const sourcetype: string = curkind.name
-        // get(kinds, `[${state.dbIndex}].name`)
+        const kind = curkind.name.toLowerCase()
         const params = {
           op,
           regionId,
@@ -112,11 +111,11 @@ const DataSourceModal = observer(
           comment,
           source_type: curkind.sourcetype,
           url: {
-            [curkind.name.toLowerCase()]: rest,
+            [kind]: rest,
           },
         }
         if (op === 'update') {
-          params.sourceId = opSourceList[0].sourceid
+          params.sourceId = opSourceList[0].source_id
         }
         mutation.mutate(params, {
           onSuccess: () => {
@@ -203,7 +202,7 @@ const DataSourceModal = observer(
 
                 return (
                   curkind && (
-                    <CreateForm
+                    <DataSourceForm
                       ref={form}
                       resInfo={resInfos.find(
                         (info) => info.name === curkind.name
