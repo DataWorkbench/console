@@ -1,7 +1,15 @@
 import { omit } from 'lodash-es'
-import { useQuery, useInfiniteQuery } from 'react-query'
+import { useQuery, useInfiniteQuery, useMutation } from 'react-query'
 import { useParams } from 'react-router-dom'
-import { loadResourceList } from 'stores/api'
+import {
+  loadResourceList,
+  createResourceJob,
+  loadSignature,
+  deleteResource,
+  updateResource,
+  downloadFile,
+  reuploadResource,
+} from 'stores/api'
 
 interface IRouteParams {
   regionId: string
@@ -76,3 +84,67 @@ export const useQueryResource = (filter: Record<string, any>, options = {}) => {
     }
   )
 }
+
+let resourcePageKey: any = ''
+
+export const getResourcePageQueryKey = () => resourcePageKey
+
+export const useQueryResourceByPage = (filter: any) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const params = {
+    regionId,
+    spaceId,
+    limit: 10,
+    offset: 0,
+    ...filter,
+  }
+  resourcePageKey = ['resourcePageList', params]
+  return useQuery(resourcePageKey, async () => loadResourceList(params), {
+    keepPreviousData: true,
+  })
+}
+
+export const useQuerySignature = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  return useQuery('signature', async () => {
+    const ret = await loadSignature({ region: regionId, spaceId })
+    return ret
+  })
+}
+
+export const useMutationResource = (options?: any) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const { endpoint, headers } = options || {}
+  return useMutation(
+    async ({
+      op,
+      ...rest
+    }: {
+      op: OP
+      resourceIds?: string[]
+      resource_id?: string
+    }) => {
+      const formParams = { endpoint, spaceId, headers, ...rest }
+      const params = {
+        ...rest,
+        regionId,
+        spaceId,
+      }
+      let ret = null
+      if (op === 'create') {
+        ret = await createResourceJob(formParams)
+      } else if (op === 'edit') {
+        ret = await updateResource(params)
+      } else if (op === 'delete') {
+        ret = await deleteResource(params)
+      } else if (op === 'enable') {
+        ret = await downloadFile(params)
+      } else if (op === 'view') {
+        ret = await reuploadResource(formParams)
+      }
+      return ret
+    }
+  )
+}
+
+export default useMutationResource
