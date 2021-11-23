@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
-import { Dropdown, Menu } from '@QCFE/lego-ui'
 import {
   Button,
   Icon,
@@ -14,15 +13,13 @@ import { observer } from 'mobx-react-lite'
 import {
   useStore,
   useQueryNetworks,
-  getFlinkClusterKey,
+  getNetworkKey,
   useMutationCluster,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
 import dayjs from 'dayjs'
 import { css } from 'twin.macro'
 import NetworkModal from './NetworkModal'
-
-const { MenuItem } = Menu
 
 interface IFilter {
   name: string
@@ -103,7 +100,6 @@ const NetworkTable = observer(() => {
         dataIndex: 'id',
         render: (v: any, row: any) => (
           <FlexBox tw="items-center">
-            <Button type="text">Flink UI</Button>
             <Button
               type="text"
               disabled={[1, 3].includes(row.status)}
@@ -114,34 +110,15 @@ const NetworkTable = observer(() => {
             >
               修改
             </Button>
-            <Center>
-              <Dropdown
-                content={
-                  <Menu
-                    onClick={(e: any, key: string) => {
-                      setOp(key)
-                      setOpNetworkList([row])
-                    }}
-                  >
-                    <MenuItem key="view">查看详情</MenuItem>
-                    {(row.status === 1 || row.status === 3) && (
-                      <MenuItem key="stop">停用</MenuItem>
-                    )}
-                    {row.status === 2 && <MenuItem key="start">启动</MenuItem>}
-                    <MenuItem
-                      key="delete"
-                      disabled={[1, 3].includes(row.status)}
-                    >
-                      删除
-                    </MenuItem>
-                  </Menu>
-                }
-              >
-                <Button type="text">
-                  <Icon name="more" clickable type="light" />
-                </Button>
-              </Dropdown>
-            </Center>
+            <Button
+              type="text"
+              onClick={() => {
+                setOp('delete')
+                setOpNetworkList([row])
+              }}
+            >
+              删除
+            </Button>
           </FlexBox>
         ),
       },
@@ -149,7 +126,7 @@ const NetworkTable = observer(() => {
   }, [setOp, setOpNetworkList, filter.reverse])
 
   const refetchData = () => {
-    queryClient.invalidateQueries(getFlinkClusterKey())
+    queryClient.invalidateQueries(getNetworkKey())
   }
 
   const mutateData = () => {
@@ -191,11 +168,7 @@ const NetworkTable = observer(() => {
       <div tw="mb-3">
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
-            <Button
-              type="primary"
-              disabled={infos.length > 4}
-              onClick={() => setOp('create')}
-            >
+            <Button type="primary" onClick={() => setOp('create')}>
               <Icon name="add" />
               创建网络
             </Button>
@@ -290,8 +263,14 @@ const NetworkTable = observer(() => {
           width={opNetworkList.length > 1 ? 600 : 400}
           onCancel={() => setOp('')}
           onOk={mutateData}
-          okType={op === 'start' ? 'primary' : 'danger'}
+          // okType={op === 'start' ? 'primary' : 'danger'}
           confirmLoading={mutation.isLoading}
+          footer={
+            <FlexBox tw="justify-end">
+              <Button onClick={() => setOp('')}>取消</Button>
+              <Button type={op === 'start' ? 'primary' : 'danger'}>确定</Button>
+            </FlexBox>
+          }
         >
           <FlexBox tw="space-x-3 mb-3">
             <Icon
@@ -304,44 +283,30 @@ const NetworkTable = observer(() => {
             />
             <section tw="flex-1">
               {(() => {
-                const txtObj = { start: '启动', stop: '停用', delete: '删除' }
-                const opText = txtObj[op]
-                const opclusterLen = opNetworkList.length
+                const opText = '删除'
+                const opNetworkLen = opNetworkList.length
 
                 const clusterText =
-                  opclusterLen === 1 ? (
+                  opNetworkLen === 1 ? (
                     <>
-                      {opText}计算集群{opNetworkList[0].name}
+                      确认{opText}网络配置{opNetworkList[0].name}
                       <span tw="text-neut-8 break-all">
                         ({opNetworkList[0].id})
                       </span>
                     </>
                   ) : (
                     <>
-                      {opText}以下{opNetworkList.length}个计算集群
+                      {opText}以下{opNetworkList.length}个网络配置
                     </>
                   )
-                if (op === 'start') {
-                  return (
-                    <>
-                      <div tw="font-medium mb-2 text-base">{clusterText}</div>
-                      <div className="modal-content-message">
-                        确定启动{clusterText}吗？
-                      </div>
-                    </>
-                  )
-                }
-
                 return (
                   <>
                     <div tw="font-medium mb-2 text-base">
                       {clusterText}注意事项
                     </div>
                     <div className="modal-content-message">
-                      {clusterText}后，已发布的作业和正在运行中实例会受到影响
-                      {op === 'stop'
-                        ? `。确认${opText}吗？`
-                        : ', 且该操作无法撤回。确认删除吗？'}
+                      {clusterText}
+                      后，关联资源会受到影响，且该操作无法撤回。确认删除吗？
                     </div>
                   </>
                 )
@@ -354,7 +319,7 @@ const NetworkTable = observer(() => {
                 dataSource={opNetworkList}
                 rowKey="id"
                 columns={columns.filter((col) =>
-                  ['name', 'status', 'version'].includes(col.dataIndex)
+                  ['name', 'router_id', 'vxnet_id'].includes(col.dataIndex)
                 )}
               />
             )}
