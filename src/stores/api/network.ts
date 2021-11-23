@@ -2,7 +2,7 @@ import { request } from 'utils'
 
 interface IParams {
   regionId: string
-  spaceId: string
+  spaceId?: string
   [k: string]: unknown
 }
 
@@ -10,6 +10,20 @@ export const listNetworks = ({ regionId, spaceId, ...rest }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/network`,
+    query: rest,
+  })
+
+export const describeRouters = ({ regionId, ...rest }: IParams) =>
+  request({
+    region: regionId,
+    action: 'DescribeRouters',
+    query: rest,
+  })
+
+export const describeRouterVxnets = ({ regionId, ...rest }: IParams) =>
+  request({
+    region: regionId,
+    action: 'DescribeRouterVxnets',
     query: rest,
   })
 

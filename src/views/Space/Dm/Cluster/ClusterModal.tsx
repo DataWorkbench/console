@@ -14,12 +14,13 @@ import {
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { set, range, trim, filter, assign } from 'lodash-es'
+import { set, range, trim, filter, assign, flatten } from 'lodash-es'
 import { useQueryClient } from 'react-query'
 import Tippy from '@tippyjs/react'
 import {
   useStore,
   useQueryFlinkVersions,
+  useQueryInfiniteNetworks,
   useMutationCluster,
   getFlinkClusterKey,
 } from 'hooks'
@@ -124,6 +125,14 @@ const ClusterModal = observer(
 
     const queryClient = useQueryClient()
     const { data: flinkVersions } = useQueryFlinkVersions()
+    const networksRet = useQueryInfiniteNetworks({
+      offset: 0,
+      limit: 10,
+    })
+    const networks = flatten(
+      networksRet.data?.pages.map((page) => page.infos || [])
+    )
+    // const { data: networksData } = useQueryNetworks()
     const mutation = useMutationCluster()
     const totalCU = params.task_num * params.task_cu + params.job_cu
 
@@ -620,12 +629,25 @@ const ClusterModal = observer(
                         help: '请选择网络',
                       },
                     ]}
-                    options={[
-                      {
-                        label: 'net-0526a830be4f3000',
-                        value: 'net-0526a830be4f3000',
-                      },
-                    ]}
+                    options={networks.map(({ name, router_id }) => ({
+                      label: name,
+                      value: router_id,
+                    }))}
+                    isLoading={networksRet.isFetching}
+                    isLoadingAtBottom
+                    searchable={false}
+                    onMenuScrollToBottom={() => {
+                      if (networksRet.hasNextPage) {
+                        networksRet.fetchNextPage()
+                      }
+                    }}
+                    bottomTextVisible
+                    // options={[
+                    //   {
+                    //     label: 'net-0526a830be4f3000',
+                    //     value: 'net-0526a830be4f3000',
+                    //   },
+                    // ]}
                     help={<div>如需选择新的 VPC，您可以新建 VPC 网络</div>}
                   />
                 </Form>

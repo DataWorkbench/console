@@ -11,7 +11,7 @@ const selectStyles = css`
       > .select-control {
         ${tw`bg-neut-16 border-neut-13`}
         &:hover,
-    &:active {
+        &:active {
           ${tw`bg-neut-16 border-neut-8`}
         }
         &:focus {
@@ -32,11 +32,14 @@ const selectStyles = css`
         }
       }
       & > .select-menu-outer {
-        ${tw`bg-neut-17 border-neut-13`}
+        ${tw`bg-neut-17 border-neut-13 !max-h-[270px]`}
+        .select-menu {
+          ${tw`!max-h-[270px]`}
+        }
         .select-option {
           ${tw`bg-neut-17 text-white`}
           &.is-selected,
-      &:hover {
+          &:hover {
             ${tw`bg-neut-16`}
           }
         }

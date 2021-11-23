@@ -5,9 +5,16 @@ import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
-import { assign } from 'lodash-es'
-import { useStore, useMutationNetwork, getNetworkKey } from 'hooks'
+import { assign, flatten } from 'lodash-es'
+import {
+  useStore,
+  useMutationNetwork,
+  getNetworkKey,
+  useQueryDescribeRouters,
+  useQueryDescribeRoutersVxnets,
+} from 'hooks'
 import { Modal, FlexBox, AffixLabel } from 'components'
+import { nameMatchRegex } from 'utils/convert'
 
 const { TextField, SelectField } = Form
 
@@ -46,9 +53,25 @@ const ClusterModal = observer(
       dmStore: { setOp, op },
     } = useStore()
     const [params, setParams] = useImmer(opNetwork || defaultParams)
+
     const formRef = useRef<Form>(null)
     const queryClient = useQueryClient()
+    const routersRet = useQueryDescribeRouters({
+      offset: 0,
+      limit: 10,
+    })
+    const vxnetsRet = useQueryDescribeRoutersVxnets({
+      offset: 0,
+      limit: 200,
+      router: params.router_id || '',
+    })
     const mutation = useMutationNetwork()
+    const routers = flatten(
+      routersRet.data?.pages.map((page) => page.router_set || [])
+    )
+    const vxnets = flatten(
+      vxnetsRet.data?.pages.map((page) => page.router_vxnet_set || [])
+    )
 
     const handleOk = () => {
       const form = formRef.current
@@ -97,7 +120,7 @@ const ClusterModal = observer(
                   {
                     rule: {
                       required: true,
-                      matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/,
+                      matchRegex: nameMatchRegex,
                     },
                     status: 'error',
                     help: '不能为空,字母、数字或下划线（_）,不能以（_）开始结尾',
@@ -110,11 +133,23 @@ const ClusterModal = observer(
                 validateOnBlur
                 name="router_id"
                 value={params.router_id}
+                options={routers.map(({ router_id, router_name }) => ({
+                  value: router_id,
+                  label: router_name,
+                }))}
                 onChange={(v: string) => {
                   setParams((draft) => {
                     draft.router_id = v
                   })
                 }}
+                isLoadingAtBottom
+                searchable={false}
+                onMenuScrollToBottom={() => {
+                  if (routersRet.hasNextPage) {
+                    routersRet.fetchNextPage()
+                  }
+                }}
+                bottomTextVisible
                 help={
                   <>
                     如需选择新的 VPC，您可以
@@ -134,7 +169,6 @@ const ClusterModal = observer(
                     help: '不能为空',
                   },
                 ]}
-                options={[]}
               />
               <SelectField
                 label={<AffixLabel>私有网络</AffixLabel>}
@@ -142,11 +176,24 @@ const ClusterModal = observer(
                 validateOnBlur
                 name="vxnet_id"
                 value={params.vxnet_id}
+                options={vxnets.map(({ vxnet_id, vxnet_name }) => ({
+                  value: vxnet_id,
+                  label: vxnet_name,
+                }))}
                 onChange={(v: string) => {
                   setParams((draft) => {
                     draft.vxnet_id = v
                   })
                 }}
+                isLoading={vxnetsRet.isFetching}
+                isLoadingAtBottom
+                searchable={false}
+                onMenuScrollToBottom={() => {
+                  if (vxnetsRet.hasNextPage) {
+                    vxnetsRet.fetchNextPage()
+                  }
+                }}
+                bottomTextVisible
                 schemas={[
                   {
                     rule: {
@@ -166,7 +213,6 @@ const ClusterModal = observer(
                     </a>
                   </>
                 }
-                options={[]}
               />
             </Form>
           </FormWrapper>
