@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from 'react-query'
+import { useQuery, useInfiniteQuery, useMutation } from 'react-query'
 import { useParams } from 'react-router-dom'
 import {
   listAvailableFlinkVersions,
@@ -9,7 +9,7 @@ import {
   startFlinkClusters,
   stopFlinkClusters,
 } from 'stores/api'
-import { get } from 'lodash-es'
+import { get, omit } from 'lodash-es'
 
 interface IRouteParams {
   regionId: string
@@ -41,6 +41,42 @@ export const useQueryFlinkClusters = (filter: any) => {
   queryKey = ['flinkCluster', params]
   return useQuery(queryKey, async () => listFlinkClusters(params), {
     keepPreviousData: true,
+  })
+}
+
+export const useQueryInfiniteFlinkClusters = ({
+  filter = {},
+  enabled = true,
+}) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const params = {
+    regionId,
+    spaceId,
+    limit: 10,
+    offset: 0,
+    ...filter,
+  }
+  const qryKey = ['flinkCluster', omit(params, 'offset')]
+  return useInfiniteQuery(qryKey, async () => listFlinkClusters(params), {
+    enabled,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.has_more) {
+        const nextOffset = allPages.reduce(
+          (acc, cur) => acc + cur.infos.length,
+          0
+        )
+
+        if (nextOffset < lastPage.total) {
+          const nextParams = {
+            ...params,
+            offset: nextOffset,
+          }
+          return nextParams
+        }
+      }
+
+      return undefined
+    },
   })
 }
 

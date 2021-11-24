@@ -2,8 +2,12 @@ import { useEffect } from 'react'
 import { DarkModal, FlexBox } from 'components'
 import { Icon, Form, Collapse, Loading } from '@QCFE/lego-ui'
 import { useImmer } from 'use-immer'
-import { get } from 'lodash-es'
-import { useMutationStreamJobArgs, useQueryStreamJobArgs } from 'hooks'
+import { get, flatten } from 'lodash-es'
+import {
+  useMutationStreamJobArgs,
+  useQueryStreamJobArgs,
+  useQueryInfiniteFlinkClusters,
+} from 'hooks'
 import { ScheForm } from './styled'
 
 const { CollapseItem } = Collapse
@@ -20,6 +24,11 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
 
   const mutation = useMutationStreamJobArgs()
   const { data, isFetching } = useQueryStreamJobArgs()
+  const clustersRet = useQueryInfiniteFlinkClusters({ filter: { limit: 50 } })
+
+  const clusters = flatten(
+    clustersRet.data?.pages.map((page) => page.infos || [])
+  )
 
   useEffect(() => {
     setParams((draft) => {
@@ -77,12 +86,36 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 name="clusters"
                 label="计算集群"
                 value={params.clusterId}
-                options={[
+                onChange={(v: string) => {
+                  setParams((draft) => {
+                    draft.clusterId = v
+                  })
+                }}
+                options={clusters.map(({ id, name }) => ({
+                  value: id,
+                  label: name,
+                }))}
+                schemas={[
                   {
-                    label: 'eng-0000000000000000',
-                    value: 'eng-0000000000000000',
+                    rule: { required: true },
+                    help: '请选择计算集群',
+                    status: 'error',
                   },
                 ]}
+                isLoadingAtBottom
+                searchable={false}
+                onMenuScrollToBottom={() => {
+                  if (clustersRet.hasNextPage) {
+                    clustersRet.fetchNextPage()
+                  }
+                }}
+                bottomTextVisible
+                // options={[
+                //   {
+                //     label: 'eng-0000000000000000',
+                //     value: 'eng-0000000000000000',
+                //   },
+                // ]}
                 help={
                   <div>
                     如需选择新的集群，可以在计算集群

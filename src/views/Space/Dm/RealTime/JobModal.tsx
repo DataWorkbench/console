@@ -1,10 +1,14 @@
 import { useRef, useMemo } from 'react'
 import { useImmer } from 'use-immer'
-import { Modal, ModalStep, ModalContent } from 'components'
+import { Modal, ModalStep, ModalContent, AffixLabel } from 'components'
 import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
-import { get, assign } from 'lodash-es'
+import { get, assign, flatten } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
-import { useMutationStreamJob, getFlowKey } from 'hooks'
+import {
+  useMutationStreamJob,
+  getFlowKey,
+  useQueryInfiniteFlinkClusters,
+} from 'hooks'
 import { useQueryClient } from 'react-query'
 
 const { TextField, TextAreaField, SelectField } = Form
@@ -34,8 +38,16 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
     step: job ? 1 : 0,
     scheType: job ? job.type : 0,
   })
+  const clustersRet = useQueryInfiniteFlinkClusters({
+    filter: { limit: 50 },
+    enabled: params.step === 1,
+  })
   const mutation = useMutationStreamJob()
   const queryClient = useQueryClient()
+
+  const clusters = flatten(
+    clustersRet.data?.pages.map((page) => page.infos || [])
+  )
 
   const handleCancel = () => {
     setParams((draft) => {
@@ -201,7 +213,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
             <Form layout="vertical" ref={form}>
               <TextField
                 name="name"
-                label="* 作业名称"
+                label={<AffixLabel>作业名称</AffixLabel>}
                 placeholder='允许包含字母、数字 及 "_"，长度2～128'
                 validateOnChange
                 defaultValue={get(job, 'name', '')}
@@ -221,15 +233,34 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
               {!job && (
                 <SelectField
                   name="cluster_id"
-                  label="计算集群"
+                  label={<AffixLabel>计算集群</AffixLabel>}
                   placeholder="请选择计算集群"
-                  value="eng-0000000000000000"
-                  options={[
+                  // value="eng-0000000000000000"
+                  options={clusters.map(({ id, name }) => ({
+                    value: id,
+                    label: name,
+                  }))}
+                  schemas={[
                     {
-                      label: 'test',
-                      value: 'eng-0000000000000000',
+                      rule: { required: true },
+                      help: '请选择计算集群',
+                      status: 'error',
                     },
                   ]}
+                  isLoadingAtBottom
+                  searchable={false}
+                  onMenuScrollToBottom={() => {
+                    if (clustersRet.hasNextPage) {
+                      clustersRet.fetchNextPage()
+                    }
+                  }}
+                  bottomTextVisible
+                  // options={[
+                  //   {
+                  //     label: 'test',
+                  //     value: 'eng-0000000000000000',
+                  //   },
+                  // ]}
                 />
               )}
               <TextAreaField

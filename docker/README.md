@@ -11,6 +11,24 @@
 - 默认 nginx 配置的宿主 PORT 为 8888
 - 映射 nginx、memcahed 配置信息到容器内,方便修改(一般默认就可以)
 
+### console 路径配置
+
+部署在 tesing 环境时候有分三个文件夹`docker` `pitrix-webconsole` `pitrix-webconsole`
+
+```yaml
+# .env文件
+
+# 本地console
+CONSOLE_SRC=../../pitrix-webconsole/src
+BIGDATA_SRC=..
+NGINX_EXPOSE_PORT=8888
+
+# testing等环境
+CONSOLE_SRC=../pitrix-webconsole
+BIGDATA_SRC=../pitrix-webconsole-bigdata
+NGINX_EXPOSE_PORT=80
+```
+
 ### 启动方式
 
 ```bash
