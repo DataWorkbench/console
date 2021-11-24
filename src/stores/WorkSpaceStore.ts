@@ -32,7 +32,15 @@ class WorkSpaceStore {
       title: '运维中心',
       subFuncList: [
         { name: 'overview', title: '运维大屏', icon: 'blockchain' },
-        { name: 'realtime', title: '实时任务运维', icon: 'blockchain' },
+        {
+          name: 'stream',
+          title: '流式计算运维',
+          icon: 'blockchain',
+          items: [
+            { name: 'release', title: '已发布作业' },
+            { name: 'job', title: '作业实例' },
+          ],
+        },
         { name: 'offline', title: '离线任务运维', icon: 'blockchain' },
         { name: 'monitor', title: '智能监控', icon: 'blockchain' },
         { name: 'logs', title: '操作日志', icon: 'blockchain' },

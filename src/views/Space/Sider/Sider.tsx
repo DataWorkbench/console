@@ -22,6 +22,14 @@ const SideMenuWrapper = styled('div')(() => [
             ${tw`pl-4 border-l-2 border-neut-2 dark:(border-neut-17)`}
           }
         }
+        .level-expand {
+          .icon-title {
+            ${tw`border-0`}
+          }
+          .level-row {
+            ${tw`border-0`}
+          }
+        }
         .selected-row {
           ${tw`bg-neut-16 dark:(bg-neut-13) rounded-sm border-l-0`}
           .icon-title {
@@ -82,10 +90,24 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
   const curFunc =
     func.subFuncList.find((fn: any) => fn.name === mod) || func.subFuncList[0]
 
-  const navMenu = func?.subFuncList.map((fn: any) => ({
-    ...fn,
-    link: `/${regionId}/workspace/${spaceId}/${funcMod}/${fn.name}`,
-  }))
+  const navMenu = func?.subFuncList.map((fn: any) => {
+    let items = []
+
+    if (fn.items) {
+      items = fn.items.map((subFn: any) => ({
+        ...subFn,
+        link: `/${regionId}/workspace/${spaceId}/${funcMod}/${subFn.name}`,
+      }))
+      return {
+        ...fn,
+        items,
+      }
+    }
+    return {
+      ...fn,
+      link: `/${regionId}/workspace/${spaceId}/${funcMod}/${fn.name}`,
+    }
+  })
 
   return (
     <SideMenuWrapper>

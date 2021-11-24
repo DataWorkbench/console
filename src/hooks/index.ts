@@ -10,5 +10,6 @@ export * from './useUdf'
 export * from './useCluster'
 export * from './useNetwork'
 export * from './useResource'
+export * from './useStream'
 
 export { useDarkMode, useScrollBlock, useStore }
