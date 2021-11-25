@@ -184,9 +184,9 @@ const DataSourceModal = observer(
                   )
                   return (
                     <>
-                      <p>
+                      <p tw="pt-2 pb-3 font-medium">
                         请选择一个数据库，您也可以参考
-                        <a href="##" className="text-link">
+                        <a href="##" tw="text-link">
                           数据库文档
                         </a>
                         进行查看配置
