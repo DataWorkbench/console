@@ -35,8 +35,7 @@ const ModalStep = ({
               </span>
               <div
                 css={[
-                  tw`font-medium`,
-                  step !== i && tw`dark:text-neut-8`,
+                  step !== i ? tw`dark:text-neut-8` : tw`font-medium`,
                   sameLine ? tw`ml-1` : tw`mt-1`,
                 ]}
               >

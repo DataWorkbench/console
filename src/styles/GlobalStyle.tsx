@@ -13,7 +13,9 @@ import pageTabStyles from './pageTabStyles'
 
 const customStyles = css`
   html {
-    ${tw`text-base`}
+    ${tw`text-base`};
+    font-family: 'Roboto', 'PingFang SC', 'Noto Sans CJK', 'WenQuanYi Micro Hei',
+      'Microsoft YaHei', sans-serif;
   }
   .light {
     --bg-primary: #fff;
