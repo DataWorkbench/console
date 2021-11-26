@@ -22,6 +22,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
       setUdfColumnSettings,
       setUdfSelectedRowKeys,
       udfStorageKey,
+      setModalData,
       // : columnSettings
     },
   } = useStore()
@@ -34,7 +35,13 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
     <div tw="mb-3">
       <FlexBox tw="justify-between">
         <Center tw="space-x-3">
-          <Button type="primary" onClick={() => setOp('create')}>
+          <Button
+            type="primary"
+            onClick={() => {
+              setOp('create')
+              setModalData({})
+            }}
+          >
             <Icon name="upload" />
             新建{udfType}函数节点
           </Button>
@@ -74,7 +81,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
               })
             }}
           />
-          <Button tw="w-8">
+          <Button>
             <Icon
               name="if-refresh"
               tw="text-xl text-white"
