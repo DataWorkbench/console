@@ -197,7 +197,11 @@ const UdfModal = observer(() => {
                     若返回上一步，本次配置的信息将清空，确定返回上一步吗？
                   </div>
                 }
-                onOk={() => setStep(0)}
+                onOk={() => {
+                  setStep(0)
+                  formData.current = {}
+                  setHasChange(false)
+                }}
                 closeAfterClick={false}
               >
                 <Button>上一步</Button>
@@ -219,6 +223,7 @@ const UdfModal = observer(() => {
           <PopConfirm
             className="popcanfirm-danger"
             type="warning"
+            placement="topRight"
             content={
               <div tw="text-neut-16">
                 若修改函数名称或属性，相关工作流、任务会出现问题，确认编辑吗？
@@ -226,7 +231,6 @@ const UdfModal = observer(() => {
             }
             onOk={() => setOp('edit')}
             okText="编辑"
-            closeAfterClick={false}
           >
             <Button type="danger">编辑</Button>
           </PopConfirm>
@@ -321,14 +325,20 @@ const UdfModal = observer(() => {
                     name="name"
                     labelClassName="label-required"
                     label={
-                      <AffixLabel
-                        required={false}
-                        help="函数名需与实现名保持一致"
-                      >
-                        函数名
-                      </AffixLabel>
+                      curLangInfo?.type === javaType ? (
+                        '函数名'
+                      ) : (
+                        <AffixLabel
+                          required={false}
+                          help="函数名需与实现名保持一致"
+                          theme="green"
+                        >
+                          函数名
+                        </AffixLabel>
+                      )
                     }
                     disabled={op === 'detail'}
+                    validateOnBlur
                     defaultValue={modalData?.name}
                     schemas={[
                       {
@@ -384,11 +394,30 @@ const UdfModal = observer(() => {
                             labelKey="name"
                             onMenuScrollToBottom={loadData}
                             bottomTextVisible
-                            valueKey="udf_id"
+                            validateOnBlur
+                            valueKey="id"
+                            clearable
                             schemas={[
                               {
                                 rule: { required: true },
-                                help: '请选择 jar',
+                                help: (
+                                  <div>
+                                    请选择 Jar，如需选择新的 Jar
+                                    包资源，可以在资源管理中
+                                    <a
+                                      href="./resource"
+                                      target="_blank"
+                                      tw="text-green-11"
+                                    >
+                                      上传资源
+                                      <Icons
+                                        name="direct"
+                                        size={14}
+                                        tw="inline-block"
+                                      />
+                                    </a>
+                                  </div>
+                                ),
                                 status: 'error',
                               },
                             ]}
@@ -421,6 +450,7 @@ const UdfModal = observer(() => {
                           labelClassName="label-required"
                           disabled={op === 'detail'}
                           defaultValue={modalData?.define}
+                          validateOnBlur
                           schemas={[
                             {
                               rule: { required: true },
