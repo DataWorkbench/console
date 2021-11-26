@@ -12,10 +12,13 @@ import {
 } from 'hooks'
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
+import { Global, css } from '@emotion/react'
+
+import sourceListBg from 'assets/source-list.svg'
 
 import MysqlImg from 'assets/svgr/sources/mysql.svg'
 import PostgresqlImg from 'assets/svgr/sources/postgresql.svg'
-import S3Img from 'assets/svgr/sources/aws-s3.svg'
+// import S3Img from 'assets/svgr/sources/aws-s3.svg'
 import ClickHouseImg from 'assets/svgr/sources/clickhouse.svg'
 import HbaseImg from 'assets/svgr/sources/hbase.svg'
 import KafkaImg from 'assets/svgr/sources/kafka.svg'
@@ -35,7 +38,7 @@ const resInfos: { name: string; img?: React.ReactNode; desc?: string }[] = [
     img: <PostgresqlImg />,
     desc: '开源的对象-关系数据库数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。 ',
   },
-  { name: 'S3', img: <S3Img />, desc: '是一种面向 Internet 的存储服务。' },
+  // { name: 'S3', img: <S3Img />, desc: '是一种面向 Internet 的存储服务。' },
   {
     name: 'ClickHouse',
     img: <ClickHouseImg />,
@@ -133,89 +136,103 @@ const DataSourceModal = observer(
     }
 
     return (
-      <Modal
-        visible
-        onCancel={onHide}
-        orient="fullright"
-        width={800}
-        title={`${op === 'create' ? '新增' : '修改'}数据源: ${
-          curkind ? curkind.name : ''
-        }`}
-        footer={
-          <div tw="flex justify-end space-x-2">
-            {state.step === 0 ? (
-              <Button onClick={onHide}>取消</Button>
-            ) : (
-              <>
-                {op === 'create' && (
-                  <Button className="mr-2" onClick={() => goStep(0)}>
-                    上一步
-                  </Button>
-                )}
-
-                <Button
-                  loading={mutation.isLoading}
-                  type="primary"
-                  onClick={handleSave}
-                >
-                  确定
-                </Button>
-              </>
-            )}
-          </div>
-        }
-      >
-        <ModalStep step={state.step} stepTexts={['选择数据库', '配置数据库']} />
-        <ModalContent>
-          {(() => {
-            switch (status) {
-              case 'loading':
-                return (
-                  <div tw="h-80">
-                    <Loading />
-                  </div>
-                )
-              case 'error':
-                return <Button onClick={() => refetch()}>重试</Button>
-              case 'success':
-                if (state.step === 0) {
-                  const items = kinds.map(({ name }) =>
-                    resInfos.find((info) => info.name === name)
-                  )
-                  return (
-                    <>
-                      <p tw="pt-2 pb-3 font-medium">
-                        请选择一个数据库，您也可以参考
-                        <a href="##" tw="text-link">
-                          数据库文档
-                        </a>
-                        进行查看配置
-                      </p>
-                      <DbList
-                        current={curkind}
-                        items={items}
-                        onChange={handleDbSelect}
-                      />
-                    </>
-                  )
-                }
-
-                return (
-                  curkind && (
-                    <DataSourceForm
-                      ref={form}
-                      resInfo={resInfos.find(
-                        (info) => info.name === curkind.name
-                      )}
-                    />
-                  )
-                )
-              default:
-                return null
+      <>
+        <Global
+          styles={css`
+            .source-item-bg {
+              background-image: url(${String(sourceListBg)});
             }
-          })()}
-        </ModalContent>
-      </Modal>
+          `}
+        />
+        <Modal
+          visible
+          onCancel={onHide}
+          orient="fullright"
+          width={800}
+          title={`${op === 'create' ? '新增' : '修改'}数据源: ${
+            curkind ? curkind.name : ''
+          }`}
+          footer={
+            <div tw="flex justify-end space-x-2">
+              {state.step === 0 ? (
+                <Button onClick={onHide}>取消</Button>
+              ) : (
+                <>
+                  {op === 'create' && (
+                    <Button className="mr-2" onClick={() => goStep(0)}>
+                      上一步
+                    </Button>
+                  )}
+
+                  <Button
+                    loading={mutation.isLoading}
+                    type="primary"
+                    onClick={handleSave}
+                  >
+                    确定
+                  </Button>
+                </>
+              )}
+            </div>
+          }
+        >
+          <ModalStep
+            step={state.step}
+            stepTexts={['选择数据库', '配置数据库']}
+          />
+          <ModalContent>
+            {(() => {
+              switch (status) {
+                case 'loading':
+                  return (
+                    <div tw="h-80">
+                      <Loading />
+                    </div>
+                  )
+                case 'error':
+                  return <Button onClick={() => refetch()}>重试</Button>
+                case 'success':
+                  if (state.step === 0) {
+                    const items = kinds
+                      .map(({ name }: { name: string }) =>
+                        resInfos.find((info) => info.name === name)
+                      )
+                      .filter((n: any) => n)
+                    return (
+                      <>
+                        <p tw="pt-2 pb-3 font-medium">
+                          请选择一个数据库，您也可以参考
+                          <a href="##" tw="text-link">
+                            数据库文档
+                          </a>
+                          进行查看配置
+                        </p>
+                        <DbList
+                          current={curkind}
+                          items={items}
+                          onChange={handleDbSelect}
+                        />
+                      </>
+                    )
+                  }
+
+                  return (
+                    curkind && (
+                      <DataSourceForm
+                        ref={form}
+                        resInfo={resInfos.find(
+                          (info) => info.name === curkind.name
+                        )}
+                      />
+                    )
+                  )
+                default:
+                  return null
+              }
+            })()}
+          </ModalContent>
+        </Modal>
+      </>
     )
   }
 )

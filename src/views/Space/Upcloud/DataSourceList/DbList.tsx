@@ -1,7 +1,9 @@
-import { ReactElement } from 'react'
-import tw from 'twin.macro'
+import tw, { styled } from 'twin.macro'
 
-const ItemWrapper = tw.div`flex p-3 border rounded-sm border-neut-2 cursor-pointer hover:border-green-11`
+const ItemWrapper = styled('div')(({ selected }: { selected: boolean }) => [
+  tw`flex p-3 border rounded-sm border-neut-2 cursor-pointer hover:border-green-11 transition-colors bg-no-repeat bg-right-bottom`,
+  selected && tw`border-green-11`,
+])
 
 interface IDbList {
   items: any[]
@@ -9,40 +11,27 @@ interface IDbList {
   onChange: (idx: number) => void
 }
 
-const DbList = ({ items, current, onChange }: IDbList) => {
-  const renderItem = ({
-    name,
-    img,
-    desc,
-  }: {
-    name: string
-    img?: ReactElement
-    desc?: string
-  }) => (
-    <ItemWrapper
-      className="group"
-      css={current?.name === name && tw`border-green-11`}
-    >
-      <div tw="w-10 flex-shrink-0">{img}</div>
-      <div tw="flex-1 pl-2 leading-5">
-        <div tw="font-medium group-hover:text-green-11">{name}</div>
-        <div tw="text-neut-8 h-10 overflow-hidden">{desc}</div>
-      </div>
-    </ItemWrapper>
-  )
-  return (
-    <div tw="flex flex-wrap">
-      {items.map((item, i: number) => (
-        <div
-          onClick={() => onChange(i)}
-          key={item.name}
-          css={[tw`w-1/3 pb-4`, (i + 1) % 3 && tw`pr-4`]}
+const DbList = ({ items, current, onChange }: IDbList) => (
+  <div tw="flex flex-wrap justify-between">
+    {items.map(({ name, img, desc }, i: number) => (
+      <div
+        onClick={() => onChange(i)}
+        key={name}
+        css={[tw`w-1/2 pb-4 odd-of-type:pr-2 even-of-type:pl-2`]}
+      >
+        <ItemWrapper
+          className="group source-item-bg"
+          selected={current?.name === name}
         >
-          {renderItem(item)}
-        </div>
-      ))}
-    </div>
-  )
-}
+          <div tw="w-10 flex-shrink-0">{img}</div>
+          <div tw="flex-1 pl-2 leading-5">
+            <div tw="font-medium group-hover:text-green-11">{name}</div>
+            <div tw="text-neut-8 h-10 overflow-hidden">{desc}</div>
+          </div>
+        </ItemWrapper>
+      </div>
+    ))}
+  </div>
+)
 
 export default DbList

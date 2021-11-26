@@ -9,7 +9,7 @@
 //   export default src
 // }
 declare module '*.svg' {
-  const content: React.FC<React.SVGProps<SVGSVGElement>>
+  const content: React.FC<React.SVGProps<SVGSVGElement>> | string
   export default content
 }
 declare module '*.png'

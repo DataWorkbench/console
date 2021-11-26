@@ -326,7 +326,10 @@ const DataSourceForm = observer(
               </AffixLabel>
             </Label>
             <Control tw="w-60">
-              <div tw="rounded-sm border border-green-11 p-2">
+              <div
+                tw="rounded-sm border border-green-11 p-2 bg-no-repeat bg-right-bottom"
+                className="source-item-bg"
+              >
                 <div tw="font-medium flex items-center">
                   <Icon name="container" tw="mr-1" />
                   <span tw="text-green-11">连接串模式</span>
@@ -342,7 +345,8 @@ const DataSourceForm = observer(
             tw="w-80"
             defaultValue={get(sourceInfo, 'name', '')}
             label={<AffixLabel>数据源名称</AffixLabel>}
-            placeholder={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
+            placeholder="请输入数据源名称（自定义）"
+            help={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
             validateOnChange
             schemas={[
               {

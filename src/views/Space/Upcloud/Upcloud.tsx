@@ -9,7 +9,7 @@ const Upcloud = () => {
     <>
       <Sider funcMod="upcloud" />
       <ContentBox tw="flex-1 overflow-y-auto ">
-        <ContentBox tw="m-5">
+        <ContentBox tw="p-5">
           {(mod === 'dsl' || !mod) && <DataSourceList />}
         </ContentBox>
       </ContentBox>
