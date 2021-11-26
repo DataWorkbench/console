@@ -153,7 +153,11 @@ const ClusterModal = observer(
                 help={
                   <>
                     如需选择新的 VPC，您可以
-                    <a href="###" tw="text-green-11">
+                    <a
+                      href="/iaas/vpc/create"
+                      target="_blank"
+                      tw="text-green-11"
+                    >
                       新建 VPC 网络
                       <Icon name="if-external-link" />
                     </a>
@@ -207,7 +211,7 @@ const ClusterModal = observer(
                 help={
                   <>
                     您可以
-                    <a href="###" tw="text-green-11">
+                    <a href="/pek3/vxnets" target="_blank" tw="text-green-11">
                       新建私有网络
                       <Icon name="if-external-link" />
                     </a>

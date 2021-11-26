@@ -119,7 +119,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 help={
                   <div>
                     如需选择新的集群，可以在计算集群
-                    <a href="###" tw="text-green-13">
+                    <a href="./cluster" target="_blank" tw="text-green-13">
                       创建集群
                     </a>
                   </div>

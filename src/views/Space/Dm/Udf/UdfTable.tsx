@@ -11,7 +11,7 @@ import { useMutationUdf, useQueryUdfList, useStore } from 'hooks'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
-import { languageFilters, udfTypes } from './constants'
+import { languageFilters, udfTypes, udfTypesComment } from './constants'
 
 const getDefaultColumns = (
   filter: Record<string, any>,
@@ -185,9 +185,14 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
       <Alert
         message={
           <Level as="nav">
-            <LevelLeft>提示</LevelLeft>
+            <LevelLeft>{udfTypesComment[tp]?.comment}</LevelLeft>
             <LevelRight>
-              <a href="###" tw="text-link">
+              <a
+                href="https://nightlies.apache.org/flink/flink-docs-release-1.11/dev/table/functions/udfs.html"
+                target="_blank"
+                tw="text-link"
+                rel="noreferrer"
+              >
                 查看详情 →
               </a>
             </LevelRight>
