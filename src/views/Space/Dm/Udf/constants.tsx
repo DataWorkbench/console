@@ -1,3 +1,5 @@
+import { LetterIcon } from '../styled'
+
 export const udfActions = ['create', 'detail', 'edit']
 export const languageFilters = [
   {
@@ -50,3 +52,32 @@ export const udfTypesComment = {
 }
 
 export const javaType = languageFilters.find((i) => i.text === 'Java')?.value
+
+export const baseColumns = [
+  {
+    title: '函数名称',
+    dataIndex: 'name',
+    render: (value: string) => {
+      return value ? (
+        <span tw="inline-flex">
+          <LetterIcon>
+            <span>{value}</span>
+          </LetterIcon>
+          <span>{value}</span>
+        </span>
+      ) : (
+        ''
+      )
+    },
+  },
+  {
+    title: 'ID',
+    dataIndex: 'udf_id',
+  },
+  {
+    title: '语言类型',
+    dataIndex: 'udf_language',
+    render: (val: number) =>
+      languageFilters.find((i) => i.value === val)?.text || val,
+  },
+]
