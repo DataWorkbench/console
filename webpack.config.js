@@ -76,7 +76,8 @@ let config = {
             ],
           },
           {
-            type: 'asset/resource',
+            // type: 'asset/resource',
+            type: 'asset',
             generator: {
               filename: 'static/imgs/[hash][ext][query]',
             },

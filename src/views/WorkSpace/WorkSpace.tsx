@@ -31,12 +31,12 @@ const tabs = [
 ]
 
 const Wrapper = styled('div')<{ isModal?: boolean }>(({ isModal }) => [
-  tw`h-full overflow-auto`,
+  tw`h-full overflow-auto flex flex-col`,
   !isModal && tw`p-5`,
 ])
 
 const Content = styled(Card)(({ isModal }: { isModal?: boolean }) => [
-  tw`pt-5 relative`,
+  tw`pt-5 flex-1 relative`,
   isModal && tw`shadow-none mb-0`,
 ])
 

@@ -41,6 +41,14 @@ const SideMenuWrapper = styled('div')(() => [
           }
         }
       }
+      .side-menu-collapse
+        .side-menu-pickup
+        .side-content
+        .icon-li
+        span.icon
+        > svg {
+        ${tw`text-green-11 fill-[#9ddfc9]`}
+      }
       .side-menu-pickup {
         box-shadow: none;
         ${tw`border-r border-neut-3 bg-neut-2 dark:(bg-neut-17 border-neut-15) shadow-none`}

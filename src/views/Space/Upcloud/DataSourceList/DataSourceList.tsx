@@ -1,12 +1,11 @@
-import { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
-import Tippy from '@tippyjs/react'
 import dayjs from 'dayjs'
-import { get, findKey } from 'lodash-es'
+import { get, findKey, pick } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import { Input } from '@QCFE/lego-ui'
+import { Input, Menu } from '@QCFE/lego-ui'
 import {
   PageTab,
   Icon,
@@ -22,17 +21,21 @@ import {
 } from '@QCFE/qingcloud-portal-ui'
 import { useQuerySource, useMutationSource, sourceTypes, useStore } from 'hooks'
 import {
+  Card,
   Center,
   ContentBox,
   FlexBox,
   Icons,
-  Menu,
-  MenuItem,
-  TableContainer,
+  // Menu,
+  // MenuItem,
+  // TableContainer,
+  Tooltip,
 } from 'components'
 
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
+
+const { MenuItem } = Menu
 
 const tabs = [
   {
@@ -60,7 +63,7 @@ const confirmMsgInfo: any = {
 }
 
 const Root = styled('div')(() => [
-  tw`pb-4`,
+  tw`h-full flex flex-col`,
   css`
     .page-tab-container {
       margin-bottom: 20px;
@@ -94,7 +97,7 @@ const ModalWrapper = styled(Modal)(() => [
 const columnSettingsKey = 'BIGDATA_SOURCELISTS_COLUMN_SETTINGS'
 
 const DataSourceList = observer(() => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
   const [isReFetching, setIsReFetching] = useState(false)
@@ -236,31 +239,19 @@ const DataSourceList = observer(() => {
               修改
             </Button>
 
-            <Tippy
+            <Tooltip
               theme="light"
-              animation="fade"
               trigger="click"
               arrow={false}
-              interactive
-              delay={100}
-              zIndex={10}
-              offset={[0, 10]}
-              appendTo={() => document.body}
               content={
-                <Menu>
-                  {/* <MenuItem
-                    onClick={() => {
-                      mutateOperation('update', [info])
-                    }}
-                  >
-                    <Icon name="pen" tw="mr-2" />
-                    修改
-                  </MenuItem> */}
-                  <MenuItem
-                    onClick={() => {
-                      mutateOperation('delete', [info])
-                    }}
-                  >
+                <Menu
+                  onClick={(e: React.SyntheticEvent, key: string) => {
+                    if (key === 'delete') {
+                      mutateOperation(key, [info])
+                    }
+                  }}
+                >
+                  <MenuItem disabled={info.status === 2} key="delete">
                     <Icon name="trash" tw="mr-2" />
                     删除
                   </MenuItem>
@@ -270,7 +261,7 @@ const DataSourceList = observer(() => {
               <Center>
                 <Icon name="more" clickable />
               </Center>
-            </Tippy>
+            </Tooltip>
           </TableActions>
         ),
       },
@@ -281,40 +272,6 @@ const DataSourceList = observer(() => {
   const columns = useMemo(
     () => utils.getTableColumnsBySetting(defaultColumns, columnSettings),
     [columnSettings, defaultColumns]
-  )
-
-  const delColumns = useMemo(
-    () => [
-      {
-        Header: '数据源名称/id',
-        id: 'sourceid',
-        accessor: (row) => [row.sourcetype, row.sourceid, row.name],
-        Cell: ({ value }) => (
-          <FlexBox tw="space-x-1 items-center">
-            <Center tw="w-6 h-6 bg-neut-3 rounded-full">
-              <Icon name="blockchain" size="small" />
-            </Center>
-            <div tw="flex-1">
-              <div tw="space-x-1">
-                <span>{value[0]}</span>
-                <span>{value[2]}</span>
-              </div>
-              <div tw="text-neut-8">{value[1]}</div>
-            </div>
-          </FlexBox>
-        ),
-      },
-      {
-        Header: '数据源类型',
-        accessor: 'comment',
-      },
-      {
-        Header: '创建时间',
-        accessor: 'createtime',
-        Cell: ({ value }) => dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
-      },
-    ],
-    []
   )
 
   const { isLoading, refetch, data } = useQuerySource(filter)
@@ -330,7 +287,7 @@ const DataSourceList = observer(() => {
           op,
           regionId,
           spaceId,
-          sourceIds: opSourceList.map((r) => r.sourceid),
+          sourceIds: opSourceList.map((r) => r.source_id),
         },
         {
           onSuccess: () => {
@@ -382,12 +339,22 @@ const DataSourceList = observer(() => {
               </Button>
               <Button
                 type="default"
-                disabled={selectedRowKeys.length === 0}
+                disabled={
+                  sourceList.filter(
+                    ({
+                      source_id,
+                      status,
+                    }: {
+                      source_id: string
+                      status: number
+                    }) => selectedRowKeys.includes(source_id) && status !== 2
+                  ).length === 0
+                }
                 onClick={() =>
                   mutateOperation(
                     'delete',
-                    sourceList.filter(({ sourceid }) =>
-                      selectedRowKeys.includes(sourceid)
+                    sourceList.filter(({ source_id }) =>
+                      selectedRowKeys.includes(source_id)
                     )
                   )
                 }
@@ -429,37 +396,39 @@ const DataSourceList = observer(() => {
               />
             </ToolBarRight>
           </ToolBar>
-          <Table
-            selectType="checkbox"
-            dataSource={sourceList}
-            columns={columns}
-            rowKey="source_id"
-            tw="pb-4"
-            selectedRowKeys={selectedRowKeys}
-            onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
-            onSort={(sortKey: string, sortOrder: string) => {
-              setFilter((draft) => {
-                draft.order_by = sortKey
-                draft.reverse = sortOrder === 'desc'
-              })
-            }}
-            pagination={{
-              total: get(data, 'total', 0),
-              current: Math.floor(filter.offset / filter.limit) + 1,
-              pageSize: filter.limit,
-              onPageChange: (page: number) => {
+          <Card tw="flex-1">
+            <Table
+              selectType="checkbox"
+              dataSource={sourceList}
+              columns={columns}
+              rowKey="source_id"
+              tw="pb-4 "
+              selectedRowKeys={selectedRowKeys}
+              onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
+              onSort={(sortKey: string, sortOrder: string) => {
                 setFilter((draft) => {
-                  draft.offset = (page - 1) * draft.limit
+                  draft.order_by = sortKey
+                  draft.reverse = sortOrder === 'desc'
                 })
-              },
-              onShowSizeChange: (limit: number) => {
-                setFilter((draft) => {
-                  draft.offset = 0
-                  draft.limit = limit
-                })
-              },
-            }}
-          />
+              }}
+              pagination={{
+                total: get(data, 'total', 0),
+                current: Math.floor(filter.offset / filter.limit) + 1,
+                pageSize: filter.limit,
+                onPageChange: (page: number) => {
+                  setFilter((draft) => {
+                    draft.offset = (page - 1) * draft.limit
+                  })
+                },
+                onShowSizeChange: (limit: number) => {
+                  setFilter((draft) => {
+                    draft.offset = 0
+                    draft.limit = limit
+                  })
+                },
+              }}
+            />
+          </Card>
         </Root>
       ) : (
         <DataEmpty onAddClick={() => mutateOperation('create')} />
@@ -471,13 +440,13 @@ const DataSourceList = observer(() => {
         if (['disable', 'enable', 'delete'].includes(op)) {
           const info = confirmMsgInfo[op]
           const filterSourceList = opSourceList.filter(
-            (obj) => obj.state !== 'disable'
+            (obj) => obj.status !== 2
           )
           const ifTableMode = op === 'delete' && filterSourceList.length > 1
           return (
             <ModalWrapper
               visible
-              width={ifTableMode ? 600 : 500}
+              width={ifTableMode ? 650 : 500}
               onCancel={handleCancel}
               footer={
                 <FlexBox tw="justify-end">
@@ -509,16 +478,30 @@ const DataSourceList = observer(() => {
                     {!ifTableMode && (
                       <div>
                         {filterSourceList
-                          .map(({ sourceid }) => sourceid)
+                          .map(
+                            ({ name, source_id }) => `${name} (${source_id})`
+                          )
                           .join(',')}
                       </div>
                     )}
                   </FlexBox>
                   <div tw="mt-2">{info.desc}</div>
                   {ifTableMode && (
-                    <TableContainer
-                      columns={delColumns}
-                      data={filterSourceList}
+                    <Table
+                      rowKey="source_id"
+                      columns={columns
+                        .filter((col: any) =>
+                          [
+                            'name',
+                            'source_type',
+                            'source_id',
+                            'created',
+                          ].includes(col.dataIndex)
+                        )
+                        .map((col: any) =>
+                          pick(col, ['title', 'dataIndex', 'render'])
+                        )}
+                      dataSource={filterSourceList}
                     />
                   )}
                   {op === 'delete' && (
