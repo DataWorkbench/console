@@ -210,7 +210,11 @@ const UdfModal = observer(() => {
               <Button onClick={() => setStep(0)}>上一步</Button>
             )
           }
-          <Button type="primary" onClick={handleOk}>
+          <Button
+            type="primary"
+            onClick={handleOk}
+            loading={mutation.isLoading}
+          >
             {step === 0 ? '下一步' : '确定'}
           </Button>
         </div>
