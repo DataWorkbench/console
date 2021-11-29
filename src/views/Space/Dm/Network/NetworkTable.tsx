@@ -16,7 +16,7 @@ import {
   getNetworkKey,
   useMutationCluster,
 } from 'hooks'
-import { get, omitBy } from 'lodash-es'
+import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
 import { css } from 'twin.macro'
 import NetworkModal from './NetworkModal'
@@ -318,9 +318,11 @@ const NetworkTable = observer(() => {
               <Table
                 dataSource={opNetworkList}
                 rowKey="id"
-                columns={columns.filter((col) =>
-                  ['name', 'router_id', 'vxnet_id'].includes(col.dataIndex)
-                )}
+                columns={columns
+                  .filter((col) =>
+                    ['name', 'router_id', 'vxnet_id'].includes(col.dataIndex)
+                  )
+                  .map((row) => pick(row, ['title', 'dataIndex', 'render']))}
               />
             )}
           </>

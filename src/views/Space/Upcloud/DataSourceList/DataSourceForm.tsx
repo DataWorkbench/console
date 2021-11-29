@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Field, Label, Control } from '@QCFE/lego-ui'
+import { Field, Label, Control, Collapse } from '@QCFE/lego-ui'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
@@ -12,6 +12,7 @@ import { FlexBox, AffixLabel } from 'components'
 import { nameMatchRegex, strlen } from 'utils/convert'
 import HdfsNodeField from './HdfsNodeField'
 
+const { CollapseItem } = Collapse
 const { TextField, TextAreaField, NumberField, PasswordField } = Form
 
 const PingTable = styled('table')(() => [
@@ -23,6 +24,17 @@ const PingTable = styled('table')(() => [
     }
     thead {
       ${tw`bg-neut-1 `}
+    }
+  `,
+])
+
+const Root = styled('div')(() => [
+  css`
+    .field {
+      ${tw`block`}
+    }
+    .collapse-item-content {
+      ${tw`pl-0`}
     }
   `,
 ])
@@ -157,45 +169,6 @@ const getFieldsInfo = (type: string) => {
         {
           name: 'nodes',
           label: 'Nodes',
-          // schemas: [
-          // {
-          //   rule: (o) => {
-          //     console.log('in rule', o)
-          //     if (trim(o.name_node) === '') {
-          //       return false
-          //     }
-          //     return true
-          //   },
-          //   help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
-          //   status: 'error',
-          // },
-          // {
-          //   rule: (v: string) => {
-          //     const splitReg = /\s*[=:]\s*|\s+/
-          //     const str = trim(v)
-          //     if (str === '') {
-          //       return true
-          //     }
-          //     const rows = str.split(/[\r\n]/).filter((n) => n !== '')
-          //     let invalid = false
-          //     rows.forEach((row) => {
-          //       const r = filter(trim(row).split(splitReg), (o) => o !== '')
-          //       if (r.length < 2) {
-          //         invalid = true
-          //       } else if (
-          //         !/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
-          //           r[1]
-          //         )
-          //       ) {
-          //         invalid = true
-          //       }
-          //     })
-          //     return !invalid
-          //   },
-          //   help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
-          //   status: 'error',
-          // },
-          // ],
         },
       ]
       break
@@ -233,10 +206,11 @@ interface IFormProps {
   resInfo: {
     name: string
     desc?: string
+    img?: React.ReactNode
   }
 }
 const DataSourceForm = observer(
-  ({ resInfo }: IFormProps, ref) => {
+  ({ resInfo }: IFormProps, ref: any) => {
     const { regionId, spaceId } =
       useParams<{ regionId: string; spaceId: string }>()
     const [pingState, setPingState] = useImmer({
@@ -301,7 +275,7 @@ const DataSourceForm = observer(
     }
 
     return (
-      <div>
+      <Root>
         <Alert
           message={
             <div>
@@ -315,7 +289,16 @@ const DataSourceForm = observer(
           closable
           tw="mb-3"
         />
-        <Form tw="max-w-lg!" layout="vertical" ref={ref}>
+        <Form
+          tw="max-w-full!"
+          css={css`
+            .field {
+              ${tw`pl-6`}
+            }
+          `}
+          layout="vertical"
+          ref={ref}
+        >
           <Field>
             <Label>
               <AffixLabel
@@ -366,8 +349,9 @@ const DataSourceForm = observer(
           />
           <TextAreaField
             name="comment"
+            tw="w-8/12"
             defaultValue={get(sourceInfo, 'comment', '')}
-            rows={3}
+            rows={4}
             label="数据源描述"
             resize
             placeholder="请填写数据库的描述信息"
@@ -383,101 +367,96 @@ const DataSourceForm = observer(
               },
             ]}
           />
-          {fields.map((field) => {
-            const {
-              name,
-              label,
-              placeholder,
-              component,
-              schemas = [],
-              ...rest
-            } = field
-            const FieldComponent = component || TextField
-            if (name === 'nodes') {
-              return (
-                <HdfsNodeField
-                  key={name}
-                  name={name}
-                  validateOnBlur
-                  label={<AffixLabel required>{label}</AffixLabel>}
-                  defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
-                  schemas={[
-                    {
-                      rule: (o) => {
-                        if (trim(o.name_node) === '') {
-                          return false
-                        }
-                        if (
-                          !/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
-                            o.port
-                          )
-                        ) {
-                          return false
-                        }
-                        return true
-                      },
-                      help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
-                      status: 'error',
-                    },
-                  ]}
-                />
-              )
-              //               return (
-              //                 <KVTextAreaField
-              //                   key={name}
-              //                   label={<AffixLabel required>{label}</AffixLabel>}
-              //                   title="Name_node/Port 信息"
-              //                   name={name}
-              //                   kvs={['Name_node', 'Port']}
-              //                   theme="light"
-              //                   schemas={schemas}
-              //                   validateOnBlur
-              //                   placeholder={`|请输入 name_node port ，多条配置之间换行输入。例如：
-              // 192.168.3.2 1234
-              // 192.168.2.8 2234`}
-              //                   defaultValue={(
-              //                     get(sourceInfo, `url.${urlType}.${name}`, []) || []
-              //                   )
-              //                     .map(
-              //                       (item: { name_node: string; port: number }) =>
-              //                         `${item.name_node} ${item.port}`
-              //                     )
-              //                     .join('\r\n')}
-              //                 />
-              //                 // <MutilInputField ref={multiFiledRef} key={name} field={field} />
-              //               )
-            }
-            return (
-              <FieldComponent
-                key={name}
-                name={name}
-                defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
-                validateOnChange
-                schemas={schemas}
-                css={['port'].includes(name) ? tw`w-28` : tw`w-80`}
-                {...rest}
-                label={<AffixLabel required>{label}</AffixLabel>}
-                placeholder={placeholder}
-              />
-            )
-          })}
-          <Field>
-            <Label>
-              <AffixLabel help="连通性测试" required={false}>
-                连通性测试
-              </AffixLabel>
-            </Label>
-            <Control>
-              <Button
-                disabled={mutation.isLoading}
-                type="outlined"
-                onClick={handlePing}
-              >
-                <Icon name="add" />
-                计算集群
-              </Button>
-            </Control>
-          </Field>
+          <Collapse defaultActiveKey={['p1']}>
+            <CollapseItem
+              key="p1"
+              label={
+                <div
+                  tw="flex items-center"
+                  css={css`
+                    & > span.icon {
+                      ${tw`relative top-0 right-0 mr-2`}
+                    }
+                  `}
+                >
+                  <Icon name="changing-over" />
+                  连接信息
+                </div>
+              }
+            >
+              {fields.map((field) => {
+                const {
+                  name,
+                  label,
+                  placeholder,
+                  component,
+                  schemas = [],
+                  ...rest
+                } = field
+                const FieldComponent = component || TextField
+                if (name === 'nodes') {
+                  return (
+                    <HdfsNodeField
+                      key={name}
+                      name={name}
+                      validateOnBlur
+                      label={<AffixLabel required>{label}</AffixLabel>}
+                      defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
+                      schemas={[
+                        {
+                          rule: (o) => {
+                            if (trim(o.name_node) === '') {
+                              return false
+                            }
+                            if (
+                              !/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
+                                o.port
+                              )
+                            ) {
+                              return false
+                            }
+                            return true
+                          },
+                          help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
+                          status: 'error',
+                        },
+                      ]}
+                    />
+                  )
+                }
+                return (
+                  <FieldComponent
+                    key={name}
+                    name={name}
+                    defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
+                    validateOnChange
+                    schemas={schemas}
+                    css={['port'].includes(name) ? tw`w-28` : tw`w-80`}
+                    {...rest}
+                    label={<AffixLabel required>{label}</AffixLabel>}
+                    placeholder={placeholder}
+                  />
+                )
+              })}
+              <Field>
+                <Label>
+                  <AffixLabel help="连通性测试" required={false}>
+                    连通性测试
+                  </AffixLabel>
+                </Label>
+                <Control>
+                  <Button
+                    disabled={mutation.isLoading}
+                    type="outlined"
+                    onClick={handlePing}
+                  >
+                    <Icon name="add" />
+                    计算集群
+                  </Button>
+                </Control>
+              </Field>
+            </CollapseItem>
+          </Collapse>
         </Form>
         {pingState.state !== '' && (
           <PingTable>
@@ -528,7 +507,7 @@ const DataSourceForm = observer(
             </tbody>
           </PingTable>
         )}
-      </div>
+      </Root>
     )
   },
   {

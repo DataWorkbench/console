@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { Modal, ModalStep, ModalContent } from 'components'
 import { Button, Form, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
+import tw from 'twin.macro'
 import {
   useQuerySourceKind,
   useMutationSource,
@@ -11,7 +12,6 @@ import {
   useStore,
 } from 'hooks'
 import { useImmer } from 'use-immer'
-import { get } from 'lodash-es'
 import { Global, css } from '@emotion/react'
 
 import sourceListBg from 'assets/source-list.svg'
@@ -80,7 +80,7 @@ const DataSourceModal = observer(
 
     const [state, setState] = useImmer({
       step: op === 'update' ? 1 : 0,
-      dbIndex: -1,
+      dbName: '',
     })
     const form = useRef<Form>()
     const queryClient = useQueryClient()
@@ -92,13 +92,14 @@ const DataSourceModal = observer(
     const mutation = useMutationSource()
     const curkind =
       op === 'create'
-        ? get(kinds, `[${state.dbIndex}]`)
+        ? // ? get(kinds, `[${state.dbName}]`)
+          kinds?.find((k) => k.name === state.dbName)
         : kinds?.find((k) => k.sourcetype === opSourceList[0]?.source_type)
 
-    const handleDbSelect = (i: number) => {
+    const handleDbSelect = (name: string) => {
       setState((draft) => {
         draft.step = 1
-        draft.dbIndex = i
+        draft.dbName = name
       })
     }
     const handleSave = () => {
@@ -134,7 +135,6 @@ const DataSourceModal = observer(
         draft.step = i
       })
     }
-
     return (
       <>
         <Global
@@ -180,8 +180,10 @@ const DataSourceModal = observer(
             step={state.step}
             stepTexts={['选择数据库', '配置数据库']}
           />
-          <ModalContent>
+          <ModalContent css={state.step === 1 && tw`px-0`}>
             {(() => {
+              let curResInfo = null
+
               switch (status) {
                 case 'loading':
                   return (
@@ -215,15 +217,13 @@ const DataSourceModal = observer(
                       </>
                     )
                   }
-
+                  curResInfo = resInfos.find(
+                    (info) => info.name === curkind.name
+                  )
                   return (
-                    curkind && (
-                      <DataSourceForm
-                        ref={form}
-                        resInfo={resInfos.find(
-                          (info) => info.name === curkind.name
-                        )}
-                      />
+                    curkind &&
+                    curResInfo && (
+                      <DataSourceForm ref={form} resInfo={curResInfo} />
                     )
                   )
                 default:

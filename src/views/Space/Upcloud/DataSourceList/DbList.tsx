@@ -8,14 +8,14 @@ const ItemWrapper = styled('div')(({ selected }: { selected: boolean }) => [
 interface IDbList {
   items: any[]
   current: any
-  onChange: (idx: number) => void
+  onChange: (name: string) => void
 }
 
 const DbList = ({ items, current, onChange }: IDbList) => (
   <div tw="flex flex-wrap justify-between">
-    {items.map(({ name, img, desc }, i: number) => (
+    {items.map(({ name, img, desc }) => (
       <div
-        onClick={() => onChange(i)}
+        onClick={() => onChange(name)}
         key={name}
         css={[tw`w-1/2 pb-4 odd-of-type:pr-2 even-of-type:pl-2`]}
       >
