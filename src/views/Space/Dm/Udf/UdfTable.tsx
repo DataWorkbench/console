@@ -7,7 +7,7 @@ import { observer } from 'mobx-react-lite'
 import dayjs from 'dayjs'
 
 import { Table } from 'views/Space/styled'
-import { useMutationUdf, useQueryUdfList, useStore } from 'hooks'
+import { useQueryUdfList, useStore } from 'hooks'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
@@ -109,14 +109,13 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
       setModalData,
       udfColumnSettings: columnSettings,
       udfSelectedRowKeys: selectedRowKeys,
-      setUdfSelectedRowKeys: setSelectedRowKeys,
+      setUdfSelectedRows,
+      setUdfFilterRows,
       // : columnSettings
     },
   } = useStore()
 
   const { data, refetch, isFetching } = useQueryUdfList(filter)
-
-  const mutation = useMutationUdf()
 
   useEffect(() => {
     setFilter((_) => {
@@ -134,20 +133,14 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           setModalData(detail)
           break
         case 'delete':
-          mutation.mutate(
-            { op: 'delete', udf_ids: [detail.udf_id] },
-            {
-              onSuccess: () => {
-                refetch()
-              },
-            }
-          )
+          setUdfFilterRows([detail])
+          setOp(actionType)
           break
         default:
           break
       }
     },
-    [setOp, setModalData, refetch, mutation]
+    [setOp, setModalData, setUdfFilterRows]
   )
 
   const defaultColumns = useMemo(() => {
@@ -159,8 +152,8 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
     [columnSettings, defaultColumns]
   )
 
-  const handleSelect = (keys: string[]) => {
-    setSelectedRowKeys(keys)
+  const handleSelect = (keys: string[], rows: Record<string, any>[]) => {
+    setUdfSelectedRows(rows)
   }
 
   const handleSort = (sortKey: string, order: 'desc' | 'asc') => {
