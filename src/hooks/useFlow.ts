@@ -1,6 +1,12 @@
-import { useMutation, useQuery, UseQueryOptions } from 'react-query'
+import {
+  useMutation,
+  useQuery,
+  useInfiniteQuery,
+  UseQueryOptions,
+} from 'react-query'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
+import { omit } from 'lodash-es'
 import {
   createStreamJob,
   updateStreamJob,
@@ -43,7 +49,7 @@ let queryKey: any = ''
 
 export const getFlowKey = () => queryKey
 
-export const useQueryFlow = (filter) => {
+export const useInfiniteQueryFlow = (filter = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
@@ -52,10 +58,31 @@ export const useQueryFlow = (filter) => {
     offset: 0,
     ...filter,
   }
-  queryKey = ['job', params]
-  return useQuery(queryKey, async () => loadWorkFlow(params), {
-    // keepPreviousData: true,
-  })
+  queryKey = ['job', omit(params, 'offset')]
+  return useInfiniteQuery(
+    queryKey,
+    async ({ pageParam = params }) => loadWorkFlow(pageParam),
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        if (lastPage.has_more) {
+          const nextOffset = allPages.reduce(
+            (acc, cur) => acc + cur.infos.length,
+            0
+          )
+
+          if (nextOffset < lastPage.total) {
+            const nextParams = {
+              ...params,
+              offset: nextOffset,
+            }
+            return nextParams
+          }
+        }
+
+        return undefined
+      },
+    }
+  )
 }
 
 export const useMutationStreamJobSchedule = () => {
