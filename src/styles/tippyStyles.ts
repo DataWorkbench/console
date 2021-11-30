@@ -112,6 +112,9 @@ const tippyStyles = css`
       ${tw`fill-current text-green-11`}
     }
   }
+  .tippy-box.popconfirm-box {
+    ${tw`bg-neut-16 text-white leading-5`}
+  }
 `
 
 export default tippyStyles
