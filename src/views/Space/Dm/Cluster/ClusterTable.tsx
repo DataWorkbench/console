@@ -18,7 +18,7 @@ import {
   getFlinkClusterKey,
   useMutationCluster,
 } from 'hooks'
-import { get, omitBy } from 'lodash-es'
+import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
 import { css } from 'twin.macro'
 import ClusterModal from './ClusterModal'
@@ -262,21 +262,25 @@ const ClusterTable = observer(() => {
   }
 
   const mutateData = () => {
+    const clusterIds = opclusterList.map((o) => o.id)
     mutation.mutate(
       {
         op,
-        clusterIds: opclusterList.map((o) => o.id),
+        clusterIds,
       },
       {
         onSuccess: () => {
           setOp('')
           refetchData()
-          setSelectedRowKeys([])
+          if (op === 'delete') {
+            setSelectedRowKeys(
+              selectedRowKeys.filter((k) => !clusterIds.includes(k))
+            )
+          }
         },
       }
     )
   }
-
   const { isFetching, isRefetching, data } = useQueryFlinkClusters(
     omitBy(filter, (v) => v === '')
   )
@@ -413,6 +417,7 @@ const ClusterTable = observer(() => {
         <Modal
           noBorder
           visible
+          draggable
           width={opclusterList.length > 1 ? 600 : 400}
           onCancel={() => setOp('')}
           onOk={mutateData}
@@ -479,9 +484,11 @@ const ClusterTable = observer(() => {
               <Table
                 dataSource={opclusterList}
                 rowKey="id"
-                columns={columns.filter((col) =>
-                  ['name', 'status', 'version'].includes(col.dataIndex)
-                )}
+                columns={columns
+                  .filter((col) =>
+                    ['name', 'version', 'updated'].includes(col.dataIndex)
+                  )
+                  .map((col) => pick(col, ['title', 'dataIndex', 'render']))}
               />
             )}
           </>

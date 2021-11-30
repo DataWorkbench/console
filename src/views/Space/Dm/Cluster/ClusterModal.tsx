@@ -132,14 +132,18 @@ const ClusterModal = observer(
     const networks = flatten(
       networksRet.data?.pages.map((page) => page.infos || [])
     )
-    // const { data: networksData } = useQueryNetworks()
     const mutation = useMutationCluster()
     const totalCU = params.task_num * params.task_cu + params.job_cu
+    const viewMode = op === 'view'
 
     const handleOk = () => {
       const baseForm = baseFormRef.current
       const optForm = optFormRef.current
       const networkForm = networkFormRef.current
+      if (viewMode) {
+        setOp('')
+        return
+      }
       if (
         baseForm?.validateFields() &&
         optForm?.validateFields() &&
@@ -217,8 +221,6 @@ const ClusterModal = observer(
       })
       return o
     }, [])
-
-    const viewMode = op === 'view'
 
     return (
       <Modal
