@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, Form } from '@QCFE/qingcloud-portal-ui'
-import { Collapse, Field, Label, PopConfirm } from '@QCFE/lego-ui'
+import { Collapse, Field, Label } from '@QCFE/lego-ui'
 import { flatten } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
@@ -15,6 +15,7 @@ import {
   ModalContent,
   Icons,
   AffixLabel,
+  PopConfirm,
 } from 'components'
 import {
   getResourceKey,
@@ -193,7 +194,7 @@ const UdfModal = observer(() => {
               <PopConfirm
                 type="warning"
                 content={
-                  <div tw="text-neut-16">
+                  <div>
                     若返回上一步，本次配置的信息将清空，确定返回上一步吗？
                   </div>
                 }
@@ -202,7 +203,6 @@ const UdfModal = observer(() => {
                   formData.current = {}
                   setHasChange(false)
                 }}
-                closeAfterClick={false}
               >
                 <Button>上一步</Button>
               </PopConfirm>
@@ -215,21 +215,21 @@ const UdfModal = observer(() => {
             onClick={handleOk}
             loading={mutation.isLoading}
           >
-            {step === 0 ? '下一步' : '确定'}
+            {step === 0 ? '下一步' : '确定新建'}
           </Button>
         </div>
       )
     }
-    // TODO: 确定按钮的颜色
     if (_op === 'detail') {
       return (
         <div tw="">
           <PopConfirm
-            className="popcanfirm-danger"
             type="warning"
             placement="topRight"
+            okType="danger"
+            closeAfterClick={false}
             content={
-              <div tw="text-neut-16">
+              <div>
                 若修改函数名称或属性，相关工作流、任务会出现问题，确认编辑吗？
               </div>
             }
@@ -246,14 +246,10 @@ const UdfModal = observer(() => {
         <Button onClick={handleCancel}>取消</Button>
         <PopConfirm
           className="popcanfirm-danger"
+          placement="topRight"
           type="warning"
-          content={
-            <div tw="text-neut-16">
-              更新内容会影响到相关工作流、任务，确认更新？
-            </div>
-          }
+          content={<div>更新内容会影响到相关工作流、任务，确认更新？</div>}
           onOk={handleOk}
-          closeAfterClick={false}
         >
           <Button type="primary">确定</Button>
         </PopConfirm>
