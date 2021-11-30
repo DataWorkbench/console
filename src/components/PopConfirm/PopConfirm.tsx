@@ -67,7 +67,7 @@ const placementMapper: PlacementMapper = {
 type PlacementType = keyof PlacementMapper
 
 interface IPopConfirmProps {
-  trigger?: 'hover' | 'click' | 'focus'
+  trigger?: 'hover' | 'click'
   type?: 'info' | 'warning' | 'error'
   content: ReactNode
   twChild?: TwStyle
@@ -161,16 +161,16 @@ export const PopConfirm = (
           },
         })
         break
-      case 'focus':
-        Object.assign(newProps, {
-          onFocus: (e: FocusEvent) => {
-            if (typeof children.props?.onFocus === 'function') {
-              newProps.onFocus(e)
-            }
-            show()
-          },
-        })
-        break
+      // case 'focus':
+      //   Object.assign(newProps, {
+      //     onFocus: (e: FocusEvent) => {
+      //       if (typeof children.props?.onFocus === 'function') {
+      //         newProps.onFocus(e)
+      //       }
+      //       show()
+      //     },
+      //   })
+      //   break
       default:
         Object.assign(newProps, {
           onClick: (e: MouseEvent) => {
