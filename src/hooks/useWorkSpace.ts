@@ -25,10 +25,7 @@ export const useQueryWorkSpace = (filter: IListWorkSpaceParams) => {
   keys.infinite = queryKey
   return useInfiniteQuery(
     queryKey,
-    async ({ pageParam = filter }) => {
-      // console.log(pageParam)
-      return loadWorkSpace(pageParam)
-    },
+    async ({ pageParam = filter }) => loadWorkSpace(pageParam),
     {
       getNextPageParam: (lastPage, allPages) => {
         if (lastPage.has_more) {

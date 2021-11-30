@@ -24,7 +24,9 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
 
   const mutation = useMutationStreamJobArgs()
   const { data, isFetching } = useQueryStreamJobArgs()
-  const clustersRet = useQueryInfiniteFlinkClusters({ filter: { limit: 50 } })
+  const clustersRet = useQueryInfiniteFlinkClusters({
+    filter: { limit: 50, status: 1 },
+  })
 
   const clusters = flatten(
     clustersRet.data?.pages.map((page) => page.infos || [])

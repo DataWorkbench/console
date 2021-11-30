@@ -39,7 +39,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
     scheType: job ? job.type : 0,
   })
   const clustersRet = useQueryInfiniteFlinkClusters({
-    filter: { limit: 50 },
+    filter: { limit: 50 }, // status: 1
     enabled: params.step === 1,
   })
   const mutation = useMutationStreamJob()
@@ -233,20 +233,13 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
               {!job && (
                 <SelectField
                   name="cluster_id"
-                  label={<AffixLabel>计算集群</AffixLabel>}
+                  label="计算集群"
                   placeholder="请选择计算集群"
                   // value="eng-0000000000000000"
                   options={clusters.map(({ id, name }) => ({
                     value: id,
                     label: name,
                   }))}
-                  schemas={[
-                    {
-                      rule: { required: true },
-                      help: '请选择计算集群',
-                      status: 'error',
-                    },
-                  ]}
                   isLoadingAtBottom
                   searchable={false}
                   onMenuScrollToBottom={() => {
@@ -255,12 +248,6 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                     }
                   }}
                   bottomTextVisible
-                  // options={[
-                  //   {
-                  //     label: 'test',
-                  //     value: 'eng-0000000000000000',
-                  //   },
-                  // ]}
                 />
               )}
               <TextAreaField

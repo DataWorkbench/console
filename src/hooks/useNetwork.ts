@@ -34,7 +34,7 @@ export const useQueryNetworks = (filter: any) => {
   })
 }
 
-export const useQueryInfiniteNetworks = (filter: any) => {
+export const useInfiniteQueryNetworks = (filter: any) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,

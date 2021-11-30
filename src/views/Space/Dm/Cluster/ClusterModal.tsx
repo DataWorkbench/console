@@ -20,7 +20,7 @@ import Tippy from '@tippyjs/react'
 import {
   useStore,
   useQueryFlinkVersions,
-  useQueryInfiniteNetworks,
+  useInfiniteQueryNetworks,
   useMutationCluster,
   getFlinkClusterKey,
 } from 'hooks'
@@ -125,7 +125,7 @@ const ClusterModal = observer(
 
     const queryClient = useQueryClient()
     const { data: flinkVersions } = useQueryFlinkVersions()
-    const networksRet = useQueryInfiniteNetworks({
+    const networksRet = useInfiniteQueryNetworks({
       offset: 0,
       limit: 10,
     })
