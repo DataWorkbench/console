@@ -10,8 +10,8 @@ import { OptButton } from './styled'
 
 const { MenuItem } = Menu
 
-const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
-const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
+// const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
+// const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
 // const RoleIconWrapper = tw.div`w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1`
 // const RowWrapper = tw(Center)`justify-between px-4 mb-3`
 const StateTag = styled('span')(({ status }: { status: number }) => [
@@ -68,11 +68,11 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     if (isModal) {
       return (
         <FlexBox>
-          <Box tw="space-x-1">
+          {/* <Box tw="space-x-1">
             <span>我的角色：</span>
             <DarkTag>{space.owner}</DarkTag>
             <GrayTag>运维</GrayTag>
-          </Box>
+          </Box> */}
           <Box>
             创建时间：
             <span tw="text-neut-16">
@@ -138,7 +138,14 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
       ]}
       onClick={handleSelected}
     >
-      <div tw="px-5 pt-4">
+      <div tw="px-5 pt-4 pb-5 relative">
+        {isModal && (
+          <Radio
+            tw="absolute top-2 right-3"
+            value={space.id}
+            checked={space.id === curSpaceId}
+          />
+        )}
         <FlexBox tw="mb-7 items-center">
           <FlexBox tw="space-x-3 w-full items-center">
             <Center
@@ -162,9 +169,11 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                   {space.status === 1 ? '活跃' : '已禁用'}
                 </StateTag>
               </FlexBox>
-              <div tw="pt-0.5 h-7 truncate">{space.desc || '暂无描述'}</div>
+              <div tw="pt-0.5 h-7 truncate" title={space.desc || ''}>
+                {space.desc || '暂无描述'}
+              </div>
             </Box>
-            {!isModal ? (
+            {!isModal && (
               <Tooltip
                 twChild={tw`self-start`}
                 placement="bottom-end"
@@ -195,8 +204,6 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
               >
                 <Icon name="more" clickable size={24} />
               </Tooltip>
-            ) : (
-              <Radio value={space.id} checked={space.id === curSpaceId} />
             )}
           </FlexBox>
         </FlexBox>

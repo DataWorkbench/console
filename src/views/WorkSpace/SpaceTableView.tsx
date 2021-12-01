@@ -107,6 +107,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                       ) => {
                         setFilter((draft) => {
                           draft.status = k === 'all' ? '' : v
+                          draft.offset = 0
                         })
                       }}
                     >

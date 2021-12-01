@@ -245,7 +245,7 @@ const SpaceModal = observer(
               style={{ color: style.color }}
             />
             <div tw="flex-1 overflow-hidden">
-              <div tw="font-semibold text-base text-neut-15 truncate">
+              <div tw="font-semibold text-base text-neut-15 break-all">
                 {opName}工作空间: 工作空间
                 {filterOptSpaces.map(({ name }) => name).join(',')}
               </div>

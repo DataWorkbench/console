@@ -11,9 +11,7 @@ import SpaceItem from './SpaceItem'
 import SpaceListsEmpty from './SpaceListsEmpty'
 
 const colorVars = {
-  // backColors: ['#b3e7d6', '#f2c0c3', '#cfafe9', '#b8def9', '#fbdeb4'],
   backColors: ['#D9F4F1', '#FDEFD8', '#F1E4FE', '#E0EBFE', '#FEE9DA'],
-  // fontColors: ['#2fb788', '#d44e4b', '#934bc5', '#229ce9', '#f59c2a'],
   fontColors: ['#14B8A6', '#F59E0B', '#A855F7', '#3B82F6', '#F97316'],
 }
 
@@ -43,6 +41,7 @@ const SpaceCardView = observer(() => {
     curRegionId: regionId,
     queryKeyWord,
     scrollElem,
+    isModal,
   } = stateStore
   const [filter, setFilter] = useImmer({
     regionId,
@@ -114,7 +113,7 @@ const SpaceCardView = observer(() => {
   }
   return (
     <>
-      <Content>
+      <Content css={isModal && tw`2xl:grid-cols-2`}>
         {workspaces.map((space, i: number) => (
           <SpaceItemWrapper
             key={space.id}
