@@ -14,7 +14,7 @@ import {
   useStore,
   useQueryNetworks,
   getNetworkKey,
-  useMutationCluster,
+  useMutationNetwork,
 } from 'hooks'
 import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
@@ -47,7 +47,7 @@ const NetworkTable = observer(() => {
     sort_by: '',
   })
   const queryClient = useQueryClient()
-  const mutation = useMutationCluster()
+  const mutation = useMutationNetwork()
 
   useEffect(() => {
     if (op === '') {
@@ -102,7 +102,6 @@ const NetworkTable = observer(() => {
           <FlexBox tw="items-center">
             <Button
               type="text"
-              disabled={[1, 3].includes(row.status)}
               onClick={() => {
                 setOp('update')
                 setOpNetworkList([row])
@@ -130,16 +129,21 @@ const NetworkTable = observer(() => {
   }
 
   const mutateData = () => {
+    const networkIds = opNetworkList.map((o) => o.id)
     mutation.mutate(
       {
         op,
-        clusterIds: opNetworkList.map((o) => o.id),
+        networkIds,
       },
       {
         onSuccess: () => {
           setOp('')
           refetchData()
-          setSelectedRowKeys([])
+          if (op === 'delete') {
+            setSelectedRowKeys(
+              selectedRowKeys.filter((k) => !networkIds.includes(k))
+            )
+          }
         },
       }
     )
@@ -149,13 +153,8 @@ const NetworkTable = observer(() => {
     omitBy(filter, (v) => v === '')
   )
   const infos = get(data, 'infos', []) || []
-  const filterClusterInfos =
-    infos.filter(
-      (info: any) =>
-        selectedRowKeys.includes(info.id) &&
-        info.status !== 1 &&
-        info.status !== 3
-    ) || []
+  const filterNetworkInfos =
+    infos.filter((info: any) => selectedRowKeys.includes(info.id)) || []
 
   const filterColumn = columnSettings
     .map((o: { key: string; checked: boolean }) => {
@@ -174,11 +173,11 @@ const NetworkTable = observer(() => {
             </Button>
             <Button
               disabled={
-                selectedRowKeys.length === 0 || filterClusterInfos.length === 0
+                selectedRowKeys.length === 0 || filterNetworkInfos.length === 0
               }
               onClick={() => {
-                if (filterClusterInfos.length) {
-                  setOpNetworkList(filterClusterInfos)
+                if (filterNetworkInfos.length) {
+                  setOpNetworkList(filterNetworkInfos)
                   setOp('delete')
                 }
               }}
@@ -263,12 +262,16 @@ const NetworkTable = observer(() => {
           width={opNetworkList.length > 1 ? 600 : 400}
           onCancel={() => setOp('')}
           onOk={mutateData}
-          // okType={op === 'start' ? 'primary' : 'danger'}
-          confirmLoading={mutation.isLoading}
           footer={
             <FlexBox tw="justify-end">
               <Button onClick={() => setOp('')}>取消</Button>
-              <Button type={op === 'start' ? 'primary' : 'danger'}>确定</Button>
+              <Button
+                type={op === 'start' ? 'primary' : 'danger'}
+                loading={mutation.isLoading}
+                onClick={mutateData}
+              >
+                确定
+              </Button>
             </FlexBox>
           }
         >
@@ -286,7 +289,7 @@ const NetworkTable = observer(() => {
                 const opText = '删除'
                 const opNetworkLen = opNetworkList.length
 
-                const clusterText =
+                const networkText =
                   opNetworkLen === 1 ? (
                     <>
                       确认{opText}网络配置{opNetworkList[0].name}
@@ -302,10 +305,10 @@ const NetworkTable = observer(() => {
                 return (
                   <>
                     <div tw="font-medium mb-2 text-base">
-                      {clusterText}注意事项
+                      {networkText}注意事项
                     </div>
                     <div className="modal-content-message">
-                      {clusterText}
+                      {networkText}
                       后，关联资源会受到影响，且该操作无法撤回。确认删除吗？
                     </div>
                   </>
