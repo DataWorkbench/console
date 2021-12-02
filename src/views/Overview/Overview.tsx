@@ -11,11 +11,18 @@ import FAQ from './FAQ'
 import Practice from './Practice'
 
 function getTabs() {
+  const h = new Date().getHours()
+  let mtxt = '上午'
+  if (h > 12 && h < 18) {
+    mtxt = '下午'
+  } else if (h >= 18) {
+    mtxt = '晚上'
+  }
   return [
     {
       title: (
         <span tw="font-semibold">
-          上午好，{get(window, 'USER.user_name', '')}，欢迎您使用大数据平台
+          {mtxt}好，{get(window, 'USER.user_name', '')}，欢迎您使用大数据平台
         </span>
       ),
       description:

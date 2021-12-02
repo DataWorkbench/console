@@ -53,7 +53,7 @@ export const disableDataSource = ({
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/source/disables`,
-    body: { sourceids: sourceIds },
+    body: { source_ids: sourceIds },
     method: 'POST',
   })
 
@@ -65,7 +65,7 @@ export const enableDataSource = ({
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/source/enables`,
-    body: { sourceids: sourceIds },
+    body: { source_ids: sourceIds },
     method: 'POST',
   })
 
@@ -77,7 +77,7 @@ export const deleteDataSource = ({
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/source/deletes`,
-    body: { sourceids: sourceIds },
+    body: { source_ids: sourceIds },
     method: 'POST',
   })
 

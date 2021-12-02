@@ -26,6 +26,7 @@ export const Header = observer(() => {
     offset: 0,
     reverse: true,
     limit: 10,
+    status: 1,
     search: '',
   })
 

@@ -31,15 +31,29 @@ const SpaceListsEmpty = () => {
   return (
     <div>
       <div css={[tw`bg-white`, !isModal && tw`pb-20`]}>
-        <div tw="h-96 border-b border-neut-2 flex items-center justify-center">
+        <div
+          css={[
+            tw`h-96 border-b border-neut-2 flex items-center justify-center`,
+            isModal && tw`h-80 border-b-0`,
+          ]}
+        >
           <div tw="w-[700px] text-center">
             <div tw="relative inline-block">
               <SexangleImg />
               <Icon name="project" size={40} tw="absolute left-4 top-5" />
             </div>
-            <div tw="font-medium text-xl mt-5">暂无工作空间</div>
+            <div tw="font-medium text-xl mt-5">
+              {isModal ? '当前没有相关「工作空间」的数据' : '暂无工作空间'}
+            </div>
             <div tw="mt-4 text-neut-8">
-              工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。
+              工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。
+              {isModal ? (
+                <a href="###" tw="text-link">
+                  了解更多
+                </a>
+              ) : (
+                '工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。'
+              )}
             </div>
             <div tw="space-x-4 mt-5">
               <Button

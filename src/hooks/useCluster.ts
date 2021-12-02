@@ -57,27 +57,31 @@ export const useQueryInfiniteFlinkClusters = ({
     ...filter,
   }
   const qryKey = ['flinkCluster', omit(params, 'offset')]
-  return useInfiniteQuery(qryKey, async () => listFlinkClusters(params), {
-    enabled,
-    getNextPageParam: (lastPage, allPages) => {
-      if (lastPage.has_more) {
-        const nextOffset = allPages.reduce(
-          (acc, cur) => acc + cur.infos.length,
-          0
-        )
+  return useInfiniteQuery(
+    qryKey,
+    async ({ pageParam = params }) => listFlinkClusters(pageParam),
+    {
+      enabled,
+      getNextPageParam: (lastPage, allPages) => {
+        if (lastPage.has_more) {
+          const nextOffset = allPages.reduce(
+            (acc, cur) => acc + cur.infos.length,
+            0
+          )
 
-        if (nextOffset < lastPage.total) {
-          const nextParams = {
-            ...params,
-            offset: nextOffset,
+          if (nextOffset < lastPage.total) {
+            const nextParams = {
+              ...params,
+              offset: nextOffset,
+            }
+            return nextParams
           }
-          return nextParams
         }
-      }
 
-      return undefined
-    },
-  })
+        return undefined
+      },
+    }
+  )
 }
 
 export const useMutationCluster = () => {

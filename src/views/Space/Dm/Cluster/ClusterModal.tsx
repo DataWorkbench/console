@@ -20,7 +20,7 @@ import Tippy from '@tippyjs/react'
 import {
   useStore,
   useQueryFlinkVersions,
-  useQueryInfiniteNetworks,
+  useInfiniteQueryNetworks,
   useMutationCluster,
   getFlinkClusterKey,
 } from 'hooks'
@@ -125,21 +125,25 @@ const ClusterModal = observer(
 
     const queryClient = useQueryClient()
     const { data: flinkVersions } = useQueryFlinkVersions()
-    const networksRet = useQueryInfiniteNetworks({
+    const networksRet = useInfiniteQueryNetworks({
       offset: 0,
       limit: 10,
     })
     const networks = flatten(
       networksRet.data?.pages.map((page) => page.infos || [])
     )
-    // const { data: networksData } = useQueryNetworks()
     const mutation = useMutationCluster()
     const totalCU = params.task_num * params.task_cu + params.job_cu
+    const viewMode = op === 'view'
 
     const handleOk = () => {
       const baseForm = baseFormRef.current
       const optForm = optFormRef.current
       const networkForm = networkFormRef.current
+      if (viewMode) {
+        setOp('')
+        return
+      }
       if (
         baseForm?.validateFields() &&
         optForm?.validateFields() &&
@@ -217,8 +221,6 @@ const ClusterModal = observer(
       })
       return o
     }, [])
-
-    const viewMode = op === 'view'
 
     return (
       <Modal
