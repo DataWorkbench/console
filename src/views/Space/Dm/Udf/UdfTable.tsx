@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 
 import { Table } from 'views/Space/styled'
 import { useQueryUdfList, useStore } from 'hooks'
+import { TextHighlight } from 'components'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
@@ -34,7 +35,9 @@ const getDefaultColumns = (
           <LetterIcon>
             <span>{value}</span>
           </LetterIcon>
-          <span className="column-name">{value}</span>
+          <span className="column-name">
+            <TextHighlight text={value} filterText={filter.search} />
+          </span>
         </span>
       ) : (
         ''
@@ -44,6 +47,9 @@ const getDefaultColumns = (
   {
     title: 'ID',
     dataIndex: 'udf_id',
+    render(val: string) {
+      return <TextHighlight text={val} filterText={filter.search} />
+    },
   },
   {
     title: '语言类型',
