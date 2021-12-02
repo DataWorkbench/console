@@ -11,20 +11,66 @@ import {
 } from '@QCFE/lego-ui'
 import { Button } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
-import { get } from 'lodash-es'
-import { useMutationStreamJobArgs, useQueryStreamJobArgs } from 'hooks'
+import { flatten, get } from 'lodash-es'
+import {
+  useMutationStreamJobArgs,
+  useQueryStreamJobArgs,
+  useQueryUdf,
+} from 'hooks'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { ScheForm } from './styled'
 
 const { CollapseItem } = Collapse
 const { NumberField, SelectField } = Form
 
+interface UdfSelectProps {
+  type: number
+  [propName: string]: any
+}
+const UdfSelect = (props: UdfSelectProps) => {
+  const { type } = props
+  const [filter] = useImmer<{
+    limit: number
+    offset: number
+    udf_type: number
+  }>({
+    limit: 15,
+    offset: 0,
+    udf_type: type,
+  })
+
+  const v = useQueryUdf(filter)
+  const { status, data, fetchNextPage, hasNextPage } = v
+  const options = flatten(
+    data?.pages.map((page: Record<string, any>) => page.infos || [])
+  )
+
+  const loadData = () => {
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }
+
+  return (
+    <SelectField
+      {...props}
+      options={options}
+      isLoading={status === 'loading'}
+      isLoadingAtBottom
+      onMenuScrollToBottom={loadData}
+      bottomTextVisible
+      valueKey="udf_id"
+      labelKey="name"
+    />
+  )
+}
+
 const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   const [params, setParams] = useImmer({
     clusterId: 'eng-0000000000000000',
-    udf_ids: [],
-    udtf_ids: [],
-    udttf_ids: [],
+    udf_ids: [] as number[],
+    udtf_ids: [] as number[],
+    udttf_ids: [] as number[],
     parallelism: 0,
   })
   const [show, setShow] = useState(false)
@@ -139,29 +185,44 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
               }
             >
               <ScheForm layout="horizon">
-                <SelectField
+                <UdfSelect
                   name="udf"
                   label="UDF"
                   value={params.udf_ids}
                   multi
                   closeOnSelect={false}
-                  options={[]}
+                  onChange={(udf_ids: number[]) =>
+                    setParams((draft) => {
+                      draft.udf_ids = udf_ids
+                    })
+                  }
+                  type={1}
                 />
-                <SelectField
+                <UdfSelect
                   name="udtf"
                   label="UDTF"
                   multi
                   closeOnSelect={false}
                   value={params.udtf_ids}
-                  options={[]}
+                  onChange={(udtf_ids: number[]) =>
+                    setParams((draft) => {
+                      draft.udtf_ids = udtf_ids
+                    })
+                  }
+                  type={2}
                 />
-                <SelectField
+                <UdfSelect
                   name="udttf"
                   label="UDTTF"
                   multi
                   closeOnSelect={false}
                   value={params.udttf_ids}
-                  options={[]}
+                  onChange={(udttf_ids: number[]) =>
+                    setParams((draft) => {
+                      draft.udttf_ids = udttf_ids
+                    })
+                  }
+                  type={3}
                 />
               </ScheForm>
             </CollapseItem>
