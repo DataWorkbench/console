@@ -39,12 +39,22 @@ class DmStore {
     this.udfType = type
   }
 
-  udfSelectedRowKeys: string[] = []
+  udfSelectedRows: Record<string, any>[] = []
+
+  get udfSelectedRowKeys() {
+    return this.udfSelectedRows.map((i) => i.udf_id)
+  }
 
   udfColumnSettings: ColumnSettingsType[] = []
 
-  setUdfSelectedRowKeys = (keys: string[]) => {
-    this.udfSelectedRowKeys = keys
+  udfFilterRows: Record<string, any>[] = []
+
+  setUdfFilterRows = (rows: Record<string, any>[]) => {
+    this.udfFilterRows = rows
+  }
+
+  setUdfSelectedRows = (rows: Record<string, any>[]) => {
+    this.udfSelectedRows = rows
   }
 
   setUdfColumnSettings = (settings: ColumnSettingsType[]) => {

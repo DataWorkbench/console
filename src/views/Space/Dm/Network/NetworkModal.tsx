@@ -6,6 +6,8 @@ import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import { assign, flatten } from 'lodash-es'
+import { useParams } from 'react-router-dom'
+
 import {
   useStore,
   useMutationNetwork,
@@ -54,6 +56,7 @@ const ClusterModal = observer(
     } = useStore()
     const [params, setParams] = useImmer(opNetwork || defaultParams)
 
+    const { regionId } = useParams<{ regionId: string }>()
     const formRef = useRef<Form>(null)
     const queryClient = useQueryClient()
     const routersRet = useQueryDescribeRouters({
@@ -153,7 +156,11 @@ const ClusterModal = observer(
                 help={
                   <>
                     如需选择新的 VPC，您可以
-                    <a href="###" tw="text-green-11">
+                    <a
+                      href="/iaas/vpc/create"
+                      target="_blank"
+                      tw="text-green-11"
+                    >
                       新建 VPC 网络
                       <Icon name="if-external-link" />
                     </a>
@@ -207,7 +214,12 @@ const ClusterModal = observer(
                 help={
                   <>
                     您可以
-                    <a href="###" tw="text-green-11">
+                    <a
+                      href={`/${regionId}/vxnets`}
+                      target="_blank"
+                      tw="text-green-11"
+                      rel="noreferrer"
+                    >
                       新建私有网络
                       <Icon name="if-external-link" />
                     </a>

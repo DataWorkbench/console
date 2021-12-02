@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, Form } from '@QCFE/qingcloud-portal-ui'
-import { Collapse, Field, Label, PopConfirm } from '@QCFE/lego-ui'
+import { Collapse, Field, Label } from '@QCFE/lego-ui'
 import { flatten } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
@@ -15,6 +15,7 @@ import {
   ModalContent,
   Icons,
   AffixLabel,
+  PopConfirm,
 } from 'components'
 import {
   getResourceKey,
@@ -193,12 +194,15 @@ const UdfModal = observer(() => {
               <PopConfirm
                 type="warning"
                 content={
-                  <div tw="text-neut-16">
+                  <div>
                     若返回上一步，本次配置的信息将清空，确定返回上一步吗？
                   </div>
                 }
-                onOk={() => setStep(0)}
-                closeAfterClick={false}
+                onOk={() => {
+                  setStep(0)
+                  formData.current = {}
+                  setHasChange(false)
+                }}
               >
                 <Button>上一步</Button>
               </PopConfirm>
@@ -206,27 +210,31 @@ const UdfModal = observer(() => {
               <Button onClick={() => setStep(0)}>上一步</Button>
             )
           }
-          <Button type="primary" onClick={handleOk}>
-            {step === 0 ? '下一步' : '确定'}
+          <Button
+            type="primary"
+            onClick={handleOk}
+            loading={mutation.isLoading}
+          >
+            {step === 0 ? '下一步' : '确定新建'}
           </Button>
         </div>
       )
     }
-    // TODO: 确定按钮的颜色
     if (_op === 'detail') {
       return (
         <div tw="">
           <PopConfirm
-            className="popcanfirm-danger"
             type="warning"
+            placement="topRight"
+            okType="danger"
+            closeAfterClick={false}
             content={
-              <div tw="text-neut-16">
+              <div>
                 若修改函数名称或属性，相关工作流、任务会出现问题，确认编辑吗？
               </div>
             }
             onOk={() => setOp('edit')}
             okText="编辑"
-            closeAfterClick={false}
           >
             <Button type="danger">编辑</Button>
           </PopConfirm>
@@ -238,14 +246,10 @@ const UdfModal = observer(() => {
         <Button onClick={handleCancel}>取消</Button>
         <PopConfirm
           className="popcanfirm-danger"
+          placement="topRight"
           type="warning"
-          content={
-            <div tw="text-neut-16">
-              更新内容会影响到相关工作流、任务，确认更新？
-            </div>
-          }
+          content={<div>更新内容会影响到相关工作流、任务，确认更新？</div>}
           onOk={handleOk}
-          closeAfterClick={false}
         >
           <Button type="primary">确定</Button>
         </PopConfirm>
@@ -321,14 +325,20 @@ const UdfModal = observer(() => {
                     name="name"
                     labelClassName="label-required"
                     label={
-                      <AffixLabel
-                        required={false}
-                        help="函数名需与实现名保持一致"
-                      >
-                        函数名
-                      </AffixLabel>
+                      curLangInfo?.type === javaType ? (
+                        '函数名'
+                      ) : (
+                        <AffixLabel
+                          required={false}
+                          help="函数名需与实现名保持一致"
+                          theme="green"
+                        >
+                          函数名
+                        </AffixLabel>
+                      )
                     }
                     disabled={op === 'detail'}
+                    validateOnBlur
                     defaultValue={modalData?.name}
                     schemas={[
                       {
@@ -384,11 +394,30 @@ const UdfModal = observer(() => {
                             labelKey="name"
                             onMenuScrollToBottom={loadData}
                             bottomTextVisible
-                            valueKey="udf_id"
+                            validateOnBlur
+                            valueKey="id"
+                            clearable
                             schemas={[
                               {
                                 rule: { required: true },
-                                help: '请选择 jar',
+                                help: (
+                                  <div>
+                                    请选择 Jar，如需选择新的 Jar
+                                    包资源，可以在资源管理中
+                                    <a
+                                      href="./resource"
+                                      target="_blank"
+                                      tw="text-green-11"
+                                    >
+                                      上传资源
+                                      <Icons
+                                        name="direct"
+                                        size={14}
+                                        tw="inline-block"
+                                      />
+                                    </a>
+                                  </div>
+                                ),
                                 status: 'error',
                               },
                             ]}
@@ -421,6 +450,7 @@ const UdfModal = observer(() => {
                           labelClassName="label-required"
                           disabled={op === 'detail'}
                           defaultValue={modalData?.define}
+                          validateOnBlur
                           schemas={[
                             {
                               rule: { required: true },

@@ -29,7 +29,7 @@ const Udf = observer(() => {
   useEffect(() => {
     const storageKey = `DM_${udfType}_COLUMN_SETTINGS`
     dmStore.set({
-      udfSelectedRowKeys: [],
+      udfSelectedRows: [],
       udfStorageKey: storageKey,
       udfColumnSettings: localstorage.getItem(storageKey) || [],
     })

@@ -37,7 +37,7 @@ export const updateUdf = ({
 export const deleteUdf = ({ regionId, spaceId, ...rest }: IUdfParams) =>
   request({
     region: regionId,
-    action: `/v1/workspace/${spaceId}/udf/deletes`,
+    uri: `/v1/workspace/${spaceId}/udf/deletes`,
     body: rest,
     method: 'POST',
   })

@@ -52,9 +52,10 @@ export const AffixLabel = ({
   return (
     <div tw="flex items-center">
       {required && <b tw="text-red-10 mr-1">*</b>}
-      <span tw="mr-1 font-medium">{children}</span>
+      <span tw="mr-1 font-medium break-all">{children}</span>
       {help && (
         <Tooltip
+          tw="break-all"
           content={help}
           placement={placement}
           trigger={trigger}

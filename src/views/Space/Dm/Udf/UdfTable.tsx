@@ -7,12 +7,14 @@ import { observer } from 'mobx-react-lite'
 import dayjs from 'dayjs'
 
 import { Table } from 'views/Space/styled'
-import { useMutationUdf, useQueryUdfList, useStore } from 'hooks'
+import { useQueryUdfList, useStore } from 'hooks'
+import { TextHighlight } from 'components'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
-import { languageFilters, udfTypes } from './constants'
+import { languageFilters, udfTypes, udfTypesComment } from './constants'
 
+// TODO: table Dark/文字色/次级辅助色
 const getDefaultColumns = (
   filter: Record<string, any>,
   actions: (type: UdfActionType, detail: Record<string, any>) => void
@@ -34,7 +36,9 @@ const getDefaultColumns = (
           <LetterIcon>
             <span>{value}</span>
           </LetterIcon>
-          <span className="column-name">{value}</span>
+          <span className="column-name">
+            <TextHighlight text={value} filterText={filter.search} />
+          </span>
         </span>
       ) : (
         ''
@@ -44,6 +48,13 @@ const getDefaultColumns = (
   {
     title: 'ID',
     dataIndex: 'udf_id',
+    render(val: string) {
+      return (
+        <span tw="dark:text-neut-8">
+          <TextHighlight text={val} filterText={filter.search} />
+        </span>
+      )
+    },
   },
   {
     title: '语言类型',
@@ -56,15 +67,20 @@ const getDefaultColumns = (
   {
     title: '描述',
     dataIndex: 'comment',
+    render: (val: string) => <span tw="dark:text-neut-8">{val}</span>,
   },
   {
-    title: '上传时间',
+    title: '更新时间',
     dataIndex: 'updated',
     sortable: true,
     sortOrder:
       // eslint-disable-next-line no-nested-ternary
       filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
-    render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+    render: (v: number) => (
+      <span tw="dark:text-neut-8">
+        {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+      </span>
+    ),
   },
   {
     title: '操作',
@@ -109,14 +125,13 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
       setModalData,
       udfColumnSettings: columnSettings,
       udfSelectedRowKeys: selectedRowKeys,
-      setUdfSelectedRowKeys: setSelectedRowKeys,
+      setUdfSelectedRows,
+      setUdfFilterRows,
       // : columnSettings
     },
   } = useStore()
 
   const { data, refetch, isFetching } = useQueryUdfList(filter)
-
-  const mutation = useMutationUdf()
 
   useEffect(() => {
     setFilter((_) => {
@@ -134,20 +149,14 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           setModalData(detail)
           break
         case 'delete':
-          mutation.mutate(
-            { op: 'delete', udf_ids: [detail.udf_id] },
-            {
-              onSuccess: () => {
-                refetch()
-              },
-            }
-          )
+          setUdfFilterRows([detail])
+          setOp(actionType)
           break
         default:
           break
       }
     },
-    [setOp, setModalData, refetch, mutation]
+    [setOp, setModalData, setUdfFilterRows]
   )
 
   const defaultColumns = useMemo(() => {
@@ -159,8 +168,8 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
     [columnSettings, defaultColumns]
   )
 
-  const handleSelect = (keys: string[]) => {
-    setSelectedRowKeys(keys)
+  const handleSelect = (keys: string[], rows: Record<string, any>[]) => {
+    setUdfSelectedRows(rows)
   }
 
   const handleSort = (sortKey: string, order: 'desc' | 'asc') => {
@@ -185,9 +194,14 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
       <Alert
         message={
           <Level as="nav">
-            <LevelLeft>提示</LevelLeft>
+            <LevelLeft>{udfTypesComment[tp]?.comment}</LevelLeft>
             <LevelRight>
-              <a href="###" tw="text-link">
+              <a
+                href="https://nightlies.apache.org/flink/flink-docs-release-1.11/dev/table/functions/udfs.html"
+                target="_blank"
+                tw="text-link"
+                rel="noreferrer"
+              >
                 查看详情 →
               </a>
             </LevelRight>
