@@ -14,6 +14,7 @@ import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
 import { languageFilters, udfTypes, udfTypesComment } from './constants'
 
+// TODO: table Dark/文字色/次级辅助色
 const getDefaultColumns = (
   filter: Record<string, any>,
   actions: (type: UdfActionType, detail: Record<string, any>) => void
@@ -48,7 +49,11 @@ const getDefaultColumns = (
     title: 'ID',
     dataIndex: 'udf_id',
     render(val: string) {
-      return <TextHighlight text={val} filterText={filter.search} />
+      return (
+        <span tw="dark:text-neut-8">
+          <TextHighlight text={val} filterText={filter.search} />
+        </span>
+      )
     },
   },
   {
@@ -62,6 +67,7 @@ const getDefaultColumns = (
   {
     title: '描述',
     dataIndex: 'comment',
+    render: (val: string) => <span tw="dark:text-neut-8">{val}</span>,
   },
   {
     title: '更新时间',
@@ -70,7 +76,11 @@ const getDefaultColumns = (
     sortOrder:
       // eslint-disable-next-line no-nested-ternary
       filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
-    render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+    render: (v: number) => (
+      <span tw="dark:text-neut-8">
+        {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+      </span>
+    ),
   },
   {
     title: '操作',
