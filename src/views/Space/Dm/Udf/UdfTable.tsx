@@ -64,7 +64,7 @@ const getDefaultColumns = (
     dataIndex: 'comment',
   },
   {
-    title: '上传时间',
+    title: '更新时间',
     dataIndex: 'updated',
     sortable: true,
     sortOrder:
