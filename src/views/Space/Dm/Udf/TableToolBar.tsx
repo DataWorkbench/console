@@ -104,11 +104,15 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
               onPressEnter={(evt) => {
                 setFilter((_) => {
                   _.search = String((evt.target as HTMLInputElement).value)
+                  _.offset = 0
                 })
               }}
               onClear={() => {
                 setFilter((_) => {
-                  _.search = ''
+                  if (_.search) {
+                    _.search = ''
+                    _.offset = 0
+                  }
                 })
               }}
             />
