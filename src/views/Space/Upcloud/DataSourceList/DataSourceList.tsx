@@ -214,7 +214,7 @@ const DataSourceList = observer(() => {
           <TableActions>
             <Button
               type="text"
-              disabled={info.state === 'enable'}
+              disabled={info.status === 1}
               onClick={() => {
                 mutateOperation('enable', [info])
               }}
@@ -223,7 +223,7 @@ const DataSourceList = observer(() => {
             </Button>
             <Button
               type="text"
-              disabled={info.state === 'disable'}
+              disabled={info.status === 2}
               onClick={() => {
                 mutateOperation('disable', [info])
               }}
@@ -439,14 +439,14 @@ const DataSourceList = observer(() => {
         }
         if (['disable', 'enable', 'delete'].includes(op)) {
           const info = confirmMsgInfo[op]
-          const filterSourceList = opSourceList.filter(
-            (obj) => obj.status !== 2
-          )
-          const ifTableMode = op === 'delete' && filterSourceList.length > 1
+          const filterSourceList =
+            op === 'delete'
+              ? opSourceList.filter((obj) => obj.status !== 2)
+              : opSourceList
           return (
             <ModalWrapper
               visible
-              width={ifTableMode ? 650 : 500}
+              width={680}
               onCancel={handleCancel}
               footer={
                 <FlexBox tw="justify-end">
@@ -457,60 +457,53 @@ const DataSourceList = observer(() => {
                     loading={mutation.isLoading}
                     type={op === 'enable' ? 'primary' : 'danger'}
                   >
-                    确认{info.name}
+                    {info.name}
                   </Button>
                 </FlexBox>
               }
             >
-              <div tw="flex items-start space-x-2">
+              <div tw="flex items-start">
                 <Icon
-                  name={op === 'enable' ? 'if-exclamation' : 'if-information'}
+                  name={op === 'enable' ? 'information' : 'if-error-info'}
+                  size={op === 'enable' ? 24 : 'medium'}
                   css={[
-                    tw`text-xl leading-6`,
+                    tw`mr-3 text-2xl leading-6`,
                     op === 'enable'
-                      ? { color: '#FFD127' }
-                      : { color: '#CF3B37' },
+                      ? css`
+                          svg {
+                            ${tw`text-white fill-[#2193D3]`}
+                          }
+                        `
+                      : tw`text-red-10`,
                   ]}
                 />
                 <div tw="space-y-2 text-neut-13 ">
                   <FlexBox tw="font-semibold text-base text-neut-15">
-                    <span tw="mr-1">{info.name}数据源:</span>
-                    {!ifTableMode && (
-                      <div>
-                        {filterSourceList
-                          .map(
-                            ({ name, source_id }) => `${name} (${source_id})`
-                          )
-                          .join(',')}
-                      </div>
-                    )}
+                    确定要{info.name}以下
+                    <span tw="mx-1 ">{filterSourceList.length}</span>
+                    个数据源吗？
                   </FlexBox>
                   <div tw="mt-2">{info.desc}</div>
-                  {ifTableMode && (
-                    <Table
-                      rowKey="source_id"
-                      columns={columns
-                        .filter((col: any) =>
-                          [
-                            'name',
-                            'source_type',
-                            'source_id',
-                            'created',
-                          ].includes(col.dataIndex)
-                        )
-                        .map((col: any) =>
-                          pick(col, ['title', 'dataIndex', 'render'])
-                        )}
-                      dataSource={filterSourceList}
-                    />
-                  )}
+
+                  <Table
+                    rowKey="source_id"
+                    columns={columns
+                      .filter((col: any) =>
+                        [
+                          'name',
+                          'source_type',
+                          'source_id',
+                          'created',
+                        ].includes(col.dataIndex)
+                      )
+                      .map((col: any) =>
+                        pick(col, ['title', 'dataIndex', 'render'])
+                      )}
+                    dataSource={filterSourceList}
+                  />
+
                   {op === 'delete' && (
-                    <div
-                      css={[
-                        tw`pt-3 space-y-1`,
-                        ifTableMode && tw`border-t border-neut-2`,
-                      ]}
-                    >
+                    <div tw="pt-3 space-y-1 border-t border-neut-2">
                       <div>
                         *请在下方输入框中输入&quot;delete&quot;以确认操作
                       </div>

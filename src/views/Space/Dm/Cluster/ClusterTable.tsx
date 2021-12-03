@@ -150,6 +150,7 @@ const ClusterTable = observer(
                       ) => {
                         setFilter((draft) => {
                           draft.status = v
+                          draft.offset = 0
                         })
                       }}
                     >
@@ -183,7 +184,6 @@ const ClusterTable = observer(
         {
           title: '网络配置名称/ID',
           dataIndex: 'network_id',
-          render: (v) => v,
         },
         {
           title: '版本',
@@ -228,7 +228,16 @@ const ClusterTable = observer(
           hiddenInSetting: true,
           render: (v: any, row: any) => (
             <FlexBox tw="items-center">
-              <Button type="text">Flink UI</Button>
+              <Button type="text">
+                <a
+                  href={`//${row.web_ui}`}
+                  target="_blank"
+                  tw="text-white!"
+                  rel="noreferrer"
+                >
+                  Flink UI
+                </a>
+              </Button>
               <Button
                 type="text"
                 disabled={[1, 3].includes(row.status)}

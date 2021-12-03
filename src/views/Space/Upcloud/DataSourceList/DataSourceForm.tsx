@@ -1,40 +1,46 @@
-import React, { useRef } from 'react'
-import { Field, Label, Control, Collapse } from '@QCFE/lego-ui'
-import { useParams } from 'react-router-dom'
+import React from 'react'
+import { Field, Label, Control, Collapse, RadioButton } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get, omit, trim } from 'lodash-es'
+import { get, trim, flatten } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import dayjs from 'dayjs'
-import { Alert, Form, Button, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
-import { useStore, useMutationSource } from 'hooks'
-import { FlexBox, AffixLabel } from 'components'
+import { Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
+import { useStore, useMutationSource, useInfiniteQueryNetworks } from 'hooks'
+import { AffixLabel, Icons } from 'components'
 import { nameMatchRegex, strlen } from 'utils/convert'
+import { NetworkModal } from 'views/Space/Dm/Network'
 import HdfsNodeField from './HdfsNodeField'
 
 const { CollapseItem } = Collapse
-const { TextField, TextAreaField, NumberField, PasswordField } = Form
+const {
+  TextField,
+  TextAreaField,
+  NumberField,
+  PasswordField,
+  RadioGroupField,
+  SelectField,
+} = Form
 
-const PingTable = styled('table')(() => [
-  tw`w-full border-l border-t border-neut-2 mb-2`,
+const Root = styled('div')(() => [
   css`
-    th,
-    td {
-      ${tw`border-r border-b border-neut-2 px-4 py-3 `}
+    .collapse-item-content > .field {
+      ${tw`block pl-6`}
     }
-    thead {
-      ${tw`bg-neut-1 `}
+    .collapse-item-content {
+      ${tw`pl-0`}
     }
   `,
 ])
 
-const Root = styled('div')(() => [
+const CollapseWrapper = styled(Collapse)(() => [
+  tw`w-full border-0`,
   css`
-    .field {
-      ${tw`block`}
-    }
-    .collapse-item-content {
-      ${tw`pl-0`}
+    .collapse-item > .collapse-item-label {
+      box-shadow: inset 0px -1px 0px #e4ebf1;
+      ${tw`border-0 h-[52px] flex items-center justify-between`}
+      .icon {
+        ${tw`relative top-0 right-0`}
+      }
     }
   `,
 ])
@@ -73,6 +79,7 @@ const compInfo = {
     name: 'password',
     label: '密码',
     placeholder: '请输入密码',
+    validateOnBlur: true,
     component: PasswordField,
     schemas: [
       { rule: { required: true }, help: '请输入密码', status: 'error' },
@@ -141,22 +148,26 @@ const getFieldsInfo = (type: string) => {
               status: 'error',
             },
             {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
+              rule: (value: string) => {
+                const l = strlen(value)
+                return l >= 1 && l <= 1024
+              },
               help: '最大长度: 1024, 最小长度: 1',
               status: 'error',
             },
           ],
         },
         {
-          name: 'znode',
+          name: 'z_node',
           label: 'Znode',
           placeholder: 'The hbase Zookeeper Node',
           schemas: [
             { rule: { required: true }, help: '请输入znode', status: 'error' },
             {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
+              rule: (value: string) => {
+                const l = strlen(value)
+                return l >= 1 && l <= 1024
+              },
               help: '最大长度: 1024, 最小长度: 1',
               status: 'error',
             },
@@ -175,7 +186,7 @@ const getFieldsInfo = (type: string) => {
     case 'kafka':
       fieldsInfo = [
         {
-          name: 'kafkabrokers',
+          name: 'kafka_brokers',
           label: 'kafkabrokers',
           placeholder: 'The kafak brokers.',
           schemas: [
@@ -185,8 +196,10 @@ const getFieldsInfo = (type: string) => {
               status: 'error',
             },
             {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
+              rule: (value: string) => {
+                const l = strlen(value)
+                return l >= 1 && l <= 1024
+              },
               help: '最大长度: 1024, 最小长度: 1',
               status: 'error',
             },
@@ -211,163 +224,152 @@ interface IFormProps {
 }
 const DataSourceForm = observer(
   ({ resInfo }: IFormProps, ref: any) => {
-    const { regionId, spaceId } =
-      useParams<{ regionId: string; spaceId: string }>()
-    const [pingState, setPingState] = useImmer({
-      state: '',
-      time: '',
-      msg: '',
-    })
+    // const { regionId, spaceId } =
+    //   useParams<{ regionId: string; spaceId: string }>()
+    const [network, setNetWork] = useImmer<{ type: 'vpc' | 'eip'; id: string }>(
+      {
+        type: 'vpc',
+        id: '',
+      }
+    )
     const mutation = useMutationSource()
+    const networksRet = useInfiniteQueryNetworks({
+      offset: 0,
+      limit: 10,
+    })
+    const networks = flatten(
+      networksRet.data?.pages.map((page) => page.infos || [])
+    )
     const {
       dataSourceStore: { op, opSourceList },
+      dmStore,
     } = useStore()
     const sourceInfo =
       op === 'update' && opSourceList.length > 0 && opSourceList[0]
     const urlType = resInfo.name.toLowerCase()
     const fields = getFieldsInfo(urlType)
-    const multiFiledRef = useRef()
+    // const multiFiledRef = useRef<any>()
 
     const handlePing = () => {
-      const formElem = ref?.current
-      if (formElem?.validateForm()) {
-        const fieldsValue: { [k: string]: any } = formElem.getFieldsValue()
-        let url = {}
-        if (urlType === 'hdfs') {
-          const nodes = multiFiledRef?.current.getValue()
-          url = {
-            [urlType]: {
-              nodes: nodes.map((n) => ({ namenode: n[0], port: +n[1] })),
-            },
-          }
-        } else {
-          url = {
-            [urlType]: omit(fieldsValue, ['name', 'comment']),
-          }
-        }
-
-        const params = {
-          op: 'ping',
-          regionId,
-          spaceId,
-          sourcetype: resInfo.name,
-          url,
-        }
-        setPingState((draft) => {
-          draft.time = dayjs(new Date()).format('YYYY-MM-DD HH:mm:ss')
-          draft.state = 'loading'
-          draft.msg = ''
-        })
-        mutation.mutate(params, {
-          onSuccess: () => {
-            setPingState((draft) => {
-              draft.state = 'passed'
-            })
-          },
-          onError: (err) => {
-            setPingState((draft) => {
-              draft.state = 'failed'
-              draft.msg = err.message
-            })
-          },
-        })
-      }
+      // const formElem = ref?.current
+      // if (formElem?.validateForm()) {
+      //   const fieldsValue: { [k: string]: any } = formElem.getFieldsValue()
+      //   let url = {}
+      //   if (urlType === 'hdfs') {
+      //     const nodes = multiFiledRef?.current.getValue()
+      //     url = {
+      //       [urlType]: {
+      //         nodes: nodes.map((n) => ({ namenode: n[0], port: +n[1] })),
+      //       },
+      //     }
+      //   } else {
+      //     url = {
+      //       [urlType]: omit(fieldsValue, ['name', 'comment']),
+      //     }
+      //   }
+      //   const params = {
+      //     op: 'ping',
+      //     regionId,
+      //     spaceId,
+      //     sourcetype: resInfo.name,
+      //     url,
+      //   }
+      //   mutation.mutate(params, {
+      //     onSuccess: () => {},
+      //     onError: () => {},
+      //   })
+      // }
     }
 
     return (
       <Root>
-        <Alert
-          message={
-            <div>
-              数据源使用需要保证对应的资源组和数据源之间是可以联通的。请参考
-              <a href="###" tw="text-link">
-                网络解决方案。
-              </a>
-            </div>
-          }
-          type="warning"
-          closable
-          tw="mb-3"
-        />
-        <Form
-          tw="max-w-full!"
-          css={css`
-            .field {
-              ${tw`pl-6`}
-            }
-          `}
-          layout="vertical"
-          ref={ref}
-        >
-          <Field>
-            <Label>
-              <AffixLabel
-                help="数据源是大数据工作台用于数据处理的出入口,数据源采用连接串和云实例两种模式, 目前暂时只支持连接串模式。"
-                required={false}
-              >
-                数据源连接方式
-              </AffixLabel>
-            </Label>
-            <Control tw="w-60">
-              <div
-                tw="rounded-sm border border-green-11 p-2 bg-no-repeat bg-right-bottom"
-                className="source-item-bg"
-              >
-                <div tw="font-medium flex items-center">
-                  <Icon name="container" tw="mr-1" />
-                  <span tw="text-green-11">连接串模式</span>
+        <Form tw="max-w-full!" layout="vertical" ref={ref}>
+          <CollapseWrapper defaultActiveKey={['p0', 'p1']}>
+            <CollapseItem
+              key="p0"
+              label={
+                <div
+                  tw="flex items-center"
+                  css={css`
+                    & > span.icon {
+                      ${tw`relative top-0 right-0 mr-2`}
+                    }
+                  `}
+                >
+                  <Icon name="file" />
+                  基本信息
                 </div>
-                <div tw="text-neut-8">
-                  连接串模式是通过IP端口用户名密码进行连接的方式。
-                </div>
-              </div>
-            </Control>
-          </Field>
-          <TextField
-            name="name"
-            tw="w-80"
-            defaultValue={get(sourceInfo, 'name', '')}
-            label={<AffixLabel>数据源名称</AffixLabel>}
-            placeholder="请输入数据源名称（自定义）"
-            help={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
-            validateOnChange
-            schemas={[
-              {
-                rule: { matchRegex: nameMatchRegex },
-                help: '允许包含字母、数字 及 "_"，长度 2-64',
-                status: 'error',
-              },
-              {
-                rule: (value: string) => {
-                  const l = strlen(value)
-                  return l >= 2 && l <= 64
-                },
-                help: '最小长度2,最大长度64',
-                status: 'error',
-              },
-            ]}
-          />
-          <TextAreaField
-            name="comment"
-            tw="w-8/12"
-            defaultValue={get(sourceInfo, 'comment', '')}
-            rows={4}
-            label="数据源描述"
-            resize
-            placeholder="请填写数据库的描述信息"
-            validateOnChange
-            schemas={[
-              {
-                rule: (value: string) => {
-                  const l = strlen(value)
-                  return l <= 256
-                },
-                help: '请填写数据库的描述信息',
-                status: 'error',
-              },
-            ]}
-          />
-          <Collapse defaultActiveKey={['p1']}>
+              }
+            >
+              <Field>
+                <Label>
+                  <AffixLabel
+                    help="数据源是大数据工作台用于数据处理的出入口,数据源采用连接串和云实例两种模式, 目前暂时只支持连接串模式。"
+                    required={false}
+                  >
+                    数据源连接方式
+                  </AffixLabel>
+                </Label>
+                <Control tw="w-60">
+                  <div
+                    tw="rounded-sm border border-green-11 p-2 bg-no-repeat bg-right-bottom"
+                    className="source-item-bg"
+                  >
+                    <div tw="font-medium flex items-center">
+                      <Icon name="container" tw="mr-1" />
+                      <span tw="text-green-11">连接串模式</span>
+                    </div>
+                    <div tw="text-neut-8">
+                      连接串模式是通过IP端口用户名密码进行连接的方式。
+                    </div>
+                  </div>
+                </Control>
+              </Field>
+              <TextField
+                name="name"
+                tw="w-80"
+                defaultValue={get(sourceInfo, 'name', '')}
+                label={<AffixLabel>数据源名称</AffixLabel>}
+                placeholder="请输入数据源名称（自定义）"
+                help={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
+                validateOnChange
+                schemas={[
+                  {
+                    rule: { matchRegex: nameMatchRegex },
+                    help: '允许包含字母、数字 及 "_"，长度 2-64',
+                    status: 'error',
+                  },
+                  {
+                    rule: (value: string) => {
+                      const l = strlen(value)
+                      return l >= 2 && l <= 64
+                    },
+                    help: '最小长度2,最大长度64',
+                    status: 'error',
+                  },
+                ]}
+              />
+              <TextAreaField
+                name="comment"
+                tw="w-8/12"
+                defaultValue={get(sourceInfo, 'comment', '')}
+                rows={4}
+                label="数据源描述"
+                resize
+                placeholder="请填写数据库的描述信息"
+                validateOnChange
+                schemas={[
+                  {
+                    rule: (value: string) => {
+                      const l = strlen(value)
+                      return l <= 256
+                    },
+                    help: '请填写数据库的描述信息',
+                    status: 'error',
+                  },
+                ]}
+              />
+            </CollapseItem>
             <CollapseItem
               key="p1"
               label={
@@ -384,6 +386,90 @@ const DataSourceForm = observer(
                 </div>
               }
             >
+              <RadioGroupField
+                name="utype"
+                value={network.type}
+                label={<AffixLabel>网络连接方式</AffixLabel>}
+                onChange={(v) =>
+                  setNetWork((draft) => {
+                    draft.type = v
+                  })
+                }
+                help={
+                  <>
+                    详情请见
+                    <a href="###" tw="text-green-11 hover:text-green-11">
+                      网络联通文档
+                      <Icons
+                        name="direct"
+                        tw="text-green-11 fill-current"
+                        size={14}
+                      />
+                    </a>
+                  </>
+                }
+              >
+                <RadioButton value="vpc">内网（推荐）</RadioButton>
+                <RadioButton value="eip">公网</RadioButton>
+              </RadioGroupField>
+              {network.type === 'vpc' && (
+                <SelectField
+                  name="network_id"
+                  value={network.id}
+                  placeholder="请选择网络配置"
+                  // validateOnBlur
+                  label={<AffixLabel>网络配置</AffixLabel>}
+                  onChange={(v: string) => {
+                    setNetWork((draft) => {
+                      draft.id = v
+                    })
+                  }}
+                  help={
+                    <>
+                      如需选择新的网络配置，您可以
+                      <span
+                        tw="text-green-11 cursor-pointer"
+                        onClick={() => dmStore.setOp('create')}
+                      >
+                        绑定VPC
+                      </span>
+                    </>
+                  }
+                  schemas={[
+                    {
+                      rule: {
+                        required: true,
+                        isExisty: false,
+                      },
+                      status: 'error',
+                      help: (
+                        <>
+                          请选择网络, 如没有可选择的网络配置，您可以
+                          <span
+                            tw="text-green-11 cursor-pointer"
+                            onClick={() => dmStore.setOp('create')}
+                          >
+                            绑定VPC
+                          </span>
+                        </>
+                      ),
+                    },
+                  ]}
+                  options={networks.map(({ name, router_id }) => ({
+                    label: name,
+                    value: router_id,
+                  }))}
+                  isLoading={networksRet.isFetching}
+                  isLoadingAtBottom
+                  searchable={false}
+                  onMenuScrollToBottom={() => {
+                    if (networksRet.hasNextPage) {
+                      networksRet.fetchNextPage()
+                    }
+                  }}
+                  bottomTextVisible
+                />
+              )}
               {fields.map((field) => {
                 const {
                   name,
@@ -440,8 +526,8 @@ const DataSourceForm = observer(
               })}
               <Field>
                 <Label>
-                  <AffixLabel help="连通性测试" required={false}>
-                    连通性测试
+                  <AffixLabel help="检查数据源参数是否正确" required={false}>
+                    数据源可用性测试
                   </AffixLabel>
                 </Label>
                 <Control>
@@ -450,63 +536,14 @@ const DataSourceForm = observer(
                     type="outlined"
                     onClick={handlePing}
                   >
-                    <Icon name="add" />
-                    计算集群
+                    开始测试
                   </Button>
                 </Control>
               </Field>
             </CollapseItem>
-          </Collapse>
+          </CollapseWrapper>
         </Form>
-        {pingState.state !== '' && (
-          <PingTable>
-            <thead>
-              <tr>
-                <th tw="w-1/3">连通性状态</th>
-                <th tw="w-1/3">测试时间</th>
-                <th tw="w-1/3">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  {(() => {
-                    if (pingState.state === 'loading') {
-                      return (
-                        <FlexBox tw="space-x-1 items-center text-green-13">
-                          <Loading size="small" noWrapper />
-                          <span>测试中</span>
-                        </FlexBox>
-                      )
-                    }
-                    if (pingState.state === 'passed') {
-                      return (
-                        <FlexBox tw="space-x-1 items-center text-green-13">
-                          <Icon name="success" type="coloured" />
-                          <span>通过</span>
-                        </FlexBox>
-                      )
-                    }
-                    if (pingState.state === 'failed') {
-                      return (
-                        <FlexBox tw="space-x-1 items-center text-red-10">
-                          <Icon
-                            name="failure"
-                            color={{ primary: '#fff', secondary: '#CA2621' }}
-                          />
-                          <span>不通</span>
-                        </FlexBox>
-                      )
-                    }
-                    return null
-                  })()}
-                </td>
-                <td>{pingState.time}</td>
-                <td>{pingState.msg}</td>
-              </tr>
-            </tbody>
-          </PingTable>
-        )}
+        {dmStore.op === 'create' && <NetworkModal appendToBody />}
       </Root>
     )
   },

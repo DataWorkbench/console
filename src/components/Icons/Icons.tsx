@@ -36,7 +36,7 @@ const Icons = (props: IconProps) => {
   }
 
   return (
-    <svg {...wh} {...others} className={className}>
+    <svg {...wh} {...others} className={className} tw="inline-block">
       <use xlinkHref={`#bdicon-${name}`} />
     </svg>
   )

@@ -1,9 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import tw from 'twin.macro'
+import tw, { css } from 'twin.macro'
 import { RadioButton, Form, Input, Button } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
-import { get } from 'lodash-es'
 import { Modal, ModalContent } from 'components'
 import { useQueryClient } from 'react-query'
 import { useWorkSpaceContext } from 'contexts'
@@ -12,25 +11,12 @@ import { useMutationWorkSpace, getWorkSpaceKey } from 'hooks'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
 
-const styleObj = {
-  error: {
-    icon: 'if-error-info',
-    color: '#cf3b37',
-    okType: 'danger',
-  },
-  warn: {
-    icon: 'if-exclamation',
-    color: '#FFD127',
-    okType: 'primary',
-  },
-}
-
 const columns = [
   {
     title: '空间名称/id',
     width: 220,
     dataIndex: 'id',
-    render: (field, row) => (
+    render: (field: string, row: any) => (
       <div tw="flex items-center w-full">
         <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
           <Icon name="project" size="small" />
@@ -46,7 +32,7 @@ const columns = [
     title: '空间状态',
     width: 100,
     dataIndex: 'status',
-    render: (field) => (
+    render: (field: number) => (
       <div
         css={[
           field === 1
@@ -76,7 +62,7 @@ const columns = [
   {
     title: '创建时间',
     dataIndex: 'created',
-    render: (field) => formatDate(field),
+    render: (field: number) => formatDate(field),
   },
 ]
 
@@ -105,8 +91,6 @@ const SpaceModal = observer(
       return true
     })
     const filterOptSpaceIds = filterOptSpaces.map((o) => o.id)
-    const modalWidth =
-      curSpaceOpt === 'delete' && filterOptSpaces.length > 1 ? 720 : 450
 
     useEffect(() => {
       setDelBtnEnable(stateStore.curSpaceOpt !== 'delete')
@@ -155,72 +139,26 @@ const SpaceModal = observer(
     }
 
     if (['enable', 'disable', 'delete'].includes(curSpaceOpt)) {
-      const curOptSpaceId = get(filterOptSpaceIds, '0')
-      const operateObj = {
+      const operateObj: any = {
         enable: {
           opName: '启动',
           desc: '启用该工作空间，下属服务也将被启用，是否确认该工作空间进行启用操作？',
-          style: styleObj.warn,
         },
         disable: {
           opName: '禁用',
           desc: '工作空间内正在运行的任务不会强制停止，已发布调度未运行的任务将不会运行。成员无法登录，是否确认进行禁用操作？',
-          style: styleObj.warn,
         },
         delete: {
           opName: '删除',
-          desc: (
-            <>
-              {filterOptSpaces.length === 1 ? (
-                <div className="space-y-3">
-                  <div>
-                    该工作空间内工作流、成员等数据都将彻底删除，无法恢复，请谨慎操作。
-                  </div>
-                  <div className="border-t border-neut-2" />
-                  <div>*请在下方输入框中输入 “{curOptSpaceId}” 以确认操作</div>
-                  <div>
-                    <Input
-                      type="text"
-                      placeholder={curOptSpaceId}
-                      onChange={(e, value) =>
-                        setDelBtnEnable(value === curOptSpaceId)
-                      }
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div tw="space-y-3">
-                  <Table
-                    dataSource={filterOptSpaces}
-                    columns={columns}
-                    rowKey="id"
-                  />
-                  <div tw="border-t border-neut-2" />
-                  <div>*请在下方输入框中输入 “delete” 以确认操作</div>
-                  <div>
-                    <Input
-                      type="text"
-                      tw="w-40"
-                      placeholder="delete"
-                      onChange={(e, value) =>
-                        setDelBtnEnable(value === 'delete')
-                      }
-                    />
-                  </div>
-                </div>
-              )}
-            </>
-          ),
-          style: styleObj.error,
+          desc: '',
         },
       }
-      const { style, opName, desc } = operateObj[curSpaceOpt]
+      const { opName, desc } = operateObj[curSpaceOpt]
       return (
         <Modal
           visible
-          title=""
           noBorder
-          width={modalWidth}
+          width={720}
           onCancel={handleModalClose}
           footer={
             <>
@@ -228,28 +166,63 @@ const SpaceModal = observer(
                 {window.getText('LEGO_UI_CANCEL')}
               </Button>
               <Button
-                type={style.okType}
+                type={curSpaceOpt === 'enable' ? 'primary' : 'danger'}
                 disabled={!delBtnEnable}
                 loading={mutation.isLoading}
                 onClick={handleOk}
               >
-                {window.getText('LEGO_UI_OK')}
+                {opName}
               </Button>
             </>
           }
         >
           <div tw="flex items-start">
             <Icon
-              name="if-exclamation"
-              tw="mr-3 text-2xl leading-6"
-              style={{ color: style.color }}
+              name={curSpaceOpt === 'enable' ? 'information' : 'if-error-info'}
+              size={curSpaceOpt === 'enable' ? 24 : 'medium'}
+              css={[
+                tw`mr-3 text-2xl leading-6`,
+                curSpaceOpt === 'enable'
+                  ? css`
+                      svg {
+                        ${tw`text-white fill-[#2193D3]`}
+                      }
+                    `
+                  : tw`text-red-10`,
+              ]}
             />
             <div tw="flex-1 overflow-hidden">
               <div tw="font-semibold text-base text-neut-15 break-all">
                 {opName}工作空间: 工作空间
-                {filterOptSpaces.map(({ name }) => name).join(',')}
+                {filterOptSpaces
+                  .map(({ name }: { name: string }) => name)
+                  .join(',')}
               </div>
-              <div tw="text-neut-13 mt-2">{desc}</div>
+              <div tw="text-neut-13 mt-2">
+                <div tw="mb-2">{desc}</div>
+                <div tw="space-y-3">
+                  <Table
+                    dataSource={filterOptSpaces}
+                    columns={columns}
+                    rowKey="id"
+                  />
+                </div>
+                {curSpaceOpt === 'delete' && (
+                  <div tw="pt-3 space-y-1 border-t border-neut-2">
+                    <div>*请在下方输入框中输入&quot;delete&quot;以确认操作</div>
+                    <div>
+                      <Input
+                        type="text"
+                        tw="w-40"
+                        placeholder="delete"
+                        onChange={(e, value) =>
+                          setDelBtnEnable(value === 'delete')
+                        }
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </Modal>

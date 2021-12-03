@@ -6,6 +6,7 @@ interface ModalStepProps {
   stepTexts: string[]
   sameLine?: boolean
   stepClassName?: any
+  className?: string
 }
 
 const ModalStep = ({
@@ -13,10 +14,14 @@ const ModalStep = ({
   stepTexts = [],
   sameLine = false,
   stepClassName,
+  className,
 }: ModalStepProps) => {
   const textsLen = stepTexts.length
   return (
-    <div tw="flex h-20 justify-center items-center bg-neut-1 dark:bg-neut-17">
+    <div
+      className={className}
+      tw="flex h-20 justify-center items-center bg-neut-1 dark:bg-neut-17"
+    >
       <div
         css={[tw`flex justify-center items-center`, stepClassName || tw`w-2/3`]}
       >
