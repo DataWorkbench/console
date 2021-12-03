@@ -3,7 +3,7 @@ import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, Form } from '@QCFE/qingcloud-portal-ui'
 import { Collapse, Field, Label } from '@QCFE/lego-ui'
-import { flatten } from 'lodash-es'
+import { flatten, isEqualWith, pickBy, identity } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 
@@ -25,6 +25,7 @@ import {
   useStore,
 } from 'hooks'
 import SelectWithRefresh from 'components/SelectWithRefresh'
+import { toJS } from 'mobx'
 import { ILanguageInterface, UdfActionType, UdfTypes } from './interfaces'
 import { javaType, languageData, udfHasLangBits, udfTypes } from './constants'
 
@@ -89,7 +90,7 @@ const UdfModal = observer(() => {
 
   const [step, setStep] = useState(op === 'create' ? 0 : 1)
   const [params, setParams] = useImmer({
-    type: modalData?.udf_language || 3,
+    type: modalData?.udf_language || javaType,
   })
 
   const formData = useRef<Record<string, any>>(modalData || {})
@@ -175,10 +176,15 @@ const UdfModal = observer(() => {
   }
 
   const handleFormChange = (fieldValue: Record<string, any>) => {
-    setHasChange(true)
     formData.current = {
       ...formData.current,
       ...fieldValue,
+    }
+
+    if (!isEqualWith(pickBy(formData.current, identity), toJS(modalData))) {
+      setHasChange(true)
+    } else {
+      setHasChange(false)
     }
   }
 
@@ -342,9 +348,12 @@ const UdfModal = observer(() => {
                     defaultValue={modalData?.name}
                     schemas={[
                       {
-                        rule: { required: true },
-                        help: '请输入函数名',
+                        rule: {
+                          required: true,
+                          matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/,
+                        },
                         status: 'error',
+                        help: '不能为空，字母、数字或下划线（_），不能以（_）开始结尾',
                       },
                     ]}
                   />
