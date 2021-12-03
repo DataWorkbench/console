@@ -89,7 +89,7 @@ const UdfModal = observer(() => {
 
   const [step, setStep] = useState(op === 'create' ? 0 : 1)
   const [params, setParams] = useImmer({
-    type: modalData?.udf_language || 3,
+    type: modalData?.udf_language || javaType,
   })
 
   const formData = useRef<Record<string, any>>(modalData || {})
