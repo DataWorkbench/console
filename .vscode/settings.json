@@ -23,5 +23,6 @@
   "tailwindcss.jsxPropImportChecking": false,
   "emmet.includeLanguages": {
     "postcss": "css"
-  }
+  },
+  "svg.preview.background": "dark-transparent"
 }

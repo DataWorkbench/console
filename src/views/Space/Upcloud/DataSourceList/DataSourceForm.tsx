@@ -148,22 +148,26 @@ const getFieldsInfo = (type: string) => {
               status: 'error',
             },
             {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
+              rule: (value: string) => {
+                const l = strlen(value)
+                return l >= 1 && l <= 1024
+              },
               help: '最大长度: 1024, 最小长度: 1',
               status: 'error',
             },
           ],
         },
         {
-          name: 'znode',
+          name: 'z_node',
           label: 'Znode',
           placeholder: 'The hbase Zookeeper Node',
           schemas: [
             { rule: { required: true }, help: '请输入znode', status: 'error' },
             {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
+              rule: (value: string) => {
+                const l = strlen(value)
+                return l >= 1 && l <= 1024
+              },
               help: '最大长度: 1024, 最小长度: 1',
               status: 'error',
             },
@@ -182,7 +186,7 @@ const getFieldsInfo = (type: string) => {
     case 'kafka':
       fieldsInfo = [
         {
-          name: 'kafkabrokers',
+          name: 'kafka_brokers',
           label: 'kafkabrokers',
           placeholder: 'The kafak brokers.',
           schemas: [
@@ -192,8 +196,10 @@ const getFieldsInfo = (type: string) => {
               status: 'error',
             },
             {
-              rule: (value: string) =>
-                value.length >= 1 && value.length <= 1024,
+              rule: (value: string) => {
+                const l = strlen(value)
+                return l >= 1 && l <= 1024
+              },
               help: '最大长度: 1024, 最小长度: 1',
               status: 'error',
             },
