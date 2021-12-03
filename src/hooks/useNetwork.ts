@@ -43,9 +43,9 @@ export const useInfiniteQueryNetworks = (filter: any) => {
     offset: 0,
     ...filter,
   }
-  const qryKey = ['network', omit(params, 'offset')]
+  queryKey = ['network', omit(params, 'offset')]
   return useInfiniteQuery(
-    qryKey,
+    queryKey,
     async ({ pageParam = params }) => listNetworks(pageParam),
     {
       getNextPageParam: (lastPage, allPages) => {

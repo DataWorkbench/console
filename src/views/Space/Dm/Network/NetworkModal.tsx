@@ -49,8 +49,14 @@ const defaultParams = {
   vxnet_id: '',
 }
 
-const ClusterModal = observer(
-  ({ opNetwork }: { opNetwork: typeof defaultParams & { id?: string } }) => {
+const NetworkModal = observer(
+  ({
+    opNetwork,
+    appendToBody = false,
+  }: {
+    opNetwork?: typeof defaultParams & { id?: string }
+    appendToBody: boolean
+  }) => {
     const {
       dmStore: { setOp, op },
     } = useStore()
@@ -104,6 +110,7 @@ const ClusterModal = observer(
         onCancel={() => setOp('')}
         width={680}
         draggable
+        appendToBody={appendToBody}
       >
         <FlexBox tw="h-full overflow-hidden">
           <FormWrapper>
@@ -234,4 +241,4 @@ const ClusterModal = observer(
   }
 )
 
-export default ClusterModal
+export default NetworkModal

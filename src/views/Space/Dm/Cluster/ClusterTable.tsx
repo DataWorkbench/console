@@ -150,6 +150,7 @@ const ClusterTable = observer(
                       ) => {
                         setFilter((draft) => {
                           draft.status = v
+                          draft.offset = 0
                         })
                       }}
                     >
@@ -183,7 +184,6 @@ const ClusterTable = observer(
         {
           title: '网络配置名称/ID',
           dataIndex: 'network_id',
-          render: (v) => v,
         },
         {
           title: '版本',

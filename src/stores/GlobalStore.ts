@@ -37,23 +37,23 @@ class GlobalStore {
         title: '工作空间',
         icon: 'project',
       },
-      {
-        name: 'access_control_policy',
-        title: '引擎管理',
-        icon: 'computing',
-        items: [
-          {
-            name: 'qingmr',
-            title: 'QingMR',
-            icon: 'image-object',
-          },
-          {
-            name: 'flink',
-            title: '实时计算 Flink',
-            icon: 'cron-job',
-          },
-        ],
-      },
+      // {
+      //   name: 'access_control_policy',
+      //   title: '引擎管理',
+      //   icon: 'computing',
+      //   items: [
+      //     {
+      //       name: 'qingmr',
+      //       title: 'QingMR',
+      //       icon: 'image-object',
+      //     },
+      //     {
+      //       name: 'flink',
+      //       title: '实时计算 Flink',
+      //       icon: 'cron-job',
+      //     },
+      //   ],
+      // },
       // {
       //   name: 'logs',
       //   title: '操作日志',

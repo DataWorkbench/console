@@ -179,8 +179,9 @@ const DataSourceModal = observer(
           <ModalStep
             step={state.step}
             stepTexts={['选择数据库', '配置数据库']}
+            css={state.step === 1 && tw`bg-white`}
           />
-          <ModalContent css={state.step === 1 && tw`px-0`}>
+          <ModalContent css={state.step === 1 && tw`px-0 pt-0`}>
             {(() => {
               let curResInfo = null
 
