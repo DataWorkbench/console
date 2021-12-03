@@ -3,7 +3,7 @@ import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, Form } from '@QCFE/qingcloud-portal-ui'
 import { Collapse, Field, Label } from '@QCFE/lego-ui'
-import { flatten } from 'lodash-es'
+import { flatten, isEqualWith, pickBy, identity } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 
@@ -25,6 +25,7 @@ import {
   useStore,
 } from 'hooks'
 import SelectWithRefresh from 'components/SelectWithRefresh'
+import { toJS } from 'mobx'
 import { ILanguageInterface, UdfActionType, UdfTypes } from './interfaces'
 import { javaType, languageData, udfHasLangBits, udfTypes } from './constants'
 
@@ -175,10 +176,15 @@ const UdfModal = observer(() => {
   }
 
   const handleFormChange = (fieldValue: Record<string, any>) => {
-    setHasChange(true)
     formData.current = {
       ...formData.current,
       ...fieldValue,
+    }
+
+    if (!isEqualWith(pickBy(formData.current, identity), toJS(modalData))) {
+      setHasChange(true)
+    } else {
+      setHasChange(false)
     }
   }
 
