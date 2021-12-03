@@ -348,9 +348,12 @@ const UdfModal = observer(() => {
                     defaultValue={modalData?.name}
                     schemas={[
                       {
-                        rule: { required: true },
-                        help: '请输入函数名',
+                        rule: {
+                          required: true,
+                          matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/,
+                        },
                         status: 'error',
+                        help: '不能为空，字母、数字或下划线（_），不能以（_）开始结尾',
                       },
                     ]}
                   />
