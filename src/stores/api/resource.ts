@@ -1,4 +1,4 @@
-import { request, formdata } from 'utils'
+import { request, customRequest } from 'utils'
 
 export interface IResourceParams {
   regionId?: string
@@ -51,7 +51,7 @@ export const createResourceJob = ({
 }: any) => {
   const params = new FormData()
   Object.keys(rest).map((key: any) => params.append(key, rest[key]))
-  formdata({
+  return customRequest({
     url: `${endpoint}/v1/workspace/${spaceId}/resource`,
     headers,
     params,
@@ -67,7 +67,7 @@ export const reuploadResource = ({
 }: any) => {
   const params = new FormData()
   Object.keys(rest).map((key: any) => params.append(key, rest[key]))
-  formdata({
+  return customRequest({
     url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}`,
   })
 }
@@ -76,7 +76,7 @@ export const deleteResource = ({
   regionId,
   spaceId,
   resourceIds,
-}: IResourceParams) => {
+}: IResourceParams) =>
   request({
     region: regionId,
     method: 'POST',
@@ -85,26 +85,28 @@ export const deleteResource = ({
       resource_ids: resourceIds,
     },
   })
-}
 
 export const updateResource = ({
   regionId,
   spaceId,
   resource_id,
   ...rest
-}: any) => {
+}: any) =>
   request({
     region: regionId,
     method: 'PUT',
     uri: `/v1/workspace/${spaceId}/resource/${resource_id}`,
     body: { ...rest },
   })
-}
 
-export const downloadFile = ({ regionId, spaceId, resource_id }: any) => {
-  request({
-    region: regionId,
+export const downloadFile = ({
+  endpoint,
+  spaceId,
+  headers,
+  resource_id,
+}: any) =>
+  customRequest({
+    url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}/download`,
     method: 'GET',
-    uri: `/v1/workspace/${spaceId}/resource/${resource_id}/download`,
+    headers,
   })
-}

@@ -121,8 +121,8 @@ export const useMutationResource = (options?: any) => {
       ...rest
     }: {
       op: OP
-      resourceIds?: string[]
-      resource_id?: string
+      resourceIds?: String[]
+      resource_id?: String
     }) => {
       const formParams = { endpoint, spaceId, headers, ...rest }
       const params = {
@@ -138,7 +138,7 @@ export const useMutationResource = (options?: any) => {
       } else if (op === 'delete') {
         ret = await deleteResource(params)
       } else if (op === 'enable') {
-        ret = await downloadFile(params)
+        ret = await downloadFile(formParams)
       } else if (op === 'view') {
         ret = await reuploadResource(formParams)
       }

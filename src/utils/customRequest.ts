@@ -4,9 +4,6 @@ import { isFunction } from 'lodash-es'
 const baseConfig: AxiosRequestConfig = {
   method: 'POST',
   timeout: 30000,
-  headers: {
-    'Content-Type': 'Multipart/Form-data',
-  },
 }
 
 const client = axios.create(baseConfig)

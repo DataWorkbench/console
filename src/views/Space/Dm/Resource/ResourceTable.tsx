@@ -24,8 +24,8 @@ const { MenuItem } = Menu
 const DarkTabs = styled(Tabs)(
   () => css`
     .tabs ul {
-      ${tw`text-neut-8 border-0`}
       background-color: #1e2f41;
+      ${tw`text-neut-8 border-0`}
       li {
         ${tw`px-0! py-4!  ml-5! mr-4! mb-0! leading-6`}
         ${tw`border-b-4! border-transparent!`}
@@ -60,6 +60,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
   ({ className }) => {
     const {
       dmStore: { setOp },
+      resourceStore: { endpoint, headers },
     } = useStore()
     const [defaultFields, setDefaultFields] = useState({})
     const [packageType, setPackageType] = useState('program')
@@ -68,6 +69,9 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const [columnSettings, setColumnSettings] = useState(
       localstorage.getItem(columnSettingsKey) || []
     )
+
+    const packageTypeName = packageType === 'program' ? '程序包' : '函数包'
+
     const [filter, setFilter] = useImmer<IFilter>({
       limit: 10,
       offset: 0,
@@ -79,7 +83,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     })
 
     const queryClient = useQueryClient()
-    const mutation = useMutationResource()
+    const mutation = useMutationResource({ endpoint, headers })
 
     const refetchData = useCallback(() => {
       queryClient.invalidateQueries(getResourcePageQueryKey())
@@ -111,11 +115,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     )
 
     const handleDelete = useCallback(
-      (row?: any) => {
+      (row?: Record<string, any>) => {
         mutation.mutate(
           {
             op: 'delete',
-            resourceIds: row ? [row.id] : selectedRowKeys,
+            resourceIds: row ? [row.resource_id] : selectedRowKeys,
           },
           {
             onSuccess: async () => {
@@ -139,10 +143,23 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
 
     const handleDownload = useCallback(
       (row: any) => {
-        mutation.mutate({
-          op: 'enable',
-          resource_id: row.id,
-        })
+        mutation.mutate(
+          {
+            op: 'enable',
+            resource_id: row.resource_id,
+          },
+          {
+            onSuccess: (data) => {
+              const blob = new Blob([data])
+              const ele = document.createElement('a')
+              ele.download = `${row.name}.jar`
+              ele.href = window.URL.createObjectURL(blob)
+              ele.click()
+              document.body.removeChild(ele)
+              window.URL.revokeObjectURL(ele.href)
+            },
+          }
+        )
       },
       [mutation]
     )
@@ -155,40 +172,61 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const columns = useMemo(() => {
       return [
         {
-          title: `${packageType === 'program' ? '程序包' : '函数包'}名称`,
+          title: `${packageTypeName}名称`,
           dataIndex: 'name',
-          key: 'name',
           sortable: true,
           sortOrder: filter.reverse ? 'asc' : 'desc',
+          render: (_: string, row: Record<string, any>) => {
+            return (
+              <FlexBox tw="items-center space-x-1">
+                <Icon
+                  name={packageType === 'program' ? 'coding' : 'terminal'}
+                  type="light"
+                  color={{
+                    primary: '#219861',
+                    secondary: '#8EDABD',
+                  }}
+                />
+                <div>{row.name}</div>
+              </FlexBox>
+            )
+          },
         },
         {
           title: 'ID',
-          dataIndex: 'id',
-          key: 'id',
+          dataIndex: 'resource_id',
+          render: (value: string) => {
+            return <div tw="text-neut-8">{value}</div>
+          },
         },
         {
           title: '语言类型',
           dataIndex: 'type',
-          key: 'type',
           render: (value: any) => <>{value === 1 ? '程序包' : '函数包'}</>,
         },
         {
           title: '描述',
           dataIndex: 'description',
-          key: 'description',
+          render: (value: string) => {
+            return <div tw="text-neut-8">{value}</div>
+          },
         },
         {
           title: '上传时间',
           dataIndex: 'updated',
-          key: 'updated',
           sortable: true,
           sortOrder: filter.reverse ? 'asc' : 'desc',
-          render: (value: number) =>
-            dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
+          render: (value: number) => {
+            return (
+              <div tw="text-neut-8">
+                {dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss')}
+              </div>
+            )
+          },
         },
         {
           title: '操作',
-          render: (value: any, row: any) => (
+          render: (_: string, row: Record<string, any>) => (
             <FlexBox tw="items-center">
               <Button type="text" onClick={() => handleEdit(row)}>
                 编辑
@@ -216,7 +254,9 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                     </Menu>
                   }
                 >
-                  <Icon name="more" clickable changeable type="light" />
+                  <div tw="flex items-center">
+                    <Icon name="more" clickable changeable type="light" />
+                  </div>
                 </Tooltip>
               </Center>
             </FlexBox>
@@ -224,17 +264,18 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
       ]
     }, [
-      packageType,
+      packageTypeName,
       filter.reverse,
+      packageType,
       handleEdit,
       handleDownload,
-      handleDelete,
       handleReupload,
+      handleDelete,
     ])
 
     const filterColumn = columnSettings
       .map((o: { key: string; checked: boolean }) => {
-        return o.checked && columns.find((col) => col.key === o.key)
+        return o.checked && columns.find((col: any) => col.key === o.key)
       })
       .filter((o: any) => o)
 
@@ -248,9 +289,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           <Alert
             type="info"
             tw="bg-neut-16! mb-4"
-            message={`提示: ${
-              packageType === 'program' ? '程序包' : '函数包'
-            }用于业务流程中的代码开发模式`}
+            message={`提示: ${packageTypeName}用于业务流程中的代码开发模式`}
             linkBtn={<Button type="text">查看详情 →</Button>}
           />
           <div tw="mt-4 mb-3">
@@ -258,7 +297,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
               <Center tw="space-x-3">
                 <Button type="primary" onClick={handleUploadClick}>
                   <Icon name="upload" />
-                  上传{packageType === 'program' ? '程序包' : '函数包'}
+                  上传{packageTypeName}
                 </Button>
                 <Button
                   disabled={!selectedRowKeys.length}
@@ -304,7 +343,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
             </FlexBox>
           </div>
           <Table
-            rowKey="id"
+            rowKey="resource_id"
             selectType="checkbox"
             loading={isFetching}
             dataSource={infos || []}
