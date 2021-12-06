@@ -42,7 +42,7 @@ const ScheduleItem = styled('div')(({ selected }: { selected?: boolean }) => [
 ])
 
 const CodeButton = styled(Button)(({ selected }: { selected?: boolean }) => [
-  tw`bg-neut-17! hover:border-white! hover:bg-neut-18!`,
+  // tw`bg-neut-17! hover:border-white! hover:bg-neut-18!`,
   selected &&
     tw`border-green-11! hover:border-green-11! text-green-11! font-medium`,
 ])

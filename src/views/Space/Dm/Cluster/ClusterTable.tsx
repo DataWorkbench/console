@@ -196,7 +196,20 @@ const ClusterTable = observer(
               required={false}
               theme="green"
             >
-              TaskManager
+              TM 数量
+            </AffixLabel>
+          ),
+          dataIndex: 'task_num',
+          render: (v: number) => v,
+        },
+        {
+          title: (
+            <AffixLabel
+              help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
+              required={false}
+              theme="green"
+            >
+              TM 规格
             </AffixLabel>
           ),
           dataIndex: 'task_cu',
@@ -209,7 +222,7 @@ const ClusterTable = observer(
               required={false}
               theme="green"
             >
-              JobManager
+              JM 规格
             </AffixLabel>
           ),
           dataIndex: 'job_cu',

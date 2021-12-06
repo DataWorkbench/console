@@ -475,7 +475,7 @@ const ClusterModal = observer(
                         help="Flink 的 TaskNumber 的数量"
                         theme="green"
                       >
-                        Task 数量
+                        TM 数量
                       </AffixLabel>
                     }
                     name="task_num"
@@ -496,7 +496,7 @@ const ClusterModal = observer(
                       theme="green"
                       help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
                     >
-                      Task CU
+                      TM 规格
                     </AffixLabel>
                     <Control tw="pl-12 pt-3 w-80!">
                       <Slider
@@ -538,7 +538,7 @@ const ClusterModal = observer(
                       theme="green"
                       help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8"
                     >
-                      Job CU
+                      JM 规格
                     </AffixLabel>
                     <Control tw="pl-12 pt-3 w-80!">
                       <Slider
@@ -582,12 +582,13 @@ const ClusterModal = observer(
                         {totalCU}
                       </span>
                       <span tw="text-neut-8">
-                        （Task 数量 * Task CU + Job CU）
+                        [ 计算方式：总计算资源 CU=TM 数量 * TM 规格(CU) + JM
+                        规格(CU)]
                       </span>
                     </div>
                     <div
                       css={[
-                        totalCU < 12 && tw`hidden`,
+                        totalCU <= 12 && tw`hidden`,
                         tw`text-red-10 w-full ml-24 mt-1`,
                       ]}
                     >
@@ -783,19 +784,19 @@ const ClusterModal = observer(
             </RadioGroup>
             <div>
               <InDemandTitle tw="text-sm">
-                Task 数量：<span>{params.task_num}</span>
+                TM 数量：<span>{params.task_num}</span>
               </InDemandTitle>
               <div tw="text-neut-8">Flink 的 TaskNumber 的数量</div>
             </div>
             <div>
               <InDemandTitle tw="text-sm">
-                Task CU：<span>{params.task_cu}</span>
+                TM 规格：<span>{params.task_cu}</span>
               </InDemandTitle>
               <div tw="text-neut-8">Flink 的 TaskManager 的 CPU 和内存设置</div>
             </div>
             <div>
               <InDemandTitle tw="text-sm">
-                Job CU：<span>{params.job_cu}</span>
+                JM 规格：<span>{params.job_cu}</span>
               </InDemandTitle>
               <div tw="text-neut-8">Flink 的 JobManager 的 CPU 和内存设置</div>
             </div>
@@ -805,7 +806,7 @@ const ClusterModal = observer(
                 <span css={[totalCU > 12 && tw`text-red-10!`]}>{totalCU}</span>
               </InDemandTitle>
               <div tw="text-neut-8">
-                总计算资源 CU =Task 数量 * Task CU + Job CU{' '}
+                [总计算资源 CU=TM 数量 * TM 规格 + JM 规格]
               </div>
             </div>
             <div tw="pt-4 pb-2 border-b border-neut-13">

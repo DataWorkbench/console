@@ -1,13 +1,15 @@
+import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useHistory } from 'react-router-dom'
 import { Modal, Button } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import { useStore } from 'stores'
-import { Center } from 'components'
+import { FlexBox } from 'components'
 import WorkSpace from 'views/WorkSpace'
 
 const SpaceListModal = observer(() => {
   const history = useHistory()
+  const [showCreate, setShowCreate] = useState(false)
   const [state, setState] = useImmer({ curRegionId: '', curSpaceId: '' })
   const { curRegionId, curSpaceId } = state
   const {
@@ -40,9 +42,15 @@ const SpaceListModal = observer(() => {
       bodyStyle={{ padding: 0 }}
       onCancel={handleHide}
       footer={
-        <Center tw="w-full justify-end">
+        <FlexBox tw="w-full justify-between">
           <div tw="text-neut-15 mr-4">
-            若无合适的工作空间，您也可以 创建新工作空间
+            若无合适的工作空间，您也可以
+            <span
+              tw="text-link ml-1 cursor-pointer"
+              onClick={() => setShowCreate(true)}
+            >
+              创建新工作空间
+            </span>
           </div>
           <div>
             <Button type="default" onClick={handleHide}>
@@ -56,10 +64,17 @@ const SpaceListModal = observer(() => {
               进入空间
             </Button>
           </div>
-        </Center>
+        </FlexBox>
       }
     >
-      <WorkSpace isModal onItemCheck={handleItemCheck} />
+      <WorkSpace
+        isModal
+        onItemCheck={handleItemCheck}
+        showCreate={showCreate}
+        onHide={() => {
+          setShowCreate(false)
+        }}
+      />
     </Modal>
   )
 })
