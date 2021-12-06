@@ -18,8 +18,8 @@ import {
   useQuerySignature,
   useStore,
 } from 'hooks'
-import { DarkModal, Tooltip, Center } from 'components'
-import { css, styled, theme } from 'twin.macro'
+import { DarkModal, Tooltip, Center, AffixLabel } from 'components'
+import tw, { css, styled, theme } from 'twin.macro'
 import { useQueryClient } from 'react-query'
 import { loadResourceList } from 'stores/api'
 import { useParams } from 'react-router-dom'
@@ -31,6 +31,33 @@ const ColoredIcon = styled(Icon)(() => [
     svg {
       color: ${theme('colors.green.11')} !important;
     }
+  `,
+])
+
+const TextFieldWrapper = styled(TextField)(() => [
+  tw`w-1/2`,
+  css`
+    .help {
+      ${tw`pl-6`}
+    }
+  `,
+])
+
+const TextAreaFieldWrapper = styled(TextAreaField)(() => [
+  tw`w-full break-words`,
+  css`
+    .control {
+      ${tw`max-w-none! w-auto!`}
+      textarea {
+        width: 608px !important;
+      }
+    }
+  `,
+])
+
+const InputWapper = styled(Input)(() => [
+  css`
+    width: 608px !important;
   `,
 ])
 
@@ -82,40 +109,41 @@ const UploadModal = observer((props: any) => {
   }
 
   const handleOk = async () => {
+    if (!form.current?.validateFields()) return
     const fields = form.current?.getFieldsValue() || {}
     if (op !== 'view') {
       const ret = await loadResourceList({
         regionId,
         spaceId,
         resource_name: fields.resource_name,
+        resource_type: packageType === 'program' ? 1 : 2,
       })
       if (ret.infos?.length > 0) {
         Message.error('名称已存在')
         return
       }
     }
-    if (form.current?.validateFields()) {
-      const params = {
-        resource_type: packageType === 'program' ? 1 : 2,
-        ...fields,
-        file,
-        resource_id: defaultFields.id,
-      }
-      mutation.mutate(
-        {
-          op,
-          ...params,
-        },
-        {
-          onSuccess: async () => {
-            setOp('')
-            handleCancel()
-            setFile(undefined)
-            queryClient.invalidateQueries(getResourcePageQueryKey())
-          },
-        }
-      )
+
+    const params = {
+      resource_type: packageType === 'program' ? 1 : 2,
+      ...fields,
+      file,
+      resource_id: defaultFields.resource_id,
     }
+    mutation.mutate(
+      {
+        op,
+        ...params,
+      },
+      {
+        onSuccess: async () => {
+          setOp('')
+          handleCancel()
+          setFile(undefined)
+          queryClient.invalidateQueries(getResourcePageQueryKey())
+        },
+      }
+    )
   }
 
   return (
@@ -187,50 +215,40 @@ const UploadModal = observer((props: any) => {
         message={`提示: ${packageTypeName}用于业务流程中的代码开发模式`}
         linkBtn={<Button type="text">查看详情 →</Button>}
       />
-      <Form ref={form}>
-        <TextField
+      <Form ref={form} tw="pl-0!">
+        <TextFieldWrapper
           maxLength="128"
           name="resource_name"
           labelClassName="medium"
           placeholder={`请输入${packageTypeName}显示名`}
-          label={
-            <>
-              <span tw="text-red-10 text-xs">*</span>&nbsp;{packageTypeName}
-              显示名
-            </>
-          }
+          label={<AffixLabel required>{packageTypeName}显示名</AffixLabel>}
           validateOnBlur
-          validateIcon
           schemas={[
             {
               rule: { required: true },
-              help: '请输入备注',
+              help: '请输入程序包显示名',
               status: 'error',
             },
           ]}
           disabled={op === 'view'}
-          defaultValue={op !== 'create' && defaultFields.name}
+          defaultValue={(op !== 'create' && defaultFields.name) || ''}
         />
-        <TextAreaField
+        <TextAreaFieldWrapper
           name="description"
           labelClassName="medium"
           label="描述"
           placeholder={`请输入${packageTypeName}描述`}
           maxLength="1024"
-          tw="w-auto!"
           disabled={op === 'view'}
-          defaultValue={op !== 'create' && defaultFields.description}
+          defaultValue={(op !== 'create' && defaultFields.description) || ''}
         />
         {op !== 'edit' && (
           <Field tw="mb-0!">
             <Label className="medium">
-              <>
-                <span tw="text-red-10 text-xs">*</span>&nbsp;添加
-                {packageTypeName}
-              </>
+              <AffixLabel required>添加{packageTypeName}</AffixLabel>
             </Label>
             <Control
-              tw="w-auto!"
+              tw="max-w-none! w-auto!"
               className={file ? 'has-icons-left has-icons-right' : ''}
             >
               {!file ? (
@@ -254,7 +272,7 @@ const UploadModal = observer((props: any) => {
                 <>
                   <Icon className="is-left" name="jar" />
                   &nbsp;
-                  <Input
+                  <InputWapper
                     value={`${file.name} (${(file.size / 1024 / 1024).toFixed(
                       2
                     )}MB)`}

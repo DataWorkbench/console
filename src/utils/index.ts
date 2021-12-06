@@ -1,6 +1,6 @@
 import request from './request'
-import formdata from './formdata'
+import customRequest from './customRequest'
 import emitter from './emitter'
 
 export * from './convert'
-export { request, formdata, emitter }
+export { request, customRequest, emitter }
