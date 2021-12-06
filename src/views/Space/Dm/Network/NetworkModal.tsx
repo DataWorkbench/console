@@ -7,6 +7,7 @@ import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import { assign, flatten } from 'lodash-es'
 import { useParams } from 'react-router-dom'
+import { Modal, FlexBox, AffixLabel } from 'components'
 
 import {
   useStore,
@@ -15,7 +16,7 @@ import {
   useQueryDescribeRouters,
   useQueryDescribeRoutersVxnets,
 } from 'hooks'
-import { Modal, FlexBox, AffixLabel } from 'components'
+
 import { nameMatchRegex } from 'utils/convert'
 
 const { TextField, SelectField } = Form
@@ -147,6 +148,15 @@ const NetworkModal = observer(
                   value: router_id,
                   label: router_name,
                 }))}
+                optionRenderer={(option: { label: string; value: string }) => (
+                  <FlexBox tw="items-center">
+                    <Icon name="vpc" tw="mr-2.5" size={18} type="light" />
+                    <div>
+                      <div>{option.label || '无'}</div>
+                      <div tw="text-neut-8">{option.value}</div>
+                    </div>
+                  </FlexBox>
+                )}
                 onChange={(v: string) => {
                   setParams((draft) => {
                     draft.router_id = v
@@ -180,7 +190,22 @@ const NetworkModal = observer(
                       isExisty: false,
                     },
                     status: 'error',
-                    help: '不能为空',
+                    help: (
+                      <>
+                        <span>不能为空,</span>
+                        <span tw="text-neut-8 ml-2">
+                          如需选择新的 VPC，您可以
+                        </span>
+                        <a
+                          href="/iaas/vpc/create"
+                          target="_blank"
+                          tw="text-green-11"
+                        >
+                          新建 VPC 网络
+                          <Icon name="if-external-link" />
+                        </a>
+                      </>
+                    ),
                   },
                 ]}
               />
@@ -194,6 +219,15 @@ const NetworkModal = observer(
                   value: vxnet_id,
                   label: vxnet_name,
                 }))}
+                optionRenderer={(option: { label: string; value: string }) => (
+                  <FlexBox tw="items-center">
+                    <Icon name="network" tw="mr-2.5" size={18} type="light" />
+                    <div>
+                      <div>{option.label || '无'}</div>
+                      <div tw="text-neut-8">{option.value}</div>
+                    </div>
+                  </FlexBox>
+                )}
                 onChange={(v: string) => {
                   setParams((draft) => {
                     draft.vxnet_id = v
@@ -215,7 +249,20 @@ const NetworkModal = observer(
                       isExisty: false,
                     },
                     status: 'error',
-                    help: '不能为空',
+                    help: (
+                      <>
+                        不能为空, <span tw="text-neut-8 ml-2">您可以</span>
+                        <a
+                          href={`/${regionId}/vxnets`}
+                          target="_blank"
+                          tw="text-green-11"
+                          rel="noreferrer"
+                        >
+                          新建私有网络
+                          <Icon name="if-external-link" />
+                        </a>
+                      </>
+                    ),
                   },
                 ]}
                 help={

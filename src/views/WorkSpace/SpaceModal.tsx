@@ -67,7 +67,7 @@ const columns = [
 ]
 
 interface SpaceModalProps {
-  onHide?: (v: boolean) => void
+  onHide?: () => void
   [propName: string]: unknown
 }
 
@@ -99,6 +99,9 @@ const SpaceModal = observer(
     const handleModalClose = () => {
       setDelBtnEnable(true)
       stateStore.set({ curSpaceOpt: '' })
+      if (onHide) {
+        onHide()
+      }
     }
 
     const handleOk = () => {
@@ -123,13 +126,15 @@ const SpaceModal = observer(
             spaceIds: filterOptSpaceIds,
           }
         } else {
-          stateStore.set({ curSpaceOpt: '' })
+          handleModalClose()
+          // stateStore.set({ curSpaceOpt: '' })
         }
       }
       if (params) {
         mutation.mutate(params, {
           onSuccess: async () => {
-            stateStore.set({ curSpaceOpt: '' })
+            handleModalClose()
+            // stateStore.set({ curSpaceOpt: '' })
             const queryKey = getWorkSpaceKey(cardView ? 'infinite' : 'page')
             await queryClient.invalidateQueries(queryKey)
             stateStore.set({ optSpaces: [] })
