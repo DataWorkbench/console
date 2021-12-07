@@ -28,8 +28,8 @@ function getTabs() {
       description:
         '大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。',
       icon: 'dashboard',
-      newsLink: '/qingstor/price/',
-      helpLink: '/qingstor/access_control/',
+      newsLink: '/bigdata/dataplat/news/product_news/',
+      helpLink: '/bigdata/dataplat/manual/overview/',
     },
   ]
 }
