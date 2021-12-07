@@ -193,11 +193,15 @@ const NetworkTable = observer(() => {
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
                   draft.name = (e.target as HTMLInputElement).value
+                  draft.offset = 0
                 })
               }}
               onClear={() => {
                 setFilter((draft) => {
-                  draft.name = ''
+                  if (draft.name) {
+                    draft.offset = 0
+                    draft.name = ''
+                  }
                 })
               }}
             />
