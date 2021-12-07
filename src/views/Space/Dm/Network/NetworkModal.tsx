@@ -111,6 +111,7 @@ const NetworkModal = observer(
         onCancel={() => setOp('')}
         width={680}
         draggable
+        okText={op === 'create' ? '创建' : '修改'}
         appendToBody={appendToBody}
       >
         <FlexBox tw="h-full overflow-hidden">
@@ -132,9 +133,10 @@ const NetworkModal = observer(
                     rule: {
                       required: true,
                       matchRegex: nameMatchRegex,
+                      maxLength: 128,
                     },
                     status: 'error',
-                    help: '不能为空,字母、数字或下划线（_）,不能以（_）开始结尾',
+                    help: '不能为空，最大长度为 128 位。字母、数字或下划线（_）,不能以（_）开始结尾',
                   },
                 ]}
               />
@@ -215,6 +217,7 @@ const NetworkModal = observer(
                 validateOnBlur
                 name="vxnet_id"
                 value={params.vxnet_id}
+                key={params.router_id}
                 options={vxnets.map(({ vxnet_id, vxnet_name }) => ({
                   value: vxnet_id,
                   label: vxnet_name,
@@ -253,7 +256,11 @@ const NetworkModal = observer(
                       <>
                         不能为空, <span tw="text-neut-8 ml-2">您可以</span>
                         <a
-                          href={`/${regionId}/vxnets`}
+                          href={
+                            params.router_id
+                              ? `/${regionId}/routers/${params.router_id}`
+                              : `/${regionId}/vxnets`
+                          }
                           target="_blank"
                           tw="text-green-11"
                           rel="noreferrer"
@@ -269,7 +276,11 @@ const NetworkModal = observer(
                   <>
                     您可以
                     <a
-                      href={`/${regionId}/vxnets`}
+                      href={
+                        params.router_id
+                          ? `/${regionId}/routers/${params.router_id}`
+                          : `/${regionId}/vxnets`
+                      }
                       target="_blank"
                       tw="text-green-11"
                       rel="noreferrer"
