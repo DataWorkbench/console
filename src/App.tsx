@@ -8,6 +8,7 @@ import {
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
 import { RootStore, StoreContext } from 'stores'
+import { set } from 'lodash-es'
 import emitter from 'utils/emitter'
 import locales from './locales'
 import Routes from './Routes'
@@ -39,6 +40,14 @@ const queryClient = new QueryClient({
 const App = () => {
   const [loading, setLoading] = useState(true)
   const handleGlobalData = () => {
+    const { hostname } = window.location
+    if (!/\.qingcloud\.com$/.test(hostname)) {
+      set(
+        window,
+        'GLOBAL_CONFIG.new_docs_url',
+        'https://deploy-preview-654--qingcloud.netlify.app'
+      )
+    }
     setLoading(false)
   }
   return (
