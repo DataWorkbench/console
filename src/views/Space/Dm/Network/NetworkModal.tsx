@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { Form } from '@QCFE/lego-ui'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
@@ -7,7 +7,7 @@ import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import { assign, flatten } from 'lodash-es'
 import { useParams } from 'react-router-dom'
-import { Modal, FlexBox, AffixLabel } from 'components'
+import { Modal, FlexBox, AffixLabel, SelectWithRefresh } from 'components'
 
 import {
   useStore,
@@ -15,11 +15,13 @@ import {
   getNetworkKey,
   useQueryDescribeRouters,
   useQueryDescribeRoutersVxnets,
+  getRoutersKey,
+  getVxnetsKey,
 } from 'hooks'
 
 import { nameMatchRegex } from 'utils/convert'
 
-const { TextField, SelectField } = Form
+const { TextField } = Form
 
 const FormWrapper = styled('div')(() => [
   css`
@@ -102,16 +104,31 @@ const NetworkModal = observer(
       }
     }
 
+    const refetctNetwork = useCallback(
+      (getKey: () => any) => {
+        queryClient.invalidateQueries(getKey())
+      },
+      [queryClient]
+    )
+
+    const refectRouters = useCallback(() => {
+      refetctNetwork(getRoutersKey)
+    }, [refetctNetwork])
+
+    const refectVxnets = useCallback(() => {
+      refetctNetwork(getVxnetsKey)
+    }, [refetctNetwork])
+
     return (
       <Modal
-        title={`${op === 'create' ? '创建' : '修改'}网络`}
+        title={`${op === 'create' ? '新建' : '修改'}网络`}
         confirmLoading={mutation.isLoading}
         visible
         onOk={handleOk}
         onCancel={() => setOp('')}
         width={680}
         draggable
-        okText={op === 'create' ? '创建' : '修改'}
+        okText={op === 'create' ? '新建' : '确认'}
         appendToBody={appendToBody}
       >
         <FlexBox tw="h-full overflow-hidden">
@@ -140,11 +157,12 @@ const NetworkModal = observer(
                   },
                 ]}
               />
-              <SelectField
+              <SelectWithRefresh
                 label={<AffixLabel>VPC 网络</AffixLabel>}
                 placeholder="请选择 VPC"
                 validateOnBlur
                 name="router_id"
+                onRefresh={refectRouters}
                 value={params.router_id}
                 options={routers.map(({ router_id, router_name }) => ({
                   value: router_id,
@@ -165,6 +183,7 @@ const NetworkModal = observer(
                   })
                 }}
                 isLoadingAtBottom
+                isLoading={routersRet.isFetching}
                 searchable={false}
                 onMenuScrollToBottom={() => {
                   if (routersRet.hasNextPage) {
@@ -211,13 +230,14 @@ const NetworkModal = observer(
                   },
                 ]}
               />
-              <SelectField
+              <SelectWithRefresh
                 label={<AffixLabel>私有网络</AffixLabel>}
                 placeholder="请选择私有网络"
                 validateOnBlur
                 name="vxnet_id"
                 value={params.vxnet_id}
                 key={params.router_id}
+                onRefresh={refectVxnets}
                 options={vxnets.map(({ vxnet_id, vxnet_name }) => ({
                   value: vxnet_id,
                   label: vxnet_name,
