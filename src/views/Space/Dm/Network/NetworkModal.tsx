@@ -197,7 +197,7 @@ const NetworkModal = observer(
                     <a
                       href="/iaas/vpc/create"
                       target="_blank"
-                      tw="text-green-11"
+                      // tw="text-green-11"
                     >
                       新建 VPC 网络
                       <Icon name="if-external-link" />
@@ -217,11 +217,7 @@ const NetworkModal = observer(
                         <span tw="text-neut-8 ml-2">
                           如需选择新的 VPC，您可以
                         </span>
-                        <a
-                          href="/iaas/vpc/create"
-                          target="_blank"
-                          tw="text-green-11"
-                        >
+                        <a href="/iaas/vpc/create" target="_blank">
                           新建 VPC 网络
                           <Icon name="if-external-link" />
                         </a>
@@ -282,7 +278,6 @@ const NetworkModal = observer(
                               : `/${regionId}/vxnets`
                           }
                           target="_blank"
-                          tw="text-green-11"
                           rel="noreferrer"
                         >
                           新建私有网络
@@ -302,7 +297,7 @@ const NetworkModal = observer(
                           : `/${regionId}/vxnets`
                       }
                       target="_blank"
-                      tw="text-green-11"
+                      // tw="text-green-11"
                       rel="noreferrer"
                     >
                       新建私有网络

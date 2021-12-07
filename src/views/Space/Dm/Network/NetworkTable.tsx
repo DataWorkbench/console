@@ -7,18 +7,21 @@ import {
   Table,
   ToolBar,
 } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, Modal } from 'components'
+import { useParams } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
+import { get, omitBy, pick } from 'lodash-es'
+import dayjs from 'dayjs'
+import { css } from 'twin.macro'
+
+import { FlexBox, Center, Modal } from 'components'
 import {
   useStore,
   useQueryNetworks,
   getNetworkKey,
   useMutationNetwork,
 } from 'hooks'
-import { get, omitBy, pick } from 'lodash-es'
-import dayjs from 'dayjs'
-import { css } from 'twin.macro'
+
 import NetworkModal from './NetworkModal'
 
 interface IFilter {
@@ -38,6 +41,8 @@ const NetworkTable = observer(() => {
   const [opNetworkList, setOpNetworkList] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
+  const { regionId } = useParams<{ regionId: string }>()
+
   const [filter, setFilter] = useImmer<IFilter>({
     name: '',
     offset: 0,
@@ -76,10 +81,24 @@ const NetworkTable = observer(() => {
       {
         title: 'VPC 网络',
         dataIndex: 'router_id',
+        render: (v: string) => (
+          <a
+            href={`/${regionId}/routers/${v}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {v}
+          </a>
+        ),
       },
       {
         title: '私有网络',
         dataIndex: 'vxnet_id',
+        render: (v: string) => (
+          <a href={`/${regionId}/vxnets/${v}`} target="_blank" rel="noreferrer">
+            {v}
+          </a>
+        ),
       },
       {
         title: '创建时间',
@@ -122,7 +141,7 @@ const NetworkTable = observer(() => {
         ),
       },
     ]
-  }, [setOp, setOpNetworkList, filter.reverse])
+  }, [setOp, setOpNetworkList, regionId, filter.reverse])
 
   const refetchData = () => {
     queryClient.invalidateQueries(getNetworkKey())

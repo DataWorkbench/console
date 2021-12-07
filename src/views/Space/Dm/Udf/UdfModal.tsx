@@ -6,6 +6,7 @@ import { Collapse, Field, Label } from '@QCFE/lego-ui'
 import { flatten, isEqualWith, pickBy, identity } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
+import { toJS } from 'mobx'
 
 import {
   FlexBox,
@@ -13,9 +14,9 @@ import {
   Modal,
   ModalStep,
   ModalContent,
-  Icons,
   AffixLabel,
   PopConfirm,
+  SelectWithRefresh,
 } from 'components'
 import {
   getResourceKey,
@@ -24,8 +25,6 @@ import {
   useQueryResource,
   useStore,
 } from 'hooks'
-import SelectWithRefresh from 'components/SelectWithRefresh'
-import { toJS } from 'mobx'
 import { ILanguageInterface, UdfActionType, UdfTypes } from './interfaces'
 import { javaType, languageData, udfHasLangBits, udfTypes } from './constants'
 
@@ -416,14 +415,11 @@ const UdfModal = observer(() => {
                                     <a
                                       href="./resource"
                                       target="_blank"
-                                      tw="text-green-11"
+                                      className="text-action"
+                                      // tw="text-green-11"
                                     >
                                       上传资源
-                                      <Icons
-                                        name="direct"
-                                        size={14}
-                                        tw="inline-block"
-                                      />
+                                      <Icon name="if-external-link" />
                                     </a>
                                   </div>
                                 ),
@@ -436,14 +432,11 @@ const UdfModal = observer(() => {
                                 <a
                                   href="./resource"
                                   target="_blank"
-                                  tw="text-green-11"
+                                  className="text-action"
+                                  // tw="text-green-11"
                                 >
                                   上传资源
-                                  <Icons
-                                    name="direct"
-                                    size={14}
-                                    tw="inline-block"
-                                  />
+                                  <Icon name="if-external-link" />
                                 </a>
                               </div>
                             }

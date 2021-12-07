@@ -43,6 +43,22 @@ const buttonStyles = css`
         }
       }
     }
+    a.text-action {
+      color: #f7fcff;
+      ${tw`hover:text-green-11 active:text-green-12 underline`}
+    }
+    a {
+      color: #2193d3;
+      &:hover {
+        color: #0ea5e9;
+      }
+      &:active {
+        color: #0369a1;
+      }
+      .if {
+        ${tw`inline-block`}
+      }
+    }
   }
 `
 
