@@ -16,8 +16,12 @@ interface IRouteParams {
 }
 
 let queryKey: any = ''
+let queryRoutersKey: any = ''
+let queryVxnetsKey: any = ''
 
 export const getNetworkKey = () => queryKey
+export const getRoutersKey = () => queryRoutersKey
+export const getVxnetsKey = () => queryVxnetsKey
 
 export const useQueryNetworks = (filter: any) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
@@ -81,9 +85,9 @@ export const useQueryDescribeRouters = (filter: {
     offset: 0,
     ...filter,
   }
-  const qryKey = ['DescribeRouters', omit(params, 'offset')]
+  queryRoutersKey = ['DescribeRouters', omit(params, 'offset')]
   return useInfiniteQuery(
-    qryKey,
+    queryRoutersKey,
     async ({ pageParam = params }) => {
       return describeRouters(pageParam)
     },
@@ -120,9 +124,9 @@ export const useQueryDescribeRoutersVxnets = (filter: {
     offset: 0,
     ...filter,
   }
-  const qryKey = ['DescribeRouterVxnets', omit(params, 'offset')]
+  queryVxnetsKey = ['DescribeRouterVxnets', omit(params, 'offset')]
   return useInfiniteQuery(
-    qryKey,
+    queryVxnetsKey,
     async ({ pageParam = params }) => {
       return describeRouterVxnets(pageParam)
     },

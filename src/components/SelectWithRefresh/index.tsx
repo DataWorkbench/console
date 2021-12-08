@@ -2,7 +2,7 @@ import { css, styled } from 'twin.macro'
 import { Select, Button, Form } from '@QCFE/lego-ui'
 
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { useState } from 'react'
+import { ReactElement, useState } from 'react'
 
 const SelectWithRefreshBox = styled('div')(() => [
   css`
@@ -15,7 +15,7 @@ interface ISelectWithRefreshProps {
   onRefresh: () => void
   [propName: string]: any
 }
-const SelectWithRefresh = (props: ISelectWithRefreshProps) => {
+const SelectWithRefreshCmp = (props: ISelectWithRefreshProps) => {
   const { onRefresh, onChange, help, labelClassName, label, ...rest } = props
   const [domId] = useState(Math.random().toString(32))
   return (
@@ -35,4 +35,8 @@ const SelectWithRefresh = (props: ISelectWithRefreshProps) => {
   )
 }
 
-export default (Form as any).getFormField(SelectWithRefresh)
+export const SelectWithRefresh: (p: ISelectWithRefreshProps) => ReactElement = (
+  Form as any
+).getFormField(SelectWithRefreshCmp)
+
+export default SelectWithRefresh
