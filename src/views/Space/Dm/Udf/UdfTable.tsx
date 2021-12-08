@@ -199,8 +199,9 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
               <a
                 href="https://nightlies.apache.org/flink/flink-docs-release-1.11/dev/table/functions/udfs.html"
                 target="_blank"
-                tw="text-link"
+                // tw="text-link"
                 rel="noreferrer"
+                className="link"
               >
                 查看详情 →
               </a>

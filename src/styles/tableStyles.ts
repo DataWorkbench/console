@@ -72,6 +72,11 @@ const tableStyles = css`
       }
     }
   }
+  .portal-grid-table {
+    .portal-loading-wrapper > .loading {
+      z-index: 119;
+    }
+  }
 `
 
 export default tableStyles

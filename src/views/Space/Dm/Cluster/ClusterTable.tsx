@@ -247,8 +247,10 @@ const ClusterTable = observer(
                   target="_blank"
                   tw="text-white!"
                   rel="noreferrer"
+                  className="link"
                 >
                   Flink UI
+                  <Icon name="if-external-link" />
                 </a>
               </Button>
               <Button

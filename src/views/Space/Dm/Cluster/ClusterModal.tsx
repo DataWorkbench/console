@@ -11,6 +11,7 @@ import {
   RadioGroup,
   RadioButton,
 } from '@QCFE/lego-ui'
+import { Icon as QIcon } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
@@ -811,8 +812,9 @@ const ClusterModal = observer(
             </div>
             <div tw="pt-4 pb-2 border-b border-neut-13">
               收费标准详见
-              <a href="###" tw="text-green-11">
+              <a href="###" className="link">
                 《大数据平台计费说明》
+                <QIcon name="if-external-link" />
               </a>
             </div>
             <div>
