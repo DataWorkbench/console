@@ -5,9 +5,16 @@ export interface GuideItemProps {
   index?: number
   desc?: string
   link?: string
+  hideLine?: boolean
 }
 
-export const GuideItem: FC<GuideItemProps> = ({ index, title, desc, link }) => {
+export const GuideItem: FC<GuideItemProps> = ({
+  index,
+  title,
+  desc,
+  link,
+  hideLine,
+}) => {
   return (
     <div tw="flex-1">
       <div tw="text-base font-medium flex">
@@ -17,14 +24,14 @@ export const GuideItem: FC<GuideItemProps> = ({ index, title, desc, link }) => {
           </span>
           {title}
         </div>
-        <div tw="border-t border-neut-3 flex-1 mt-3 mx-3" />
+        {!hideLine && (
+          <div tw="border h-0.5 border-neut-2 flex-1 mt-[11px] mx-3 " />
+        )}
       </div>
-      <div tw="text-neut-8 mt-4 w-10/12">
-        {desc}
-        <a href={link} tw="text-link">
-          查看
-        </a>
-      </div>
+      <div tw="text-neut-8 mt-4 w-10/12">{desc}</div>
+      <a href={link} className="link">
+        详情介绍
+      </a>
     </div>
   )
 }

@@ -59,9 +59,24 @@ const buttonStyles = css`
         color: #f7fcff;
         ${tw`hover:text-green-11 active:text-green-12 underline`}
       }
-      .if {
-        ${tw`inline-block`}
+    }
+  }
+  a {
+    &.link {
+      color: #2563eb;
+      ${tw`underline`}
+      &:hover {
+        color: #3b82f6;
       }
+      &:active {
+        color: #1d4ed8;
+      }
+    }
+    &.text-action {
+      ${tw`hover:text-green-12 text-green-11 active:text-green-13 underline`}
+    }
+    .if {
+      ${tw`inline-block`}
     }
   }
 `

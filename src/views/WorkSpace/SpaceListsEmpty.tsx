@@ -30,11 +30,11 @@ const SpaceListsEmpty = () => {
   const { isModal } = stateStore
   return (
     <div>
-      <div css={[tw`bg-white`, !isModal && tw`pb-20`]}>
+      <div css={[tw`bg-white`, !isModal && tw`pb-2`]}>
         <div
           css={[
-            tw`h-96 border-b border-neut-2 flex items-center justify-center`,
-            isModal && tw`h-80 border-b-0`,
+            tw`border-b border-neut-2 flex items-center justify-center`,
+            isModal ? tw`h-80 border-b-0` : tw`h-auto`,
           ]}
         >
           <div tw="w-[700px] text-center">
@@ -46,16 +46,16 @@ const SpaceListsEmpty = () => {
               {isModal ? '当前没有相关「工作空间」的数据' : '暂无工作空间'}
             </div>
             <div tw="mt-4 text-neut-8">
-              工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。
               {isModal ? (
-                <a href="###" tw="text-link">
-                  了解更多
-                </a>
-              ) : (
-                '工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。'
-              )}
+                <span>
+                  工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。
+                  <a href="###" tw="text-link">
+                    了解更多
+                  </a>
+                </span>
+              ) : null}
             </div>
-            <div tw="space-x-4 mt-5">
+            <div tw="mt-6">
               <Button
                 type="primary"
                 onClick={() => {
@@ -65,18 +65,16 @@ const SpaceListsEmpty = () => {
                 <Icon name="add" />
                 创建工作空间
               </Button>
-              <Button type="default" css={isModal && tw`hidden`}>
-                <Icon name="documentation" />
-                使用指南
-              </Button>
             </div>
-            {/* <div tw="space-x-3 mt-4">
-              <a href="###" tw="text-link">
+            <div css={[tw`space-x-3 mt-3`, !isModal && tw`mb-8`]}>
+              <a href="###" className="link">
                 使用指南
               </a>
-              <span>|</span>
-             <a href="###">使用指南</a>
-            </div> */}
+              <span tw="text-link">|</span>
+              <a href="###" className="link">
+                使用指南
+              </a>
+            </div>
           </div>
         </div>
         {!isModal && <Guide title={guideData.title} items={guideData.items} />}
