@@ -47,6 +47,7 @@ const resInfos = [
   },
   {
     name: 'Hbase',
+    showname: 'HBase',
     img: <HbaseImg />,
     desc: 'HBase 是一个开源的非关系型分布式数据库，实现的编程语言为 Java。它可以对稀疏文件提供极高的容错率。 ',
   },
@@ -57,6 +58,7 @@ const resInfos = [
   },
   {
     name: 'Ftp',
+    showname: 'FTP',
     img: <FtpImg />,
     desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
   },
@@ -83,7 +85,7 @@ const DataSourceModal = observer(
       step: op === 'update' ? 1 : 0,
       dbName: '',
     })
-    const getFormData = useRef()
+    const getFormData = useRef<() => any>()
     const queryClient = useQueryClient()
     const {
       status,
@@ -93,9 +95,9 @@ const DataSourceModal = observer(
     const mutation = useMutationSource()
     const curkind =
       op === 'create'
-        ? // ? get(kinds, `[${state.dbName}]`)
-          kinds?.find((k) => k.name === state.dbName)
+        ? kinds?.find((k) => k.name === state.dbName)
         : kinds?.find((k) => k.source_type === opSourceList[0]?.source_type)
+    const curResInfo = resInfos.find((info) => info.name === curkind?.name)
 
     const handleDbSelect = (name: string) => {
       setState((draft) => {
@@ -145,7 +147,7 @@ const DataSourceModal = observer(
           orient="fullright"
           width={800}
           title={`${op === 'create' ? '新增' : '修改'}数据源: ${
-            curkind ? curkind.name : ''
+            curResInfo ? curResInfo.showname || curResInfo.name : ''
           }`}
           footer={
             <div tw="flex justify-end space-x-2">
@@ -178,8 +180,6 @@ const DataSourceModal = observer(
           />
           <ModalContent css={state.step === 1 && tw`px-0 pt-0`}>
             {(() => {
-              let curResInfo = null
-
               switch (status) {
                 case 'loading':
                   return (
@@ -220,9 +220,9 @@ const DataSourceModal = observer(
                       </>
                     )
                   }
-                  curResInfo = resInfos.find(
-                    (info) => info.name === curkind.name
-                  )
+                  // curResInfo = resInfos.find(
+                  //   (info) => info.name === curkind.name
+                  // )
                   return (
                     curkind &&
                     curResInfo && (
