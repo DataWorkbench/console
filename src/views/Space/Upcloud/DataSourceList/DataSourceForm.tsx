@@ -6,7 +6,13 @@ import { get, set, trim, flatten, omit, pick } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
-import { useStore, useMutationSource, useInfiniteQueryNetworks } from 'hooks'
+import { useQueryClient } from 'react-query'
+import {
+  useStore,
+  useMutationSource,
+  useInfiniteQueryNetworks,
+  getNetworkKey,
+} from 'hooks'
 import { AffixLabel, Icons } from 'components'
 import { nameMatchRegex, strlen, getHelpCenterLink } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
@@ -24,11 +30,29 @@ const {
 
 const Root = styled('div')(() => [
   css`
+    div[class='help'] {
+      ${tw`text-neut-8`}
+    }
     .collapse-item-content > .field {
       ${tw`block pl-6`}
     }
     .collapse-item-content {
       ${tw`pl-0`}
+    }
+  `,
+])
+
+const SelectFieldRefresh = styled('div')(() => [
+  tw`relative`,
+  css`
+    .field {
+      ${tw`block pl-6 mb-6`}
+    }
+    button {
+      ${tw`mt-[26px] ml-2 absolute top-0 left-[284px]`}
+      svg {
+        ${tw`text-neut-15 fill-current`}
+      }
     }
   `,
 ])
@@ -51,10 +75,11 @@ const compInfo = {
     name: 'database',
     label: '数据库名称（Database Name）',
     placeholder: '请输入数据库名称（Database Name）',
+    help: '字母、数字或下划线（_）',
     schemas: [
       {
-        rule: { required: true },
-        help: '请输入数据库名称（Database Name）',
+        rule: { required: true, matchRegex: nameMatchRegex },
+        help: '字母、数字或下划线（_）,不能以（_）开结尾',
         status: 'error',
       },
       {
@@ -140,15 +165,7 @@ const compInfo = {
 
 const getFieldsInfo = (type: string) => {
   const { database, host, password, port, user } = compInfo
-  let fieldsInfo: {
-    name: string
-    label?: string | React.ReactNode
-    placeholder?: string
-    schemas?: any
-    component?: any
-    defaultValue?: string | number
-    validateOnBlur?: boolean
-  }[] = []
+  let fieldsInfo: any[] = []
   let pwd = { name: '' }
   switch (type) {
     case 'clickhouse':
@@ -177,8 +194,9 @@ const getFieldsInfo = (type: string) => {
       fieldsInfo = [
         {
           name: 'zookeeper',
-          label: 'Zookeeper',
-          placeholder: 'The hbase Zookeeper',
+          label: '使用 Zookeeper 的地址（ZooKeeper Quorum）',
+          placeholder: '请输入',
+          help: '例如：zk_host1:2181,zk_host2:2181,zk_host3:2181',
           schemas: [
             {
               rule: { required: true },
@@ -197,8 +215,9 @@ const getFieldsInfo = (type: string) => {
         },
         {
           name: 'z_node',
-          label: 'Znode',
-          placeholder: 'The hbase Zookeeper Node',
+          label: '使用 ZooKeeper 的根目录（ZooKeeper Znode Parent）',
+          placeholder: '请输入',
+          help: '例如：/hbase',
           schemas: [
             { rule: { required: true }, help: '请输入znode', status: 'error' },
             {
@@ -232,7 +251,8 @@ const getFieldsInfo = (type: string) => {
         {
           name: 'kafka_brokers',
           label: 'Broker 连接列表（Broker List）',
-          placeholder: 'The kafak brokers.',
+          placeholder: '请输入',
+          help: '例如：kafka1:9092,kafka2:9092,kafka3:9092',
           schemas: [
             {
               rule: { required: true },
@@ -266,9 +286,10 @@ interface IFormProps {
     img?: React.ReactNode
     source_type: number
   }
-  getFormData: MutableRefObject<() => any>
+  getFormData?: MutableRefObject<() => any>
 }
 const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
+  const queryClient = useQueryClient()
   const [network, setNetWork] = useImmer<{ type: 'vpc' | 'eip'; id: string }>({
     type: 'vpc',
     id: '',
@@ -292,12 +313,14 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
   const fields = getFieldsInfo(urlType)
 
   useMount(() => {
-    if (op === 'update') {
+    if (sourceInfo) {
       setNetWork((draft) => {
-        draft.id = get(
+        const networkId = get(
           sourceInfo,
           `url.${urlType}.network.vpc_network.network_id`
         )
+        draft.id = networkId
+        draft.type = networkId ? 'vpc' : 'eip'
       })
     }
   })
@@ -503,62 +526,71 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
               <RadioButton value="eip">公网</RadioButton>
             </RadioGroupField>
             {network.type === 'vpc' && (
-              <SelectField
-                name="network_id"
-                value={network.id}
-                placeholder="请选择网络配置"
-                validateOnChange
-                label={<AffixLabel>网络配置</AffixLabel>}
-                onChange={(v: string) => {
-                  setNetWork((draft) => {
-                    draft.id = v
-                  })
-                }}
-                help={
-                  <>
-                    如需选择新的网络配置，您可以
-                    <span
-                      tw="text-green-11 cursor-pointer"
-                      onClick={() => dmStore.setOp('create')}
-                    >
-                      绑定VPC
-                    </span>
-                  </>
-                }
-                schemas={[
-                  {
-                    rule: {
-                      required: true,
-                      isExisty: false,
-                    },
-                    status: 'error',
-                    help: (
-                      <>
-                        请选择网络, 如没有可选择的网络配置，您可以
-                        <span
-                          tw="text-green-11 cursor-pointer"
-                          onClick={() => dmStore.setOp('create')}
-                        >
-                          绑定VPC
-                        </span>
-                      </>
-                    ),
-                  },
-                ]}
-                options={networks.map(({ name, id }) => ({
-                  label: name,
-                  value: id,
-                }))}
-                isLoading={networksRet.isFetching}
-                isLoadingAtBottom
-                searchable={false}
-                onMenuScrollToBottom={() => {
-                  if (networksRet.hasNextPage) {
-                    networksRet.fetchNextPage()
+              <SelectFieldRefresh>
+                <SelectField
+                  name="network_id"
+                  value={network.id}
+                  placeholder="请选择网络配置"
+                  validateOnChange
+                  label={<AffixLabel>网络配置</AffixLabel>}
+                  onChange={(v: string) => {
+                    setNetWork((draft) => {
+                      draft.id = v
+                    })
+                  }}
+                  help={
+                    <>
+                      如需选择新的网络配置，您可以
+                      <span
+                        tw="text-green-11 cursor-pointer"
+                        onClick={() => dmStore.setOp('create')}
+                      >
+                        绑定VPC
+                      </span>
+                    </>
                   }
-                }}
-                bottomTextVisible
-              />
+                  schemas={[
+                    {
+                      rule: {
+                        required: true,
+                        isExisty: false,
+                      },
+                      status: 'error',
+                      help: (
+                        <>
+                          请选择网络, 如没有可选择的网络配置，您可以
+                          <span
+                            tw="text-green-11 cursor-pointer"
+                            onClick={() => dmStore.setOp('create')}
+                          >
+                            绑定 VPC
+                          </span>
+                        </>
+                      ),
+                    },
+                  ]}
+                  options={networks.map(({ name, id }) => ({
+                    label: name,
+                    value: id,
+                  }))}
+                  isLoading={networksRet.isFetching}
+                  isLoadingAtBottom
+                  searchable={false}
+                  onMenuScrollToBottom={() => {
+                    if (networksRet.hasNextPage) {
+                      networksRet.fetchNextPage()
+                    }
+                  }}
+                  bottomTextVisible
+                />
+                <Button
+                  onClick={() => {
+                    queryClient.invalidateQueries(getNetworkKey())
+                  }}
+                >
+                  <Icon name="refresh" size={20} />
+                </Button>
+              </SelectFieldRefresh>
             )}
             {fields.map((field) => {
               const {
@@ -607,7 +639,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
                   defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
                   validateOnChange
                   schemas={schemas}
-                  css={['port'].includes(name) ? tw`w-28` : tw`w-80`}
+                  css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
                   {...rest}
                   label={<AffixLabel required>{label}</AffixLabel>}
                   placeholder={placeholder}
@@ -622,7 +654,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
               </Label>
               <Control>
                 <Button
-                  disabled={mutation.isLoading}
+                  loading={mutation.isLoading}
                   type="outlined"
                   onClick={handlePing}
                 >

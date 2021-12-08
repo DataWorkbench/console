@@ -135,7 +135,7 @@ const DataSourceList = observer(() => {
   const defaultColumns = useMemo(
     () => [
       {
-        title: '数据源名称/id',
+        title: '数据源名称/ID',
         dataIndex: 'source_id',
         render: (v: string, info: any) => (
           <FlexBox tw="space-x-1 items-center">
@@ -177,21 +177,60 @@ const DataSourceList = observer(() => {
         },
       },
       {
-        title: '连通性测试状态',
+        title: '连接信息',
+        dataIndex: 'url',
+        width: 250,
+        render: (v: any, row) => {
+          const tp = findKey(sourceTypes, (o) => o === row.source_type)
+
+          if (tp) {
+            const key = tp.toLowerCase()
+            const urlObj = get(v, key)
+            const networkId = get(urlObj, 'network.vpc_network.network_id')
+            return (
+              <div tw="space-y-1">
+                <div tw="truncate">
+                  {['mysql', 'clickhouse', 'postgresql'].includes(key) && (
+                    <>
+                      <span tw="inline-block px-1.5 bg-[#E0EBFE] text-[#3B82F6] rounded-sm mr-0.5">
+                        URL
+                      </span>
+                      <span>
+                        {urlObj.host}: {urlObj.port}
+                      </span>
+                    </>
+                  )}
+                </div>
+                {networkId && (
+                  <div tw="truncate">
+                    <span tw="inline-block px-1.5 bg-[#F1E4FE] text-[#A855F7] rounded-sm mr-0.5">
+                      内网
+                    </span>
+                    {networkId}
+                  </div>
+                )}
+              </div>
+            )
+          }
+          return ''
+        },
+      },
+      {
+        title: '数据源可用性',
         dataIndex: 'connection',
-        render: (v: string) => {
-          if (v === 'failed') {
+        render: (v: number) => {
+          if (v === 1) {
             return (
               <Center tw="space-x-1">
-                <Icons name="circle_close" size={12} />
-                <span>不通过</span>
+                <Icons name="circle_check" size={12} />
+                <span>可用</span>
               </Center>
             )
           }
           return (
             <Center tw="space-x-1">
-              <Icons name="circle_check" size={12} />
-              <span>通过</span>
+              <Icons name="circle_close" size={12} />
+              <span>不可用</span>
             </Center>
           )
         },

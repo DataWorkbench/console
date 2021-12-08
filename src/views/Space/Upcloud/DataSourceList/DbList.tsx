@@ -13,7 +13,7 @@ interface IDbList {
 
 const DbList = ({ items, current, onChange }: IDbList) => (
   <div tw="flex flex-wrap justify-between">
-    {items.map(({ name, img, desc }) => (
+    {items.map(({ name, showname, img, desc }) => (
       <div
         onClick={() => onChange(name)}
         key={name}
@@ -25,7 +25,9 @@ const DbList = ({ items, current, onChange }: IDbList) => (
         >
           <div tw="w-10 flex-shrink-0">{img}</div>
           <div tw="flex-1 pl-2 leading-5">
-            <div tw="font-medium group-hover:text-green-11">{name}</div>
+            <div tw="font-medium group-hover:text-green-11">
+              {showname || name}
+            </div>
             <div tw="text-neut-8 h-10 overflow-hidden">{desc}</div>
           </div>
         </ItemWrapper>
