@@ -7,7 +7,7 @@ class WorkSpaceStore {
   funcList = [
     {
       name: 'upcloud',
-      title: '数据上云',
+      title: '数据源管理',
       subFuncList: [
         { name: 'dsl', title: '数据源列表', icon: 'blockchain' },
         // { name: 'tools', title: '网络连通工具', icon: 'earth' },
@@ -16,7 +16,7 @@ class WorkSpaceStore {
     },
     {
       name: 'dm',
-      title: '云上加工',
+      title: '数据开发',
       subFuncList: [
         { name: 'realtime', title: '实时计算', icon: 'cogwheel' },
         { name: 'network', title: '网络配置', icon: 'earth' },

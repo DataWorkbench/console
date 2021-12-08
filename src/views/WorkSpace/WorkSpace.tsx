@@ -26,7 +26,7 @@ const tabs = [
       '工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。',
     icon: 'project',
     key: 'workspace',
-    helpLink: '/compute/vm/',
+    helpLink: '/bigdata/dataplat/manual/workspace_list/',
   },
 ]
 
@@ -62,7 +62,7 @@ const WorkSpace = observer(
         { title: '空间名称/id', dataIndex: 'id', fixedInSetting: true },
         { title: '空间状态', dataIndex: 'status' },
         { title: '空间所有者', dataIndex: 'owner' },
-        { title: '成员数', dataIndex: 'name' },
+        // { title: '成员数', dataIndex: 'name' },
         { title: '描述', dataIndex: 'desc' },
         { title: '创建时间', dataIndex: 'created' },
         { title: '操作', dataIndex: 'updated' },

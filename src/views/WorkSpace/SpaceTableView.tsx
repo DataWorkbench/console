@@ -66,7 +66,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             sortable: true,
             sortKey: 'name',
             sortOrder: sort.name,
-            width: 210,
+            // width: 260,
             render: (field: string, row: any) => (
               <div tw="flex items-center w-full">
                 <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
@@ -137,6 +137,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
               </FlexBox>
             ),
             dataIndex,
+            // width: 180,
             render: (field: number) => (
               <div
                 css={[
@@ -168,9 +169,10 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
           return {
             title,
             dataIndex,
+            // width: 180,
             render: (field: string) => (
               <div>
-                <div>xxx@test.com</div>
+                {/* <div>xxx@test.com</div> */}
                 <div tw="text-neut-8">{field}</div>
               </div>
             ),
@@ -187,7 +189,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
           return {
             title,
             dataIndex,
-            width: 200,
+            // width: 200,
             render: (field: string) => (
               <div tw="h-10 truncate">{field || '暂无描述'}</div>
             ),
@@ -208,7 +210,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             title,
             dataIndex,
             // width: ifExceedMaxWidth ? 380 : 330,
-            width: ifExceedMaxWidth ? 300 : 260,
+            width: ifExceedMaxWidth ? 320 : 280,
             render: (filed: any, row: any) => (
               <TableRowOpt space={row} regionId={regionId} />
             ),
