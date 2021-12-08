@@ -1,4 +1,5 @@
 import { useQuery, useMutation } from 'react-query'
+import { useParams } from 'react-router-dom'
 import {
   loadSourceKind,
   createDataSource,
@@ -39,7 +40,7 @@ export const useQuerySourceKind = (regionId: string, spaceId: string) => {
     const ret = await loadSourceKind({ spaceId, regionId })
     return get(ret, 'kinds', []).map((kind: { name: SourceType }) => ({
       ...kind,
-      sourcetype: sourceTypes[kind.name],
+      source_type: sourceTypes[kind.name],
     }))
   })
 }
@@ -55,27 +56,36 @@ export const useQuerySource = (filter: IDataSourceParams) => {
   })
 }
 
-interface MutationSourceParams extends IDataSourceParams {
-  op: 'disable' | 'enable' | 'delete' | 'create' | 'update'
+interface MutationSourceParams {
+  op: 'disable' | 'enable' | 'delete' | 'create' | 'update' | 'ping'
+  source_type?: number
   sourceIds?: string[]
   sourceId?: string
+  url?: any
 }
 
 export const useMutationSource = () => {
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
   return useMutation(async ({ op, ...rest }: MutationSourceParams) => {
     let ret = null
+    const params = {
+      ...rest,
+      regionId,
+      spaceId,
+    }
     if (op === 'create') {
-      ret = await createDataSource(rest)
+      ret = await createDataSource(params)
     } else if (op === 'enable') {
-      ret = await enableDataSource(rest)
+      ret = await enableDataSource(params)
     } else if (op === 'disable') {
-      ret = await disableDataSource(rest)
+      ret = await disableDataSource(params)
     } else if (op === 'delete') {
-      ret = await deleteDataSource(rest)
+      ret = await deleteDataSource(params)
     } else if (op === 'update') {
-      ret = await updateDataSource(rest)
+      ret = await updateDataSource(params)
     } else if (op === 'ping') {
-      ret = await pingDataSource(rest)
+      ret = await pingDataSource(params)
     }
     return ret
   })

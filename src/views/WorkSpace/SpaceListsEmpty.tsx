@@ -2,6 +2,7 @@ import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
 import { Guide, GuideProps } from 'components'
+import { getHelpCenterLink } from 'utils'
 import SexangleImg from 'assets/svgr/sexangle.svg'
 
 const guideData: GuideProps = {
@@ -48,7 +49,12 @@ const SpaceListsEmpty = () => {
             <div tw="mt-4 text-neut-8">
               工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。
               {isModal ? (
-                <a href="###" tw="text-link">
+                <a
+                  tw="text-link cursor-pointer"
+                  href={getHelpCenterLink('/bigdata/dataplat/intro/concept/')}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   了解更多
                 </a>
               ) : (

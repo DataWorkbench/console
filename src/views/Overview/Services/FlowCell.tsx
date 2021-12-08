@@ -31,7 +31,7 @@ const FlowCell: React.FC<FlowCellProps> = ({ item, placement }) => {
       </motion.div>
       <div>
         <Icons name={item.xlink} size={56} tw="pointer-events-none" />
-        <div tw="pt-3">{item.text}</div>
+        <div tw="pt-3 w-20 -ml-3 text-center">{item.text}</div>
       </div>
     </div>
   )
