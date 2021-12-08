@@ -81,24 +81,34 @@ const NetworkTable = observer(() => {
       {
         title: 'VPC 网络',
         dataIndex: 'router_id',
-        render: (v: string) => (
-          <a
-            href={`/${regionId}/routers/${v}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {v}
-          </a>
-        ),
+        render: (v: string) =>
+          v ? (
+            <a
+              href={`/${regionId}/routers/${v}`}
+              target="_blank"
+              rel="noreferrer"
+              className="link"
+            >
+              {v}
+              <Icon name="if-external-link" />
+            </a>
+          ) : null,
       },
       {
         title: '私有网络',
         dataIndex: 'vxnet_id',
-        render: (v: string) => (
-          <a href={`/${regionId}/vxnets/${v}`} target="_blank" rel="noreferrer">
-            {v}
-          </a>
-        ),
+        render: (v: string) =>
+          v ? (
+            <a
+              href={`/${regionId}/vxnets/${v}`}
+              target="_blank"
+              rel="noreferrer"
+              className="link"
+            >
+              {v}
+              <Icon name="if-external-link" />
+            </a>
+          ) : null,
       },
       {
         title: '创建时间',

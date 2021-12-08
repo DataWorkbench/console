@@ -201,6 +201,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
                 target="_blank"
                 // tw="text-link"
                 rel="noreferrer"
+                className="link"
               >
                 查看详情 →
               </a>
