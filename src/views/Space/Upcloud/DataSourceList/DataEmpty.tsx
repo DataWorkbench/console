@@ -1,4 +1,4 @@
-import { Button, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
 import { ContentBox, FlexBox } from 'components'
 import SexangleImg from 'assets/svgr/sexangle.svg'
 
@@ -16,7 +16,15 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => (
         数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。
       </p>
       <div>
-        <Button tw="mr-4">
+        <Button
+          tw="mr-4"
+          onClick={() => {
+            const openModal = Modal.open(HelpCenterModal, {
+              link: '/bigdata/dataplat/manual/data_up_cloud/source_data/data_summary/',
+              onCancel: () => Modal.close(openModal),
+            })
+          }}
+        >
           <Icon name="if-book" type="light" />
           使用指南
         </Button>

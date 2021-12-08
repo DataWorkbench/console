@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { Modal, ModalStep, ModalContent } from 'components'
-import { Button, Form, Loading } from '@QCFE/qingcloud-portal-ui'
+import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
 import tw from 'twin.macro'
 import {
@@ -13,6 +13,7 @@ import {
 } from 'hooks'
 import { useImmer } from 'use-immer'
 import { Global, css } from '@emotion/react'
+import { getHelpCenterLink } from 'utils'
 
 import sourceListBg from 'assets/source-list.svg'
 
@@ -27,7 +28,7 @@ import HdfsImg from 'assets/svgr/sources/hadoop.svg'
 import DataSourceForm from './DataSourceForm'
 import DbList from './DbList'
 
-const resInfos: { name: string; img?: React.ReactNode; desc?: string }[] = [
+const resInfos = [
   {
     name: 'MySQL',
     img: <MysqlImg />,
@@ -38,7 +39,7 @@ const resInfos: { name: string; img?: React.ReactNode; desc?: string }[] = [
     img: <PostgresqlImg />,
     desc: '开源的对象-关系数据库数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。 ',
   },
-  // { name: 'S3', img: <S3Img />, desc: '是一种面向 Internet 的存储服务。' },
+  // { name: 'S3', img: <S3Img />, desc: '是一种面向 Internet 的存储服务。', source_type: 4, },
   {
     name: 'ClickHouse',
     img: <ClickHouseImg />,
@@ -46,6 +47,7 @@ const resInfos: { name: string; img?: React.ReactNode; desc?: string }[] = [
   },
   {
     name: 'Hbase',
+    showname: 'HBase',
     img: <HbaseImg />,
     desc: 'HBase 是一个开源的非关系型分布式数据库，实现的编程语言为 Java。它可以对稀疏文件提供极高的容错率。 ',
   },
@@ -56,6 +58,7 @@ const resInfos: { name: string; img?: React.ReactNode; desc?: string }[] = [
   },
   {
     name: 'Ftp',
+    showname: 'FTP',
     img: <FtpImg />,
     desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
   },
@@ -82,7 +85,7 @@ const DataSourceModal = observer(
       step: op === 'update' ? 1 : 0,
       dbName: '',
     })
-    const form = useRef<Form>()
+    const getFormData = useRef<() => any>()
     const queryClient = useQueryClient()
     const {
       status,
@@ -92,9 +95,9 @@ const DataSourceModal = observer(
     const mutation = useMutationSource()
     const curkind =
       op === 'create'
-        ? // ? get(kinds, `[${state.dbName}]`)
-          kinds?.find((k) => k.name === state.dbName)
-        : kinds?.find((k) => k.sourcetype === opSourceList[0]?.source_type)
+        ? kinds?.find((k) => k.name === state.dbName)
+        : kinds?.find((k) => k.source_type === opSourceList[0]?.source_type)
+    const curResInfo = resInfos.find((info) => info.name === curkind?.name)
 
     const handleDbSelect = (name: string) => {
       setState((draft) => {
@@ -103,31 +106,25 @@ const DataSourceModal = observer(
       })
     }
     const handleSave = () => {
-      const formElem = form.current
-      if (formElem?.validateForm()) {
-        const { name, comment, ...rest } = formElem.getFieldsValue()
-        const kind = curkind.name.toLowerCase()
-        const params = {
-          op,
-          regionId,
-          spaceId,
-          name,
-          comment,
-          source_type: curkind.sourcetype,
-          url: {
-            [kind]: rest,
-          },
+      if (getFormData?.current) {
+        const data = (getFormData as any).current()
+        if (data) {
+          const params = {
+            op,
+            source_type: curkind.source_type,
+            ...data,
+          }
+          if (op === 'update') {
+            params.sourceId = opSourceList[0].source_id
+          }
+          mutation.mutate(params, {
+            onSuccess: () => {
+              onHide()
+              const queryKey = getSourceKey()
+              queryClient.invalidateQueries(queryKey)
+            },
+          })
         }
-        if (op === 'update') {
-          params.sourceId = opSourceList[0].source_id
-        }
-        mutation.mutate(params, {
-          onSuccess: () => {
-            onHide()
-            const queryKey = getSourceKey()
-            queryClient.invalidateQueries(queryKey)
-          },
-        })
       }
     }
     const goStep = (i: number) => {
@@ -150,7 +147,7 @@ const DataSourceModal = observer(
           orient="fullright"
           width={800}
           title={`${op === 'create' ? '新增' : '修改'}数据源: ${
-            curkind ? curkind.name : ''
+            curResInfo ? curResInfo.showname || curResInfo.name : ''
           }`}
           footer={
             <div tw="flex justify-end space-x-2">
@@ -183,8 +180,6 @@ const DataSourceModal = observer(
           />
           <ModalContent css={state.step === 1 && tw`px-0 pt-0`}>
             {(() => {
-              let curResInfo = null
-
               switch (status) {
                 case 'loading':
                   return (
@@ -205,7 +200,14 @@ const DataSourceModal = observer(
                       <>
                         <p tw="pt-2 pb-3 font-medium">
                           请选择一个数据库，您也可以参考
-                          <a href="##" tw="text-link">
+                          <a
+                            href={getHelpCenterLink(
+                              '/bigdata/dataplat/manual/data_up_cloud/source_data/data_summary/'
+                            )}
+                            target="_blank"
+                            tw="text-link"
+                            rel="noreferrer"
+                          >
                             数据库文档
                           </a>
                           进行查看配置
@@ -218,13 +220,20 @@ const DataSourceModal = observer(
                       </>
                     )
                   }
-                  curResInfo = resInfos.find(
-                    (info) => info.name === curkind.name
-                  )
+                  // curResInfo = resInfos.find(
+                  //   (info) => info.name === curkind.name
+                  // )
                   return (
                     curkind &&
                     curResInfo && (
-                      <DataSourceForm ref={form} resInfo={curResInfo} />
+                      <DataSourceForm
+                        getFormData={getFormData}
+                        // ref={form}
+                        resInfo={{
+                          ...curResInfo,
+                          source_type: curkind.source_type,
+                        }}
+                      />
                     )
                   )
                 default:
