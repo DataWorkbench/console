@@ -67,7 +67,7 @@ const customStyles = css`
       .collapse-panel {
         ${tw`bg-neut-16`}
         .tab-title {
-          ${tw`text-white`}
+          ${tw`text-white font-medium`}
         }
         button.is-text,
         .tab-description {
@@ -117,6 +117,14 @@ const customStyles = css`
             }
           }
         }
+      }
+    }
+  }
+
+  .page-tab-container {
+    .collapse-panel {
+      .tab-title {
+        ${tw`font-medium`}
       }
     }
   }
