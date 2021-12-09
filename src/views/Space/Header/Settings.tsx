@@ -93,7 +93,7 @@ export const Settings = ({ darkMode }) => {
       <span tw="ml-5 mr-2 dark:text-white font-semibold">
         {get(window, 'USER.user_name', '')}
       </span>
-      <span tw="mr-6 inline-block bg-neut-2 dark:bg-neut-13 dark:text-white px-2 py-0.5 rounded-2xl">
+      <span tw="leading-5 mr-5 inline-block bg-neut-2 dark:bg-neut-13 dark:text-white px-2 py-0.5 rounded-2xl">
         项目所有者
       </span>
     </Center>
