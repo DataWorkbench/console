@@ -16,9 +16,9 @@ const FuncWrapper = styled('div')(({ current }: { current: boolean }) => [
       &::after {
         position: absolute;
         content: ' ';
-        width: 60%;
+        width: 24px;
         height: 0.125rem;
-        left: 20%;
+        left: calc(50% - 12px);
         bottom: 1px;
         background-color: ${theme('colors.green.11')};
       }
@@ -43,7 +43,7 @@ export const Navs = ({ mod }: NavsProps) => {
       {funcList.map(({ title, name }) => (
         <FuncWrapper key={name} current={mod === name}>
           <Link
-            tw="inline-block py-3 "
+            tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white"
             onClick={() => handNavClick(name)}
             to={`/${regionId}/workspace/${spaceId}/${name}`}
           >

@@ -46,7 +46,7 @@ export const Header = observer(() => {
         <BackMenu />
         <Center
           size={32}
-          tw="text-sm rounded-sm bg-[#cfafe9] text-[#934bc5] font-semibold"
+          tw="text-sm rounded-sm bg-[#F1E4FE] text-[#A855F7] font-semibold"
         >
           {getShortSpaceName(space?.name)}
         </Center>
