@@ -59,7 +59,7 @@ const WorkSpace = observer(
       scrollElem: null,
       cardView: true,
       defaultColumns: [
-        { title: '空间名称/id', dataIndex: 'id', fixedInSetting: true },
+        { title: '空间名称/ID', dataIndex: 'id', fixedInSetting: true },
         { title: '空间状态', dataIndex: 'status' },
         { title: '空间所有者', dataIndex: 'owner' },
         // { title: '成员数', dataIndex: 'name' },

@@ -11,7 +11,6 @@ import {
   RadioGroup,
   RadioButton,
 } from '@QCFE/lego-ui'
-import { Icon as QIcon } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
@@ -25,7 +24,14 @@ import {
   useMutationCluster,
   getFlinkClusterKey,
 } from 'hooks'
-import { Modal, FlexBox, Center, KVTextAreaField, AffixLabel } from 'components'
+import {
+  Modal,
+  FlexBox,
+  Center,
+  KVTextAreaField,
+  AffixLabel,
+  TextLink,
+} from 'components'
 
 const { CollapseItem } = Collapse
 const { TextField, SelectField, NumberField } = Form
@@ -812,10 +818,11 @@ const ClusterModal = observer(
             </div>
             <div tw="pt-4 pb-2 border-b border-neut-13">
               收费标准详见
-              <a href="###" className="link">
+              {/* <a href="###" className="link"> */}
+              <TextLink href="###" hasIcon={false}>
                 《大数据平台计费说明》
-                <QIcon name="if-external-link" />
-              </a>
+              </TextLink>
+              {/* <QIcon name="if-external-link" /> */}
             </div>
             <div>
               <FlexBox tw="justify-between">

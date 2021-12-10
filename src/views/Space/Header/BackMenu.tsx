@@ -93,7 +93,7 @@ export const BackMenu = () => {
         >
           <Icon
             name="if-ninedot"
-            style={{ fontSize: 32 }}
+            style={{ fontSize: 40 }}
             tw="dark:text-white"
           />
         </Center>

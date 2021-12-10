@@ -32,7 +32,7 @@ export const Tooltip = (
     ...omit(rest, 'data-tw'),
     content: (
       <div
-        css={hasPadding && tw`px-2 py-3`}
+        css={hasPadding && tw`px-3 py-2`}
         onClick={() => {
           instance?.hide()
         }}

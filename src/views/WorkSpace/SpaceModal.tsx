@@ -13,7 +13,7 @@ const { TextField, RadioGroupField, TextAreaField } = Form
 
 const columns = [
   {
-    title: '空间名称/id',
+    title: '空间名称/ID',
     width: 220,
     dataIndex: 'id',
     render: (field: string, row: any) => (

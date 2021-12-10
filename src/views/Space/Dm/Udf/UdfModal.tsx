@@ -17,6 +17,7 @@ import {
   AffixLabel,
   PopConfirm,
   SelectWithRefresh,
+  ActionLink,
 } from 'components'
 import {
   getResourceKey,
@@ -412,15 +413,15 @@ const UdfModal = observer(() => {
                                   <div>
                                     请选择 Jar，如需选择新的 Jar
                                     包资源，可以在资源管理中
-                                    <a
+                                    <ActionLink
                                       href="./resource"
                                       target="_blank"
-                                      className="text-action"
+                                      // className="text-action"
                                       // tw="text-green-11"
                                     >
                                       上传资源
                                       <Icon name="if-external-link" />
-                                    </a>
+                                    </ActionLink>
                                   </div>
                                 ),
                                 status: 'error',
@@ -429,15 +430,14 @@ const UdfModal = observer(() => {
                             help={
                               <div>
                                 如需选择新的 Jar 包资源，可以在资源管理中
-                                <a
+                                <ActionLink
                                   href="./resource"
                                   target="_blank"
-                                  className="text-action"
+                                  // className="text-action"
                                   // tw="text-green-11"
                                 >
                                   上传资源
-                                  <Icon name="if-external-link" />
-                                </a>
+                                </ActionLink>
                               </div>
                             }
                             disabled={op === 'detail'}

@@ -43,41 +43,6 @@ const buttonStyles = css`
         }
       }
     }
-
-    a {
-      &.link {
-        color: #2193d3;
-        ${tw`underline`}
-        &:hover {
-          color: #0ea5e9;
-        }
-        &:active {
-          color: #0369a1;
-        }
-      }
-      &.text-action {
-        color: #f7fcff;
-        ${tw`hover:text-green-11 active:text-green-12 underline`}
-      }
-    }
-  }
-  a {
-    &.link {
-      color: #2563eb;
-      ${tw`underline`}
-      &:hover {
-        color: #3b82f6;
-      }
-      &:active {
-        color: #1d4ed8;
-      }
-    }
-    &.text-action {
-      ${tw`hover:text-green-12 text-green-11 active:text-green-13 underline`}
-    }
-    .if {
-      ${tw`inline-block`}
-    }
   }
 `
 

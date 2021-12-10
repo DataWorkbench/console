@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 import { Icon } from '@QCFE/lego-ui'
 import { Tooltip } from 'components/Tooltip'
 import { Center } from 'components/Center'
+import tw, { styled, css } from 'twin.macro'
 
 // const TooltipWrapper = styled(Tooltip)(() => [
 //   css`
@@ -16,6 +17,19 @@ import { Center } from 'components/Center'
 //     }
 //   `,
 // ])
+
+const IconBoxWithTootip = styled(Center)(() => {
+  return [
+    css`
+      &{
+        [aria-expanded='true'] {
+          .icon svg.qicon {
+            ${tw`fill-[#324558]  dark:fill-[#fff]`}
+          }
+      }
+    `,
+  ]
+})
 
 export const AffixLabel = ({
   required = true,
@@ -54,19 +68,32 @@ export const AffixLabel = ({
       {required && <b tw="text-red-10 mr-1">*</b>}
       <span tw="mr-1 font-medium break-all">{children}</span>
       {help && (
-        <Tooltip
-          tw="break-all"
-          content={help}
-          placement={placement}
-          trigger={trigger}
-          theme={theme}
-          disabled={disabled}
-          hasPadding
-        >
-          <Center>
-            <Icon name="information" size={16} />
-          </Center>
-        </Tooltip>
+        <IconBoxWithTootip>
+          <Tooltip
+            tw="break-all"
+            content={help}
+            placement={placement}
+            trigger={trigger}
+            theme={theme}
+            disabled={disabled}
+            hasPadding
+          >
+            <Center>
+              <Icon
+                name="information"
+                // tw="label-help-icon-light dark:label-help-icon-dark"
+                css={[
+                  css`
+                    svg {
+                      ${tw`text-white fill-[#939ea9] dark:text-[#000] dark:fill-[#939ea9]`}
+                    }
+                  `,
+                ]}
+                size={16}
+              />
+            </Center>
+          </Tooltip>
+        </IconBoxWithTootip>
       )}
     </div>
   )

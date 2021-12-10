@@ -1,7 +1,7 @@
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
-import { Guide, GuideProps } from 'components'
+import { Guide, GuideProps, TextLink } from 'components'
 import { getHelpCenterLink } from 'utils'
 import SexangleImg from 'assets/svgr/sexangle.svg'
 
@@ -72,13 +72,13 @@ const SpaceListsEmpty = () => {
               </Button>
             </div>
             <div css={[tw`space-x-3 mt-3`, !isModal && tw`mb-8`]}>
-              <a href="###" className="link">
+              <TextLink href="###" hasIcon={false}>
                 使用指南
-              </a>
+              </TextLink>
               <span tw="text-link">|</span>
-              <a href="###" className="link">
+              <TextLink a href="###" hasIcon={false}>
                 使用指南
-              </a>
+              </TextLink>
             </div>
           </div>
         </div>

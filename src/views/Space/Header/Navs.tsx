@@ -8,17 +8,19 @@ interface NavsProps {
 }
 
 const FuncWrapper = styled('div')(({ current }: { current: boolean }) => [
-  tw`relative inline-block mr-6 text-sm hover:(dark:text-white)`,
-  current && tw`font-semibold relative dark:text-white`,
+  tw`relative text-sm hover:(dark:text-white) px-1`,
+  current
+    ? tw`font-semibold relative dark:text-white text-neut-19`
+    : tw`text-neut-13 dark:text-neut-8 `,
 
   current &&
     css`
       &::after {
         position: absolute;
         content: ' ';
-        width: 60%;
+        width: 24px;
         height: 0.125rem;
-        left: 20%;
+        left: calc(50% - 12px);
         bottom: 1px;
         background-color: ${theme('colors.green.11')};
       }
@@ -39,11 +41,11 @@ export const Navs = ({ mod }: NavsProps) => {
     globalStore.set({ darkMode })
   }
   return (
-    <div>
+    <div tw="flex gap-6">
       {funcList.map(({ title, name }) => (
         <FuncWrapper key={name} current={mod === name}>
           <Link
-            tw="inline-block py-3 "
+            tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-medium"
             onClick={() => handNavClick(name)}
             to={`/${regionId}/workspace/${spaceId}/${name}`}
           >

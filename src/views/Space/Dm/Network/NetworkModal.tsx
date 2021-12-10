@@ -7,7 +7,13 @@ import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import { assign, flatten } from 'lodash-es'
 import { useParams } from 'react-router-dom'
-import { Modal, FlexBox, AffixLabel, SelectWithRefresh } from 'components'
+import {
+  Modal,
+  FlexBox,
+  AffixLabel,
+  SelectWithRefresh,
+  TextLink,
+} from 'components'
 
 import {
   useStore,
@@ -194,15 +200,15 @@ const NetworkModal = observer(
                 help={
                   <>
                     如需选择新的 VPC，您可以
-                    <a
+                    <TextLink
                       href="/iaas/vpc/create"
                       target="_blank"
-                      className="link"
+                      // className="link"
                       // tw="text-green-11"
+                      hasIcon
                     >
                       新建 VPC 网络
-                      <Icon name="if-external-link" />
-                    </a>
+                    </TextLink>
                   </>
                 }
                 schemas={[
@@ -218,14 +224,14 @@ const NetworkModal = observer(
                         <span tw="text-neut-8 ml-2">
                           如需选择新的 VPC，您可以
                         </span>
-                        <a
+                        <TextLink
                           href="/iaas/vpc/create"
                           target="_blank"
-                          className="link"
+                          hasIcon
+                          // className="link"
                         >
                           新建 VPC 网络
-                          <Icon name="if-external-link" />
-                        </a>
+                        </TextLink>
                       </>
                     ),
                   },
@@ -276,7 +282,7 @@ const NetworkModal = observer(
                     help: (
                       <>
                         不能为空, <span tw="text-neut-8 ml-2">您可以</span>
-                        <a
+                        <TextLink
                           href={
                             params.router_id
                               ? `/${regionId}/routers/${params.router_id}`
@@ -284,11 +290,11 @@ const NetworkModal = observer(
                           }
                           target="_blank"
                           rel="noreferrer"
-                          className="link"
+                          hasIcon
+                          // className="link"
                         >
                           新建私有网络
-                          <Icon name="if-external-link" />
-                        </a>
+                        </TextLink>
                       </>
                     ),
                   },
@@ -296,7 +302,7 @@ const NetworkModal = observer(
                 help={
                   <>
                     您可以
-                    <a
+                    <TextLink
                       href={
                         params.router_id
                           ? `/${regionId}/routers/${params.router_id}`
@@ -305,11 +311,11 @@ const NetworkModal = observer(
                       target="_blank"
                       // tw="text-green-11"
                       rel="noreferrer"
-                      className="link"
+                      hasIcon
+                      // className="link"
                     >
                       新建私有网络
-                      <Icon name="if-external-link" />
-                    </a>
+                    </TextLink>
                   </>
                 }
               />
