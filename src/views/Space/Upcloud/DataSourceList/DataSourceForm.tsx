@@ -594,6 +594,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
                   bottomTextVisible
                 />
                 <Button
+                  disabled={isViewMode}
                   onClick={() => {
                     queryClient.invalidateQueries(getNetworkKey())
                   }}

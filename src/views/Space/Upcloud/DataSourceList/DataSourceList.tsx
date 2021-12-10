@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, findKey, pick } from 'lodash-es'
+import { get, pick } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
@@ -19,7 +19,7 @@ import {
   ToolBarRight,
   utils,
 } from '@QCFE/qingcloud-portal-ui'
-import { useQuerySource, useMutationSource, sourceTypes, useStore } from 'hooks'
+import { useQuerySource, useMutationSource, useStore } from 'hooks'
 import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
 
 import DataSourceModal from './DataSourceModal'
@@ -119,22 +119,6 @@ const DataSourceList = observer(() => {
   }, [regionId, spaceId, setFilter])
 
   const handleMutate = (params: any) => {
-    // if (['disable', 'enable', 'delete', 'ping'].includes(curOp)) {
-    //   let params = null
-    //   if (curOp === 'ping') {
-    //     params = {
-    //       op: curOp,
-    //       source_type: get(opSourceList, '[0].source_type'),
-    //       url: get(opSourceList, '[0].url'),
-    //     }
-    //   } else {
-    //     params = {
-    //       op: curOp,
-    //       sourceIds: opSourceList.map((r) => r.source_id),
-    //     }
-    //   }
-
-    // }
     mutation.mutate(params, {
       onSuccess: () => {
         mutateOperation()
@@ -206,7 +190,7 @@ const DataSourceList = observer(() => {
       title: '数据源类型',
       dataIndex: 'source_type',
       render: (v: number) => {
-        return findKey(sourceTypes, (o) => o === v)
+        return sourceKinds.find((kind) => kind.source_type === v)?.name
       },
     },
     {
@@ -214,10 +198,12 @@ const DataSourceList = observer(() => {
       dataIndex: 'url',
       width: 250,
       render: (v: any, row: any) => {
-        const tp = findKey(sourceTypes, (o) => o === row.source_type)
+        const kindName = sourceKinds.find(
+          (kind) => kind.source_type === row.source_type
+        )?.name
 
-        if (tp) {
-          const key = tp.toLowerCase()
+        if (kindName) {
+          const key = kindName.toLowerCase()
           const urlObj = get(v, key)
           // const networkId = get(urlObj, 'network.vpc_network.network_id')
           const networkName = get(row, 'network_name')

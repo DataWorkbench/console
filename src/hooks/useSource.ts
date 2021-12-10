@@ -13,35 +13,11 @@ import {
 } from 'stores/api'
 import { get } from 'lodash-es'
 
-export const sourceTypes = {
-  MySQL: 1,
-  PostgreSQL: 2,
-  Kafka: 3,
-  S3: 4,
-  ClickHouse: 5,
-  Hbase: 6,
-  Ftp: 7,
-  HDFS: 8,
-}
-
-type SourceType =
-  | 'MySQL'
-  | 'PostgreSQL'
-  | 'Kafka'
-  | 'S3'
-  | 'ClickHouse'
-  | 'Hbase'
-  | 'Ftp'
-  | 'HDFS'
-
 export const useQuerySourceKind = (regionId: string, spaceId: string) => {
   const queryKey = 'sourcekind'
   return useQuery(queryKey, async () => {
     const ret = await loadSourceKind({ spaceId, regionId })
-    return get(ret, 'kinds', []).map((kind: { name: SourceType }) => ({
-      ...kind,
-      source_type: sourceTypes[kind.name],
-    }))
+    return get(ret, 'kinds', [])
   })
 }
 
