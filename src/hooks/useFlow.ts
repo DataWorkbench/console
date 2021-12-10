@@ -185,7 +185,8 @@ export const useMutationReleaseStreamJob = () => {
     workFlowStore: { curJob },
   } = useStore()
   const { regionId, spaceId } = useParams<IRouteParams>()
-  return useMutation(async () =>
-    releaseStreamJob({ regionId, spaceId, jobId: curJob?.id })
+  return useMutation(
+    async (params: Record<string, string | boolean | number>) =>
+      releaseStreamJob({ ...params, regionId, spaceId, jobId: curJob?.id })
   )
 }
