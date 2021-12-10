@@ -404,7 +404,7 @@ const UdfModal = observer(() => {
                             onMenuScrollToBottom={loadData}
                             bottomTextVisible
                             validateOnBlur
-                            valueKey="id"
+                            valueKey="resource_id"
                             clearable
                             schemas={[
                               {
