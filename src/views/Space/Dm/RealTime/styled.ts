@@ -15,7 +15,7 @@ export const StreamToolBar = styled('div')(
 export const ScheForm = styled(Form)(() => [
   css`
     &.is-horizon-layout {
-      ${tw`pl-5`}
+      ${tw`pl-0`}
       .field {
         > .label {
           ${tw`w-28`}

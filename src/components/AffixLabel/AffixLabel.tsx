@@ -27,7 +27,7 @@ export const AffixLabel = ({
   theme = 'darker',
 }: {
   required?: boolean
-  help?: string
+  help?: ReactNode
   children?: ReactNode
   placement?:
     | 'top'
