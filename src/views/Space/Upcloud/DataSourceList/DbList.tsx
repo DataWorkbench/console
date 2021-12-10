@@ -1,4 +1,5 @@
 import tw, { styled } from 'twin.macro'
+import { SourceKindImg } from './styled'
 
 const ItemWrapper = styled('div')(({ selected }: { selected: boolean }) => [
   tw`flex p-3 border rounded-sm border-neut-2 cursor-pointer hover:border-green-11 transition-colors bg-no-repeat bg-right-bottom`,
@@ -13,7 +14,7 @@ interface IDbList {
 
 const DbList = ({ items, current, onChange }: IDbList) => (
   <div tw="flex flex-wrap justify-between">
-    {items.map(({ name, showname, img, desc }) => (
+    {items.map(({ name, showname, desc }) => (
       <div
         onClick={() => onChange(name)}
         key={name}
@@ -23,7 +24,9 @@ const DbList = ({ items, current, onChange }: IDbList) => (
           className="group source-item-bg"
           selected={current?.name === name}
         >
-          <div tw="w-10 flex-shrink-0">{img}</div>
+          <div tw="w-10 flex-shrink-0">
+            <SourceKindImg type={name} />
+          </div>
           <div tw="flex-1 pl-2 leading-5">
             <div tw="font-medium group-hover:text-green-11">
               {showname || name}

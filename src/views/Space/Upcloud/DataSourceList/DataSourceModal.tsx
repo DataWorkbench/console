@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { Modal, ModalStep, ModalContent } from 'components'
@@ -11,63 +11,14 @@ import {
   getSourceKey,
   useStore,
 } from 'hooks'
+import { get } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Global, css } from '@emotion/react'
 import { getHelpCenterLink } from 'utils'
 
 import sourceListBg from 'assets/source-list.svg'
-
-import MysqlImg from 'assets/svgr/sources/mysql.svg'
-import PostgresqlImg from 'assets/svgr/sources/postgresql.svg'
-// import S3Img from 'assets/svgr/sources/aws-s3.svg'
-import ClickHouseImg from 'assets/svgr/sources/clickhouse.svg'
-import HbaseImg from 'assets/svgr/sources/hbase.svg'
-import KafkaImg from 'assets/svgr/sources/kafka.svg'
-import FtpImg from 'assets/svgr/sources/ftp.svg'
-import HdfsImg from 'assets/svgr/sources/hadoop.svg'
 import DataSourceForm from './DataSourceForm'
 import DbList from './DbList'
-
-const resInfos = [
-  {
-    name: 'MySQL',
-    img: <MysqlImg />,
-    desc: '是一个完全托管的数据库服务，可使用世界上最受欢迎的开源数据库来部署云原生应用程序。',
-  },
-  {
-    name: 'PostgreSQL',
-    img: <PostgresqlImg />,
-    desc: '开源的对象-关系数据库数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。 ',
-  },
-  // { name: 'S3', img: <S3Img />, desc: '是一种面向 Internet 的存储服务。', source_type: 4, },
-  {
-    name: 'ClickHouse',
-    img: <ClickHouseImg />,
-    desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
-  },
-  {
-    name: 'Hbase',
-    showname: 'HBase',
-    img: <HbaseImg />,
-    desc: 'HBase 是一个开源的非关系型分布式数据库，实现的编程语言为 Java。它可以对稀疏文件提供极高的容错率。 ',
-  },
-  {
-    name: 'Kafka',
-    img: <KafkaImg />,
-    desc: '由Scala和Java编写，目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。',
-  },
-  {
-    name: 'Ftp',
-    showname: 'FTP',
-    img: <FtpImg />,
-    desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
-  },
-  {
-    name: 'HDFS',
-    img: <HdfsImg />,
-    desc: '由Scala和Java编写，目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。',
-  },
-]
 
 interface DataSourceModalProp {
   onHide?: () => void
@@ -78,11 +29,11 @@ const DataSourceModal = observer(
     const { regionId, spaceId } =
       useParams<{ regionId: string; spaceId: string }>()
     const {
-      dataSourceStore: { op, opSourceList },
+      dataSourceStore: { op, opSourceList, sourceKinds },
     } = useStore()
 
     const [state, setState] = useImmer({
-      step: op === 'update' ? 1 : 0,
+      step: ['update', 'view'].includes(op) ? 1 : 0,
       dbName: '',
     })
     const getFormData = useRef<() => any>()
@@ -97,7 +48,7 @@ const DataSourceModal = observer(
       op === 'create'
         ? kinds?.find((k) => k.name === state.dbName)
         : kinds?.find((k) => k.source_type === opSourceList[0]?.source_type)
-    const curResInfo = resInfos.find((info) => info.name === curkind?.name)
+    const curKindInfo = sourceKinds.find((info) => info.name === curkind?.name)
 
     const handleDbSelect = (name: string) => {
       setState((draft) => {
@@ -105,8 +56,10 @@ const DataSourceModal = observer(
         draft.dbName = name
       })
     }
-    const handleSave = () => {
-      if (getFormData?.current) {
+    const handleSubmitClick = () => {
+      if (op === 'view') {
+        onHide()
+      } else if (getFormData?.current) {
         const data = (getFormData as any).current()
         if (data) {
           const params = {
@@ -132,6 +85,7 @@ const DataSourceModal = observer(
         draft.step = i
       })
     }
+    const opTxt = get({ create: '新增', update: '修改', view: '查看' }, op)
     return (
       <>
         <Global
@@ -146,8 +100,8 @@ const DataSourceModal = observer(
           onCancel={onHide}
           orient="fullright"
           width={800}
-          title={`${op === 'create' ? '新增' : '修改'}数据源: ${
-            curResInfo ? curResInfo.showname || curResInfo.name : ''
+          title={`${opTxt}数据源: ${
+            curKindInfo ? curKindInfo.showname || curKindInfo.name : ''
           }`}
           footer={
             <div tw="flex justify-end space-x-2">
@@ -164,9 +118,9 @@ const DataSourceModal = observer(
                   <Button
                     loading={mutation.isLoading}
                     type="primary"
-                    onClick={handleSave}
+                    onClick={handleSubmitClick}
                   >
-                    确定
+                    {op === 'view' ? '关闭' : opTxt}
                   </Button>
                 </>
               )}
@@ -193,7 +147,7 @@ const DataSourceModal = observer(
                   if (state.step === 0) {
                     const items = kinds
                       .map(({ name }: { name: string }) =>
-                        resInfos.find((info) => info.name === name)
+                        sourceKinds.find((info) => info.name === name)
                       )
                       .filter((n: any) => n)
                     return (
@@ -220,17 +174,14 @@ const DataSourceModal = observer(
                       </>
                     )
                   }
-                  // curResInfo = resInfos.find(
-                  //   (info) => info.name === curkind.name
-                  // )
+
                   return (
                     curkind &&
-                    curResInfo && (
+                    curKindInfo && (
                       <DataSourceForm
-                        getFormData={getFormData}
-                        // ref={form}
+                        getFormData={getFormData as any}
                         resInfo={{
-                          ...curResInfo,
+                          ...curKindInfo,
                           source_type: curkind.source_type,
                         }}
                       />

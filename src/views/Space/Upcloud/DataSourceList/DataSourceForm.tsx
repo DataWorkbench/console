@@ -117,7 +117,10 @@ const compInfo = {
         status: 'error',
       },
       {
-        rule: (value: string) => strlen(value) >= 1 && strlen(value) <= 64,
+        rule: (value: string) => {
+          const l = strlen(value)
+          return l >= 1 && l <= 64
+        },
         help: '最大长度: 64, 最小长度: 1',
         status: 'error',
       },
@@ -126,7 +129,6 @@ const compInfo = {
   port: {
     name: 'port',
     label: '数据库端口号',
-    // placeholder: '请输入端口信息',
     schemas: [
       {
         rule: {
@@ -308,9 +310,13 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
     dmStore,
   } = useStore()
   const sourceInfo =
-    op === 'update' && opSourceList.length > 0 && opSourceList[0]
+    ['update', 'view'].includes(op) &&
+    opSourceList.length > 0 &&
+    opSourceList[0]
   const urlType = resInfo.name.toLowerCase()
   const fields = getFieldsInfo(urlType)
+
+  const isViewMode = op === 'view'
 
   useMount(() => {
     if (sourceInfo) {
@@ -439,6 +445,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
               placeholder="请输入数据源名称（自定义）"
               help={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
               validateOnChange
+              disabled={isViewMode}
               schemas={[
                 {
                   rule: { matchRegex: nameMatchRegex },
@@ -461,6 +468,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
               defaultValue={get(sourceInfo, 'comment', '')}
               rows={4}
               label="数据源描述"
+              disabled={isViewMode}
               resize
               placeholder="请填写数据库的描述信息"
               validateOnChange
@@ -495,6 +503,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
             <RadioGroupField
               name="utype"
               value={network.type}
+              disabled={isViewMode}
               label={<AffixLabel>网络连接方式</AffixLabel>}
               onChange={(v) =>
                 setNetWork((draft) => {
@@ -532,6 +541,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
                   value={network.id}
                   placeholder="请选择网络配置"
                   validateOnChange
+                  disabled={isViewMode}
                   label={<AffixLabel>网络配置</AffixLabel>}
                   onChange={(v: string) => {
                     setNetWork((draft) => {
@@ -636,6 +646,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
                 <FieldComponent
                   key={name}
                   name={name}
+                  disabled={isViewMode}
                   defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
                   validateOnChange
                   schemas={schemas}
@@ -661,6 +672,19 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
                   开始测试
                 </Button>
               </Control>
+              {mutation.isError && (
+                <div
+                  tw="text-red-10 flex items-center mt-2"
+                  css={css`
+                    svg {
+                      ${tw`fill-[#CA2621] text-white`}
+                    }
+                  `}
+                >
+                  <Icon name="error" />
+                  不可用，${get(mutation, 'error.message', '')}
+                </div>
+              )}
             </Field>
           </CollapseItem>
         </CollapseWrapper>

@@ -57,7 +57,7 @@ export const useQuerySource = (filter: IDataSourceParams) => {
 }
 
 interface MutationSourceParams {
-  op: 'disable' | 'enable' | 'delete' | 'create' | 'update' | 'ping'
+  op: 'disable' | 'enable' | 'delete' | 'create' | 'update' | 'ping' | 'view'
   source_type?: number
   sourceIds?: string[]
   sourceId?: string
