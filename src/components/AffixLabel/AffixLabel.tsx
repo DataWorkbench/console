@@ -23,7 +23,9 @@ const IconBoxWithTootip = styled(Center)(() => {
     css`
       &{
         [aria-expanded='true'] {
-        ${tw`label-help-icon-light-hover dark:label-help-icon-dark-hover`}
+          .icon svg.qicon {
+            ${tw`fill-[#324558]  dark:fill-[#fff]`}
+          }
       }
     `,
   ]
@@ -79,7 +81,14 @@ export const AffixLabel = ({
             <Center>
               <Icon
                 name="information"
-                tw="label-help-icon-light dark:label-help-icon-dark"
+                // tw="label-help-icon-light dark:label-help-icon-dark"
+                css={[
+                  css`
+                    svg {
+                      ${tw`text-white fill-[#939ea9] dark:text-[#000] dark:fill-[#939ea9]`}
+                    }
+                  `,
+                ]}
                 size={16}
               />
             </Center>

@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { TextLink } from '../Link'
 
 export interface GuideItemProps {
   title: string
@@ -29,9 +30,11 @@ export const GuideItem: FC<GuideItemProps> = ({
         )}
       </div>
       <div tw="text-neut-8 mt-4 w-10/12">{desc}</div>
-      <a href={link} className="link">
+      {/* <a href={link} className="link"> */}
+      <TextLink hasIcon={false} href={link}>
         详情介绍
-      </a>
+      </TextLink>
+      {/* </a> */}
     </div>
   )
 }

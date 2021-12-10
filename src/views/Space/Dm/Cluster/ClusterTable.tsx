@@ -9,7 +9,14 @@ import {
   ToolBar,
   localstorage,
 } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, Modal, Tooltip, AffixLabel } from 'components'
+import {
+  FlexBox,
+  Center,
+  Modal,
+  Tooltip,
+  AffixLabel,
+  TextLink,
+} from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
 import {
@@ -242,16 +249,16 @@ const ClusterTable = observer(
           render: (v: any, row: any) => (
             <FlexBox tw="items-center">
               <Button type="text">
-                <a
+                <TextLink
                   href={`//${row.web_ui}`}
                   target="_blank"
                   tw="text-white!"
                   rel="noreferrer"
-                  className="link"
+                  hasIcon
+                  // className="link"
                 >
                   Flink UI
-                  <Icon name="if-external-link" />
-                </a>
+                </TextLink>
               </Button>
               <Button
                 type="text"

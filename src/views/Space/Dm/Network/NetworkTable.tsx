@@ -14,7 +14,7 @@ import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
 import { css } from 'twin.macro'
 
-import { FlexBox, Center, Modal } from 'components'
+import { FlexBox, Center, Modal, TextLink } from 'components'
 import {
   useStore,
   useQueryNetworks,
@@ -83,15 +83,15 @@ const NetworkTable = observer(() => {
         dataIndex: 'router_id',
         render: (v: string) =>
           v ? (
-            <a
+            <TextLink
               href={`/${regionId}/routers/${v}`}
               target="_blank"
               rel="noreferrer"
-              className="link"
+              hasIcon
+              // className="link"
             >
               {v}
-              <Icon name="if-external-link" />
-            </a>
+            </TextLink>
           ) : null,
       },
       {
@@ -99,15 +99,15 @@ const NetworkTable = observer(() => {
         dataIndex: 'vxnet_id',
         render: (v: string) =>
           v ? (
-            <a
+            <TextLink
               href={`/${regionId}/vxnets/${v}`}
               target="_blank"
               rel="noreferrer"
-              className="link"
+              hasIcon
+              // className="link"
             >
               {v}
-              <Icon name="if-external-link" />
-            </a>
+            </TextLink>
           ) : null,
       },
       {

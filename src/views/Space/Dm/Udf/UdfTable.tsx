@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 
 import { Table } from 'views/Space/styled'
 import { useQueryUdfList, useStore } from 'hooks'
-import { TextHighlight } from 'components'
+import { TextHighlight, TextLink } from 'components'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
@@ -196,15 +196,16 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           <Level as="nav">
             <LevelLeft>{udfTypesComment[tp]?.comment}</LevelLeft>
             <LevelRight>
-              <a
+              <TextLink
                 href="https://nightlies.apache.org/flink/flink-docs-release-1.11/dev/table/functions/udfs.html"
                 target="_blank"
                 // tw="text-link"
                 rel="noreferrer"
-                className="link"
+                hasIcon={false}
+                // className="link"
               >
                 查看详情 →
-              </a>
+              </TextLink>
             </LevelRight>
           </Level>
         }
