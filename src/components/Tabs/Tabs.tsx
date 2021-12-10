@@ -72,14 +72,7 @@ export const Tabs: FC<TabsProps> = ({
                   handleTabClick(name)
                 }}
               >
-                <span
-                  css={[
-                    curPanelName === name &&
-                      tw`inline-block transform -translate-y-0.5`,
-                  ]}
-                >
-                  {label}
-                </span>
+                <span>{label}</span>
               </div>
             )
           })}

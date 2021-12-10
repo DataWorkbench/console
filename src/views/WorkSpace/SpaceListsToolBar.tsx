@@ -97,12 +97,22 @@ const SpaceListsToolBar = observer(() => {
               </Menu>
             }
           >
-            <Button>
-              <Center tw="justify-between space-x-2">
-                <Icon name="if-layout-four" tw="text-base mr-1" />
+            <Button tw="w-32 justify-start">
+              <Center tw="">
+                <Icon
+                  name="if-layout-four"
+                  style={{
+                    width: '14px',
+                    height: '14px',
+                    lineHeight: '14px',
+                  }}
+                  tw="mr-1"
+                />
                 <span>更多操作</span>
               </Center>
-              <Icon name="caret-down" />
+              <div tw="ml-auto">
+                <Icon name="caret-down" />
+              </div>
             </Button>
           </Dropdown>
         )}

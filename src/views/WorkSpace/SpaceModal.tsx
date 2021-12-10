@@ -213,8 +213,11 @@ const SpaceModal = observer(
                   />
                 </div>
                 {curSpaceOpt === 'delete' && (
-                  <div tw="pt-3 space-y-1 border-t border-neut-2">
-                    <div>*请在下方输入框中输入&quot;delete&quot;以确认操作</div>
+                  <div tw="pt-6 space-y-1 border-t border-neut-2">
+                    <div>
+                      <span tw="text-red-10">*</span>
+                      请在下方输入框中输入&quot;delete&quot;以确认操作
+                    </div>
                     <div>
                       <Input
                         type="text"

@@ -150,13 +150,17 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           },
           {
             onSuccess: (data) => {
-              const blob = new Blob([data])
+              const blob = new Blob([data], {
+                type: 'application/x-java-archive',
+              })
               const ele = document.createElement('a')
+              ele.style.display = 'none'
               ele.download = `${row.name}.jar`
               ele.href = window.URL.createObjectURL(blob)
+              document.body.appendChild(ele)
               ele.click()
-              document.body.removeChild(ele)
               window.URL.revokeObjectURL(ele.href)
+              document.body.removeChild(ele)
             },
           }
         )

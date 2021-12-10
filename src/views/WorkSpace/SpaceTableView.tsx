@@ -3,13 +3,14 @@ import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get, omitBy } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import tw from 'twin.macro'
+import tw, { css } from 'twin.macro'
 import { formatDate } from 'utils/convert'
 import { Menu } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { useWorkSpaceContext } from 'contexts'
 import { useQueryPageWorkSpace } from 'hooks'
 import { Tooltip, FlexBox } from 'components'
+import { useHistory } from 'react-router-dom'
 import TableRowOpt from './TableRowOpt'
 
 const { MenuItem } = Menu
@@ -33,6 +34,9 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     name: 'asc',
     created: 'desc',
   })
+
+  const history = useHistory()
+
   interface IFilter {
     regionId: string
     limit: number
@@ -69,11 +73,21 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             // width: 260,
             render: (field: string, row: any) => (
               <div tw="flex items-center w-full">
-                <div tw="bg-neut-3 rounded-full p-1 flex items-center justify-center">
-                  <Icon name="project" size="small" />
+                <div
+                  className="list-icon-wrap"
+                  tw="bg-neut-3 rounded-full p-1 flex items-center justify-center"
+                >
+                  <Icon name="project" size="small" className="list-icon" />
                 </div>
                 <div tw="ml-2 flex-1 overflow-hidden">
-                  <div tw="font-semibold truncate" title={row.name}>
+                  <div
+                    className="row-name"
+                    tw="font-semibold truncate max-w-[186px] cursor-pointer"
+                    title={row.name}
+                    onClick={() =>
+                      history.push(`${regionId}/workspace/${field}/upcloud`)
+                    }
+                  >
                     {row.name}
                   </div>
                   <div tw="text-neut-8">{field}</div>
@@ -191,7 +205,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             dataIndex,
             // width: 200,
             render: (field: string) => (
-              <div tw="h-10 truncate">{field || '暂无描述'}</div>
+              <div tw="truncate">{field || '暂无描述'}</div>
             ),
           }
         }
@@ -221,11 +235,13 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     )
   }, [
     defaultColumns,
-    regionId,
-    ifExceedMaxWidth,
-    sort,
-    setFilter,
+    sort.name,
+    sort.created,
     filter.status,
+    ifExceedMaxWidth,
+    history,
+    regionId,
+    setFilter,
   ])
 
   const filterColumn = columnSettings
@@ -294,7 +310,23 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
       onSelect={handleSelect}
-      tw="table-auto"
+      css={[
+        tw`table-auto`,
+        css`
+          .table-row:hover {
+            .row-name {
+              ${tw`text-green-11`}
+            }
+            .list-icon-wrap {
+              background-color: #ecfdf5;
+            }
+            .list-icon svg {
+              color: #059669;
+              fill: #31cd88;
+            }
+          }
+        `,
+      ]}
       dataSource={data?.infos || []}
       columns={filterColumn.length > 0 ? filterColumn : columns}
       onSort={handleSort}

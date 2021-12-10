@@ -105,8 +105,11 @@ export const downloadFile = ({
   headers,
   resource_id,
 }: any) =>
-  customRequest({
-    url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}/download`,
-    method: 'GET',
-    headers,
-  })
+  customRequest(
+    {
+      url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}/download`,
+      method: 'GET',
+      headers,
+    },
+    { responseType: 'blob' }
+  )

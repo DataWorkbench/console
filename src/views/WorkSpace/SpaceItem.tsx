@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import { Radio, Menu, Icon } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
@@ -8,7 +8,7 @@ import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
 import { OptButton } from './styled'
 
-const { MenuItem } = Menu
+const { MenuItem, SubMenu } = Menu
 
 // const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
 // const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
@@ -53,7 +53,10 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     workSpaceStore: { funcList },
   } = useStore()
 
+  const history = useHistory()
+
   const handleSelected = () => {
+    history.push(`${regionId}/workspace/${space.id}/upcloud`)
     if (isModal) {
       stateStore.set({ curSpace: space })
       onItemCheck(regionId, space.id)
@@ -61,6 +64,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   }
 
   const handleSpaceOpt = (e, k, v) => {
+    e.stopPropagation()
     stateStore.set({ curSpaceOpt: v, optSpaces: [space] })
   }
 
@@ -130,13 +134,18 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     <Card
       className={className}
       css={[
-        tw`rounded border border-t-4 text-neut-8 border-neut-2`,
+        tw`rounded border border-t-4 text-neut-8 border-neut-2 cursor-pointer`,
         css`
           box-shadow: 0px 15px 30px rgba(3, 5, 7, 0.08);
+          &:hover {
+            .wks-title {
+              color: #10b981;
+            }
+          }
         `,
         isModal && tw`cursor-pointer`,
       ]}
-      onClick={handleSelected}
+      onClick={() => handleSelected()}
     >
       <div tw="px-5 pt-4 pb-5 relative">
         {isModal && (
@@ -158,12 +167,13 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             <Box tw="flex-1 overflow-hidden min-w-[276px]">
               <FlexBox tw="items-center">
                 <span
+                  className="wks-title"
                   tw="font-medium text-base text-neut-16 truncate max-w-[80px]"
                   title={space.name}
                 >
                   {space.name}
                 </span>
-                <span>（{space.id}）</span>
+                <span tw="truncate max-w-[130px]">（{space.id}）</span>
                 <StateTag status={space.status}>
                   <Icon name="radio" />
                   {space.status === 1 ? '活跃' : '已禁用'}
@@ -174,36 +184,43 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
               </div>
             </Box>
             {!isModal && (
-              <Tooltip
-                twChild={tw`self-start`}
-                placement="bottom-end"
-                offset={[0, -5]}
-                theme="light"
-                trigger="click"
-                arrow={false}
-                content={
-                  <Menu onClick={handleSpaceOpt}>
-                    <MenuItem value="update" disabled={disableStatus}>
-                      <Icon name="pen" />
-                      修改工作空间
-                    </MenuItem>
-                    <MenuItem value="disable" disabled={disableStatus}>
-                      <i className="if if-minus-square" tw="text-base mr-2" />
-                      禁用工作空间
-                    </MenuItem>
-                    <MenuItem value="enable" disabled={space.status === 1}>
-                      <Icon name="start" />
-                      启动工作空间
-                    </MenuItem>
-                    <MenuItem value="delete">
-                      <Icon name="trash" />
-                      删除
-                    </MenuItem>
-                  </Menu>
-                }
+              <div
+                onClick={(e: React.SyntheticEvent) => {
+                  e.stopPropagation()
+                }}
               >
-                <Icon name="more" clickable size={24} />
-              </Tooltip>
+                <Tooltip
+                  twChild={tw`self-start`}
+                  placement="bottom-end"
+                  offset={[0, -5]}
+                  theme="light"
+                  trigger="click"
+                  arrow={false}
+                  zIndex={119} // 阻止冒泡后tooltip不会消失 modal z-index
+                  content={
+                    <Menu onClick={handleSpaceOpt}>
+                      <MenuItem value="update" disabled={disableStatus}>
+                        <Icon name="pen" />
+                        修改工作空间
+                      </MenuItem>
+                      <MenuItem value="disable" disabled={disableStatus}>
+                        <i className="if if-minus-square" tw="text-base mr-2" />
+                        禁用工作空间
+                      </MenuItem>
+                      <MenuItem value="enable" disabled={space.status === 1}>
+                        <Icon name="start" />
+                        启动工作空间
+                      </MenuItem>
+                      <MenuItem value="delete">
+                        <Icon name="trash" />
+                        删除
+                      </MenuItem>
+                    </Menu>
+                  }
+                >
+                  <Icon name="more" clickable size={24} />
+                </Tooltip>
+              </div>
             )}
           </FlexBox>
         </FlexBox>
@@ -224,18 +241,49 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                       该工作空间已被禁用，暂时无法操作其工作项
                     </div>
                   ) : (
-                    <Menu>
-                      {subFuncList.map((subFunc) => (
-                        <MenuItem key={subFunc.name}>
-                          <Link
-                            to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                            tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                    <Menu
+                      onClick={(e: React.SyntheticEvent) => {
+                        e.stopPropagation()
+                      }}
+                    >
+                      {subFuncList.map((subFunc: any) => {
+                        const subItems = subFunc.items || []
+                        return subItems.length ? (
+                          <SubMenu
+                            onClick={(e: React.SyntheticEvent) => {
+                              e.stopPropagation()
+                            }}
+                            title={
+                              <span>
+                                <Icon name={subFunc.icon} />
+                                <span>{subFunc.title}</span>
+                              </span>
+                            }
+                            overlayClassName="sub"
                           >
-                            <Icon name={subFunc.icon} type="dark" tw="mr-1" />
-                            {subFunc.title}
-                          </Link>
-                        </MenuItem>
-                      ))}
+                            {subItems.map((secondMenu: any) => (
+                              <MenuItem key={secondMenu.name}>
+                                <Link
+                                  to={`${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
+                                  tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                                >
+                                  {secondMenu.title}
+                                </Link>
+                              </MenuItem>
+                            ))}
+                          </SubMenu>
+                        ) : (
+                          <MenuItem key={subFunc.name}>
+                            <Link
+                              to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                              tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                            >
+                              <Icon name={subFunc.icon} type="dark" tw="mr-1" />
+                              {subFunc.title}
+                            </Link>
+                          </MenuItem>
+                        )
+                      })}
                     </Menu>
                   )}
                 </>
