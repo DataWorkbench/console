@@ -1,6 +1,12 @@
 import tw, { css } from 'twin.macro'
 
 const selectStyles = css`
+  .select > .select-menu-outer {
+    ${tw`!max-h-[270px]`}
+    .select-menu {
+      ${tw`!max-h-[270px]`}
+    }
+  }
   .dark {
     .select {
       &.is-danger {
@@ -32,10 +38,8 @@ const selectStyles = css`
         }
       }
       & > .select-menu-outer {
-        ${tw`bg-neut-17 border-neut-13 !max-h-[270px]`}
-        .select-menu {
-          ${tw`!max-h-[270px]`}
-        }
+        ${tw`bg-neut-17 border-neut-13`}
+
         .select-option {
           ${tw`bg-neut-17 text-white`}
           &.is-selected,
