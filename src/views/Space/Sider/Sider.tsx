@@ -7,6 +7,12 @@ const SideMenuWrapper = styled('div')(() => [
   tw`relative`,
   css`
     .side-menu-wrap {
+      .icon-title,
+      .icon-li {
+        .icon .qicon {
+          transform: scale(1.25);
+        }
+      }
       .side-menu {
         height: calc(100vh - 60px);
         ${tw`border-r border-neut-3 bg-neut-2 dark:(bg-neut-17 border-neut-15) shadow-none`}
@@ -19,7 +25,7 @@ const SideMenuWrapper = styled('div')(() => [
         .level-row {
           ${tw`pl-0 text-xs h-10 font-semibold text-neut-15 dark:(text-white)`}
           .icon-title {
-            ${tw`pl-4 border-l-2 border-neut-2 dark:(border-neut-17)`}
+            ${tw`pl-3 border-l-2 border-neut-2 dark:(border-neut-17)`}
           }
         }
         .level-expand {
