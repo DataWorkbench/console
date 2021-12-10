@@ -68,7 +68,10 @@ export const Settings = ({ darkMode }) => {
       </IconBox> */}
         <Tooltip
           theme={darkMode ? 'light' : 'dark'}
-          content={<div tw="text-white dark:text-neut-13  p-3">帮助中心</div>}
+          hasPadding
+          content={
+            <div tw="text-white dark:text-neut-13 leading-5">帮助中心</div>
+          }
         >
           <IconBox
             onClick={

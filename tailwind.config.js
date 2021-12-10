@@ -78,6 +78,30 @@ module.exports = {
           lineHeight: 1,
           content: '"*"',
         },
+        '.label-help-icon-light': {
+          '.qicon': {
+            color: neut['0'],
+            fill: neut['8'],
+          },
+        },
+        '.label-help-icon-light-hover': {
+          '.qicon': {
+            color: neut['0'],
+            fill: neut['15'],
+          },
+        },
+        '.label-help-icon-dark': {
+          '.qicon': {
+            color: '#000',
+            fill: neut['8'],
+          },
+        },
+        '.label-help-icon-dark-hover': {
+          '.qicon': {
+            color: '#000',
+            fill: neut['0'],
+          },
+        },
       })
     }),
   ],
