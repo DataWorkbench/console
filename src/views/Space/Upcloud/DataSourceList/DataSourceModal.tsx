@@ -46,10 +46,10 @@ const DataSourceModal = observer(
     const mutation = useMutationSource()
     const curkind =
       op === 'create'
-        ? kinds?.find((k) => k.name === state.dbName)
-        : kinds?.find((k) => k.source_type === opSourceList[0]?.source_type)
-    const curKindInfo = sourceKinds.find((info) => info.name === curkind?.name)
-
+        ? sourceKinds.find((k) => k.name === state.dbName)
+        : sourceKinds.find(
+            (k) => k.source_type === opSourceList[0]?.source_type
+          )
     const handleDbSelect = (name: string) => {
       setState((draft) => {
         draft.step = 1
@@ -61,7 +61,7 @@ const DataSourceModal = observer(
         onHide()
       } else if (getFormData?.current) {
         const data = (getFormData as any).current()
-        if (data) {
+        if (data && curkind?.source_type) {
           const params = {
             op,
             source_type: curkind.source_type,
@@ -101,7 +101,7 @@ const DataSourceModal = observer(
           orient="fullright"
           width={800}
           title={`${opTxt}数据源: ${
-            curKindInfo ? curKindInfo.showname || curKindInfo.name : ''
+            curkind ? curkind.showname || curkind.name : ''
           }`}
           footer={
             <div tw="flex justify-end space-x-2">
@@ -176,14 +176,10 @@ const DataSourceModal = observer(
                   }
 
                   return (
-                    curkind &&
-                    curKindInfo && (
+                    curkind && (
                       <DataSourceForm
                         getFormData={getFormData as any}
-                        resInfo={{
-                          ...curKindInfo,
-                          source_type: curkind.source_type,
-                        }}
+                        resInfo={curkind}
                       />
                     )
                   )
