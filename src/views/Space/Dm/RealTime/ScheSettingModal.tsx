@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import tw from 'twin.macro'
 import {
   Collapse,
   Icon,
@@ -14,7 +15,7 @@ import {
   Loading,
   DatePicker,
 } from '@QCFE/lego-ui'
-import { DarkModal, FlexBox } from 'components'
+import { DarkModal, FlexBox, AffixLabel } from 'components'
 import { useImmer } from 'use-immer'
 import { range } from 'lodash-es'
 import { useStore } from 'stores'
@@ -301,7 +302,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
               <ScheSettingForm layout="horizon" ref={formRef}>
                 <RadioGroupField
                   name="schedulePolicy"
-                  label="调度策略"
+                  label={<AffixLabel>调度策略</AffixLabel>}
                   value={params.schedulePolicy}
                   onChange={(v: number) => {
                     setParams((draft) => {
@@ -345,7 +346,27 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                     />
                     <SelectField
                       name="concurrencyPolicy"
-                      label="* 并发策略"
+                      label={
+                        <AffixLabel
+                          help={
+                            <ul tw="leading-5">
+                              <li>1. “允许”(即允许多个作业实例同时运行) </li>
+                              <li>
+                                2. “禁止”(即只允许一个作业实例运行,
+                                如果到达调度周期的执行时间点时上一个实例还没有运行完成,
+                                则放弃本次实例的运行)
+                              </li>
+                              <li>
+                                3. “替换“(即,
+                                只允许一个作业实例运行，如果到达调度周期的执行点时上一个实例还没运行完成,
+                                则将这个实例终止, 然后启动新的实例)
+                              </li>
+                            </ul>
+                          }
+                        >
+                          并发策略
+                        </AffixLabel>
+                      }
                       value={params.concurrencyPolicy}
                       validateOnChange
                       onChange={(v: number) => {
@@ -366,47 +387,6 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         },
                       ]}
                     />
-
-                    <SliderField
-                      name="p2"
-                      label="出错重跑最大次数"
-                      hasTooltip
-                      value={params.retryLimit}
-                      markDots
-                      min={1}
-                      max={99}
-                      onChange={(v: string) => {
-                        setParams((draft) => {
-                          draft.retryLimit = +v
-                        })
-                      }}
-                      marks={{
-                        1: '1',
-                        20: '20',
-                        40: '40',
-                        60: '60',
-                        80: '80',
-                        99: '99',
-                      }}
-                      hasInput
-                    />
-                    <Field>
-                      <Label>* 出错重跑间隔</Label>
-                      <Control>
-                        <InputNumber
-                          isMini
-                          min={1}
-                          max={30}
-                          value={params.retryInterval}
-                          onChange={(v: number) => {
-                            setParams((draft) => {
-                              draft.retryInterval = v
-                            })
-                          }}
-                        />
-                      </Control>
-                      <div tw="leading-8 ml-2">分钟</div>
-                    </Field>
 
                     <SelectField
                       name="schePeriod"
@@ -743,7 +723,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
 
                     <Field>
                       <Label>cron 表达式</Label>
-                      <Control>{params.express}</Control>
+                      <Control tw="font-mono">{params.express}</Control>
                     </Field>
                   </>
                 )}
@@ -805,6 +785,48 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                   </Control>
                   <div tw="leading-6 ml-2">出错自动重跑</div>
                 </Field>
+                <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
+                  <SliderField
+                    name="p2"
+                    label="出错重跑最大次数"
+                    hasTooltip
+                    value={params.retryLimit}
+                    markDots
+                    min={1}
+                    max={99}
+                    onChange={(v: string) => {
+                      setParams((draft) => {
+                        draft.retryLimit = +v
+                      })
+                    }}
+                    marks={{
+                      1: '1',
+                      20: '20',
+                      40: '40',
+                      60: '60',
+                      80: '80',
+                      99: '99',
+                    }}
+                    hasInput
+                  />
+                  <Field>
+                    <Label>* 出错重跑间隔</Label>
+                    <Control>
+                      <InputNumber
+                        isMini
+                        min={1}
+                        max={30}
+                        value={params.retryInterval}
+                        onChange={(v: number) => {
+                          setParams((draft) => {
+                            draft.retryInterval = v
+                          })
+                        }}
+                      />
+                    </Control>
+                    <div tw="leading-8 ml-2">分钟</div>
+                  </Field>
+                </div>
                 <Field>
                   <Label>超时时间</Label>
                   <Control>

@@ -39,9 +39,10 @@ export const AffixLabel = ({
   trigger = 'mouseenter focus',
   disabled = false,
   theme = 'darker',
+  className,
 }: {
   required?: boolean
-  help?: string
+  help?: ReactNode
   children?: ReactNode
   placement?:
     | 'top'
@@ -62,11 +63,12 @@ export const AffixLabel = ({
   trigger?: string
   disabled?: boolean
   theme?: 'light' | 'dark' | 'darker' | 'green'
+  className?: string
 }) => {
   return (
-    <div tw="flex items-center">
+    <div tw="flex items-center" className={className}>
       {required && <b tw="text-red-10 mr-1">*</b>}
-      <span tw="mr-1 font-medium break-all">{children}</span>
+      <div tw="mr-1 inline-block font-medium break-all">{children}</div>
       {help && (
         <IconBoxWithTootip>
           <Tooltip

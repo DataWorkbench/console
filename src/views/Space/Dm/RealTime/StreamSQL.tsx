@@ -16,6 +16,7 @@ import {
 } from 'hooks'
 import { StreamToolBar } from './styled'
 import StreamRightMenu from './StreamRightMenu'
+import ReleaseModal from './ReleaseModal'
 
 const AceEditorWrapper = styled('div')(() => [
   css`
@@ -36,6 +37,7 @@ const AceEditorWrapper = styled('div')(() => [
 ])
 
 const StreamSQL = () => {
+  const [show, toggleShow] = useState(false)
   const mutation = useMutationStreamJobCode()
   const releaseMutation = useMutationReleaseStreamJob()
   const [code, setCode] = useState()
@@ -83,16 +85,17 @@ const StreamSQL = () => {
     )
   }
 
-  const release = () => {
-    releaseMutation.mutate(null, {
-      onSuccess: () => {
-        Notify.success({
-          title: '操作提示',
-          content: '代码保存成功',
-          placement: 'bottomRight',
-        })
-      },
-    })
+  const onRelease = () => {
+    toggleShow(true)
+    // releaseMutation.mutate(null as any, {
+    //   onSuccess: () => {
+    //     Notify.success({
+    //       title: '操作提示',
+    //       content: '代码保存成功',
+    //       placement: 'bottomRight',
+    //     })
+    //   },
+    // })
   }
   return (
     <FlexBox tw="h-full flex-1">
@@ -116,7 +119,7 @@ const StreamSQL = () => {
           </Button>
           <Button
             type="primary"
-            onClick={release}
+            onClick={onRelease}
             loading={releaseMutation.isLoading}
           >
             <Icon name="export" />
@@ -156,6 +159,7 @@ create table pd
         </AceEditorWrapper>
       </FlexBox>
       <StreamRightMenu />
+      {show && <ReleaseModal onCancel={() => toggleShow(false)} />}
     </FlexBox>
   )
 }
