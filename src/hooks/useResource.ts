@@ -104,17 +104,8 @@ export const useQueryResourceByPage = (filter: any) => {
   })
 }
 
-export const useQuerySignature = () => {
+export const useMutationResource = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  return useQuery('signature', async () => {
-    const ret = await loadSignature({ region: regionId, spaceId })
-    return ret
-  })
-}
-
-export const useMutationResource = (options?: any) => {
-  const { regionId, spaceId } = useParams<IRouteParams>()
-  const { endpoint, headers } = options || {}
   return useMutation(
     async ({
       op,
@@ -124,23 +115,33 @@ export const useMutationResource = (options?: any) => {
       resourceIds?: String[]
       resource_id?: String
     }) => {
-      const formParams = { endpoint, spaceId, headers, ...rest }
+      const formParams = { spaceId, ...rest }
       const params = {
         ...rest,
         regionId,
         spaceId,
       }
       let ret = null
+      let endpoint = ''
+      let headers = ''
+      if (['create', 'enable', 'view'].includes(op)) {
+        const signature = await loadSignature({
+          region: regionId,
+          spaceId,
+        })
+        endpoint = signature.endpoint
+        headers = signature.headers
+      }
       if (op === 'create') {
-        ret = await createResourceJob(formParams)
+        ret = await createResourceJob({ endpoint, headers, ...formParams })
       } else if (op === 'edit') {
         ret = await updateResource(params)
       } else if (op === 'delete') {
         ret = await deleteResource(params)
       } else if (op === 'enable') {
-        ret = await downloadFile(formParams)
+        ret = await downloadFile({ endpoint, headers, ...formParams })
       } else if (op === 'view') {
-        ret = await reuploadResource(formParams)
+        ret = await reuploadResource({ endpoint, headers, ...formParams })
       }
       return ret
     }

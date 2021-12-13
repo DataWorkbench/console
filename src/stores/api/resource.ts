@@ -66,9 +66,11 @@ export const reuploadResource = ({
   ...rest
 }: any) => {
   const params = new FormData()
-  Object.keys(rest).map((key: any) => params.append(key, rest[key]))
+  params.append('file', rest.file)
   return customRequest({
     url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}`,
+    headers,
+    params,
   })
 }
 
