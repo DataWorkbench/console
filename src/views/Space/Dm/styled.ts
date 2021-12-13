@@ -6,10 +6,6 @@ export const HorizonTabs = styled(Tabs)(() => [
   tw`bg-neut-16 text-neut-8`,
   css`
     .tabs.is-horizon > ul {
-      // border-bottom-width: 3px;
-      // padding-top: 16px;
-      // padding-bottom: 13px;
-      // height: 56px;
       ${tw`border-neut-16 bg-[#1E2F41]`}
       > li {
         ${tw`pt-4`}
