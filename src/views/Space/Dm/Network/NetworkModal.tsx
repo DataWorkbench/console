@@ -157,9 +157,10 @@ const NetworkModal = observer(
                       required: true,
                       matchRegex: nameMatchRegex,
                       maxLength: 128,
+                      minLength: 2,
                     },
                     status: 'error',
-                    help: '不能为空，最大长度为 128 位。字母、数字或下划线（_）,不能以（_）开始结尾',
+                    help: '不能为空，长度为 2～128 位。字母、数字或下划线（_）,不能以（_）开始结尾',
                   },
                 ]}
               />
