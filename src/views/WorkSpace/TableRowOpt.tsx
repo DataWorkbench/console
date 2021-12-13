@@ -34,7 +34,7 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
                   {subFuncList.map((subFunc) => (
                     <MenuItem key={subFunc.name}>
                       <Link
-                        to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                        to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
                         tw="flex items-center space-x-1 py-2 px-5 (text-neut-15 no-underline)! hover:(bg-neut-1 text-current)"
                       >
                         <Icon name={subFunc.icon} />
@@ -48,7 +48,7 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
           }
         >
           <Link
-            to={`${regionId}/workspace/${space.id}/${funcName}`}
+            to={`/${regionId}/workspace/${space.id}/${funcName}`}
             onClick={(e) => {
               if (disableStatus) {
                 e.preventDefault()

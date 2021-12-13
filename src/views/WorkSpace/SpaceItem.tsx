@@ -49,17 +49,17 @@ interface IProps {
 const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const stateStore = useWorkSpaceContext()
   const { isModal, curSpaceId, onItemCheck } = stateStore
+  const history = useHistory()
   const {
     workSpaceStore: { funcList },
   } = useStore()
 
-  const history = useHistory()
-
-  const handleSelected = () => {
-    history.push(`${regionId}/workspace/${space.id}/upcloud`)
+  const handleCardClick = () => {
     if (isModal) {
       stateStore.set({ curSpace: space })
       onItemCheck(regionId, space.id)
+    } else {
+      history.push(`/${regionId}/workspace/${space.id}/upcloud`)
     }
   }
 
@@ -130,24 +130,17 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     )
   }
   const disableStatus = space.status === 2
+
   return (
     <Card
-      className={className}
-      css={[
-        tw`rounded border border-t-4 text-neut-8 border-neut-2 cursor-pointer`,
-        css`
-          box-shadow: 0px 15px 30px rgba(3, 5, 7, 0.08);
-          &:hover {
-            .wks-title {
-              color: #10b981;
-            }
-          }
-        `,
-        isModal && tw`cursor-pointer`,
-      ]}
-      onClick={() => handleSelected()}
+      className={`${className} group`}
+      tw="rounded border border-t-4 text-neut-8 border-neut-2"
+      css={css`
+        box-shadow: 0px 5px 15px rgba(3, 5, 7, 0.08);
+      `}
+      onClick={handleCardClick}
     >
-      <div tw="px-5 pt-4 pb-5 relative">
+      <div tw="px-5 pt-4 pb-5 relative cursor-pointer">
         {isModal && (
           <Radio
             tw="absolute top-2 right-3"
@@ -168,7 +161,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
               <FlexBox tw="items-center">
                 <span
                   className="wks-title"
-                  tw="font-medium text-base text-neut-16 truncate max-w-[80px]"
+                  tw="font-medium text-base text-neut-16 truncate max-w-[80px] transition-colors group-hover:text-green-11"
                   title={space.name}
                 >
                   {space.name}
@@ -185,6 +178,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             </Box>
             {!isModal && (
               <div
+                tw="self-baseline"
                 onClick={(e: React.SyntheticEvent) => {
                   e.stopPropagation()
                 }}
@@ -228,7 +222,12 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
         {renderGrid()}
       </div>
       {!isModal && (
-        <div tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-4 xl:space-x-4 2xl:space-x-4">
+        <div
+          tw="px-5 py-4 flex justify-center bg-neut-1 border-t border-neut-3 space-x-4 xl:space-x-4 2xl:space-x-4"
+          onClick={(e: React.SyntheticEvent) => {
+            e.stopPropagation()
+          }}
+        >
           {funcList.map(({ name: funcName, title, subFuncList }) => (
             <Tooltip
               key={funcName}
@@ -264,7 +263,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                             {subItems.map((secondMenu: any) => (
                               <MenuItem key={secondMenu.name}>
                                 <Link
-                                  to={`${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
+                                  to={`/${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
                                   tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
                                 >
                                   {secondMenu.title}
@@ -275,7 +274,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                         ) : (
                           <MenuItem key={subFunc.name}>
                             <Link
-                              to={`${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                              to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
                               tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
                             >
                               <Icon name={subFunc.icon} type="dark" tw="mr-1" />
@@ -290,7 +289,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
               }
             >
               <Link
-                to={`${regionId}/workspace/${space.id}/${funcName}`}
+                to={`/${regionId}/workspace/${space.id}/${funcName}`}
                 onClick={(e) => {
                   if (disableStatus) {
                     e.preventDefault()

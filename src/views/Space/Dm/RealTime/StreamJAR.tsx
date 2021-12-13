@@ -73,15 +73,6 @@ const StreamJAR = () => {
 
   const handleRelease = () => {
     toggleShow(true)
-    // releaseMutation.mutate(null as any, {
-    //   onSuccess: () => {
-    //     Notify.success({
-    //       title: '操作提示',
-    //       content: '代码保存成功',
-    //       placement: 'bottomRight',
-    //     })
-    //   },
-    // })
   }
   return (
     <div tw="pl-5">
@@ -95,7 +86,7 @@ const StreamJAR = () => {
           theme="light"
           placement="bottom"
           hasPadding
-          content="请添加jar包后发布"
+          content="请添加Jar包后发布"
         >
           <Button
             type="primary"
@@ -111,8 +102,8 @@ const StreamJAR = () => {
       <Form tw="mt-5 w-96!" ref={form} layout="vertical">
         <SelectField
           name="resource_id"
-          label={<AffixLabel>引用Jar包</AffixLabel>}
-          placeholder="请选择要引用的 Jar 包资源"
+          label={<AffixLabel>引用 Jar 包（程序包）</AffixLabel>}
+          placeholder="请选择要引用的 Jar 包（程序包）"
           help={
             <>
               如需选择新的资源，可以在资源管理中
@@ -124,10 +115,25 @@ const StreamJAR = () => {
               </Link>
             </>
           }
+          optionRenderer={(option) => (
+            <div tw="flex items-center space-x-1">
+              <Icon
+                name={option.type === 1 ? 'coding' : 'terminal'}
+                type="light"
+                color={{
+                  primary: '#219861',
+                  secondary: '#8EDABD',
+                }}
+              />
+              <span>{option.label}</span>
+              <span tw="text-neut-8">ID: {option.value}</span>
+            </div>
+          )}
           value={params.resourceId}
           options={resources.map((res) => ({
             label: res.name,
             value: res.resource_id,
+            type: res.type,
           }))}
           schemas={[
             {
