@@ -157,7 +157,9 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
             <section tw="flex-1">
               <>
                 <div tw="font-medium mb-2 text-base">
-                  {`删除函数节点 ${deleteText} 注意事项`}
+                  {udfFilterRows.length === 1
+                    ? `删除函数节点 ${deleteText} 注意事项`
+                    : `删除以下 ${udfFilterRows.length} 个函数注意事项`}
                 </div>
                 <div className="modal-content-message">
                   {`删除 ${deleteText} 后，相关工作流、任务会出现问题，且该操作无法撤回。确认删除吗？`}
