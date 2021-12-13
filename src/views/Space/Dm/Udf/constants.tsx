@@ -36,17 +36,17 @@ export const udfHasLangBits = {
 
 export const udfTypesComment = {
   UDF: {
-    comment: 'UDF(User-Defined Functions) ：用户定义（普通）函数。',
+    comment: 'UDF (User-Defined Functions)：用户定义（普通）函数。',
     path: '',
   },
   UDTF: {
     comment:
-      'UDTF(User-Defined Table Functions) 用来解决输入一行输出多行(On-to-many maping) 的需求。',
+      'UDTF (User-Defined Table Functions)：用来解决输入一行输出多行(On-to-many maping) 的需求。',
     path: '',
   },
   UDTTF: {
     comment:
-      'UDTTF (User-Defined Temporal Table Functions) 一种时态表函数,通过一个时间属性来确定表数据的版本。',
+      'UDTTF (User-Defined Temporal Table Functions)：一种时态表函数,通过一个时间属性来确定表数据的版本。',
     path: '',
   },
 }
