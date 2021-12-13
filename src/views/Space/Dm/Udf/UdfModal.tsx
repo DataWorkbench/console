@@ -359,9 +359,11 @@ const UdfModal = observer(() => {
                         rule: {
                           required: true,
                           matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/,
+                          maxLength: 128,
+                          minLength: 2,
                         },
                         status: 'error',
-                        help: '不能为空，字母、数字或下划线（_），不能以（_）开始结尾',
+                        help: '不能为空，长度为 2～128。字母、数字或下划线（_），不能以（_）开始结尾',
                       },
                     ]}
                   />
