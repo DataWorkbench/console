@@ -68,14 +68,14 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
   }
 
   const deleteText = useMemo(
-    () => udfFilterRows.map((i) => i.name).join('、'),
+    () => udfFilterRows.map((i) => `${i.name}(${i.udf_id})`).join('、'),
     [udfFilterRows]
   )
   return (
     <>
       <div tw="mb-3">
         <FlexBox tw="justify-between">
-          <Center tw="space-x-3">
+          <Center tw="space-x-2">
             <Button
               type="primary"
               onClick={() => {
@@ -83,8 +83,8 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
                 setModalData({})
               }}
             >
-              <Icon name="upload" />
-              新建{udfType}函数节点
+              <Icon name="if-add" size={16} />
+              {`新建 ${udfType} 函数节点`}
             </Button>
             <Button
               disabled={!udfSelectedRowKeys.length}
@@ -156,9 +156,11 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
             />
             <section tw="flex-1">
               <>
-                <div tw="font-medium mb-2 text-base">{deleteText}注意事项</div>
+                <div tw="font-medium mb-2 text-base">
+                  {`删除函数节点 ${deleteText} 注意事项`}
+                </div>
                 <div className="modal-content-message">
-                  {`删除${deleteText}后，相关工作流、任务会出现问题，且该操作无法撤回。确认删除吗？`}
+                  {`删除 ${deleteText} 后，相关工作流、任务会出现问题，且该操作无法撤回。确认删除吗？`}
                 </div>
               </>
             </section>
