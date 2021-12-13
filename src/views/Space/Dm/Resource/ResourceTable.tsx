@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Table, ToolBar, localstorage, Icon } from '@QCFE/qingcloud-portal-ui'
 import { Tabs, Alert, Button, InputSearch, Menu } from '@QCFE/lego-ui'
 import tw, { styled, css } from 'twin.macro'
@@ -15,6 +15,7 @@ import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import UploadModal from './UploadModal'
+import DeleteModal from './DeleteModal'
 
 const columnSettingsKey = 'RESOURCE_TABLE_COLUMN_SETTINGS'
 
@@ -60,12 +61,16 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
   ({ className }) => {
     const {
       dmStore: { setOp },
-      resourceStore: { endpoint, headers },
     } = useStore()
+
+    const [uploadVisible, setUploadVisible] = useState(false)
+    const [deleteVisible, setDeleteVisible] = useState(false)
+    const [deleteData, setDeleteData] = useState<any>({})
     const [defaultFields, setDefaultFields] = useState({})
     const [packageType, setPackageType] = useState('program')
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-    const [visible, setVisible] = useState(false)
+    const [selectedRows, setSelectedRows] = useState<any>([])
+    const [selectedMap, setSelectedMap] = useState<any>({})
     const [columnSettings, setColumnSettings] = useState(
       localstorage.getItem(columnSettingsKey) || []
     )
@@ -83,15 +88,15 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     })
 
     const queryClient = useQueryClient()
-    const mutation = useMutationResource({ endpoint, headers })
+    const mutation = useMutationResource()
 
     const refetchData = useCallback(() => {
       queryClient.invalidateQueries(getResourcePageQueryKey())
     }, [queryClient])
 
     const toggle = useCallback(() => {
-      setVisible(!visible)
-    }, [visible])
+      setUploadVisible(!uploadVisible)
+    }, [uploadVisible])
 
     const handleUploadClick = () => {
       setOp('create')
@@ -103,6 +108,10 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       setFilter((draft) => {
         draft.resource_type = name === 'program' ? 1 : 2
       })
+
+      setSelectedRows([])
+      setSelectedRowKeys([])
+      setSelectedMap([])
     }
 
     const handleEdit = useCallback(
@@ -114,22 +123,31 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       [setOp, toggle]
     )
 
-    const handleDelete = useCallback(
-      (row?: Record<string, any>) => {
-        mutation.mutate(
-          {
-            op: 'delete',
-            resourceIds: row ? [row.resource_id] : selectedRowKeys,
-          },
-          {
-            onSuccess: async () => {
-              if (!row) setSelectedRowKeys([])
-              refetchData()
-            },
-          }
+    const handleDelSuccess = () => {
+      refetchData()
+      if (deleteData.type === 'batch') {
+        setSelectedRowKeys([])
+        setSelectedRows([])
+      } else {
+        const newSelectedRows = selectedRows.filter(
+          (el: any) => el.resource_id !== deleteData.value[0].resource_id
         )
+        const newSelectedKeys = selectedRowKeys.filter(
+          (el: string) => el !== deleteData.value[0].resource_id
+        )
+        setSelectedRows(newSelectedRows)
+        setSelectedRowKeys(newSelectedKeys)
+      }
+      setDeleteData({})
+    }
+
+    const handleDelete = useCallback(
+      (row?: any) => {
+        const rows: any = row ? [row] : selectedRows
+        setDeleteData({ type: row ? 'single' : 'batch', value: rows })
+        setDeleteVisible(true)
       },
-      [selectedRowKeys, refetchData, mutation]
+      [selectedRows]
     )
 
     const handleReupload = useCallback(
@@ -204,9 +222,9 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           },
         },
         {
-          title: '语言类型',
-          dataIndex: 'type',
-          render: (value: any) => <>{value === 1 ? '程序包' : '函数包'}</>,
+          title: '文件大小',
+          dataIndex: 'size',
+          render: (value: number) => <>{Math.round(value / 1000)}kb</>,
         },
         {
           title: '描述',
@@ -283,8 +301,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       })
       .filter((o: any) => o)
 
+    useEffect(() => {
+      setSelectedRows(selectedRowKeys.map((el: string) => selectedMap[el]))
+    }, [selectedMap, selectedRowKeys])
+
     return (
-      <div>
+      <>
         <DarkTabs defaultActiveName={packageType} onChange={handleTabChange}>
           <TabPanel key="program" label="程序包" name="program" />
           <TabPanel key="function" label="函数包" name="function" />
@@ -293,7 +315,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           <Alert
             type="info"
             tw="bg-neut-16! mb-4"
-            message={`提示: ${packageTypeName}用于业务流程中的代码开发模式`}
+            message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
             linkBtn={<Button type="text">查看详情 →</Button>}
           />
           <div tw="mt-4 mb-3">
@@ -317,12 +339,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                   placeholder="请输入关键词进行搜索"
                   onPressEnter={(e: React.SyntheticEvent) => {
                     setFilter((draft) => {
-                      draft.resource_name = (e.target as HTMLInputElement).value
+                      draft.search = (e.target as HTMLInputElement).value
                     })
                   }}
                   onClear={() => {
                     setFilter((draft) => {
-                      draft.resource_name = ''
+                      draft.search = ''
                     })
                   }}
                 />
@@ -353,8 +375,13 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
             dataSource={infos || []}
             columns={filterColumn.length > 0 ? filterColumn : columns}
             selectedRowKeys={selectedRowKeys}
-            onSelect={(keys: string[]) => {
+            onSelect={(keys: string[], rows: any) => {
               setSelectedRowKeys(keys)
+              const rowsMap = rows.reduce((acc: any, cur: any) => {
+                acc[cur.resource_id] = cur
+                return acc
+              }, {})
+              setSelectedMap({ ...selectedMap, ...rowsMap })
             }}
             pagination={{
               total: data?.total || 0,
@@ -382,12 +409,23 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         </div>
 
         <UploadModal
-          visible={visible}
+          visible={uploadVisible}
           type={packageType}
           handleCancel={toggle}
           defaultFields={defaultFields}
         />
-      </div>
+
+        {Object.keys(deleteData).length && (
+          <DeleteModal
+            visible={deleteVisible}
+            packageType={packageType}
+            deleteData={deleteData}
+            toggle={() => setDeleteVisible(!deleteVisible)}
+            mutation={mutation}
+            success={handleDelSuccess}
+          />
+        )}
+      </>
     )
   }
 )

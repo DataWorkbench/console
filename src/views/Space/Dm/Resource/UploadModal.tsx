@@ -12,12 +12,7 @@ import {
 } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { useRef, useState } from 'react'
-import {
-  getResourcePageQueryKey,
-  useMutationResource,
-  useQuerySignature,
-  useStore,
-} from 'hooks'
+import { getResourcePageQueryKey, useMutationResource, useStore } from 'hooks'
 import { DarkModal, Tooltip, Center, AffixLabel } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useQueryClient } from 'react-query'
@@ -69,12 +64,9 @@ interface IRouteParams {
 
 const UploadModal = observer((props: any) => {
   const {
-    resourceStore,
     dmStore: { setOp, op },
   } = useStore()
-  const { data: signature } = useQuerySignature()
-  const { endpoint, headers } = signature || {}
-  resourceStore.set({ endpoint, headers })
+
   const resourceEl = useRef<HTMLInputElement>(null)
   const form = useRef<Form>(null)
   const [file, setFile] = useState<File>()
@@ -84,14 +76,14 @@ const UploadModal = observer((props: any) => {
 
   const packageTypeName = packageType === 'program' ? '程序包' : '函数包'
 
-  const mutation = useMutationResource({ endpoint, headers })
+  const mutation = useMutationResource()
 
   const queryClient = useQueryClient()
 
   const closeModal = () => {
     handleCancel()
     setFile(undefined)
-    if (op === 'edit') setOp('')
+    setOp('')
   }
 
   const handleFile = () => {
@@ -111,7 +103,7 @@ const UploadModal = observer((props: any) => {
   const handleOk = async () => {
     if (!form.current?.validateFields()) return
     const fields = form.current?.getFieldsValue() || {}
-    if (op !== 'view') {
+    if (op === 'create') {
       const ret = await loadResourceList({
         regionId,
         spaceId,
@@ -189,7 +181,7 @@ const UploadModal = observer((props: any) => {
                 placement="top-end"
                 content={
                   <Center tw="h-9 px-3 text-neut-13">
-                    请先添加符合要求的程序包
+                    请先添加符合要求的{packageTypeName}
                   </Center>
                 }
               >
@@ -212,7 +204,7 @@ const UploadModal = observer((props: any) => {
       <Alert
         type="info"
         tw="bg-neut-16! mb-4"
-        message={`提示: ${packageTypeName}用于业务流程中的代码开发模式`}
+        message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
         linkBtn={<Button type="text">查看详情 →</Button>}
       />
       <Form ref={form} tw="pl-0!">
@@ -227,6 +219,11 @@ const UploadModal = observer((props: any) => {
             {
               rule: { required: true },
               help: '请输入程序包显示名',
+              status: 'error',
+            },
+            {
+              rule: { matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/ },
+              help: '只允许字母、数字或下划线（_）,不能以（_）开始结尾',
               status: 'error',
             },
           ]}
