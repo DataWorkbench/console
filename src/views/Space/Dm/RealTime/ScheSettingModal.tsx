@@ -14,6 +14,7 @@ import {
   Select,
   Loading,
   DatePicker,
+  Button,
 } from '@QCFE/lego-ui'
 import { DarkModal, FlexBox, AffixLabel } from 'components'
 import { useImmer } from 'use-immer'
@@ -100,7 +101,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
     retryPolicy: 1,
     timeout: 0,
     periodType: 'minute',
-    schedulePolicy: 1,
+    schedulePolicy: 0,
     executed: null,
     immediately: false,
   })
@@ -251,7 +252,20 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
       width={800}
       visible={visible}
       onOk={save}
-      confirmLoading={mutation.isLoading}
+      footer={
+        <>
+          <Button onClick={onCancel}>取消</Button>
+          <Button
+            type="primary"
+            disabled={params.schedulePolicy === 0}
+            onClick={save}
+            loading={mutation.isLoading}
+          >
+            确定
+          </Button>
+        </>
+      }
+      // confirmLoading={mutation.isLoading}
     >
       <div>
         <Collapse defaultActiveKey={['p1', 'p2']}>
@@ -309,6 +323,13 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                       draft.schedulePolicy = v
                     })
                   }}
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请选择调度策略',
+                      status: 'error',
+                    },
+                  ]}
                 >
                   <Radio value={2}>执行一次</Radio>
                   <Radio value={1}>重复执行</Radio>
@@ -348,6 +369,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                       name="concurrencyPolicy"
                       label={
                         <AffixLabel
+                          theme="green"
                           help={
                             <ul tw="leading-5">
                               <li>1. “允许”(即允许多个作业实例同时运行) </li>
@@ -390,7 +412,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
 
                     <SelectField
                       name="schePeriod"
-                      label="* 调度周期"
+                      label={<AffixLabel>调度周期</AffixLabel>}
                       value={params.periodType}
                       onChange={(v: TPeriodType) => {
                         setParams((draft) => {
@@ -429,7 +451,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         return (
                           <>
                             <Field>
-                              <Label>* 开始时间</Label>
+                              <Label>
+                                <AffixLabel>开始时间</AffixLabel>
+                              </Label>
                               <Control>
                                 <Select
                                   options={hourOpts}
@@ -444,7 +468,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               </Control>
                             </Field>
                             <Field>
-                              <Label>* 时间间隔</Label>
+                              <Label>
+                                <AffixLabel>时间间隔</AffixLabel>
+                              </Label>
                               <Control>
                                 <Select
                                   options={minuOpts}
@@ -459,7 +485,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               </Control>
                             </Field>
                             <Field>
-                              <Label>* 结束时间</Label>
+                              <Label>
+                                <AffixLabel>结束时间</AffixLabel>
+                              </Label>
                               <Control>
                                 <Select
                                   options={hourOpts}
@@ -492,7 +520,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               <Radio value={1}>
                                 <>
                                   <Field>
-                                    <Label>开始时间</Label>
+                                    <Label>
+                                      <AffixLabel>开始时间</AffixLabel>
+                                    </Label>
                                     <Control>
                                       <Select
                                         options={hourOpts}
@@ -507,7 +537,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                                     <div tw="leading-8 ml-2">时</div>
                                   </Field>
                                   <Field>
-                                    <Label>时间间隔</Label>
+                                    <Label>
+                                      <AffixLabel>时间间隔</AffixLabel>
+                                    </Label>
                                     <Control>
                                       <Select
                                         options={range(1, 24).map((v) => ({
@@ -525,7 +557,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                                     <div tw="leading-8 ml-2">小时</div>
                                   </Field>
                                   <Field>
-                                    <Label>结束时间</Label>
+                                    <Label>
+                                      <AffixLabel>结束时间</AffixLabel>
+                                    </Label>
                                     <Control>
                                       <Select
                                         options={hourOpts}
@@ -545,7 +579,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                                 <SelectField
                                   multi
                                   closeOnSelect={false}
-                                  label="指定时间"
+                                  label={<AffixLabel>指定时间</AffixLabel>}
                                   name="hourlys"
                                   value={curPeriodData.hours}
                                   options={hourOpts}
@@ -569,7 +603,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         return (
                           <SmallDatePickerField
                             name="scheDate"
-                            label="* 定时调度时间"
+                            label={<AffixLabel>定时调度时间</AffixLabel>}
                             dateFormat="H:i"
                             noCalendar
                             enableTime
@@ -613,7 +647,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                             />
                             <SmallDatePickerField
                               name="scheDate"
-                              label="* 定时调度时间"
+                              label={<AffixLabel>定时调度时间</AffixLabel>}
                               dateFormat="H:i"
                               noCalendar
                               enableTime
@@ -634,7 +668,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         return (
                           <>
                             <SelectField
-                              label="指定时间"
+                              label={<AffixLabel>指定时间</AffixLabel>}
                               name="monthDaily"
                               multi
                               closeOnSelect={false}
@@ -650,7 +684,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                             />
                             <SmallDatePickerField
                               name="scheDate"
-                              label="* 定时调度时间"
+                              label={<AffixLabel>定时调度时间</AffixLabel>}
                               dateFormat="H:i"
                               noCalendar
                               enableTime
@@ -702,7 +736,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                             />
                             <SmallDatePickerField
                               name="scheDate"
-                              label="* 定时调度时间"
+                              label={<AffixLabel>定时调度时间</AffixLabel>}
                               dateFormat="H:i"
                               noCalendar
                               enableTime
@@ -733,7 +767,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                     return (
                       <>
                         <RadioGroupField
-                          label="* 执行时间"
+                          label={<AffixLabel>执行时间</AffixLabel>}
                           value={params.immediately}
                           name="immediately"
                           onChange={(v: boolean) => {
@@ -772,7 +806,9 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                   return null
                 })()}
                 <Field>
-                  <Label>* 重试策略</Label>
+                  <Label>
+                    <AffixLabel>重试策略</AffixLabel>
+                  </Label>
                   <Control>
                     <Toggle
                       checked={params.retryPolicy === 2}

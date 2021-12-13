@@ -1,5 +1,12 @@
 import tw, { css } from 'twin.macro'
 
+/**
+ * primary 主要按钮
+ * default 次要按钮
+ * outlined 切换按钮
+ * black 普通按钮、图标按钮
+ */
+
 const buttonStyles = css`
   .dark {
     button.button {
@@ -38,7 +45,7 @@ const buttonStyles = css`
         &:hover {
           ${tw`bg-neut-13`}
         }
-        &:hover {
+        &:active {
           ${tw`bg-neut-15`}
         }
       }

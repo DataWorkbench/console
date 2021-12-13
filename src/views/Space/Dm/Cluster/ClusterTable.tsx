@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import { Menu } from '@QCFE/lego-ui'
+import { useParams, Link } from 'react-router-dom'
 import {
   Button,
   Icon,
@@ -28,7 +29,7 @@ import {
 import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
 import { css } from 'twin.macro'
-import { Link } from 'react-router-dom'
+
 import ClusterModal from './ClusterModal'
 
 const { MenuItem } = Menu
@@ -98,6 +99,7 @@ const ClusterTable = observer(
     const {
       dmStore: { setOp, op },
     } = useStore()
+    const { regionId, spaceId } = useParams<IRouteParams>()
     const [opclusterList, setOpClusterList] = useState<any[]>([])
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
     const [columnSettings, setColumnSettings] = useState(
@@ -365,7 +367,10 @@ const ClusterTable = observer(
             {selectMode ? (
               <div>
                 如需选择新的计算集群，您可以
-                <Link to="###" tw="text-green-11">
+                <Link
+                  to={`/${regionId}/workspace/${spaceId}/dm/cluster`}
+                  tw="underline text-underline-offset[2px]"
+                >
                   新建计算集群
                 </Link>
               </div>
