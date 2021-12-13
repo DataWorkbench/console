@@ -52,10 +52,11 @@ export const useQueryResource = (filter: Record<string, any>, options = {}) => {
   const params = {
     regionId,
     spaceId,
+    limit: 10,
     ...rest,
   }
 
-  const queryKey = ['workspaces', params]
+  const queryKey = ['resource', params]
   keys.infinite = queryKey
 
   return useInfiniteQuery(
@@ -65,7 +66,7 @@ export const useQueryResource = (filter: Record<string, any>, options = {}) => {
     },
     {
       getNextPageParam: (lastPage: any, allPages: any) => {
-        if (lastPage.infos?.length === filter.limit) {
+        if (lastPage.has_more) {
           const nextOffset = allPages.reduce(
             (acc: number, cur: Record<string, any>) => acc + cur.infos.length,
             0
