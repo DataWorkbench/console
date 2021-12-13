@@ -1,6 +1,6 @@
 import { Button, ButtonProps, Icon } from '@QCFE/qingcloud-portal-ui'
 import React, { PropsWithChildren } from 'react'
-import tw, { styled } from 'twin.macro'
+import tw, { styled, css } from 'twin.macro'
 
 interface LinkInterface {
   hasIcon?: boolean
@@ -36,9 +36,16 @@ const Link = (
 
 const getLink = (isLink: boolean) =>
   styled(Link)(() => {
-    return isLink
-      ? tw`underline text-[#2563EB] dark:text-[#2193D3] hover:text-[#3B82F6] hover:dark:text-[#0EA5E9] active:text-[#1D4ED8] active:dark:text-[#0369A1]`
-      : tw`underline text-green-11 dark:text-[#F7FCFF] hover:text-green-12 hover:dark:text-green-11 active:text-green-13 active:dark:text-green-12`
+    return [
+      isLink
+        ? tw`underline text-[#2563EB] dark:text-[#2193D3] hover:text-[#3B82F6] hover:dark:text-[#0EA5E9] active:text-[#1D4ED8] active:dark:text-[#0369A1]`
+        : tw`underline text-green-11 dark:text-[#F7FCFF] hover:text-green-12 hover:dark:text-green-11 active:text-green-13 active:dark:text-green-12`,
+      css`
+        & .if {
+          ${tw`inline-block`}
+        }
+      `,
+    ]
   })
 
 export const TextLink = getLink(true)

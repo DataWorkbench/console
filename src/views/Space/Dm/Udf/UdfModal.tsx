@@ -32,24 +32,34 @@ import { javaType, languageData, udfHasLangBits, udfTypes } from './constants'
 const { TextField, TextAreaField } = Form
 const { CollapseItem } = Collapse
 
-const LangItem = styled('div')(({ selected }: { selected?: boolean }) => [
-  tw`w-1/3 border rounded overflow-hidden border-neut-13 cursor-pointer transition-colors`,
-  selected &&
-    css`
-      ${tw`border-green-13`}
+const LangItem = styled('div')(
+  ({ selected, count = 3 }: { selected?: boolean; count: number }) => {
+    const active = css`
+      ${tw`border-green-11 text-green-11`}
       svg {
-        ${tw`text-green-13`}
+        color: #34d399;
+        fill: #059669;
       }
-    `,
-  css`
-    &:hover {
-      ${tw`border-green-13`}
-      svg {
-        ${tw`text-green-13`}
-      }
-    }
-  `,
-])
+    `
+    return [
+      tw`border rounded overflow-hidden border-neut-13 cursor-pointer transition-colors`,
+      selected && active,
+      count === 3 // 进处理 2 和 3 个数
+        ? css`
+            ${tw`w-1/3`}
+          `
+        : css`
+            ${tw`w-1/2`}
+          `,
+      css`
+        background: linear-gradient(89.9deg, #324558 0%, #3e5265 99.46%);
+        &:hover {
+          ${active}
+        }
+      `,
+    ]
+  }
+)
 
 const FormWrapper = styled('div')(() => [
   css`
@@ -279,11 +289,12 @@ const UdfModal = observer(() => {
         )}
         {step === 0 && (
           <ModalContent>
-            <FlexBox tw="justify-around space-x-3">
+            <FlexBox css={tw`flex justify-between space-x-3`}>
               {langData.map(({ type, icon, text }) => (
                 <LangItem
                   key={type}
                   selected={type === params.type}
+                  count={langData.length}
                   onClick={() => {
                     setParams((draft) => {
                       draft.type = type
@@ -330,18 +341,15 @@ const UdfModal = observer(() => {
                   <TextField
                     name="name"
                     labelClassName="label-required"
+                    placeholder="请输入函数名"
                     label={
-                      curLangInfo?.type === javaType ? (
-                        '函数名'
-                      ) : (
-                        <AffixLabel
-                          required={false}
-                          help="函数名需与实现名保持一致"
-                          theme="green"
-                        >
-                          函数名
-                        </AffixLabel>
-                      )
+                      <AffixLabel
+                        required={false}
+                        help="函数名需与实现名保持一致"
+                        theme="green"
+                      >
+                        函数名
+                      </AffixLabel>
                     }
                     disabled={op === 'detail'}
                     validateOnBlur
@@ -362,12 +370,14 @@ const UdfModal = observer(() => {
                     label="描述"
                     disabled={op === 'detail'}
                     defaultValue={modalData?.comment}
+                    placeholder="请输入函数描述"
                   />
                   <TextAreaField
                     name="usage_sample"
                     label="示例"
                     disabled={op === 'detail'}
                     defaultValue={modalData?.usage_sample}
+                    placeholder="示例样本"
                   />
                 </Form>
               </FormWrapper>
@@ -394,8 +404,9 @@ const UdfModal = observer(() => {
                         return (
                           <SelectWithRefresh
                             onRefresh={() => refetchResource()}
+                            placeholder="请选择要引用的 Jar 包资源"
                             name="define"
-                            label={`引用${text}包`}
+                            label="引用 Jar 包"
                             labelClassName="label-required"
                             options={options}
                             isLoading={status === 'loading'}
@@ -420,7 +431,6 @@ const UdfModal = observer(() => {
                                       // tw="text-green-11"
                                     >
                                       上传资源
-                                      <Icon name="if-external-link" />
                                     </ActionLink>
                                   </div>
                                 ),
@@ -452,6 +462,7 @@ const UdfModal = observer(() => {
                           labelClassName="label-required"
                           disabled={op === 'detail'}
                           defaultValue={modalData?.define}
+                          placeholder="请输入（或将已编辑好的语句粘贴于此处）"
                           validateOnBlur
                           schemas={[
                             {
