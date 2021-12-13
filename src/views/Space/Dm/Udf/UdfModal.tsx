@@ -289,7 +289,7 @@ const UdfModal = observer(() => {
         )}
         {step === 0 && (
           <ModalContent>
-            <FlexBox css={tw`justify-between space-x-3`}>
+            <FlexBox tw="justify-between space-x-3">
               {langData.map(({ type, icon, text }) => (
                 <LangItem
                   key={type}
