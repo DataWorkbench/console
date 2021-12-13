@@ -187,6 +187,7 @@ const NetworkModal = observer(
                 onChange={(v: string) => {
                   setParams((draft) => {
                     draft.router_id = v
+                    draft.vxnet_id = ''
                   })
                 }}
                 isLoadingAtBottom
