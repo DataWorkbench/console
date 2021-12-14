@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Table, ToolBar, localstorage, Icon } from '@QCFE/qingcloud-portal-ui'
-import { Tabs, Alert, Button, InputSearch, Menu } from '@QCFE/lego-ui'
+import {
+  Table,
+  ToolBar,
+  localstorage,
+  Icon,
+  InputSearch,
+} from '@QCFE/qingcloud-portal-ui'
+import { Tabs, Alert, Button, Menu } from '@QCFE/lego-ui'
 import tw, { styled, css } from 'twin.macro'
 import {
   getResourcePageQueryKey,
@@ -335,7 +341,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
               </Center>
               <Center tw="space-x-3">
                 <InputSearch
-                  tw="w-64"
+                  tw="w-64 border-[#4C5E70]!"
                   placeholder="请输入关键词进行搜索"
                   onPressEnter={(e: React.SyntheticEvent) => {
                     setFilter((draft) => {
@@ -348,7 +354,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                     })
                   }}
                 />
-                <Button loading={isRefetching} tw="px-[5px]">
+                <Button
+                  type="black"
+                  loading={isRefetching}
+                  tw="px-[5px] border-[#4C5E70]!"
+                >
                   <Icon
                     name="if-refresh"
                     tw="text-xl text-white"

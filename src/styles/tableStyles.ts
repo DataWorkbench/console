@@ -2,6 +2,13 @@ import tw, { css } from 'twin.macro'
 
 const tableStyles = css`
   .dark {
+    .columns-setting-container {
+      .button.is-default.is-trigger {
+        border-color: #4c5e70;
+        background-color: transparent;
+        ${tw`hover:bg-neut-13 active:bg-neut-15`}
+      }
+    }
     .portal-grid-table {
       ${tw`w-full text-white`}
       .empty-placeholder {
@@ -15,7 +22,7 @@ const tableStyles = css`
       .grid-table-content .grid-table-header,
       .table-row {
         .table-icon {
-          ${tw`pr-4`}
+          ${tw`pr-0`}
           .checkbox {
             &::before {
               ${tw`border-neut-13`}
@@ -54,6 +61,9 @@ const tableStyles = css`
         ${tw`bg-neut-16 border-b border-neut-13`}
         &:hover {
           ${tw`bg-neut-17`}
+        }
+        .table-col:last-child .button.is-text:first-child {
+          ${tw`pl-0`}
         }
       }
       .grid-table-footer {

@@ -39,9 +39,6 @@ export const LetterIcon = styled.div(
 export const TableActions = styled(FlexBox)(() => [
   css`
     ${tw`items-center relative`}
-    button.is-text {
-      ${tw`text-link px-2 hover:text-link border-0 focus:text-link`}
-    }
   `,
 ])
 export default HorizonTabs

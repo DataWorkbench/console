@@ -419,7 +419,11 @@ const DataSourceList = observer(() => {
                   handleQuery('')
                 }}
               />
-              <Button loading={isReFetching} tw="px-[5px]">
+              <Button
+                type="black"
+                loading={isReFetching}
+                tw="px-[5px] border-[#4C5E70]!"
+              >
                 <Icon
                   name="if-refresh"
                   tw="text-xl"
