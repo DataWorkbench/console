@@ -120,14 +120,6 @@ const customStyles = css`
       }
     }
   }
-
-  .page-tab-container {
-    .collapse-panel {
-      .tab-title {
-        ${tw`font-medium`}
-      }
-    }
-  }
 `
 
 const GlobalStyles = () => (

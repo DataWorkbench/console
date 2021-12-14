@@ -132,7 +132,7 @@ const SpaceListsToolBar = observer(() => {
               stateStore.set({ queryKeyWord: '' })
             }}
           />
-          <Button loading={queryRefetch} tw="px-1.5">
+          <Button loading={queryRefetch} tw="px-[5px]">
             <Icon
               name="if-refresh"
               tw="text-xl"

@@ -45,7 +45,7 @@ export const Navs = ({ mod }: NavsProps) => {
       {funcList.map(({ title, name }) => (
         <FuncWrapper key={name} current={mod === name}>
           <Link
-            tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-medium"
+            tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
             onClick={() => handNavClick(name)}
             to={`/${regionId}/workspace/${spaceId}/${name}`}
           >

@@ -76,7 +76,7 @@ const SpaceListsEmpty = () => {
                 使用指南
               </TextLink>
               <span tw="text-link">|</span>
-              <TextLink a href="###" hasIcon={false}>
+              <TextLink href="###" hasIcon={false}>
                 使用指南
               </TextLink>
             </div>

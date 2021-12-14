@@ -147,6 +147,7 @@ const WorkSpace = observer(
                     type="icon"
                     loading={stateStore.queryRefetch}
                     onClick={reloadWorkSpace}
+                    tw="px-[5px]"
                   >
                     <Icon name="if-refresh" tw="text-xl" />
                   </Button>
