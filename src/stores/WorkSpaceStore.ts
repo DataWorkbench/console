@@ -24,7 +24,7 @@ class WorkSpaceStore {
         // { name: 'table', title: '表管理', icon: 'listview' },
         { name: 'resource', title: '资源管理', icon: 'resource' },
         { name: 'udf', title: '函数管理', icon: 'textarea' },
-        { name: 'history', title: '任务运维', icon: 'paper' },
+        // { name: 'history', title: '任务运维', icon: 'paper' },
       ],
     },
     {
