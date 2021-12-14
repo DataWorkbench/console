@@ -181,7 +181,7 @@ export const InstanceTable = observer(
                 }}
               />
             )}
-            <Button loading={isRefetching}>
+            <Button loading={isRefetching} tw="px-[5px]">
               <Icon
                 name="if-refresh"
                 tw="text-xl text-white"

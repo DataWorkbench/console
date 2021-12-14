@@ -116,7 +116,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
                 })
               }}
             />
-            <Button loading={!!isFetching}>
+            <Button loading={!!isFetching} tw="px-[5px]">
               <Icon
                 name="if-refresh"
                 tw="text-xl text-white"

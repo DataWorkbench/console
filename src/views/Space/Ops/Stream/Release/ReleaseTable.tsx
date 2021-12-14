@@ -256,7 +256,7 @@ export const ReleaseTable = observer(({ query }: any) => {
   return (
     <FlexBox orient="column">
       <FlexBox tw="justify-end pt-5 pb-3">
-        <Button loading={isRefetching}>
+        <Button loading={isRefetching} tw="px-[5px]">
           <Icon
             name="if-refresh"
             tw="text-xl text-white"
