@@ -53,6 +53,16 @@ module.exports = {
       red,
       green,
       neut,
+      blue: {
+        10: '#2193D3',
+        12: '#1E85C7',
+        13: '#0B75B7',
+      },
+      deepblue: {
+        10: '#0366D6',
+        12: '#3B82F6',
+        13: '#035CC1',
+      },
       link: {
         DEFAULT: '#0366D6',
         dark: '#035CC1',
