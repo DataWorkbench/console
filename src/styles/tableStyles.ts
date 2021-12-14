@@ -62,7 +62,7 @@ const tableStyles = css`
         &:hover {
           ${tw`bg-neut-17`}
         }
-        .table-col:last-child .button.is-text:first-child {
+        .table-col:last-child .button.is-text:first-of-type {
           ${tw`pl-0`}
         }
       }
