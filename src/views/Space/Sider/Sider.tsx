@@ -26,6 +26,13 @@ const SideMenuWrapper = styled('div')(() => [
           ${tw`pl-0 text-xs h-10 font-semibold text-neut-15 dark:(text-white)`}
           .icon-title {
             ${tw`pl-3 border-l-2 border-neut-2 dark:(border-neut-17)`}
+            svg.qicon {
+              ${tw`dark:text-white text-neut-16 fill-[#b6c2cd] dark:fill-[#fff6]`}
+
+              &.qicon-textarea {
+                ${tw`dark:text-[#fff6] dark:fill-[#fff]`}
+              }
+            }
           }
         }
         .level-expand {
@@ -41,8 +48,12 @@ const SideMenuWrapper = styled('div')(() => [
           .icon-title {
             ${tw`text-white border-green-11!`}
             svg.qicon {
-              color: #fff;
-              fill: rgba(255, 255, 255, 0.4);
+              ${tw`dark:text-white text-[#fff6] fill-[#fff] dark:fill-[#fff6]`}
+
+              // 函数管理图标相反
+              &.qicon-textarea {
+                ${tw`dark:text-[#fff6] dark:fill-[#fff]`}
+              }
             }
           }
         }
@@ -69,8 +80,7 @@ const SideMenuWrapper = styled('div')(() => [
             span.icon {
               ${tw`border-l-2 border-neut-2 dark:(border-neut-17) pl-2 box-content`}
               svg {
-                color: #fff;
-                fill: rgba(255, 255, 255, 0.4);
+                ${tw`dark:text-white text[#fff6] fill-[#fff] dark:fill-[#fff6]`}
               }
             }
             &.selected {
