@@ -17,8 +17,8 @@ const StreamRightMenu = ({
   showScheSetting = false,
   onScheSettingClose = () => {},
 }: {
-  showScheSetting: boolean
-  onScheSettingClose: () => void
+  showScheSetting?: boolean
+  onScheSettingClose?: () => void
 }) => {
   const [showSetting, setShowSetting] = useState(false)
   const [showArgs, setShowArgs] = useState(false)

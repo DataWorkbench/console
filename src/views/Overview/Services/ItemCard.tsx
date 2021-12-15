@@ -1,4 +1,4 @@
-import { Center } from 'components'
+import { Center, HelpCenterLink } from 'components'
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'stores'
 
@@ -25,11 +25,7 @@ const ItemCard = ({ item }: ItemCardTypes) => {
       </Center>
       <div tw="flex-1 font-normal text-neut-8 text-xs text-left pt-4 px-3">
         {desc}
-        {moreLink && (
-          <a href={moreLink} tw="text-link">
-            了解更多
-          </a>
-        )}
+        {moreLink && <HelpCenterLink href={moreLink}>了解更多</HelpCenterLink>}
       </div>
       <Center tw="pb-5">
         <Button

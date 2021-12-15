@@ -9,7 +9,7 @@ import { DndProvider } from 'react-dnd'
 import { useStore } from 'stores'
 import tw, { css, styled } from 'twin.macro'
 import StreamOperator from './StreamOperator'
-import StreamSQL from './StreamSQL'
+import StreamCode from './StreamCode'
 import StreamJAR from './StreamJAR'
 
 const { TabPanel } = Tabs
@@ -89,8 +89,8 @@ const JobTabs = observer(() => {
                   </DndProvider>
                 )
               }
-              if (flow.type === 2) {
-                return <StreamSQL tw="flex-1 h-full" />
+              if ([2, 4, 5].includes(flow.type)) {
+                return <StreamCode tw="flex-1 h-full" tp={flow.type as any} />
               }
               if (flow.type === 3) {
                 return <StreamJAR tw="flex-1 h-full" />
