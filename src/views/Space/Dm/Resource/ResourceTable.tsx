@@ -203,7 +203,10 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           title: `${packageTypeName}名称`,
           dataIndex: 'name',
           sortable: true,
-          sortOrder: filter.reverse ? 'asc' : 'desc',
+          sortOrder:
+            //  filter.reverse ? 'asc' : 'desc',
+            // eslint-disable-next-line no-nested-ternary
+            filter.sort_by === 'name' ? (filter.reverse ? 'asc' : 'desc') : '',
           render: (_: string, row: Record<string, any>) => {
             return (
               <FlexBox tw="items-center space-x-1">
@@ -243,7 +246,14 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           title: '上传时间',
           dataIndex: 'updated',
           sortable: true,
-          sortOrder: filter.reverse ? 'asc' : 'desc',
+          sortOrder:
+            // filter.reverse ? 'asc' : 'desc',
+            // eslint-disable-next-line no-nested-ternary
+            filter.sort_by === 'updated'
+              ? filter.reverse
+                ? 'asc'
+                : 'desc'
+              : '',
           render: (value: number) => {
             return (
               <div tw="text-neut-8">
@@ -310,6 +320,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     }, [
       packageTypeName,
       filter.reverse,
+      filter.sort_by,
       packageType,
       handleEdit,
       handleDownload,

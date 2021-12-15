@@ -23,6 +23,7 @@ interface IFilter {
   name?: string
   id?: string
   status?: number
+  sort_by?: string
 }
 
 const columnSettingsKey = 'ASSOIATE_INSTANCE_COLUMN_SETTINGS'
@@ -41,6 +42,7 @@ export const InstanceTable = observer(
       limit: 10,
       offset: 0,
       reverse: true,
+      sort_by: 'updated',
     })
 
     const queryClient = useQueryClient()
@@ -107,7 +109,10 @@ export const InstanceTable = observer(
         title: '创建时间',
         dataIndex: 'created',
         sortable: true,
-        sortOrder: filter.reverse ? 'asc' : 'desc',
+        sortOrder:
+          // filter.reverse ? 'asc' : 'desc',
+          // eslint-disable-next-line no-nested-ternary
+          filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (value: any) =>
           dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
@@ -115,7 +120,10 @@ export const InstanceTable = observer(
         title: '结束时间',
         dataIndex: 'updated',
         sortable: true,
-        sortOrder: filter.reverse ? 'asc' : 'desc',
+        sortOrder:
+          // filter.reverse ? 'asc' : 'desc',
+          // eslint-disable-next-line no-nested-ternary
+          filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (value: any) =>
           dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
@@ -214,7 +222,7 @@ export const InstanceTable = observer(
           }}
           onSort={(sortKey: any, order: string) => {
             setFilter((draft) => {
-              // draft.sort_by = sortKey
+              draft.sort_by = sortKey
               draft.reverse = order === 'asc'
             })
           }}

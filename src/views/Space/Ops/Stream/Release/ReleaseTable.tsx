@@ -195,7 +195,10 @@ export const ReleaseTable = observer(({ query }: any) => {
         title: '发布时间',
         dataIndex: 'created',
         sortable: true,
-        sortOrder: filter.reverse ? 'asc' : 'desc',
+        sortOrder:
+          // filter.reverse ? 'asc' : 'desc',
+          // eslint-disable-next-line no-nested-ternary
+          filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (value: any) =>
           dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
@@ -203,7 +206,10 @@ export const ReleaseTable = observer(({ query }: any) => {
         title: '最后修改时间',
         dataIndex: 'updated',
         sortable: true,
-        sortOrder: filter.reverse ? 'asc' : 'desc',
+        // filter.reverse ? 'asc' : 'desc',
+        sortOrder:
+          // eslint-disable-next-line no-nested-ternary
+          filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (value: any) =>
           dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
@@ -237,7 +243,7 @@ export const ReleaseTable = observer(({ query }: any) => {
         ),
       },
     ],
-    [filter.reverse, handleOperation, hanldeMenuClick]
+    [filter.reverse, filter.sort_by, handleOperation, hanldeMenuClick]
   )
 
   const filterColumn = columnSettings
