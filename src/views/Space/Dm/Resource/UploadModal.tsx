@@ -203,7 +203,7 @@ const UploadModal = observer((props: any) => {
     >
       <Alert
         type="info"
-        tw="bg-neut-16! mb-4"
+        tw="mb-4"
         message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
         linkBtn={<Button type="text">查看详情 →</Button>}
       />

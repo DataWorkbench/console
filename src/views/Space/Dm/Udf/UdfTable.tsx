@@ -210,7 +210,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           </Level>
         }
         type="info"
-        tw="bg-neut-16! mb-4"
+        tw="mb-4"
       />
       <TableToolBar
         defaultColumns={defaultColumns}
