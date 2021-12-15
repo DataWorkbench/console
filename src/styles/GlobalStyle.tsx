@@ -17,6 +17,9 @@ const customStyles = css`
     font-family: 'Roboto', 'PingFang SC', 'Noto Sans CJK', 'WenQuanYi Micro Hei',
       'Microsoft YaHei', sans-serif;
   }
+  a {
+    ${tw`text-green-11 dark:text-white hover:text-green-12 hover:dark:text-green-11 active:text-green-13 active:dark:text-green-12`},
+  }
   .light {
     --bg-primary: #fff;
     --bg-secondary: #f1f5f9;
@@ -32,9 +35,6 @@ const customStyles = css`
     --color-primary: #2563eb;
 
     label {
-      ${tw`text-white`};
-    }
-    a:hover {
       ${tw`text-white`};
     }
 
