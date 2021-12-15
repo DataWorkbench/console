@@ -18,6 +18,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import { useQueryClient } from 'react-query'
 import { loadResourceList } from 'stores/api'
 import { useParams } from 'react-router-dom'
+import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
 
 const { TextField, TextAreaField } = Form
 
@@ -74,8 +75,6 @@ const UploadModal = observer((props: any) => {
 
   const { visible, handleCancel, type: packageType, defaultFields } = props
 
-  const packageTypeName = packageType === 'program' ? '程序包' : '函数包'
-
   const mutation = useMutationResource()
 
   const queryClient = useQueryClient()
@@ -108,7 +107,7 @@ const UploadModal = observer((props: any) => {
         regionId,
         spaceId,
         resource_name: fields.resource_name,
-        resource_type: packageType === 'program' ? 1 : 2,
+        resource_type: PackageTypeMap[packageType],
       })
       if (ret.infos?.length > 0) {
         Message.error('名称已存在')
@@ -117,7 +116,7 @@ const UploadModal = observer((props: any) => {
     }
 
     const params = {
-      resource_type: packageType === 'program' ? 1 : 2,
+      resource_type: PackageTypeMap[packageType],
       ...fields,
       file,
       resource_id: defaultFields.resource_id,
@@ -141,7 +140,7 @@ const UploadModal = observer((props: any) => {
   return (
     <DarkModal
       width={800}
-      title={`${op === 'edit' ? '编辑' : '上传'}${packageTypeName}`}
+      title={`${op === 'edit' ? '编辑' : '上传'}${PackageName[packageType]}`}
       visible={visible}
       onCancel={closeModal}
       footer={
@@ -181,7 +180,7 @@ const UploadModal = observer((props: any) => {
                 placement="top-end"
                 content={
                   <Center tw="h-9 px-3 text-neut-13">
-                    请先添加符合要求的{packageTypeName}
+                    请先添加符合要求的{PackageName[packageType]}
                   </Center>
                 }
               >
@@ -204,7 +203,7 @@ const UploadModal = observer((props: any) => {
       <Alert
         type="info"
         tw="mb-4"
-        message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
+        message={PackageTypeTip[packageType]}
         linkBtn={<Button type="text">查看详情 →</Button>}
       />
       <Form ref={form} tw="pl-0!">
@@ -213,8 +212,10 @@ const UploadModal = observer((props: any) => {
           autoComplete="off"
           name="resource_name"
           labelClassName="medium"
-          placeholder={`请输入${packageTypeName}显示名`}
-          label={<AffixLabel required>{packageTypeName}显示名</AffixLabel>}
+          placeholder={`请输入${PackageName[packageType]}显示名`}
+          label={
+            <AffixLabel required>{PackageName[packageType]}显示名</AffixLabel>
+          }
           validateOnBlur
           schemas={[
             {
@@ -235,7 +236,7 @@ const UploadModal = observer((props: any) => {
           name="description"
           labelClassName="medium"
           label="描述"
-          placeholder={`请输入${packageTypeName}描述`}
+          placeholder={`请输入${PackageName[packageType]}描述`}
           maxLength="1024"
           disabled={op === 'view'}
           defaultValue={(op !== 'create' && defaultFields.description) || ''}
@@ -243,7 +244,7 @@ const UploadModal = observer((props: any) => {
         {op !== 'edit' && (
           <Field tw="mb-0!">
             <Label className="medium">
-              <AffixLabel required>添加{packageTypeName}</AffixLabel>
+              <AffixLabel required>添加{PackageName[packageType]}</AffixLabel>
             </Label>
             <Control
               tw="max-w-none! w-auto!"
@@ -264,7 +265,7 @@ const UploadModal = observer((props: any) => {
                     onChange={handleResourceChange}
                   />
                   <ColoredIcon name="add" />
-                  添加{packageTypeName}
+                  添加{PackageName[packageType]}
                 </Button>
               ) : (
                 <>
