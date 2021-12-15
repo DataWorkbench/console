@@ -1,8 +1,7 @@
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
-import { Guide, GuideProps, TextLink } from 'components'
-import { getHelpCenterLink } from 'utils'
+import { Guide, GuideProps, HelpCenterLink } from 'components'
 import SexangleImg from 'assets/svgr/sexangle.svg'
 
 const guideData: GuideProps = {
@@ -48,14 +47,12 @@ const SpaceListsEmpty = () => {
             </div>
             <div tw="mt-4 text-neut-8">
               {isModal ? (
-                <a
-                  tw="text-link cursor-pointer"
-                  href={getHelpCenterLink('/bigdata/dataplat/intro/concept/')}
-                  target="_blank"
-                  rel="noreferrer"
+                <HelpCenterLink
+                  href="/bigdata/dataplat/intro/concept/"
+                  isIframe={!isModal}
                 >
                   了解更多
-                </a>
+                </HelpCenterLink>
               ) : (
                 '工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。'
               )}
@@ -72,13 +69,19 @@ const SpaceListsEmpty = () => {
               </Button>
             </div>
             <div css={[tw`space-x-3 mt-3`, !isModal && tw`mb-8`]}>
-              <TextLink href="###" hasIcon={false}>
+              <HelpCenterLink
+                href="/bigdata/dataplat/manual/overview/"
+                isIframe={!isModal}
+              >
                 使用指南
-              </TextLink>
-              <span tw="text-link">|</span>
-              <TextLink href="###" hasIcon={false}>
-                使用指南
-              </TextLink>
+              </HelpCenterLink>
+              <span tw="text-deepblue-10">|</span>
+              <HelpCenterLink
+                href="/bigdata/dataplat/manual/overview/"
+                isIframe={!isModal}
+              >
+                介绍视频
+              </HelpCenterLink>
             </div>
           </div>
         </div>
