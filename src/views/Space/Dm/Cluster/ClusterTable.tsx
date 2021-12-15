@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import { Menu } from '@QCFE/lego-ui'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import {
   Button,
   Icon,
@@ -17,6 +17,7 @@ import {
   Tooltip,
   AffixLabel,
   TextLink,
+  RouterLink,
 } from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
@@ -36,8 +37,16 @@ const { MenuItem } = Menu
 
 const statusFilters = [
   {
-    text: '运行中',
+    text: '已删除',
     value: 1,
+    color: {
+      primary: '#939EA9',
+      secondary: '#DEE7F1',
+    },
+  },
+  {
+    text: '运行中',
+    value: 2,
     color: {
       primary: '#15A675',
       secondary: '#C6F4E4',
@@ -45,7 +54,7 @@ const statusFilters = [
   },
   {
     text: '停止',
-    value: 2,
+    value: 3,
     color: {
       primary: '#939EA9',
       secondary: '#DEE7F1',
@@ -53,7 +62,7 @@ const statusFilters = [
   },
   {
     text: '启动中',
-    value: 3,
+    value: 4,
     color: {
       primary: '#2193D3',
       secondary: '#C1E9FF',
@@ -61,7 +70,7 @@ const statusFilters = [
   },
   {
     text: '异常',
-    value: 4,
+    value: 5,
     color: {
       primary: '#CF3B37',
       secondary: '#FEF2F2',
@@ -69,7 +78,7 @@ const statusFilters = [
   },
   {
     text: '欠费',
-    value: 5,
+    value: 6,
     color: {
       primary: '#A855F7',
       secondary: '#F6EDFF',
@@ -78,13 +87,13 @@ const statusFilters = [
 ]
 
 interface IFilter {
-  name: string
   offset: number
   limit: number
   reverse: boolean
   search: string
   sort_by: string
   status: string | number
+  verbose: number
 }
 
 const columnSettingsKey = 'BIGDATA_CLUSTER_COLUMN_SETTINGS'
@@ -106,13 +115,13 @@ const ClusterTable = observer(
       localstorage.getItem(columnSettingsKey) || []
     )
     const [filter, setFilter] = useImmer<IFilter>({
-      name: '',
       offset: 0,
       limit: 10,
       reverse: true,
       search: '',
       sort_by: '',
-      status: selectMode ? 1 : '',
+      status: selectMode ? 2 : '',
+      verbose: 1,
     })
     const queryClient = useQueryClient()
     const mutation = useMutationCluster()
@@ -132,9 +141,9 @@ const ClusterTable = observer(
           render: (v: any, row: any) => (
             <FlexBox tw="items-center space-x-1">
               <Center tw="bg-neut-13 rounded-full w-6 h-6">
-                <Icon name="pod" type="light" />
+                <Icon name="pod" type="light" size={16} />
               </Center>
-              <div>
+              <div tw="flex-1 break-all">
                 <div>{row.name}</div>
                 <div>{row.id}</div>
               </div>
@@ -193,6 +202,25 @@ const ClusterTable = observer(
         {
           title: '网络配置名称/ID',
           dataIndex: 'network_id',
+          render: (v: string, row: any) => {
+            return (
+              <div tw="cursor-pointer text-white hover:text-green-11">
+                <Tooltip
+                  content={
+                    <>
+                      <div>VPC: {get(row, 'network_info.router_id')}</div>
+                      <div>Vxnet: {get(row, 'network_info.vxnet_id')}</div>
+                    </>
+                  }
+                  theme="light"
+                  hasPadding
+                >
+                  <div>{get(row, 'network_info.name')}</div>
+                </Tooltip>
+                <div tw="text-neut-8">{get(row, 'id')}</div>
+              </div>
+            )
+          },
         },
         {
           title: '版本',
@@ -251,20 +279,13 @@ const ClusterTable = observer(
           render: (v: any, row: any) => (
             <FlexBox tw="items-center">
               <Button type="text">
-                <TextLink
-                  href={`//${row.web_ui}`}
-                  target="_blank"
-                  tw="text-white!"
-                  rel="noreferrer"
-                  hasIcon
-                  // className="link"
-                >
+                <TextLink href={`//${row.web_ui}`} target="_blank">
                   Flink UI
                 </TextLink>
               </Button>
               <Button
                 type="text"
-                disabled={[1, 3].includes(row.status)}
+                disabled={[2, 4].includes(row.status)}
                 onClick={() => {
                   setOp('update')
                   setOpClusterList([row])
@@ -285,15 +306,15 @@ const ClusterTable = observer(
                       }}
                     >
                       <MenuItem key="view">查看详情</MenuItem>
-                      {(row.status === 1 || row.status === 3) && (
+                      {(row.status === 2 || row.status === 4) && (
                         <MenuItem key="stop">停用</MenuItem>
                       )}
-                      {row.status === 2 && (
+                      {row.status === 3 && (
                         <MenuItem key="start">启动</MenuItem>
                       )}
                       <MenuItem
                         key="delete"
-                        disabled={[1, 3].includes(row.status)}
+                        disabled={[2, 4].includes(row.status)}
                       >
                         删除
                       </MenuItem>
@@ -350,8 +371,8 @@ const ClusterTable = observer(
       infos.filter(
         (info: any) =>
           selectedRowKeys.includes(info.id) &&
-          info.status !== 1 &&
-          info.status !== 3
+          info.status !== 2 &&
+          info.status !== 4
       ) || []
 
     const filterColumn = columnSettings
@@ -367,12 +388,9 @@ const ClusterTable = observer(
             {selectMode ? (
               <div>
                 如需选择新的计算集群，您可以
-                <Link
-                  to={`/${regionId}/workspace/${spaceId}/dm/cluster`}
-                  tw="underline text-underline-offset[2px]"
-                >
+                <RouterLink to={`/${regionId}/workspace/${spaceId}/dm/cluster`}>
                   新建计算集群
-                </Link>
+                </RouterLink>
               </div>
             ) : (
               <Center tw="space-x-3">
@@ -418,12 +436,12 @@ const ClusterTable = observer(
                 placeholder="请输入关键词进行搜索"
                 onPressEnter={(e: React.SyntheticEvent) => {
                   setFilter((draft) => {
-                    draft.name = (e.target as HTMLInputElement).value
+                    draft.search = (e.target as HTMLInputElement).value
                   })
                 }}
                 onClear={() => {
                   setFilter((draft) => {
-                    draft.name = ''
+                    draft.search = ''
                   })
                 }}
               />

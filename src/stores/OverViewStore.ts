@@ -33,7 +33,7 @@ class OverViewStore {
       xlink: 'icon_service_1',
       desc: '在云上的大数据开发环境，将您的数据进行加工，支持实时处理、离线批量处理。根据您的业务需求，采用页面拖拽编排的方式，自定义处理内容，进一步降低数据处理难度，提升数据开发体验。',
       enabled: true,
-      moreLink: '/bigdata/dataplat/intro/development_process/',
+      moreLink: '/bigdata/dataplat/manual/data_development/summary/',
     },
     {
       text: '数据仓库',
@@ -66,7 +66,7 @@ class OverViewStore {
       xlink: 'icon_service_5',
       desc: '实时监测数据加工任务的状态，监测批量/实时任务的运行情况、资源调度分配、工作耗时情况、工作报错情况。并及时发出预警。',
       enabled: true,
-      moreLink: '##',
+      moreLink: '/bigdata/dataplat/manual/operation_maintence/released_job/',
     },
   ]
 
