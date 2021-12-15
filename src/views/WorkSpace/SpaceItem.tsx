@@ -249,6 +249,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                         const subItems = subFunc.items || []
                         return subItems.length ? (
                           <SubMenu
+                            key={subFunc.name}
                             onClick={(e: React.SyntheticEvent) => {
                               e.stopPropagation()
                             }}
