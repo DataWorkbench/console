@@ -14,8 +14,8 @@ import { useImmer } from 'use-immer'
 import { flatten, get } from 'lodash-es'
 import {
   useMutationStreamJobArgs,
+  useQueryResource,
   useQueryStreamJobArgs,
-  useQueryUdf,
 } from 'hooks'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { ScheForm } from './styled'
@@ -23,23 +23,23 @@ import { ScheForm } from './styled'
 const { CollapseItem } = Collapse
 const { NumberField, SelectField } = Form
 
-interface UdfSelectProps {
+interface ResourceSelectProps {
   type: number
   [propName: string]: any
 }
-const UdfSelect = (props: UdfSelectProps) => {
+const ResourceSelect = (props: ResourceSelectProps) => {
   const { type } = props
   const [filter] = useImmer<{
     limit: number
     offset: number
-    udf_type: number
+    resource_type: number
   }>({
     limit: 15,
     offset: 0,
-    udf_type: type,
+    resource_type: type,
   })
 
-  const v = useQueryUdf(filter)
+  const v = useQueryResource(filter)
   const { status, data, fetchNextPage, hasNextPage } = v
   const options = flatten(
     data?.pages.map((page: Record<string, any>) => page.infos || [])
@@ -59,7 +59,7 @@ const UdfSelect = (props: UdfSelectProps) => {
       isLoadingAtBottom
       onMenuScrollToBottom={loadData}
       bottomTextVisible
-      valueKey="udf_id"
+      valueKey="resource_id"
       labelKey="name"
     />
   )
@@ -68,9 +68,8 @@ const UdfSelect = (props: UdfSelectProps) => {
 const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   const [params, setParams] = useImmer({
     clusterId: 'eng-0000000000000000',
-    udf_ids: [] as number[],
-    udtf_ids: [] as number[],
-    udttf_ids: [] as number[],
+    udfs: [] as string[],
+    connectors: [] as string[],
     parallelism: 0,
   })
   const [show, setShow] = useState(false)
@@ -83,9 +82,8 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
     setParams((draft) => {
       draft.clusterId = get(data, 'cluster_id', '')
       draft.parallelism = get(data, 'parallelism', 0)
-      draft.udf_ids = get(data, 'function.udf_ids', [])
-      draft.udtf_ids = get(data, 'function.udtf_ids', [])
-      draft.udttf_ids = get(data, 'function.udttf_ids', [])
+      draft.udfs = get(data, 'udfs', [])
+      draft.connectors = get(data, 'connectors', [])
     })
   }, [data, setParams])
 
@@ -93,11 +91,8 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
     mutation.mutate(
       {
         cluster_id: params.clusterId,
-        function: {
-          udf_ids: params.udf_ids,
-          udtf_ids: params.udtf_ids,
-          udttf_ids: params.udttf_ids,
-        },
+        connectors: params.connectors,
+        udfs: params.udfs,
         parallelism: params.parallelism,
       },
       {
@@ -121,7 +116,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
         confirmLoading={mutation.isLoading}
       >
         <Loading spinning={isFetching}>
-          <Collapse defaultActiveKey={['p1', 'p2']}>
+          <Collapse defaultActiveKey={['p1']}>
             <CollapseItem
               key="p1"
               label={
@@ -185,44 +180,31 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
               }
             >
               <ScheForm layout="horizon">
-                <UdfSelect
+                <ResourceSelect
                   name="udf"
-                  label="UDF"
-                  value={params.udf_ids}
+                  label="依赖包"
+                  value={params.connectors}
                   multi
                   closeOnSelect={false}
-                  onChange={(udf_ids: number[]) =>
+                  onChange={(connectors: string[]) =>
                     setParams((draft) => {
-                      draft.udf_ids = udf_ids
-                    })
-                  }
-                  type={1}
-                />
-                <UdfSelect
-                  name="udtf"
-                  label="UDTF"
-                  multi
-                  closeOnSelect={false}
-                  value={params.udtf_ids}
-                  onChange={(udtf_ids: number[]) =>
-                    setParams((draft) => {
-                      draft.udtf_ids = udtf_ids
-                    })
-                  }
-                  type={2}
-                />
-                <UdfSelect
-                  name="udttf"
-                  label="UDTTF"
-                  multi
-                  closeOnSelect={false}
-                  value={params.udttf_ids}
-                  onChange={(udttf_ids: number[]) =>
-                    setParams((draft) => {
-                      draft.udttf_ids = udttf_ids
+                      draft.connectors = connectors
                     })
                   }
                   type={3}
+                />
+                <ResourceSelect
+                  name="函数包"
+                  label="函数包"
+                  multi
+                  closeOnSelect={false}
+                  value={params.udfs}
+                  onChange={(udfs: string[]) =>
+                    setParams((draft) => {
+                      draft.udfs = udfs
+                    })
+                  }
+                  type={2}
                 />
               </ScheForm>
             </CollapseItem>
