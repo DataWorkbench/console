@@ -69,6 +69,7 @@ const UploadModal = observer((props: any) => {
   } = useStore()
 
   const [resourceName, setResourceName] = useState('')
+  const [fileTip, setFileTip] = useState('')
 
   const resourceEl = useRef<HTMLInputElement>(null)
   const form = useRef<Form>(null)
@@ -89,6 +90,8 @@ const UploadModal = observer((props: any) => {
     handleCancel()
     setFile(undefined)
     setOp('')
+    setResourceName('')
+    setFileTip('')
   }
 
   const handleFile = () => {
@@ -102,8 +105,19 @@ const UploadModal = observer((props: any) => {
   }
 
   const handleResourceChange = (event: any) => {
-    setFile(event.target.files[0])
-    if (!resourceName) setResourceName(event.target.files[0].name)
+    const resource = event.target.files[0]
+
+    if (resource.size > 100 * 1024 * 1024) {
+      setFileTip('size')
+      return
+    }
+    if (resource.type !== 'application/java-archive') {
+      setFileTip('type')
+      return
+    }
+    setFile(resource)
+    setFileTip('')
+    if (!resourceName) setResourceName(resource.name)
   }
 
   const handleOk = async () => {
@@ -232,7 +246,7 @@ const UploadModal = observer((props: any) => {
             },
             {
               rule: { matchRegex: /^(?!_)[a-zA-Z0-9_]+/ },
-              help: '只允许中文、数字、字母或下划线(_) 不能以(_)开头',
+              help: '只允许数字、字母或下划线(_) 不能以(_)开头',
               status: 'error',
             },
             {
@@ -251,7 +265,7 @@ const UploadModal = observer((props: any) => {
           labelClassName="medium"
           label="描述"
           placeholder={`请输入${PackageName[packageType]}描述`}
-          maxLength="1024"
+          maxLength="500"
           disabled={op === 'view'}
           defaultValue={(op !== 'create' && defaultFields.description) || ''}
         />
@@ -309,8 +323,26 @@ const UploadModal = observer((props: any) => {
           </Field>
         )}
         {op !== 'edit' && (
-          <div tw="pl-28 ml-2 pb-3 pt-1 text-neut-8">
-            仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
+          <div tw="pb-3">
+            <div tw="pl-28 ml-2 pt-1 text-neut-8">
+              仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
+            </div>
+            {fileTip && (
+              <div tw="text-red-10 ml-2 pl-28 align-middle mt-1">
+                <Icon
+                  tw="inline-block align-top text-red-10"
+                  name="error"
+                  size="small"
+                  color={{
+                    primary: 'transparent',
+                    secondary: '#CF3B37',
+                  }}
+                />
+                {fileTip === 'size'
+                  ? '已选文件超过 100 MB，请重新添加'
+                  : '已选文件格式不合规，请重新添加'}
+              </div>
+            )}
           </div>
         )}
       </Form>

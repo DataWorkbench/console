@@ -58,7 +58,7 @@ export default function DeleteModal(props: any) {
     {
       title: '文件大小',
       dataIndex: 'size',
-      render: (value: number) => <>{Math.round(value / 1000)}kb</>,
+      render: (value: number) => <>{Math.round(value / 1024)}kb</>,
     },
     {
       title: '描述',
@@ -81,7 +81,7 @@ export default function DeleteModal(props: any) {
             loading={mutation.isLoading}
             onClick={handleDelete}
           >
-            确定
+            删除
           </Button>
         </FlexBox>
       }
@@ -139,7 +139,7 @@ export default function DeleteModal(props: any) {
                         )后，相关作业将无法引用，已引用的作业将受到影响，且该操作无法撤回。确认删除吗？
                       </>
                     ))}
-                  {packageType === 'denpendency' &&
+                  {packageType === 'dependency' &&
                     (selectedList.length > 1 ? (
                       <>
                         删除以下依赖包后，具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认，且该操作无法撤回。确认删除吗？

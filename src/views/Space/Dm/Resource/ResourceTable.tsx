@@ -232,7 +232,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         {
           title: '文件大小',
           dataIndex: 'size',
-          render: (value: number) => <>{Math.round(value / 1000)}kb</>,
+          render: (value: number) => <>{Math.round(value / 1024)}kb</>,
         },
         {
           title: '描述',

@@ -22,7 +22,7 @@ export const Release = () => {
           <Label>作业流程</Label>
           <Control>
             <InputSearch
-              placeholder="搜素业务流名称、ID"
+              placeholder="搜索作业名称、ID"
               onPressEnter={(e: React.SyntheticEvent) => {
                 handleQueryChange(
                   'search',

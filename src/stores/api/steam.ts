@@ -25,7 +25,7 @@ export const listStreamJobInstances = ({
 }: IStreamParams) => {
   request({
     region: regionId,
-    uri: `/v1/wortspace/${spaceId}/stream/job/instance`,
+    uri: `/v1/workspace/${spaceId}/stream/job/instance`,
     query: rest,
   })
 }
