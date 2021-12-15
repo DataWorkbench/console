@@ -220,6 +220,7 @@ const SpaceModal = observer(
                     </div>
                     <div>
                       <Input
+                        autocomplete="off"
                         type="text"
                         tw="w-40"
                         placeholder="delete"
@@ -267,6 +268,7 @@ const SpaceModal = observer(
             )}
             <TextField
               name="name"
+              autocomplete="off"
               label="工作空间名称"
               validateOnChange
               placeholder="字母、数字或下划线（_）"

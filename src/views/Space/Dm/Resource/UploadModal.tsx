@@ -210,6 +210,7 @@ const UploadModal = observer((props: any) => {
       <Form ref={form} tw="pl-0!">
         <TextFieldWrapper
           maxLength="128"
+          autocomplete="off"
           name="resource_name"
           labelClassName="medium"
           placeholder={`请输入${packageTypeName}显示名`}

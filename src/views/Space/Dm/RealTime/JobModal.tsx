@@ -232,6 +232,7 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
             <div tw="flex justify-center mb-10">
               <Form layout="vertical" ref={form}>
                 <TextField
+                  autocomplete="off"
                   name="name"
                   label={<AffixLabel>作业名称</AffixLabel>}
                   placeholder='允许包含字母、数字 及 "_"，长度2～128'

@@ -58,6 +58,7 @@ const ReleaseModal = ({ onCancel }: { onCancel: () => void }) => {
         <div>描述</div>
         <div tw="w-80">
           <Input
+            autocomplete="off"
             value={params.desc}
             onChange={(e: any, v: string | number) =>
               setParams((draft) => {

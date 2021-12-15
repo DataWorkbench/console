@@ -268,6 +268,7 @@ const ClusterModal = observer(
               >
                 <Form ref={baseFormRef}>
                   <TextField
+                    autocomplete="off"
                     label={<AffixLabel required>名称</AffixLabel>}
                     name="name"
                     placeholder="请输入计算集群名称"

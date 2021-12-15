@@ -107,6 +107,7 @@ const compInfo = {
   },
   password: {
     name: 'password',
+    autocomplete: 'off',
     label: '密码（Password）',
     placeholder: '请输入数据库密码（Password）',
     component: PasswordField,
@@ -149,6 +150,7 @@ const compInfo = {
   user: {
     name: 'user',
     label: '用户名（User Name）',
+    autocomplete: 'off',
     placeholder: '请输入数据库用户名（User Name）',
     schemas: [
       {
@@ -440,6 +442,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
             <TextField
               name="name"
               tw="w-80"
+              autocomplete="off"
               defaultValue={get(sourceInfo, 'name', '')}
               label={<AffixLabel>数据源名称</AffixLabel>}
               placeholder="请输入数据源名称（自定义）"
