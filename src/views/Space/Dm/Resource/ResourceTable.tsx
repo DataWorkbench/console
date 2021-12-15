@@ -267,6 +267,16 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                   trigger="click"
                   placement="bottom"
                   arrow={false}
+                  twChild={
+                    css`
+                      &[aria-expanded='true'] {
+                        ${tw`bg-[#4C5E70]`}
+                      }
+                      svg {
+                        ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                      }
+                    ` as any
+                  }
                   content={
                     <Menu
                       onClick={(e: any, key: any) => {
@@ -282,8 +292,14 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                     </Menu>
                   }
                 >
-                  <div tw="flex items-center">
-                    <Icon name="more" clickable changeable type="light" />
+                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-[#4C5E70] rounded-sm">
+                    <Icon
+                      name="more"
+                      clickable
+                      changeable
+                      type="light"
+                      size={20}
+                    />
                   </div>
                 </Tooltip>
               </Center>
