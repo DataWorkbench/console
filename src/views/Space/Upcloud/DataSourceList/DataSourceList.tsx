@@ -558,7 +558,7 @@ const DataSourceList = observer(() => {
                       </div>
                       <div>
                         <Input
-                          autocomplete="off"
+                          autoComplete="off"
                           type="text"
                           placeholder="delete"
                           tw="w-40"

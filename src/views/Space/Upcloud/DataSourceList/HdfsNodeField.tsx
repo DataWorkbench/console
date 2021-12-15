@@ -24,7 +24,7 @@ const HdfsNodeField = forwardRef((props: IHdfsNodeField, ref) => {
   return (
     <div tw="flex space-x-2">
       <Input
-        autocomplete="off"
+        autoComplete="off"
         type="text"
         ref={ref}
         tw="w-full max-w-[328px]"
@@ -41,7 +41,7 @@ const HdfsNodeField = forwardRef((props: IHdfsNodeField, ref) => {
         }}
       />
       <Input
-        autocomplete="off"
+        autoComplete="off"
         type="text"
         tw="w-24"
         onBlur={handleOnBlur}

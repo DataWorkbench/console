@@ -226,7 +226,7 @@ const KVTextArea = forwardRef(
                 onMouseLeave={() => setCurIptIdx(-1)}
               >
                 <Input
-                  autocomplete="off"
+                  autoComplete="off"
                   disabled={disabled}
                   defaultValue={kv[0] || ''}
                   onChange={(e, v) => handleInputChange('k', String(v), i)}
@@ -234,7 +234,7 @@ const KVTextArea = forwardRef(
                 />
                 <div>{division}</div>
                 <Input
-                  autocomplete="off"
+                  autoComplete="off"
                   disabled={disabled}
                   defaultValue={kv[1] || ''}
                   onChange={(e, v) => handleInputChange('v', String(v), i)}

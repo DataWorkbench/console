@@ -339,7 +339,7 @@ const UdfModal = observer(() => {
                     <span>{curLangInfo?.text}</span>
                   </Field>
                   <TextField
-                    autocomplete="off"
+                    autoComplete="off"
                     name="name"
                     labelClassName="label-required"
                     placeholder="请输入函数名"
