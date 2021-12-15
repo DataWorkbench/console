@@ -203,7 +203,10 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           title: `${packageTypeName}名称`,
           dataIndex: 'name',
           sortable: true,
-          sortOrder: filter.reverse ? 'asc' : 'desc',
+          sortOrder:
+            //  filter.reverse ? 'asc' : 'desc',
+            // eslint-disable-next-line no-nested-ternary
+            filter.sort_by === 'name' ? (filter.reverse ? 'asc' : 'desc') : '',
           render: (_: string, row: Record<string, any>) => {
             return (
               <FlexBox tw="items-center space-x-1">
@@ -243,7 +246,14 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           title: '上传时间',
           dataIndex: 'updated',
           sortable: true,
-          sortOrder: filter.reverse ? 'asc' : 'desc',
+          sortOrder:
+            // filter.reverse ? 'asc' : 'desc',
+            // eslint-disable-next-line no-nested-ternary
+            filter.sort_by === 'updated'
+              ? filter.reverse
+                ? 'asc'
+                : 'desc'
+              : '',
           render: (value: number) => {
             return (
               <div tw="text-neut-8">
@@ -267,6 +277,16 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                   trigger="click"
                   placement="bottom"
                   arrow={false}
+                  twChild={
+                    css`
+                      &[aria-expanded='true'] {
+                        ${tw`bg-[#4C5E70]`}
+                      }
+                      svg {
+                        ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                      }
+                    ` as any
+                  }
                   content={
                     <Menu
                       onClick={(e: any, key: any) => {
@@ -282,8 +302,14 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                     </Menu>
                   }
                 >
-                  <div tw="flex items-center">
-                    <Icon name="more" clickable changeable type="light" />
+                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-[#4C5E70] rounded-sm">
+                    <Icon
+                      name="more"
+                      clickable
+                      changeable
+                      type="light"
+                      size={20}
+                    />
                   </div>
                 </Tooltip>
               </Center>
@@ -294,6 +320,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     }, [
       packageTypeName,
       filter.reverse,
+      filter.sort_by,
       packageType,
       handleEdit,
       handleDownload,
@@ -320,7 +347,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         <div tw="bg-neut-16 p-5" className={className}>
           <Alert
             type="info"
-            tw="bg-neut-16! mb-4"
+            tw="mb-4"
             message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
             linkBtn={<Button type="text">查看详情 →</Button>}
           />

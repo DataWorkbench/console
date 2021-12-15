@@ -102,14 +102,21 @@ const NetworkTable = observer(() => {
         title: '创建时间',
         dataIndex: 'created',
         sortable: true,
-        sortOrder: filter.reverse ? 'asc' : 'desc',
+        sortOrder:
+          // filter.reverse ? 'asc' : 'desc',
+          // eslint-disable-next-line no-nested-ternary
+          filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
         title: '最近更新时间',
         dataIndex: 'updated',
         sortable: true,
-        sortOrder: filter.reverse ? 'asc' : 'desc',
+        sortOrder:
+          // filter.reverse ? 'asc' : 'desc',
+          // eslint-disable-next-line no-nested-ternary
+          filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
+
         render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
@@ -139,7 +146,7 @@ const NetworkTable = observer(() => {
         ),
       },
     ]
-  }, [setOp, setOpNetworkList, regionId, filter.reverse])
+  }, [setOp, setOpNetworkList, filter.sort_by, regionId, filter.reverse])
 
   const refetchData = () => {
     queryClient.invalidateQueries(getNetworkKey())

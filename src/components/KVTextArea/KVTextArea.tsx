@@ -10,6 +10,7 @@ import {
 import { trim, filter } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { FlexBox } from 'components/Box'
+import { Tooltip } from '../Tooltip'
 
 const Root = styled('div')(() => [
   tw`flex-1`,
@@ -34,7 +35,10 @@ const InputRow = styled(FlexBox)(
     tw`px-3 py-1.5 items-center`,
     css`
       &:hover {
-        ${tw`bg-neut-2 dark:bg-neut-17`}
+        ${tw`bg-neut-2 dark:bg-[#1E2F41]`}
+      }
+      .icon svg {
+        ${tw`dark:text-white dark:fill-[#fff6]`}
       }
     `,
   ]
@@ -226,6 +230,7 @@ const KVTextArea = forwardRef(
                 onMouseLeave={() => setCurIptIdx(-1)}
               >
                 <Input
+                  autoComplete="off"
                   disabled={disabled}
                   defaultValue={kv[0] || ''}
                   onChange={(e, v) => handleInputChange('k', String(v), i)}
@@ -233,19 +238,22 @@ const KVTextArea = forwardRef(
                 />
                 <div>{division}</div>
                 <Input
+                  autoComplete="off"
                   disabled={disabled}
                   defaultValue={kv[1] || ''}
                   onChange={(e, v) => handleInputChange('v', String(v), i)}
                   onBlur={(e, v) => handleInputBlur(v)}
                 />
                 <div tw="px-2" css={[curIptIndex !== i && tw`invisible`]}>
-                  <Icon
-                    disabled={disabled}
-                    name="trash"
-                    clickable
-                    type="dark"
-                    onClick={() => handleInputsDel(i)}
-                  />
+                  <Tooltip content="删除" theme="light" hasPadding>
+                    <Icon
+                      disabled={disabled}
+                      name="trash"
+                      clickable
+                      type="dark"
+                      onClick={() => handleInputsDel(i)}
+                    />
+                  </Tooltip>
                 </div>
               </InputRow>
             ))}

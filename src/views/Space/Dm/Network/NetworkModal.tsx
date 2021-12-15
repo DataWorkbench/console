@@ -141,6 +141,7 @@ const NetworkModal = observer(
           <FormWrapper>
             <Form ref={formRef}>
               <TextField
+                autoComplete="off"
                 label={<AffixLabel>网络名称</AffixLabel>}
                 placeholder="请输入网络名称"
                 name="name"

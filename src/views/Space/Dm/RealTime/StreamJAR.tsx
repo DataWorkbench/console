@@ -210,6 +210,7 @@ const StreamJAR = () => {
             <TextField
               name="jar_entry"
               label="运行函数入口"
+              autoComplete="off"
               placeholder="请输入运行函数入口"
               value={params.jarEntry}
               onChange={(v: string) => {
@@ -221,6 +222,7 @@ const StreamJAR = () => {
             <TextField
               name="jar_args"
               label="运行参数"
+              autoComplete="off"
               placeholder="请输入运行参数"
               value={params.jarArgs}
               onChange={(v: string) => {

@@ -285,18 +285,21 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
             <ScheSettingForm layout="horizon">
               <TextField
                 value={curJob?.name}
+                autoComplete="off"
                 disabled
                 name="name"
                 label="业务名称"
               />
               <TextField
                 value={curJob?.id}
+                autoComplete="off"
                 disabled
                 name="id"
                 label="业务 ID"
               />
               <TextField
                 value={curJob?.desc}
+                autoComplete="off"
                 disabled
                 name="desc"
                 label="业务描述"

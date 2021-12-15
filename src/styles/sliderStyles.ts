@@ -10,6 +10,9 @@ const sliderStyles = css`
         ${tw`border-neut-13`}
       }
     }
+    .alert-info {
+      ${tw`bg-[#2193d31a]`}
+    }
   }
 `
 export default sliderStyles
