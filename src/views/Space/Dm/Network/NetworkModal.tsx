@@ -202,13 +202,7 @@ const NetworkModal = observer(
                 help={
                   <>
                     如需选择新的 VPC，您可以
-                    <TextLink
-                      href="/iaas/vpc/create"
-                      target="_blank"
-                      // className="link"
-                      // tw="text-green-11"
-                      hasIcon
-                    >
+                    <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
                       新建 VPC 网络
                     </TextLink>
                   </>
@@ -230,7 +224,6 @@ const NetworkModal = observer(
                           href="/iaas/vpc/create"
                           target="_blank"
                           hasIcon
-                          // className="link"
                         >
                           新建 VPC 网络
                         </TextLink>

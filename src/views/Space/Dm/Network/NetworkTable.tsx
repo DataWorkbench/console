@@ -83,13 +83,7 @@ const NetworkTable = observer(() => {
         dataIndex: 'router_id',
         render: (v: string) =>
           v ? (
-            <TextLink
-              href={`/${regionId}/routers/${v}`}
-              target="_blank"
-              rel="noreferrer"
-              hasIcon
-              // className="link"
-            >
+            <TextLink href={`/${regionId}/routers/${v}`} target="_blank">
               {v}
             </TextLink>
           ) : null,
@@ -99,13 +93,7 @@ const NetworkTable = observer(() => {
         dataIndex: 'vxnet_id',
         render: (v: string) =>
           v ? (
-            <TextLink
-              href={`/${regionId}/vxnets/${v}`}
-              target="_blank"
-              rel="noreferrer"
-              hasIcon
-              // className="link"
-            >
+            <TextLink href={`/${regionId}/vxnets/${v}`} target="_blank">
               {v}
             </TextLink>
           ) : null,

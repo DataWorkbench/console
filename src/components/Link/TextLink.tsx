@@ -1,6 +1,7 @@
 import { ButtonProps, Icon } from '@QCFE/qingcloud-portal-ui'
 import React, { PropsWithChildren } from 'react'
 import tw, { styled, css } from 'twin.macro'
+import { Link as ReactRouterLink } from 'react-router-dom'
 
 interface LinkInterface {
   hasIcon?: boolean
@@ -38,18 +39,27 @@ const Link = (
   return <a {...rest}>{children}</a>
 }
 
-const TextLink = styled(Link)(
+const colorThemes = {
+  blue: tw`text-deepblue-10 dark:text-blue-10 hover:text-deepblue-12 hover:dark:text-blue-12 active:text-deepblue-13 active:dark:text-blue-13`,
+  white: tw`text-green-11 dark:text-white hover:text-green-12 hover:dark:text-green-11 active:text-green-13 active:dark:text-green-12`,
+}
+
+export const TextLink = styled(Link)(
   ({ color = 'blue' }: { color?: 'blue' | 'white' }) => [
     tw`font-semibold underline text-underline-offset[1px]`,
-    color === 'blue' &&
-      tw`text-deepblue-10 dark:text-blue-10 hover:text-deepblue-12 hover:dark:text-blue-12 active:text-deepblue-13 active:dark:text-blue-13`,
-    color === 'white' &&
-      tw`text-green-11 dark:text-white hover:text-green-12 hover:dark:text-green-11 active:text-green-13 active:dark:text-green-12`,
+    () => colorThemes[color],
     css`
       & .if {
         ${tw`inline-block`}
       }
     `,
+  ]
+)
+
+export const RouterLink = styled(ReactRouterLink)(
+  ({ color = 'white' }: { color?: 'blue' | 'white' }) => [
+    tw`font-semibold underline text-underline-offset[1px]`,
+    () => colorThemes[color],
   ]
 )
 

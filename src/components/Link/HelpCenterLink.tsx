@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react'
 import { Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
 import { getHelpCenterLink } from 'utils'
-import TextLink from './TextLink'
+import { TextLink } from './TextLink'
 
 interface LinkInterface {
   isIframe?: boolean
