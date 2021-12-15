@@ -11,7 +11,7 @@ import {
   PopConfirm,
 } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getResourcePageQueryKey, useMutationResource, useStore } from 'hooks'
 import { DarkModal, Tooltip, Center, AffixLabel } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
@@ -68,6 +68,8 @@ const UploadModal = observer((props: any) => {
     dmStore: { setOp, op },
   } = useStore()
 
+  const [resourceName, setResourceName] = useState('')
+
   const resourceEl = useRef<HTMLInputElement>(null)
   const form = useRef<Form>(null)
   const [file, setFile] = useState<File>()
@@ -78,6 +80,10 @@ const UploadModal = observer((props: any) => {
   const mutation = useMutationResource()
 
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    form.current?.validateFields()
+  }, [resourceName])
 
   const closeModal = () => {
     handleCancel()
@@ -97,6 +103,7 @@ const UploadModal = observer((props: any) => {
 
   const handleResourceChange = (event: any) => {
     setFile(event.target.files[0])
+    if (!resourceName) setResourceName(event.target.files[0].name)
   }
 
   const handleOk = async () => {
@@ -220,16 +227,23 @@ const UploadModal = observer((props: any) => {
           schemas={[
             {
               rule: { required: true },
-              help: '请输入程序包显示名',
+              help: `请输入${PackageName[packageType]}显示名`,
               status: 'error',
             },
             {
-              rule: { matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/ },
-              help: '只允许字母、数字或下划线（_）,不能以（_）开始结尾',
+              rule: { matchRegex: /^(?!_)[a-zA-Z0-9_]+/ },
+              help: '只允许中文、数字、字母或下划线(_) 不能以(_)开头',
+              status: 'error',
+            },
+            {
+              rule: { matchRegex: /.jar$/ },
+              help: '需要.jar扩展名',
               status: 'error',
             },
           ]}
           disabled={op === 'view'}
+          value={resourceName}
+          onChange={(value: string) => setResourceName(value)}
           defaultValue={(op !== 'create' && defaultFields.name) || ''}
         />
         <TextAreaFieldWrapper
