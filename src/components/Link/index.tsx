@@ -1,6 +1,6 @@
-import TextLink from './TextLink'
+import { TextLink, RouterLink } from './TextLink'
 import HelpCenterLink from './HelpCenterLink'
 
-export { TextLink, HelpCenterLink }
+export { TextLink, RouterLink, HelpCenterLink }
 
 export default TextLink

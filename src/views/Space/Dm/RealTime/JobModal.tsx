@@ -16,30 +16,39 @@ import { nameMatchRegex, strlen } from 'utils/convert'
 
 const { TextField, TextAreaField } = Form
 
-const ScheduleItem = styled('div')(({ selected }: { selected?: boolean }) => [
-  tw`flex flex-col w-1/3 rounded border-2 overflow-hidden border-neut-13 cursor-pointer transition-colors`,
-  selected &&
-    css`
-      ${tw`border-green-11`}
-      svg {
-        path:nth-of-type(1) {
-          fill-opacity: 0.8;
+const ScheduleItem = styled('div')(
+  ({
+    selected,
+    disabled = false,
+  }: {
+    selected?: boolean
+    disabled?: boolean
+  }) => [
+    tw`flex flex-col w-1/3 rounded border-2 overflow-hidden border-neut-13 transition-colors`,
+    disabled ? tw`cursor-not-allowed` : tw`cursor-pointer`,
+    selected &&
+      css`
+        ${tw`border-green-11`}
+        svg {
+          path:nth-of-type(1) {
+            fill-opacity: 0.8;
+          }
+          stop {
+            stop-color: ${theme('colors.green.11')};
+          }
         }
-        stop {
-          stop-color: ${theme('colors.green.11')};
+      `,
+    css`
+      &:hover {
+        svg {
+          path:nth-of-type(1) {
+            fill-opacity: 0.8;
+          }
         }
       }
     `,
-  css`
-    &:hover {
-      svg {
-        path:nth-of-type(1) {
-          fill-opacity: 0.8;
-        }
-      }
-    }
-  `,
-])
+  ]
+)
 
 const CodeButton = styled(Button)(({ selected }: { selected?: boolean }) => [
   // tw`bg-neut-17! hover:border-white! hover:bg-neut-18!`,
@@ -98,12 +107,6 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
   const scheduleTypes = useMemo(
     () => [
       {
-        type: 1,
-        title: '节点编排',
-        disp: '通过可视化节点编排完成 Flink 任务构建，适合有一定技术思想的业务人员进行数据开发。',
-        icon: <NodeTypeImg />,
-      },
-      {
         type: 2,
         title: 'SQL模式',
         disp: '原生 Flink SQL 支持，包含更多特性和功能，比算子编排更为强大。',
@@ -120,10 +123,15 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
         ],
         icon: <CodeTypeImg />,
       },
+      {
+        type: 1,
+        title: '算子编排（敬请期待）',
+        disp: '通过可视化节点编排完成 Flink 任务构建，适合有一定技术思想的业务人员进行数据开发。',
+        icon: <NodeTypeImg />,
+      },
     ],
     []
   )
-
   return (
     <>
       <Modal
@@ -180,10 +188,17 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                         key={type}
                         className="group"
                         selected={selected}
+                        disabled={type === 1}
                         onClick={() => {
-                          if (type !== -1) {
+                          if (type !== 1) {
+                            let tp = type
+                            if (type === -1) {
+                              tp = [3, 4, 5].includes(params.scheType)
+                                ? params.scheType
+                                : 3
+                            }
                             setParams((draft) => {
-                              draft.scheType = type
+                              draft.scheType = tp
                             })
                           }
                         }}
@@ -209,7 +224,8 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
                                 <CodeButton
                                   key={item.type}
                                   selected={params.scheType === item.type}
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation()
                                     setParams((draft) => {
                                       draft.scheType = item.type
                                     })

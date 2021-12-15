@@ -17,6 +17,7 @@ import { useImmer } from 'use-immer'
 import { set, range, trim, filter, assign, flatten } from 'lodash-es'
 import { useQueryClient } from 'react-query'
 import Tippy from '@tippyjs/react'
+import { useParams } from 'react-router-dom'
 import {
   useStore,
   useQueryFlinkVersions,
@@ -31,6 +32,7 @@ import {
   KVTextAreaField,
   AffixLabel,
   TextLink,
+  RouterLink,
 } from 'components'
 
 const { CollapseItem } = Collapse
@@ -125,6 +127,8 @@ const ClusterModal = observer(
     const {
       dmStore: { setOp, op },
     } = useStore()
+    const { regionId, spaceId } =
+      useParams<{ regionId: string; spaceId: string }>()
     const [params, setParams] = useImmer(opCluster || defaultParams)
     const baseFormRef = useRef<Form>(null)
     const networkFormRef = useRef<Form>(null)
@@ -652,13 +656,16 @@ const ClusterModal = observer(
                       }
                     }}
                     bottomTextVisible
-                    // options={[
-                    //   {
-                    //     label: 'net-0526a830be4f3000',
-                    //     value: 'net-0526a830be4f3000',
-                    //   },
-                    // ]}
-                    help={<div>如需选择新的 VPC，您可以新建 VPC 网络</div>}
+                    help={
+                      <div>
+                        如需选择新的 VPC，您可以
+                        <RouterLink
+                          to={`/${regionId}/workspace/${spaceId}/dm/network`}
+                        >
+                          新建 VPC 网络
+                        </RouterLink>
+                      </div>
+                    }
                   />
                 </Form>
               </CollapseItem>
