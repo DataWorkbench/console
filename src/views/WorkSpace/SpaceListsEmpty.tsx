@@ -47,10 +47,7 @@ const SpaceListsEmpty = () => {
             </div>
             <div tw="mt-4 text-neut-8">
               {isModal ? (
-                <HelpCenterLink
-                  href="/bigdata/dataplat/intro/concept/"
-                  isIframe={!isModal}
-                >
+                <HelpCenterLink href="/intro/concept/" isIframe={!isModal}>
                   了解更多
                 </HelpCenterLink>
               ) : (
@@ -69,17 +66,11 @@ const SpaceListsEmpty = () => {
               </Button>
             </div>
             <div css={[tw`space-x-3 mt-3`, !isModal && tw`mb-8`]}>
-              <HelpCenterLink
-                href="/bigdata/dataplat/manual/overview/"
-                isIframe={!isModal}
-              >
+              <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
                 使用指南
               </HelpCenterLink>
               <span tw="text-deepblue-10">|</span>
-              <HelpCenterLink
-                href="/bigdata/dataplat/manual/overview/"
-                isIframe={!isModal}
-              >
+              <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
                 介绍视频
               </HelpCenterLink>
             </div>

@@ -30,7 +30,7 @@ const TabWrapper = styled(Tabs)(() => [
       }
     }
     .tab-content {
-      ${tw`flex-1 py-0!`}
+      ${tw`flex-1 h-full py-0!`}
       .tab-panel {
         ${tw`flex h-full`}
       }

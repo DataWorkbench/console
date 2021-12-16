@@ -279,7 +279,7 @@ const SpaceModal = observer(
                     required: true,
                     matchRegex: nameMatchRegex,
                   },
-                  help: '字母、数字或下划线（_）,不能以（_）开结尾',
+                  help: '字母、数字或下划线（_）,不能以（_）开始结尾',
                   status: 'error',
                 },
                 {

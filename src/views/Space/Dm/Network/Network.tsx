@@ -1,5 +1,6 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components'
+import { getHelpCenterLink } from 'utils'
 import NetworkTable from './NetworkTable'
 
 const pageTabsData = [
@@ -8,7 +9,9 @@ const pageTabsData = [
     description:
       '计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明',
     icon: 'earth',
-    helpLink: '/compute/vm/',
+    helpLink: getHelpCenterLink(
+      '/manual/data_development/network/create_network/'
+    ),
   },
 ]
 

@@ -1,21 +1,21 @@
 import { FC } from 'react'
-import { Card, CardHeader, CardContent } from 'components'
-import { Icon, Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
+import { Card, CardHeader, CardContent, HelpCenterLink } from 'components'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 
 const questions = [
   {
     title: '大数据工作台的基本概念',
-    link: '/bigdata/dataplat/intro/concept/',
+    link: '/intro/concept/',
   },
   {
     title: '使用大数据工作台的准备工作',
-    link: '/bigdata/dataplat/prepare/create_workspace/',
+    link: '/prepare/create_workspace/',
   },
   {
     title: '数据开发的基本流程',
-    link: '/bigdata/dataplat/intro/development_process/',
+    link: '/intro/development_process/',
   },
-  { title: '大数据工作台的计费概述', link: '/bigdata/dataplat/billing/price/' },
+  { title: '大数据工作台的计费概述', link: '/billing/price/' },
   { title: '大数据平台监控与运维', link: '' },
   { title: '大数据工作台的计费概述11', link: '' },
 ]
@@ -33,22 +33,14 @@ const FAQ: FC = ({ className }) => {
                 tw="flex align-middle mt-2 cursor-pointer hover:text-green-11 hover:font-medium"
               >
                 <Icon name="file" />
-                <div
-                  tw="pl-3 cursor-pointer"
-                  onClick={() => {
-                    const openModal = Modal.open(HelpCenterModal, {
-                      link: quest.link,
-                      onCancel: () => Modal.close(openModal),
-                    })
-                  }}
-                >
-                  {quest.title}
-                </div>
+                <HelpCenterLink href={quest.link}>{quest.title}</HelpCenterLink>
               </li>
             ))}
           </ul>
           <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center">
-            <span tw="mr-2">更多帮助指引</span>
+            <HelpCenterLink tw="mr-2" href="/intro/introduction/">
+              更多帮助指引
+            </HelpCenterLink>
             <Icon name="next" />
           </div>
         </div>

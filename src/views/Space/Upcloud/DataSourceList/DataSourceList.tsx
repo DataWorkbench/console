@@ -34,7 +34,7 @@ const tabs = [
     description:
       '数据源主要用于数据集成过程中 Reader 和 Writer 的对象，您可以在数据源管理页面查看、新增及批量新增数据源。指定的整个数据库全部或者部分表一次性的全部同步至MySQL，并且支持后续的实时增量同步模式，将新增数据持续同步至 MySQL。',
     icon: 'blockchain',
-    helpLink: '/bigdata/dataplat/quickstart/add_origin_data/',
+    helpLink: '/quickstart/add_origin_data/',
   },
 ]
 

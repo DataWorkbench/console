@@ -1,6 +1,7 @@
 import { Button, Icon, Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
 import { ContentBox, FlexBox } from 'components'
 import SexangleImg from 'assets/svgr/sexangle.svg'
+import { getHelpCenterLink } from 'utils/'
 
 const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => (
   <ContentBox tw="py-20 rounded-sm bg-white">
@@ -20,7 +21,9 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => (
           tw="mr-4"
           onClick={() => {
             const openModal = Modal.open(HelpCenterModal, {
-              link: '/bigdata/dataplat/manual/data_up_cloud/source_data/data_summary/',
+              link: getHelpCenterLink(
+                '/manual/data_up_cloud/source_data/data_summary/'
+              ),
               onCancel: () => Modal.close(openModal),
             })
           }}
