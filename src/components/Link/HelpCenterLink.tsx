@@ -24,7 +24,7 @@ const HelpCenterLink = (
 
   const handleOpenHelpCenter = (link: string) => {
     const openModal = Modal.open(HelpCenterModal, {
-      link,
+      link: getHelpCenterLink(link),
       onCancel: () => Modal.close(openModal),
     })
   }
@@ -35,7 +35,7 @@ const HelpCenterLink = (
         ...rest,
       }
     : {
-        href: href ? getHelpCenterLink(href) : '###',
+        href: href ? getHelpCenterLink(href, true) : '###',
         target: '_blank',
         hasIcon: true,
         ...rest,

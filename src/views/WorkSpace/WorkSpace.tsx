@@ -15,6 +15,7 @@ import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
 import { WorkSpaceContext } from 'contexts'
 import { useQueryRegion } from 'hooks'
+import { getHelpCenterLink } from 'utils'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
 import BestPractice from './BestPractice'
@@ -26,7 +27,7 @@ const tabs = [
       '工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。',
     icon: 'project',
     key: 'workspace',
-    helpLink: '/bigdata/dataplat/manual/workspace_list/',
+    helpLink: getHelpCenterLink('/manual/workspace_list/'),
   },
 ]
 

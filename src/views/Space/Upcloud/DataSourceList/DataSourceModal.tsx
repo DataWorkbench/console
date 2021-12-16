@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
-import { Modal, ModalStep, ModalContent } from 'components'
+import { Modal, ModalStep, ModalContent, HelpCenterLink } from 'components'
 import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
 import tw from 'twin.macro'
@@ -14,7 +14,6 @@ import {
 import { get } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Global, css } from '@emotion/react'
-import { getHelpCenterLink } from 'utils'
 
 import sourceListBg from 'assets/source-list.svg'
 import DataSourceForm from './DataSourceForm'
@@ -154,16 +153,12 @@ const DataSourceModal = observer(
                       <>
                         <p tw="pt-2 pb-3 font-medium">
                           请选择一个数据库，您也可以参考
-                          <a
-                            href={getHelpCenterLink(
-                              '/bigdata/dataplat/manual/data_up_cloud/source_data/data_summary/'
-                            )}
-                            target="_blank"
-                            tw="text-link"
-                            rel="noreferrer"
+                          <HelpCenterLink
+                            href="/manual/data_up_cloud/source_data/data_summary/"
+                            isIframe={false}
                           >
                             数据库文档
-                          </a>
+                          </HelpCenterLink>
                           进行查看配置
                         </p>
                         <DbList

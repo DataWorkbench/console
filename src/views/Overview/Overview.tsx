@@ -4,6 +4,7 @@ import { get } from 'lodash-es'
 import tw, { styled, css } from 'twin.macro'
 import { FlexBox, Card, CardHeader, CardContent, IconCard } from 'components'
 import { useStore } from 'stores'
+import { getHelpCenterLink } from 'utils/'
 import SpaceListModal from './SpaceListModal'
 import Services from './Services'
 import PlatformFeat from './PlatformFeat/PlatformFeat'
@@ -28,8 +29,8 @@ function getTabs() {
       description:
         '大数据平台开发一站式智能开发，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力。实现数据在云平台各产品之间快速流转，支撑上层业务应用，消除企业数据孤岛，带动大数据周边产品消费。',
       icon: 'dashboard',
-      newsLink: '/bigdata/dataplat/news/product_news/',
-      helpLink: '/bigdata/dataplat/manual/overview/',
+      newsLink: getHelpCenterLink('/news/product_news/'),
+      helpLink: getHelpCenterLink('/manual/overview/'),
     },
   ]
 }
