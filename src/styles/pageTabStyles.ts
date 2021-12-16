@@ -13,6 +13,9 @@ const pageTabStyles = css`
         ${tw`py-6`}
         .button-list {
           ${tw`h-5`}
+          .if {
+            ${tw`text-base`}
+          }
         }
       }
     }
