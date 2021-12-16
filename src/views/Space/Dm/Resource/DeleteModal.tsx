@@ -2,6 +2,7 @@ import { Button, Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Modal } from 'components'
 import { useState } from 'react'
 import { css } from 'twin.macro'
+import { PackageName } from './constants'
 
 export default function DeleteModal(props: any) {
   const {
@@ -32,7 +33,7 @@ export default function DeleteModal(props: any) {
 
   const columns = [
     {
-      title: '函数包名称',
+      title: `${PackageName[packageType]}名称`,
       dataIndex: 'name',
       render: (_: string, row: Record<string, any>) => {
         return (
@@ -57,7 +58,7 @@ export default function DeleteModal(props: any) {
     {
       title: '文件大小',
       dataIndex: 'size',
-      render: (value: number) => <>{Math.round(value / 1000)}kb</>,
+      render: (value: number) => <>{Math.round(value / 1024)}kb</>,
     },
     {
       title: '描述',
@@ -80,7 +81,7 @@ export default function DeleteModal(props: any) {
             loading={mutation.isLoading}
             onClick={handleDelete}
           >
-            确定
+            删除
           </Button>
         </FlexBox>
       }
@@ -99,13 +100,13 @@ export default function DeleteModal(props: any) {
             const deleteTitle =
               selectedList.length === 1 ? (
                 <>
-                  删除{packageType === 'program' ? '程序包' : '函数包'}
+                  删除{PackageName[packageType]}
                   {selectedList[0].name}({selectedList[0].resource_id})注意事项
                 </>
               ) : (
                 <>
-                  删除以下{selectedList.length}个
-                  {packageType === 'program' ? '程序包' : '函数包'}注意事项
+                  删除以下{selectedList.length}个{PackageName[packageType]}
+                  注意事项
                 </>
               )
             return (
@@ -136,6 +137,18 @@ export default function DeleteModal(props: any) {
                         删除函数包{selectedList[0].name}(
                         {selectedList[0].resource_id}
                         )后，相关作业将无法引用，已引用的作业将受到影响，且该操作无法撤回。确认删除吗？
+                      </>
+                    ))}
+                  {packageType === 'dependency' &&
+                    (selectedList.length > 1 ? (
+                      <>
+                        删除以下依赖包后，具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认，且该操作无法撤回。确认删除吗？
+                      </>
+                    ) : (
+                      <>
+                        删除依赖包{selectedList[0].name}(
+                        {selectedList[0].resource_id}
+                        )后，具体文案待确认具体文案待确认具体文案待确认具体文案待确认，且该操作无法撤回。确认删除吗？
                       </>
                     ))}
                 </div>

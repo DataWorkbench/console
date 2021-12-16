@@ -22,6 +22,7 @@ import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
+import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
 
 const columnSettingsKey = 'RESOURCE_TABLE_COLUMN_SETTINGS'
 
@@ -81,13 +82,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       localstorage.getItem(columnSettingsKey) || []
     )
 
-    const packageTypeName = packageType === 'program' ? '程序包' : '函数包'
-
     const [filter, setFilter] = useImmer<IFilter>({
       limit: 10,
       offset: 0,
       resource_name: '',
-      resource_type: packageType === 'program' ? 1 : 2,
+      resource_type: PackageTypeMap[packageType],
       reverse: true,
       search: '',
       sort_by: '',
@@ -112,7 +111,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const handleTabChange = (name: string) => {
       setPackageType(name)
       setFilter((draft) => {
-        draft.resource_type = name === 'program' ? 1 : 2
+        draft.resource_type = PackageTypeMap[name]
       })
 
       setSelectedRows([])
@@ -175,11 +174,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           {
             onSuccess: (data) => {
               const blob = new Blob([data], {
-                type: 'application/x-java-archive',
+                type: 'application/java-archive',
               })
               const ele = document.createElement('a')
               ele.style.display = 'none'
-              ele.download = `${row.name}.jar`
+              ele.download = row.name
               ele.href = window.URL.createObjectURL(blob)
               document.body.appendChild(ele)
               ele.click()
@@ -200,7 +199,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const columns = useMemo(() => {
       return [
         {
-          title: `${packageTypeName}名称`,
+          title: `${PackageName[packageType]}名称`,
           dataIndex: 'name',
           sortable: true,
           sortOrder:
@@ -233,7 +232,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         {
           title: '文件大小',
           dataIndex: 'size',
-          render: (value: number) => <>{Math.round(value / 1000)}kb</>,
+          render: (value: number) => <>{Math.round(value / 1024)}kb</>,
         },
         {
           title: '描述',
@@ -318,7 +317,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
       ]
     }, [
-      packageTypeName,
       filter.reverse,
       filter.sort_by,
       packageType,
@@ -343,12 +341,13 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         <DarkTabs defaultActiveName={packageType} onChange={handleTabChange}>
           <TabPanel key="program" label="程序包" name="program" />
           <TabPanel key="function" label="函数包" name="function" />
+          <TabPanel key="dependency" label="依赖包" name="dependency" />
         </DarkTabs>
         <div tw="bg-neut-16 p-5" className={className}>
           <Alert
             type="info"
             tw="mb-4"
-            message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
+            message={PackageTypeTip[packageType]}
             linkBtn={<Button type="text">查看详情 →</Button>}
           />
           <div tw="mt-4 mb-3">
@@ -356,7 +355,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
               <Center tw="space-x-3">
                 <Button type="primary" onClick={handleUploadClick}>
                   <Icon name="upload" />
-                  上传{packageTypeName}
+                  上传{PackageName[packageType]}
                 </Button>
                 <Button
                   disabled={!selectedRowKeys.length}
