@@ -1,5 +1,4 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
-import { css, styled, theme } from 'twin.macro'
 import { FlexBox } from 'components'
 import { getHelpCenterLink } from 'utils'
 import ResourceTable from './ResourceTable'
@@ -14,32 +13,10 @@ const tabs = [
   },
 ]
 
-const PageTabWrapper = styled('div')(
-  () => css`
-    margin-bottom: ${theme('margin.5')};
-    .collapse-panel {
-      background-color: ${theme('colors.neut.16')};
-      .tab-title {
-        color: #fff;
-      }
-      button.is-text,
-      .tab-description {
-        color: ${theme('colors.neut.8')};
-      }
-      svg {
-        color: hsla(0, 0%, 100%, 0.9);
-        fill: hsla(0, 0%, 100%, 0.4);
-      }
-    }
-  `
-)
-
 const Resource = () => {
   return (
     <FlexBox orient="column" tw="p-5 h-full">
-      <PageTabWrapper>
-        <PageTab tabs={tabs} />
-      </PageTabWrapper>
+      <PageTab tabs={tabs} />
       <ResourceTable tw="flex-1" />
     </FlexBox>
   )

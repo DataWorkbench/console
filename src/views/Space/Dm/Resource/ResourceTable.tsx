@@ -15,11 +15,12 @@ import {
   useStore,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
-import { FlexBox, Center, Tooltip } from 'components'
+import { FlexBox, Center, Tooltip, Icons } from 'components'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
+import { formatBytes } from 'utils/convert'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
 import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
@@ -32,13 +33,12 @@ const { MenuItem } = Menu
 const DarkTabs = styled(Tabs)(
   () => css`
     .tabs ul {
-      background-color: #1e2f41;
-      ${tw`text-neut-8 border-0`}
+      ${tw`text-neut-8 border-0 bg-[#1E2F41]`}
       li {
-        ${tw`px-0! py-4!  ml-5! mr-4! mb-0! leading-6`}
+        ${tw`px-0! py-4!  ml-5! mr-4! mb-0! leading-6 h-14`}
         ${tw`border-b-4! border-transparent!`}
       &:hover {
-          ${tw`text-white border-0`}
+          ${tw`text-white border-0 font-medium`}
         }
         & + li {
           ${tw`ml-4! mr-5!`}
@@ -209,15 +209,22 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           render: (_: string, row: Record<string, any>) => {
             return (
               <FlexBox tw="items-center space-x-1">
-                <Icon
-                  name={packageType === 'program' ? 'coding' : 'terminal'}
-                  type="light"
-                  color={{
-                    primary: '#219861',
-                    secondary: '#8EDABD',
-                  }}
-                />
-                <div>{row.name}</div>
+                {packageType === 'dependency' ? (
+                  <Icons name="dependency" width={20} size={20} />
+                ) : (
+                  <Icon
+                    tw="w-5! h-5!"
+                    name={packageType === 'program' ? 'coding' : 'terminal'}
+                    type="light"
+                    color={{
+                      primary: '#219861',
+                      secondary: '#8EDABD',
+                    }}
+                  />
+                )}
+                <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
+                  <div tw="max-w-[130px] truncate">{row.name}</div>
+                </Tooltip>
               </FlexBox>
             )
           },
@@ -232,13 +239,17 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         {
           title: '文件大小',
           dataIndex: 'size',
-          render: (value: number) => <>{Math.round(value / 1024)}kb</>,
+          render: (value: number) => <>{formatBytes(value, 2)}</>,
         },
         {
           title: '描述',
           dataIndex: 'description',
           render: (value: string) => {
-            return <div tw="text-neut-8">{value}</div>
+            return (
+              <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
+                <div tw="max-w-[150px] truncate text-neut-8">{value}</div>
+              </Tooltip>
+            )
           },
         },
         {
