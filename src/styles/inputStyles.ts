@@ -8,6 +8,9 @@ const inputStyles = css`
     .input,
     .textarea {
       ${tw`bg-neut-16 text-white border-neut-13`}
+      &::placeholder {
+        color: #939ea9;
+      }
       &[disabled] {
         ${tw`bg-neut-13`}
       }

@@ -269,7 +269,14 @@ const ClusterTable = observer(
           title: '最近更新时间',
           dataIndex: 'updated',
           sortable: true,
-          sortOrder: filter.reverse ? 'asc' : 'desc',
+          // filter.reverse ? 'asc' : 'desc',
+          sortOrder:
+            // eslint-disable-next-line no-nested-ternary
+            filter.sort_by === 'updated'
+              ? filter.reverse
+                ? 'asc'
+                : 'desc'
+              : '',
           render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
         },
         !selectMode && {
@@ -334,6 +341,7 @@ const ClusterTable = observer(
       setOp,
       setOpClusterList,
       filter.reverse,
+      filter.sort_by,
       filter.status,
       setFilter,
       selectMode,

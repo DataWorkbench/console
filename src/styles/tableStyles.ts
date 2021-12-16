@@ -1,6 +1,14 @@
 import tw, { css } from 'twin.macro'
 
 const tableStyles = css`
+  .portal-grid-table {
+    .grid-table-content .grid-table-header,
+    .table-row {
+      .table-icon {
+        ${tw`pr-0`}
+      }
+    }
+  }
   .dark {
     .columns-setting-container {
       .button.is-default.is-trigger {
@@ -61,6 +69,9 @@ const tableStyles = css`
         ${tw`bg-neut-16 border-b border-neut-13`}
         &:hover {
           ${tw`bg-neut-17`}
+          a {
+            ${tw`text-[#0EA5E9]`}
+          }
         }
         .table-col:last-child .button.is-text:first-of-type {
           ${tw`pl-0`}
