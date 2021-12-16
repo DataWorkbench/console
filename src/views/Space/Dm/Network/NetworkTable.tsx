@@ -68,12 +68,12 @@ const NetworkTable = observer(() => {
         dataIndex: 'name',
         render: (v: any, row: any) => (
           <FlexBox tw="items-center space-x-1">
-            <Center tw="bg-neut-13 rounded-full w-6 h-6">
+            <Center tw="bg-neut-13 rounded-full p-1.5 mr-2">
               <Icon name="earth" type="light" />
             </Center>
             <div>
-              <div>{row.name}</div>
-              <div>{row.id}</div>
+              <div tw="font-semibold">{row.name}</div>
+              <div tw="dark:text-neut-8">{row.id}</div>
             </div>
           </FlexBox>
         ),
@@ -114,7 +114,11 @@ const NetworkTable = observer(() => {
           // filter.reverse ? 'asc' : 'desc',
           // eslint-disable-next-line no-nested-ternary
           filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
-        render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        render: (v: number) => (
+          <span tw="dark:text-neut-8">
+            {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        ),
       },
       {
         title: '最近更新时间',
@@ -125,7 +129,11 @@ const NetworkTable = observer(() => {
           // eslint-disable-next-line no-nested-ternary
           filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
 
-        render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        render: (v: number) => (
+          <span tw="dark:text-neut-8">
+            {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        ),
       },
       {
         title: '操作',
