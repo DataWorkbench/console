@@ -13,7 +13,7 @@ export const HorizonTabs = styled(Tabs)(() => [
           ${tw`ml-4 h-14`}
         }
         &:hover {
-          ${tw`text-white border-transparent`}
+          ${tw`text-white border-transparent font-medium`}
         }
         ${tw`mx-4 px-0 border-b-[3px] pt-4 pb-[13px] h-14`}
 
