@@ -37,7 +37,7 @@ let instanceQueryKey: any = ''
 
 export const getJobInstanceKey = () => instanceQueryKey
 
-export const useQueryJobInstances = (filter: any, enabled?: boolean) => {
+export const useQueryJobInstances = (filter: any, type?: string) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
@@ -46,13 +46,15 @@ export const useQueryJobInstances = (filter: any, enabled?: boolean) => {
     offset: 0,
     ...filter,
   }
-  instanceQueryKey = ['STREAM_JOB_INSTANCES', params]
+  instanceQueryKey = [
+    type === 'modal' ? 'JOB_INSTANCES' : 'STREAM_JOB_INSTANCES',
+    params,
+  ]
   return useQuery(
     instanceQueryKey,
     async () => listStreamJobInstances(params),
     {
       keepPreviousData: true,
-      enabled,
     }
   )
 }
@@ -89,14 +91,18 @@ export const useMutationReleaseJobs = () => {
 export const useMutationInstance = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(
-    async ({ op, ...rest }: { op: OP; inst_ids: string[] }) => {
+    async ({ op, ...rest }: { op: OP; inst_ids: object[] }) => {
       const params = {
         spaceId,
         regionId,
         ...rest,
       }
       let ret = null
-      ret = await terminateInstances(params)
+      if (op === 'enable') {
+        ret = await resumeReleaseJob(params)
+      } else if (op === 'stop') {
+        ret = await terminateInstances(params)
+      }
 
       return ret
     }

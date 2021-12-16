@@ -13,7 +13,6 @@ import {
   getReleaseJobsKey,
   useMutationReleaseJobs,
   useQueryReleaseJobs,
-  useStore,
 } from 'hooks'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
@@ -21,6 +20,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { omitBy, get } from 'lodash-es'
 import { Tooltip, Center } from 'components'
+import { useHistory, useParams } from 'react-router-dom'
 import { AssoiateModal } from './AssoiateModal'
 
 const { MenuItem } = Menu
@@ -40,13 +40,16 @@ const JobTypes: ITypes = {
 }
 
 export const ReleaseTable = observer(({ query }: any) => {
-  const {
-    dmStore: { setModalData },
-  } = useStore()
+  const history = useHistory()
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+
   const [visible, setVisible] = useState(false)
+  const [currentRelease, setCurrentRelease] = useState<any>({})
   const [columnSettings, setColumnSettings] = useState(
     localstorage.getItem(columnSettingsKey) || []
   )
+
   const [filter, setFilter] = useImmer({
     limit: 10,
     offset: 0,
@@ -56,7 +59,7 @@ export const ReleaseTable = observer(({ query }: any) => {
     sort_by: '',
   })
 
-  const toggle = () => setVisible(!visible)
+  const toggle = useCallback(() => setVisible(!visible), [visible])
 
   const queryClient = useQueryClient()
   const mutation = useMutationReleaseJobs()
@@ -130,7 +133,12 @@ export const ReleaseTable = observer(({ query }: any) => {
 
   const hanldeMenuClick = useCallback(
     (key: OP, row: any) => {
-      if (key === 'stop') {
+      if (key === 'detail') {
+        setCurrentRelease(row)
+        toggle()
+      } else if (key === 'view') {
+        history.push(`/${regionId}/workspace/${spaceId}/dm`)
+      } else if (key === 'stop') {
         let stopRunning = false
         Modal.warning({
           confirmLoading: mutation.isLoading,
@@ -156,13 +164,9 @@ export const ReleaseTable = observer(({ query }: any) => {
             handleMutation(row, 'stop', { stopRunning })
           },
         })
-      } else if (key === 'detail') {
-        setModalData(row)
       }
-      // setOp(key)
-      // handleMutation(row)
     },
-    [handleMutation, mutation.isLoading, setModalData]
+    [handleMutation, history, mutation.isLoading, regionId, spaceId, toggle]
   )
 
   const columns = useMemo(
@@ -346,7 +350,13 @@ export const ReleaseTable = observer(({ query }: any) => {
         }}
       />
 
-      <AssoiateModal visible={visible} toggle={toggle} />
+      <AssoiateModal
+        visible={visible}
+        toggle={() => {
+          toggle()
+        }}
+        modalData={currentRelease}
+      />
     </FlexBox>
   )
 })
