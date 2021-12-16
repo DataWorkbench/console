@@ -22,6 +22,8 @@ import { omitBy, get } from 'lodash-es'
 import { Tooltip, Center } from 'components'
 import { useHistory, useParams } from 'react-router-dom'
 import { AssoiateModal } from './AssoiateModal'
+import ScheSettingModal from '../../../Dm/RealTime/ScheSettingModal'
+import ReleaseModal from './RelaseModal'
 
 const { MenuItem } = Menu
 
@@ -45,6 +47,8 @@ export const ReleaseTable = observer(({ query }: any) => {
     useParams<{ regionId: string; spaceId: string }>()
 
   const [visible, setVisible] = useState(false)
+  const [scheVisible, setScheVisible] = useState(false)
+  const [releaseVisible, setReleaseVisible] = useState(false)
   const [currentRelease, setCurrentRelease] = useState<any>({})
   const [columnSettings, setColumnSettings] = useState(
     localstorage.getItem(columnSettingsKey) || []
@@ -138,6 +142,8 @@ export const ReleaseTable = observer(({ query }: any) => {
         toggle()
       } else if (key === 'view') {
         history.push(`/${regionId}/workspace/${spaceId}/dm`)
+      } else if (key === 'update') {
+        setScheVisible(true)
       } else if (key === 'stop') {
         let stopRunning = false
         Modal.warning({
@@ -268,7 +274,7 @@ export const ReleaseTable = observer(({ query }: any) => {
                   >
                     <MenuItem key="detail">关联实例</MenuItem>
                     <MenuItem key="view">作业详情</MenuItem>
-                    <MenuItem key="schedule">调度配置</MenuItem>
+                    <MenuItem key="update">调度配置</MenuItem>
                     <MenuItem key="stop">下线</MenuItem>
                   </Menu>
                 }
@@ -357,6 +363,25 @@ export const ReleaseTable = observer(({ query }: any) => {
         }}
         modalData={currentRelease}
       />
+
+      <ScheSettingModal
+        origin="ops"
+        visible={scheVisible}
+        onCancel={() => {
+          setScheVisible(false)
+        }}
+        onSuccess={() => {
+          setReleaseVisible(true)
+        }}
+      />
+
+      {releaseVisible && (
+        <ReleaseModal
+          onCancel={() => {
+            setReleaseVisible(false)
+          }}
+        />
+      )}
     </FlexBox>
   )
 })

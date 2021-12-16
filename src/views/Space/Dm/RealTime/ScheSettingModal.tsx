@@ -39,12 +39,21 @@ const { CollapseItem } = Collapse
 
 interface IScheSettingModal {
   visible?: boolean
+  origin?: string
   onCancel?: () => void
+  onSuccess?: () => void
 }
 
 type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
 
-const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
+const ScheSettingModal = ({
+  visible,
+  origin,
+  onCancel,
+  onSuccess,
+}: IScheSettingModal) => {
+  const [disabled, setDisabled] = useState(Boolean(origin === 'ops'))
+
   // const [period, setPeriod] = useState<TPeriodType>('minute')
   const [defCurDate] = useState(dayjs().hour(0).minute(20).toDate())
   // const { regionId, spaceId } = useParams<IUseParms>()
@@ -215,7 +224,17 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
     }
   }, [periodData, periodType, setParams])
 
+  const handleCancel = () => {
+    if (onCancel) onCancel()
+    if (origin === 'ops') setDisabled(true)
+  }
+
   const save = () => {
+    if (origin === 'ops') {
+      if (onCancel) onCancel()
+      if (onSuccess) onSuccess()
+      return
+    }
     if (formRef.current?.validateForm()) {
       mutation.mutate(
         {
@@ -247,22 +266,33 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
   return (
     <DarkModal
       orient="fullright"
-      onCancel={onCancel}
+      onCancel={handleCancel}
       title="调度配置"
       width={800}
       visible={visible}
       onOk={save}
       footer={
         <>
-          <Button onClick={onCancel}>取消</Button>
-          <Button
-            type="primary"
-            disabled={params.schedulePolicy === 0}
-            onClick={save}
-            loading={mutation.isLoading}
-          >
-            确定
-          </Button>
+          <Button onClick={handleCancel}>取消</Button>
+          {origin === 'ops' && disabled ? (
+            <Button
+              type="primary"
+              onClick={() => {
+                setDisabled(false)
+              }}
+            >
+              编辑
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              disabled={params.schedulePolicy === 0}
+              onClick={save}
+              loading={mutation.isLoading}
+            >
+              确定
+            </Button>
+          )}
         </>
       }
       // confirmLoading={mutation.isLoading}
@@ -318,6 +348,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
             <Loading spinning={isFetching}>
               <ScheSettingForm layout="horizon" ref={formRef}>
                 <RadioGroupField
+                  disabled={disabled}
                   name="schedulePolicy"
                   label={<AffixLabel>调度策略</AffixLabel>}
                   value={params.schedulePolicy}
@@ -340,6 +371,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                 {params.schedulePolicy === 1 && (
                   <>
                     <DatePickerField
+                      disabled={disabled}
                       name="timeEffect"
                       label="生效时间"
                       mode="range"
@@ -369,6 +401,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                       }}
                     />
                     <SelectField
+                      disabled={disabled}
                       name="concurrencyPolicy"
                       label={
                         <AffixLabel
@@ -414,6 +447,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                     />
 
                     <SelectField
+                      disabled={disabled}
                       name="schePeriod"
                       label={<AffixLabel>调度周期</AffixLabel>}
                       value={params.periodType}
@@ -459,6 +493,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               </Label>
                               <Control>
                                 <Select
+                                  disabled={disabled}
                                   options={hourOpts}
                                   value={curPeriodData.startHour}
                                   onChange={(v: number) => {
@@ -476,6 +511,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               </Label>
                               <Control>
                                 <Select
+                                  disabled={disabled}
                                   options={minuOpts}
                                   value={curPeriodData.stampMinu}
                                   onChange={(v: number) =>
@@ -493,6 +529,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               </Label>
                               <Control>
                                 <Select
+                                  disabled={disabled}
                                   options={hourOpts}
                                   value={curPeriodData.endHour}
                                   onChange={(v: number) =>
@@ -512,6 +549,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         return (
                           <HorizonFiledsWrapper>
                             <RadioGroup
+                              disabled={disabled}
                               direction="column"
                               value={curPeriodData.tp}
                               onChange={(v: number) => {
@@ -605,6 +643,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         curPeriodData = periodData[periodType]
                         return (
                           <SmallDatePickerField
+                            disabled={disabled}
                             name="scheDate"
                             label={<AffixLabel>定时调度时间</AffixLabel>}
                             dateFormat="H:i"
@@ -626,6 +665,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         return (
                           <>
                             <SelectField
+                              disabled={disabled}
                               label="指定时间"
                               name="weekly"
                               multi
@@ -649,6 +689,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               ]}
                             />
                             <SmallDatePickerField
+                              disabled={disabled}
                               name="scheDate"
                               label={<AffixLabel>定时调度时间</AffixLabel>}
                               dateFormat="H:i"
@@ -671,6 +712,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         return (
                           <>
                             <SelectField
+                              disabled={disabled}
                               label={<AffixLabel>指定时间</AffixLabel>}
                               name="monthDaily"
                               multi
@@ -686,6 +728,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               }}
                             />
                             <SmallDatePickerField
+                              disabled={disabled}
                               name="scheDate"
                               label={<AffixLabel>定时调度时间</AffixLabel>}
                               dateFormat="H:i"
@@ -708,6 +751,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                         return (
                           <>
                             <SelectField
+                              disabled={disabled}
                               label="指定月份"
                               name="monthly"
                               multi
@@ -723,6 +767,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               }}
                             />
                             <SelectField
+                              disabled={disabled}
                               label="指定时间"
                               name="daily"
                               multi
@@ -738,6 +783,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                               }}
                             />
                             <SmallDatePickerField
+                              disabled={disabled}
                               name="scheDate"
                               label={<AffixLabel>定时调度时间</AffixLabel>}
                               dateFormat="H:i"
@@ -770,6 +816,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                     return (
                       <>
                         <RadioGroupField
+                          disabled={disabled}
                           label={<AffixLabel>执行时间</AffixLabel>}
                           value={params.immediately}
                           name="immediately"
@@ -787,6 +834,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                             <Label />
                             <Control>
                               <DatePicker
+                                disabled={disabled}
                                 dateFormat="Y-m-d H:i:S"
                                 enableTime
                                 enableSeconds
@@ -814,6 +862,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                   </Label>
                   <Control>
                     <Toggle
+                      disabled={disabled}
                       checked={params.retryPolicy === 2}
                       onChange={(checked: boolean) => {
                         setParams((draft) => {
@@ -826,6 +875,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                 </Field>
                 <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
                   <SliderField
+                    disabled={disabled}
                     name="p2"
                     label="出错重跑最大次数"
                     hasTooltip
@@ -852,6 +902,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                     <Label>* 出错重跑间隔</Label>
                     <Control>
                       <InputNumber
+                        disabled={disabled}
                         isMini
                         min={1}
                         max={30}
@@ -870,6 +921,7 @@ const ScheSettingModal = ({ visible, onCancel }: IScheSettingModal) => {
                   <Label>超时时间</Label>
                   <Control>
                     <InputNumber
+                      disabled={disabled}
                       isMini
                       min={0}
                       max={4320}
