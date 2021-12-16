@@ -360,11 +360,11 @@ const UdfModal = observer(() => {
                         rule: {
                           required: true,
                           matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/,
-                          maxLength: 128,
-                          minLength: 2,
+                          maxLength: 65,
+                          minLength: 1,
                         },
                         status: 'error',
-                        help: '不能为空，长度为 2～128。字母、数字或下划线（_），不能以（_）开始结尾',
+                        help: '不能为空，长度为 1～65。字母、数字或下划线（_），不能以（_）开始结尾',
                       },
                     ]}
                   />
@@ -373,14 +373,30 @@ const UdfModal = observer(() => {
                     label="描述"
                     disabled={op === 'detail'}
                     defaultValue={modalData?.comment}
+                    validateOnBlur
                     placeholder="请输入函数描述"
+                    schemas={[
+                      {
+                        rule: { maxLength: 256 },
+                        help: '输入超过 256 个字',
+                        status: 'error',
+                      },
+                    ]}
                   />
                   <TextAreaField
                     name="usage_sample"
                     label="示例"
                     disabled={op === 'detail'}
+                    validateOnBlur
                     defaultValue={modalData?.usage_sample}
                     placeholder="示例样本"
+                    schemas={[
+                      {
+                        rule: { maxLength: 2000 },
+                        help: '输入超过 2000 个字',
+                        status: 'error',
+                      },
+                    ]}
                   />
                 </Form>
               </FormWrapper>
@@ -472,7 +488,12 @@ const UdfModal = observer(() => {
                           schemas={[
                             {
                               rule: { required: true },
-                              help: `请输入${text}语句`,
+                              help: `请输入 ${text} 语句`,
+                              status: 'error',
+                            },
+                            {
+                              rule: { maxLength: 20000 },
+                              help: '输入超过 20000 个字',
                               status: 'error',
                             },
                           ]}
