@@ -61,6 +61,9 @@ const tableStyles = css`
         ${tw`bg-neut-16 border-b border-neut-13`}
         &:hover {
           ${tw`bg-neut-17`}
+          a {
+            ${tw`text-[#0EA5E9]`}
+          }
         }
         .table-col:last-child .button.is-text:first-of-type {
           ${tw`pl-0`}

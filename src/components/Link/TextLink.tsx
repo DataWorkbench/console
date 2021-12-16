@@ -26,7 +26,7 @@ const Link = (
   ) : (
     <>
       {childrenProp}
-      <Icon name="if-external-link" />
+      <Icon name="if-external-link" size={14} tw="text-sm font-normal ml-0.5" />
     </>
   )
   if (type !== 'a') {
