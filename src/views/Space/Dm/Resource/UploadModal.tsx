@@ -71,7 +71,7 @@ const UploadModal = observer((props: any) => {
   const { visible, handleCancel, type: packageType, defaultFields } = props
 
   const [resourceName, setResourceName] = useState(
-    op !== 'create' && defaultFields.name
+    (op !== 'create' && defaultFields.name) || ''
   )
   const [fileTip, setFileTip] = useState('')
 
@@ -87,6 +87,10 @@ const UploadModal = observer((props: any) => {
   useEffect(() => {
     form.current?.validateFields()
   }, [resourceName])
+
+  useEffect(() => {
+    if (visible) setResourceName(defaultFields.name || '')
+  }, [defaultFields.name, visible])
 
   const closeModal = () => {
     handleCancel()
