@@ -6,10 +6,16 @@ import { useStore } from 'stores'
 import { Center } from 'components'
 import { useImmer } from 'use-immer'
 import { useQueryWorkSpace } from 'hooks'
+import { css } from 'twin.macro'
 import { Settings } from './Settings'
 import { Navs } from './Navs'
 import { BackMenu } from './BackMenu'
 import { Root, SelectWrapper } from './styled'
+
+const colorVars = {
+  backColors: ['#D9F4F1', '#FDEFD8', '#F1E4FE', '#E0EBFE', '#FEE9DA'],
+  fontColors: ['#14B8A6', '#F59E0B', '#A855F7', '#3B82F6', '#F97316'],
+}
 
 export const Header = observer(() => {
   const { regionId, spaceId } =
@@ -33,6 +39,7 @@ export const Header = observer(() => {
   const { status, data, fetchNextPage, hasNextPage } = useQueryWorkSpace(filter)
   const workspaces = flatten(data?.pages.map((page) => page.infos || []))
   const space = workspaces?.find(({ id }) => id === spaceId)
+  const spaceIndex: number = workspaces?.findIndex(({ id }) => id === spaceId)
 
   const loadData = () => {
     if (hasNextPage) {
@@ -46,7 +53,15 @@ export const Header = observer(() => {
         <BackMenu />
         <Center
           size={32}
-          tw="text-sm rounded-sm bg-[#F1E4FE] text-[#A855F7] font-semibold"
+          tw="text-sm rounded-sm  font-semibold"
+          css={css`
+            background: ${colorVars.backColors[
+              spaceIndex % colorVars.backColors.length
+            ]};
+            color: ${colorVars.fontColors[
+              spaceIndex % colorVars.fontColors.length
+            ]};
+          `}
         >
           {getShortSpaceName(space?.name)}
         </Center>
