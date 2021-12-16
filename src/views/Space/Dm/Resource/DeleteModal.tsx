@@ -73,6 +73,7 @@ export default function DeleteModal(props: any) {
       width={selectedList?.length > 1 ? 800 : 400}
       onCancel={toggle}
       confirmLoading={mutation.isLoading}
+      okText="删除"
       footer={
         <FlexBox tw="justify-end">
           <Button onClick={toggle}>取消</Button>
