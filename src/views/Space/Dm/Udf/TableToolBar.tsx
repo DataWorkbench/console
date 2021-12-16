@@ -146,6 +146,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
           width={udfSelectedRowKeys.length > 1 ? 600 : 400}
           onCancel={() => setOp('')}
           onOk={mutateData}
+          okText="删除"
           okType="danger"
           confirmLoading={mutation.isLoading}
         >

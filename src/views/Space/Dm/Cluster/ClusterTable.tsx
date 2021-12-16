@@ -513,6 +513,7 @@ const ClusterTable = observer(
             draggable
             width={opclusterList.length > 1 ? 600 : 400}
             onCancel={() => setOp('')}
+            okText="删除"
             onOk={mutateData}
             okType={op === 'start' ? 'primary' : 'danger'}
             confirmLoading={mutation.isLoading}
