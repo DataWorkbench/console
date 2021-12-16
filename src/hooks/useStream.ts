@@ -65,8 +65,8 @@ export const useMutationReleaseJobs = () => {
       ...rest
     }: {
       op: OP
-      jobId: string
-      stop_running: boolean
+      jobId: String
+      stopRunning: Boolean
     }) => {
       const params = {
         spaceId,

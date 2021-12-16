@@ -1,10 +1,11 @@
 import { FlexBox } from 'components/Box'
-import { Button, Checkbox, Dropdown, Menu, Radio } from '@QCFE/lego-ui'
+import { Button, Checkbox, Menu } from '@QCFE/lego-ui'
 import {
   Modal,
   Table,
   Icon,
   ToolBar,
+  Divider,
   localstorage,
 } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
@@ -40,7 +41,7 @@ const JobTypes: ITypes = {
 
 export const ReleaseTable = observer(({ query }: any) => {
   const {
-    dmStore: { setOp, op, setModalData },
+    dmStore: { setModalData },
   } = useStore()
   const [visible, setVisible] = useState(false)
   const [columnSettings, setColumnSettings] = useState(
@@ -54,7 +55,6 @@ export const ReleaseTable = observer(({ query }: any) => {
     status: undefined,
     sort_by: '',
   })
-  const [modalChecked, setModalChecked] = useState(false)
 
   const toggle = () => setVisible(!visible)
 
@@ -71,39 +71,8 @@ export const ReleaseTable = observer(({ query }: any) => {
     queryClient.invalidateQueries(getReleaseJobsKey())
   }, [queryClient])
 
-  const handleOperation = useCallback(
-    (row: any) => {
-      if (row.status === 1) {
-        Modal.warning({
-          confirmLoading: mutation.isLoading,
-          title: `暂停调度作业 ${row.name}`,
-          okType: 'danger',
-          okText: '暂停',
-          content: (
-            <>
-              <div tw="text-neut-8">
-                暂停后，相关实例需要手动恢复执行，确认暂停么?
-              </div>
-              <Checkbox>同时停止运行中的实例</Checkbox>
-            </>
-          ),
-        })
-      } else {
-        Modal.info({
-          confirmLoading: mutation.isLoading,
-          title: `恢复调度作业 ${row.name}`,
-          okText: '恢复',
-          content: (
-            <div tw="text-neut-8">确认恢复调度作业 ${row.name} 么？</div>
-          ),
-        })
-      }
-    },
-    [mutation.isLoading]
-  )
-
   const handleMutation = useCallback(
-    (row: any, options?: any) => {
+    (row: any, op: OP, options?: any) => {
       mutation.mutate(
         {
           op,
@@ -112,19 +81,57 @@ export const ReleaseTable = observer(({ query }: any) => {
         },
         {
           onSuccess: () => {
-            setOp('')
             refetchData()
-            setModalChecked(false)
           },
         }
       )
     },
-    [mutation, op, refetchData, setOp]
+    [mutation, refetchData]
+  )
+
+  const handleOperation = useCallback(
+    (row: any) => {
+      if (row.status === 1) {
+        let stopRunning: boolean = false
+        Modal.warning({
+          title: `暂停调度作业 ${row.name}`,
+          okType: 'danger',
+          okText: '暂停',
+          content: (
+            <>
+              <div tw="text-neut-8 mb-2">
+                暂停后，相关实例需要手动恢复执行，确认暂停么?
+              </div>
+              <Checkbox
+                tw="text-white!"
+                onChange={(_: any, checked: boolean) => {
+                  stopRunning = checked
+                }}
+              >
+                同时停止运行中的实例
+              </Checkbox>
+            </>
+          ),
+          confirmLoading: mutation.isLoading,
+          onOk: () => handleMutation(row, 'disable', { stopRunning }),
+        })
+      } else {
+        Modal.info({
+          title: `恢复调度作业 ${row.name}`,
+          okText: '恢复',
+          content: <div tw="text-neut-8">确认恢复调度作业 {row.name} 么？</div>,
+          confirmLoading: mutation.isLoading,
+          onOk: () => handleMutation(row, 'enable'),
+        })
+      }
+    },
+    [handleMutation, mutation.isLoading]
   )
 
   const hanldeMenuClick = useCallback(
     (key: OP, row: any) => {
       if (key === 'stop') {
+        let stopRunning = false
         Modal.warning({
           confirmLoading: mutation.isLoading,
           title: `下线作业 ${row.name}`,
@@ -132,19 +139,21 @@ export const ReleaseTable = observer(({ query }: any) => {
           okText: '下线',
           content: (
             <>
-              <div tw="text-neut-8">
-                作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么??
+              <div tw="text-neut-8 mb-2">
+                作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?
               </div>
               <Checkbox
-                onChange={(e: any, value: boolean) => setModalChecked(value)}
+                tw="text-white!"
+                onChange={(_: any, checked: boolean) => {
+                  stopRunning = checked
+                }}
               >
                 同时停止运行中的实例
               </Checkbox>
             </>
           ),
           onOk: () => {
-            setOp(key)
-            handleMutation(row, { stop_running: modalChecked })
+            handleMutation(row, 'stop', { stopRunning })
           },
         })
       } else if (key === 'detail') {
@@ -153,7 +162,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       // setOp(key)
       // handleMutation(row)
     },
-    [handleMutation, modalChecked, mutation.isLoading, setModalData, setOp]
+    [handleMutation, mutation.isLoading, setModalData]
   )
 
   const columns = useMemo(
@@ -167,9 +176,21 @@ export const ReleaseTable = observer(({ query }: any) => {
         dataIndex: 'status',
         render: (value: number) => {
           return (
-            <Radio checked={value === 1}>
+            <div tw="flex items-center">
+              <Icon
+                tw="mr-2"
+                name="radio"
+                color={
+                  value === 1
+                    ? {
+                        primary: '#15A675',
+                        secondary: '#C6F4E4',
+                      }
+                    : ''
+                }
+              />
               {value === 1 ? '调度中' : '已暂停'}
-            </Radio>
+            </div>
           )
         },
       },
@@ -177,8 +198,8 @@ export const ReleaseTable = observer(({ query }: any) => {
         title: '发布描述',
         dataIndex: 'desc',
         render: (value: string) => (
-          <Tooltip theme="light" animation="fade" content={<>{value}</>}>
-            <>{value}</>
+          <Tooltip content={<Center tw="p-3">{value}</Center>}>
+            <div tw="max-w-[130px] truncate">{value}</div>
           </Tooltip>
         ),
       },
@@ -199,8 +220,11 @@ export const ReleaseTable = observer(({ query }: any) => {
           // filter.reverse ? 'asc' : 'desc',
           // eslint-disable-next-line no-nested-ternary
           filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
-        render: (value: any) =>
-          dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        render: (value: number) => (
+          <div tw="text-neut-8">
+            {dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss')}
+          </div>
+        ),
       },
       {
         title: '最后修改时间',
@@ -210,8 +234,11 @@ export const ReleaseTable = observer(({ query }: any) => {
         sortOrder:
           // eslint-disable-next-line no-nested-ternary
           filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
-        render: (value: any) =>
-          dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss'),
+        render: (value: number) => (
+          <div tw="text-neut-8">
+            {dayjs(value * 1000).format('YYYY-MM-DD HH:mm:ss')}
+          </div>
+        ),
       },
       {
         title: '操作',
@@ -221,8 +248,16 @@ export const ReleaseTable = observer(({ query }: any) => {
             <Button type="text" onClick={() => handleOperation(row)}>
               {row.status === 1 ? '暂停' : '恢复'}
             </Button>
+            <Divider
+              type="vertical"
+              height={20}
+              style={{ borderColor: '#475569', margin: '0 14px 0 5px' }}
+            />
             <Center>
-              <Dropdown
+              <Tooltip
+                arrow={false}
+                trigger="click"
+                placement="bottom-end"
                 content={
                   <Menu
                     onClick={(e: any, key: OP) => hanldeMenuClick(key, row)}
@@ -234,10 +269,8 @@ export const ReleaseTable = observer(({ query }: any) => {
                   </Menu>
                 }
               >
-                <Button type="text">
-                  <Icon name="more" />
-                </Button>
-              </Dropdown>
+                <Icon name="more" tw="w-5! h-5! cursor-pointer" />
+              </Tooltip>
             </Center>
           </FlexBox>
         ),
