@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 
 // import { Table } from 'views/Space/styled'
 import { useQueryUdfList, useStore } from 'hooks'
-import { TextHighlight, TextLink } from 'components'
+import { Center, TextHighlight, TextLink, Tooltip } from 'components'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
@@ -66,8 +66,15 @@ const getDefaultColumns = (
   },
   {
     title: '描述',
+    width: 190,
     dataIndex: 'comment',
-    render: (val: string) => <span tw="dark:text-neut-8">{val}</span>,
+    render: (val: string) => {
+      return (
+        <Tooltip content={<Center tw="p-3 break-all">{val}</Center>}>
+          <div tw="max-w-[150px] truncate text-neut-8">{val}</div>
+        </Tooltip>
+      )
+    },
   },
   {
     title: '更新时间',

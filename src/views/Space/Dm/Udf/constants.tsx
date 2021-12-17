@@ -1,3 +1,5 @@
+import { Center, Tooltip } from 'components'
+
 import { LetterIcon } from '../styled'
 
 export const udfActions = ['create', 'detail', 'edit']
@@ -60,10 +62,10 @@ export const baseColumns = [
     render: (value: string) => {
       return value ? (
         <span tw="inline-flex">
-          <LetterIcon>
+          <LetterIcon tw="flex-none items-center">
             <span>{value}</span>
           </LetterIcon>
-          <span>{value}</span>
+          <span className="column-name">{value}</span>
         </span>
       ) : (
         ''
@@ -73,11 +75,26 @@ export const baseColumns = [
   {
     title: 'ID',
     dataIndex: 'udf_id',
+    render: (val: string) => {
+      return <span tw="text-neut-8">{val}</span>
+    },
   },
   {
     title: '语言类型',
     dataIndex: 'udf_language',
     render: (val: number) =>
       languageFilters.find((i) => i.value === val)?.text || val,
+  },
+  {
+    title: '描述',
+    width: 190,
+    dataIndex: 'comment',
+    render: (val: string) => {
+      return (
+        <Tooltip content={<Center tw="p-3 break-all">{val}</Center>}>
+          <div tw="max-w-[150px] truncate text-neut-8">{val}</div>
+        </Tooltip>
+      )
+    },
   },
 ]

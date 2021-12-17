@@ -26,7 +26,9 @@ export const HorizonTabs = styled(Tabs)(() => [
 ])
 
 export const LetterIcon = styled.div(
-  () => [tw`inline-block w-5 h-5 text-center overflow-hidden rounded-sm mr-1`],
+  () => [
+    tw`inline-block w-5 h-5 text-center overflow-hidden rounded-sm mr-1 text-white`,
+  ],
   css`
     background-color: #00a0aa;
     span {
