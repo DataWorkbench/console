@@ -49,7 +49,7 @@ const confirmMsgInfo: any = {
   },
   delete: {
     name: '删除',
-    desc: '该数据源后删除后业务流程将无法引用，该操作无法撤回，请谨慎操作。',
+    desc: '数据源后删除后新建作业将无法引用，该操作无法撤回，请谨慎操作。',
   },
 }
 
@@ -215,9 +215,15 @@ const DataSourceList = observer(() => {
                     <span tw="inline-block px-1.5 bg-[#E0EBFE] text-[#3B82F6] rounded-sm mr-0.5">
                       URL
                     </span>
-                    <span>
-                      {`${key}://${urlObj.host}:${urlObj.port}/${urlObj.database}`}
-                    </span>
+                    <Tooltip
+                      content={`${key}://${urlObj.host}:${urlObj.port}/${urlObj.database}`}
+                      hasPadding
+                    >
+                      <span tw="inline-flex">
+                        <span tw="truncate max-w-[108px] mr-[-4px]">{`${key}://${urlObj.host}`}</span>
+                        {`:${urlObj.port}/${urlObj.database}`}
+                      </span>
+                    </Tooltip>
                   </>
                 )}
               </div>
@@ -350,6 +356,7 @@ const DataSourceList = observer(() => {
   const handleQuery = (v: string) => {
     setFilter((draft) => {
       draft.search = v
+      draft.offset = 0
     })
   }
 
@@ -416,14 +423,12 @@ const DataSourceList = observer(() => {
                 onPressEnter={() => handleQuery(searchName)}
                 onClear={() => {
                   setSearchName('')
-                  handleQuery('')
+                  if (filter.search) {
+                    handleQuery('')
+                  }
                 }}
               />
-              <Button
-                type="black"
-                loading={isReFetching}
-                tw="px-[5px] border-line-dark!"
-              >
+              <Button loading={isReFetching} tw="px-[5px]">
                 <Icon
                   name="if-refresh"
                   tw="text-xl"
@@ -495,7 +500,7 @@ const DataSourceList = observer(() => {
           return (
             <ModalWrapper
               visible
-              width={680}
+              width={800}
               onCancel={handleCancel}
               footer={
                 <FlexBox tw="justify-end">
@@ -542,11 +547,12 @@ const DataSourceList = observer(() => {
                           'name',
                           'source_type',
                           'source_id',
+                          'url',
                           'created',
                         ].includes(col.dataIndex)
                       )
                       .map((col: any) =>
-                        pick(col, ['title', 'dataIndex', 'render'])
+                        pick(col, ['title', 'dataIndex', 'render', 'width'])
                       )}
                     dataSource={filterSourceList}
                   />
