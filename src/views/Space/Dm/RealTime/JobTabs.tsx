@@ -58,7 +58,7 @@ const JobTabs = observer(() => {
   }, [spaceId, workFlowStore])
 
   return (
-    <div tw="flex-1 relative">
+    <div tw="flex-1 w-full relative">
       <TabWrapper
         type="card"
         activeName={curJob?.id}

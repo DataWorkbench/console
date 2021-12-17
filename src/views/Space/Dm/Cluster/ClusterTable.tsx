@@ -203,22 +203,29 @@ const ClusterTable = observer(
           title: '网络配置名称/ID',
           dataIndex: 'network_id',
           render: (v: string, row: any) => {
+            const networkInfo = get(row, 'network_info')
             return (
-              <div tw="cursor-pointer text-white hover:text-green-11">
-                <Tooltip
-                  content={
-                    <>
-                      <div>VPC: {get(row, 'network_info.router_id')}</div>
-                      <div>Vxnet: {get(row, 'network_info.vxnet_id')}</div>
-                    </>
-                  }
-                  theme="light"
-                  hasPadding
-                >
-                  <div>{get(row, 'network_info.name')}</div>
-                </Tooltip>
-                <div tw="text-neut-8">{get(row, 'id')}</div>
-              </div>
+              <>
+                {networkInfo ? (
+                  <div tw="cursor-pointer text-white hover:text-green-11">
+                    <Tooltip
+                      content={
+                        <>
+                          <div>VPC: {get(row, 'network_info.router_id')}</div>
+                          <div>Vxnet: {get(row, 'network_info.vxnet_id')}</div>
+                        </>
+                      }
+                      theme="light"
+                      hasPadding
+                    >
+                      <div>{get(row, 'network_info.name')}</div>
+                    </Tooltip>
+                    <div tw="text-neut-8">{get(row, 'id')}</div>
+                  </div>
+                ) : (
+                  <div tw="text-neut-8">{get(row, 'id')}</div>
+                )}
+              </>
             )
           },
         },
@@ -290,7 +297,8 @@ const ClusterTable = observer(
                   Flink UI
                 </TextLink>
               </Button>
-              <Button
+              <div tw="text-neut-8 mr-2">|</div>
+              {/* <Button
                 type="text"
                 disabled={[2, 4].includes(row.status)}
                 onClick={() => {
@@ -299,7 +307,7 @@ const ClusterTable = observer(
                 }}
               >
                 修改
-              </Button>
+              </Button> */}
               <Center>
                 <Tooltip
                   trigger="click"
@@ -320,10 +328,28 @@ const ClusterTable = observer(
                         <MenuItem key="start">启动</MenuItem>
                       )}
                       <MenuItem
+                        key="update"
+                        disabled={[2, 4].includes(row.status)}
+                      >
+                        <AffixLabel
+                          required={false}
+                          help="如需修改，请先停用计算集群"
+                          theme="light"
+                        >
+                          修改
+                        </AffixLabel>
+                      </MenuItem>
+                      <MenuItem
                         key="delete"
                         disabled={[2, 4].includes(row.status)}
                       >
-                        删除
+                        <AffixLabel
+                          required={false}
+                          help="如需删除，请先停用计算集群"
+                          theme="light"
+                        >
+                          删除
+                        </AffixLabel>
                       </MenuItem>
                     </Menu>
                   }
@@ -388,6 +414,7 @@ const ClusterTable = observer(
         return o.checked && columns.find((col) => col.dataIndex === o.key)
       })
       .filter((o) => o)
+    const opWordInfo = { start: '启动', stop: '停用', delete: '删除' }
 
     return (
       <FlexBox tw="w-full flex-1" orient="column">
@@ -521,7 +548,7 @@ const ClusterTable = observer(
             draggable
             width={opclusterList.length > 1 ? 600 : 400}
             onCancel={() => setOp('')}
-            okText="删除"
+            okText={opWordInfo[op]}
             onOk={mutateData}
             okType={op === 'start' ? 'primary' : 'danger'}
             confirmLoading={mutation.isLoading}
@@ -537,8 +564,8 @@ const ClusterTable = observer(
               />
               <section tw="flex-1">
                 {(() => {
-                  const txtObj = { start: '启动', stop: '停用', delete: '删除' }
-                  const opText = txtObj[op]
+                  // const txtObj = { start: '启动', stop: '停用', delete: '删除' }
+                  const opText = opWordInfo[op]
                   const opclusterLen = opclusterList.length
 
                   const clusterText =

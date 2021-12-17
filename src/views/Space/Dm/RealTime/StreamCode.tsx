@@ -1,13 +1,15 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useEffect } from 'react'
 import { FlexBox } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, trim } from 'lodash-es'
 import { theme } from 'twin.macro'
 import Editor from '@monaco-editor/react'
+import { useQueryClient } from 'react-query'
 import {
   useMutationStreamJobCode,
   useMutationReleaseStreamJob,
   useQueryStreamJobCode,
+  getStreamJobCodeKey,
 } from 'hooks'
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
@@ -32,8 +34,10 @@ const StreamCode = ({ tp }: IProp) => {
   const editorRef = useRef(null)
   const mutation = useMutationStreamJobCode()
   const releaseMutation = useMutationReleaseStreamJob()
-  const { data } = useQueryStreamJobCode()
+  const { data, isLoading } = useQueryStreamJobCode()
   const codeName = CODETYPE[tp]
+  const codeStr = get(data, `${codeName}.code`)
+  const queryClient = useQueryClient()
   const defaultCode = useMemo(() => {
     let v = ''
     if (codeName === 'sql') {
@@ -98,6 +102,7 @@ def main(args: Array[String]): Unit = {
       },
       {
         onSuccess: () => {
+          queryClient.invalidateQueries(getStreamJobCodeKey())
           setEnableRelease(true)
           Notify.success({
             title: '操作提示',
@@ -157,7 +162,6 @@ def main(args: Array[String]): Unit = {
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor
-    const codeStr = get(data, `${codeName}.code`)
     if (codeStr) {
       editor.setValue(codeStr)
       setEnableRelease(true)
@@ -166,10 +170,17 @@ def main(args: Array[String]): Unit = {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, save)
   }
 
+  useEffect(() => {
+    if (codeStr) {
+      editorRef.current?.setValue(codeStr)
+      setEnableRelease(true)
+    }
+  }, [codeStr])
+
   return (
-    <FlexBox tw="h-full flex-1">
-      <FlexBox tw="flex-col flex-1">
-        <StreamToolBar>
+    <FlexBox tw="h-full w-full flex-1">
+      <FlexBox tw="flex flex-col flex-1 w-full">
+        <StreamToolBar tw="pb-4">
           {/* <Button type="black">
             <Icon name="listview" type="light" />
             插入表
@@ -196,12 +207,14 @@ def main(args: Array[String]): Unit = {
             发布
           </Button>
         </StreamToolBar>
-        <div tw="flex-1 pt-4 flex flex-col">
+        <div tw="flex-1 overflow-hidden flex flex-col">
           <Editor
             defaultLanguage={codeName}
-            defaultValue={defaultCode}
+            defaultValue={
+              isLoading ? '代码加载中......' : codeStr || defaultCode
+            }
             theme="my-theme"
-            tw="flex-1 h-full overflow-auto"
+            tw="overflow-hidden"
             options={{
               minimap: { enabled: false },
             }}
