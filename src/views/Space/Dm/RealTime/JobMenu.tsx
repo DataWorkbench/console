@@ -163,7 +163,7 @@ const JobMenu = observer(() => {
         <div tw="mt-3 px-2 flex items-center">
           <InputSearch
             tw="dark:bg-neut-17 dark:text-white dark:border-neut-13 dark:hover:border-neut-13"
-            placeholder="搜索任务关键词/创建人"
+            placeholder="搜索作业名称/创建人"
             onPressEnter={(evt) => {
               setFilter((draft) => {
                 draft.search = String((evt.target as HTMLInputElement).value)

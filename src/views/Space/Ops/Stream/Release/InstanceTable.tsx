@@ -1,4 +1,5 @@
-import { Button, InputSearch, Menu } from '@QCFE/lego-ui'
+import React, { useEffect, useState } from 'react'
+import { Button, Menu } from '@QCFE/lego-ui'
 import {
   Modal,
   Table,
@@ -16,7 +17,6 @@ import {
 } from 'hooks'
 import { omitBy, get } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import { InstanceState } from '../constants'
@@ -113,28 +113,28 @@ export const InstanceTable = observer(
       })
     }
 
-    const handleResume = () => {
-      mutation.mutate(
-        {
-          op: 'stop',
-          inst_ids: [],
-        },
-        {
-          onSuccess: () => {
-            setSelectedRowKeys([])
-            setSelectedRows([])
-            setSelectedMap({})
-            refetchData()
-          },
-        }
-      )
-    }
+    // const handleResume = () => {
+    //   mutation.mutate(
+    //     {
+    //       op: 'stop',
+    //       inst_ids: [],
+    //     },
+    //     {
+    //       onSuccess: () => {
+    //         setSelectedRowKeys([])
+    //         setSelectedRows([])
+    //         setSelectedMap({})
+    //         refetchData()
+    //       },
+    //     }
+    //   )
+    // }
 
     const handleMenuClick = (op: OP, row: any) => {
       if (op === 'stop') {
         handleTerminate(row)
       } else if (op === 'enable') {
-        handleResume()
+        // handleResume()
       }
     }
 
@@ -221,9 +221,9 @@ export const InstanceTable = observer(
                       <Menu
                         onClick={(e: any, key: OP) => handleMenuClick(key, row)}
                       >
-                        {row.state === 4 && (
+                        {/* {row.state === 4 && (
                           <MenuItem key="enable">恢复</MenuItem>
-                        )}
+                        )} */}
                         <MenuItem key="stop">终止</MenuItem>
                       </Menu>
                     }
@@ -255,7 +255,7 @@ export const InstanceTable = observer(
 
     useEffect(() => {
       setFilter((draft) => {
-        draft.job_id = query.id || modalData.id || ''
+        draft.job_id = query.jobId || modalData.id || ''
         draft.state = query.state || 0
       })
     }, [modalData.id, query, setFilter])
@@ -275,7 +275,7 @@ export const InstanceTable = observer(
               <Icon name="stop" />
               终止
             </Button>
-            <Button
+            {/* <Button
               disabled={!selectedRowKeys.length}
               onClick={() => handleResume()}
               tw="ml-2"
@@ -285,10 +285,10 @@ export const InstanceTable = observer(
                 color={{ primary: '#939EA9', secondary: '#B6C2CD' }}
               />
               恢复
-            </Button>
+            </Button> */}
           </div>
           <Center tw="space-x-3">
-            {type === 'modal' && (
+            {/* {type === 'modal' && (
               <InputSearch
                 tw="w-64"
                 placeholder="请输入作业流程名称/版本进行搜索"
@@ -303,7 +303,7 @@ export const InstanceTable = observer(
                   })
                 }}
               />
-            )}
+            )} */}
             <Button
               type="black"
               loading={isRefetching}
