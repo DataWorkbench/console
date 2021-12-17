@@ -77,9 +77,12 @@ export const Header = observer(() => {
             value: id,
             label: name,
           }))}
-          onChange={(v) =>
-            history.push(pathname.replace(/(?<=workspace\/)[^/]*/, String(v)))
-          }
+          onChange={(v) => {
+            // history.push(pathname.replace(/(?<=workspace\/)[^/]*/, String(v)))
+            history.push(
+              pathname.replace(/\/workspace\/[^/]*/, `/workspace/${v}`)
+            )
+          }}
         />
       </Center>
       <Navs mod={mod} />

@@ -481,7 +481,7 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
                     const l = strlen(value)
                     return l <= 256
                   },
-                  help: '请填写数据库的描述信息',
+                  help: '数据库的长度在0-256字节之间',
                   status: 'error',
                 },
               ]}
