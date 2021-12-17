@@ -316,7 +316,7 @@ const ClusterTable = observer(
                   twChild={
                     css`
                       &[aria-expanded='true'] {
-                        ${tw`bg-[#4C5E70]`}
+                        ${tw`bg-line-dark`}
                       }
                       svg {
                         ${tw`text-white! bg-transparent! fill-[transparent]!`}
@@ -364,7 +364,7 @@ const ClusterTable = observer(
                     </Menu>
                   }
                 >
-                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-[#4C5E70] rounded-sm">
+                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
                     <Icon
                       name="more"
                       clickable
@@ -499,7 +499,7 @@ const ClusterTable = observer(
               <Button
                 type="black"
                 loading={isRefetching}
-                tw="px-[5px] border-[#4C5E70]!"
+                tw="px-[5px] border-line-dark!"
               >
                 <Icon
                   name="if-refresh"

@@ -308,7 +308,7 @@ export const ReleaseTable = observer(({ query }: any) => {
         <Button
           type="black"
           loading={isRefetching}
-          tw="px-[5px] border-[#4C5E70]!"
+          tw="px-[5px] border-line-dark!"
         >
           <Icon
             name="if-refresh"
