@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import tw from 'twin.macro'
 import {
   Collapse,
@@ -230,11 +230,6 @@ const ScheSettingModal = ({
   }
 
   const save = () => {
-    if (origin === 'ops') {
-      if (onCancel) onCancel()
-      if (onSuccess) onSuccess()
-      return
-    }
     if (formRef.current?.validateForm()) {
       mutation.mutate(
         {
@@ -256,6 +251,9 @@ const ScheSettingModal = ({
           onSuccess: () => {
             if (onCancel) {
               onCancel()
+            }
+            if (origin === 'ops') {
+              if (onSuccess) onSuccess()
             }
           },
         }

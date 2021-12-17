@@ -1,3 +1,4 @@
+import React from 'react'
 import { FlexBox } from 'components/Box'
 import { InputSearch, Field, Label, Control, Select } from '@QCFE/lego-ui'
 import { useImmer } from 'use-immer'
@@ -5,10 +6,10 @@ import { InstanceTable } from '../Release/InstanceTable'
 import { InstanceState } from '../constants'
 
 const defaultQuery: {
-  id: string
+  jobId: string
   state: number
 } = {
-  id: '',
+  jobId: '',
   state: 0,
 }
 
@@ -22,15 +23,15 @@ export const Job = () => {
           <Label>作业</Label>
           <Control>
             <InputSearch
-              placeholder="搜索作业名称、ID"
+              placeholder="搜索作业ID"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setQuery((draft) => {
-                  draft.id = (e.target as HTMLInputElement).value
+                  draft.jobId = (e.target as HTMLInputElement).value
                 })
               }}
               onClear={() => {
                 setQuery((draft) => {
-                  draft.id = ''
+                  draft.jobId = ''
                 })
               }}
             />

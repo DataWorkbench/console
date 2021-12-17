@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { FlexBox } from 'components/Box'
 import { Button, Checkbox, Menu } from '@QCFE/lego-ui'
 import {
@@ -13,10 +14,10 @@ import {
   getReleaseJobsKey,
   useMutationReleaseJobs,
   useQueryReleaseJobs,
+  useStore,
 } from 'hooks'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { omitBy, get } from 'lodash-es'
 import { Tooltip, Center } from 'components'
@@ -42,6 +43,8 @@ const JobTypes: ITypes = {
 }
 
 export const ReleaseTable = observer(({ query }: any) => {
+  const { workFlowStore } = useStore()
+
   const history = useHistory()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
@@ -141,8 +144,10 @@ export const ReleaseTable = observer(({ query }: any) => {
         setCurrentRelease(row)
         toggle()
       } else if (key === 'view') {
+        workFlowStore.set({ curJob: row })
         history.push(`/${regionId}/workspace/${spaceId}/dm`)
       } else if (key === 'update') {
+        workFlowStore.set({ curJob: row })
         setScheVisible(true)
       } else if (key === 'stop') {
         let stopRunning = false
@@ -172,7 +177,15 @@ export const ReleaseTable = observer(({ query }: any) => {
         })
       }
     },
-    [handleMutation, history, mutation.isLoading, regionId, spaceId, toggle]
+    [
+      handleMutation,
+      history,
+      mutation.isLoading,
+      regionId,
+      spaceId,
+      toggle,
+      workFlowStore,
+    ]
   )
 
   const columns = useMemo(
@@ -364,16 +377,18 @@ export const ReleaseTable = observer(({ query }: any) => {
         modalData={currentRelease}
       />
 
-      <ScheSettingModal
-        origin="ops"
-        visible={scheVisible}
-        onCancel={() => {
-          setScheVisible(false)
-        }}
-        onSuccess={() => {
-          setReleaseVisible(true)
-        }}
-      />
+      {scheVisible && (
+        <ScheSettingModal
+          origin="ops"
+          visible={scheVisible}
+          onCancel={() => {
+            setScheVisible(false)
+          }}
+          onSuccess={() => {
+            setReleaseVisible(true)
+          }}
+        />
+      )}
 
       {releaseVisible && (
         <ReleaseModal
