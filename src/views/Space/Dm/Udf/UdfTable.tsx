@@ -30,10 +30,10 @@ const getDefaultColumns = (
     render: (value: string, row: Record<string, any>) => {
       return value ? (
         <span
-          tw="cursor-pointer inline-flex"
+          tw="cursor-pointer inline-flex items-center"
           onClick={() => actions('detail', row)}
         >
-          <LetterIcon>
+          <LetterIcon tw="flex-none">
             <span>{value}</span>
           </LetterIcon>
           <span className="column-name">
