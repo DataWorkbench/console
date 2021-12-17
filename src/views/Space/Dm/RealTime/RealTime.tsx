@@ -58,12 +58,12 @@ const RealTime = observer(() => {
   }
 
   return (
-    <div tw="flex min-h-[600px] h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
+    <div tw="flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
       <JobMenu />
       {curJob ? (
         <JobTabs />
       ) : (
-        <Center tw="flex-1 text-neut-8 bg-neut-18 rounded">
+        <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
           <div tw="space-y-2">
             <FlexBox tw="space-x-1">
               {steps.slice(0, 4).map((step, i) => renderStep(step, i, i !== 3))}

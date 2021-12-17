@@ -161,6 +161,10 @@ export const useMutationStreamJobCode = () => {
   )
 }
 
+let queryStreamobCodeKey: any = ''
+
+export const getStreamJobCodeKey = () => queryStreamobCodeKey
+
 export const useQueryStreamJobCode = (options?: UseQueryOptions) => {
   const {
     workFlowStore: { curJob },
@@ -171,9 +175,9 @@ export const useQueryStreamJobCode = (options?: UseQueryOptions) => {
     spaceId,
     jobId: curJob?.id,
   }
-  const key = ['streamJobCode', params]
+  queryStreamobCodeKey = ['streamJobCode', params]
   return useQuery(
-    key,
+    queryStreamobCodeKey,
     async () =>
       getStreamJobCode({ ...params, regionId, spaceId, jobId: curJob?.id }),
     options
