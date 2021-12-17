@@ -1,7 +1,8 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { Modal, ModalStep, ModalContent, HelpCenterLink } from 'components'
+import { PopConfirm } from '@QCFE/lego-ui'
 import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
 import tw from 'twin.macro'
@@ -11,7 +12,7 @@ import {
   getSourceKey,
   useStore,
 } from 'hooks'
-import { get } from 'lodash-es'
+import { get, values, omit } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Global, css } from '@emotion/react'
 
@@ -35,6 +36,7 @@ const DataSourceModal = observer(
       step: ['update', 'view'].includes(op) ? 1 : 0,
       dbName: '',
     })
+    const [confirmVisible, setcConfirmVisible] = useState(false)
     const getFormData = useRef<() => any>()
     const queryClient = useQueryClient()
     const {
@@ -84,6 +86,13 @@ const DataSourceModal = observer(
         draft.step = i
       })
     }
+    const handleFieldValueChange = () => {
+      const data = (getFormData as any).current(false)
+      if (data) {
+        const field = values(omit(data, 'utype')).find((v: string) => v !== '')
+        setcConfirmVisible(field.length > 0)
+      }
+    }
     const opTxt = get({ create: '新增', update: '修改', view: '查看' }, op)
     return (
       <>
@@ -109,9 +118,25 @@ const DataSourceModal = observer(
               ) : (
                 <>
                   {op === 'create' && (
-                    <Button className="mr-2" onClick={() => goStep(0)}>
-                      上一步
-                    </Button>
+                    <>
+                      {confirmVisible ? (
+                        <PopConfirm
+                          type="warning"
+                          content="选择此项，刚刚填写的数据源配置信息将清空，确定选择此项吗？"
+                          onOk={() => {
+                            goStep(0)
+                          }}
+                        >
+                          <Button className="mr-2" onClick={() => goStep(0)}>
+                            上一步
+                          </Button>
+                        </PopConfirm>
+                      ) : (
+                        <Button className="mr-2" onClick={() => goStep(0)}>
+                          上一步
+                        </Button>
+                      )}
+                    </>
                   )}
 
                   <Button
@@ -175,6 +200,7 @@ const DataSourceModal = observer(
                       <DataSourceForm
                         getFormData={getFormData as any}
                         resInfo={curkind}
+                        onFieldValueChange={handleFieldValueChange}
                       />
                     )
                   )
