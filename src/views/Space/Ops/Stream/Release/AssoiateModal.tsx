@@ -1,13 +1,8 @@
 import { Modal } from 'components'
-import { useStore } from 'hooks'
 import { observer } from 'mobx-react-lite'
 import { InstanceTable } from './InstanceTable'
 
-export const AssoiateModal = observer(({ visible, toggle }: any) => {
-  const {
-    dmStore: { modalData, setModalData },
-  } = useStore()
-
+export const AssoiateModal = observer(({ visible, toggle, modalData }: any) => {
   return (
     <Modal
       width={1000}
@@ -17,10 +12,11 @@ export const AssoiateModal = observer(({ visible, toggle }: any) => {
       footer={null}
       onCancel={() => {
         toggle()
-        setModalData({})
       }}
     >
-      <InstanceTable type="modal" />
+      <div tw="px-5">
+        <InstanceTable type="modal" modalData={modalData} />
+      </div>
     </Modal>
   )
 })

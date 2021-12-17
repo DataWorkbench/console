@@ -18,6 +18,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import { useQueryClient } from 'react-query'
 import { loadResourceList } from 'stores/api'
 import { useParams } from 'react-router-dom'
+import { formatBytes } from 'utils/convert'
 import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
 
 const { TextField, TextAreaField } = Form
@@ -67,16 +68,17 @@ const UploadModal = observer((props: any) => {
   const {
     dmStore: { setOp, op },
   } = useStore()
+  const { visible, handleCancel, type: packageType, defaultFields } = props
 
-  const [resourceName, setResourceName] = useState('')
+  const [resourceName, setResourceName] = useState(
+    (op !== 'create' && defaultFields.name) || ''
+  )
   const [fileTip, setFileTip] = useState('')
 
   const resourceEl = useRef<HTMLInputElement>(null)
   const form = useRef<Form>(null)
   const [file, setFile] = useState<File>()
   const { regionId, spaceId } = useParams<IRouteParams>()
-
-  const { visible, handleCancel, type: packageType, defaultFields } = props
 
   const mutation = useMutationResource()
 
@@ -85,6 +87,10 @@ const UploadModal = observer((props: any) => {
   useEffect(() => {
     form.current?.validateFields()
   }, [resourceName])
+
+  useEffect(() => {
+    if (visible) setResourceName(defaultFields.name || '')
+  }, [defaultFields.name, visible])
 
   const closeModal = () => {
     handleCancel()
@@ -111,7 +117,7 @@ const UploadModal = observer((props: any) => {
       setFileTip('size')
       return
     }
-    if (resource.type !== 'application/java-archive') {
+    if (!/.jar$/.test(resource.name)) {
       setFileTip('type')
       return
     }
@@ -258,7 +264,6 @@ const UploadModal = observer((props: any) => {
           disabled={op === 'view'}
           value={resourceName}
           onChange={(value: string) => setResourceName(value)}
-          defaultValue={(op !== 'create' && defaultFields.name) || ''}
         />
         <TextAreaFieldWrapper
           name="description"
@@ -300,9 +305,7 @@ const UploadModal = observer((props: any) => {
                   <Icon className="is-left" name="jar" />
                   &nbsp;
                   <InputWapper
-                    value={`${file.name} (${(file.size / 1024 / 1024).toFixed(
-                      2
-                    )}MB)`}
+                    value={`${file.name} (${formatBytes(file.size, 2)})`}
                   />
                   <PopConfirm
                     type="warning"

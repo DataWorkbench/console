@@ -41,6 +41,7 @@ declare module '@QCFE/qingcloud-portal-ui' {
   export function SideMenu(props: any): JSX.Element
   export function PageTab(props: any): JSX.Element
   export function ToolBar(props: any): JSX.Element
+  export function Divider(props: any): JSX.Element
 
   export interface ModalProps {
     css?: Record<string, Record<string, unknown>>
