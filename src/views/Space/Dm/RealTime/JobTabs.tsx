@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useUpdateEffect } from 'react-use'
+import { useUpdateEffect, useUnmount } from 'react-use'
 import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { findIndex } from 'lodash-es'
@@ -56,6 +56,10 @@ const JobTabs = observer(() => {
   useUpdateEffect(() => {
     workFlowStore.set({ panels: [], curJob: null })
   }, [spaceId, workFlowStore])
+
+  useUnmount(() => {
+    workFlowStore.set({ panels: [], curJob: null })
+  })
 
   return (
     <div tw="flex-1 w-full relative">

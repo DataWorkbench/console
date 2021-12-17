@@ -1,13 +1,14 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
-import { FlexBox } from 'components'
+import { FlexBox, Modal } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
-import { get, trim } from 'lodash-es'
+import { get, trim, isUndefined } from 'lodash-es'
 import { theme } from 'twin.macro'
 import Editor from '@monaco-editor/react'
 import { useQueryClient } from 'react-query'
 import {
   useMutationStreamJobCode,
   useMutationReleaseStreamJob,
+  useQueryStreamJobSchedule,
   useQueryStreamJobCode,
   getStreamJobCodeKey,
 } from 'hooks'
@@ -31,12 +32,16 @@ interface IProp {
 const StreamCode = ({ tp }: IProp) => {
   const [show, toggleShow] = useState(false)
   const [enableRelease, setEnableRelease] = useState(false)
+  const [showScheModal, toggleScheModal] = useState(false)
+  const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef(null)
   const mutation = useMutationStreamJobCode()
   const releaseMutation = useMutationReleaseStreamJob()
   const { data, isLoading } = useQueryStreamJobCode()
+  const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
   const codeStr = get(data, `${codeName}.code`)
+  const loadingWord = '代码加载中......'
   const queryClient = useQueryClient()
   const defaultCode = useMemo(() => {
     let v = ''
@@ -81,7 +86,7 @@ def main(args: Array[String]): Unit = {
   const showWarn = () => {
     Notify.warning({
       title: '操作提示',
-      content: '请选填写代码',
+      content: '请先填写代码',
       placement: 'bottomRight',
     })
   }
@@ -120,7 +125,12 @@ def main(args: Array[String]): Unit = {
       showWarn()
       return
     }
-    toggleShow(true)
+
+    if (get(scheData, 'schedule_policy') === 0) {
+      toggleScheModal(true)
+    } else {
+      toggleShow(true)
+    }
   }
 
   const handleEditorWillMount = (monaco) => {
@@ -162,20 +172,24 @@ def main(args: Array[String]): Unit = {
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor
-    if (codeStr) {
-      editor.setValue(codeStr)
-      setEnableRelease(true)
+    if (!isUndefined(codeStr)) {
+      editor.setValue(codeStr || defaultCode)
+      if (codeStr) {
+        setEnableRelease(true)
+      }
     }
     // eslint-disable-next-line no-bitwise
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, save)
   }
 
   useEffect(() => {
-    if (codeStr) {
-      editorRef.current?.setValue(codeStr)
-      setEnableRelease(true)
+    if (!isUndefined(codeStr)) {
+      editorRef.current?.setValue(codeStr || defaultCode)
+      if (codeStr) {
+        setEnableRelease(true)
+      }
     }
-  }, [codeStr])
+  }, [codeStr, defaultCode])
 
   return (
     <FlexBox tw="h-full w-full flex-1">
@@ -210,9 +224,7 @@ def main(args: Array[String]): Unit = {
         <div tw="flex-1 overflow-hidden flex flex-col">
           <Editor
             defaultLanguage={codeName}
-            defaultValue={
-              isLoading ? '代码加载中......' : codeStr || defaultCode
-            }
+            defaultValue={isLoading ? loadingWord : codeStr || defaultCode}
             theme="my-theme"
             tw="overflow-hidden"
             options={{
@@ -223,7 +235,39 @@ def main(args: Array[String]): Unit = {
           />
         </div>
       </FlexBox>
-      <StreamRightMenu />
+      <StreamRightMenu
+        showScheSetting={showScheSettingModal}
+        onScheSettingClose={() => {
+          setShowScheSettingModal(false)
+        }}
+      />
+      {showScheModal && (
+        <Modal
+          visible
+          noBorder
+          width={400}
+          onCancel={() => toggleScheModal(false)}
+          okText="调度配置"
+          onOk={() => {
+            setShowScheSettingModal(true)
+            toggleScheModal(false)
+          }}
+        >
+          <div tw="flex">
+            <Icon
+              name="exclamation"
+              color={{ secondary: '#F5C414' }}
+              size={20}
+            />
+            <div tw="ml-3">
+              <div tw="text-base">尚未配置调度任务</div>
+              <div tw="mt-2 text-neut-8">
+                发布调度任务前，请先完成调度配置，否则无法发布
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
       {show && <ReleaseModal onCancel={() => toggleShow(false)} />}
     </FlexBox>
   )
