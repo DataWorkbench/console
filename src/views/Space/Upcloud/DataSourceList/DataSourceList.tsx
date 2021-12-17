@@ -356,6 +356,7 @@ const DataSourceList = observer(() => {
   const handleQuery = (v: string) => {
     setFilter((draft) => {
       draft.search = v
+      draft.offset = 0
     })
   }
 
@@ -422,7 +423,9 @@ const DataSourceList = observer(() => {
                 onPressEnter={() => handleQuery(searchName)}
                 onClear={() => {
                   setSearchName('')
-                  handleQuery('')
+                  if (filter.search) {
+                    handleQuery('')
+                  }
                 }}
               />
               <Button loading={isReFetching} tw="px-[5px]">
