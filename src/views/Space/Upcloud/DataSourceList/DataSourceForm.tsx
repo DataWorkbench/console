@@ -203,8 +203,11 @@ const getFieldsInfo = (type: string) => {
           help: '例如：zk_host1:2181,zk_host2:2181,zk_host3:2181',
           schemas: [
             {
-              rule: { required: true },
-              help: '请输入zookeeper',
+              rule: {
+                required: true,
+                matchRegex: /^([1-9a-zA-Z_.-]+:\d{1,5},?)+$/,
+              },
+              help: '请输入zookeeper, 例如：zk_host1:2181,zk_host2:2181',
               status: 'error',
             },
             {
@@ -223,7 +226,11 @@ const getFieldsInfo = (type: string) => {
           placeholder: '请输入',
           help: '例如：/hbase',
           schemas: [
-            { rule: { required: true }, help: '请输入znode', status: 'error' },
+            {
+              rule: { required: true, matchRegex: /^\// },
+              help: '请输入znode, 例如：/hbase',
+              status: 'error',
+            },
             {
               rule: (value: string) => {
                 const l = strlen(value)
@@ -291,8 +298,13 @@ interface IFormProps {
     source_type: number
   }
   getFormData?: MutableRefObject<() => any>
+  onFieldValueChange?: (fieldValue: string, formModel: any) => void
 }
-const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
+const DataSourceForm = ({
+  resInfo,
+  getFormData,
+  onFieldValueChange,
+}: IFormProps) => {
   const queryClient = useQueryClient()
   const [network, setNetWork] = useImmer<{ type: 'vpc' | 'eip'; id: string }>({
     type: 'vpc',
@@ -333,53 +345,59 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
     }
   })
 
-  const getValidFormData = useCallback(() => {
-    const formElem = ref?.current
-    if (formElem?.validateForm()) {
-      const {
-        name,
-        comment,
-        network_id: networkId,
-        ...others
-      } = formElem.getFieldsValue()
-      let rest = omit(others, 'utype')
-      if (networkId) {
-        rest.network = {
-          type: 2,
-          vpc_network: {
-            network_id: networkId,
+  const parseFormData = useCallback(
+    (needValid = true) => {
+      const formElem = ref?.current
+      if (!needValid) {
+        return formElem?.getFieldsValue()
+      }
+      if (formElem?.validateForm()) {
+        const {
+          name,
+          comment,
+          network_id: networkId,
+          ...others
+        } = formElem.getFieldsValue()
+        let rest = omit(others, 'utype')
+        if (networkId) {
+          rest.network = {
+            type: 2,
+            vpc_network: {
+              network_id: networkId,
+            },
+          }
+        } else {
+          rest.network = {
+            type: 1,
+          }
+        }
+        if (urlType === 'hdfs') {
+          const shiftArr = ['name_node', 'port']
+          rest.nodes = pick(rest, shiftArr)
+          rest = omit(rest, shiftArr)
+        }
+        const data = {
+          name,
+          comment,
+          url: {
+            [urlType]: rest,
           },
         }
-      } else {
-        rest.network = {
-          type: 1,
-        }
+        return data
       }
-      if (urlType === 'hdfs') {
-        const shiftArr = ['name_node', 'port']
-        rest.nodes = pick(rest, shiftArr)
-        rest = omit(rest, shiftArr)
-      }
-      const data = {
-        name,
-        comment,
-        url: {
-          [urlType]: rest,
-        },
-      }
-      return data
-    }
-    return null
-  }, [ref, urlType])
+      return null
+    },
+    [ref, urlType]
+  )
 
   useEffect(() => {
     if (getFormData) {
-      getFormData.current = getValidFormData
+      getFormData.current = parseFormData
     }
-  }, [getFormData, getValidFormData])
+  }, [getFormData, parseFormData])
 
   const handlePing = () => {
-    const formData = getValidFormData()
+    const formData = parseFormData()
     if (formData) {
       mutation.mutate(
         {
@@ -397,7 +415,12 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
 
   return (
     <Root>
-      <Form tw="max-w-full!" layout="vertical" ref={ref}>
+      <Form
+        tw="max-w-full!"
+        layout="vertical"
+        ref={ref}
+        onFieldValueChange={onFieldValueChange}
+      >
         <CollapseWrapper defaultActiveKey={['p0', 'p1']}>
           <CollapseItem
             key="p0"
