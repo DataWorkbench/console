@@ -4,6 +4,7 @@ const tippyStyles = css`
   .tippy-box {
     .tippy-content {
       padding: 0;
+      ${tw`break-all`}
     }
   }
   .tippy-box[data-theme~='light'] {

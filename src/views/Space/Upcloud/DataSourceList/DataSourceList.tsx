@@ -215,9 +215,15 @@ const DataSourceList = observer(() => {
                     <span tw="inline-block px-1.5 bg-[#E0EBFE] text-[#3B82F6] rounded-sm mr-0.5">
                       URL
                     </span>
-                    <span>
-                      {`${key}://${urlObj.host}:${urlObj.port}/${urlObj.database}`}
-                    </span>
+                    <Tooltip
+                      content={`${key}://${urlObj.host}:${urlObj.port}/${urlObj.database}`}
+                      hasPadding
+                    >
+                      <span tw="inline-flex">
+                        <span tw="truncate max-w-[108px] mr-[-4px]">{`${key}://${urlObj.host}`}</span>
+                        {`:${urlObj.port}/${urlObj.database}`}
+                      </span>
+                    </Tooltip>
                   </>
                 )}
               </div>
@@ -491,7 +497,7 @@ const DataSourceList = observer(() => {
           return (
             <ModalWrapper
               visible
-              width={680}
+              width={800}
               onCancel={handleCancel}
               footer={
                 <FlexBox tw="justify-end">
@@ -543,7 +549,7 @@ const DataSourceList = observer(() => {
                         ].includes(col.dataIndex)
                       )
                       .map((col: any) =>
-                        pick(col, ['title', 'dataIndex', 'render'])
+                        pick(col, ['title', 'dataIndex', 'render', 'width'])
                       )}
                     dataSource={filterSourceList}
                   />
