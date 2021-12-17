@@ -29,7 +29,7 @@ import {
 } from 'hooks'
 import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
-import { css } from 'twin.macro'
+import tw, { css } from 'twin.macro'
 
 import ClusterModal from './ClusterModal'
 
@@ -313,6 +313,16 @@ const ClusterTable = observer(
                   trigger="click"
                   placement="bottom"
                   arrow={false}
+                  twChild={
+                    css`
+                      &[aria-expanded='true'] {
+                        ${tw`bg-line-dark`}
+                      }
+                      svg {
+                        ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                      }
+                    ` as any
+                  }
                   content={
                     <Menu
                       onClick={(e: any, key: any) => {
@@ -354,8 +364,14 @@ const ClusterTable = observer(
                     </Menu>
                   }
                 >
-                  <div tw="flex items-center">
-                    <Icon name="more" clickable changeable type="light" />
+                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
+                    <Icon
+                      name="more"
+                      clickable
+                      changeable
+                      type="light"
+                      size={20}
+                    />
                   </div>
                 </Tooltip>
               </Center>
@@ -483,7 +499,7 @@ const ClusterTable = observer(
               <Button
                 type="black"
                 loading={isRefetching}
-                tw="px-[5px] border-[#4C5E70]!"
+                tw="px-[5px] border-line-dark!"
               >
                 <Icon
                   name="if-refresh"

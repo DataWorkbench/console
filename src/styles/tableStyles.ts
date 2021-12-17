@@ -12,7 +12,8 @@ const tableStyles = css`
   .dark {
     .columns-setting-container {
       .button.is-default.is-trigger {
-        border-color: #4c5e70;
+        // border-color: #4c5e70;
+        ${tw`border-line-dark`}
         background-color: transparent;
         ${tw`hover:bg-neut-13 active:bg-neut-15`}
       }

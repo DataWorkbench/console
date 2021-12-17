@@ -5,7 +5,7 @@ import { Button } from '@QCFE/qingcloud-portal-ui'
 import { jsPlumb } from 'jsplumb'
 import { useDrop } from 'react-dnd'
 import { nanoid } from 'nanoid'
-import tw from 'twin.macro'
+import tw, { theme } from 'twin.macro'
 import NodeMenu from './NodeMenu'
 
 const StreamOperator = ({ className }: { className?: string }) => {
@@ -41,11 +41,11 @@ const StreamOperator = ({ className }: { className?: string }) => {
         DragOptions: { cursor: 'pointer', zIndex: 2000 },
         Anchors: ['Top', 'Bottom'],
         PaintStyle: {
-          stroke: '#4C5E70',
+          stroke: theme('colors.line.dark'),
           strokeWidth: 1,
         },
         EndpointStyle: {
-          fill: '#4C5E70',
+          fill: theme('colors.line.dark'),
           stroke: '#939EA9',
           radius: 3,
         },

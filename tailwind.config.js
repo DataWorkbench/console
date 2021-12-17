@@ -67,6 +67,9 @@ module.exports = {
         DEFAULT: '#0366D6',
         dark: '#035CC1',
       },
+      line: {
+        dark: '#4C5E70',
+      },
     },
     extend: {
       fontSize: {

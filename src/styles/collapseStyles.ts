@@ -5,7 +5,7 @@ const collapseStyles = css`
     .collapse {
       ${tw`text-white border-neut-13 border-0 w-full`}
       .collapse-item-label {
-        ${tw`bg-neut-17 text-white  border-t-0 border-b-[#4C5E70] border-b`}
+        ${tw`bg-neut-17 text-white  border-t-0 border-b-line-dark border-b`}
 
         > span {
           svg {

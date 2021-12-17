@@ -290,7 +290,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                   twChild={
                     css`
                       &[aria-expanded='true'] {
-                        ${tw`bg-[#4C5E70]`}
+                        ${tw`bg-line-dark`}
                       }
                       svg {
                         ${tw`text-white! bg-transparent! fill-[transparent]!`}
@@ -312,7 +312,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                     </Menu>
                   }
                 >
-                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-[#4C5E70] rounded-sm">
+                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
                     <Icon
                       name="more"
                       clickable
@@ -378,7 +378,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
               </Center>
               <Center tw="space-x-3">
                 <InputSearch
-                  tw="w-64 border-[#4C5E70]!"
+                  tw="w-64 border-line-dark!"
                   placeholder="请输入关键词进行搜索"
                   onPressEnter={(e: React.SyntheticEvent) => {
                     setFilter((draft) => {
@@ -394,7 +394,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                 <Button
                   type="black"
                   loading={isRefetching}
-                  tw="px-[5px] border-[#4C5E70]!"
+                  tw="px-[5px] border-line-dark!"
                 >
                   <Icon
                     name="if-refresh"

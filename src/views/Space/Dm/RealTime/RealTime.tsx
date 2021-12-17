@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
-import tw, { css } from 'twin.macro'
+import tw, { css, theme } from 'twin.macro'
 import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
 import JobMenu from './JobMenu'
@@ -47,7 +47,9 @@ const RealTime = observer(() => {
                 css`
                   border-top: 4px solid transparent;
                   border-bottom: 4px solid transparent;
-                  border-${reverse ? 'right' : 'left'}: 4px solid #4c5e70;
+                  border-${reverse ? 'right' : 'left'}: 4px solid ${theme(
+                  'colors.line.dark'
+                )};
                 `,
               ]}
             />
@@ -76,7 +78,7 @@ const RealTime = observer(() => {
                   css={`
                     border-left: 4px solid transparent;
                     border-right: 4px solid transparent;
-                    border-top: 4px solid #4c5e70;
+                    border-top: 4px solid ${theme('colors.line.dark')};
                   `}
                 />
               </div>
