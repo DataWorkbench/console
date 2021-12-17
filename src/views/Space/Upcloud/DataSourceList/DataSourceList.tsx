@@ -49,7 +49,7 @@ const confirmMsgInfo: any = {
   },
   delete: {
     name: '删除',
-    desc: '该数据源后删除后业务流程将无法引用，该操作无法撤回，请谨慎操作。',
+    desc: '数据源后删除后新建作业将无法引用，该操作无法撤回，请谨慎操作。',
   },
 }
 
@@ -419,11 +419,7 @@ const DataSourceList = observer(() => {
                   handleQuery('')
                 }}
               />
-              <Button
-                type="black"
-                loading={isReFetching}
-                tw="px-[5px] border-line-dark!"
-              >
+              <Button loading={isReFetching} tw="px-[5px]">
                 <Icon
                   name="if-refresh"
                   tw="text-xl"
@@ -542,6 +538,7 @@ const DataSourceList = observer(() => {
                           'name',
                           'source_type',
                           'source_id',
+                          'url',
                           'created',
                         ].includes(col.dataIndex)
                       )
