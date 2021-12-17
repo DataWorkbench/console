@@ -22,7 +22,7 @@ export const Release = () => {
           <Label>作业流程</Label>
           <Control>
             <InputSearch
-              placeholder="搜素业务流名称、ID"
+              placeholder="搜索作业名称、ID"
               onPressEnter={(e: React.SyntheticEvent) => {
                 handleQueryChange(
                   'search',
@@ -41,6 +41,7 @@ export const Release = () => {
             <Select
               placeholder="请选择"
               options={[
+                { value: 0, label: '全部' },
                 { value: 1, label: '调度中' },
                 { value: 2, label: '已暂停' },
               ]}

@@ -13,8 +13,8 @@ import {
   useInfiniteQueryNetworks,
   getNetworkKey,
 } from 'hooks'
-import { AffixLabel, Icons } from 'components'
-import { nameMatchRegex, strlen, getHelpCenterLink } from 'utils'
+import { AffixLabel, HelpCenterLink } from 'components'
+import { nameMatchRegex, strlen } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
 import HdfsNodeField from './HdfsNodeField'
 
@@ -79,7 +79,7 @@ const compInfo = {
     schemas: [
       {
         rule: { required: true, matchRegex: nameMatchRegex },
-        help: '字母、数字或下划线（_）,不能以（_）开结尾',
+        help: '字母、数字或下划线（_）,不能以（_）开始结尾',
         status: 'error',
       },
       {
@@ -516,21 +516,12 @@ const DataSourceForm = ({ resInfo, getFormData }: IFormProps) => {
               help={
                 <>
                   详情请见
-                  <a
-                    href={getHelpCenterLink(
-                      '/bigdata/dataplat/manual/data_up_cloud/connect/'
-                    )}
-                    tw="text-green-11 hover:text-green-11"
-                    target="_blank"
-                    rel="noreferrer"
+                  <HelpCenterLink
+                    href="/manual/data_up_cloud/connect/"
+                    isIframe={false}
                   >
                     网络联通文档
-                    <Icons
-                      name="direct"
-                      tw="text-green-11 fill-current"
-                      size={14}
-                    />
-                  </a>
+                  </HelpCenterLink>
                 </>
               }
             >

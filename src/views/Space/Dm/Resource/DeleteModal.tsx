@@ -1,7 +1,8 @@
 import { Button, Icon, Table } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Modal } from 'components'
+import { FlexBox, Modal, Icons, Tooltip, Center } from 'components'
 import { useState } from 'react'
 import { css } from 'twin.macro'
+import { PackageName } from './constants'
 
 export default function DeleteModal(props: any) {
   const {
@@ -32,20 +33,27 @@ export default function DeleteModal(props: any) {
 
   const columns = [
     {
-      title: '函数包名称',
+      title: `${PackageName[packageType]}名称`,
       dataIndex: 'name',
       render: (_: string, row: Record<string, any>) => {
         return (
           <FlexBox tw="items-center space-x-1">
-            <Icon
-              name={packageType === 'program' ? 'coding' : 'terminal'}
-              type="light"
-              color={{
-                primary: '#219861',
-                secondary: '#8EDABD',
-              }}
-            />
-            <div>{row.name}</div>
+            {packageType === 'dependency' ? (
+              <Icons name="dependency" width={20} size={20} />
+            ) : (
+              <Icon
+                tw="w-5! h-5!"
+                name={packageType === 'program' ? 'coding' : 'terminal'}
+                type="light"
+                color={{
+                  primary: '#219861',
+                  secondary: '#8EDABD',
+                }}
+              />
+            )}
+            <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
+              <div tw="max-w-[130px] truncate">{row.name}</div>
+            </Tooltip>
           </FlexBox>
         )
       },
@@ -53,15 +61,23 @@ export default function DeleteModal(props: any) {
     {
       title: 'ID',
       dataIndex: 'resource_id',
+      render: (value: string) => <div tw="text-neut-8">{value}</div>,
     },
     {
       title: '文件大小',
       dataIndex: 'size',
-      render: (value: number) => <>{Math.round(value / 1000)}kb</>,
+      render: (value: number) => <>{Math.round(value / 1024)}kb</>,
     },
     {
       title: '描述',
       dataIndex: 'description',
+      render: (value: string) => {
+        return (
+          <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
+            <div tw="max-w-[150px] truncate text-neut-8">{value}</div>
+          </Tooltip>
+        )
+      },
     },
   ]
 
@@ -72,6 +88,7 @@ export default function DeleteModal(props: any) {
       width={selectedList?.length > 1 ? 800 : 400}
       onCancel={toggle}
       confirmLoading={mutation.isLoading}
+      okText="删除"
       footer={
         <FlexBox tw="justify-end">
           <Button onClick={toggle}>取消</Button>
@@ -80,7 +97,7 @@ export default function DeleteModal(props: any) {
             loading={mutation.isLoading}
             onClick={handleDelete}
           >
-            确定
+            删除
           </Button>
         </FlexBox>
       }
@@ -99,13 +116,13 @@ export default function DeleteModal(props: any) {
             const deleteTitle =
               selectedList.length === 1 ? (
                 <>
-                  删除{packageType === 'program' ? '程序包' : '函数包'}
+                  删除{PackageName[packageType]}
                   {selectedList[0].name}({selectedList[0].resource_id})注意事项
                 </>
               ) : (
                 <>
-                  删除以下{selectedList.length}个
-                  {packageType === 'program' ? '程序包' : '函数包'}注意事项
+                  删除以下{selectedList.length}个{PackageName[packageType]}
+                  注意事项
                 </>
               )
             return (
@@ -136,6 +153,18 @@ export default function DeleteModal(props: any) {
                         删除函数包{selectedList[0].name}(
                         {selectedList[0].resource_id}
                         )后，相关作业将无法引用，已引用的作业将受到影响，且该操作无法撤回。确认删除吗？
+                      </>
+                    ))}
+                  {packageType === 'dependency' &&
+                    (selectedList.length > 1 ? (
+                      <>
+                        删除以下依赖包后，具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认，且该操作无法撤回。确认删除吗？
+                      </>
+                    ) : (
+                      <>
+                        删除依赖包{selectedList[0].name}(
+                        {selectedList[0].resource_id}
+                        )后，具体文案待确认具体文案待确认具体文案待确认具体文案待确认，且该操作无法撤回。确认删除吗？
                       </>
                     ))}
                 </div>

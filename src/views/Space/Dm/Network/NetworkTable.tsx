@@ -309,6 +309,7 @@ const NetworkTable = observer(() => {
           visible
           width={opNetworkList.length > 1 ? 600 : 400}
           onCancel={() => setOp('')}
+          okText="删除"
           onOk={mutateData}
           footer={
             <FlexBox tw="justify-end">

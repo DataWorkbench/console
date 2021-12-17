@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { Alert, Button, utils } from '@QCFE/qingcloud-portal-ui'
+import { Alert, Button, utils, Table } from '@QCFE/qingcloud-portal-ui'
 import { Level, LevelLeft, LevelRight } from '@QCFE/lego-ui'
 import { useImmer } from 'use-immer'
 
 import { observer } from 'mobx-react-lite'
 import dayjs from 'dayjs'
 
-import { Table } from 'views/Space/styled'
+// import { Table } from 'views/Space/styled'
 import { useQueryUdfList, useStore } from 'hooks'
 import { TextHighlight, TextLink } from 'components'
 import { TableActions, LetterIcon } from '../styled'

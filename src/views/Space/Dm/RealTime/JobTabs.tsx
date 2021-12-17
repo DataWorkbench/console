@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useUpdateEffect } from 'react-use'
+import { useUpdateEffect, useUnmount } from 'react-use'
 import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { findIndex } from 'lodash-es'
@@ -30,7 +30,7 @@ const TabWrapper = styled(Tabs)(() => [
       }
     }
     .tab-content {
-      ${tw`flex-1 py-0!`}
+      ${tw`flex-1 h-full py-0!`}
       .tab-panel {
         ${tw`flex h-full`}
       }
@@ -57,8 +57,12 @@ const JobTabs = observer(() => {
     workFlowStore.set({ panels: [], curJob: null })
   }, [spaceId, workFlowStore])
 
+  useUnmount(() => {
+    workFlowStore.set({ panels: [], curJob: null })
+  })
+
   return (
-    <div tw="flex-1 relative">
+    <div tw="flex-1 w-full relative">
       <TabWrapper
         type="card"
         activeName={curJob?.id}

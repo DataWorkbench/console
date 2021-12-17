@@ -17,6 +17,10 @@ const customStyles = css`
     font-family: 'Roboto', 'PingFang SC', 'Noto Sans CJK', 'WenQuanYi Micro Hei',
       'Microsoft YaHei', sans-serif;
   }
+
+  body {
+    ${tw`overflow-hidden min-h-screen h-screen`}
+  }
   .light {
     --bg-primary: #fff;
     --bg-secondary: #f1f5f9;

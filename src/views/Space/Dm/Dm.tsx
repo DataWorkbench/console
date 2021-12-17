@@ -10,9 +10,9 @@ function Dm() {
   const { mod } = useParams<{ mod: string }>()
 
   return (
-    <div tw="flex-1 flex h-full">
+    <div tw="flex-1 flex h-full w-full">
       <Sider funcMod="dm" />
-      <div tw="flex-1 overflow-y-auto">
+      <div tw="flex-1 w-full overflow-y-auto">
         {(mod === 'realtime' || !mod) && <RealTime />}
         {mod === 'network' && <Network />}
         {mod === 'resource' && <Resource />}

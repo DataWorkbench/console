@@ -11,13 +11,15 @@ import {
   PopConfirm,
 } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { getResourcePageQueryKey, useMutationResource, useStore } from 'hooks'
 import { DarkModal, Tooltip, Center, AffixLabel } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useQueryClient } from 'react-query'
 import { loadResourceList } from 'stores/api'
 import { useParams } from 'react-router-dom'
+import { formatBytes } from 'utils/convert'
+import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
 
 const { TextField, TextAreaField } = Form
 
@@ -66,24 +68,36 @@ const UploadModal = observer((props: any) => {
   const {
     dmStore: { setOp, op },
   } = useStore()
+  const { visible, handleCancel, type: packageType, defaultFields } = props
+
+  const [resourceName, setResourceName] = useState(
+    (op !== 'create' && defaultFields.name) || ''
+  )
+  const [fileTip, setFileTip] = useState('')
 
   const resourceEl = useRef<HTMLInputElement>(null)
   const form = useRef<Form>(null)
   const [file, setFile] = useState<File>()
   const { regionId, spaceId } = useParams<IRouteParams>()
 
-  const { visible, handleCancel, type: packageType, defaultFields } = props
-
-  const packageTypeName = packageType === 'program' ? '程序包' : '函数包'
-
   const mutation = useMutationResource()
 
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    form.current?.validateFields()
+  }, [resourceName])
+
+  useEffect(() => {
+    if (visible) setResourceName(defaultFields.name || '')
+  }, [defaultFields.name, visible])
 
   const closeModal = () => {
     handleCancel()
     setFile(undefined)
     setOp('')
+    setResourceName('')
+    setFileTip('')
   }
 
   const handleFile = () => {
@@ -97,7 +111,19 @@ const UploadModal = observer((props: any) => {
   }
 
   const handleResourceChange = (event: any) => {
-    setFile(event.target.files[0])
+    const resource = event.target.files[0]
+
+    if (resource.size > 100 * 1024 * 1024) {
+      setFileTip('size')
+      return
+    }
+    if (!/.jar$/.test(resource.name)) {
+      setFileTip('type')
+      return
+    }
+    setFile(resource)
+    setFileTip('')
+    if (!resourceName) setResourceName(resource.name)
   }
 
   const handleOk = async () => {
@@ -108,7 +134,7 @@ const UploadModal = observer((props: any) => {
         regionId,
         spaceId,
         resource_name: fields.resource_name,
-        resource_type: packageType === 'program' ? 1 : 2,
+        resource_type: PackageTypeMap[packageType],
       })
       if (ret.infos?.length > 0) {
         Message.error('名称已存在')
@@ -117,7 +143,7 @@ const UploadModal = observer((props: any) => {
     }
 
     const params = {
-      resource_type: packageType === 'program' ? 1 : 2,
+      resource_type: PackageTypeMap[packageType],
       ...fields,
       file,
       resource_id: defaultFields.resource_id,
@@ -141,7 +167,7 @@ const UploadModal = observer((props: any) => {
   return (
     <DarkModal
       width={800}
-      title={`${op === 'edit' ? '编辑' : '上传'}${packageTypeName}`}
+      title={`${op === 'edit' ? '编辑' : '上传'}${PackageName[packageType]}`}
       visible={visible}
       onCancel={closeModal}
       footer={
@@ -181,7 +207,7 @@ const UploadModal = observer((props: any) => {
                 placement="top-end"
                 content={
                   <Center tw="h-9 px-3 text-neut-13">
-                    请先添加符合要求的{packageTypeName}
+                    请先添加符合要求的{PackageName[packageType]}
                   </Center>
                 }
               >
@@ -204,7 +230,7 @@ const UploadModal = observer((props: any) => {
       <Alert
         type="info"
         tw="mb-4"
-        message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
+        message={PackageTypeTip[packageType]}
         linkBtn={<Button type="text">查看详情 →</Button>}
       />
       <Form ref={form} tw="pl-0!">
@@ -213,37 +239,45 @@ const UploadModal = observer((props: any) => {
           autoComplete="off"
           name="resource_name"
           labelClassName="medium"
-          placeholder={`请输入${packageTypeName}显示名`}
-          label={<AffixLabel required>{packageTypeName}显示名</AffixLabel>}
+          placeholder={`请输入${PackageName[packageType]}显示名`}
+          label={
+            <AffixLabel required>{PackageName[packageType]}显示名</AffixLabel>
+          }
           validateOnBlur
           schemas={[
             {
               rule: { required: true },
-              help: '请输入程序包显示名',
+              help: `请输入${PackageName[packageType]}显示名`,
               status: 'error',
             },
             {
-              rule: { matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/ },
-              help: '只允许字母、数字或下划线（_）,不能以（_）开始结尾',
+              rule: { matchRegex: /^(?!_)[a-zA-Z0-9_]+/ },
+              help: '只允许数字、字母或下划线(_) 不能以(_)开头',
+              status: 'error',
+            },
+            {
+              rule: { matchRegex: /.jar$/ },
+              help: '需要.jar扩展名',
               status: 'error',
             },
           ]}
           disabled={op === 'view'}
-          defaultValue={(op !== 'create' && defaultFields.name) || ''}
+          value={resourceName}
+          onChange={(value: string) => setResourceName(value)}
         />
         <TextAreaFieldWrapper
           name="description"
           labelClassName="medium"
           label="描述"
-          placeholder={`请输入${packageTypeName}描述`}
-          maxLength="1024"
+          placeholder={`请输入${PackageName[packageType]}描述`}
+          maxLength="500"
           disabled={op === 'view'}
           defaultValue={(op !== 'create' && defaultFields.description) || ''}
         />
         {op !== 'edit' && (
           <Field tw="mb-0!">
             <Label className="medium">
-              <AffixLabel required>添加{packageTypeName}</AffixLabel>
+              <AffixLabel required>添加{PackageName[packageType]}</AffixLabel>
             </Label>
             <Control
               tw="max-w-none! w-auto!"
@@ -264,16 +298,14 @@ const UploadModal = observer((props: any) => {
                     onChange={handleResourceChange}
                   />
                   <ColoredIcon name="add" />
-                  添加{packageTypeName}
+                  添加{PackageName[packageType]}
                 </Button>
               ) : (
                 <>
                   <Icon className="is-left" name="jar" />
                   &nbsp;
                   <InputWapper
-                    value={`${file.name} (${(file.size / 1024 / 1024).toFixed(
-                      2
-                    )}MB)`}
+                    value={`${file.name} (${formatBytes(file.size, 2)})`}
                   />
                   <PopConfirm
                     type="warning"
@@ -294,8 +326,26 @@ const UploadModal = observer((props: any) => {
           </Field>
         )}
         {op !== 'edit' && (
-          <div tw="pl-28 ml-2 pb-3 pt-1 text-neut-8">
-            仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
+          <div tw="pb-3">
+            <div tw="pl-28 ml-2 pt-1 text-neut-8">
+              仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
+            </div>
+            {fileTip && (
+              <div tw="text-red-10 ml-2 pl-28 align-middle mt-1">
+                <Icon
+                  tw="inline-block align-top text-red-10"
+                  name="error"
+                  size="small"
+                  color={{
+                    primary: 'transparent',
+                    secondary: '#CF3B37',
+                  }}
+                />
+                {fileTip === 'size'
+                  ? '已选文件超过 100 MB，请重新添加'
+                  : '已选文件格式不合规，请重新添加'}
+              </div>
+            )}
           </div>
         )}
       </Form>

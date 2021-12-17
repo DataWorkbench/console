@@ -11,7 +11,7 @@ export const listReleaseStreamJobs = ({
   spaceId,
   ...rest
 }: IStreamParams) => {
-  request({
+  return request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/stream/job/release`,
     query: rest,
@@ -23,9 +23,9 @@ export const listStreamJobInstances = ({
   spaceId,
   ...rest
 }: IStreamParams) => {
-  request({
+  return request({
     region: regionId,
-    uri: `/v1/wortspace/${spaceId}/stream/job/instance`,
+    uri: `/v1/workspace/${spaceId}/stream/job/instance`,
     query: rest,
   })
 }
@@ -35,7 +35,7 @@ export const resumeReleaseJob = ({
   spaceId,
   jobId,
 }: IStreamParams) => {
-  request({
+  return request({
     region: regionId,
     method: 'POST',
     uri: `/v1/workspace/${spaceId}/stream/job/release/${jobId}/resume`,
@@ -49,14 +49,14 @@ export const suspendReleaseJob = ({
   regionId,
   spaceId,
   jobId,
-  stop_running,
+  stopRunning,
 }: IStreamParams) => {
-  request({
+  return request({
     region: regionId,
     method: 'POST',
     uri: `/v1/workspace/${spaceId}/stream/job/release/${jobId}/suspend`,
     body: {
-      stop_running,
+      stop_running: stopRunning,
     },
   })
 }
@@ -65,14 +65,14 @@ export const offlineReleaseJob = ({
   regionId,
   spaceId,
   jobId,
-  stop_running,
+  stopRunning,
 }: IStreamParams) => {
-  request({
+  return request({
     region: regionId,
     method: 'POST',
     uri: `/v1/workspace/${spaceId}/stream/job/release/${jobId}/offline`,
     body: {
-      stop_running,
+      stop_running: stopRunning,
     },
   })
 }
@@ -82,7 +82,7 @@ export const terminateInstances = ({
   spaceId,
   inst_ids,
 }: IStreamParams) => {
-  request({
+  return request({
     region: regionId,
     method: 'POST',
     uri: `/v1/workspace/${spaceId}/stream/job/instance/terminates`,

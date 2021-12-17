@@ -13,7 +13,7 @@ export const HorizonTabs = styled(Tabs)(() => [
           ${tw`ml-4 h-14`}
         }
         &:hover {
-          ${tw`text-white border-transparent`}
+          ${tw`text-white border-transparent font-medium`}
         }
         ${tw`mx-4 px-0 border-b-[3px] pt-4 pb-[13px] h-14`}
 
@@ -26,7 +26,7 @@ export const HorizonTabs = styled(Tabs)(() => [
 ])
 
 export const LetterIcon = styled.div(
-  () => [tw`inline-block w-5 h-5 text-center overflow-hidden rounded-sm mr-2`],
+  () => [tw`inline-block w-5 h-5 text-center overflow-hidden rounded-sm mr-1`],
   css`
     background-color: #00a0aa;
     span {

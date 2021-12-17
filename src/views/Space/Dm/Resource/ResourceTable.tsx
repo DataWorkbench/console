@@ -15,13 +15,15 @@ import {
   useStore,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
-import { FlexBox, Center, Tooltip } from 'components'
+import { FlexBox, Center, Tooltip, Icons } from 'components'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
+import { formatBytes } from 'utils/convert'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
+import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
 
 const columnSettingsKey = 'RESOURCE_TABLE_COLUMN_SETTINGS'
 
@@ -31,13 +33,12 @@ const { MenuItem } = Menu
 const DarkTabs = styled(Tabs)(
   () => css`
     .tabs ul {
-      background-color: #1e2f41;
-      ${tw`text-neut-8 border-0`}
+      ${tw`text-neut-8 border-0 bg-[#1E2F41]`}
       li {
-        ${tw`px-0! py-4!  ml-5! mr-4! mb-0! leading-6`}
+        ${tw`px-0! py-4!  ml-5! mr-4! mb-0! leading-6 h-14`}
         ${tw`border-b-4! border-transparent!`}
       &:hover {
-          ${tw`text-white border-0`}
+          ${tw`text-white border-0 font-medium`}
         }
         & + li {
           ${tw`ml-4! mr-5!`}
@@ -81,13 +82,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       localstorage.getItem(columnSettingsKey) || []
     )
 
-    const packageTypeName = packageType === 'program' ? '程序包' : '函数包'
-
     const [filter, setFilter] = useImmer<IFilter>({
       limit: 10,
       offset: 0,
       resource_name: '',
-      resource_type: packageType === 'program' ? 1 : 2,
+      resource_type: PackageTypeMap[packageType],
       reverse: true,
       search: '',
       sort_by: '',
@@ -112,7 +111,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const handleTabChange = (name: string) => {
       setPackageType(name)
       setFilter((draft) => {
-        draft.resource_type = name === 'program' ? 1 : 2
+        draft.resource_type = PackageTypeMap[name]
       })
 
       setSelectedRows([])
@@ -175,11 +174,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           {
             onSuccess: (data) => {
               const blob = new Blob([data], {
-                type: 'application/x-java-archive',
+                type: 'application/java-archive',
               })
               const ele = document.createElement('a')
               ele.style.display = 'none'
-              ele.download = `${row.name}.jar`
+              ele.download = row.name
               ele.href = window.URL.createObjectURL(blob)
               document.body.appendChild(ele)
               ele.click()
@@ -200,7 +199,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const columns = useMemo(() => {
       return [
         {
-          title: `${packageTypeName}名称`,
+          title: `${PackageName[packageType]}名称`,
           dataIndex: 'name',
           sortable: true,
           sortOrder:
@@ -210,15 +209,22 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           render: (_: string, row: Record<string, any>) => {
             return (
               <FlexBox tw="items-center space-x-1">
-                <Icon
-                  name={packageType === 'program' ? 'coding' : 'terminal'}
-                  type="light"
-                  color={{
-                    primary: '#219861',
-                    secondary: '#8EDABD',
-                  }}
-                />
-                <div>{row.name}</div>
+                {packageType === 'dependency' ? (
+                  <Icons name="dependency" width={20} size={20} />
+                ) : (
+                  <Icon
+                    tw="w-5! h-5!"
+                    name={packageType === 'program' ? 'coding' : 'terminal'}
+                    type="light"
+                    color={{
+                      primary: '#219861',
+                      secondary: '#8EDABD',
+                    }}
+                  />
+                )}
+                <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
+                  <div tw="max-w-[130px] truncate">{row.name}</div>
+                </Tooltip>
               </FlexBox>
             )
           },
@@ -233,13 +239,17 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         {
           title: '文件大小',
           dataIndex: 'size',
-          render: (value: number) => <>{Math.round(value / 1000)}kb</>,
+          render: (value: number) => <>{formatBytes(value, 2)}</>,
         },
         {
           title: '描述',
           dataIndex: 'description',
           render: (value: string) => {
-            return <div tw="text-neut-8">{value}</div>
+            return (
+              <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
+                <div tw="max-w-[150px] truncate text-neut-8">{value}</div>
+              </Tooltip>
+            )
           },
         },
         {
@@ -318,7 +328,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
       ]
     }, [
-      packageTypeName,
       filter.reverse,
       filter.sort_by,
       packageType,
@@ -343,12 +352,13 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         <DarkTabs defaultActiveName={packageType} onChange={handleTabChange}>
           <TabPanel key="program" label="程序包" name="program" />
           <TabPanel key="function" label="函数包" name="function" />
+          <TabPanel key="dependency" label="依赖包" name="dependency" />
         </DarkTabs>
         <div tw="bg-neut-16 p-5" className={className}>
           <Alert
             type="info"
             tw="mb-4"
-            message={`提示: ${packageTypeName}用于作业中的代码开发模式`}
+            message={PackageTypeTip[packageType]}
             linkBtn={<Button type="text">查看详情 →</Button>}
           />
           <div tw="mt-4 mb-3">
@@ -356,7 +366,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
               <Center tw="space-x-3">
                 <Button type="primary" onClick={handleUploadClick}>
                   <Icon name="upload" />
-                  上传{packageTypeName}
+                  上传{PackageName[packageType]}
                 </Button>
                 <Button
                   disabled={!selectedRowKeys.length}

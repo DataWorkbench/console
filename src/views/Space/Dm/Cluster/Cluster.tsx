@@ -1,5 +1,6 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components/Box'
+import { getHelpCenterLink } from 'utils'
 import ClusterTable from './ClusterTable'
 
 const pageTabsData = [
@@ -8,7 +9,9 @@ const pageTabsData = [
     description:
       '计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明计算集群文案说明',
     icon: 'pod',
-    helpLink: '/compute/vm/',
+    helpLink: getHelpCenterLink(
+      '/manual/data_development/flink_cluster/create_cluster/'
+    ),
   },
 ]
 

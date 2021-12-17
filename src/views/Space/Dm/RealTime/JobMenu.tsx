@@ -1,21 +1,16 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Tooltip, Menu } from '@QCFE/lego-ui'
-import {
-  Icon,
-  InputSearch,
-  Loading,
-  Button,
-  Modal,
-} from '@QCFE/qingcloud-portal-ui'
-import tw, { css, styled } from 'twin.macro'
+import { Icon, InputSearch, Loading, Modal } from '@QCFE/qingcloud-portal-ui'
+import { motion } from 'framer-motion'
+import tw, { css, styled, theme } from 'twin.macro'
 import { flatten } from 'lodash-es'
 import { useStore } from 'stores'
 import { useScroll } from 'react-use'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import { useInfiniteQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
-import { FlexBox, Center } from 'components'
+import { FlexBox, Center, HelpCenterLink } from 'components'
 import JobModal from './JobModal'
 
 const { MenuItem } = Menu
@@ -48,6 +43,7 @@ const JobMenu = observer(() => {
   const [alterFlowId, setAlterFlowId] = useState(null)
   const [editJob, setEditJob] = useState(null)
   const [visible, setVisible] = useState(false)
+  const [isOpenHelp, setIsOpenHelp] = useState(true)
   const [delVisible, setDelVisible] = useState(false)
   const [showMoreLoading, setShowMoreLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -145,13 +141,22 @@ const JobMenu = observer(() => {
             clickable
             onClick={() => setVisible(true)}
           />
-          <Button
+          {/* <Button
             onClick={refreshJobs}
             type="text"
             loading={flowsRet.isRefetching}
           >
-            <Icon name="refresh" type="light" />
-          </Button>
+          </Button> */}
+          {/* <Icon
+            name="refresh"
+            type="light"
+            color={{
+              primary: theme('colors.white'),
+              secondary: theme('colors.white'),
+            }}
+            clickable
+            onClick={refreshJobs}
+          /> */}
         </div>
       </div>
       <div tw="border-b dark:border-neut-15">
@@ -170,29 +175,63 @@ const JobMenu = observer(() => {
               })
             }}
           />
-          <Icon
+          {/* <Icon
             tw="ml-2 cursor-pointer"
             name="filter"
             changeable
             type="light"
-          />
+          /> */}
         </div>
-        <div tw="mx-2 mt-3 bg-neut-17 p-2">
+        <motion.div
+          tw="mx-2 mt-3 bg-neut-17 p-2"
+          animate={
+            isOpenHelp
+              ? {
+                  opacity: 1,
+                }
+              : {
+                  opacity: 0,
+                  transitionEnd: {
+                    display: 'none',
+                  },
+                }
+          }
+          exit={{ display: 'none' }}
+        >
           <div tw="flex items-center justify-between border-b border-neut-13 pb-1">
             <span>👋️ 快速上手文档</span>
-            <Icon name="close" type="light" />
+            <Icon
+              name="close"
+              type="light"
+              onClick={() => setIsOpenHelp(false)}
+              css={[
+                tw`-mt-4 cursor-pointer`,
+                css`
+                  &:hover {
+                    svg {
+                      ${tw`text-white!`}
+                    }
+                  }
+                `,
+              ]}
+              color={{
+                primary: theme('colors.neut.8'),
+              }}
+            />
           </div>
           <ul tw="pt-2">
             <li>
-              <Icon name="file" tw="align-middle" />
-              <span tw="align-middle text-neut-8">作业是什么？</span>
+              <HelpCenterLink href="/manual/data_development/job/summary/">
+                作业是什么？
+              </HelpCenterLink>
             </li>
             <li>
-              <Icon name="file" tw="align-middle" />
-              <span tw="align-middle text-neut-8">作业的操作指南</span>
+              <HelpCenterLink href="/manual/data_development/job/create_job_sql/">
+                作业的操作指南
+              </HelpCenterLink>
             </li>
           </ul>
-        </div>
+        </motion.div>
         <div tw="text-center my-3">
           <button
             type="button"

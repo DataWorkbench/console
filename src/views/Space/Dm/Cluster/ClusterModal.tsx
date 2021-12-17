@@ -484,7 +484,7 @@ const ClusterModal = observer(
                   <NumberField
                     label={
                       <AffixLabel
-                        help="Flink 的 TaskNumber 的数量"
+                        help="Flink 的 TaskManager 的数量"
                         theme="green"
                       >
                         TM 数量
