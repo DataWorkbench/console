@@ -641,7 +641,16 @@ const ClusterModal = observer(
                           isExisty: false,
                         },
                         status: 'error',
-                        help: '请选择网络',
+                        help: (
+                          <div>
+                            请选择网络，如需选择新的 VPC，您可以
+                            <RouterLink
+                              to={`/${regionId}/workspace/${spaceId}/dm/network`}
+                            >
+                              新建 VPC 网络
+                            </RouterLink>
+                          </div>
+                        ),
                       },
                     ]}
                     options={networks.map(({ name, router_id }) => ({
