@@ -165,6 +165,7 @@ let config = {
     }),
     new MonacoWebpackPlugin({
       languages: ['sql', 'python', 'scala'],
+      filename: 'static/js/[name].worker.js',
     }),
   ].filter(Boolean),
 }
