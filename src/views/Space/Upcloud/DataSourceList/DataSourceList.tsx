@@ -216,6 +216,7 @@ const DataSourceList = observer(() => {
                       URL
                     </span>
                     <Tooltip
+                      theme="darker"
                       content={`${key}://${urlObj.host}:${urlObj.port}/${urlObj.database}`}
                       hasPadding
                     >
