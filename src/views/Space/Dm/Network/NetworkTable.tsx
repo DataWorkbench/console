@@ -357,8 +357,7 @@ const NetworkTable = observer(() => {
                       {networkText}注意事项
                     </div>
                     <div className="modal-content-message">
-                      {networkText}
-                      后，关联资源会受到影响，且该操作无法撤回。确认删除吗？
+                      删除网络配置后，关联该资源的内网数据源将无法正常访问，且该操作无法撤回，确认删除吗？
                     </div>
                   </>
                 )

@@ -23,7 +23,7 @@ const ItemCard = ({ item }: ItemCardTypes) => {
         <Icon name={icon} />
         <span tw="ml-2">{text}</span>
       </Center>
-      <div tw="flex-1 font-normal text-neut-8 text-xs text-left pt-4 px-3">
+      <div tw="flex-1 font-normal text-neut-8 text-xs text-left pt-4 px-3 whitespace-pre-line">
         {desc}
         {moreLink && <HelpCenterLink href={moreLink}>了解更多</HelpCenterLink>}
       </div>
