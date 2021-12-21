@@ -157,15 +157,9 @@ export default function DeleteModal(props: any) {
                     ))}
                   {packageType === 'dependency' &&
                     (selectedList.length > 1 ? (
-                      <>
-                        删除以下依赖包后，具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认具体文案待确认，且该操作无法撤回。确认删除吗？
-                      </>
+                      <>删除资源操作无法撤回，确认删除吗？</>
                     ) : (
-                      <>
-                        删除依赖包{selectedList[0].name}(
-                        {selectedList[0].resource_id}
-                        )后，具体文案待确认具体文案待确认具体文案待确认具体文案待确认，且该操作无法撤回。确认删除吗？
-                      </>
+                      <>删除资源操作无法撤回，确认删除吗？</>
                     ))}
                 </div>
               </>

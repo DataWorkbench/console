@@ -13,13 +13,11 @@ const RealTime = observer(() => {
 
   const steps = useMemo(
     () => [
-      '新建业务流程',
-      '新建表',
-      '新建节点',
-      '编辑节点',
-      '测试运行并设置调度',
-      '提交、发布节点',
-      '生产环境查看任务',
+      '创建作业',
+      '编辑 SQL',
+      '测试运行',
+      '提交、发布',
+      '查看任务以及运维',
     ],
     []
   )
@@ -68,7 +66,7 @@ const RealTime = observer(() => {
         <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
           <div tw="space-y-2">
             <FlexBox tw="space-x-1">
-              {steps.slice(0, 4).map((step, i) => renderStep(step, i, i !== 3))}
+              {steps.slice(0, 3).map((step, i) => renderStep(step, i, i !== 2))}
             </FlexBox>
             <FlexBox tw="justify-end">
               <div tw="flex flex-col items-center pr-5">
@@ -85,8 +83,8 @@ const RealTime = observer(() => {
             </FlexBox>
             <FlexBox tw="space-x-1 flex-row-reverse">
               {steps
-                .slice(4)
-                .map((step, i) => renderStep(step, i + 4, i + 4 !== 6, true))}
+                .slice(3)
+                .map((step, i) => renderStep(step, i + 3, i + 3 !== 4, true))}
             </FlexBox>
           </div>
         </Center>
