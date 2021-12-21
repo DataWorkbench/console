@@ -46,7 +46,11 @@ const ReleaseModal = ({ onCancel }: { onCancel: () => void }) => {
       confirmLoading={releaseMutation.isLoading}
     >
       <div tw="flex">
-        <Icon name="exclamation" color={{ secondary: '#F5C414' }} size={20} />
+        <Icon
+          name="exclamation"
+          color={{ secondary: '#F5C414', primary: '' }}
+          size={20}
+        />
         <div tw="ml-3">
           <div tw="text-base">发布调度任务</div>
           <div tw="mt-2 text-neut-8">
@@ -80,7 +84,8 @@ const ReleaseModal = ({ onCancel }: { onCancel: () => void }) => {
           <AffixLabel
             tw="ml-2"
             required={false}
-            help="如果当前作业有任务实例正在运行 ，勾选后发布，此运行中的任务实例会被强制终止"
+            theme="green"
+            help="如果当前作业有任务实例正在运行，勾选后发布，此运行中的任务实例会被强制终止"
           >
             终止当前作业正在运行中的实例
           </AffixLabel>
