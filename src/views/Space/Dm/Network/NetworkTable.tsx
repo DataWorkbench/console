@@ -36,7 +36,7 @@ interface IFilter {
 const columnSettingsKey = 'BIGDATA_NETWORK_COLUMN_SETTINGS'
 const NetworkTable = observer(() => {
   const {
-    dmStore: { setOp, op },
+    dmStore: { setNetWorkOp, networkOp },
   } = useStore()
   const [opNetworkList, setOpNetworkList] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
@@ -55,10 +55,10 @@ const NetworkTable = observer(() => {
   const mutation = useMutationNetwork()
 
   useEffect(() => {
-    if (op === '') {
+    if (networkOp === '') {
       setOpNetworkList([])
     }
-  }, [op])
+  }, [networkOp])
 
   const columns = useMemo(() => {
     return [
@@ -143,7 +143,7 @@ const NetworkTable = observer(() => {
             <Button
               type="text"
               onClick={() => {
-                setOp('update')
+                setNetWorkOp('update')
                 setOpNetworkList([row])
               }}
             >
@@ -152,7 +152,7 @@ const NetworkTable = observer(() => {
             <Button
               type="text"
               onClick={() => {
-                setOp('delete')
+                setNetWorkOp('delete')
                 setOpNetworkList([row])
               }}
             >
@@ -162,7 +162,7 @@ const NetworkTable = observer(() => {
         ),
       },
     ]
-  }, [setOp, setOpNetworkList, filter.sort_by, regionId, filter.reverse])
+  }, [setNetWorkOp, setOpNetworkList, filter.sort_by, regionId, filter.reverse])
 
   const refetchData = () => {
     queryClient.invalidateQueries(getNetworkKey())
@@ -172,14 +172,14 @@ const NetworkTable = observer(() => {
     const networkIds = opNetworkList.map((o) => o.id)
     mutation.mutate(
       {
-        op,
+        op: networkOp,
         networkIds,
       },
       {
         onSuccess: () => {
-          setOp('')
+          setNetWorkOp('')
           refetchData()
-          if (op === 'delete') {
+          if (networkOp === 'delete') {
             setSelectedRowKeys(
               selectedRowKeys.filter((k) => !networkIds.includes(k))
             )
@@ -207,7 +207,7 @@ const NetworkTable = observer(() => {
       <div tw="mb-3">
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
-            <Button type="primary" onClick={() => setOp('create')}>
+            <Button type="primary" onClick={() => setNetWorkOp('create')}>
               <Icon name="add" />
               创建网络
             </Button>
@@ -218,7 +218,7 @@ const NetworkTable = observer(() => {
               onClick={() => {
                 if (filterNetworkInfos.length) {
                   setOpNetworkList(filterNetworkInfos)
-                  setOp('delete')
+                  setNetWorkOp('delete')
                 }
               }}
             >
@@ -300,22 +300,24 @@ const NetworkTable = observer(() => {
           })
         }}
       />
-      {(op === 'create' || op === 'update') && (
+      {(networkOp === 'create' || networkOp === 'update') && (
         <NetworkModal opNetwork={opNetworkList[0]} />
       )}
-      {(op === 'start' || op === 'stop' || op === 'delete') && (
+      {(networkOp === 'start' ||
+        networkOp === 'stop' ||
+        networkOp === 'delete') && (
         <Modal
           noBorder
           visible
           width={opNetworkList.length > 1 ? 600 : 400}
-          onCancel={() => setOp('')}
+          onCancel={() => setNetWorkOp('')}
           okText="删除"
           onOk={mutateData}
           footer={
             <FlexBox tw="justify-end">
-              <Button onClick={() => setOp('')}>取消</Button>
+              <Button onClick={() => setNetWorkOp('')}>取消</Button>
               <Button
-                type={op === 'start' ? 'primary' : 'danger'}
+                type={networkOp === 'start' ? 'primary' : 'danger'}
                 loading={mutation.isLoading}
                 onClick={mutateData}
               >

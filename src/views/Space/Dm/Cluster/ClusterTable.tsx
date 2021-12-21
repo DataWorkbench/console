@@ -417,13 +417,13 @@ const ClusterTable = observer(
       omitBy(filter, (v) => v === '')
     )
     const infos = get(data, 'infos', []) || []
-    const filterClusterInfos =
-      infos.filter(
-        (info: any) =>
-          selectedRowKeys.includes(info.id) &&
-          info.status !== 2 &&
-          info.status !== 4
-      ) || []
+    // const filterClusterInfos =
+    //   infos.filter(
+    //     (info: any) =>
+    //       selectedRowKeys.includes(info.id) &&
+    //       info.status !== 2 &&
+    //       info.status !== 4
+    //   ) || []
 
     const filterColumn = columnSettings
       .map((o: { key: string; checked: boolean }) => {
@@ -464,7 +464,7 @@ const ClusterTable = observer(
                     创建集群
                   </Button>
                 </Tooltip>
-                <Button
+                {/* <Button
                   disabled={
                     selectedRowKeys.length === 0 ||
                     filterClusterInfos.length === 0
@@ -478,7 +478,7 @@ const ClusterTable = observer(
                 >
                   <Icon name="trash" type="light" />
                   <span>删除</span>
-                </Button>
+                </Button> */}
               </Center>
             )}
             <Center tw="space-x-3">
@@ -519,7 +519,8 @@ const ClusterTable = observer(
           </FlexBox>
         </div>
         <Table
-          selectType={selectMode ? 'radio' : 'checkbox'}
+          // selectType={selectMode ? 'radio' : 'checkbox'}
+          selectType={selectMode && 'radio'}
           dataSource={infos || []}
           loading={isFetching}
           columns={filterColumn.length > 0 ? filterColumn : columns}

@@ -31,7 +31,7 @@ export const Header = observer(() => {
     regionId,
     offset: 0,
     reverse: true,
-    limit: 10,
+    limit: 100,
     status: 1,
     search: '',
   })
