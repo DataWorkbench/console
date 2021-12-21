@@ -3,7 +3,7 @@ import { FlexBox, Modal } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
 import { theme } from 'twin.macro'
-import Editor from '@monaco-editor/react'
+import Editor from 'react-monaco-editor'
 import { useQueryClient } from 'react-query'
 import {
   useMutationStreamJobCode,
@@ -29,6 +29,7 @@ interface IProp {
   /** 2: SQL 4: Python 5: Scala */
   tp: 2 | 4 | 5
 }
+
 const StreamCode = ({ tp }: IProp) => {
   const [show, toggleShow] = useState(false)
   const [enableRelease, setEnableRelease] = useState(false)
@@ -179,7 +180,7 @@ def main(args: Array[String]): Unit = {
       }
     }
     // eslint-disable-next-line no-bitwise
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, save)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, save)
   }
 
   useEffect(() => {
@@ -223,15 +224,15 @@ def main(args: Array[String]): Unit = {
         </StreamToolBar>
         <div tw="flex-1 overflow-hidden flex flex-col">
           <Editor
-            defaultLanguage={codeName}
+            language={codeName}
             defaultValue={isLoading ? loadingWord : codeStr || defaultCode}
             theme="my-theme"
             tw="overflow-hidden"
             options={{
               minimap: { enabled: false },
             }}
-            beforeMount={handleEditorWillMount}
-            onMount={handleEditorDidMount}
+            editorWillMount={handleEditorWillMount}
+            editorDidMount={handleEditorDidMount}
           />
         </div>
       </FlexBox>

@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const WebpackBar = require('webpackbar')
 const path = require('path')
@@ -161,6 +162,10 @@ let config = {
       name: NODE_ENV,
       color: 'green',
       profile: !isDev,
+    }),
+    new MonacoWebpackPlugin({
+      languages: ['sql', 'python', 'scala'],
+      filename: 'static/js/[name].worker.js',
     }),
   ].filter(Boolean),
 }

@@ -13,7 +13,7 @@ import {
   useInfiniteQueryNetworks,
   getNetworkKey,
 } from 'hooks'
-import { AffixLabel, HelpCenterLink } from 'components'
+import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
 import HdfsNodeField from './HdfsNodeField'
@@ -25,7 +25,6 @@ const {
   NumberField,
   PasswordField,
   RadioGroupField,
-  SelectField,
 } = Form
 
 const Root = styled('div')(() => [
@@ -42,20 +41,20 @@ const Root = styled('div')(() => [
   `,
 ])
 
-const SelectFieldRefresh = styled('div')(() => [
-  tw`relative`,
-  css`
-    .field {
-      ${tw`block pl-6 mb-6`}
-    }
-    button {
-      ${tw`mt-[26px] ml-2 absolute top-0 left-[284px]`}
-      svg {
-        ${tw`text-neut-15 fill-current`}
-      }
-    }
-  `,
-])
+// const SelectFieldRefresh = styled('div')(() => [
+//   tw`relative`,
+//   css`
+//     .field {
+//       ${tw`block pl-6 mb-6`}
+//     }
+//     button {
+//       ${tw`mt-[26px] ml-2 absolute top-0 left-[284px]`}
+//       svg {
+//         ${tw`text-neut-15 fill-current`}
+//       }
+//     }
+//   `,
+// ])
 
 const CollapseWrapper = styled(Collapse)(() => [
   tw`w-full border-0`,
@@ -314,7 +313,7 @@ const DataSourceForm = ({
   const mutation = useMutationSource()
   const networksRet = useInfiniteQueryNetworks({
     offset: 0,
-    limit: 10,
+    limit: 100,
   })
   const networks = flatten(
     networksRet.data?.pages.map((page) => page.infos || [])
@@ -552,8 +551,8 @@ const DataSourceForm = ({
               <RadioButton value="eip">公网</RadioButton>
             </RadioGroupField>
             {network.type === 'vpc' && (
-              <SelectFieldRefresh>
-                <SelectField
+              <>
+                <SelectWithRefresh
                   name="network_id"
                   value={network.id}
                   placeholder="请选择网络配置"
@@ -565,12 +564,15 @@ const DataSourceForm = ({
                       draft.id = v
                     })
                   }}
+                  onRefresh={() => {
+                    queryClient.invalidateQueries(getNetworkKey())
+                  }}
                   help={
                     <>
                       如需选择新的网络配置，您可以
                       <span
                         tw="text-green-11 cursor-pointer"
-                        onClick={() => dmStore.setOp('create')}
+                        onClick={() => dmStore.setNetWorkOp('create')}
                       >
                         绑定VPC
                       </span>
@@ -588,7 +590,64 @@ const DataSourceForm = ({
                           请选择网络, 如没有可选择的网络配置，您可以
                           <span
                             tw="text-green-11 cursor-pointer"
-                            onClick={() => dmStore.setOp('create')}
+                            onClick={() => dmStore.setNetWorkOp('create')}
+                          >
+                            绑定 VPC
+                          </span>
+                        </>
+                      ),
+                    },
+                  ]}
+                  options={networks.map(({ name, id }) => ({
+                    label: name,
+                    value: id,
+                  }))}
+                  isLoading={networksRet.isFetching}
+                  isLoadingAtBottom
+                  searchable={false}
+                  onMenuScrollToBottom={() => {
+                    if (networksRet.hasNextPage) {
+                      networksRet.fetchNextPage()
+                    }
+                  }}
+                  bottomTextVisible
+                />
+                {/* <SelectField
+                  name="network_id"
+                  value={network.id}
+                  placeholder="请选择网络配置"
+                  validateOnChange
+                  disabled={isViewMode}
+                  label={<AffixLabel>网络配置</AffixLabel>}
+                  onChange={(v: string) => {
+                    setNetWork((draft) => {
+                      draft.id = v
+                    })
+                  }}
+                  help={
+                    <>
+                      如需选择新的网络配置，您可以
+                      <span
+                        tw="text-green-11 cursor-pointer"
+                        onClick={() => dmStore.setNetWorkOp('create')}
+                      >
+                        绑定VPC
+                      </span>
+                    </>
+                  }
+                  schemas={[
+                    {
+                      rule: {
+                        required: true,
+                        isExisty: false,
+                      },
+                      status: 'error',
+                      help: (
+                        <>
+                          请选择网络, 如没有可选择的网络配置，您可以
+                          <span
+                            tw="text-green-11 cursor-pointer"
+                            onClick={() => dmStore.setNetWorkOp('create')}
                           >
                             绑定 VPC
                           </span>
@@ -617,8 +676,8 @@ const DataSourceForm = ({
                   }}
                 >
                   <Icon name="refresh" size={20} />
-                </Button>
-              </SelectFieldRefresh>
+                </Button> */}
+              </>
             )}
             {fields.map((field) => {
               const {
@@ -707,7 +766,7 @@ const DataSourceForm = ({
           </CollapseItem>
         </CollapseWrapper>
       </Form>
-      {dmStore.op === 'create' && <NetworkModal appendToBody />}
+      {dmStore.networkOp === 'create' && <NetworkModal appendToBody />}
     </Root>
   )
 }

@@ -28,6 +28,21 @@ import { SourceKindImg } from './styled'
 
 const { MenuItem } = Menu
 
+const getEllipsisText = (text: string, lenght: number) => {
+  let index = 0
+  let count = 0
+  while (index < text.length) {
+    const temp = count + (text[index].charCodeAt(0) <= 255 ? 1 : 2) // 中文算2个字
+    if (temp >= lenght) {
+      // 判断是否溢出
+      return `${text.slice(0, index)}...`
+    }
+    count = temp
+    index += 1
+  }
+  return text
+}
+
 const tabs = [
   {
     title: '数据源',
@@ -216,11 +231,12 @@ const DataSourceList = observer(() => {
                       URL
                     </span>
                     <Tooltip
+                      theme="darker"
                       content={`${key}://${urlObj.host}:${urlObj.port}/${urlObj.database}`}
                       hasPadding
                     >
-                      <span tw="inline-flex">
-                        <span tw="truncate max-w-[108px] mr-[-4px]">{`${key}://${urlObj.host}`}</span>
+                      <span>
+                        {getEllipsisText(`${key}://${urlObj.host}`, 16)}
                         {`:${urlObj.port}/${urlObj.database}`}
                       </span>
                     </Tooltip>

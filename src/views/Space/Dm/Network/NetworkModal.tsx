@@ -64,10 +64,10 @@ const NetworkModal = observer(
     appendToBody = false,
   }: {
     opNetwork?: typeof defaultParams & { id?: string }
-    appendToBody: boolean
+    appendToBody?: boolean
   }) => {
     const {
-      dmStore: { setOp, op },
+      dmStore: { setNetWorkOp, networkOp },
     } = useStore()
     const [params, setParams] = useImmer(opNetwork || defaultParams)
 
@@ -96,14 +96,14 @@ const NetworkModal = observer(
       if (form?.validateFields()) {
         const paramsData = assign(
           {
-            op,
+            op: networkOp,
             ...params,
           },
           opNetwork && { network_id: opNetwork.id }
         )
         mutation.mutate(paramsData, {
           onSuccess: () => {
-            setOp('')
+            setNetWorkOp('')
             queryClient.invalidateQueries(getNetworkKey())
           },
         })
@@ -127,14 +127,14 @@ const NetworkModal = observer(
 
     return (
       <Modal
-        title={`${op === 'create' ? '新建' : '修改'}网络`}
+        title={`${networkOp === 'create' ? '新建' : '修改'}网络`}
         confirmLoading={mutation.isLoading}
         visible
         onOk={handleOk}
-        onCancel={() => setOp('')}
+        onCancel={() => setNetWorkOp('')}
         width={680}
         draggable
-        okText={op === 'create' ? '新建' : '确认'}
+        okText={networkOp === 'create' ? '新建' : '确认'}
         appendToBody={appendToBody}
       >
         <FlexBox tw="h-full overflow-hidden">

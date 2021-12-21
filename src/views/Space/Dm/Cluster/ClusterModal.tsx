@@ -17,13 +17,13 @@ import { useImmer } from 'use-immer'
 import { set, range, trim, filter, assign, flatten } from 'lodash-es'
 import { useQueryClient } from 'react-query'
 import Tippy from '@tippyjs/react'
-import { useParams } from 'react-router-dom'
 import {
   useStore,
   useQueryFlinkVersions,
   useInfiniteQueryNetworks,
   useMutationCluster,
   getFlinkClusterKey,
+  getNetworkKey,
 } from 'hooks'
 import {
   Modal,
@@ -32,8 +32,9 @@ import {
   KVTextAreaField,
   AffixLabel,
   TextLink,
-  RouterLink,
+  SelectWithRefresh,
 } from 'components'
+import { NetworkModal } from 'views/Space/Dm/Network'
 
 const { CollapseItem } = Collapse
 const { TextField, SelectField, NumberField } = Form
@@ -76,6 +77,14 @@ const InDemandTitle = styled('div')(() => [
   css`
     span {
       ${tw`text-green-11 font-semibold text-xl`}
+    }
+  `,
+])
+
+const KVTextAreaFieldWrapper = styled(KVTextAreaField)(() => [
+  css`
+    & > .label {
+      ${tw`items-start! mt-1.5`}
     }
   `,
 ])
@@ -126,9 +135,9 @@ const ClusterModal = observer(
   ({ opCluster }: { opCluster: typeof defaultParams }) => {
     const {
       dmStore: { setOp, op },
+      dmStore,
     } = useStore()
-    const { regionId, spaceId } =
-      useParams<{ regionId: string; spaceId: string }>()
+
     const [params, setParams] = useImmer(opCluster || defaultParams)
     const baseFormRef = useRef<Form>(null)
     const networkFormRef = useRef<Form>(null)
@@ -138,7 +147,7 @@ const ClusterModal = observer(
     const { data: flinkVersions } = useQueryFlinkVersions()
     const networksRet = useInfiniteQueryNetworks({
       offset: 0,
-      limit: 10,
+      limit: 100,
     })
     const networks = flatten(
       networksRet.data?.pages.map((page) => page.infos || [])
@@ -228,7 +237,7 @@ const ClusterModal = observer(
     const marks = useMemo(() => {
       const o = {}
       range(0, 9, 1).forEach((v) => {
-        set(o, v, String(v))
+        set(o, v, v === 0 ? '0.5' : String(v))
       })
       return o
     }, [])
@@ -266,7 +275,7 @@ const ClusterModal = observer(
                       tw="(relative top-0 left-0)!"
                       type="light"
                     />
-                    <span>基础属性</span>
+                    <span>基础设置</span>
                   </FlexBox>
                 }
               >
@@ -298,7 +307,7 @@ const ClusterModal = observer(
                   <SelectField
                     label={<AffixLabel required>版本</AffixLabel>}
                     name="version"
-                    validateOnBlur
+                    validateOnChange
                     placeholder="请选择版本"
                     disabled={viewMode}
                     options={flinkVersions?.map((version: string) => ({
@@ -340,8 +349,8 @@ const ClusterModal = observer(
                         重启策略
                       </AffixLabel>
                     }
+                    validateOnChange
                     placeholder="请选择重启策略"
-                    clearable
                     disabled={viewMode}
                     value={strategy.restart_strategy}
                     onChange={(v: any) =>
@@ -361,7 +370,7 @@ const ClusterModal = observer(
                         value: 'failure-rate',
                       },
                     ]}
-                    help="重启策略是指在发生故障时. 如何处理(重启)任务作业"
+                    help="当 Flink Task 发生故障时的默认重启策略，具体作业也可以通过单独定义覆盖该默认配置。"
                   />
                   {strategy.restart_strategy === 'fixed-delay' && (
                     <RestartWrapper>
@@ -510,19 +519,20 @@ const ClusterModal = observer(
                     >
                       TM 规格
                     </AffixLabel>
-                    <Control tw="pl-12 pt-3 w-80!">
+                    <Control tw="pl-7 pt-3 w-80!">
                       <Slider
-                        min={0.5}
+                        min={0}
                         max={8}
-                        step={0.5}
+                        step={1}
                         marks={marks}
                         hasTooltip
                         markDots
+                        tipFormatter={(v) => `${v === 0 ? '0.5' : v} CU`}
                         disabled={viewMode}
                         value={params.task_cu}
                         onChange={(v: number) => {
                           setParams((draft) => {
-                            draft.task_cu = v
+                            draft.task_cu = v === 0 ? 0.5 : v
                           })
                         }}
                       />
@@ -536,9 +546,16 @@ const ClusterModal = observer(
                         tw="ml-3"
                         disabled={viewMode}
                         value={params.task_cu}
-                        onChange={(v: number) => {
+                        upHandler={(v: number) => {
                           setParams((draft) => {
-                            draft.task_cu = v
+                            const fmVal = Math.ceil(v)
+                            draft.task_cu = fmVal === 0 ? 0.5 : fmVal
+                          })
+                        }}
+                        downHandler={(v: number) => {
+                          setParams((draft) => {
+                            const fmVal = Math.floor(v)
+                            draft.task_cu = fmVal === 0 ? 0.5 : fmVal
                           })
                         }}
                       />
@@ -552,19 +569,20 @@ const ClusterModal = observer(
                     >
                       JM 规格
                     </AffixLabel>
-                    <Control tw="pl-12 pt-3 w-80!">
+                    <Control tw="pl-7 pt-3 w-80!">
                       <Slider
-                        min={0.5}
+                        min={0}
                         max={8}
-                        step={0.5}
+                        step={1}
                         marks={marks}
                         hasTooltip
                         markDots
+                        tipFormatter={(v) => `${v === 0 ? '0.5' : v} CU`}
                         disabled={viewMode}
                         value={params.job_cu}
                         onChange={(v: number) => {
                           setParams((draft) => {
-                            draft.job_cu = v
+                            draft.job_cu = v === 0 ? 0.5 : v
                           })
                         }}
                       />
@@ -578,9 +596,16 @@ const ClusterModal = observer(
                         isMini
                         tw="ml-3"
                         disabled={viewMode}
-                        onChange={(v: number) => {
+                        upHandler={(v: number) => {
                           setParams((draft) => {
-                            draft.job_cu = v
+                            const fmVal = Math.ceil(v)
+                            draft.job_cu = fmVal === 0 ? 0.5 : fmVal
+                          })
+                        }}
+                        downHandler={(v: number) => {
+                          setParams((draft) => {
+                            const fmVal = Math.floor(v)
+                            draft.job_cu = fmVal === 0 ? 0.5 : fmVal
                           })
                         }}
                       />
@@ -623,16 +648,21 @@ const ClusterModal = observer(
                 }
               >
                 <Form ref={networkFormRef}>
-                  <SelectField
-                    label={<AffixLabel>选择网络</AffixLabel>}
+                  <SelectWithRefresh
+                    label={
+                      <AffixLabel tw="font-medium text-sm">网络配置</AffixLabel>
+                    }
                     name="network_id"
                     value={params.network_id}
-                    validateOnBlur
+                    validateOnChange
                     disabled={viewMode}
                     onChange={(v: string) => {
                       setParams((draft) => {
                         draft.network_id = v
                       })
+                    }}
+                    onRefresh={() => {
+                      queryClient.invalidateQueries(getNetworkKey())
                     }}
                     schemas={[
                       {
@@ -642,14 +672,15 @@ const ClusterModal = observer(
                         },
                         status: 'error',
                         help: (
-                          <div>
-                            请选择网络，如需选择新的 VPC，您可以
-                            <RouterLink
-                              to={`/${regionId}/workspace/${spaceId}/dm/network`}
+                          <>
+                            请选择网络,如需选择新的 VPC，您可以
+                            <span
+                              tw="text-green-11 cursor-pointer"
+                              onClick={() => dmStore.setNetWorkOp('create')}
                             >
-                              新建 VPC 网络
-                            </RouterLink>
-                          </div>
+                              绑定 VPC
+                            </span>
+                          </>
                         ),
                       },
                     ]}
@@ -669,11 +700,12 @@ const ClusterModal = observer(
                     help={
                       <div>
                         如需选择新的 VPC，您可以
-                        <RouterLink
-                          to={`/${regionId}/workspace/${spaceId}/dm/network`}
+                        <span
+                          tw="text-green-11 cursor-pointer"
+                          onClick={() => dmStore.setNetWorkOp('create')}
                         >
-                          新建 VPC 网络
-                        </RouterLink>
+                          绑定 VPC
+                        </span>
                       </div>
                     }
                   />
@@ -728,7 +760,7 @@ const ClusterModal = observer(
                 }
               >
                 <Form ref={optFormRef}>
-                  <KVTextAreaField
+                  <KVTextAreaFieldWrapper
                     disabled={viewMode}
                     label="Host别名"
                     title="Hosts 信息"
@@ -753,9 +785,13 @@ const ClusterModal = observer(
                     ]}
                     onChange={sethostAliases}
                   />
-                  <KVTextAreaField
+                  <KVTextAreaFieldWrapper
                     disabled={viewMode}
-                    label={<AffixLabel required={false}>Flink参数</AffixLabel>}
+                    label={
+                      <AffixLabel required={false} help="    ">
+                        Flink参数
+                      </AffixLabel>
+                    }
                     name="custom"
                     validateOnBlur
                     division=":"
@@ -866,6 +902,7 @@ const ClusterModal = observer(
             </div>
           </div>
         </FlexBox>
+        {dmStore.networkOp === 'create' && <NetworkModal appendToBody />}
       </Modal>
     )
   }

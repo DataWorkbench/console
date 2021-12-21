@@ -90,7 +90,7 @@ const DataSourceModal = observer(
       const data = (getFormData as any).current(false)
       if (data) {
         const field = values(omit(data, 'utype')).find((v: string) => v !== '')
-        setcConfirmVisible(field.length > 0)
+        setcConfirmVisible(field && field.length > 0)
       }
     }
     const opTxt = get({ create: '新增', update: '修改', view: '查看' }, op)
@@ -111,6 +111,8 @@ const DataSourceModal = observer(
           title={`${opTxt}数据源: ${
             curkind ? curkind.showname || curkind.name : ''
           }`}
+          maskClosable={false}
+          escClosable={false}
           footer={
             <div tw="flex justify-end space-x-2">
               {state.step === 0 ? (
