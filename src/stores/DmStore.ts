@@ -19,8 +19,14 @@ class DmStore {
   // 增、删、改操作状态
   op: OP = ''
 
+  networkOp: OP = ''
+
   setOp = (op: OP) => {
     this.op = op
+  }
+
+  setNetWorkOp = (op: OP) => {
+    this.networkOp = op
   }
 
   // 函数管理相关
