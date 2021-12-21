@@ -488,11 +488,13 @@ const ClusterTable = observer(
                 onPressEnter={(e: React.SyntheticEvent) => {
                   setFilter((draft) => {
                     draft.search = (e.target as HTMLInputElement).value
+                    draft.offset = 0
                   })
                 }}
                 onClear={() => {
                   setFilter((draft) => {
                     draft.search = ''
+                    draft.offset = 0
                   })
                 }}
               />
