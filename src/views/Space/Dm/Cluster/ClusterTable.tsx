@@ -36,14 +36,14 @@ import ClusterModal from './ClusterModal'
 const { MenuItem } = Menu
 
 const statusFilters = [
-  {
-    text: '已删除',
-    value: 1,
-    color: {
-      primary: '#939EA9',
-      secondary: '#DEE7F1',
-    },
-  },
+  // {
+  //   text: '已删除',
+  //   value: 1,
+  //   color: {
+  //     primary: '#939EA9',
+  //     secondary: '#DEE7F1',
+  //   },
+  // },
   {
     text: '运行中',
     value: 2,
@@ -236,7 +236,7 @@ const ClusterTable = observer(
         {
           title: (
             <AffixLabel
-              help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
+              help="Flink 的 TaskManager 的数量"
               required={false}
               theme="green"
             >
