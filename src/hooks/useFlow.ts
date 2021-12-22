@@ -20,6 +20,7 @@ import {
   setStreamJobCode,
   getStreamJobCode,
   releaseStreamJob,
+  inConnectors,
 } from 'stores/api'
 
 interface IRouteParams {
@@ -193,4 +194,18 @@ export const useMutationReleaseStreamJob = () => {
     async (params: Record<string, string | boolean | number>) =>
       releaseStreamJob({ ...params, regionId, spaceId, jobId: curJob?.id })
   )
+}
+
+export const useQueryInConnectorsQuery = () => {
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  const params = {
+    regionId,
+    spaceId,
+    jobId: curJob?.id,
+  }
+  return useQuery('In_Connectors', async () => inConnectors(params))
 }
