@@ -273,7 +273,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 <ResourceSelect
                   name="connectors"
                   label="依赖包"
-                  icon={<Icons name="dependency" />}
+                  icon={<Icons name="icon_dependency" />}
                   placeholder="请选择运行所需依赖包"
                   value={params.connectors}
                   multi
