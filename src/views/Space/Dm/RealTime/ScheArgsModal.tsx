@@ -274,6 +274,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                   name="connectors"
                   label="依赖包"
                   icon={<Icons name="dependency" />}
+                  placeholder="请选择运行所需依赖包"
                   value={params.connectors}
                   multi
                   closeOnSelect={false}
@@ -287,6 +288,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 <ResourceSelect
                   name="udfs"
                   label="函数包"
+                  placeholder="请选择运行所需函数包"
                   icon={
                     <Icon
                       name="terminal"
@@ -311,7 +313,8 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 />
                 <SelectField
                   name="builtInConnectors"
-                  label="内置 connectors"
+                  label="内置 Connector"
+                  placeholder="请选择运行所需内置 Connector"
                   multi
                   searchable
                   closeOnSelect={false}
