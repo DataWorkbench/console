@@ -7,6 +7,7 @@ import {
   Tooltip,
   Modal,
   SelectWithRefresh,
+  TextLink,
 } from 'components'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
@@ -19,7 +20,7 @@ import {
   getResourceKey,
 } from 'hooks'
 import { get, flatten } from 'lodash-es'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
 import { StreamToolBar } from './styled'
@@ -131,12 +132,12 @@ const StreamJAR = () => {
               help={
                 <div tw="text-neut-8">
                   如需选择新的资源，可以在资源管理中
-                  <Link
-                    to={`/${regionId}/workspace/${spaceId}/dm/resource`}
+                  <TextLink
+                    href={`/${regionId}/workspace/${spaceId}/dm/resource`}
                     tw="text-white underline text-underline-offset[2px]"
                   >
                     上传资源
-                  </Link>
+                  </TextLink>
                 </div>
               }
               valueRenderer={(option: any) => (
