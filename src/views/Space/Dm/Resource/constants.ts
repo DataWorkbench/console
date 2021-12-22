@@ -18,4 +18,10 @@ export const PackageTypeMap: any = {
   dependency: 3,
 }
 
+export const PackageDocsHref: any = {
+  program: '',
+  function: '',
+  dependency: '',
+}
+
 export default {}
