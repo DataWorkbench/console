@@ -5,7 +5,7 @@ import emitter from 'utils/emitter'
 
 const baseConfig: AxiosRequestConfig = {
   method: 'POST',
-  timeout: 60000,
+  // timeout: 60000,
 }
 
 function getMessage(ret: {}) {
@@ -20,7 +20,11 @@ client.interceptors.response.use(
     return response
   },
   (error) => {
-    if (axios.isCancel(error) || error.code === 'ECONNABORTED') {
+    if (axios.isCancel(error)) {
+      emitter.emit('error', {
+        title: `已取消`,
+      })
+    } else if (error.code === 'ECONNABORTED') {
       emitter.emit('error', {
         title: `网络超时: [timeout]`,
         content: error.message,

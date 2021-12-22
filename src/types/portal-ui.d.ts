@@ -57,6 +57,7 @@ declare module '@QCFE/qingcloud-portal-ui' {
     children?: JSX.Element | JSX.Element[]
     footer?: React.ReactNode | string | null
     okType?: string
+    okText?: string
     cancelType?: string
     confirmLoading?: boolean
     showConfirmLoading?: boolean

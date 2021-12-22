@@ -74,8 +74,13 @@ const InputWapper = styled(Input)(() => [
 
 const ControlWrap = styled(Control)(() => [
   css`
-    &:hover .icon.is-right {
-      ${tw`block`}
+    &:hover {
+      input {
+        ${tw`bg-neut-15`}
+      }
+      .icon.is-right {
+        ${tw`block`}
+      }
     }
   `,
 ])
@@ -92,15 +97,18 @@ const UploadModal = observer((props: any) => {
   } = useStore()
   const { visible, handleCancel, type: packageType, defaultFields } = props
 
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
   const [resourceName, setResourceName] = useState(
     (op !== 'create' && defaultFields.name) || ''
   )
   const [fileTip, setFileTip] = useState('')
+  const [file, setFile] = useState<File>()
+  const [cancelUpload, setCancelUpload] = useState<() => void>()
+  const [isFailed, setIsFailed] = useState(false)
 
   const resourceEl = useRef<HTMLInputElement>(null)
   const form = useRef<Form>(null)
-  const [file, setFile] = useState<File>()
-  const { regionId, spaceId } = useParams<IRouteParams>()
 
   const mutation = useMutationResource()
 
@@ -120,6 +128,12 @@ const UploadModal = observer((props: any) => {
     setOp('')
     setResourceName('')
     setFileTip('')
+    setIsFailed(false)
+
+    if (cancelUpload) {
+      cancelUpload()
+      setCancelUpload(undefined)
+    }
   }
 
   const handleFile = () => {
@@ -130,6 +144,10 @@ const UploadModal = observer((props: any) => {
 
   const handleClear = () => {
     setFile(undefined)
+    if (cancelUpload) {
+      cancelUpload()
+      setCancelUpload(undefined)
+    }
   }
 
   const handleResourceChange = (event: any) => {
@@ -153,6 +171,7 @@ const UploadModal = observer((props: any) => {
   }
 
   const handleOk = async () => {
+    setIsFailed(false)
     if (!form.current?.validateFields()) return
     const fields = form.current?.getFieldsValue() || {}
     if (op === 'create') {
@@ -177,6 +196,9 @@ const UploadModal = observer((props: any) => {
     mutation.mutate(
       {
         op,
+        cancel: (c: any) => {
+          setCancelUpload(() => () => c())
+        },
         ...params,
       },
       {
@@ -186,6 +208,9 @@ const UploadModal = observer((props: any) => {
           setFile(undefined)
           queryClient.invalidateQueries(getResourcePageQueryKey())
         },
+        onError: () => {
+          setIsFailed(true)
+        },
       }
     )
   }
@@ -193,6 +218,9 @@ const UploadModal = observer((props: any) => {
   return (
     <DarkModal
       width={800}
+      closable={false}
+      escClosable={false}
+      maskClosable={false}
       title={`${op === 'edit' ? '编辑' : '上传'}${PackageName[packageType]}`}
       visible={visible}
       onCancel={closeModal}
@@ -205,9 +233,10 @@ const UploadModal = observer((props: any) => {
           ) : (
             <PopConfirm
               type="warning"
+              okType="danger"
+              okText="确认"
               content="此时取消，将清空已上传资源并关闭弹窗，确认清空并关闭弹窗吗？"
               onOk={closeModal}
-              hideOnClick={false}
             >
               <Button tw="bg-neut-16! mr-3">取消</Button>
             </PopConfirm>
@@ -243,7 +272,7 @@ const UploadModal = observer((props: any) => {
                 onClick={handleOk}
                 loading={mutation.isLoading}
               >
-                上传
+                {isFailed ? '重试' : '上传'}
               </Button>
             ))}
         </>
@@ -305,21 +334,43 @@ const UploadModal = observer((props: any) => {
                     <span tw="text-neut-8 ml-2">
                       ({formatBytes(file.size, 2)})
                     </span>
+                    {isFailed && (
+                      <span tw="text-red-10 ml-2">文件上传失败</span>
+                    )}
                   </div>
-                  <PopConfirm
-                    type="warning"
-                    okText="移除"
-                    content="此时移除，将清空已上传资源，确定移除资源吗？"
-                    onOk={handleClear}
-                    closeAfterClick={false}
-                  >
-                    <Icon
-                      tw="hidden hover:bg-neut-13! cursor-pointer"
-                      className="is-right"
-                      name="close"
-                      clickable
-                    />
-                  </PopConfirm>
+                  {cancelUpload ? (
+                    <PopConfirm
+                      type="warning"
+                      okText="移除"
+                      okType="danger"
+                      content="此时移除，将清空已上传资源，确定移除资源吗？"
+                      onOk={handleClear}
+                      closeAfterClick={false}
+                    >
+                      <Icon
+                        tw="hidden hover:bg-neut-13! cursor-pointer"
+                        className="is-right"
+                        name="close"
+                        clickable
+                      />
+                    </PopConfirm>
+                  ) : (
+                    <Tooltip
+                      theme="light"
+                      placement="top"
+                      content={
+                        <Center tw="h-9 px-3 text-neut-13">移除资源</Center>
+                      }
+                    >
+                      <Icon
+                        tw="hidden hover:bg-neut-13! cursor-pointer"
+                        className="is-right"
+                        name="close"
+                        clickable
+                        onClick={handleClear}
+                      />
+                    </Tooltip>
+                  )}
                 </>
               )}
             </ControlWrap>

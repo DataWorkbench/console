@@ -110,9 +110,11 @@ export const useMutationResource = () => {
   return useMutation(
     async ({
       op,
+      cancel,
       ...rest
     }: {
       op: OP
+      cancel?: any
       resourceIds?: String[]
       resource_id?: String
     }) => {
@@ -134,7 +136,12 @@ export const useMutationResource = () => {
         headers = signature.headers
       }
       if (op === 'create') {
-        ret = await createResourceJob({ endpoint, headers, ...formParams })
+        ret = await createResourceJob({
+          cancel,
+          endpoint,
+          headers,
+          ...formParams,
+        })
       } else if (op === 'edit') {
         ret = await updateResource(params)
       } else if (op === 'delete') {
@@ -142,7 +149,12 @@ export const useMutationResource = () => {
       } else if (op === 'enable') {
         ret = await downloadFile({ endpoint, headers, ...formParams })
       } else if (op === 'view') {
-        ret = await reuploadResource({ endpoint, headers, ...formParams })
+        ret = await reuploadResource({
+          cancel,
+          endpoint,
+          headers,
+          ...formParams,
+        })
       }
       return ret
     }

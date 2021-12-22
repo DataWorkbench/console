@@ -47,31 +47,39 @@ export const createResourceJob = ({
   endpoint,
   spaceId,
   headers,
+  cancel,
   ...rest
 }: any) => {
   const params = new FormData()
   Object.keys(rest).map((key: any) => params.append(key, rest[key]))
-  return customRequest({
-    url: `${endpoint}/v1/workspace/${spaceId}/resource`,
-    headers,
-    params,
-  })
+  return customRequest(
+    {
+      url: `${endpoint}/v1/workspace/${spaceId}/resource`,
+      headers,
+      params,
+    },
+    { cancel }
+  )
 }
 
 export const reuploadResource = ({
   endpoint,
   spaceId,
   headers,
+  cancel,
   resource_id,
   ...rest
 }: any) => {
   const params = new FormData()
   params.append('file', rest.file)
-  return customRequest({
-    url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}`,
-    headers,
-    params,
-  })
+  return customRequest(
+    {
+      url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}`,
+      headers,
+      params,
+    },
+    { cancel }
+  )
 }
 
 export const deleteResource = ({
