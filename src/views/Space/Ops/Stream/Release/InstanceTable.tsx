@@ -20,7 +20,7 @@ import MessageModal from './MessageModal'
 interface IFilter {
   state?: number
   job_id?: string
-  version?: number
+  version?: string
   limit: number
   offset: number
   sort_by: string
@@ -46,7 +46,7 @@ export const InstanceTable = observer(
     )
     const [filter, setFilter] = useImmer<IFilter>({
       job_id: '',
-      version: 0,
+      version: '',
       state: 0,
       limit: 10,
       offset: 0,
@@ -159,7 +159,7 @@ export const InstanceTable = observer(
       setFilter((draft) => {
         draft.job_id = query.jobId || modalData.id || ''
         draft.state = query.state || 0
-        draft.version = Number(query.version) || 0
+        draft.version = query.version || ''
       })
     }, [modalData.id, query, setFilter])
 
