@@ -45,9 +45,24 @@ export const useMutationStreamJob = () => {
   })
 }
 
-let queryKey: any = ''
+let infiniteQueryKey: any = ''
+let streamJobCodeKey: any = ''
+let streamJobScheduleKey: any = ''
 
-export const getFlowKey = () => queryKey
+export const getStreamJobCodeKey = () => streamJobCodeKey
+
+type FlowKeyType = '' | 'streamJobCode' | 'StreamJobSchedule'
+
+export const getFlowKey = (tp: FlowKeyType = '') => {
+  switch (tp) {
+    case 'streamJobCode':
+      return streamJobCodeKey
+    case 'StreamJobSchedule':
+      return streamJobScheduleKey
+    default:
+      return infiniteQueryKey
+  }
+}
 
 export const useInfiniteQueryFlow = (filter = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
@@ -58,9 +73,9 @@ export const useInfiniteQueryFlow = (filter = {}) => {
     offset: 0,
     ...filter,
   }
-  queryKey = ['job', omit(params, 'offset')]
+  infiniteQueryKey = ['job', omit(params, 'offset')]
   return useInfiniteQuery(
-    queryKey,
+    infiniteQueryKey,
     async ({ pageParam = params }) => loadWorkFlow(pageParam),
     {
       getNextPageParam: (lastPage, allPages) => {
@@ -112,8 +127,12 @@ export const useQueryStreamJobSchedule = (options?: UseQueryOptions) => {
     spaceId,
     jobId: curJob?.id,
   }
-  const key = ['flowSche', params]
-  return useQuery(key, async () => getStreamJobSchedule(params), options)
+  streamJobScheduleKey = ['jobSchedule', params]
+  return useQuery(
+    streamJobScheduleKey,
+    async () => getStreamJobSchedule(params),
+    options
+  )
 }
 
 export const useMutationStreamJobArgs = () => {
@@ -161,10 +180,6 @@ export const useMutationStreamJobCode = () => {
   )
 }
 
-let queryStreamobCodeKey: any = ''
-
-export const getStreamJobCodeKey = () => queryStreamobCodeKey
-
 export const useQueryStreamJobCode = (options?: UseQueryOptions) => {
   const {
     workFlowStore: { curJob },
@@ -175,9 +190,9 @@ export const useQueryStreamJobCode = (options?: UseQueryOptions) => {
     spaceId,
     jobId: curJob?.id,
   }
-  queryStreamobCodeKey = ['streamJobCode', params]
+  streamJobCodeKey = ['streamJobCode', params]
   return useQuery(
-    queryStreamobCodeKey,
+    streamJobCodeKey,
     async () =>
       getStreamJobCode({ ...params, regionId, spaceId, jobId: curJob?.id }),
     options

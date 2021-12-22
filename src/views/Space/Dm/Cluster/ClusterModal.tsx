@@ -32,8 +32,8 @@ import {
   Center,
   KVTextAreaField,
   AffixLabel,
-  TextLink,
   SelectWithRefresh,
+  HelpCenterLink,
 } from 'components'
 import { NetworkModal } from 'views/Space/Dm/Network'
 
@@ -114,7 +114,7 @@ const defaultParams = {
     },
     restart_strategy: {
       failure_rate_delay: 1,
-      failure_rate_failure_rate_interval: 3,
+      failure_rate_failure_rate_interval: 60,
       failure_rate_max_failures_per_interval: 1,
       fixed_delay_attempts: 1,
       fixed_delay_delay: 1,
@@ -427,9 +427,9 @@ const ClusterModal = observer(
                             min={1}
                             max={86400}
                             value={strategy.failure_rate_delay}
-                            onChange={(v: any) =>
+                            onChange={(v: any) => {
                               setStrategy('failure_rate_delay', v)
-                            }
+                            }}
                           />
                         </Control>
                         <Center tw="ml-1">秒</Center>
@@ -471,7 +471,7 @@ const ClusterModal = observer(
                             }
                           />
                         </Control>
-                        <Center tw="ml-1">分</Center>
+                        <Center tw="ml-1">秒</Center>
                       </Field>
                     </RestartWrapper>
                   )}
@@ -685,9 +685,9 @@ const ClusterModal = observer(
                         ),
                       },
                     ]}
-                    options={networks.map(({ name, router_id }) => ({
+                    options={networks.map(({ name, id }) => ({
                       label: name,
-                      value: router_id,
+                      value: id,
                     }))}
                     isLoading={networksRet.isFetching}
                     isLoadingAtBottom
@@ -906,9 +906,9 @@ const ClusterModal = observer(
                 <div tw="pt-4 pb-2 border-b border-neut-13">
                   收费标准详见
                   {/* <a href="###" className="link"> */}
-                  <TextLink href="###" hasIcon={false}>
+                  <HelpCenterLink href="/billing/price/" isIframe={false}>
                     《大数据平台计费说明》
-                  </TextLink>
+                  </HelpCenterLink>
                   {/* <QIcon name="if-external-link" /> */}
                 </div>
                 <div>
