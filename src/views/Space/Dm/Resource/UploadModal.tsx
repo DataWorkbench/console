@@ -135,6 +135,10 @@ const UploadModal = observer((props: any) => {
   const handleResourceChange = (event: any) => {
     const resource = event.target.files[0]
 
+    if (resource.size === 0) {
+      Message.error('文件大小为0')
+      return
+    }
     if (resource.size > 100 * 1024 * 1024) {
       setFileTip('size')
       return
@@ -361,13 +365,13 @@ const UploadModal = observer((props: any) => {
               status: 'error',
             },
             {
-              rule: { matchRegex: /^(?!_)[a-zA-Z0-9_]+/ },
+              rule: { matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_.]+$/ },
               help: '只允许数字、字母或下划线(_) 不能以(_)开头',
               status: 'error',
             },
             {
               rule: { matchRegex: /.jar$/ },
-              help: '需要.jar扩展名',
+              help: '请以(.jar)扩展名结尾',
               status: 'error',
             },
           ]}
