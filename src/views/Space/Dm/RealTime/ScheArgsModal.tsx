@@ -214,7 +214,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                         }
                         css={[
                           showMsg && !params.clusterId
-                            ? tw`border-red-10 border`
+                            ? tw`border-red-10! border`
                             : '',
                         ]}
                       >
