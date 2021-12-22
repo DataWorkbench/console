@@ -111,6 +111,8 @@ const DataSourceModal = observer(
           title={`${opTxt}数据源: ${
             curkind ? curkind.showname || curkind.name : ''
           }`}
+          maskClosable={false}
+          escClosable={false}
           footer={
             <div tw="flex justify-end space-x-2">
               {state.step === 0 ? (

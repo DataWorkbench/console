@@ -1,15 +1,22 @@
 import { useRef, useEffect, useState } from 'react'
 import { Form, Icon } from '@QCFE/lego-ui'
 import { Button, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import tw, { styled, css } from 'twin.macro'
-import { FlexBox, AffixLabel, Tooltip, Modal } from 'components'
+import {
+  FlexBox,
+  AffixLabel,
+  Tooltip,
+  Modal,
+  SelectWithRefresh,
+} from 'components'
 import { useImmer } from 'use-immer'
+import { useQueryClient } from 'react-query'
 import {
   useQueryResource,
   useMutationStreamJobCode,
   useQueryStreamJobCode,
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
+  getResourceKey,
 } from 'hooks'
 import { get, flatten } from 'lodash-es'
 import { Link, useParams } from 'react-router-dom'
@@ -17,23 +24,7 @@ import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
 import { StreamToolBar } from './styled'
 
-const { TextField, SelectField } = Form
-
-const ResourceSelectWrapper = styled('div')(() => [
-  tw`flex`,
-  css`
-    > .field {
-      ${tw`block mb-6`}
-    }
-    > button {
-      ${tw`ml-1 mt-[30px] px-1.5`}
-      span.icon {
-        svg {
-          ${tw`text-white fill-current`}
-        }
-    }
-  `,
-])
+const { TextField } = Form
 
 const StreamJAR = () => {
   const { regionId, spaceId } =
@@ -42,6 +33,7 @@ const StreamJAR = () => {
   const [show, toggleShow] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showScheSettingModal, setShowScheSettingModal] = useState(false)
+  const queryClient = useQueryClient()
   const [params, setParams] = useImmer({
     jarArgs: '',
     jarEntry: '',
@@ -49,6 +41,7 @@ const StreamJAR = () => {
   })
   const resouceRet = useQueryResource({
     resource_type: 1,
+    limit: 100,
   })
   const { data: scheData } = useQueryStreamJobSchedule()
   const { data } = useQueryStreamJobCode()
@@ -68,7 +61,7 @@ const StreamJAR = () => {
     if (get(data, 'jar.resource_id') !== '') {
       setEnableRelease(true)
     }
-  }, [data])
+  }, [data, scheData])
   const resources = flatten(
     resouceRet.data?.pages.map((page: Record<string, any>) => page.infos || [])
   )
@@ -103,6 +96,7 @@ const StreamJAR = () => {
       toggleShow(true)
     }
   }
+
   return (
     <FlexBox tw="h-full flex-1">
       <FlexBox tw="flex-col flex-1 pl-5">
@@ -114,7 +108,6 @@ const StreamJAR = () => {
           <Tooltip
             disabled={enableRelease}
             theme="light"
-            placement="bottom"
             hasPadding
             content="请添加Jar包后发布"
           >
@@ -131,87 +124,89 @@ const StreamJAR = () => {
         </StreamToolBar>
         <div tw="mt-5 flex-1">
           <Form tw="w-96!" ref={form} layout="vertical">
-            <ResourceSelectWrapper>
-              <SelectField
-                name="resource_id"
-                label={<AffixLabel>引用 Jar 包（程序包）</AffixLabel>}
-                placeholder="请选择要引用的 Jar 包（程序包）"
-                help={
-                  <div tw="text-neut-8">
-                    如需选择新的资源，可以在资源管理中
-                    <Link
-                      to={`/${regionId}/workspace/${spaceId}/dm/resource`}
-                      tw="text-white underline text-underline-offset[2px]"
-                    >
-                      上传资源
-                    </Link>
-                  </div>
+            <SelectWithRefresh
+              name="resource_id"
+              label={<AffixLabel>引用 Jar 包（程序包）</AffixLabel>}
+              placeholder="请选择要引用的 Jar 包（程序包）"
+              help={
+                <div tw="text-neut-8">
+                  如需选择新的资源，可以在资源管理中
+                  <Link
+                    to={`/${regionId}/workspace/${spaceId}/dm/resource`}
+                    tw="text-white underline text-underline-offset[2px]"
+                  >
+                    上传资源
+                  </Link>
+                </div>
+              }
+              valueRenderer={(option: any) => (
+                <div tw="flex items-center space-x-1">
+                  <Icon
+                    name="coding"
+                    type="light"
+                    color={{
+                      primary: '#219861',
+                      secondary: '#8EDABD',
+                    }}
+                  />
+                  <span>{option.label}</span>
+                  <span tw="text-neut-8">ID: {option.value}</span>
+                </div>
+              )}
+              optionRenderer={(option: any) => (
+                <div tw="flex items-center space-x-1">
+                  <Icon
+                    name="coding"
+                    type="light"
+                    color={{
+                      primary: '#219861',
+                      secondary: '#8EDABD',
+                    }}
+                  />
+                  <span>{option.label}</span>
+                  <span tw="text-neut-8">ID: {option.value}</span>
+                </div>
+              )}
+              value={params.resourceId}
+              options={resources.map((res) => ({
+                label: res.name,
+                value: res.resource_id,
+                type: res.type,
+              }))}
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择要引用的 Jar 包资源',
+                  status: 'error',
+                },
+              ]}
+              isLoading={resouceRet.isFetching}
+              isLoadingAtBottom
+              searchable={false}
+              onMenuScrollToBottom={() => {
+                if (resouceRet.hasNextPage) {
+                  resouceRet.fetchNextPage()
                 }
-                valueRenderer={(option: any) => (
-                  <div tw="flex items-center space-x-1">
-                    <Icon
-                      name="coding"
-                      type="light"
-                      color={{
-                        primary: '#219861',
-                        secondary: '#8EDABD',
-                      }}
-                    />
-                    <span>{option.label}</span>
-                    <span tw="text-neut-8">ID: {option.value}</span>
-                  </div>
-                )}
-                optionRenderer={(option: any) => (
-                  <div tw="flex items-center space-x-1">
-                    <Icon
-                      name="coding"
-                      type="light"
-                      color={{
-                        primary: '#219861',
-                        secondary: '#8EDABD',
-                      }}
-                    />
-                    <span>{option.label}</span>
-                    <span tw="text-neut-8">ID: {option.value}</span>
-                  </div>
-                )}
-                value={params.resourceId}
-                options={resources.map((res) => ({
-                  label: res.name,
-                  value: res.resource_id,
-                  type: res.type,
-                }))}
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请选择要引用的 Jar 包资源',
-                    status: 'error',
-                  },
-                ]}
-                isLoading={resouceRet.isFetching}
-                isLoadingAtBottom
-                searchable={false}
-                onMenuScrollToBottom={() => {
-                  if (resouceRet.hasNextPage) {
-                    resouceRet.fetchNextPage()
-                  }
-                }}
-                onChange={(v: string) => {
-                  setParams((draft) => {
-                    draft.resourceId = v
-                  })
-                }}
-                bottomTextVisible
-              />
-              <Button type="black">
+              }}
+              onChange={(v: string) => {
+                setParams((draft) => {
+                  draft.resourceId = v
+                })
+              }}
+              onRefresh={() => {
+                queryClient.invalidateQueries(getResourceKey('infinite'))
+              }}
+              bottomTextVisible
+            />
+            {/* <Button type="black">
                 <Icon name="refresh" size={20} changeable />
-              </Button>
-            </ResourceSelectWrapper>
+              </Button> */}
+
             <TextField
               name="jar_entry"
-              label="运行函数入口"
+              label="入口类（Entry Class）"
               autoComplete="off"
-              placeholder="请输入运行函数入口"
+              placeholder="请输入入口类（Entry Class）"
               value={params.jarEntry}
               onChange={(v: string) => {
                 setParams((draft) => {
@@ -221,9 +216,9 @@ const StreamJAR = () => {
             />
             <TextField
               name="jar_args"
-              label="运行参数"
+              label="程序参数（Program Arguments）"
               autoComplete="off"
-              placeholder="请输入运行参数"
+              placeholder="请输入程序参数（Program Arguments）"
               value={params.jarArgs}
               onChange={(v: string) => {
                 setParams((draft) => {

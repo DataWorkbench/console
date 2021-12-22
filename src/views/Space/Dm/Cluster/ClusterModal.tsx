@@ -17,13 +17,14 @@ import { useImmer } from 'use-immer'
 import { set, range, trim, filter, assign, flatten } from 'lodash-es'
 import { useQueryClient } from 'react-query'
 import Tippy from '@tippyjs/react'
-import { useParams } from 'react-router-dom'
+import dayjs from 'dayjs'
 import {
   useStore,
   useQueryFlinkVersions,
   useInfiniteQueryNetworks,
   useMutationCluster,
   getFlinkClusterKey,
+  getNetworkKey,
 } from 'hooks'
 import {
   Modal,
@@ -32,8 +33,9 @@ import {
   KVTextAreaField,
   AffixLabel,
   TextLink,
-  RouterLink,
+  SelectWithRefresh,
 } from 'components'
+import { NetworkModal } from 'views/Space/Dm/Network'
 
 const { CollapseItem } = Collapse
 const { TextField, SelectField, NumberField } = Form
@@ -76,6 +78,14 @@ const InDemandTitle = styled('div')(() => [
   css`
     span {
       ${tw`text-green-11 font-semibold text-xl`}
+    }
+  `,
+])
+
+const KVTextAreaFieldWrapper = styled(KVTextAreaField)(() => [
+  css`
+    & > .label {
+      ${tw`items-start! mt-1.5`}
     }
   `,
 ])
@@ -126,9 +136,9 @@ const ClusterModal = observer(
   ({ opCluster }: { opCluster: typeof defaultParams }) => {
     const {
       dmStore: { setOp, op },
+      dmStore,
     } = useStore()
-    const { regionId, spaceId } =
-      useParams<{ regionId: string; spaceId: string }>()
+
     const [params, setParams] = useImmer(opCluster || defaultParams)
     const baseFormRef = useRef<Form>(null)
     const networkFormRef = useRef<Form>(null)
@@ -138,7 +148,7 @@ const ClusterModal = observer(
     const { data: flinkVersions } = useQueryFlinkVersions()
     const networksRet = useInfiniteQueryNetworks({
       offset: 0,
-      limit: 10,
+      limit: 100,
     })
     const networks = flatten(
       networksRet.data?.pages.map((page) => page.infos || [])
@@ -228,11 +238,10 @@ const ClusterModal = observer(
     const marks = useMemo(() => {
       const o = {}
       range(0, 9, 1).forEach((v) => {
-        set(o, v, String(v))
+        set(o, v, v === 0 ? '0.5' : String(v))
       })
       return o
     }, [])
-
     return (
       <Modal
         title={(() => {
@@ -248,6 +257,7 @@ const ClusterModal = observer(
         confirmLoading={mutation.isLoading}
         visible
         onOk={handleOk}
+        okText={op === 'create' ? '立即创建' : '确认'}
         onCancel={() => setOp('')}
         width={1000}
       >
@@ -266,7 +276,7 @@ const ClusterModal = observer(
                       tw="(relative top-0 left-0)!"
                       type="light"
                     />
-                    <span>基础属性</span>
+                    <span>基础设置</span>
                   </FlexBox>
                 }
               >
@@ -298,7 +308,7 @@ const ClusterModal = observer(
                   <SelectField
                     label={<AffixLabel required>版本</AffixLabel>}
                     name="version"
-                    validateOnBlur
+                    validateOnChange
                     placeholder="请选择版本"
                     disabled={viewMode}
                     options={flinkVersions?.map((version: string) => ({
@@ -340,8 +350,8 @@ const ClusterModal = observer(
                         重启策略
                       </AffixLabel>
                     }
+                    validateOnChange
                     placeholder="请选择重启策略"
-                    clearable
                     disabled={viewMode}
                     value={strategy.restart_strategy}
                     onChange={(v: any) =>
@@ -361,7 +371,7 @@ const ClusterModal = observer(
                         value: 'failure-rate',
                       },
                     ]}
-                    help="重启策略是指在发生故障时. 如何处理(重启)任务作业"
+                    help="当 Flink Task 发生故障时的默认重启策略，具体作业也可以通过单独定义覆盖该默认配置。"
                   />
                   {strategy.restart_strategy === 'fixed-delay' && (
                     <RestartWrapper>
@@ -510,19 +520,20 @@ const ClusterModal = observer(
                     >
                       TM 规格
                     </AffixLabel>
-                    <Control tw="pl-12 pt-3 w-80!">
+                    <Control tw="pl-7 pt-3 w-80!">
                       <Slider
-                        min={0.5}
+                        min={0}
                         max={8}
-                        step={0.5}
+                        step={1}
                         marks={marks}
                         hasTooltip
                         markDots
+                        tipFormatter={(v) => `${v === 0 ? '0.5' : v} CU`}
                         disabled={viewMode}
                         value={params.task_cu}
                         onChange={(v: number) => {
                           setParams((draft) => {
-                            draft.task_cu = v
+                            draft.task_cu = v === 0 ? 0.5 : v
                           })
                         }}
                       />
@@ -536,9 +547,16 @@ const ClusterModal = observer(
                         tw="ml-3"
                         disabled={viewMode}
                         value={params.task_cu}
-                        onChange={(v: number) => {
+                        upHandler={(v: number) => {
                           setParams((draft) => {
-                            draft.task_cu = v
+                            const fmVal = Math.ceil(v)
+                            draft.task_cu = fmVal === 0 ? 0.5 : fmVal
+                          })
+                        }}
+                        downHandler={(v: number) => {
+                          setParams((draft) => {
+                            const fmVal = Math.floor(v)
+                            draft.task_cu = fmVal === 0 ? 0.5 : fmVal
                           })
                         }}
                       />
@@ -552,19 +570,20 @@ const ClusterModal = observer(
                     >
                       JM 规格
                     </AffixLabel>
-                    <Control tw="pl-12 pt-3 w-80!">
+                    <Control tw="pl-7 pt-3 w-80!">
                       <Slider
-                        min={0.5}
+                        min={0}
                         max={8}
-                        step={0.5}
+                        step={1}
                         marks={marks}
                         hasTooltip
                         markDots
+                        tipFormatter={(v) => `${v === 0 ? '0.5' : v} CU`}
                         disabled={viewMode}
                         value={params.job_cu}
                         onChange={(v: number) => {
                           setParams((draft) => {
-                            draft.job_cu = v
+                            draft.job_cu = v === 0 ? 0.5 : v
                           })
                         }}
                       />
@@ -578,9 +597,16 @@ const ClusterModal = observer(
                         isMini
                         tw="ml-3"
                         disabled={viewMode}
-                        onChange={(v: number) => {
+                        upHandler={(v: number) => {
                           setParams((draft) => {
-                            draft.job_cu = v
+                            const fmVal = Math.ceil(v)
+                            draft.job_cu = fmVal === 0 ? 0.5 : fmVal
+                          })
+                        }}
+                        downHandler={(v: number) => {
+                          setParams((draft) => {
+                            const fmVal = Math.floor(v)
+                            draft.job_cu = fmVal === 0 ? 0.5 : fmVal
                           })
                         }}
                       />
@@ -622,17 +648,22 @@ const ClusterModal = observer(
                   </FlexBox>
                 }
               >
-                <Form ref={networkFormRef}>
-                  <SelectField
-                    label={<AffixLabel>选择网络</AffixLabel>}
+                <Form ref={networkFormRef} layout="column">
+                  <SelectWithRefresh
+                    label={
+                      <AffixLabel tw="font-medium text-sm">网络配置</AffixLabel>
+                    }
                     name="network_id"
                     value={params.network_id}
-                    validateOnBlur
+                    validateOnChange
                     disabled={viewMode}
                     onChange={(v: string) => {
                       setParams((draft) => {
                         draft.network_id = v
                       })
+                    }}
+                    onRefresh={() => {
+                      queryClient.invalidateQueries(getNetworkKey())
                     }}
                     schemas={[
                       {
@@ -642,14 +673,15 @@ const ClusterModal = observer(
                         },
                         status: 'error',
                         help: (
-                          <div>
-                            请选择网络，如需选择新的 VPC，您可以
-                            <RouterLink
-                              to={`/${regionId}/workspace/${spaceId}/dm/network`}
+                          <>
+                            请选择网络,如需选择新的 VPC，您可以
+                            <span
+                              tw="text-green-11 cursor-pointer"
+                              onClick={() => dmStore.setNetWorkOp('create')}
                             >
-                              新建 VPC 网络
-                            </RouterLink>
-                          </div>
+                              绑定 VPC
+                            </span>
+                          </>
                         ),
                       },
                     ]}
@@ -669,11 +701,12 @@ const ClusterModal = observer(
                     help={
                       <div>
                         如需选择新的 VPC，您可以
-                        <RouterLink
-                          to={`/${regionId}/workspace/${spaceId}/dm/network`}
+                        <span
+                          tw="text-green-11 cursor-pointer"
+                          onClick={() => dmStore.setNetWorkOp('create')}
                         >
-                          新建 VPC 网络
-                        </RouterLink>
+                          绑定 VPC
+                        </span>
                       </div>
                     }
                   />
@@ -728,7 +761,7 @@ const ClusterModal = observer(
                 }
               >
                 <Form ref={optFormRef}>
-                  <KVTextAreaField
+                  <KVTextAreaFieldWrapper
                     disabled={viewMode}
                     label="Host别名"
                     title="Hosts 信息"
@@ -753,9 +786,13 @@ const ClusterModal = observer(
                     ]}
                     onChange={sethostAliases}
                   />
-                  <KVTextAreaField
+                  <KVTextAreaFieldWrapper
                     disabled={viewMode}
-                    label={<AffixLabel required={false}>Flink参数</AffixLabel>}
+                    label={
+                      <AffixLabel required={false} help="    ">
+                        Flink参数
+                      </AffixLabel>
+                    }
                     name="custom"
                     validateOnBlur
                     division=":"
@@ -781,91 +818,128 @@ const ClusterModal = observer(
             </Collapse>
           </FormWrapper>
           <div tw="w-80 px-5 pt-5 space-y-4">
-            <div tw="text-base font-semibold">费用预览</div>
-            <RadioGroup value={1}>
-              <RadioButton value={1}>按需计费</RadioButton>
-              <Tippy
-                theme="light"
-                animation="fade"
-                arrow
-                delay={100}
-                offset={[60, 10]}
-                content={
-                  <Center tw="h-9 px-3 text-neut-13">
-                    限时免费，预留合约敬请期待
-                  </Center>
-                }
-              >
-                <div>
-                  <RadioButton
-                    value={2}
-                    tw="bg-neut-13! text-neut-8! cursor-not-allowed"
-                  >
-                    预留合约
-                  </RadioButton>
-                </div>
-              </Tippy>
-            </RadioGroup>
-            <div>
-              <InDemandTitle tw="text-sm">
-                TM 数量：<span>{params.task_num}</span>
-              </InDemandTitle>
-              <div tw="text-neut-8">Flink 的 TaskNumber 的数量</div>
-            </div>
-            <div>
-              <InDemandTitle tw="text-sm">
-                TM 规格：<span>{params.task_cu}</span>
-              </InDemandTitle>
-              <div tw="text-neut-8">Flink 的 TaskManager 的 CPU 和内存设置</div>
-            </div>
-            <div>
-              <InDemandTitle tw="text-sm">
-                JM 规格：<span>{params.job_cu}</span>
-              </InDemandTitle>
-              <div tw="text-neut-8">Flink 的 JobManager 的 CPU 和内存设置</div>
-            </div>
-            <div>
-              <InDemandTitle tw="text-sm">
-                总计算资源 CU：
-                <span css={[totalCU > 12 && tw`text-red-10!`]}>{totalCU}</span>
-              </InDemandTitle>
-              <div tw="text-neut-8">
-                [总计算资源 CU=TM 数量 * TM 规格 + JM 规格]
+            {op === 'view' ? (
+              <div>
+                <div tw="text-base font-semibold mb-4">租赁信息</div>
+                <FlexBox>
+                  <div tw="w-24 text-right">计费方式：</div>
+                  <div tw="text-neut-8">按需计费</div>
+                </FlexBox>
+                <FlexBox>
+                  <div tw="w-24 text-right">开始计费时间：</div>
+                  <div tw="text-neut-8">
+                    {dayjs(params.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
+                  </div>
+                </FlexBox>
+                <FlexBox>
+                  <div tw="w-24 text-right">停止计费时间：</div>
+                  <div tw="text-neut-8">使用中</div>
+                </FlexBox>
+                <FlexBox>
+                  <div tw="w-24 text-right">价格：</div>
+                  <div tw="text-neut-8">
+                    ¥0 <del>0.281</del> 每小时
+                    <span tw="text-[#B24B06] ml-1">限时免费</span>
+                  </div>
+                </FlexBox>
               </div>
-            </div>
-            <div tw="pt-4 pb-2 border-b border-neut-13">
-              收费标准详见
-              {/* <a href="###" className="link"> */}
-              <TextLink href="###" hasIcon={false}>
-                《大数据平台计费说明》
-              </TextLink>
-              {/* <QIcon name="if-external-link" /> */}
-            </div>
-            <div>
-              <FlexBox tw="justify-between">
-                <div tw="text-sm">总价</div>
-                <div tw="text-neut-8">
-                  <span tw="text-xl text-green-11">¥ 0</span>{' '}
-                  <del tw="">8.1245/小时</del>
+            ) : (
+              <>
+                <div tw="text-base font-semibold">费用预览</div>
+                <RadioGroup value={1}>
+                  <RadioButton value={1}>按需计费</RadioButton>
+                  <Tippy
+                    theme="light"
+                    animation="fade"
+                    arrow
+                    delay={100}
+                    offset={[60, 10]}
+                    content={
+                      <Center tw="h-9 px-3 text-neut-13">
+                        限时免费，预留合约敬请期待
+                      </Center>
+                    }
+                  >
+                    <div>
+                      <RadioButton
+                        value={2}
+                        tw="bg-neut-13! text-neut-8! cursor-not-allowed"
+                      >
+                        预留合约
+                      </RadioButton>
+                    </div>
+                  </Tippy>
+                </RadioGroup>
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    TM 数量：<span>{params.task_num}</span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">Flink 的 TaskNumber 的数量</div>
                 </div>
-              </FlexBox>
-              <FlexBox tw="justify-between">
-                <div
-                  tw="rounded-sm px-1"
-                  css={css`
-                    background: #b34b06;
-                  `}
-                >
-                  限时免费，机不可失
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    TM 规格：<span>{params.task_cu}</span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">
+                    Flink 的 TaskManager 的 CPU 和内存设置
+                  </div>
                 </div>
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    JM 规格：<span>{params.job_cu}</span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">
+                    Flink 的 JobManager 的 CPU 和内存设置
+                  </div>
+                </div>
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    总计算资源 CU：
+                    <span css={[totalCU > 12 && tw`text-red-10!`]}>
+                      {totalCU}
+                    </span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">
+                    [总计算资源 CU=TM 数量 * TM 规格 + JM 规格]
+                  </div>
+                </div>
+                <div tw="pt-4 pb-2 border-b border-neut-13">
+                  收费标准详见
+                  {/* <a href="###" className="link"> */}
+                  <TextLink href="###" hasIcon={false}>
+                    《大数据平台计费说明》
+                  </TextLink>
+                  {/* <QIcon name="if-external-link" /> */}
+                </div>
+                <div>
+                  <FlexBox tw="justify-between">
+                    <div tw="text-sm">总价</div>
+                    <div tw="text-neut-8">
+                      <span tw="text-xl text-green-11">¥ 0</span>{' '}
+                      <del tw="">8.1245/小时</del>
+                    </div>
+                  </FlexBox>
+                  <FlexBox tw="justify-between">
+                    <div
+                      tw="rounded-sm px-1"
+                      css={css`
+                        background: #b34b06;
+                      `}
+                    >
+                      限时免费，机不可失
+                    </div>
 
-                <div tw="text-neut-8">
-                  (合 <span tw="text-green-11">¥0</span> <del>2718</del> 每月 )
+                    <div tw="text-neut-8">
+                      (合 <span tw="text-green-11">¥0</span> <del>2718</del>{' '}
+                      每月 )
+                    </div>
+                  </FlexBox>
                 </div>
-              </FlexBox>
-            </div>
+              </>
+            )}
           </div>
         </FlexBox>
+        {dmStore.networkOp === 'create' && <NetworkModal appendToBody />}
       </Modal>
     )
   }

@@ -49,12 +49,12 @@ class DataSourceStore {
     {
       name: 'Ftp',
       showname: 'FTP',
-      desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
+      desc: '用于在网络上进行文件传输的一套标准协议，它工作在 OSI 模型中的应用层',
       source_type: 7,
     },
     {
       name: 'HDFS',
-      desc: '由Scala和Java编写，目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。',
+      desc: '在通用硬件上的分布式文件系统，提供高吞吐量的数据访问，适合大规模数据集上的应用。',
       source_type: 8,
     },
   ]

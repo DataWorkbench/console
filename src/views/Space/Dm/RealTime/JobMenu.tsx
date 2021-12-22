@@ -340,7 +340,7 @@ const JobMenu = observer(() => {
           onOk={handleDel}
           confirmLoading={mutation.isLoading}
         >
-          确定要删除Job: {editJob?.name}
+          删除作业操作无法撤回，确认删除吗？
         </Modal>
       )}
     </div>

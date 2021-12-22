@@ -36,14 +36,14 @@ import ClusterModal from './ClusterModal'
 const { MenuItem } = Menu
 
 const statusFilters = [
-  {
-    text: '已删除',
-    value: 1,
-    color: {
-      primary: '#939EA9',
-      secondary: '#DEE7F1',
-    },
-  },
+  // {
+  //   text: '已删除',
+  //   value: 1,
+  //   color: {
+  //     primary: '#939EA9',
+  //     secondary: '#DEE7F1',
+  //   },
+  // },
   {
     text: '运行中',
     value: 2,
@@ -236,7 +236,7 @@ const ClusterTable = observer(
         {
           title: (
             <AffixLabel
-              help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
+              help="Flink 的 TaskManager 的数量"
               required={false}
               theme="green"
             >
@@ -343,7 +343,11 @@ const ClusterTable = observer(
                       >
                         <AffixLabel
                           required={false}
-                          help="如需修改，请先停用计算集群"
+                          // help="如需修改，请先停用计算集群"
+                          help={
+                            ![2, 4].includes(row.status) &&
+                            '如需修改，请先停用计算集群'
+                          }
                           theme="light"
                         >
                           修改
@@ -355,7 +359,10 @@ const ClusterTable = observer(
                       >
                         <AffixLabel
                           required={false}
-                          help="如需删除，请先停用计算集群"
+                          help={
+                            ![2, 4].includes(row.status) &&
+                            '如需删除，请先停用计算集群'
+                          }
                           theme="light"
                         >
                           删除
@@ -417,13 +424,13 @@ const ClusterTable = observer(
       omitBy(filter, (v) => v === '')
     )
     const infos = get(data, 'infos', []) || []
-    const filterClusterInfos =
-      infos.filter(
-        (info: any) =>
-          selectedRowKeys.includes(info.id) &&
-          info.status !== 2 &&
-          info.status !== 4
-      ) || []
+    // const filterClusterInfos =
+    //   infos.filter(
+    //     (info: any) =>
+    //       selectedRowKeys.includes(info.id) &&
+    //       info.status !== 2 &&
+    //       info.status !== 4
+    //   ) || []
 
     const filterColumn = columnSettings
       .map((o: { key: string; checked: boolean }) => {
@@ -464,7 +471,7 @@ const ClusterTable = observer(
                     创建集群
                   </Button>
                 </Tooltip>
-                <Button
+                {/* <Button
                   disabled={
                     selectedRowKeys.length === 0 ||
                     filterClusterInfos.length === 0
@@ -478,7 +485,7 @@ const ClusterTable = observer(
                 >
                   <Icon name="trash" type="light" />
                   <span>删除</span>
-                </Button>
+                </Button> */}
               </Center>
             )}
             <Center tw="space-x-3">
@@ -521,7 +528,8 @@ const ClusterTable = observer(
           </FlexBox>
         </div>
         <Table
-          selectType={selectMode ? 'radio' : 'checkbox'}
+          // selectType={selectMode ? 'radio' : 'checkbox'}
+          selectType={selectMode && 'radio'}
           dataSource={infos || []}
           loading={isFetching}
           columns={filterColumn.length > 0 ? filterColumn : columns}

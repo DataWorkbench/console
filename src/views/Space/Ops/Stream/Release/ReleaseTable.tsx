@@ -24,7 +24,7 @@ import { Tooltip, Center } from 'components'
 import { useHistory, useParams } from 'react-router-dom'
 import { AssoiateModal } from './AssoiateModal'
 import ScheSettingModal from '../../../Dm/RealTime/ScheSettingModal'
-import ReleaseModal from './RelaseModal'
+import ReleaseModal from '../../../Dm/RealTime/ReleaseModal'
 
 const { MenuItem } = Menu
 
@@ -220,9 +220,10 @@ export const ReleaseTable = observer(({ query }: any) => {
       {
         title: '发布描述',
         dataIndex: 'desc',
+        width: 250,
         render: (value: string) => (
           <Tooltip content={<Center tw="p-3">{value}</Center>}>
-            <div tw="max-w-[130px] truncate">{value}</div>
+            <div tw="max-w-[200px] truncate">{value}</div>
           </Tooltip>
         ),
       },
@@ -292,7 +293,9 @@ export const ReleaseTable = observer(({ query }: any) => {
                   </Menu>
                 }
               >
-                <Icon name="more" tw="w-5! h-5! cursor-pointer" />
+                <div tw="flex items-center">
+                  <Icon name="more" clickable changeable type="light" />
+                </div>
               </Tooltip>
             </Center>
           </FlexBox>
