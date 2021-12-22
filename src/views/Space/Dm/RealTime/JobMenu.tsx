@@ -4,7 +4,7 @@ import { Tooltip, Menu } from '@QCFE/lego-ui'
 import { Icon, InputSearch, Loading, Modal } from '@QCFE/qingcloud-portal-ui'
 import { motion } from 'framer-motion'
 import tw, { css, styled, theme } from 'twin.macro'
-import { flatten } from 'lodash-es'
+import { flatten, get } from 'lodash-es'
 import { useStore } from 'stores'
 import { useScroll } from 'react-use'
 import { useQueryClient } from 'react-query'
@@ -41,6 +41,7 @@ const TooltipWrapper = styled(Tooltip)(() => [
 
 const JobMenu = observer(() => {
   const [alterFlowId, setAlterFlowId] = useState(null)
+  const [curCreateJobId, setCurCreateJobId] = useState(null)
   const [editJob, setEditJob] = useState(null)
   const [visible, setVisible] = useState(false)
   const [isOpenHelp, setIsOpenHelp] = useState(true)
@@ -52,7 +53,7 @@ const JobMenu = observer(() => {
     search: '',
     offset: 0,
     limit: 100,
-    reverse: false,
+    reverse: true,
   })
 
   const flowsRet = useInfiniteQueryFlow(filter)
@@ -70,6 +71,16 @@ const JobMenu = observer(() => {
     scrollRef.current.scrollHeight -
       (scrollPos.y + scrollRef.current.clientHeight) <=
       20
+
+  useEffect(() => {
+    if (flows && curCreateJobId) {
+      const curFlow = flows.find((flow) => flow.id === curCreateJobId)
+      if (curFlow) {
+        workFlowStore.set({ curJob: curFlow })
+        setCurCreateJobId(null)
+      }
+    }
+  }, [flows, curCreateJobId, workFlowStore])
 
   useEffect(() => {
     if (needLoadingMore) {
@@ -93,7 +104,13 @@ const JobMenu = observer(() => {
     setVisible(true)
     setEditJob(job)
   }
-  const hideEditModal = () => {
+  const hideEditModal = (data: any) => {
+    const jobId = get(data, 'id')
+    if (jobId) {
+      setCurCreateJobId(jobId)
+      // setAlterFlowId(jobId)
+    }
+    // console.log(jobId)
     setVisible(false)
     setEditJob(null)
   }
@@ -340,7 +357,7 @@ const JobMenu = observer(() => {
           onOk={handleDel}
           confirmLoading={mutation.isLoading}
         >
-          删除作业操作无法撤回，确认删除吗？
+          <>删除作业操作无法撤回，确认删除吗？</>
         </Modal>
       )}
     </div>

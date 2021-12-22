@@ -10,7 +10,8 @@ import {
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
   useQueryStreamJobCode,
-  getStreamJobCodeKey,
+  // getStreamJobCodeKey,
+  getFlowKey,
 } from 'hooks'
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
@@ -108,7 +109,7 @@ def main(args: Array[String]): Unit = {
       },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries(getStreamJobCodeKey())
+          queryClient.invalidateQueries(getFlowKey('streamJobCode'))
           setEnableRelease(true)
           Notify.success({
             title: '操作提示',

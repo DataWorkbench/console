@@ -220,10 +220,10 @@ const ClusterTable = observer(
                     >
                       <div>{get(row, 'network_info.name')}</div>
                     </Tooltip>
-                    <div tw="text-neut-8">{get(row, 'id')}</div>
+                    <div tw="text-neut-8">{get(row, 'network_id')}</div>
                   </div>
                 ) : (
-                  <div tw="text-neut-8">{get(row, 'id')}</div>
+                  <div tw="text-neut-8">{get(row, 'network_id')}</div>
                 )}
               </>
             )
@@ -456,6 +456,7 @@ const ClusterTable = observer(
                   theme="light"
                   placement="top-start"
                   animation="fade"
+                  visible={infos.length > 5}
                   content={
                     <Center tw="h-9 px-3 text-neut-13">
                       单个用户最多可创建 5 个集群，如需更多集群，请提交工单
@@ -579,7 +580,7 @@ const ClusterTable = observer(
             okType={op === 'start' ? 'primary' : 'danger'}
             confirmLoading={mutation.isLoading}
           >
-            <FlexBox tw="space-x-3 mb-3">
+            <FlexBox tw="mb-3">
               <Icon
                 name="if-exclamation"
                 css={css`
@@ -588,7 +589,7 @@ const ClusterTable = observer(
                   line-height: 24px;
                 `}
               />
-              <section tw="flex-1">
+              <section tw="flex-1 w-full pl-3">
                 {(() => {
                   // const txtObj = { start: '启动', stop: '停用', delete: '删除' }
                   const opText = opWordInfo[op]
@@ -610,8 +611,10 @@ const ClusterTable = observer(
                   if (op === 'start') {
                     return (
                       <>
-                        <div tw="font-medium mb-2 text-base">{clusterText}</div>
-                        <div className="modal-content-message">
+                        <div tw="font-medium mb-2 text-base break-all">
+                          {clusterText}
+                        </div>
+                        <div className="modal-content-message" tw="break-all">
                           确定启动{clusterText}吗？
                         </div>
                       </>
@@ -620,10 +623,10 @@ const ClusterTable = observer(
 
                   return (
                     <>
-                      <div tw="font-medium mb-2 text-base">
+                      <div tw="font-medium mb-2 text-base break-all">
                         {clusterText}注意事项
                       </div>
-                      <div className="modal-content-message">
+                      <div className="modal-content-message" tw="break-all">
                         {clusterText}后，已发布的作业和正在运行中实例会受到影响
                         {op === 'stop'
                           ? `。确认${opText}吗？`

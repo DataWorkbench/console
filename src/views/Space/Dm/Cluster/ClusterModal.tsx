@@ -32,9 +32,10 @@ import {
   Center,
   KVTextAreaField,
   AffixLabel,
-  TextLink,
   SelectWithRefresh,
+  HelpCenterLink,
 } from 'components'
+import { strlen, nameMatchRegex } from 'utils/convert'
 import { NetworkModal } from 'views/Space/Dm/Network'
 
 const { CollapseItem } = Collapse
@@ -114,7 +115,7 @@ const defaultParams = {
     },
     restart_strategy: {
       failure_rate_delay: 1,
-      failure_rate_failure_rate_interval: 3,
+      failure_rate_failure_rate_interval: 60,
       failure_rate_max_failures_per_interval: 1,
       fixed_delay_attempts: 1,
       fixed_delay_delay: 1,
@@ -298,10 +299,18 @@ const ClusterModal = observer(
                       {
                         rule: {
                           required: true,
-                          matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/,
+                          matchRegex: nameMatchRegex,
                         },
                         status: 'error',
                         help: '不能为空,字母、数字或下划线（_）,不能以（_）开始结尾',
+                      },
+                      {
+                        rule: (value: string) => {
+                          const l = strlen(value)
+                          return l >= 1 && l <= 128
+                        },
+                        help: '最小长度1,最大长度128',
+                        status: 'error',
                       },
                     ]}
                   />
@@ -426,9 +435,12 @@ const ClusterModal = observer(
                             isMini
                             min={1}
                             max={86400}
-                            value={strategy.failure_rate_delay}
+                            value={strategy.failure_rate_failure_rate_interval}
                             onChange={(v: any) =>
-                              setStrategy('failure_rate_delay', v)
+                              setStrategy(
+                                'failure_rate_failure_rate_interval',
+                                v
+                              )
                             }
                           />
                         </Control>
@@ -441,7 +453,7 @@ const ClusterModal = observer(
                             disabled={viewMode}
                             isMini
                             min={1}
-                            max={10800}
+                            max={1000}
                             value={
                               strategy.failure_rate_max_failures_per_interval
                             }
@@ -461,17 +473,14 @@ const ClusterModal = observer(
                             disabled={viewMode}
                             isMini
                             min={1}
-                            max={1440}
-                            value={strategy.failure_rate_failure_rate_interval}
-                            onChange={(v: any) =>
-                              setStrategy(
-                                'failure_rate_failure_rate_interval',
-                                v
-                              )
-                            }
+                            max={86400}
+                            value={strategy.failure_rate_delay}
+                            onChange={(v: any) => {
+                              setStrategy('failure_rate_delay', v)
+                            }}
                           />
                         </Control>
-                        <Center tw="ml-1">分</Center>
+                        <Center tw="ml-1">秒</Center>
                       </Field>
                     </RestartWrapper>
                   )}
@@ -685,9 +694,9 @@ const ClusterModal = observer(
                         ),
                       },
                     ]}
-                    options={networks.map(({ name, router_id }) => ({
+                    options={networks.map(({ name, id }) => ({
                       label: name,
-                      value: router_id,
+                      value: id,
                     }))}
                     isLoading={networksRet.isFetching}
                     isLoadingAtBottom
@@ -906,9 +915,9 @@ const ClusterModal = observer(
                 <div tw="pt-4 pb-2 border-b border-neut-13">
                   收费标准详见
                   {/* <a href="###" className="link"> */}
-                  <TextLink href="###" hasIcon={false}>
+                  <HelpCenterLink href="/billing/price/" isIframe={false}>
                     《大数据平台计费说明》
-                  </TextLink>
+                  </HelpCenterLink>
                   {/* <QIcon name="if-external-link" /> */}
                 </div>
                 <div>

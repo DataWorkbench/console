@@ -21,7 +21,12 @@ import { useImmer } from 'use-immer'
 import { range } from 'lodash-es'
 import { useStore } from 'stores'
 import dayjs from 'dayjs'
-import { useMutationStreamJobSchedule, useQueryStreamJobSchedule } from 'hooks'
+import { useQueryClient } from 'react-query'
+import {
+  getFlowKey,
+  useMutationStreamJobSchedule,
+  useQueryStreamJobSchedule,
+} from 'hooks'
 import {
   ScheSettingForm,
   SmallDatePickerField,
@@ -52,6 +57,7 @@ const ScheSettingModal = ({
   onCancel,
   onSuccess,
 }: IScheSettingModal) => {
+  const queryClient = useQueryClient()
   const [disabled, setDisabled] = useState(Boolean(origin === 'ops'))
 
   // const [period, setPeriod] = useState<TPeriodType>('minute')
@@ -249,6 +255,7 @@ const ScheSettingModal = ({
         },
         {
           onSuccess: () => {
+            queryClient.invalidateQueries(getFlowKey('StreamJobSchedule'))
             if (onCancel) {
               onCancel()
             }
@@ -316,21 +323,21 @@ const ScheSettingModal = ({
                 autoComplete="off"
                 disabled
                 name="name"
-                label="业务名称"
+                label="作业名称"
               />
               <TextField
                 value={curJob?.id}
                 autoComplete="off"
                 disabled
                 name="id"
-                label="业务 ID"
+                label="作业 ID"
               />
               <TextField
                 value={curJob?.desc}
                 autoComplete="off"
                 disabled
                 name="desc"
-                label="业务描述"
+                label="作业描述"
               />
             </ScheSettingForm>
           </CollapseItem>
@@ -869,13 +876,13 @@ const ScheSettingModal = ({
                       }}
                     />
                   </Control>
-                  <div tw="leading-6 ml-2">出错自动重跑</div>
+                  <div tw="leading-6 ml-2">出错自动重试</div>
                 </Field>
                 <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
                   <SliderField
                     disabled={disabled}
                     name="p2"
-                    label="出错重跑最大次数"
+                    label="出错重试最大次数"
                     hasTooltip
                     value={params.retryLimit}
                     markDots
@@ -897,7 +904,9 @@ const ScheSettingModal = ({
                     hasInput
                   />
                   <Field>
-                    <Label>* 出错重跑间隔</Label>
+                    <Label>
+                      <AffixLabel>出错重试间隔</AffixLabel>
+                    </Label>
                     <Control>
                       <InputNumber
                         disabled={disabled}
