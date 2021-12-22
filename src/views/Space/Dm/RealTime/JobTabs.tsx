@@ -28,6 +28,12 @@ const TabWrapper = styled(Tabs)(() => [
           }
         }
       }
+      .tabs-handler {
+        ${tw`h-7 bg-neut-18 bg-gradient-to-r from-neut-18 to-neut-18`}
+        svg {
+          ${tw`text-white`}
+        }
+      }
     }
     .tab-content {
       ${tw`flex-1 h-full py-0!`}
@@ -62,7 +68,7 @@ const JobTabs = observer(() => {
   })
 
   return (
-    <div tw="flex-1 w-full relative">
+    <div tw="flex-1 w-full overflow-x-hidden relative">
       <TabWrapper
         type="card"
         activeName={curJob?.id}
