@@ -6,7 +6,15 @@ import {
   Icon,
   InputSearch,
 } from '@QCFE/qingcloud-portal-ui'
-import { Tabs, Alert, Button, Menu } from '@QCFE/lego-ui'
+import {
+  Tabs,
+  Alert,
+  Button,
+  Menu,
+  Level,
+  LevelLeft,
+  LevelRight,
+} from '@QCFE/lego-ui'
 import tw, { styled, css } from 'twin.macro'
 import {
   getResourcePageQueryKey,
@@ -15,7 +23,7 @@ import {
   useStore,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
-import { FlexBox, Center, Tooltip, Icons } from 'components'
+import { FlexBox, Center, Tooltip, Icons, TextLink } from 'components'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
@@ -23,7 +31,12 @@ import { observer } from 'mobx-react-lite'
 import { formatBytes } from 'utils/convert'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
-import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
+import {
+  // PackageDocsHref,
+  PackageName,
+  PackageTypeMap,
+  PackageTypeTip,
+} from './constants'
 
 const columnSettingsKey = 'RESOURCE_TABLE_COLUMN_SETTINGS'
 
@@ -200,6 +213,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       return [
         {
           title: `${PackageName[packageType]}名称`,
+          width: 200,
           dataIndex: 'name',
           sortable: true,
           sortOrder:
@@ -223,7 +237,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                   />
                 )}
                 <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
-                  <div tw="max-w-[130px] truncate">{row.name}</div>
+                  <div tw="max-w-[180px] truncate">{row.name}</div>
                 </Tooltip>
               </FlexBox>
             )
@@ -243,11 +257,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: '描述',
+          width: 250,
           dataIndex: 'description',
           render: (value: string) => {
             return (
               <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
-                <div tw="max-w-[150px] truncate text-neut-8">{value}</div>
+                <div tw="max-w-[230px] truncate text-neut-8">{value}</div>
               </Tooltip>
             )
           },
@@ -358,8 +373,21 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           <Alert
             type="info"
             tw="mb-4"
-            message={PackageTypeTip[packageType]}
-            linkBtn={<Button type="text">查看详情 →</Button>}
+            message={
+              <Level as="nav">
+                <LevelLeft>{PackageTypeTip[packageType]}</LevelLeft>
+                <LevelRight>
+                  <TextLink
+                    // href={PackageDocsHref[packageType]}
+                    target="_blank"
+                    rel="noreferrer"
+                    hasIcon={false}
+                  >
+                    查看详情 →
+                  </TextLink>
+                </LevelRight>
+              </Level>
+            }
           />
           <div tw="mt-4 mb-3">
             <FlexBox tw="justify-between">

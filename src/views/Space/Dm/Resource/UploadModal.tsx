@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import {
   Alert,
   Button,
@@ -8,18 +9,31 @@ import {
   Icon,
   Input,
   Message,
-  PopConfirm,
+  Level,
+  LevelLeft,
+  LevelRight,
 } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { useEffect, useRef, useState } from 'react'
 import { getResourcePageQueryKey, useMutationResource, useStore } from 'hooks'
-import { DarkModal, Tooltip, Center, AffixLabel } from 'components'
+import {
+  DarkModal,
+  Tooltip,
+  Center,
+  AffixLabel,
+  TextLink,
+  PopConfirm,
+} from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useQueryClient } from 'react-query'
 import { loadResourceList } from 'stores/api'
 import { useParams } from 'react-router-dom'
 import { formatBytes } from 'utils/convert'
-import { PackageName, PackageTypeMap, PackageTypeTip } from './constants'
+import {
+  // PackageDocsHref,
+  PackageName,
+  PackageTypeMap,
+  PackageTypeTip,
+} from './constants'
 
 const { TextField, TextAreaField } = Form
 
@@ -55,6 +69,14 @@ const TextAreaFieldWrapper = styled(TextAreaField)(() => [
 const InputWapper = styled(Input)(() => [
   css`
     width: 608px !important;
+  `,
+])
+
+const ControlWrap = styled(Control)(() => [
+  css`
+    &:hover .icon.is-right {
+      ${tw`block`}
+    }
   `,
 ])
 
@@ -179,15 +201,11 @@ const UploadModal = observer((props: any) => {
           ) : (
             <PopConfirm
               type="warning"
-              content={
-                <div tw="text-neut-16">
-                  此时取消，将清空已上传资源并关闭弹窗，确认清空并关闭弹窗吗？
-                </div>
-              }
+              content="此时取消，将清空已上传资源并关闭弹窗，确认清空并关闭弹窗吗？"
               onOk={closeModal}
-              closeAfterClick={false}
+              hideOnClick={false}
             >
-              <Button tw="bg-neut-16!">取消</Button>
+              <Button tw="bg-neut-16! mr-3">取消</Button>
             </PopConfirm>
           )}
           {op === 'edit' && (
@@ -230,10 +248,102 @@ const UploadModal = observer((props: any) => {
       <Alert
         type="info"
         tw="mb-4"
-        message={PackageTypeTip[packageType]}
-        linkBtn={<Button type="text">查看详情 →</Button>}
+        message={
+          <Level as="nav">
+            <LevelLeft>{PackageTypeTip[packageType]}</LevelLeft>
+            <LevelRight>
+              <TextLink
+                // href={PackageDocsHref[packageType]}
+                target="_blank"
+                rel="noreferrer"
+                hasIcon={false}
+              >
+                查看详情 →
+              </TextLink>
+            </LevelRight>
+          </Level>
+        }
       />
       <Form ref={form} tw="pl-0!">
+        {op !== 'edit' && (
+          <Field tw="mb-0!">
+            <Label className="medium">
+              <AffixLabel required>添加{PackageName[packageType]}</AffixLabel>
+            </Label>
+            <ControlWrap
+              tw="max-w-none! w-auto!"
+              className={file ? 'has-icons-left has-icons-right' : ''}
+            >
+              {!file ? (
+                <Button
+                  tw="bg-neut-16! border-green-11! text-green-11!"
+                  onClick={handleFile}
+                >
+                  <input
+                    accept=".jar"
+                    name="file"
+                    type="file"
+                    multiple={false}
+                    tw="hidden"
+                    ref={resourceEl}
+                    onChange={handleResourceChange}
+                  />
+                  <ColoredIcon name="add" />
+                  添加{PackageName[packageType]}
+                </Button>
+              ) : (
+                <>
+                  <Icon className="is-left" name="jar" />
+                  &nbsp;
+                  <InputWapper />
+                  <div tw="absolute left-8 top-1/2 -translate-y-1/2">
+                    {file.name}
+                    <span tw="text-neut-8 ml-2">
+                      ({formatBytes(file.size, 2)})
+                    </span>
+                  </div>
+                  <PopConfirm
+                    type="warning"
+                    okText="移除"
+                    content="此时移除，将清空已上传资源，确定移除资源吗？"
+                    onOk={handleClear}
+                    closeAfterClick={false}
+                  >
+                    <Icon
+                      tw="hidden hover:bg-neut-13! cursor-pointer"
+                      className="is-right"
+                      name="close"
+                      clickable
+                    />
+                  </PopConfirm>
+                </>
+              )}
+            </ControlWrap>
+          </Field>
+        )}
+        {op !== 'edit' && (
+          <div tw="pb-3">
+            <div tw="pl-28 ml-2 pt-1 text-neut-8">
+              仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
+            </div>
+            {fileTip && (
+              <div tw="text-red-10 ml-2 pl-28 align-middle mt-1">
+                <Icon
+                  tw="inline-block align-top text-red-10"
+                  name="error"
+                  size="small"
+                  color={{
+                    primary: 'transparent',
+                    secondary: '#CF3B37',
+                  }}
+                />
+                {fileTip === 'size'
+                  ? '已选文件超过 100 MB，请重新添加'
+                  : '已选文件格式不合规，请重新添加'}
+              </div>
+            )}
+          </div>
+        )}
         <TextFieldWrapper
           maxLength="128"
           autoComplete="off"
@@ -274,80 +384,6 @@ const UploadModal = observer((props: any) => {
           disabled={op === 'view'}
           defaultValue={(op !== 'create' && defaultFields.description) || ''}
         />
-        {op !== 'edit' && (
-          <Field tw="mb-0!">
-            <Label className="medium">
-              <AffixLabel required>添加{PackageName[packageType]}</AffixLabel>
-            </Label>
-            <Control
-              tw="max-w-none! w-auto!"
-              className={file ? 'has-icons-left has-icons-right' : ''}
-            >
-              {!file ? (
-                <Button
-                  tw="bg-neut-16! border-green-11! text-green-11!"
-                  onClick={handleFile}
-                >
-                  <input
-                    accept=".jar"
-                    name="file"
-                    type="file"
-                    multiple={false}
-                    tw="hidden"
-                    ref={resourceEl}
-                    onChange={handleResourceChange}
-                  />
-                  <ColoredIcon name="add" />
-                  添加{PackageName[packageType]}
-                </Button>
-              ) : (
-                <>
-                  <Icon className="is-left" name="jar" />
-                  &nbsp;
-                  <InputWapper
-                    value={`${file.name} (${formatBytes(file.size, 2)})`}
-                  />
-                  <PopConfirm
-                    type="warning"
-                    okText="移除"
-                    content={
-                      <div tw="text-neut-16">
-                        此时移除，将清空已上传资源，确定移除资源吗？
-                      </div>
-                    }
-                    onOk={handleClear}
-                    closeAfterClick={false}
-                  >
-                    <Icon className="is-right" name="close" clickable />
-                  </PopConfirm>
-                </>
-              )}
-            </Control>
-          </Field>
-        )}
-        {op !== 'edit' && (
-          <div tw="pb-3">
-            <div tw="pl-28 ml-2 pt-1 text-neut-8">
-              仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
-            </div>
-            {fileTip && (
-              <div tw="text-red-10 ml-2 pl-28 align-middle mt-1">
-                <Icon
-                  tw="inline-block align-top text-red-10"
-                  name="error"
-                  size="small"
-                  color={{
-                    primary: 'transparent',
-                    secondary: '#CF3B37',
-                  }}
-                />
-                {fileTip === 'size'
-                  ? '已选文件超过 100 MB，请重新添加'
-                  : '已选文件格式不合规，请重新添加'}
-              </div>
-            )}
-          </div>
-        )}
       </Form>
     </DarkModal>
   )
