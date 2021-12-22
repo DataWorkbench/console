@@ -23,7 +23,7 @@ export const TextHighlight = (props: ITextHighlightProps) => {
         if (cur) {
           prev.push(React.createElement('span', {}, cur))
         }
-        if (index < arr.length) {
+        if (index < arr.length - 1) {
           prev.push(React.createElement(FilterBox, {}, filterText))
         }
         return prev

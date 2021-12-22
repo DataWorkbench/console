@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { DarkModal, FlexBox } from 'components'
+import { Fragment, ReactElement, useEffect, useMemo, useState } from 'react'
+import { DarkModal, FlexBox, TextHighlight, Icons, TextLink } from 'components'
 import {
   Icon,
   Form,
@@ -14,10 +14,12 @@ import { useImmer } from 'use-immer'
 import { flatten, get } from 'lodash-es'
 import {
   useMutationStreamJobArgs,
+  useQueryInConnectorsQuery,
   useQueryResource,
   useQueryStreamJobArgs,
 } from 'hooks'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
+import tw, { theme } from 'twin.macro'
 import { ScheForm } from './styled'
 
 const { CollapseItem } = Collapse
@@ -25,25 +27,48 @@ const { NumberField, SelectField } = Form
 
 interface ResourceSelectProps {
   type: number
+  icon: ReactElement
   [propName: string]: any
 }
+
+const renderLabel = (label: string, icon: ReactElement, search: string) => {
+  return (
+    <FlexBox tw="items-center gap-1" key={label}>
+      {icon}
+      <TextHighlight key={label} text={label} filterText={search} />
+    </FlexBox>
+  )
+}
+
 const ResourceSelect = (props: ResourceSelectProps) => {
-  const { type } = props
-  const [filter] = useImmer<{
+  const { type, icon } = props
+  const [filter, setFilter] = useImmer<{
     limit: number
     offset: number
     resource_type: number
+    search: string
   }>({
     limit: 15,
     offset: 0,
     resource_type: type,
+    search: '',
   })
 
   const v = useQueryResource(filter)
   const { status, data, fetchNextPage, hasNextPage } = v
   const options = flatten(
     data?.pages.map((page: Record<string, any>) => page.infos || [])
-  )
+  ).map((i) => {
+    return {
+      label: (
+        <Fragment key={i.resource_id}>
+          {renderLabel(i.name, icon, filter.search)}
+          <span tw="text-neut-8">ID:{i.resource_id}</span>
+        </Fragment>
+      ),
+      value: i.resource_id,
+    }
+  })
 
   const loadData = () => {
     if (hasNextPage) {
@@ -51,16 +76,28 @@ const ResourceSelect = (props: ResourceSelectProps) => {
     }
   }
 
+  const onSearch = (_search: string) => {
+    setFilter((_) => {
+      _.offset = 0
+      _.search = _search.toLowerCase()
+    })
+  }
+
   return (
     <SelectField
       {...props}
       options={options}
+      multi
+      searchable
+      closeOnSelect={false}
+      openOnClick
       isLoading={status === 'loading'}
       isLoadingAtBottom
       onMenuScrollToBottom={loadData}
+      onInputChange={onSearch}
       bottomTextVisible
-      valueKey="resource_id"
-      labelKey="name"
+      // valueKey="resource_id"
+      // labelKey="name"
     />
   )
 }
@@ -71,12 +108,34 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
     udfs: [] as string[],
     connectors: [] as string[],
     parallelism: 0,
+    builtInConnectors: [] as string[],
   })
   const [show, setShow] = useState(false)
   const [cluster, setCluster] = useState(null)
+  const [showMsg, setShowMsg] = useState(false)
 
   const mutation = useMutationStreamJobArgs()
   const { data, isFetching } = useQueryStreamJobArgs()
+
+  const [connectorsKeyword, setConnectorsKeyword] = useState('')
+  const { isFetching: conIsFetching, data: builtInConnectorsRes } =
+    useQueryInConnectorsQuery()
+  const builtInConnectors = useMemo(
+    () =>
+      !conIsFetching && builtInConnectorsRes.ret_code === 0
+        ? builtInConnectorsRes?.items
+            .filter((i: string) => i.indexOf(connectorsKeyword) !== -1)
+            .map((i: string) => ({
+              value: i,
+              label: renderLabel(
+                i,
+                <Icons name="connector" />,
+                connectorsKeyword
+              ),
+            })) || []
+        : [],
+    [builtInConnectorsRes, conIsFetching, connectorsKeyword]
+  )
 
   useEffect(() => {
     setParams((draft) => {
@@ -84,16 +143,26 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
       draft.parallelism = get(data, 'parallelism', 0)
       draft.udfs = get(data, 'udfs', [])
       draft.connectors = get(data, 'connectors', [])
+      draft.builtInConnectors = get(data, 'built_in_connectors', [])
     })
   }, [data, setParams])
 
+  const onFilterConnectors = (_input: string) => {
+    const input = _input.toLowerCase()
+    setConnectorsKeyword(input)
+  }
   const save = () => {
+    setShowMsg(true)
+    if (!params.clusterId) {
+      return
+    }
     mutation.mutate(
       {
         cluster_id: params.clusterId,
         connectors: params.connectors,
         udfs: params.udfs,
         parallelism: params.parallelism,
+        built_in_connectors: params.builtInConnectors,
       },
       {
         onSuccess: () => {
@@ -132,28 +201,49 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
             >
               <ScheForm layout="horizon">
                 <Field>
-                  <Label>计算集群</Label>
+                  <Label tw="label-required">计算集群</Label>
                   <Control>
-                    <Button onClick={() => setShow(true)}>
-                      <Icon name="pod" />
-                      {(() => {
-                        if (cluster) {
-                          return (
-                            <>
-                              {cluster.name}
-                              <span tw="text-neut-8">({cluster.id})</span>
-                            </>
-                          )
+                    <>
+                      <Button
+                        onClick={() => {
+                          setShow(true)
+                          setShowMsg(true)
+                        }}
+                        type={
+                          showMsg && !params.clusterId ? 'outlined' : 'default'
                         }
+                        css={[
+                          showMsg && !params.clusterId
+                            ? tw`border-red-10! border`
+                            : '',
+                        ]}
+                      >
+                        <Icon name="pod" />
+                        {(() => {
+                          if (cluster) {
+                            return (
+                              <>
+                                {cluster.name}
+                                <span tw="text-neut-8">({cluster.id})</span>
+                              </>
+                            )
+                          }
 
-                        return params.clusterId || '选择集群'
-                      })()}
-                    </Button>
+                          return params.clusterId || '选择集群'
+                        })()}
+                      </Button>
+                    </>
                   </Control>
+                  {showMsg && !params.clusterId && (
+                    <div className="help is-danger has-danger-help">
+                      请选择集群
+                    </div>
+                  )}
                 </Field>
                 <NumberField
                   isMini
                   min={0}
+                  labelClassName="label-required"
                   max={100}
                   name="id"
                   label="并行度"
@@ -171,18 +261,20 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
               label={
                 <FlexBox tw="items-center space-x-1">
                   <Icon
-                    name="clock"
+                    name="record"
                     tw="(relative top-0 left-0)!"
                     type="light"
                   />
-                  <span>函数配置</span>
+                  <span>依赖资源</span>
                 </FlexBox>
               }
             >
               <ScheForm layout="horizon">
                 <ResourceSelect
-                  name="udf"
+                  name="connectors"
                   label="依赖包"
+                  icon={<Icons name="icon_dependency" />}
+                  placeholder="请选择运行所需依赖包"
                   value={params.connectors}
                   multi
                   closeOnSelect={false}
@@ -194,8 +286,21 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                   type={3}
                 />
                 <ResourceSelect
-                  name="函数包"
+                  name="udfs"
                   label="函数包"
+                  placeholder="请选择运行所需函数包"
+                  icon={
+                    <Icon
+                      name="terminal"
+                      size={20}
+                      type="light"
+                      color={{
+                        secondary: theme('colors.green')[11],
+                        primary: theme('colors.green')[4],
+                      }}
+                      tw="bg-transparent!"
+                    />
+                  }
                   multi
                   closeOnSelect={false}
                   value={params.udfs}
@@ -205,6 +310,31 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     })
                   }
                   type={2}
+                />
+                <SelectField
+                  name="builtInConnectors"
+                  label="内置 Connector"
+                  placeholder="请选择运行所需内置 Connector"
+                  multi
+                  searchable
+                  closeOnSelect={false}
+                  openOnClick
+                  onInputChange={onFilterConnectors}
+                  value={params.builtInConnectors}
+                  onChange={(_builtInConnectors: string[]) =>
+                    setParams((draft) => {
+                      draft.builtInConnectors = _builtInConnectors
+                    })
+                  }
+                  options={builtInConnectors || []}
+                  help={
+                    <div>
+                      详细说明见
+                      <TextLink href="###" hasIcon>
+                        帮助文档
+                      </TextLink>
+                    </div>
+                  }
                 />
               </ScheForm>
             </CollapseItem>

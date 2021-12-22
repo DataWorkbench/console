@@ -132,3 +132,10 @@ export const releaseStreamJob = ({
     body: rest,
     method: 'POST',
   })
+
+export const inConnectors = ({ regionId, spaceId, jobId }: IStreamParams) => {
+  return request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/args/connectors`,
+  })
+}
