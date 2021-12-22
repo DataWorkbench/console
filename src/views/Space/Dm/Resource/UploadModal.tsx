@@ -13,6 +13,7 @@ import {
   LevelLeft,
   LevelRight,
 } from '@QCFE/lego-ui'
+import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import { getResourcePageQueryKey, useMutationResource, useStore } from 'hooks'
 import {
@@ -85,6 +86,15 @@ const ControlWrap = styled(Control)(() => [
   `,
 ])
 
+const LoadingWrap = styled(Loading)(() => [
+  css`
+    ${tw`w-5! h-5!`}
+    span {
+      ${tw`bg-white!`}
+    }
+  `,
+])
+
 interface IRouteParams {
   regionId: string
   spaceId: string
@@ -123,17 +133,17 @@ const UploadModal = observer((props: any) => {
   }, [defaultFields.name, visible])
 
   const closeModal = () => {
+    if (cancelUpload) {
+      cancelUpload()
+      setCancelUpload(undefined)
+    }
+
     handleCancel()
     setFile(undefined)
     setOp('')
     setResourceName('')
     setFileTip('')
     setIsFailed(false)
-
-    if (cancelUpload) {
-      cancelUpload()
-      setCancelUpload(undefined)
-    }
   }
 
   const handleFile = () => {
@@ -210,6 +220,7 @@ const UploadModal = observer((props: any) => {
         },
         onError: () => {
           setIsFailed(true)
+          closeModal()
         },
       }
     )
@@ -250,28 +261,33 @@ const UploadModal = observer((props: any) => {
               确认
             </Button>
           )}
+          {op !== 'edit' && !file && (
+            <Tooltip
+              theme="light"
+              animation="fade"
+              placement="top-end"
+              content={
+                <Center tw="h-9 px-3 text-neut-13">
+                  请先添加符合要求的{PackageName[packageType]}
+                </Center>
+              }
+            >
+              <Button disabled tw="text-neut-8!">
+                上传
+              </Button>
+            </Tooltip>
+          )}
           {op !== 'edit' &&
-            (!file ? (
-              <Tooltip
-                theme="light"
-                animation="fade"
-                placement="top-end"
-                content={
-                  <Center tw="h-9 px-3 text-neut-13">
-                    请先添加符合要求的{PackageName[packageType]}
-                  </Center>
-                }
-              >
-                <Button disabled tw="text-neut-8!">
-                  上传
-                </Button>
-              </Tooltip>
+            file &&
+            (mutation.isLoading ? (
+              <Button type="primary" tw="cursor-not-allowed bg-green-11!">
+                <div>
+                  <LoadingWrap size={20} />
+                </div>
+                <span tw="ml-1">上传中</span>
+              </Button>
             ) : (
-              <Button
-                type="primary"
-                onClick={handleOk}
-                loading={mutation.isLoading}
-              >
+              <Button type="primary" onClick={handleOk}>
                 {isFailed ? '重试' : '上传'}
               </Button>
             ))}
