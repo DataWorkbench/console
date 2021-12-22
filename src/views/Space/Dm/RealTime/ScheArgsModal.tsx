@@ -1,5 +1,5 @@
 import { Fragment, ReactElement, useEffect, useMemo, useState } from 'react'
-import { DarkModal, FlexBox, TextHighlight, Icons } from 'components'
+import { DarkModal, FlexBox, TextHighlight, Icons, TextLink } from 'components'
 import {
   Icon,
   Form,
@@ -19,7 +19,7 @@ import {
   useQueryStreamJobArgs,
 } from 'hooks'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
-import { theme } from 'twin.macro'
+import tw, { theme } from 'twin.macro'
 import { ScheForm } from './styled'
 
 const { CollapseItem } = Collapse
@@ -112,6 +112,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   })
   const [show, setShow] = useState(false)
   const [cluster, setCluster] = useState(null)
+  const [showMsg, setShowMsg] = useState(false)
 
   const mutation = useMutationStreamJobArgs()
   const { data, isFetching } = useQueryStreamJobArgs()
@@ -151,6 +152,10 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
     setConnectorsKeyword(input)
   }
   const save = () => {
+    setShowMsg(true)
+    if (!params.clusterId) {
+      return
+    }
     mutation.mutate(
       {
         cluster_id: params.clusterId,
@@ -196,28 +201,49 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
             >
               <ScheForm layout="horizon">
                 <Field>
-                  <Label>计算集群</Label>
+                  <Label tw="label-required">计算集群</Label>
                   <Control>
-                    <Button onClick={() => setShow(true)}>
-                      <Icon name="pod" />
-                      {(() => {
-                        if (cluster) {
-                          return (
-                            <>
-                              {cluster.name}
-                              <span tw="text-neut-8">({cluster.id})</span>
-                            </>
-                          )
+                    <>
+                      <Button
+                        onClick={() => {
+                          setShow(true)
+                          setShowMsg(true)
+                        }}
+                        type={
+                          showMsg && !params.clusterId ? 'outlined' : 'default'
                         }
+                        css={[
+                          showMsg && !params.clusterId
+                            ? tw`border-red-10 border`
+                            : '',
+                        ]}
+                      >
+                        <Icon name="pod" />
+                        {(() => {
+                          if (cluster) {
+                            return (
+                              <>
+                                {cluster.name}
+                                <span tw="text-neut-8">({cluster.id})</span>
+                              </>
+                            )
+                          }
 
-                        return params.clusterId || '选择集群'
-                      })()}
-                    </Button>
+                          return params.clusterId || '选择集群'
+                        })()}
+                      </Button>
+                    </>
                   </Control>
+                  {showMsg && !params.clusterId && (
+                    <div className="help is-danger has-danger-help">
+                      请选择集群
+                    </div>
+                  )}
                 </Field>
                 <NumberField
                   isMini
                   min={0}
+                  labelClassName="label-required"
                   max={100}
                   name="id"
                   label="并行度"
@@ -298,6 +324,14 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     })
                   }
                   options={builtInConnectors || []}
+                  help={
+                    <div>
+                      详细说明见
+                      <TextLink href="###" hasIcon>
+                        帮助文档
+                      </TextLink>
+                    </div>
+                  }
                 />
               </ScheForm>
             </CollapseItem>
