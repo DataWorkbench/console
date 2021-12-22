@@ -343,7 +343,11 @@ const ClusterTable = observer(
                       >
                         <AffixLabel
                           required={false}
-                          help="如需修改，请先停用计算集群"
+                          // help="如需修改，请先停用计算集群"
+                          help={
+                            ![2, 4].includes(row.status) &&
+                            '如需修改，请先停用计算集群'
+                          }
                           theme="light"
                         >
                           修改
@@ -355,7 +359,10 @@ const ClusterTable = observer(
                       >
                         <AffixLabel
                           required={false}
-                          help="如需删除，请先停用计算集群"
+                          help={
+                            ![2, 4].includes(row.status) &&
+                            '如需删除，请先停用计算集群'
+                          }
                           theme="light"
                         >
                           删除
