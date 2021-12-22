@@ -252,7 +252,7 @@ const getFieldsInfo = (type: string) => {
         {
           ...port,
           label: '端口（Port）',
-          defaultValue: '9000',
+          defaultValue: 9000,
         },
       ]
       break
