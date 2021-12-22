@@ -1,13 +1,6 @@
 import React from 'react'
 import { FlexBox, Center } from 'components'
-import {
-  InputSearch,
-  Field,
-  Label,
-  Control,
-  Select,
-  Message,
-} from '@QCFE/lego-ui'
+import { InputSearch, Field, Label, Control, Select } from '@QCFE/lego-ui'
 import { useImmer } from 'use-immer'
 import { InstanceTable } from '../Release/InstanceTable'
 import { InstanceState } from '../constants'
@@ -75,14 +68,9 @@ export const Job = () => {
               <InputSearch
                 placeholder="搜索作业版本"
                 onPressEnter={(e: React.SyntheticEvent) => {
-                  const { value } = e.target as HTMLInputElement
-                  if (/^[\d]+$/.test(value)) {
-                    setQuery((draft) => {
-                      draft.version = value
-                    })
-                  } else {
-                    Message.error('版本号格式错误')
-                  }
+                  setQuery((draft) => {
+                    draft.version = (e.target as HTMLInputElement).value
+                  })
                 }}
                 onClear={() => {
                   setQuery((draft) => {
