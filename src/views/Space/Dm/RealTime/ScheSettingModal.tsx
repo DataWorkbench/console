@@ -904,7 +904,9 @@ const ScheSettingModal = ({
                     hasInput
                   />
                   <Field>
-                    <Label>* 出错重试间隔</Label>
+                    <Label>
+                      <AffixLabel>出错重试间隔</AffixLabel>
+                    </Label>
                     <Control>
                       <InputNumber
                         disabled={disabled}

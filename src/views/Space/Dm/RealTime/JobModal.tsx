@@ -56,7 +56,13 @@ const CodeButton = styled(Button)(({ selected }: { selected?: boolean }) => [
     tw`border-green-11! hover:border-green-11! text-green-11! font-medium`,
 ])
 
-const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
+const JobModal = ({
+  job,
+  onCancel,
+}: {
+  job: any
+  onCancel: (data?: any) => void
+}) => {
   const form = useRef<Form>(null)
   const [show, setShow] = useState(false)
   const [cluster, setCluster] = useState(null)
@@ -68,12 +74,12 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
   const mutation = useMutationStreamJob()
   const queryClient = useQueryClient()
 
-  const handleCancel = () => {
+  const handleCancel = (data: any) => {
     setParams((draft) => {
       draft.step = 0
     })
     if (onCancel) {
-      onCancel()
+      onCancel(data)
     }
   }
 
@@ -95,8 +101,8 @@ const JobModal = ({ job, onCancel }: { job: any; onCancel: () => void }) => {
           cluster && { cluster_id: cluster.id }
         ),
         {
-          onSuccess: () => {
-            handleCancel()
+          onSuccess: (data) => {
+            handleCancel(data)
             queryClient.invalidateQueries(getFlowKey())
           },
         }

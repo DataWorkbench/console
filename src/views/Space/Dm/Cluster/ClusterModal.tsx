@@ -35,6 +35,7 @@ import {
   SelectWithRefresh,
   HelpCenterLink,
 } from 'components'
+import { strlen, nameMatchRegex } from 'utils/convert'
 import { NetworkModal } from 'views/Space/Dm/Network'
 
 const { CollapseItem } = Collapse
@@ -298,10 +299,18 @@ const ClusterModal = observer(
                       {
                         rule: {
                           required: true,
-                          matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/,
+                          matchRegex: nameMatchRegex,
                         },
                         status: 'error',
                         help: '不能为空,字母、数字或下划线（_）,不能以（_）开始结尾',
+                      },
+                      {
+                        rule: (value: string) => {
+                          const l = strlen(value)
+                          return l >= 1 && l <= 128
+                        },
+                        help: '最小长度1,最大长度128',
+                        status: 'error',
                       },
                     ]}
                   />
@@ -426,10 +435,13 @@ const ClusterModal = observer(
                             isMini
                             min={1}
                             max={86400}
-                            value={strategy.failure_rate_delay}
-                            onChange={(v: any) => {
-                              setStrategy('failure_rate_delay', v)
-                            }}
+                            value={strategy.failure_rate_failure_rate_interval}
+                            onChange={(v: any) =>
+                              setStrategy(
+                                'failure_rate_failure_rate_interval',
+                                v
+                              )
+                            }
                           />
                         </Control>
                         <Center tw="ml-1">秒</Center>
@@ -441,7 +453,7 @@ const ClusterModal = observer(
                             disabled={viewMode}
                             isMini
                             min={1}
-                            max={10800}
+                            max={1000}
                             value={
                               strategy.failure_rate_max_failures_per_interval
                             }
@@ -461,14 +473,11 @@ const ClusterModal = observer(
                             disabled={viewMode}
                             isMini
                             min={1}
-                            max={1440}
-                            value={strategy.failure_rate_failure_rate_interval}
-                            onChange={(v: any) =>
-                              setStrategy(
-                                'failure_rate_failure_rate_interval',
-                                v
-                              )
-                            }
+                            max={86400}
+                            value={strategy.failure_rate_delay}
+                            onChange={(v: any) => {
+                              setStrategy('failure_rate_delay', v)
+                            }}
                           />
                         </Control>
                         <Center tw="ml-1">秒</Center>
