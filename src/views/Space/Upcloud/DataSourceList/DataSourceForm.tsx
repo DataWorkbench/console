@@ -147,7 +147,7 @@ const compInfo = {
     showButton: false,
   },
   user: {
-    name: 'user',
+    name: 'usenanme',
     label: '用户名（User Name）',
     autoComplete: 'off',
     placeholder: '请输入数据库用户名（User Name）',
@@ -252,7 +252,7 @@ const getFieldsInfo = (type: string) => {
         {
           ...port,
           label: '端口（Port）',
-          defaultValue: 9000,
+          // defaultValue: 9000,
         },
       ]
       break
@@ -306,6 +306,20 @@ const parseRemoteData = (
     )
   }
   return data
+}
+
+/**
+ * 新建场景默认值
+ */
+const getInitValue = (path: string) => {
+  const initValues = {
+    url: {
+      hdfs: {
+        port: 9000,
+      },
+    },
+  }
+  return get(initValues, path, '')
 }
 interface IFormProps {
   resInfo: {
@@ -743,7 +757,11 @@ const DataSourceForm = ({
                   key={name}
                   name={name}
                   disabled={isViewMode}
-                  defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
+                  defaultValue={get(
+                    sourceInfo,
+                    `url.${urlType}.${name}`,
+                    getInitValue(`url.${urlType}.${name}`)
+                  )}
                   validateOnChange
                   schemas={schemas}
                   css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
