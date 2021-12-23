@@ -20,6 +20,9 @@ import HdfsNodeField from './HdfsNodeField'
 
 const ipReg =
   /(^(((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))\.){3}((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))$)|(^((([a-zA-Z0-9_-])+\.)+([a-zA-Z])+)$)/
+
+const hostReg = /^([1-9a-zA-Z_.-]+(:\d{1,5})?,)*([1-9a-zA-Z_.-]+(:\d{1,5})?)?$/
+
 const { CollapseItem } = Collapse
 const {
   TextField,
@@ -206,7 +209,7 @@ const getFieldsInfo = (type: string) => {
             {
               rule: {
                 required: true,
-                matchRegex: /^([1-9a-zA-Z_.-]+:\d{1,5},?)+$/,
+                matchRegex: hostReg,
               },
               help: '请输入zookeeper, 例如：zk_host1:2181,zk_host2:2181',
               status: 'error',
@@ -267,7 +270,7 @@ const getFieldsInfo = (type: string) => {
           help: '例如：kafka1:9092,kafka2:9092,kafka3:9092',
           schemas: [
             {
-              rule: { required: true },
+              rule: { required: true, matchRegex: hostReg },
               help: '请输入kafkabrokers',
               status: 'error',
             },
