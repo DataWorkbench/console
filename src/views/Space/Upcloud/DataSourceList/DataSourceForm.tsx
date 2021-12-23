@@ -18,6 +18,8 @@ import { nameMatchRegex, strlen } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
 import HdfsNodeField from './HdfsNodeField'
 
+const ipReg =
+  /(^(((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))\.){3}((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))$)|(^((([a-zA-Z0-9_-])+\.)+([a-zA-Z])+)$)/
 const { CollapseItem } = Collapse
 const {
   TextField,
@@ -91,15 +93,15 @@ const compInfo = {
   host: {
     name: 'host',
     label: '数据库 IP 地址',
-    placeholder: '请输入 ip，如 1.1.1.1',
+    placeholder: '请输入 ip 或者域名，如 1.1.1.1',
     schemas: [
       {
         rule: {
           required: true,
-          // matchRegex:
+          matchRegex: ipReg,
           //   /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
         },
-        help: '请输入 ip，如 1.1.1.1',
+        help: '请输入 ip 或者域名，如 1.1.1.1',
         status: 'error',
       },
     ],
