@@ -282,7 +282,7 @@ const JobModal = ({
                 {!job && (
                   <Field>
                     <Label>计算集群</Label>
-                    <Control>
+                    <Control tw="space-x-2">
                       <Button onClick={() => setShow(true)}>
                         <Icon name="pod" />
                         {cluster ? (
@@ -294,6 +294,21 @@ const JobModal = ({
                           '选择集群'
                         )}
                       </Button>
+                      {cluster && (
+                        <Button
+                          type="black"
+                          onClick={() => setCluster(null)}
+                          css={[
+                            css`
+                              .icon:hover {
+                                ${tw`bg-neut-13!`}
+                              }
+                            `,
+                          ]}
+                        >
+                          <Icon name="close" size={20} />
+                        </Button>
+                      )}
                     </Control>
                   </Field>
                 )}
@@ -308,7 +323,7 @@ const JobModal = ({
           )}
         </ModalContent>
       </Modal>
-      {show && (
+      <div css={!show && tw`hidden`}>
         <ClusterTableModal
           onCancel={() => setShow(false)}
           onOk={(clusterItem) => {
@@ -318,7 +333,7 @@ const JobModal = ({
             setShow(false)
           }}
         />
-      )}
+      </div>
     </>
   )
 }

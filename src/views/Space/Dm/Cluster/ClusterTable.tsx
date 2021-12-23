@@ -249,7 +249,12 @@ const ClusterTable = observer(
         {
           title: (
             <AffixLabel
-              help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
+              help={
+                <>
+                  <div>Flink 的 TaskManager 的 CPU 和内存设置</div>
+                  <div>每 CU 为 1 核 4 GB</div>
+                </>
+              }
               required={false}
               theme="green"
             >
@@ -262,7 +267,12 @@ const ClusterTable = observer(
         {
           title: (
             <AffixLabel
-              help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8"
+              help={
+                <>
+                  <div>Flink 的 JobManager 的 CPU 和内存设置</div>
+                  <div>每 CU 为 1 核 4 GB</div>
+                </>
+              }
               required={false}
               theme="green"
             >
@@ -345,7 +355,7 @@ const ClusterTable = observer(
                           required={false}
                           // help="如需修改，请先停用计算集群"
                           help={
-                            ![2, 4].includes(row.status) &&
+                            [2, 4].includes(row.status) &&
                             '如需修改，请先停用计算集群'
                           }
                           theme="light"
@@ -360,7 +370,7 @@ const ClusterTable = observer(
                         <AffixLabel
                           required={false}
                           help={
-                            ![2, 4].includes(row.status) &&
+                            [2, 4].includes(row.status) &&
                             '如需删除，请先停用计算集群'
                           }
                           theme="light"
@@ -456,7 +466,7 @@ const ClusterTable = observer(
                   theme="light"
                   placement="top-start"
                   animation="fade"
-                  visible={infos.length > 5}
+                  disabled={infos.length < 5}
                   content={
                     <Center tw="h-9 px-3 text-neut-13">
                       单个用户最多可创建 5 个集群，如需更多集群，请提交工单
