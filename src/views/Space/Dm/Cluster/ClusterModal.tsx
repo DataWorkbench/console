@@ -37,6 +37,7 @@ import {
 } from 'components'
 import { strlen, nameMatchRegex } from 'utils/convert'
 import { NetworkModal } from 'views/Space/Dm/Network'
+import { Button } from '@QCFE/qingcloud-portal-ui'
 
 const { CollapseItem } = Collapse
 const { TextField, SelectField, NumberField } = Form
@@ -255,10 +256,19 @@ const ClusterModal = observer(
           return `${opTxt}计算集群`
         })()}
         orient="fullright"
-        confirmLoading={mutation.isLoading}
         visible
-        onOk={handleOk}
-        okText={op === 'create' ? '立即创建' : '确认'}
+        footer={
+          <>
+            {op !== 'view' && <Button onClick={() => setOp('')}>取消</Button>}
+            <Button
+              type="primary"
+              onClick={handleOk}
+              loading={mutation.isLoading}
+            >
+              {op === 'create' ? '立即创建' : '确认'}
+            </Button>
+          </>
+        }
         onCancel={() => setOp('')}
         width={1000}
       >
