@@ -13,7 +13,13 @@ const ModalWrapper = styled(Modal)(() => [
   `,
 ])
 
-const ReleaseModal = ({ onCancel }: { onCancel: () => void }) => {
+const ReleaseModal = ({
+  onCancel,
+  onSuccess,
+}: {
+  onCancel: () => void
+  onSuccess: () => void
+}) => {
   const releaseMutation = useMutationReleaseStreamJob()
   const [params, setParams] = useImmer({
     desc: '',
@@ -33,6 +39,7 @@ const ReleaseModal = ({ onCancel }: { onCancel: () => void }) => {
             placement: 'bottomRight',
           })
           onCancel()
+          onSuccess()
         },
       }
     )
