@@ -38,6 +38,9 @@ const customStyles = css`
     label {
       ${tw`text-white`};
     }
+    label.radio.disabled {
+      ${tw`text-white`}
+    }
 
     .field .control input[type='text'][disabled],
     .field .control input[type='password'][disabled],

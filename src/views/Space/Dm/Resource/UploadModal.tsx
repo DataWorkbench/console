@@ -29,6 +29,7 @@ import { useQueryClient } from 'react-query'
 import { loadResourceList } from 'stores/api'
 import { useParams } from 'react-router-dom'
 import { formatBytes } from 'utils/convert'
+import axios from 'axios'
 import {
   // PackageDocsHref,
   PackageName,
@@ -181,7 +182,6 @@ const UploadModal = observer((props: any) => {
   }
 
   const handleOk = async () => {
-    setIsFailed(false)
     if (!form.current?.validateFields()) return
     const fields = form.current?.getFieldsValue() || {}
     if (op === 'create') {
@@ -196,6 +196,8 @@ const UploadModal = observer((props: any) => {
         return
       }
     }
+
+    setIsFailed(false)
 
     const params = {
       resource_type: PackageTypeMap[packageType],
@@ -218,9 +220,10 @@ const UploadModal = observer((props: any) => {
           setFile(undefined)
           queryClient.invalidateQueries(getResourcePageQueryKey())
         },
-        onError: () => {
-          setIsFailed(true)
-          closeModal()
+        onError: (error) => {
+          if (!axios.isCancel(error)) {
+            setIsFailed(true)
+          }
         },
       }
     )
@@ -280,12 +283,22 @@ const UploadModal = observer((props: any) => {
           {op !== 'edit' &&
             file &&
             (mutation.isLoading ? (
-              <Button type="primary" tw="cursor-not-allowed bg-green-11!">
-                <div>
-                  <LoadingWrap size={20} />
-                </div>
-                <span tw="ml-1">上传中</span>
-              </Button>
+              <Tooltip
+                theme="light"
+                animation="fade"
+                content={
+                  <Center tw="h-9 px-3 text-neut-13">
+                    上传完成后将自动关闭对话框
+                  </Center>
+                }
+              >
+                <Button type="primary" tw="cursor-not-allowed bg-green-11!">
+                  <div>
+                    <LoadingWrap size={20} />
+                  </div>
+                  <span tw="ml-1">上传中</span>
+                </Button>
+              </Tooltip>
             ) : (
               <Button type="primary" onClick={handleOk}>
                 {isFailed ? '重试' : '上传'}

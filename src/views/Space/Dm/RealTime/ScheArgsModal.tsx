@@ -341,7 +341,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
           </Collapse>
         </Loading>
       </DarkModal>
-      {show && (
+      <div css={!show && tw`hidden`}>
         <ClusterTableModal
           onCancel={() => setShow(false)}
           onOk={(clusterItem) => {
@@ -354,7 +354,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
             setShow(false)
           }}
         />
-      )}
+      </div>
     </>
   )
 }

@@ -20,7 +20,7 @@ export const Job = () => {
 
   return (
     <div tw="p-5">
-      <FlexBox tw="py-6 bg-neut-16 border-b border-neut-3" orient="row">
+      <FlexBox tw="py-6 bg-neut-16 border-b border-neut-13" orient="row">
         <Center>
           <Field className="is-horizontal">
             <Label>实例状态</Label>
