@@ -395,6 +395,7 @@ export const ReleaseTable = observer(({ query }: any) => {
 
       {releaseVisible && (
         <ReleaseModal
+          onSuccess={refetchData}
           onCancel={() => {
             setReleaseVisible(false)
           }}
