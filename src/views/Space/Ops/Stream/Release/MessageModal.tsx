@@ -55,7 +55,7 @@ export default function MessageModal({ visible, cancel, row = {} }: any) {
               </div>
               <div tw="flex">
                 <span tw="text-neut-8 w-14 mr-3">所属作业: </span>
-                <span>{row.job_id}</span>
+                <span tw="text-green-11">{row.job_id}</span>
               </div>
             </div>
             <div>

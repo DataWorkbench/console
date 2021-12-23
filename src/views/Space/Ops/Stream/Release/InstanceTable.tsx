@@ -125,7 +125,7 @@ export const InstanceTable = observer(
         render: (_: any, row: Record<string, any>) => {
           return (
             <FlexBox tw="items-center">
-              <Button type="text" disabled={row.state === 1}>
+              <Button type="text">
                 <TextLink
                   href={`//${row.id}.flink.databench.io`}
                   target="_blank"
