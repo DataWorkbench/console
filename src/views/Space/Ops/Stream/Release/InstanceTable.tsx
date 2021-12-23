@@ -51,7 +51,7 @@ export const InstanceTable = observer(
       limit: 10,
       offset: 0,
       reverse: true,
-      sort_by: 'update',
+      sort_by: '',
     })
 
     const queryClient = useQueryClient()

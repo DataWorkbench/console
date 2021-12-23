@@ -17,7 +17,7 @@ export const Release = () => {
 
   return (
     <div tw="p-5">
-      <FlexBox tw="py-6 bg-neut-16 border-b border-neut-3 ">
+      <FlexBox tw="py-6 bg-neut-16 border-b border-neut-13 ">
         <Center>
           <Field className="is-horizontal">
             <Label>调度状态</Label>
