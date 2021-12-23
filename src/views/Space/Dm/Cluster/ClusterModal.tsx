@@ -14,7 +14,16 @@ import {
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { set, range, trim, filter, assign, flatten } from 'lodash-es'
+import {
+  set,
+  range,
+  trim,
+  filter,
+  assign,
+  flatten,
+  pick,
+  keys,
+} from 'lodash-es'
 import { useQueryClient } from 'react-query'
 import Tippy from '@tippyjs/react'
 import dayjs from 'dayjs'
@@ -34,6 +43,7 @@ import {
   AffixLabel,
   SelectWithRefresh,
   HelpCenterLink,
+  TextLink,
 } from 'components'
 import { strlen, nameMatchRegex } from 'utils/convert'
 import { NetworkModal } from 'views/Space/Dm/Network'
@@ -141,7 +151,9 @@ const ClusterModal = observer(
       dmStore,
     } = useStore()
 
-    const [params, setParams] = useImmer(opCluster || defaultParams)
+    const [params, setParams] = useImmer(
+      opCluster ? pick(opCluster, keys(defaultParams)) : defaultParams
+    )
     const baseFormRef = useRef<Form>(null)
     const networkFormRef = useRef<Form>(null)
     const optFormRef = useRef<Form>(null)
@@ -178,8 +190,9 @@ const ClusterModal = observer(
             op,
             ...params,
           },
-          opCluster && { cluster_id: opCluster.id }
+          opCluster && { clusterId: opCluster.id }
         )
+
         mutation.mutate(paramsData, {
           onSuccess: () => {
             setOp('')
@@ -329,7 +342,7 @@ const ClusterModal = observer(
                     name="version"
                     validateOnChange
                     placeholder="请选择版本"
-                    disabled={viewMode}
+                    disabled={viewMode || op === 'update'}
                     options={flinkVersions?.map((version: string) => ({
                       label: version,
                       value: version,
@@ -535,7 +548,12 @@ const ClusterModal = observer(
                   <Field>
                     <AffixLabel
                       theme="green"
-                      help="Flink 的 TaskManager 的 CPU 和内存设置单个集群： 0.5≤TaskManager CU≦8"
+                      help={
+                        <>
+                          <div>Flink 的 TaskManager 的 CPU 和内存设置</div>
+                          <div>单个集群： 0.5≤TaskManager CU≦8</div>
+                        </>
+                      }
                     >
                       TM 规格
                     </AffixLabel>
@@ -585,7 +603,12 @@ const ClusterModal = observer(
                   <Field>
                     <AffixLabel
                       theme="green"
-                      help="Flink 的 JobManager 的 CPU 和内存设置单个集群： 0.5≤JobManager CU≦8"
+                      help={
+                        <>
+                          <div>Flink 的 JobManager 的 CPU 和内存设置</div>
+                          <div>单个集群： 0.5≤JobManager CU≦8</div>
+                        </>
+                      }
                     >
                       JM 规格
                     </AffixLabel>
@@ -808,7 +831,21 @@ const ClusterModal = observer(
                   <KVTextAreaFieldWrapper
                     disabled={viewMode}
                     label={
-                      <AffixLabel required={false} help="    ">
+                      <AffixLabel
+                        required={false}
+                        help={
+                          <div>
+                            Flink 参数
+                            <TextLink
+                              href="https://nightlies.apache.org/flink/flink-docs-master/docs/deployment/config/"
+                              color="white"
+                              tw="ml-1"
+                            >
+                              参考链接
+                            </TextLink>
+                          </div>
+                        }
+                      >
                         Flink参数
                       </AffixLabel>
                     }
@@ -821,8 +858,10 @@ const ClusterModal = observer(
                           `${item.key} ${item.value}`
                       )
                       .join('\r\n')}
-                    placeholder={`Flink 的参数配置, yaml 格式，多个参数用，隔开。
-示例：key01:value01，key02:value02`}
+                    placeholder={`Flink 的参数配置, yaml 格式，多个参数换行输入。
+示例：
+key01:value01
+key02:value02`}
                     schemas={[
                       {
                         rule: isKvStr,
