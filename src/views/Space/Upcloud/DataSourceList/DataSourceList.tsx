@@ -93,6 +93,30 @@ const ModalWrapper = styled(Modal)(() => [
 
 const columnSettingsKey = 'BIGDATA_SOURCELISTS_COLUMN_SETTINGS'
 
+const getUrl = (
+  urlObj: Record<string, any>,
+  type:
+    | 'hbase'
+    | 'kafka'
+    | 'ftp'
+    | 'hdfs'
+    | 'mysql'
+    | 'clickhouse'
+    | 'postgresql'
+) => {
+  switch (type) {
+    case 'hbase':
+      return urlObj.zookeeper
+    case 'kafka':
+      return urlObj.kafka_brokers
+    case 'ftp':
+      return `ftp://${urlObj?.host}:${urlObj?.port}`
+    case 'hdfs':
+      return `${urlObj?.nodes?.name_node}:${urlObj?.nodes?.port}`
+    default:
+      return `${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+  }
+}
 const DataSourceList = observer(() => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
@@ -224,24 +248,25 @@ const DataSourceList = observer(() => {
           const networkName = get(row, 'network_name')
           return (
             <div tw="space-y-1">
-              <div tw="truncate">
-                {['mysql', 'clickhouse', 'postgresql'].includes(key) && (
-                  <>
-                    <span tw="inline-block px-1.5 bg-[#E0EBFE] text-[#3B82F6] rounded-sm mr-0.5">
-                      URL
+              <div tw="truncate flex">
+                <>
+                  <span tw="inline-block px-1.5 bg-[#E0EBFE] text-center text-[#3B82F6] h-5 w-9 rounded-sm mr-0.5">
+                    URL
+                  </span>
+                  <Tooltip
+                    theme="darker"
+                    content={getUrl(urlObj, key as 'mysql')}
+                    hasPadding
+                  >
+                    <span tw="truncate max-w-[180px] inline-block">
+                      {!['mysql', 'clickhouse', 'postgresql'].includes(key)
+                        ? getUrl(urlObj, key as 'mysql')
+                        : `${getEllipsisText(`${key}://${urlObj.host}`, 16)}:${
+                            urlObj.port
+                          }/${urlObj.database}`}
                     </span>
-                    <Tooltip
-                      theme="darker"
-                      content={`${key}://${urlObj.host}:${urlObj.port}/${urlObj.database}`}
-                      hasPadding
-                    >
-                      <span>
-                        {getEllipsisText(`${key}://${urlObj.host}`, 16)}
-                        {`:${urlObj.port}/${urlObj.database}`}
-                      </span>
-                    </Tooltip>
-                  </>
-                )}
+                  </Tooltip>
+                </>
               </div>
               {networkName && (
                 <div tw="truncate">

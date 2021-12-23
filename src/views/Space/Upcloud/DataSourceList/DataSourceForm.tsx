@@ -2,7 +2,7 @@ import React, { useRef, useCallback, useEffect, MutableRefObject } from 'react'
 import { Field, Label, Control, Collapse, RadioButton } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get, set, trim, flatten, omit, pick } from 'lodash-es'
+import { get, set, trim, flatten, omit, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
@@ -147,7 +147,7 @@ const compInfo = {
     showButton: false,
   },
   user: {
-    name: 'user',
+    name: 'usenanme',
     label: '用户名（User Name）',
     autoComplete: 'off',
     placeholder: '请输入数据库用户名（User Name）',
@@ -252,7 +252,7 @@ const getFieldsInfo = (type: string) => {
         {
           ...port,
           label: '端口（Port）',
-          defaultValue: 9000,
+          // defaultValue: 9000,
         },
       ]
       break
@@ -289,6 +289,38 @@ const getFieldsInfo = (type: string) => {
   return fieldsInfo
 }
 
+const parseRemoteData = (
+  data: Record<'url' & string, any>,
+  urlType: string
+) => {
+  const { url } = data
+  if (urlType === 'hdfs') {
+    const pushArr = ['name_node', 'port']
+    return omit(
+      merge(data, {
+        url: {
+          hdfs: pick(get(url, 'hdfs.nodes'), pushArr),
+        },
+      }),
+      'url.hdfs.nodes'
+    )
+  }
+  return data
+}
+
+/**
+ * 新建场景默认值
+ */
+const getInitValue = (path: string) => {
+  const initValues = {
+    url: {
+      hdfs: {
+        port: 9000,
+      },
+    },
+  }
+  return get(initValues, path, '')
+}
 interface IFormProps {
   resInfo: {
     name: string
@@ -322,11 +354,12 @@ const DataSourceForm = ({
     dataSourceStore: { op, opSourceList },
     dmStore,
   } = useStore()
+
+  const urlType = resInfo.name.toLowerCase()
   const sourceInfo =
     ['update', 'view'].includes(op) &&
     opSourceList.length > 0 &&
-    opSourceList[0]
-  const urlType = resInfo.name.toLowerCase()
+    parseRemoteData(opSourceList[0], urlType)
   const fields = getFieldsInfo(urlType)
 
   const isViewMode = op === 'view'
@@ -724,7 +757,11 @@ const DataSourceForm = ({
                   key={name}
                   name={name}
                   disabled={isViewMode}
-                  defaultValue={get(sourceInfo, `url.${urlType}.${name}`, '')}
+                  defaultValue={get(
+                    sourceInfo,
+                    `url.${urlType}.${name}`,
+                    getInitValue(`url.${urlType}.${name}`)
+                  )}
                   validateOnChange
                   schemas={schemas}
                   css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
