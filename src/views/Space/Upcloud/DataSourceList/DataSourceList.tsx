@@ -407,7 +407,7 @@ const DataSourceList = observer(() => {
                   <Icon name="trash" tw="mr-2" />
                   可用性测试
                 </MenuItem>
-                <MenuItem key="update">
+                <MenuItem key="update" disabled={info.status === 2}>
                   <Icon name="pen" tw="mr-2" />
                   编辑
                 </MenuItem>
