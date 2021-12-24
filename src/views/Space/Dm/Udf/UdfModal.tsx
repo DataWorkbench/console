@@ -117,7 +117,7 @@ const UdfModal = observer(() => {
   }>({
     limit: 15,
     offset: 0,
-    resource_type: 1, //
+    resource_type: 2, //
     // udf_type: 1,
   })
 

@@ -167,7 +167,9 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
                     : `删除以下 ${udfFilterRows.length} 个函数注意事项`}
                 </div>
                 <div className="modal-content-message">
-                  删除函数操作无法撤回，确认删除吗？
+                  {udfFilterRows.length === 1
+                    ? `删除函数 ${deleteText} 操作无法撤回，确认删除吗？`
+                    : '删除函数操作无法撤回，确认删除吗？'}
                 </div>
               </>
             </section>
