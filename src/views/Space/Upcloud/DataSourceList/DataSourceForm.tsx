@@ -194,7 +194,7 @@ const getFieldsInfo = (type: string) => {
           ...port,
           label: '端口（Port）',
         },
-        { ...user, name: 'username', placeholder: '请输入用户名' },
+        { ...user, placeholder: '请输入用户名' },
         { ...pwd, placeholder: '请输入密码' },
       ]
       break
