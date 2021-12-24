@@ -155,6 +155,7 @@ const UploadModal = observer((props: any) => {
 
   const handleClear = () => {
     setFile(undefined)
+    setIsFailed(false)
     if (cancelUpload) {
       cancelUpload()
       setCancelUpload(undefined)
