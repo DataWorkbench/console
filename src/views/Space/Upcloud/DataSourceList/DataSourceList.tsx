@@ -215,7 +215,11 @@ const DataSourceList = observer(() => {
               {sourceKindName && <SourceKindImg type={sourceKindName as any} />}
             </Center>
             <div tw="flex-1">
-              <div>{info.name}</div>
+              <div>
+                <Tooltip content={info.name} theme="dark">
+                  <span>{getEllipsisText(info.name, 14)}</span>
+                </Tooltip>
+              </div>
               <div tw="text-neut-8">{v}</div>
             </div>
           </FlexBox>
@@ -364,6 +368,13 @@ const DataSourceList = observer(() => {
     {
       title: '数据源描述',
       dataIndex: 'comment',
+      render: (v: string) => {
+        return (
+          <Tooltip content={v} theme="dark" hasPadding>
+            <span>{getEllipsisText(v, 20)}</span>
+          </Tooltip>
+        )
+      },
     },
     {
       title: '创建时间',
@@ -538,7 +549,7 @@ const DataSourceList = observer(() => {
               />
             </ToolBarRight>
           </ToolBar>
-          <Card tw="flex-1">
+          <Card tw="flex-1 pb-5 px-5">
             <Table
               selectType="checkbox"
               dataSource={sourceList}
