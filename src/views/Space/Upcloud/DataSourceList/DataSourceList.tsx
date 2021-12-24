@@ -452,7 +452,7 @@ const DataSourceList = observer(() => {
                   )
                 }
               >
-                <Icon name="add" />
+                <Icon name="trash" />
                 删除
               </Button>
             </ToolBarLeft>
