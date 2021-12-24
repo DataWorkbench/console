@@ -5,7 +5,7 @@ import tw, { css, styled } from 'twin.macro'
 import { get, set, trim, flatten, omit, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
-import { Form, Button, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Form, Button, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
 import {
   useStore,
@@ -433,7 +433,9 @@ const DataSourceForm = ({
     }
   }, [getFormData, parseFormData])
 
+  const hasPingRef = useRef(false)
   const handlePing = () => {
+    hasPingRef.current = true
     const formData = parseFormData()
     if (formData) {
       mutation.mutate(
@@ -783,13 +785,22 @@ const DataSourceForm = ({
                 </AffixLabel>
               </Label>
               <Control>
-                <Button
-                  loading={mutation.isLoading}
-                  type="outlined"
-                  onClick={handlePing}
-                >
-                  开始测试
-                </Button>
+                {mutation.isLoading ? (
+                  <Button
+                    // loading={mutation.isLoading}
+                    type="outlined"
+                  >
+                    <Loading size="small" tw="w-[30px]" /> 测试中
+                  </Button>
+                ) : (
+                  <Button
+                    // loading={mutation.isLoading}
+                    type="outlined"
+                    onClick={handlePing}
+                  >
+                    {hasPingRef.current ? '重新测试' : '开始测试'}
+                  </Button>
+                )}
               </Control>
               {mutation.isError && (
                 <div
