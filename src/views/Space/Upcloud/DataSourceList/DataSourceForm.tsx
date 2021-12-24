@@ -21,7 +21,7 @@ import HdfsNodeField from './HdfsNodeField'
 const ipReg =
   /(^(((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))\.){3}((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))$)|(^((([a-zA-Z0-9_-])+\.)+([a-zA-Z])+)$)/
 
-const hostReg = /^([1-9a-zA-Z_.-]+(:\d{1,5})?,)*([1-9a-zA-Z_.-]+(:\d{1,5})?)?$/
+const hostReg = /^([0-9a-zA-Z_.-]+(:\d{1,5})?,)*([0-9a-zA-Z_.-]+(:\d{1,5})?)?$/
 
 const { CollapseItem } = Collapse
 const {
