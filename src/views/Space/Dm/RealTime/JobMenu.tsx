@@ -16,7 +16,7 @@ import JobModal from './JobModal'
 const { MenuItem } = Menu
 
 const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
-  tw`border border-neut-13 rounded-sm leading-6 px-1 text-neut-8 scale-75`,
+  tw`border border-neut-13 rounded-sm leading-6 px-1 text-neut-8 scale-75 origin-left`,
   tw`group-hover:(bg-white text-neut-13 border-white)`,
   selected && tw`bg-white text-neut-13 border-white`,
 ])
@@ -262,7 +262,7 @@ const JobMenu = observer(() => {
           </button>
         </div>
       </div>
-      <div tw="pt-4 flex-1 overflow-y-auto" ref={scrollRef}>
+      <div tw="pt-4 flex-1 h-full overflow-y-auto" ref={scrollRef}>
         {(() => {
           if (flowsRet.isLoading) {
             return (
@@ -288,7 +288,7 @@ const JobMenu = observer(() => {
                   onMouseLeave={() => setAlterFlowId(null)}
                 >
                   <FlexBox tw="items-center">
-                    <Icon name="caret-right" type="light" />
+                    {/* <Icon name="caret-right" type="light" /> */}
                     <Tag selected={curJob?.id === flow.id}>
                       {(() => {
                         switch (flow.type) {
@@ -307,7 +307,7 @@ const JobMenu = observer(() => {
                         }
                       })()}
                     </Tag>
-                    <span tw="ml-1">{flow.name}</span>
+                    <span tw="-ml-0.5">{flow.name}</span>
                   </FlexBox>
                   {alterFlowId === flow.id && (
                     <TooltipWrapper

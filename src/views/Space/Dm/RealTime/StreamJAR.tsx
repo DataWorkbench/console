@@ -59,7 +59,7 @@ const StreamJAR = () => {
     }
   }, [data, setParams])
   useEffect(() => {
-    if (get(data, 'jar.resource_id') !== '') {
+    if (get(data, 'jar.resource_id')) {
       setEnableRelease(true)
     }
   }, [data, scheData])
@@ -97,7 +97,6 @@ const StreamJAR = () => {
       toggleShow(true)
     }
   }
-
   return (
     <FlexBox tw="h-full flex-1">
       <FlexBox tw="flex-col flex-1 pl-5">
