@@ -110,7 +110,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
     parallelism: 0,
     builtInConnectors: [] as string[],
   })
-  const [show, setShow] = useState(false)
+  const [showCluster, setShowCluster] = useState(false)
   const [cluster, setCluster] = useState(null)
   const [showMsg, setShowMsg] = useState(false)
 
@@ -206,7 +206,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     <>
                       <Button
                         onClick={() => {
-                          setShow(true)
+                          setShowCluster(true)
                           setShowMsg(true)
                         }}
                         type={
@@ -341,9 +341,10 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
           </Collapse>
         </Loading>
       </DarkModal>
-      <div css={!show && tw`hidden`}>
+      <div css={!showCluster && tw`hidden`}>
         <ClusterTableModal
-          onCancel={() => setShow(false)}
+          selectedIds={[params.clusterId]}
+          onCancel={() => setShowCluster(false)}
           onOk={(clusterItem) => {
             if (clusterItem) {
               setCluster(clusterItem)
@@ -351,7 +352,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 draft.clusterId = clusterItem.id
               })
             }
-            setShow(false)
+            setShowCluster(false)
           }}
         />
       </div>
