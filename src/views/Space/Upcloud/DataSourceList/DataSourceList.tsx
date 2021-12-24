@@ -415,7 +415,7 @@ const DataSourceList = observer(() => {
                 }}
               >
                 <MenuItem key="ping">
-                  <Icon name="trash" tw="mr-2" />
+                  <Icon name="if-doublecheck" tw="mr-2" />
                   可用性测试
                 </MenuItem>
                 <MenuItem key="update" disabled={info.status === 2}>
