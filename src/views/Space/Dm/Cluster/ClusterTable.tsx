@@ -129,7 +129,12 @@ const ClusterTable = observer(
     })
     const queryClient = useQueryClient()
     const mutation = useMutationCluster()
-
+    useEffect(() => {
+      if (selectMode) {
+        // && selectedIds.length
+        setSelectedRowKeys(selectedIds)
+      }
+    }, [selectMode, selectedIds])
     useEffect(() => {
       if (op === '') {
         setOpClusterList([])
