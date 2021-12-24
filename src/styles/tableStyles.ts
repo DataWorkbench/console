@@ -7,6 +7,9 @@ const tableStyles = css`
       .table-icon {
         ${tw`pr-0`}
       }
+      .table-col:last-child .button.is-text {
+        ${tw`px-0 mr-4`}
+      }
     }
   }
   .dark {
@@ -73,9 +76,6 @@ const tableStyles = css`
           a {
             ${tw`text-[#0EA5E9]`}
           }
-        }
-        .table-col:last-child .button.is-text:first-of-type {
-          ${tw`pl-0`}
         }
       }
       .grid-table-footer {

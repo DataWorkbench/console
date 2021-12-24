@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { Modal, ModalStep, ModalContent, HelpCenterLink } from 'components'
-import { PopConfirm } from '@QCFE/lego-ui'
+import { PopConfirm, Icon } from '@QCFE/lego-ui'
 import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useQueryClient } from 'react-query'
 import tw from 'twin.macro'
@@ -141,6 +141,8 @@ const DataSourceModal = observer(
                     </>
                   )}
 
+                  {op === 'update' && <Button onClick={onHide}>取消</Button>}
+
                   <Button
                     loading={mutation.isLoading}
                     type="primary"
@@ -155,8 +157,9 @@ const DataSourceModal = observer(
         >
           <ModalStep
             step={state.step}
-            stepTexts={['选择数据库', '配置数据库']}
+            stepTexts={['选择数据源', '配置数据源']}
             css={state.step === 1 && tw`bg-white`}
+            doneIcon={<Icon name="check" size={20} type="coloured" />}
           />
           <ModalContent css={state.step === 1 && tw`px-0 pt-0`}>
             {(() => {

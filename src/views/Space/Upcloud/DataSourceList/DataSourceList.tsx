@@ -188,12 +188,13 @@ const DataSourceList = observer(() => {
     {
       title: '数据源名称/ID',
       dataIndex: 'source_id',
+      width: 220,
       render: (v: string, info: any) => {
         const sourceKindName = sourceKinds.find(
           (kind) => kind.source_type === info.source_type
         )?.name
         return (
-          <FlexBox tw="space-x-1 items-center">
+          <FlexBox tw="space-x-2 items-center">
             <Center>
               {sourceKindName && <SourceKindImg type={sourceKindName as any} />}
             </Center>
@@ -250,7 +251,7 @@ const DataSourceList = observer(() => {
             <div tw="space-y-1">
               <div tw="truncate flex">
                 <>
-                  <span tw="inline-block px-1.5 bg-[#E0EBFE] text-center text-[#3B82F6] h-5 w-9 rounded-sm mr-0.5">
+                  <span tw="inline-block px-1.5 bg-[#E0EBFE] text-center text-[#3B82F6] h-5 w-9 rounded-sm mr-0.5 font-medium">
                     URL
                   </span>
                   <Tooltip
@@ -270,7 +271,7 @@ const DataSourceList = observer(() => {
               </div>
               {networkName && (
                 <div tw="truncate">
-                  <span tw="inline-block px-1.5 bg-[#F1E4FE] text-[#A855F7] rounded-sm mr-0.5">
+                  <span tw="inline-block px-1.5 bg-[#F1E4FE] text-[#A855F7] rounded-sm mr-0.5 font-medium">
                     内网
                   </span>
                   {networkName}
@@ -293,7 +294,7 @@ const DataSourceList = observer(() => {
         ) {
           return (
             <>
-              <Icon name="if-load" tw="mr-1" size={12} />
+              <Icon name="if-load" tw="mr-1" size={16} />
               检测中
             </>
           )
@@ -302,14 +303,14 @@ const DataSourceList = observer(() => {
         if (v === 1) {
           return (
             <Center tw="space-x-1">
-              <Icons name="circle_check" size={12} />
+              <Icons name="circle_check" size={16} />
               <span>可用</span>
             </Center>
           )
         }
         return (
           <Center tw="space-x-1">
-            <Icons name="circle_close" size={12} />
+            <Icons name="circle_error" size={16} />
             <span>不可用</span>
           </Center>
         )
@@ -344,6 +345,17 @@ const DataSourceList = observer(() => {
             theme="light"
             trigger="click"
             arrow={false}
+            twChild={
+              css`
+                &[aria-expanded='true'],
+                &:hover {
+                  ${tw`bg-neut-2 rounded-sm`}
+                }
+                svg {
+                  ${tw`text-black! bg-transparent! fill-[transparent]!`}
+                }
+              ` as any
+            }
             content={
               <Menu
                 onClick={(e: React.SyntheticEvent, key: any) => {
@@ -383,8 +395,8 @@ const DataSourceList = observer(() => {
               </Menu>
             }
           >
-            <Center>
-              <Icon name="more" clickable />
+            <Center tw="w-6 h-6">
+              <Icon name="more" size={20} clickable />
             </Center>
           </Tooltip>
         </>

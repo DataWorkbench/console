@@ -12,7 +12,9 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => (
           <Icon name="blockchain" size={60} tw="mb-3 inline-block" />
         </div>
       </div>
-      <div tw="mb-3 font-medium text-xl">暂无数据源</div>
+      <div tw="mb-5 font-medium text-xl text-[#19121A] leading-5">
+        暂无数据源
+      </div>
       <p tw="mx-auto mb-6 text-neut-8 text-center max-w-[700px]">
         数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。
       </p>

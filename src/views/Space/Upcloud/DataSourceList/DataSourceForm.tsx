@@ -486,12 +486,14 @@ const DataSourceForm = ({
               </Label>
               <Control tw="w-60">
                 <div
-                  tw="rounded-sm border border-green-11 p-2 bg-no-repeat bg-right-bottom"
+                  tw="rounded-sm border border-green-11 p-3 pb-5 bg-no-repeat bg-right-bottom"
                   className="source-item-bg"
                 >
                   <div tw="font-medium flex items-center">
-                    <Icon name="container" tw="mr-1" />
-                    <span tw="text-green-11">连接串模式</span>
+                    <Icon name="container" tw="mr-2" size={20} />
+                    <span tw="text-green-11 text-sm leading-[22px]">
+                      连接串模式
+                    </span>
                   </div>
                   <div tw="text-neut-8">
                     连接串模式是通过IP端口用户名密码进行连接的方式。
