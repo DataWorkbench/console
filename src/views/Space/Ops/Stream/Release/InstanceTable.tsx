@@ -160,6 +160,8 @@ export const InstanceTable = observer(
         draft.job_id = query.jobId || modalData.id || ''
         draft.state = query.state || 0
         draft.version = query.version || ''
+        draft.offset = 0
+        draft.limit = 10
       })
     }, [modalData.id, query, setFilter])
 
