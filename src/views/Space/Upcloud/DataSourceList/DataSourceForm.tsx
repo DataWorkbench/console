@@ -580,7 +580,7 @@ const DataSourceForm = ({
                     href="/manual/data_up_cloud/connect/"
                     isIframe={false}
                   >
-                    网络联通文档
+                    网络连通文档
                   </HelpCenterLink>
                 </>
               }

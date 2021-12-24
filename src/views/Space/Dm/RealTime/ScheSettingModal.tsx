@@ -824,6 +824,9 @@ const ScheSettingModal = ({
                 {(() => {
                   if (params.schedulePolicy === 2) {
                     const curDate = new Date()
+                    const executedDate = params.executed
+                      ? new Date(params.executed * 1000)
+                      : curDate
                     return (
                       <>
                         <RadioGroupField
@@ -850,7 +853,11 @@ const ScheSettingModal = ({
                                 enableTime
                                 enableSeconds
                                 minDate={curDate}
-                                defaultValue={curDate}
+                                defaultValue={
+                                  executedDate < curDate
+                                    ? curDate
+                                    : executedDate
+                                }
                                 onChange={(d: Date[]) => {
                                   if (d.length) {
                                     setParams((draft) => {

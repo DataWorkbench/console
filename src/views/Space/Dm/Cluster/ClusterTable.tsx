@@ -101,16 +101,20 @@ const ClusterTable = observer(
   ({
     selectMode = false,
     onSelect,
+    selectedIds = [],
   }: {
     selectMode?: boolean
     onSelect?: (clusterId?: any[]) => void
+    selectedIds?: string[]
   }) => {
     const {
       dmStore: { setOp, op },
     } = useStore()
-    const { regionId, spaceId } = useParams<IRouteParams>()
+    const { regionId, spaceId } =
+      useParams<{ regionId: string; spaceId: string }>()
     const [opclusterList, setOpClusterList] = useState<any[]>([])
-    const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+    const [selectedRowKeys, setSelectedRowKeys] =
+      useState<string[]>(selectedIds)
     const [columnSettings, setColumnSettings] = useState(
       localstorage.getItem(columnSettingsKey) || []
     )

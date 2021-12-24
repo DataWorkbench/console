@@ -17,9 +17,11 @@ const Alert = styled('div')(() => [
 const ClusterTableModal = ({
   onCancel,
   onOk,
+  selectedIds = [],
 }: {
   onCancel?: () => void
-  onOk?: (cluster) => void
+  onOk?: (cluster: any) => void
+  selectedIds?: string[]
 }) => {
   const [cluster, setCluster] = useState(null)
   return (
@@ -37,13 +39,14 @@ const ClusterTableModal = ({
     >
       <Alert>
         <Icon name="information" size={20} tw="mr-1.5" />
-        请选择运行当前作业的计算集群，请注意保证网络联通性，具体可参考：
+        请选择运行当前作业的计算集群，请注意保证网络连通性，具体可参考：
         <HelpCenterLink isIframe={false} href="/quickstart/create_net/">
-          网络联通文档
+          网络连通文档
         </HelpCenterLink>
       </Alert>
       <ClusterTable
         selectMode
+        selectedIds={selectedIds}
         onSelect={(clusters) => {
           setCluster(get(clusters, '[0]'))
         }}
