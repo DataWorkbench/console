@@ -152,7 +152,7 @@ const compInfo = {
     showButton: false,
   },
   user: {
-    name: 'usenanme',
+    name: 'user',
     label: '用户名（User Name）',
     autoComplete: 'off',
     placeholder: '请输入数据库用户名（User Name）',
@@ -188,13 +188,13 @@ const getFieldsInfo = (type: string) => {
         {
           ...host,
           label: '主机别名（Host）',
-          placeholder: '请输入 FTP 的主机别名(（Host）',
+          placeholder: '请输入 FTP 的主机别名（Host）',
         },
         {
           ...port,
           label: '端口（Port）',
         },
-        { ...user, placeholder: '请输入用户名' },
+        { ...user, name: 'username', placeholder: '请输入用户名' },
         { ...pwd, placeholder: '请输入密码' },
       ]
       break
