@@ -143,7 +143,7 @@ export const ReleaseTable = observer(({ query }: any) => {
         setCurrentRelease(row)
         toggle()
       } else if (key === 'view') {
-        workFlowStore.set({ curJob: row })
+        workFlowStore.set({ curViewJobId: row.id })
         history.push(`/${regionId}/workspace/${spaceId}/dm`)
       } else if (key === 'update') {
         workFlowStore.set({ curJob: row })

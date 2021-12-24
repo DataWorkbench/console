@@ -9,11 +9,13 @@ import {
 } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, TextLink, Icons } from 'components'
 import dayjs from 'dayjs'
-import { getJobInstanceKey, useQueryJobInstances } from 'hooks'
+import { getJobInstanceKey, useQueryJobInstances, useStore } from 'hooks'
 import { omitBy, get } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
+import tw, { css } from 'twin.macro'
+import { useHistory, useParams } from 'react-router-dom'
 import { InstanceState } from '../constants'
 import MessageModal from './MessageModal'
 
@@ -39,6 +41,11 @@ export const InstanceTable = observer(
     query?: any
     modalData?: any
   }) => {
+    const { workFlowStore } = useStore()
+    const history = useHistory()
+    const { regionId, spaceId } =
+      useParams<{ regionId: string; spaceId: string }>()
+
     const [messageVisible, setMessageVisible] = useState(false)
     const [currentRow, setCurrentRow] = useState(undefined)
     const [columnSettings, setColumnSettings] = useState(
@@ -102,13 +109,21 @@ export const InstanceTable = observer(
         },
       },
       {
-        title: '所属作业名称/ID',
+        title: '所属作业/ID',
         dataIndex: 'job_id',
-        render: (value: string) => {
+        render: (value: string, row: Record<string, any>) => {
           return (
             <div>
               {/* <div>{row.job_name}</div> */}
-              <div>{value}</div>
+              <div
+                className="highlight"
+                onClick={() => {
+                  workFlowStore.set({ curViewJobId: row.job_id })
+                  history.push(`/${regionId}/workspace/${spaceId}/dm`)
+                }}
+              >
+                {value}
+              </div>
             </div>
           )
         },
@@ -212,6 +227,13 @@ export const InstanceTable = observer(
           </Center>
         </FlexBox>
         <Table
+          css={[
+            css`
+              .table-row:hover .highlight {
+                ${tw`text-green-11 cursor-pointer`}
+              }
+            `,
+          ]}
           rowKey="id"
           loading={isFetching}
           dataSource={infos || []}

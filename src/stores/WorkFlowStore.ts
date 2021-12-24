@@ -11,6 +11,8 @@ interface IJob {
 class WorkFlowStore {
   rootStore
 
+  curViewJobId: undefined | string
+
   curJob: null | IJob = null
 
   panels: IJob[] = []
