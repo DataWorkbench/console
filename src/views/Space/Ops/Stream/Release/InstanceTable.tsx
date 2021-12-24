@@ -7,7 +7,7 @@ import {
   Divider,
   localstorage,
 } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, TextLink } from 'components'
+import { FlexBox, Center, TextLink, Icons } from 'components'
 import dayjs from 'dayjs'
 import { getJobInstanceKey, useQueryJobInstances } from 'hooks'
 import { omitBy, get } from 'lodash-es'
@@ -75,6 +75,19 @@ export const InstanceTable = observer(
       {
         title: '实例ID',
         dataIndex: 'id',
+        render: (value: string) => {
+          return (
+            <FlexBox tw="items-center space-x-1">
+              <Center
+                tw="bg-neut-13 rounded-full w-6 h-6 mr-2 border-2 border-solid border-neut-16"
+                className="release-icon"
+              >
+                <Icons name="stream-job" size={14} />
+              </Center>
+              <div tw="flex-1 break-all">{value}</div>
+            </FlexBox>
+          )
+        },
       },
       {
         title: '状态',
@@ -89,8 +102,16 @@ export const InstanceTable = observer(
         },
       },
       {
-        title: '所属作业',
+        title: '所属作业名称/ID',
         dataIndex: 'job_id',
+        render: (value: string) => {
+          return (
+            <div>
+              {/* <div>{row.job_name}</div> */}
+              <div>{value}</div>
+            </div>
+          )
+        },
       },
       {
         title: '创建时间',
