@@ -10,6 +10,7 @@ import { useScroll } from 'react-use'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import { useInfiniteQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
+import SimpleBar from 'simplebar-react'
 import { FlexBox, Center, HelpCenterLink } from 'components'
 import JobModal from './JobModal'
 
@@ -263,90 +264,92 @@ const JobMenu = observer(() => {
         </div>
       </div>
       <div tw="pt-4 flex-1 h-full overflow-y-auto" ref={scrollRef}>
-        {(() => {
-          if (flowsRet.isLoading) {
+        <SimpleBar tw="h-full">
+          {(() => {
+            if (flowsRet.isLoading) {
+              return (
+                <div tw="h-48">
+                  <Loading />
+                </div>
+              )
+            }
             return (
-              <div tw="h-48">
-                <Loading />
-              </div>
-            )
-          }
-          return (
-            <>
-              {flows?.map((flow: any) => (
-                <FlexBox
-                  key={flow.id}
-                  className="group"
-                  css={[
-                    tw`leading-8 px-2 cursor-pointer items-center justify-between`,
-                    curJob?.id === flow.id
-                      ? tw`bg-green-11`
-                      : tw`hover:bg-neut-13`,
-                  ]}
-                  onClick={() => handleItemClick(flow)}
-                  onMouseEnter={() => setAlterFlowId(flow.id)}
-                  onMouseLeave={() => setAlterFlowId(null)}
-                >
-                  <FlexBox tw="items-center">
-                    {/* <Icon name="caret-right" type="light" /> */}
-                    <Tag selected={curJob?.id === flow.id}>
-                      {(() => {
-                        switch (flow.type) {
-                          case 1:
-                            return '算子'
-                          case 2:
-                            return 'Sql'
-                          case 3:
-                            return 'Jar'
-                          case 4:
-                            return 'Python'
-                          case 5:
-                            return 'Scala'
-                          default:
-                            return ''
+              <>
+                {flows?.map((flow: any) => (
+                  <FlexBox
+                    key={flow.id}
+                    className="group"
+                    css={[
+                      tw`leading-8 px-2 cursor-pointer items-center justify-between`,
+                      curJob?.id === flow.id
+                        ? tw`bg-green-11`
+                        : tw`hover:bg-neut-13`,
+                    ]}
+                    onClick={() => handleItemClick(flow)}
+                    onMouseEnter={() => setAlterFlowId(flow.id)}
+                    onMouseLeave={() => setAlterFlowId(null)}
+                  >
+                    <FlexBox tw="items-center">
+                      {/* <Icon name="caret-right" type="light" /> */}
+                      <Tag selected={curJob?.id === flow.id}>
+                        {(() => {
+                          switch (flow.type) {
+                            case 1:
+                              return '算子'
+                            case 2:
+                              return 'Sql'
+                            case 3:
+                              return 'Jar'
+                            case 4:
+                              return 'Python'
+                            case 5:
+                              return 'Scala'
+                            default:
+                              return ''
+                          }
+                        })()}
+                      </Tag>
+                      <span tw="-ml-0.5">{flow.name}</span>
+                    </FlexBox>
+                    {alterFlowId === flow.id && (
+                      <TooltipWrapper
+                        content={
+                          <Menu
+                            onClick={(e: any, key: string) => {
+                              if (key === 'edit') {
+                                showEditModal(flow)
+                              } else {
+                                showDelModal(flow)
+                              }
+                            }}
+                          >
+                            <MenuItem key="edit">
+                              <Icon name="pen" tw="mr-2" />
+                              编辑信息
+                            </MenuItem>
+                            <MenuItem key="delete">
+                              <Icon name="trash" tw="mr-2" />
+                              删除
+                            </MenuItem>
+                          </Menu>
                         }
-                      })()}
-                    </Tag>
-                    <span tw="-ml-0.5">{flow.name}</span>
+                        placement="rightTop"
+                        trigger="hover"
+                      >
+                        <Center>
+                          <Icon name="more" type="light" />
+                        </Center>
+                      </TooltipWrapper>
+                    )}
                   </FlexBox>
-                  {alterFlowId === flow.id && (
-                    <TooltipWrapper
-                      content={
-                        <Menu
-                          onClick={(e: any, key: string) => {
-                            if (key === 'edit') {
-                              showEditModal(flow)
-                            } else {
-                              showDelModal(flow)
-                            }
-                          }}
-                        >
-                          <MenuItem key="edit">
-                            <Icon name="pen" tw="mr-2" />
-                            编辑信息
-                          </MenuItem>
-                          <MenuItem key="delete">
-                            <Icon name="trash" tw="mr-2" />
-                            删除
-                          </MenuItem>
-                        </Menu>
-                      }
-                      placement="rightTop"
-                      trigger="hover"
-                    >
-                      <Center>
-                        <Icon name="more" type="light" />
-                      </Center>
-                    </TooltipWrapper>
-                  )}
-                </FlexBox>
-              ))}
-              <div css={[tw`h-10`, !showMoreLoading && tw`hidden`]}>
-                <Loading size="small" />
-              </div>
-            </>
-          )
-        })()}
+                ))}
+                <div css={[tw`h-10`, !showMoreLoading && tw`hidden`]}>
+                  <Loading size="small" />
+                </div>
+              </>
+            )
+          })()}
+        </SimpleBar>
       </div>
       {visible && <JobModal job={editJob} onCancel={hideEditModal} />}
       {delVisible && (
