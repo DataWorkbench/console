@@ -91,3 +91,15 @@ export const terminateInstances = ({
     },
   })
 }
+
+export const describeFlinkUI = ({
+  regionId,
+  spaceId,
+  inst_id,
+}: IStreamParams) => {
+  return request({
+    region: regionId,
+    method: 'GET',
+    uri: `/v1/workspace/${spaceId}/stream/job/instance/${inst_id}/flink-ui`,
+  })
+}

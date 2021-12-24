@@ -9,12 +9,16 @@ import {
 } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, TextLink, Icons } from 'components'
 import dayjs from 'dayjs'
-import { getJobInstanceKey, useQueryJobInstances, useStore } from 'hooks'
+import {
+  getJobInstanceKey,
+  useMutationInstance,
+  useQueryJobInstances,
+  useStore,
+} from 'hooks'
 import { omitBy, get } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
-import tw, { css } from 'twin.macro'
 import { useHistory, useParams } from 'react-router-dom'
 import { InstanceState } from '../constants'
 import MessageModal from './MessageModal'
@@ -62,6 +66,7 @@ export const InstanceTable = observer(
     })
 
     const queryClient = useQueryClient()
+    const mutation = useMutationInstance()
 
     const { isFetching, isRefetching, data } = useQueryJobInstances(
       omitBy(filter, (v) => v === ''),
@@ -76,6 +81,28 @@ export const InstanceTable = observer(
     const handleCheckRowDetail = (row: any) => {
       setCurrentRow(row)
       setMessageVisible(true)
+    }
+
+    const handleFinkUI = (id: String) => {
+      mutation.mutate(
+        { op: 'view', inst_id: id },
+        {
+          onSuccess: (response: any) => {
+            const ele = document.createElement('a')
+            ele.style.display = 'none'
+            ele.target = '_blank'
+            ele.href = `//${response?.web_ui || ''}`
+            document.body.appendChild(ele)
+            ele.click()
+            document.body.removeChild(ele)
+          },
+        }
+      )
+    }
+
+    const handleJobView = (curViewJobId: string) => {
+      workFlowStore.set({ curViewJobId })
+      history.push(`/${regionId}/workspace/${spaceId}/dm`)
     }
 
     const columns = [
@@ -116,11 +143,8 @@ export const InstanceTable = observer(
             <div>
               {/* <div>{row.job_name}</div> */}
               <div
-                className="highlight"
-                onClick={() => {
-                  workFlowStore.set({ curViewJobId: row.job_id })
-                  history.push(`/${regionId}/workspace/${spaceId}/dm`)
-                }}
+                tw="hover:text-green-11 cursor-pointer"
+                onClick={() => handleJobView(row.job_id)}
               >
                 {value}
               </div>
@@ -162,10 +186,7 @@ export const InstanceTable = observer(
           return (
             <FlexBox tw="items-center">
               <Button type="text">
-                <TextLink
-                  href={`//${row.id}.flink.databench.io`}
-                  target="_blank"
-                >
+                <TextLink onClick={() => handleFinkUI(row.id)}>
                   Flink UI
                 </TextLink>
               </Button>
@@ -227,15 +248,8 @@ export const InstanceTable = observer(
           </Center>
         </FlexBox>
         <Table
-          css={[
-            css`
-              .table-row:hover .highlight {
-                ${tw`text-green-11 cursor-pointer`}
-              }
-            `,
-          ]}
           rowKey="id"
-          loading={isFetching}
+          loading={isFetching || mutation.isLoading}
           dataSource={infos || []}
           columns={filterColumn.length > 0 ? filterColumn : columns}
           onSort={(sortKey: any, order: string) => {
@@ -266,6 +280,7 @@ export const InstanceTable = observer(
           visible={messageVisible}
           row={currentRow}
           cancel={() => setMessageVisible(false)}
+          webUI={handleFinkUI}
         />
       </FlexBox>
     )
