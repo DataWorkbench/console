@@ -102,9 +102,6 @@ export const useInfiniteQueryFlow = (filter = {}) => {
 }
 
 export const useMutationStreamJobSchedule = () => {
-  const {
-    workFlowStore: { curJob },
-  } = useStore()
   const { regionId, spaceId } = useParams<IRouteParams>()
 
   return useMutation(async (params: IWorkFlowParams) => {
@@ -112,7 +109,6 @@ export const useMutationStreamJobSchedule = () => {
       ...params,
       regionId,
       spaceId,
-      flowId: curJob?.id,
     })
     return ret
   })
