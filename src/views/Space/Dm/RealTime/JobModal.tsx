@@ -332,6 +332,7 @@ const JobModal = ({
             }
             setShow(false)
           }}
+          selectedIds={cluster ? [cluster.id] : []}
         />
       </div>
     </>

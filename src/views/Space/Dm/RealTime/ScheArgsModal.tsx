@@ -104,7 +104,7 @@ const ResourceSelect = (props: ResourceSelectProps) => {
 
 const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   const [params, setParams] = useImmer({
-    clusterId: 'eng-0000000000000000',
+    clusterId: '',
     udfs: [] as string[],
     connectors: [] as string[],
     parallelism: 0,
