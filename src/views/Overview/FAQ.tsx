@@ -33,12 +33,20 @@ const FAQ: FC = ({ className }) => {
                 tw="flex align-middle mt-2 cursor-pointer hover:text-green-11 hover:font-medium"
               >
                 <Icon name="file" />
-                <HelpCenterLink href={quest.link}>{quest.title}</HelpCenterLink>
+                <HelpCenterLink
+                  tw="text-neut-15 no-underline font-normal hover:text-green-11"
+                  href={quest.link}
+                >
+                  {quest.title}
+                </HelpCenterLink>
               </li>
             ))}
           </ul>
           <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center">
-            <HelpCenterLink tw="mr-2" href="/intro/introduction/">
+            <HelpCenterLink
+              tw="mr-2 text-neut-15 no-underline font-normal hover:text-green-11"
+              href="/intro/introduction/"
+            >
               更多帮助指引
             </HelpCenterLink>
             <Icon name="next" />

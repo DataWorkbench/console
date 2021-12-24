@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useUpdateEffect, useUnmount } from 'react-use'
-import { Tabs, Icon } from '@QCFE/lego-ui'
+import { Tabs } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { findIndex } from 'lodash-es'
 import { useParams } from 'react-router-dom'
@@ -22,14 +22,30 @@ const TabWrapper = styled(Tabs)(() => [
       ul {
         border: 0;
         li {
-          ${tw`bg-neut-18! border-0! text-white rounded py-1! text-xs`}
-          svg {
-            ${tw`text-white`}
+          ${tw`(border-none rounded-b-none mx-0.5)!`}
+          .tag {
+            ${tw`border border-neut-13 text-neut-8 scale-75 bg-transparent`}
+          }
+          &.is-active {
+            ${tw`text-white bg-green-11! hover:(bg-green-11)!`}
+            .tag {
+              ${tw`text-neut-13 bg-white border-0`}
+            }
+            > span.icon:hover svg {
+              ${tw`text-white!`}
+            }
+          }
+          ${tw`(bg-neut-18  pl-1 pr-3 py-1)! text-white rounded text-xs hover:((text-white bg-neut-16)!)`}
+          > span.icon {
+            ${tw`ml-2!`}
+            svg {
+              ${tw`text-white`}
+            }
           }
         }
       }
       .tabs-handler {
-        ${tw`h-7 bg-neut-18 bg-gradient-to-r from-neut-18 to-neut-18`}
+        ${tw`h-9 bg-gradient-to-r from-neut-15 to-neut-16 bg-opacity-70 rounded-t-sm border-b-0`}
         svg {
           ${tw`text-white`}
         }
@@ -67,6 +83,17 @@ const JobTabs = observer(() => {
     workFlowStore.set({ panels: [], curJob: null })
   })
 
+  const showNames: any = useMemo(
+    () => ({
+      1: '算子',
+      2: 'Sql',
+      3: 'Jar',
+      4: 'Python',
+      5: 'Scala',
+    }),
+    []
+  )
+
   return (
     <div tw="flex-1 w-full overflow-x-hidden relative">
       <TabWrapper
@@ -85,10 +112,10 @@ const JobTabs = observer(() => {
             name={flow.id}
             closable
             label={
-              <span>
-                <Icon name="name-space" />
-                {flow.name}
-              </span>
+              <div tw="inline-flex items-center justify-center">
+                <div className="tag">{showNames[flow.type]}</div>
+                <div>{flow.name}</div>
+              </div>
             }
           >
             {(() => {

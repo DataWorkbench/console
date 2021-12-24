@@ -23,7 +23,7 @@ const PlatformFeat = ({ className }) => {
       {
         title: '多种数据源支持',
         subtitle:
-          '支持：“MySQL”、“PostgreSQL”、“Kafka ” 、“S3”、“ClickHouse”、“HBase”、“HDFS”、“FTP”等多种数据源。',
+          '支持：“MySQL”、“PostgreSQL”、“Kafka ” 、“ClickHouse”、“HBase”、“HDFS”、“FTP”等多种数据源。',
       },
     ],
     []
