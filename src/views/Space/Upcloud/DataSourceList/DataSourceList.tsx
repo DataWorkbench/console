@@ -159,7 +159,10 @@ const DataSourceList = observer(() => {
   const networks: Map<string, Record<string, any>> = useMemo(() => {
     if (!isFetching && networkResp && networkResp?.ret_code === 0) {
       return new Map(
-        networkResp.infos.map((info: Record<string, any>) => [info.id, info])
+        (networkResp?.infos || []).map((info: Record<string, any>) => [
+          info.id,
+          info,
+        ])
       )
     }
     return new Map()
