@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
@@ -19,7 +19,12 @@ import {
   ToolBarRight,
   utils,
 } from '@QCFE/qingcloud-portal-ui'
-import { useQuerySource, useMutationSource, useStore } from 'hooks'
+import {
+  useQuerySource,
+  useMutationSource,
+  useStore,
+  useQueryNetworks,
+} from 'hooks'
 import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
 
 import DataSourceModal from './DataSourceModal'
@@ -148,6 +153,18 @@ const DataSourceList = observer(() => {
   const { isLoading, refetch, data } = useQuerySource(filter)
   const mutation = useMutationSource()
 
+  const { data: networkResp, isFetching } = useQueryNetworks({
+    limit: 100, // TODO: 这里暂时写死 100
+  })
+  const networks: Map<string, Record<string, any>> = useMemo(() => {
+    if (!isFetching && networkResp && networkResp?.ret_code === 0) {
+      return new Map(
+        networkResp.infos.map((info: Record<string, any>) => [info.id, info])
+      )
+    }
+    return new Map()
+  }, [isFetching, networkResp])
+
   useEffect(() => {
     setFilter((draft) => {
       draft.offset = 0
@@ -273,7 +290,36 @@ const DataSourceList = observer(() => {
                   <span tw="inline-block px-1.5 bg-[#F1E4FE] text-[#A855F7] rounded-sm mr-0.5">
                     内网
                   </span>
-                  {networkName}
+                  {networks.has(
+                    get(urlObj, 'network.vpc_network.network_id')
+                  ) ? (
+                    <Tooltip
+                      theme="darker"
+                      content={
+                        <>
+                          <div>
+                            {`VPC:   ${
+                              networks.get(
+                                get(urlObj, 'network.vpc_network.network_id')
+                              )?.router_id
+                            }`}
+                          </div>
+                          <div>
+                            {`vxnet: ${
+                              networks.get(
+                                get(urlObj, 'network.vpc_network.network_id')
+                              )?.vxnet_id
+                            }`}
+                          </div>
+                        </>
+                      }
+                      hasPadding
+                    >
+                      {networkName}
+                    </Tooltip>
+                  ) : (
+                    networkName
+                  )}
                 </div>
               )}
             </div>
