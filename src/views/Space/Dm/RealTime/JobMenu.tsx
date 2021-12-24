@@ -11,8 +11,6 @@ import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import { useInfiniteQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
 import SimpleBar from 'simplebar-react'
-// eslint-disable-next-line import/no-extraneous-dependencies
-import 'simplebar/dist/simplebar.min.css'
 import { FlexBox, Center, HelpCenterLink } from 'components'
 import JobModal from './JobModal'
 
