@@ -479,15 +479,16 @@ const DataSourceList = observer(() => {
               <Button
                 type="default"
                 disabled={
-                  sourceList.filter(
-                    ({
-                      source_id,
-                      status,
-                    }: {
-                      source_id: string
-                      status: number
-                    }) => selectedRowKeys.includes(source_id) && status !== 2
-                  ).length === 0
+                  // .filter(
+                  // ({
+                  // source_id,
+                  // status,
+                  // }: {
+                  // source_id: string
+                  // status: number
+                  // }) => selectedRowKeys.includes(source_id) && status !== 2
+                  // ).
+                  selectedRowKeys.length === 0
                 }
                 onClick={() =>
                   mutateOperation(
@@ -580,10 +581,10 @@ const DataSourceList = observer(() => {
         }
         if (['disable', 'enable', 'delete'].includes(op)) {
           const info = confirmMsgInfo[op]
-          const filterSourceList =
-            op === 'delete'
-              ? opSourceList.filter((obj) => obj.status !== 2)
-              : opSourceList
+          const filterSourceList = opSourceList
+          // op === 'delete'
+          // ? opSourceList.filter((obj) => obj.status !== 2)
+          // : opSourceList
           return (
             <ModalWrapper
               visible
