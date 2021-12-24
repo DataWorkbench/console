@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
@@ -19,7 +19,12 @@ import {
   ToolBarRight,
   utils,
 } from '@QCFE/qingcloud-portal-ui'
-import { useQuerySource, useMutationSource, useStore } from 'hooks'
+import {
+  useQuerySource,
+  useMutationSource,
+  useStore,
+  useQueryNetworks,
+} from 'hooks'
 import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
 
 import DataSourceModal from './DataSourceModal'
@@ -148,6 +153,21 @@ const DataSourceList = observer(() => {
   const { isLoading, refetch, data } = useQuerySource(filter)
   const mutation = useMutationSource()
 
+  const { data: networkResp, isFetching } = useQueryNetworks({
+    limit: 100, // TODO: 这里暂时写死 100
+  })
+  const networks: Map<string, Record<string, any>> = useMemo(() => {
+    if (!isFetching && networkResp && networkResp?.ret_code === 0) {
+      return new Map(
+        (networkResp?.infos || []).map((info: Record<string, any>) => [
+          info.id,
+          info,
+        ])
+      )
+    }
+    return new Map()
+  }, [isFetching, networkResp])
+
   useEffect(() => {
     setFilter((draft) => {
       draft.offset = 0
@@ -198,7 +218,11 @@ const DataSourceList = observer(() => {
               {sourceKindName && <SourceKindImg type={sourceKindName as any} />}
             </Center>
             <div tw="flex-1">
-              <div>{info.name}</div>
+              <div>
+                <Tooltip content={info.name} theme="dark">
+                  <span>{getEllipsisText(info.name, 14)}</span>
+                </Tooltip>
+              </div>
               <div tw="text-neut-8">{v}</div>
             </div>
           </FlexBox>
@@ -273,7 +297,36 @@ const DataSourceList = observer(() => {
                   <span tw="inline-block px-1.5 bg-[#F1E4FE] text-[#A855F7] rounded-sm mr-0.5">
                     内网
                   </span>
-                  {networkName}
+                  {networks.has(
+                    get(urlObj, 'network.vpc_network.network_id')
+                  ) ? (
+                    <Tooltip
+                      theme="darker"
+                      content={
+                        <>
+                          <div>
+                            {`VPC:   ${
+                              networks.get(
+                                get(urlObj, 'network.vpc_network.network_id')
+                              )?.router_id
+                            }`}
+                          </div>
+                          <div>
+                            {`vxnet: ${
+                              networks.get(
+                                get(urlObj, 'network.vpc_network.network_id')
+                              )?.vxnet_id
+                            }`}
+                          </div>
+                        </>
+                      }
+                      hasPadding
+                    >
+                      {networkName}
+                    </Tooltip>
+                  ) : (
+                    networkName
+                  )}
                 </div>
               )}
             </div>
@@ -318,6 +371,13 @@ const DataSourceList = observer(() => {
     {
       title: '数据源描述',
       dataIndex: 'comment',
+      render: (v: string) => {
+        return (
+          <Tooltip content={v} theme="dark" hasPadding>
+            <span>{getEllipsisText(v, 20)}</span>
+          </Tooltip>
+        )
+      },
     },
     {
       title: '创建时间',
@@ -358,10 +418,10 @@ const DataSourceList = observer(() => {
                 }}
               >
                 <MenuItem key="ping">
-                  <Icon name="trash" tw="mr-2" />
+                  <Icon name="if-doublecheck" tw="mr-2" />
                   可用性测试
                 </MenuItem>
-                <MenuItem key="update">
+                <MenuItem key="update" disabled={info.status === 2}>
                   <Icon name="pen" tw="mr-2" />
                   编辑
                 </MenuItem>
@@ -433,15 +493,16 @@ const DataSourceList = observer(() => {
               <Button
                 type="default"
                 disabled={
-                  sourceList.filter(
-                    ({
-                      source_id,
-                      status,
-                    }: {
-                      source_id: string
-                      status: number
-                    }) => selectedRowKeys.includes(source_id) && status !== 2
-                  ).length === 0
+                  // .filter(
+                  // ({
+                  // source_id,
+                  // status,
+                  // }: {
+                  // source_id: string
+                  // status: number
+                  // }) => selectedRowKeys.includes(source_id) && status !== 2
+                  // ).
+                  selectedRowKeys.length === 0
                 }
                 onClick={() =>
                   mutateOperation(
@@ -491,7 +552,7 @@ const DataSourceList = observer(() => {
               />
             </ToolBarRight>
           </ToolBar>
-          <Card tw="flex-1">
+          <Card tw="flex-1 pb-5 px-5">
             <Table
               selectType="checkbox"
               dataSource={sourceList}
@@ -534,10 +595,10 @@ const DataSourceList = observer(() => {
         }
         if (['disable', 'enable', 'delete'].includes(op)) {
           const info = confirmMsgInfo[op]
-          const filterSourceList =
-            op === 'delete'
-              ? opSourceList.filter((obj) => obj.status !== 2)
-              : opSourceList
+          const filterSourceList = opSourceList
+          // op === 'delete'
+          // ? opSourceList.filter((obj) => obj.status !== 2)
+          // : opSourceList
           return (
             <ModalWrapper
               visible
