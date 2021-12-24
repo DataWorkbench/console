@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { FlexBox } from 'components/Box'
+import { FlexBox, Icons, Tooltip, Center } from 'components'
 import { Button, Checkbox, Menu } from '@QCFE/lego-ui'
 import {
   Modal,
@@ -20,7 +20,6 @@ import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import dayjs from 'dayjs'
 import { omitBy, get } from 'lodash-es'
-import { Tooltip, Center } from 'components'
 import { useHistory, useParams } from 'react-router-dom'
 import { AssoiateModal } from './AssoiateModal'
 import ScheSettingModal from '../../../Dm/RealTime/ScheSettingModal'
@@ -144,7 +143,7 @@ export const ReleaseTable = observer(({ query }: any) => {
         setCurrentRelease(row)
         toggle()
       } else if (key === 'view') {
-        workFlowStore.set({ curJob: row })
+        workFlowStore.set({ curViewJobId: row.id })
         history.push(`/${regionId}/workspace/${spaceId}/dm`)
       } else if (key === 'update') {
         workFlowStore.set({ curJob: row })
@@ -191,8 +190,24 @@ export const ReleaseTable = observer(({ query }: any) => {
   const columns = useMemo(
     () => [
       {
-        title: '作业名称',
+        title: '作业名称/ID',
         dataIndex: 'name',
+        render: (value: string, row: Record<string, any>) => {
+          return (
+            <FlexBox tw="items-center space-x-1">
+              <Center
+                tw="bg-neut-13 rounded-full w-6 h-6 mr-2 border-2 border-solid border-neut-16"
+                className="release-icon"
+              >
+                <Icons name="stream-release" size={14} />
+              </Center>
+              <div tw="flex-1 break-all">
+                <div>{row.name}</div>
+                <div>{row.id}</div>
+              </div>
+            </FlexBox>
+          )
+        },
       },
       {
         title: '调度状态',
@@ -222,7 +237,7 @@ export const ReleaseTable = observer(({ query }: any) => {
         dataIndex: 'desc',
         width: 250,
         render: (value: string) => (
-          <Tooltip content={<Center tw="p-3">{value}</Center>}>
+          <Tooltip theme="light" content={<Center tw="p-3">{value}</Center>}>
             <div tw="max-w-[200px] truncate">{value}</div>
           </Tooltip>
         ),
@@ -315,6 +330,8 @@ export const ReleaseTable = observer(({ query }: any) => {
     setFilter((draft) => {
       draft.search = query.search
       draft.status = query.status
+      draft.offset = 0
+      draft.limit = 10
     })
   }, [query, setFilter])
 

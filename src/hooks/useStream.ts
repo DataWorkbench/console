@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import {
+  describeFlinkUI,
   listReleaseStreamJobs,
   listStreamJobInstances,
   offlineReleaseJob,
@@ -91,7 +92,14 @@ export const useMutationReleaseJobs = () => {
 export const useMutationInstance = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(
-    async ({ op, ...rest }: { op: OP; inst_ids: object[] }) => {
+    async ({
+      op,
+      ...rest
+    }: {
+      op: OP
+      inst_id?: String
+      inst_ids?: object[]
+    }) => {
       const params = {
         spaceId,
         regionId,
@@ -102,6 +110,8 @@ export const useMutationInstance = () => {
         ret = await resumeReleaseJob(params)
       } else if (op === 'stop') {
         ret = await terminateInstances(params)
+      } else if (op === 'view') {
+        ret = await describeFlinkUI(params)
       }
 
       return ret

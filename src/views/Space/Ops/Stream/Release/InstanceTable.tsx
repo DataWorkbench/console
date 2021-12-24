@@ -7,13 +7,19 @@ import {
   Divider,
   localstorage,
 } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, TextLink } from 'components'
+import { FlexBox, Center, TextLink, Icons } from 'components'
 import dayjs from 'dayjs'
-import { getJobInstanceKey, useQueryJobInstances } from 'hooks'
+import {
+  getJobInstanceKey,
+  useMutationInstance,
+  useQueryJobInstances,
+  useStore,
+} from 'hooks'
 import { omitBy, get } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
+import { useHistory, useParams } from 'react-router-dom'
 import { InstanceState } from '../constants'
 import MessageModal from './MessageModal'
 
@@ -39,6 +45,11 @@ export const InstanceTable = observer(
     query?: any
     modalData?: any
   }) => {
+    const { workFlowStore } = useStore()
+    const history = useHistory()
+    const { regionId, spaceId } =
+      useParams<{ regionId: string; spaceId: string }>()
+
     const [messageVisible, setMessageVisible] = useState(false)
     const [currentRow, setCurrentRow] = useState(undefined)
     const [columnSettings, setColumnSettings] = useState(
@@ -55,6 +66,7 @@ export const InstanceTable = observer(
     })
 
     const queryClient = useQueryClient()
+    const mutation = useMutationInstance()
 
     const { isFetching, isRefetching, data } = useQueryJobInstances(
       omitBy(filter, (v) => v === ''),
@@ -71,10 +83,45 @@ export const InstanceTable = observer(
       setMessageVisible(true)
     }
 
+    const handleFinkUI = (id: String) => {
+      mutation.mutate(
+        { op: 'view', inst_id: id },
+        {
+          onSuccess: (response: any) => {
+            const ele = document.createElement('a')
+            ele.style.display = 'none'
+            ele.target = '_blank'
+            ele.href = `//${response?.web_ui || ''}`
+            document.body.appendChild(ele)
+            ele.click()
+            document.body.removeChild(ele)
+          },
+        }
+      )
+    }
+
+    const handleJobView = (curViewJobId: string) => {
+      workFlowStore.set({ curViewJobId })
+      history.push(`/${regionId}/workspace/${spaceId}/dm`)
+    }
+
     const columns = [
       {
         title: '实例ID',
         dataIndex: 'id',
+        render: (value: string) => {
+          return (
+            <FlexBox tw="items-center space-x-1">
+              <Center
+                tw="bg-neut-13 rounded-full w-6 h-6 mr-2 border-2 border-solid border-neut-16"
+                className="release-icon"
+              >
+                <Icons name="stream-job" size={14} />
+              </Center>
+              <div tw="flex-1 break-all">{value}</div>
+            </FlexBox>
+          )
+        },
       },
       {
         title: '状态',
@@ -89,8 +136,21 @@ export const InstanceTable = observer(
         },
       },
       {
-        title: '所属作业',
+        title: '所属作业/ID',
         dataIndex: 'job_id',
+        render: (value: string, row: Record<string, any>) => {
+          return (
+            <div>
+              {/* <div>{row.job_name}</div> */}
+              <div
+                tw="hover:text-green-11 cursor-pointer"
+                onClick={() => handleJobView(row.job_id)}
+              >
+                {value}
+              </div>
+            </div>
+          )
+        },
       },
       {
         title: '创建时间',
@@ -125,11 +185,8 @@ export const InstanceTable = observer(
         render: (_: any, row: Record<string, any>) => {
           return (
             <FlexBox tw="items-center">
-              <Button type="text" disabled={row.state === 1}>
-                <TextLink
-                  href={`//${row.id}.flink.databench.io`}
-                  target="_blank"
-                >
+              <Button type="text">
+                <TextLink onClick={() => handleFinkUI(row.id)}>
                   Flink UI
                 </TextLink>
               </Button>
@@ -160,6 +217,8 @@ export const InstanceTable = observer(
         draft.job_id = query.jobId || modalData.id || ''
         draft.state = query.state || 0
         draft.version = query.version || ''
+        draft.offset = 0
+        draft.limit = 10
       })
     }, [modalData.id, query, setFilter])
 
@@ -190,7 +249,7 @@ export const InstanceTable = observer(
         </FlexBox>
         <Table
           rowKey="id"
-          loading={isFetching}
+          loading={isFetching || mutation.isLoading}
           dataSource={infos || []}
           columns={filterColumn.length > 0 ? filterColumn : columns}
           onSort={(sortKey: any, order: string) => {
@@ -221,6 +280,7 @@ export const InstanceTable = observer(
           visible={messageVisible}
           row={currentRow}
           cancel={() => setMessageVisible(false)}
+          webUI={handleFinkUI}
         />
       </FlexBox>
     )
