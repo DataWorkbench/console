@@ -30,8 +30,6 @@ const { TextField } = Form
 
 const StreamJAR = () => {
   const { workFlowStore } = useStore()
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
   const [enableRelease, setEnableRelease] = useState(false)
   const [show, toggleShow] = useState(false)
   const [uploadVisible, setUploadVisible] = useState(false)
