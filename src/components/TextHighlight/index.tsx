@@ -5,7 +5,7 @@ const FilterBox = styled.span(() => [tw`text-green-11`])
 
 interface ITextHighlightProps {
   text: string
-  filterText: string
+  filterText?: string
   color?: string
 }
 export const TextHighlight = (props: ITextHighlightProps) => {

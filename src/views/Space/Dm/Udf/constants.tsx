@@ -1,4 +1,5 @@
-import { Center, Tooltip } from 'components'
+import { TextEllipsis } from 'components'
+import tw from 'twin.macro'
 
 import { LetterIcon } from '../styled'
 
@@ -59,14 +60,15 @@ export const baseColumns = [
   {
     title: '函数名称',
     dataIndex: 'name',
+    // width: 200,
     render: (value: string) => {
       return value ? (
-        <span tw="inline-flex">
+        <div tw="cursor-pointer flex-auto flex items-center">
           <LetterIcon tw="flex-none items-center">
             <span>{value}</span>
           </LetterIcon>
-          <span className="column-name">{value}</span>
-        </span>
+          <TextEllipsis>{value}</TextEllipsis>
+        </div>
       ) : (
         ''
       )
@@ -87,14 +89,9 @@ export const baseColumns = [
   },
   {
     title: '描述',
-    width: 190,
     dataIndex: 'comment',
     render: (val: string) => {
-      return (
-        <Tooltip content={<Center tw="p-3 break-all">{val}</Center>}>
-          <div tw="max-w-[150px] truncate text-neut-8">{val}</div>
-        </Tooltip>
-      )
+      return <TextEllipsis twStyle={tw`text-neut-8`}>{val}</TextEllipsis>
     },
   },
 ]

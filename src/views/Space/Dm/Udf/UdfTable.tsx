@@ -8,7 +8,8 @@ import dayjs from 'dayjs'
 
 // import { Table } from 'views/Space/styled'
 import { useQueryUdfList, useStore } from 'hooks'
-import { Center, TextHighlight, TextLink, Tooltip } from 'components'
+import { TextEllipsis, TextHighlight, TextLink } from 'components'
+import tw from 'twin.macro'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
@@ -28,17 +29,22 @@ const getDefaultColumns = (
 
     render: (value: string, row: Record<string, any>) => {
       return value ? (
-        <span
-          tw="cursor-pointer inline-flex items-center"
+        <div
+          tw="cursor-pointer flex-auto flex items-center"
           onClick={() => actions('detail', row)}
         >
           <LetterIcon tw="flex-none">
             <span>{value}</span>
           </LetterIcon>
-          <span className="column-name">
-            <TextHighlight text={value} filterText={filter.search} />
-          </span>
-        </span>
+          <div
+            tw="flex-auto hover:text-green-11 font-medium"
+            className="column-name"
+          >
+            <TextEllipsis>
+              <TextHighlight text={value} filterText={filter.search} />
+            </TextEllipsis>
+          </div>
+        </div>
       ) : (
         ''
       )
@@ -65,14 +71,10 @@ const getDefaultColumns = (
   },
   {
     title: '描述',
-    width: 190,
+    // width: 190,
     dataIndex: 'comment',
     render: (val: string) => {
-      return (
-        <Tooltip content={<Center tw="p-3 break-all">{val}</Center>}>
-          <div tw="max-w-[150px] truncate text-neut-8">{val}</div>
-        </Tooltip>
-      )
+      return <TextEllipsis twStyle={tw`text-neut-8`}>{val}</TextEllipsis>
     },
   },
   {
