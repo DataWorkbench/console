@@ -220,8 +220,8 @@ const DataSourceList = observer(() => {
             </Center>
             <div tw="flex-1">
               <div>
-                <Tooltip content={info.name} theme="dark">
-                  <span>{getEllipsisText(info.name, 14)}</span>
+                <Tooltip content={info.name} hasPadding theme="dark">
+                  <span>{getEllipsisText(info.name, 20)}</span>
                 </Tooltip>
               </div>
               <div tw="text-neut-8">{v}</div>
@@ -323,10 +323,14 @@ const DataSourceList = observer(() => {
                       }
                       hasPadding
                     >
-                      {networkName}
+                      <span title={networkName}>
+                        {getEllipsisText(networkName, 26)}
+                      </span>
                     </Tooltip>
                   ) : (
-                    networkName
+                    <span title={networkName}>
+                      {getEllipsisText(networkName, 26)}
+                    </span>
                   )}
                 </div>
               )}
