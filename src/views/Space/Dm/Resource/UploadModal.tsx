@@ -14,8 +14,7 @@ import {
   LevelRight,
 } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
-import { observer } from 'mobx-react-lite'
-import { getResourcePageQueryKey, useMutationResource, useStore } from 'hooks'
+import { useMutationResource } from 'hooks'
 import {
   DarkModal,
   Tooltip,
@@ -25,11 +24,9 @@ import {
   PopConfirm,
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
-import { useQueryClient } from 'react-query'
-import { loadResourceList } from 'stores/api'
-import { useParams } from 'react-router-dom'
 import { formatBytes } from 'utils/convert'
 import axios from 'axios'
+import { useImmer } from 'use-immer'
 import {
   // PackageDocsHref,
   PackageName,
@@ -96,42 +93,56 @@ const LoadingWrap = styled(Loading)(() => [
   `,
 ])
 
-interface IRouteParams {
-  regionId: string
-  spaceId: string
-  mod?: string
+type IPackageType = 'program' | 'function' | 'dependency'
+
+interface IFormFields {
+  resource_id?: String | undefined
+  resource_type: Number
+  file?: File | undefined
+  resource_name: String
+  description: String
 }
 
-const UploadModal = observer((props: any) => {
+const getDefaultFields = (type: IPackageType) => ({
+  resource_id: undefined,
+  resource_type: PackageTypeMap[type],
+  file: undefined,
+  resource_name: '',
+  description: '',
+})
+
+const UploadModal = (props: any) => {
   const {
-    dmStore: { setOp, op },
-  } = useStore()
-  const { visible, handleCancel, type: packageType, defaultFields } = props
+    visible,
+    operation,
+    handleCancel,
+    handleSuccess,
+    type: packageType,
+    initFields,
+  } = props
 
-  const { regionId, spaceId } = useParams<IRouteParams>()
+  const PackageNameByType = PackageName[packageType]
+  const defaultFields = getDefaultFields(packageType)
 
-  const [resourceName, setResourceName] = useState(
-    (op !== 'create' && defaultFields.name) || ''
-  )
+  const [fields, setFields] = useImmer<IFormFields>(defaultFields)
   const [fileTip, setFileTip] = useState('')
-  const [file, setFile] = useState<File>()
-  const [cancelUpload, setCancelUpload] = useState<() => void>()
   const [isFailed, setIsFailed] = useState(false)
+  const [cancelUpload, setCancelUpload] = useState<() => void>()
 
-  const resourceEl = useRef<HTMLInputElement>(null)
   const form = useRef<Form>(null)
-
+  const resourceEl = useRef<HTMLInputElement>(null)
   const mutation = useMutationResource()
 
-  const queryClient = useQueryClient()
-
   useEffect(() => {
-    form.current?.validateFields()
-  }, [resourceName])
-
-  useEffect(() => {
-    if (visible) setResourceName(defaultFields.name || '')
-  }, [defaultFields.name, visible])
+    if (initFields) {
+      setFields((draft) => {
+        draft.resource_id = initFields.resource_id
+        draft.resource_type = initFields.type
+        draft.resource_name = initFields.name
+        draft.description = initFields.description
+      })
+    }
+  }, [initFields, setFields])
 
   const closeModal = () => {
     if (cancelUpload) {
@@ -140,9 +151,7 @@ const UploadModal = observer((props: any) => {
     }
 
     handleCancel()
-    setFile(undefined)
-    setOp('')
-    setResourceName('')
+    setFields(defaultFields)
     setFileTip('')
     setIsFailed(false)
   }
@@ -154,8 +163,8 @@ const UploadModal = observer((props: any) => {
   }
 
   const handleClear = () => {
-    setFile(undefined)
     setIsFailed(false)
+    setFields(defaultFields)
     if (cancelUpload) {
       cancelUpload()
       setCancelUpload(undefined)
@@ -164,62 +173,49 @@ const UploadModal = observer((props: any) => {
 
   const handleResourceChange = (event: any) => {
     const resource = event.target.files[0]
+    const { size, name } = resource
 
-    if (resource.size === 0) {
+    if (size === 0) {
       Message.error('文件大小为0')
       return
     }
-    if (resource.size > 100 * 1024 * 1024) {
+    if (size > 100 * 1024 * 1024) {
       setFileTip('size')
       return
     }
-    if (!/.jar$/.test(resource.name)) {
+    if (!/.jar$/.test(name)) {
       setFileTip('type')
       return
     }
-    setFile(resource)
+
     setFileTip('')
-    if (!resourceName) setResourceName(resource.name)
+
+    setFields((draft) => {
+      draft.file = resource
+      if (!fields.resource_name) draft.resource_name = name
+    })
   }
 
   const handleOk = async () => {
     if (!form.current?.validateFields()) return
-    const fields = form.current?.getFieldsValue() || {}
-    if (op === 'create') {
-      const ret = await loadResourceList({
-        regionId,
-        spaceId,
-        resource_name: fields.resource_name,
-        resource_type: PackageTypeMap[packageType],
-      })
-      if (ret.infos?.length > 0) {
-        Message.error('名称已存在')
-        return
-      }
-    }
 
     setIsFailed(false)
-
-    const params = {
-      resource_type: PackageTypeMap[packageType],
-      ...fields,
-      file,
-      resource_id: defaultFields.resource_id,
-    }
     mutation.mutate(
       {
-        op,
+        op: operation,
         cancel: (c: any) => {
           setCancelUpload(() => () => c())
         },
-        ...params,
+        ...fields,
       },
       {
-        onSuccess: async () => {
-          setOp('')
-          handleCancel()
-          setFile(undefined)
-          queryClient.invalidateQueries(getResourcePageQueryKey())
+        onSuccess: async (data) => {
+          if (data === 'DUPLICATE_RESOURCE_NAME') {
+            Message.error('名称已存在')
+            return
+          }
+          closeModal()
+          if (handleSuccess) handleSuccess()
         },
         onError: (error) => {
           if (!axios.isCancel(error)) {
@@ -236,12 +232,12 @@ const UploadModal = observer((props: any) => {
       closable={false}
       escClosable={false}
       maskClosable={false}
-      title={`${op === 'edit' ? '编辑' : '上传'}${PackageName[packageType]}`}
+      title={`${operation === 'edit' ? '编辑' : '上传'}${PackageNameByType}`}
       visible={visible}
       onCancel={closeModal}
       footer={
         <>
-          {!file ? (
+          {!fields.file ? (
             <Button tw="bg-neut-16!" onClick={closeModal}>
               取消
             </Button>
@@ -256,7 +252,7 @@ const UploadModal = observer((props: any) => {
               <Button tw="bg-neut-16! mr-3">取消</Button>
             </PopConfirm>
           )}
-          {op === 'edit' && (
+          {operation === 'edit' && (
             <Button
               type="primary"
               onClick={handleOk}
@@ -265,14 +261,14 @@ const UploadModal = observer((props: any) => {
               确认
             </Button>
           )}
-          {op !== 'edit' && !file && (
+          {operation !== 'edit' && !fields.file && (
             <Tooltip
               theme="light"
               animation="fade"
               placement="top-end"
               content={
                 <Center tw="h-9 px-3 text-neut-13">
-                  请先添加符合要求的{PackageName[packageType]}
+                  请先添加符合要求的{PackageNameByType}
                 </Center>
               }
             >
@@ -281,8 +277,8 @@ const UploadModal = observer((props: any) => {
               </Button>
             </Tooltip>
           )}
-          {op !== 'edit' &&
-            file &&
+          {operation !== 'edit' &&
+            fields.file &&
             (mutation.isLoading ? (
               <Tooltip
                 theme="light"
@@ -328,16 +324,16 @@ const UploadModal = observer((props: any) => {
         }
       />
       <Form ref={form} tw="pl-0!">
-        {op !== 'edit' && (
+        {operation !== 'edit' && (
           <Field tw="mb-0!">
             <Label className="medium">
-              <AffixLabel required>添加{PackageName[packageType]}</AffixLabel>
+              <AffixLabel required>添加{PackageNameByType}</AffixLabel>
             </Label>
             <ControlWrap
               tw="max-w-none! w-auto!"
-              className={file ? 'has-icons-left has-icons-right' : ''}
+              className={fields.file ? 'has-icons-left has-icons-right' : ''}
             >
-              {!file ? (
+              {!fields.file ? (
                 <Button
                   tw="bg-neut-16! border-green-11! text-green-11!"
                   onClick={handleFile}
@@ -352,7 +348,7 @@ const UploadModal = observer((props: any) => {
                     onChange={handleResourceChange}
                   />
                   <ColoredIcon name="add" />
-                  添加{PackageName[packageType]}
+                  添加{PackageNameByType}
                 </Button>
               ) : (
                 <>
@@ -360,9 +356,9 @@ const UploadModal = observer((props: any) => {
                   &nbsp;
                   <InputWapper />
                   <div tw="absolute left-8 top-1/2 -translate-y-1/2">
-                    {file.name}
+                    {fields.file.name}
                     <span tw="text-neut-8 ml-2">
-                      ({formatBytes(file.size, 2)})
+                      ({formatBytes(fields.file.size, 2)})
                     </span>
                     {isFailed && (
                       <span tw="text-red-10 ml-2">文件上传失败</span>
@@ -406,7 +402,7 @@ const UploadModal = observer((props: any) => {
             </ControlWrap>
           </Field>
         )}
-        {op !== 'edit' && (
+        {operation !== 'edit' && (
           <div tw="pb-3">
             <div tw="pl-28 ml-2 pt-1 text-neut-8">
               仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
@@ -434,15 +430,20 @@ const UploadModal = observer((props: any) => {
           autoComplete="off"
           name="resource_name"
           labelClassName="medium"
-          placeholder={`请输入${PackageName[packageType]}显示名`}
-          label={
-            <AffixLabel required>{PackageName[packageType]}显示名</AffixLabel>
-          }
+          placeholder={`请输入${PackageNameByType}显示名`}
+          label={<AffixLabel required>{PackageNameByType}显示名</AffixLabel>}
           validateOnBlur
+          disabled={operation === 'view'}
+          onChange={(value: string) =>
+            setFields((draft) => {
+              draft.resource_name = value
+            })
+          }
+          value={fields.resource_name}
           schemas={[
             {
               rule: { required: true },
-              help: `请输入${PackageName[packageType]}显示名`,
+              help: `请输入${PackageNameByType}显示名`,
               status: 'error',
             },
             {
@@ -456,22 +457,24 @@ const UploadModal = observer((props: any) => {
               status: 'error',
             },
           ]}
-          disabled={op === 'view'}
-          value={resourceName}
-          onChange={(value: string) => setResourceName(value)}
         />
         <TextAreaFieldWrapper
           name="description"
           labelClassName="medium"
           label="描述"
-          placeholder={`请输入${PackageName[packageType]}描述`}
+          placeholder={`请输入${PackageNameByType}描述`}
           maxLength="500"
-          disabled={op === 'view'}
-          defaultValue={(op !== 'create' && defaultFields.description) || ''}
+          disabled={operation === 'view'}
+          value={fields.description}
+          onChange={(value: String) =>
+            setFields((draft) => {
+              draft.description = value
+            })
+          }
         />
       </Form>
     </DarkModal>
   )
-})
+}
 
 export default UploadModal
