@@ -3,6 +3,7 @@ import { FlexBox, Modal } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
 import { theme } from 'twin.macro'
+import { useUnmount } from 'react-use'
 import Editor from 'react-monaco-editor'
 import { useQueryClient } from 'react-query'
 import {
@@ -12,6 +13,7 @@ import {
   useQueryStreamJobCode,
   // getStreamJobCodeKey,
   getFlowKey,
+  useStore,
 } from 'hooks'
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
@@ -32,6 +34,7 @@ interface IProp {
 }
 
 const StreamCode = ({ tp }: IProp) => {
+  const { workFlowStore } = useStore()
   const [show, toggleShow] = useState(false)
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
@@ -193,6 +196,19 @@ def main(args: Array[String]): Unit = {
     }
   }, [codeStr, defaultCode])
 
+  useUnmount(() => {
+    workFlowStore.set({
+      showNotify: false,
+    })
+  })
+
+  const handleReleaseSuccess = () => {
+    toggleShow(false)
+    workFlowStore.set({
+      showNotify: true,
+    })
+  }
+
   return (
     <FlexBox tw="h-full w-full flex-1">
       <FlexBox tw="flex flex-col flex-1 w-full">
@@ -270,7 +286,12 @@ def main(args: Array[String]): Unit = {
           </div>
         </Modal>
       )}
-      {show && <ReleaseModal onCancel={() => toggleShow(false)} />}
+      {show && (
+        <ReleaseModal
+          onSuccess={handleReleaseSuccess}
+          onCancel={() => toggleShow(false)}
+        />
+      )}
     </FlexBox>
   )
 }

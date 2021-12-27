@@ -1,12 +1,13 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useUpdateEffect, useUnmount } from 'react-use'
-import { Tabs } from '@QCFE/lego-ui'
+import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { findIndex } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
 import { useStore } from 'stores'
+import { RouterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import StreamOperator from './StreamOperator'
 import StreamCode from './StreamCode'
@@ -46,8 +47,11 @@ const TabWrapper = styled(Tabs)(() => [
       }
       .tabs-handler {
         ${tw`h-9 bg-gradient-to-r from-neut-15 to-neut-16 bg-opacity-70 rounded-t-sm border-b-0`}
-        svg {
-          ${tw`text-white`}
+        > span.icon {
+          ${tw`-mt-1!`}
+          svg {
+            ${tw`text-white`}
+          }
         }
       }
     }
@@ -61,10 +65,12 @@ const TabWrapper = styled(Tabs)(() => [
 ])
 
 const JobTabs = observer(() => {
-  const { spaceId } = useParams<{ spaceId: string }>()
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const notifyTmRef = useRef<any>(null)
   const {
     workFlowStore,
-    workFlowStore: { curJob, panels, addPanel, removePanel },
+    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify },
   } = useStore()
 
   const added = curJob && findIndex(panels, (p) => p.id === curJob.id) > -1
@@ -75,12 +81,25 @@ const JobTabs = observer(() => {
     }
   }, [curJob, added, addPanel])
 
+  useEffect(() => {
+    if (showNotify) {
+      if (notifyTmRef.current) {
+        clearTimeout(notifyTmRef.current)
+      }
+      notifyTmRef.current = setTimeout(() => {
+        workFlowStore.set({
+          showNotify: false,
+        })
+      }, 5000)
+    }
+  }, [showNotify, notifyTmRef, workFlowStore])
+
   useUpdateEffect(() => {
     workFlowStore.set({ panels: [], curJob: null })
   }, [spaceId, workFlowStore])
 
   useUnmount(() => {
-    workFlowStore.set({ panels: [], curJob: null })
+    workFlowStore.set({ panels: [], curJob: null, curViewJobId: null })
   })
 
   const showNames: any = useMemo(
@@ -95,7 +114,34 @@ const JobTabs = observer(() => {
   )
 
   return (
-    <div tw="flex-1 w-full overflow-x-hidden relative">
+    <div tw="flex-1 w-full overflow-x-hidden">
+      {showNotify && (
+        <div tw="absolute left-0 top-0 w-full pointer-events-none z-10">
+          <div tw="flex justify-center">
+            <div tw="flex items-center bg-white text-neut-15 px-3 py-2 rounded-sm">
+              <Icon
+                name="success"
+                type="light"
+                size={20}
+                tw="mr-2"
+                color={{
+                  secondary: '#15a675',
+                }}
+              />
+              <div tw="pointer-events-auto">
+                调度作业发布成功，您可前往
+                <RouterLink
+                  color="blue"
+                  to={`/${regionId}/workspace/${spaceId}/ops/release`}
+                >
+                  运维中心-已发布作业
+                </RouterLink>{' '}
+                查看作业详情
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <TabWrapper
         type="card"
         activeName={curJob?.id}

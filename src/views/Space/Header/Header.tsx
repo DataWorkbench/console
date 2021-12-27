@@ -41,10 +41,8 @@ export const Header = observer(() => {
   const space = workspaces?.find(({ id }) => id === spaceId)
   const spaceIndex: number = workspaces?.findIndex(({ id }) => id === spaceId)
 
-  const loadData = () => {
-    if (hasNextPage) {
-      fetchNextPage()
-    }
+  if (status === 'success' && hasNextPage) {
+    fetchNextPage()
   }
 
   return (
@@ -69,10 +67,10 @@ export const Header = observer(() => {
           darkMode={darkMode}
           defaultValue={spaceId}
           isLoading={status === 'loading'}
-          isLoadingAtBottom
+          // isLoadingAtBottom
           searchable={false}
-          onMenuScrollToBottom={loadData}
-          bottomTextVisible
+          // onMenuScrollToBottom={loadData}
+          // bottomTextVisible
           options={workspaces.map(({ id, name }) => ({
             value: id,
             label: name,

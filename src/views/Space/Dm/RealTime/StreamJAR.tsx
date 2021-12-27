@@ -10,6 +10,7 @@ import {
   TextLink,
 } from 'components'
 import { useImmer } from 'use-immer'
+import { useUnmount } from 'react-use'
 import { useQueryClient } from 'react-query'
 import {
   useQueryResource,
@@ -18,6 +19,7 @@ import {
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
   getResourceKey,
+  useStore,
 } from 'hooks'
 import { get, flatten } from 'lodash-es'
 import { useParams } from 'react-router-dom'
@@ -28,6 +30,7 @@ import { StreamToolBar } from './styled'
 const { TextField } = Form
 
 const StreamJAR = () => {
+  const { workFlowStore } = useStore()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
   const [enableRelease, setEnableRelease] = useState(false)
@@ -97,6 +100,20 @@ const StreamJAR = () => {
       toggleShow(true)
     }
   }
+
+  useUnmount(() => {
+    workFlowStore.set({
+      showNotify: false,
+    })
+  })
+
+  const handleReleaseSuccess = () => {
+    toggleShow(false)
+    workFlowStore.set({
+      showNotify: true,
+    })
+  }
+
   return (
     <FlexBox tw="h-full flex-1">
       <FlexBox tw="flex-col flex-1 pl-5">
@@ -228,7 +245,12 @@ const StreamJAR = () => {
             />
           </Form>
         </div>
-        {show && <ReleaseModal onCancel={() => toggleShow(false)} />}
+        {show && (
+          <ReleaseModal
+            onSuccess={handleReleaseSuccess}
+            onCancel={() => toggleShow(false)}
+          />
+        )}
         {showScheModal && (
           <Modal
             visible

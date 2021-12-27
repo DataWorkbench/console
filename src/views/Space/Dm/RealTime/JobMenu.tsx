@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Tooltip, Menu } from '@QCFE/lego-ui'
 import { Icon, InputSearch, Loading, Modal } from '@QCFE/qingcloud-portal-ui'
@@ -6,7 +6,6 @@ import { motion } from 'framer-motion'
 import tw, { css, styled, theme } from 'twin.macro'
 import { flatten, get } from 'lodash-es'
 import { useStore } from 'stores'
-import { useScroll } from 'react-use'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import { useInfiniteQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
@@ -47,9 +46,7 @@ const JobMenu = observer(() => {
   const [visible, setVisible] = useState(false)
   const [isOpenHelp, setIsOpenHelp] = useState(true)
   const [delVisible, setDelVisible] = useState(false)
-  const [showMoreLoading, setShowMoreLoading] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const scrollPos = useScroll(scrollRef)
+
   const [filter, setFilter] = useImmer({
     search: '',
     offset: 0,
@@ -62,16 +59,15 @@ const JobMenu = observer(() => {
   const mutation = useMutationStreamJob()
   const {
     workFlowStore,
-    workFlowStore: { curJob, removePanel },
+    workFlowStore: { curJob, curViewJobId, removePanel },
   } = useStore()
   const flows = flatten(flowsRet.data?.pages.map((page) => page.infos || []))
 
-  const needLoadingMore =
-    scrollRef?.current &&
-    scrollPos.y > 0 &&
-    scrollRef.current.scrollHeight -
-      (scrollPos.y + scrollRef.current.clientHeight) <=
-      20
+  if (flowsRet.isSuccess) {
+    if (flowsRet.hasNextPage) {
+      flowsRet.fetchNextPage()
+    }
+  }
 
   useEffect(() => {
     if (flows && curCreateJobId) {
@@ -84,15 +80,13 @@ const JobMenu = observer(() => {
   }, [flows, curCreateJobId, workFlowStore])
 
   useEffect(() => {
-    if (needLoadingMore) {
-      if (flowsRet.hasNextPage) {
-        setShowMoreLoading(true)
-        flowsRet.fetchNextPage()
-      } else {
-        setShowMoreLoading(false)
+    if (flows && curViewJobId) {
+      const curFlow = flows.find((flow) => flow.id === curViewJobId)
+      if (curFlow) {
+        workFlowStore.set({ curJob: curFlow, curViewJobId: null })
       }
     }
-  }, [needLoadingMore, flowsRet])
+  }, [flows, curViewJobId, workFlowStore])
 
   const handleItemClick = useCallback(
     (flow) => {
@@ -105,13 +99,11 @@ const JobMenu = observer(() => {
     setVisible(true)
     setEditJob(job)
   }
-  const hideEditModal = (data: any) => {
+  const hideCreateEditModal = (data: any) => {
     const jobId = get(data, 'id')
     if (jobId) {
       setCurCreateJobId(jobId)
-      // setAlterFlowId(jobId)
     }
-    // console.log(jobId)
     setVisible(false)
     setEditJob(null)
   }
@@ -181,7 +173,7 @@ const JobMenu = observer(() => {
         <div tw="mt-3 px-2 flex items-center">
           <InputSearch
             tw="dark:bg-neut-17 dark:text-white dark:border-neut-13 dark:hover:border-neut-13"
-            placeholder="搜索作业名称/创建人"
+            placeholder="搜索作业名称"
             onPressEnter={(evt) => {
               setFilter((draft) => {
                 draft.search = String((evt.target as HTMLInputElement).value)
@@ -263,7 +255,7 @@ const JobMenu = observer(() => {
           </button>
         </div>
       </div>
-      <div tw="pt-4 flex-1 h-full overflow-y-auto" ref={scrollRef}>
+      <div tw="pt-4 flex-1 h-full overflow-y-auto">
         <SimpleBar tw="h-full">
           {(() => {
             if (flowsRet.isLoading) {
@@ -343,15 +335,12 @@ const JobMenu = observer(() => {
                     )}
                   </FlexBox>
                 ))}
-                <div css={[tw`h-10`, !showMoreLoading && tw`hidden`]}>
-                  <Loading size="small" />
-                </div>
               </>
             )
           })()}
         </SimpleBar>
       </div>
-      {visible && <JobModal job={editJob} onCancel={hideEditModal} />}
+      {visible && <JobModal job={editJob} onCancel={hideCreateEditModal} />}
       {delVisible && (
         <Modal
           visible
