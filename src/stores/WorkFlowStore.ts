@@ -11,11 +11,13 @@ interface IJob {
 class WorkFlowStore {
   rootStore
 
-  curViewJobId: undefined | string
+  curViewJobId: null | string = null
 
   curJob: null | IJob = null
 
   panels: IJob[] = []
+
+  showNotify = false
 
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {

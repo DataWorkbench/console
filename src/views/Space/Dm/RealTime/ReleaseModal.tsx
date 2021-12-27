@@ -17,8 +17,8 @@ const ReleaseModal = ({
   onCancel,
   onSuccess,
 }: {
-  onCancel: () => void
-  onSuccess: () => void
+  onCancel?: () => void
+  onSuccess?: () => void
 }) => {
   const releaseMutation = useMutationReleaseStreamJob()
   const [params, setParams] = useImmer({
@@ -38,8 +38,9 @@ const ReleaseModal = ({
             content: '发布成功',
             placement: 'bottomRight',
           })
-          onCancel()
-          onSuccess()
+          if (onSuccess) {
+            onSuccess()
+          }
         },
       }
     )
@@ -51,6 +52,8 @@ const ReleaseModal = ({
       onCancel={onCancel}
       onOk={onOk}
       confirmLoading={releaseMutation.isLoading}
+      escClosable={false}
+      maskClosable={false}
     >
       <div tw="flex">
         <Icon
