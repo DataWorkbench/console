@@ -123,6 +123,10 @@ const customStyles = css`
         }
       }
     }
+
+    .tippy-content {
+      ${tw`leading-5`}
+    }
   }
 `
 

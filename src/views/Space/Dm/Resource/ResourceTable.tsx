@@ -20,7 +20,6 @@ import {
   getResourcePageQueryKey,
   useMutationResource,
   useQueryResourceByPage,
-  useStore,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
 import { FlexBox, Center, Tooltip, Icons, TextLink } from 'components'
@@ -79,14 +78,11 @@ interface IFilter {
 
 const ResourceTable: React.FC<{ className?: string }> = observer(
   ({ className }) => {
-    const {
-      dmStore: { setOp },
-    } = useStore()
-
+    const [operation, setOperation] = useState('')
     const [uploadVisible, setUploadVisible] = useState(false)
     const [deleteVisible, setDeleteVisible] = useState(false)
     const [deleteData, setDeleteData] = useState<any>({})
-    const [defaultFields, setDefaultFields] = useState({})
+    const [defaultFields, setDefaultFields] = useState(undefined)
     const [packageType, setPackageType] = useState('program')
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
     const [selectedRows, setSelectedRows] = useState<any>([])
@@ -112,13 +108,9 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       queryClient.invalidateQueries(getResourcePageQueryKey())
     }, [queryClient])
 
-    const toggle = useCallback(() => {
-      setUploadVisible(!uploadVisible)
-    }, [uploadVisible])
-
     const handleUploadClick = () => {
-      setOp('create')
-      toggle()
+      setOperation('create')
+      setUploadVisible(true)
     }
 
     const handleTabChange = (name: string) => {
@@ -132,14 +124,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       setSelectedMap([])
     }
 
-    const handleEdit = useCallback(
-      (row) => {
-        setOp('edit')
-        toggle()
-        setDefaultFields(row)
-      },
-      [setOp, toggle]
-    )
+    const handleEdit = useCallback((row) => {
+      setDefaultFields(row)
+      setOperation('edit')
+      setUploadVisible(true)
+    }, [])
 
     const handleDelSuccess = () => {
       refetchData()
@@ -168,14 +157,11 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       [selectedRows]
     )
 
-    const handleReupload = useCallback(
-      (row: any) => {
-        setDefaultFields(row)
-        toggle()
-        setOp('view')
-      },
-      [toggle, setOp]
-    )
+    const handleReupload = useCallback((row: any) => {
+      setDefaultFields(row)
+      setUploadVisible(true)
+      setOperation('view')
+    }, [])
 
     const handleDownload = useCallback(
       (row: any) => {
@@ -446,7 +432,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           <Table
             rowKey="resource_id"
             selectType="checkbox"
-            loading={isFetching}
+            loading={isFetching || mutation.isLoading}
             dataSource={infos || []}
             columns={filterColumn.length > 0 ? filterColumn : columns}
             selectedRowKeys={selectedRowKeys}
@@ -483,12 +469,20 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
           />
         </div>
 
-        <UploadModal
-          visible={uploadVisible}
-          type={packageType}
-          handleCancel={toggle}
-          defaultFields={defaultFields}
-        />
+        {uploadVisible && (
+          <UploadModal
+            type={packageType}
+            operation={operation}
+            visible={uploadVisible}
+            initFields={defaultFields}
+            handleCancel={() => {
+              setUploadVisible(false)
+              setDefaultFields(undefined)
+              setOperation('')
+            }}
+            handleSuccess={refetchData}
+          />
+        )}
 
         {Object.keys(deleteData).length && (
           <DeleteModal

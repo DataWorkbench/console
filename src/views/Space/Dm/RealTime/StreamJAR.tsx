@@ -7,7 +7,6 @@ import {
   Tooltip,
   Modal,
   SelectWithRefresh,
-  TextLink,
 } from 'components'
 import { useImmer } from 'use-immer'
 import { useUnmount } from 'react-use'
@@ -22,10 +21,10 @@ import {
   useStore,
 } from 'hooks'
 import { get, flatten } from 'lodash-es'
-import { useParams } from 'react-router-dom'
 import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
 import { StreamToolBar } from './styled'
+import UploadModal from '../Resource/UploadModal'
 
 const { TextField } = Form
 
@@ -35,6 +34,7 @@ const StreamJAR = () => {
     useParams<{ regionId: string; spaceId: string }>()
   const [enableRelease, setEnableRelease] = useState(false)
   const [show, toggleShow] = useState(false)
+  const [uploadVisible, setUploadVisible] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const queryClient = useQueryClient()
@@ -148,12 +148,14 @@ const StreamJAR = () => {
               help={
                 <div tw="text-neut-8">
                   如需选择新的资源，可以在资源管理中
-                  <TextLink
-                    href={`/${regionId}/workspace/${spaceId}/dm/resource`}
-                    tw="text-white underline text-underline-offset[2px]"
+                  <span
+                    tw="text-green-11 cursor-pointer"
+                    onClick={() => {
+                      setUploadVisible(true)
+                    }}
                   >
                     上传资源
-                  </TextLink>
+                  </span>
                 </div>
               }
               valueRenderer={(option: any) => (
@@ -285,6 +287,18 @@ const StreamJAR = () => {
           setShowScheSettingModal(false)
         }}
       />
+
+      {uploadVisible && (
+        <UploadModal
+          type="program"
+          operation="create"
+          visible={uploadVisible}
+          handleCancel={() => setUploadVisible(false)}
+          handleSuccess={() =>
+            queryClient.invalidateQueries(getResourceKey('infinite'))
+          }
+        />
+      )}
     </FlexBox>
   )
 }
