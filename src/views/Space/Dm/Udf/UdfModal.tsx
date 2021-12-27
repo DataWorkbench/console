@@ -17,7 +17,6 @@ import {
   AffixLabel,
   PopConfirm,
   SelectWithRefresh,
-  TextLink,
 } from 'components'
 import {
   getResourceKey,
@@ -28,6 +27,7 @@ import {
 } from 'hooks'
 import { ILanguageInterface, UdfActionType, UdfTypes } from './interfaces'
 import { javaType, languageData, udfHasLangBits, udfTypes } from './constants'
+import UploadModal from '../Resource/UploadModal'
 
 const { TextField, TextAreaField } = Form
 const { CollapseItem } = Collapse
@@ -98,6 +98,7 @@ const UdfModal = observer(() => {
     dmStore: { op, setOp, udfType, modalData },
   } = useStore()
 
+  const [uploadVisible, setUploadVisible] = useState(false)
   const [step, setStep] = useState(op === 'create' ? 0 : 1)
   const [params, setParams] = useImmer({
     type: modalData?.udf_language || javaType,
@@ -443,15 +444,14 @@ const UdfModal = observer(() => {
                                   <div>
                                     请选择 Jar，如需选择新的 Jar
                                     包资源，可以在资源管理中
-                                    <TextLink
-                                      href="./resource"
-                                      target="_blank"
-                                      color="white"
-                                      // className="text-action"
-                                      // tw="text-green-11"
+                                    <span
+                                      tw="text-green-11 cursor-pointer"
+                                      onClick={() => {
+                                        setUploadVisible(true)
+                                      }}
                                     >
                                       上传资源
-                                    </TextLink>
+                                    </span>
                                   </div>
                                 ),
                                 status: 'error',
@@ -460,15 +460,14 @@ const UdfModal = observer(() => {
                             help={
                               <div>
                                 如需选择新的 Jar 包资源，可以在资源管理中
-                                <TextLink
-                                  href="./resource"
-                                  target="_blank"
-                                  color="white"
-                                  // className="text-action"
-                                  // tw="text-green-11"
+                                <span
+                                  tw="text-green-11 cursor-pointer"
+                                  onClick={() => {
+                                    setUploadVisible(true)
+                                  }}
                                 >
                                   上传资源
-                                </TextLink>
+                                </span>
                               </div>
                             }
                             disabled={op === 'detail'}
@@ -508,6 +507,16 @@ const UdfModal = observer(() => {
           </Collapse>
         )}
       </>
+
+      {uploadVisible && (
+        <UploadModal
+          type="function"
+          operation="create"
+          visible={uploadVisible}
+          handleCancel={() => setUploadVisible(false)}
+          handleSuccess={() => refetchResource()}
+        />
+      )}
     </Modal>
   )
 })

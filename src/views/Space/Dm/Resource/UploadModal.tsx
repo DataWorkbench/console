@@ -229,6 +229,7 @@ const UploadModal = (props: any) => {
   return (
     <DarkModal
       width={800}
+      appendToBody
       closable={false}
       escClosable={false}
       maskClosable={false}
