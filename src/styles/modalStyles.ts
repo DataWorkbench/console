@@ -6,7 +6,7 @@ const modalStyles = css`
       .modal-card-head,
       .modal-card-foot,
       .modal-card-body {
-        ${tw`bg-neut-16 border-neut-13 text-white`}
+        ${tw`bg-neut-16 border-neut-13 text-white break-all`}
       }
       .modal-card-title {
         ${tw`text-white`}

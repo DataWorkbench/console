@@ -14,7 +14,6 @@ import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
 import { languageFilters, udfTypes, udfTypesComment } from './constants'
 
-// TODO: table Dark/文字色/次级辅助色
 const getDefaultColumns = (
   filter: Record<string, any>,
   actions: (type: UdfActionType, detail: Record<string, any>) => void
@@ -132,8 +131,8 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
       setModalData,
       udfColumnSettings: columnSettings,
       udfSelectedRowKeys: selectedRowKeys,
-      setUdfSelectedRows,
-      setUdfFilterRows,
+      setUdfSelectedRowKeys,
+      setUdfFilterRowKeys,
       // : columnSettings
     },
   } = useStore()
@@ -156,14 +155,14 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           setModalData(detail)
           break
         case 'delete':
-          setUdfFilterRows([detail])
+          setUdfFilterRowKeys([detail.udf_id])
           setOp(actionType)
           break
         default:
           break
       }
     },
-    [setOp, setModalData, setUdfFilterRows]
+    [setOp, setModalData, setUdfFilterRowKeys]
   )
 
   const defaultColumns = useMemo(() => {
@@ -175,8 +174,8 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
     [columnSettings, defaultColumns]
   )
 
-  const handleSelect = (keys: string[], rows: Record<string, any>[]) => {
-    setUdfSelectedRows(rows)
+  const handleSelect = (keys: string[]) => {
+    setUdfSelectedRowKeys(keys)
   }
 
   const handleSort = (sortKey: string, order: 'desc' | 'asc') => {
@@ -223,6 +222,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
         defaultColumns={defaultColumns}
         setFilter={setFilter}
         refetch={refetch}
+        data={data?.infos || []}
       />
       <Table
         onSelect={handleSelect}
