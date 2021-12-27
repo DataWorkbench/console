@@ -58,7 +58,7 @@ const RealTime = observer(() => {
   }
 
   return (
-    <div tw="flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
+    <div tw="relative flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
       <JobMenu />
       {curJob ? (
         <JobTabs />
