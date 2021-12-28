@@ -504,6 +504,9 @@ const ScheSettingModal = ({
                                   onChange={(v: number) => {
                                     setPeriodData((draft) => {
                                       draft.minute.startHour = v
+                                      if (v > draft.minute.endHour) {
+                                        draft.minute.endHour = v
+                                      }
                                     })
                                   }}
                                 />
@@ -538,7 +541,13 @@ const ScheSettingModal = ({
                               <Control>
                                 <Select
                                   disabled={disabled}
-                                  options={hourOpts}
+                                  options={hourOpts.map((opt) => {
+                                    return {
+                                      ...opt,
+                                      disabled:
+                                        opt.value < curPeriodData.startHour,
+                                    }
+                                  })}
                                   value={curPeriodData.endHour}
                                   onChange={(v: number) =>
                                     setPeriodData((draft) => {
@@ -582,6 +591,9 @@ const ScheSettingModal = ({
                                         onChange={(v: number) => {
                                           setPeriodData((draft) => {
                                             draft.hour.startHour = v
+                                            if (v > draft.hour.endHour) {
+                                              draft.hour.endHour = v
+                                            }
                                           })
                                         }}
                                       />
@@ -614,7 +626,14 @@ const ScheSettingModal = ({
                                     </Label>
                                     <Control>
                                       <Select
-                                        options={hourOpts}
+                                        options={hourOpts.map((opt) => {
+                                          return {
+                                            ...opt,
+                                            disabled:
+                                              opt.value <
+                                              curPeriodData.startHour,
+                                          }
+                                        })}
                                         value={curPeriodData.endHour}
                                         onChange={(v: number) => {
                                           setPeriodData((draft) => {
@@ -954,6 +973,9 @@ const ScheSettingModal = ({
                     />
                   </Control>
                   <div tw="leading-8 ml-2">分钟</div>
+                  {params.timeout === 0 && (
+                    <div className="help">注：0表示不超时</div>
+                  )}
                 </Field>
               </ScheSettingForm>
             </Loading>

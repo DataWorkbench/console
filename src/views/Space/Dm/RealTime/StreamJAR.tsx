@@ -20,6 +20,7 @@ import {
   getResourceKey,
   useStore,
 } from 'hooks'
+import { strlen } from 'utils/convert'
 import { get, flatten } from 'lodash-es'
 import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
@@ -230,6 +231,15 @@ const StreamJAR = () => {
                   draft.jarEntry = v
                 })
               }}
+              schemas={[
+                {
+                  rule: (value: string) => {
+                    return strlen(value) <= 1024
+                  },
+                  help: '最大自负长度1024字节',
+                  status: 'error',
+                },
+              ]}
             />
             <TextField
               name="jar_args"
@@ -242,6 +252,15 @@ const StreamJAR = () => {
                   draft.jarArgs = v
                 })
               }}
+              schemas={[
+                {
+                  rule: (value: string) => {
+                    return strlen(value) <= 1024
+                  },
+                  help: '最大自负长度1024字节',
+                  status: 'error',
+                },
+              ]}
             />
           </Form>
         </div>
