@@ -19,7 +19,7 @@ build_job:
   tags:
     - mrunner
   script:
-    - npm ci
+    - npm install
     - npm run build
 
 deploy_job:
