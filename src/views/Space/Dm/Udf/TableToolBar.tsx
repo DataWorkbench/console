@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Button, ToolBar, Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import { css } from 'twin.macro'
-import { pullAllBy } from 'lodash-es'
+import { without } from 'lodash-es'
 
 import { FlexBox, Center, Modal } from 'components'
 import { useMutationUdf, useStore } from 'hooks'
@@ -18,6 +18,7 @@ interface ITableToolBarProps {
   defaultColumns: Record<string, any>[]
   setFilter: (_: (_: IUdfFilterInterface) => void) => void
   refetch: () => Promise<any>
+  data: { name: string; udf_id: string }[]
 }
 
 const TableToolBar = observer((props: ITableToolBarProps) => {
@@ -26,13 +27,12 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
       op,
       setOp,
       udfType,
-      udfSelectedRowKeys,
       setUdfColumnSettings,
       udfStorageKey,
-      udfSelectedRows,
       setModalData,
-      udfFilterRows,
-      setUdfFilterRows,
+      udfSelectedRowKeys,
+      udfFilterRowKeys,
+      setUdfFilterRowKeys,
       set,
       // : columnSettings
     },
@@ -41,23 +41,22 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
   const mutation = useMutationUdf()
   const isFetching = useIsFetching()
 
-  const { defaultColumns, setFilter, refetch } = props
+  const { defaultColumns, setFilter, refetch, data } = props
 
   const mutateData = () => {
     mutation.mutate(
       {
         op: 'delete',
-        udf_ids: udfFilterRows.map((i) => i.udf_id),
+        udf_ids: udfFilterRowKeys,
       },
       {
         onSuccess: () => {
           const params = {
-            udfSelectedRows: pullAllBy(
-              toJS(udfSelectedRows),
-              toJS(udfFilterRows),
-              'udf_id'
+            udfSelectedRowKeys: without(
+              toJS(udfSelectedRowKeys),
+              ...udfFilterRowKeys
             ),
-            udfFilterRows: [],
+            udfFilterRowKeys: [],
             op: '',
           }
           set(params)
@@ -67,6 +66,10 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
     )
   }
 
+  const udfFilterRows = useMemo(
+    () => data.filter((i) => udfFilterRowKeys.includes(i.udf_id)),
+    [udfFilterRowKeys, data]
+  )
   const deleteText = useMemo(
     () => udfFilterRows.map((i) => `${i.name}(${i.udf_id})`).join('、'),
     [udfFilterRows]
@@ -90,7 +93,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
               disabled={!udfSelectedRowKeys.length}
               onClick={() => {
                 setOp('delete')
-                setUdfFilterRows(udfSelectedRows)
+                setUdfFilterRowKeys(udfSelectedRowKeys)
               }}
             >
               <Icon name="trash" type="light" />
@@ -143,7 +146,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
         <Modal
           noBorder
           visible
-          width={udfSelectedRowKeys.length > 1 ? 600 : 400}
+          width={udfSelectedRowKeys.length > 1 ? 800 : 400}
           onCancel={() => setOp('')}
           onOk={mutateData}
           okText="删除"

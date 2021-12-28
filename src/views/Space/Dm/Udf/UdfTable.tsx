@@ -8,13 +8,13 @@ import dayjs from 'dayjs'
 
 // import { Table } from 'views/Space/styled'
 import { useQueryUdfList, useStore } from 'hooks'
-import { Center, TextHighlight, TextLink, Tooltip } from 'components'
+import { TextEllipsis, TextHighlight, TextLink } from 'components'
+import tw from 'twin.macro'
 import { TableActions, LetterIcon } from '../styled'
 import TableToolBar from './TableToolBar'
 import { IUdfFilterInterface, IUdfTable, UdfActionType } from './interfaces'
 import { languageFilters, udfTypes, udfTypesComment } from './constants'
 
-// TODO: table Dark/文字色/次级辅助色
 const getDefaultColumns = (
   filter: Record<string, any>,
   actions: (type: UdfActionType, detail: Record<string, any>) => void
@@ -29,17 +29,22 @@ const getDefaultColumns = (
 
     render: (value: string, row: Record<string, any>) => {
       return value ? (
-        <span
-          tw="cursor-pointer inline-flex items-center"
+        <div
+          tw="cursor-pointer flex-auto flex items-center"
           onClick={() => actions('detail', row)}
         >
           <LetterIcon tw="flex-none">
             <span>{value}</span>
           </LetterIcon>
-          <span className="column-name">
-            <TextHighlight text={value} filterText={filter.search} />
-          </span>
-        </span>
+          <div
+            tw="flex-auto hover:text-green-11 font-medium"
+            className="column-name"
+          >
+            <TextEllipsis>
+              <TextHighlight text={value} filterText={filter.search} />
+            </TextEllipsis>
+          </div>
+        </div>
       ) : (
         ''
       )
@@ -66,14 +71,10 @@ const getDefaultColumns = (
   },
   {
     title: '描述',
-    width: 190,
+    // width: 190,
     dataIndex: 'comment',
     render: (val: string) => {
-      return (
-        <Tooltip content={<Center tw="p-3 break-all">{val}</Center>}>
-          <div tw="max-w-[150px] truncate text-neut-8">{val}</div>
-        </Tooltip>
-      )
+      return <TextEllipsis twStyle={tw`text-neut-8`}>{val}</TextEllipsis>
     },
   },
   {
@@ -132,8 +133,8 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
       setModalData,
       udfColumnSettings: columnSettings,
       udfSelectedRowKeys: selectedRowKeys,
-      setUdfSelectedRows,
-      setUdfFilterRows,
+      setUdfSelectedRowKeys,
+      setUdfFilterRowKeys,
       // : columnSettings
     },
   } = useStore()
@@ -156,14 +157,14 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           setModalData(detail)
           break
         case 'delete':
-          setUdfFilterRows([detail])
+          setUdfFilterRowKeys([detail.udf_id])
           setOp(actionType)
           break
         default:
           break
       }
     },
-    [setOp, setModalData, setUdfFilterRows]
+    [setOp, setModalData, setUdfFilterRowKeys]
   )
 
   const defaultColumns = useMemo(() => {
@@ -175,8 +176,8 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
     [columnSettings, defaultColumns]
   )
 
-  const handleSelect = (keys: string[], rows: Record<string, any>[]) => {
-    setUdfSelectedRows(rows)
+  const handleSelect = (keys: string[]) => {
+    setUdfSelectedRowKeys(keys)
   }
 
   const handleSort = (sortKey: string, order: 'desc' | 'asc') => {
@@ -223,6 +224,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
         defaultColumns={defaultColumns}
         setFilter={setFilter}
         refetch={refetch}
+        data={data?.infos || []}
       />
       <Table
         onSelect={handleSelect}

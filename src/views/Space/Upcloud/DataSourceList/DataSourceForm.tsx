@@ -804,7 +804,7 @@ const DataSourceForm = ({
                   </Button>
                 )}
               </Control>
-              {mutation.isError && (
+              {mutation.isError ? (
                 <div
                   tw="text-red-10 flex items-center mt-2"
                   css={css`
@@ -816,6 +816,21 @@ const DataSourceForm = ({
                   <Icon name="error" />
                   不可用，${get(mutation, 'error.message', '')}
                 </div>
+              ) : (
+                hasPingRef.current &&
+                !mutation.isLoading && (
+                  <div
+                    tw="flex items-center mt-2.5"
+                    css={css`
+                      svg {
+                        ${tw`fill-[#059669] text-white`}
+                      }
+                    `}
+                  >
+                    <Icon name="success" size={16} />
+                    <span tw="ml-1 text-green-11">测试通过</span>
+                  </div>
+                )
               )}
             </Field>
           </CollapseItem>
