@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useReducer } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
@@ -27,6 +27,7 @@ import {
 } from 'hooks'
 import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
 
+import { pingDataSource } from 'stores/api'
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
 import { SourceKindImg } from './styled'
@@ -134,6 +135,8 @@ const DataSourceList = observer(() => {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
 
+  const pingIds = useRef(new Map<string, 'loading' | 'success' | 'fail'>())
+  const [, forceUpdate] = useReducer((x) => x + 1, 0)
   const [filter, setFilter] = useImmer<{
     regionId: string
     spaceId: string
@@ -192,6 +195,32 @@ const DataSourceList = observer(() => {
     })
   }
 
+  const pingMutate = (params: Record<string, any>, id: string) => {
+    const refetchFn = () => {
+      const iter = pingIds.current.values()
+      let item = null
+      do {
+        item = iter.next()
+        if (item.value === 'loading') {
+          forceUpdate()
+          return
+        }
+      } while (!item.done)
+      pingIds.current.clear()
+      refetch()
+    }
+    pingDataSource({ regionId, spaceId, ...params }).then(
+      () => {
+        pingIds.current.set(id, 'success')
+        refetchFn()
+      },
+      () => {
+        pingIds.current.set(id, 'fail')
+        refetchFn()
+      }
+    )
+  }
+
   const handleOk = () => {
     if (op === '') {
       return
@@ -208,7 +237,7 @@ const DataSourceList = observer(() => {
     {
       title: '数据源名称/ID',
       dataIndex: 'source_id',
-      width: 220,
+      width: 230,
       render: (v: string, info: any) => {
         const sourceKindName = sourceKinds.find(
           (kind) => kind.source_type === info.source_type
@@ -344,33 +373,35 @@ const DataSourceList = observer(() => {
       title: '数据源可用性',
       dataIndex: 'connection',
       render: (v: number, row: any) => {
-        if (
-          op === 'ping' &&
-          mutation.isLoading &&
-          get(opSourceList, '[0].source_id') === get(row, 'source_id')
-        ) {
-          return (
-            <>
-              <Icon name="if-load" tw="mr-1" size={16} />
-              检测中
-            </>
-          )
+        const renderFn = (state: 'loading' | 'success' | 'fail') => {
+          switch (state) {
+            case 'loading':
+              return (
+                <>
+                  <Icon name="if-load" tw="mr-1" size={16} />
+                  检测中
+                </>
+              )
+            case 'success':
+              return (
+                <Center tw="space-x-1">
+                  <Icons name="circle_check" size={16} />
+                  <span>可用</span>
+                </Center>
+              )
+            default:
+              return (
+                <Center tw="space-x-1">
+                  <Icons name="circle_close" size={16} />
+                  <span>不可用</span>
+                </Center>
+              )
+          }
         }
-
-        if (v === 1) {
-          return (
-            <Center tw="space-x-1">
-              <Icons name="circle_check" size={16} />
-              <span>可用</span>
-            </Center>
-          )
+        if (pingIds.current.has(get(row, 'source_id'))) {
+          return renderFn(pingIds.current.get(get(row, 'source_id'))!)
         }
-        return (
-          <Center tw="space-x-1">
-            <Icons name="circle_error" size={16} />
-            <span>不可用</span>
-          </Center>
-        )
+        return renderFn(v === 1 ? 'success' : 'fail')
       },
     },
     {
@@ -394,6 +425,7 @@ const DataSourceList = observer(() => {
     {
       title: '操作',
       key: 'table_actions',
+      width: 150,
       render: (v: string, info: any) => (
         <>
           <Button
@@ -425,11 +457,15 @@ const DataSourceList = observer(() => {
                 onClick={(e: React.SyntheticEvent, key: any) => {
                   mutateOperation(key, [info])
                   if (key === 'ping') {
-                    handleMutate({
-                      op: key,
-                      source_type: info.source_type,
-                      url: info.url,
-                    })
+                    pingIds.current.set(get(info, 'source_id'), 'loading')
+                    pingMutate(
+                      {
+                        op: key,
+                        source_type: info.source_type,
+                        url: info.url,
+                      },
+                      info.source_id
+                    )
                   }
                 }}
               >
