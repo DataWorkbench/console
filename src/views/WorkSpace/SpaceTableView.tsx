@@ -70,19 +70,18 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             sortable: true,
             sortKey: 'name',
             sortOrder: sort.name,
-            // width: 260,
             render: (field: string, row: any) => (
               <div tw="flex items-center w-full">
                 <div
                   className="list-icon-wrap"
-                  tw="bg-neut-3 rounded-full p-1 flex items-center justify-center"
+                  tw="bg-neut-3 rounded-full p-1 flex items-center justify-center border-2 border-solid border-white"
                 >
                   <Icon name="project" size="small" className="list-icon" />
                 </div>
                 <div tw="ml-2 flex-1 overflow-hidden">
                   <div
                     className="row-name"
-                    tw="font-semibold truncate max-w-[186px] cursor-pointer"
+                    tw="font-semibold cursor-pointer"
                     title={row.name}
                     onClick={() =>
                       history.push(`${regionId}/workspace/${field}/upcloud`)

@@ -241,6 +241,8 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                     </div>
                   ) : (
                     <Menu
+                      mode="inline"
+                      defaultExpandKeys={['stream']}
                       onClick={(e: React.SyntheticEvent) => {
                         e.stopPropagation()
                       }}
@@ -265,7 +267,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                               <MenuItem key={secondMenu.name}>
                                 <Link
                                   to={`/${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
-                                  tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                                  tw="flex items-center py-2 pl-6! cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
                                 >
                                   {secondMenu.title}
                                 </Link>

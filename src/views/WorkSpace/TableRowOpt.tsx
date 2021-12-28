@@ -5,7 +5,7 @@ import { useWorkSpaceContext } from 'contexts'
 import { Tooltip } from 'components'
 import { OptButton } from './styled'
 
-const { MenuItem } = Menu
+const { MenuItem, SubMenu } = Menu
 
 const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
   const stateStore = useWorkSpaceContext()
@@ -30,18 +30,46 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
                   该工作空间已被禁用，暂时无法操作其工作项
                 </div>
               ) : (
-                <Menu>
-                  {subFuncList.map((subFunc) => (
-                    <MenuItem key={subFunc.name}>
-                      <Link
-                        to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                        tw="flex items-center space-x-1 py-2 px-5 (text-neut-15 no-underline)! hover:(bg-neut-1 text-current)"
+                <Menu mode="inline" defaultExpandKeys={['stream']}>
+                  {subFuncList.map((subFunc: any) => {
+                    const subItems = subFunc.items || []
+                    return subItems.length ? (
+                      <SubMenu
+                        key={subFunc.name}
+                        onClick={(e: React.SyntheticEvent) => {
+                          e.stopPropagation()
+                        }}
+                        title={
+                          <span>
+                            <Icon name={subFunc.icon} />
+                            <span>{subFunc.title}</span>
+                          </span>
+                        }
+                        overlayClassName="sub"
                       >
-                        <Icon name={subFunc.icon} />
-                        <span>{subFunc.title}</span>
-                      </Link>
-                    </MenuItem>
-                  ))}
+                        {subItems.map((secondMenu: any) => (
+                          <MenuItem key={secondMenu.name}>
+                            <Link
+                              to={`/${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
+                              tw="flex items-center space-x-1 py-2 pl-6! (text-neut-15 no-underline)! hover:(bg-neut-1 text-current)"
+                            >
+                              <span>{secondMenu.title}</span>
+                            </Link>
+                          </MenuItem>
+                        ))}
+                      </SubMenu>
+                    ) : (
+                      <MenuItem key={subFunc.name}>
+                        <Link
+                          to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                          tw="flex items-center space-x-1 py-2 px-5 (text-neut-15 no-underline)! hover:(bg-neut-1 text-current)"
+                        >
+                          <Icon name={subFunc.icon} />
+                          <span>{subFunc.title}</span>
+                        </Link>
+                      </MenuItem>
+                    )
+                  })}
                 </Menu>
               )}
             </>
