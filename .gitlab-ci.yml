@@ -1,0 +1,41 @@
+stages:
+  - build
+  - deploy
+
+cache:
+  paths:
+    - dist/
+    - node_modules/
+
+variables:
+  NEW_TESTING: '192.168.27.136'
+
+build_job:
+  stage: build
+  only:
+    - feat/enfi
+    - dev
+  tags:
+    - mrunner
+  script:
+    - npm install
+    - npm run build
+
+deploy_job:
+  stage: deploy
+  only:
+    - feat/enfi
+  tags:
+    - mrunner
+  script:
+    # - docker 
+    # - rsync -rlptDzvh --delete -e "ssh -p 3333" dist/* root@$NEW_TESTING:/data/webapp/enfi/webroot
+
+deploy_job:
+  stage: deploy
+  only:
+    - dev
+  tags:
+    - mrunner
+  script:
+    - rsync -rlptDzvh --delete -e "ssh -p 3333" dist/* root@$NEW_TESTING:/data/webapp/pitrix-webconsole-bigdata
