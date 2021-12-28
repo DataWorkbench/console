@@ -9,6 +9,7 @@ cache:
 
 variables:
   NEW_TESTING: '192.168.27.136'
+  TAG: '0.1.0'
 
 build_job:
   stage: build
@@ -18,7 +19,7 @@ build_job:
   tags:
     - mrunner
   script:
-    - npm install
+    - npm ci
     - npm run build
 
 deploy_job:
@@ -28,8 +29,9 @@ deploy_job:
   tags:
     - mrunner
   script:
-    # - docker 
-    # - rsync -rlptDzvh --delete -e "ssh -p 3333" dist/* root@$NEW_TESTING:/data/webapp/enfi/webroot
+    - docker build -f docker/enfi/Dockerfile -t dockerhub.qingcloud.com/databench/web:$TAG .
+    - docker images
+    - docker push dockerhub.qingcloud.com/databench/web:$TAG
 
 deploy_job:
   stage: deploy
