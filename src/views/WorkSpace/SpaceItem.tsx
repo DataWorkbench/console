@@ -291,7 +291,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             >
               <Link
                 to={`/${regionId}/workspace/${space.id}/${
-                  funcName === 'ops' ? 'ops/release' : ''
+                  funcName === 'ops' ? 'ops/release' : funcName
                 }`}
                 onClick={(e) => {
                   if (disableStatus) {

@@ -49,7 +49,7 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
         >
           <Link
             to={`/${regionId}/workspace/${space.id}/${
-              funcName === 'ops' ? 'ops/release' : ''
+              funcName === 'ops' ? 'ops/release' : funcName
             }`}
             onClick={(e) => {
               if (disableStatus) {
