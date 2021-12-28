@@ -28,7 +28,7 @@ const HelpCenterLink = (
       onCancel: () => Modal.close(openModal),
     })
   }
-  const linkProps = isIframe
+  const linkProps: any = isIframe
     ? {
         onClick: () => href && handleOpenHelpCenter(href),
         hasIcon: false,
@@ -40,7 +40,7 @@ const HelpCenterLink = (
         hasIcon: true,
         ...rest,
       }
-  return <TextLink type={isIframe ? 'button' : 'a'} {...linkProps} />
+  return <TextLink linkType={isIframe ? 'button' : 'a'} {...linkProps} />
 }
 
 export default HelpCenterLink
