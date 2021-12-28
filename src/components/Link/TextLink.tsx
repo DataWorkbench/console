@@ -5,22 +5,27 @@ import { Link as ReactRouterLink } from 'react-router-dom'
 
 interface LinkInterface {
   hasIcon?: boolean
-  type?: 'a' | 'button'
+  linkType?: 'a' | 'button'
 }
 
 const Link = (
   props: PropsWithChildren<
     Partial<
-      LinkInterface &
-        React.DetailedHTMLProps<
-          React.AnchorHTMLAttributes<HTMLAnchorElement>,
-          HTMLAnchorElement
-        > &
-        ButtonProps
+      React.DetailedHTMLProps<
+        React.AnchorHTMLAttributes<HTMLAnchorElement>,
+        HTMLAnchorElement
+      > &
+        ButtonProps &
+        LinkInterface
     >
   >
 ) => {
-  const { hasIcon = true, type = 'a', children: childrenProp, ...rest } = props
+  const {
+    hasIcon = true,
+    linkType: type = 'a',
+    children: childrenProp,
+    ...rest
+  } = props
   const children = !hasIcon ? (
     childrenProp
   ) : (
