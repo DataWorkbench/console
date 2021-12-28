@@ -317,6 +317,16 @@ const JobModal = ({
                   label="描述"
                   defaultValue={get(job, 'desc', '')}
                   placeholder="请输入作业描述"
+                  schemas={[
+                    {
+                      rule: (value: string) => {
+                        const l = strlen(value)
+                        return l <= 1024
+                      },
+                      help: '最大自负长度1024字节',
+                      status: 'error',
+                    },
+                  ]}
                 />
               </Form>
             </div>
