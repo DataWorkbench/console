@@ -1,18 +1,19 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
-import { FlexBox, Modal } from 'components'
+import { Center, FlexBox, Modal } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
 import { theme } from 'twin.macro'
-import { useUnmount } from 'react-use'
+import { useUnmount, useMeasure } from 'react-use'
 import Editor from 'react-monaco-editor'
 import { useQueryClient } from 'react-query'
+import { Rnd } from 'react-rnd'
 import {
   useMutationStreamJobCode,
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
   useQueryStreamJobCode,
   useMutationStreamJobCodeSyntax,
-  // getStreamJobCodeKey,
+  useMutationStreamJobCodeRun,
   getFlowKey,
   useStore,
 } from 'hooks'
@@ -36,14 +37,17 @@ interface IProp {
 
 const StreamCode = ({ tp }: IProp) => {
   const { workFlowStore } = useStore()
+  const [boxRef, boxDimensions] = useMeasure()
   const [show, toggleShow] = useState(false)
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
+  const [showRunLog, setShowRunLog] = useState(false)
   const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
+  const runMutation = useMutationStreamJobCodeRun()
   const { data, isLoading } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
@@ -98,14 +102,32 @@ def main(args: Array[String]): Unit = {
     })
   }
 
+  const handleRun = () => {
+    runMutation.mutate(
+      {},
+      {
+        onSuccess: () => {
+          setShowRunLog(true)
+          // console.log('in this....')
+        },
+        onError: () => {
+          setShowRunLog(true)
+        },
+      }
+    )
+  }
+
   const mutateCodeData = (op: 'codeSave' | 'codeSyntax') => {
-    const code = editorRef.current?.getValue()
-    if (trim(code) === '') {
+    const code = trim(editorRef.current?.getValue())
+    if (code === '') {
       showWarn()
       return
     }
     const isSaveOp = op === 'codeSave'
     const opMutation = isSaveOp ? mutation : syntaxMutation
+    if (code === loadingWord || opMutation.isLoading) {
+      return
+    }
     opMutation.mutate(
       {
         [codeName]: {
@@ -215,7 +237,7 @@ def main(args: Array[String]): Unit = {
   }
 
   return (
-    <FlexBox tw="h-full w-full flex-1">
+    <FlexBox tw="relative h-full w-full flex-1" ref={boxRef}>
       <FlexBox tw="flex flex-col flex-1 w-full">
         <StreamToolBar tw="pb-4">
           {/* <Button type="black">
@@ -231,7 +253,12 @@ def main(args: Array[String]): Unit = {
             <Icon name="remark" type="light" />
             语法检查
           </Button>
-          <Button type="black">
+          <Button
+            type="black"
+            tw="w-[60px] px-0"
+            onClick={handleRun}
+            loading={runMutation.isLoading}
+          >
             <Icon name="triangle-right" type="light" />
             运行
           </Button>
@@ -306,6 +333,36 @@ def main(args: Array[String]): Unit = {
           onSuccess={handleReleaseSuccess}
           onCancel={() => toggleShow(false)}
         />
+      )}
+      {showRunLog && boxDimensions.height && (
+        <Rnd
+          tw="z-[999] bg-neut-20 text-white border border-neut-15 rounded-t-sm"
+          bounds="parent"
+          minHeight={64}
+          default={{
+            width: '100%',
+            height: 384,
+            x: 0,
+            y: boxDimensions.height - 384,
+          }}
+          dragHandleClassName="runlog-toolbar"
+        >
+          <div tw="flex justify-between h-10 items-center border-b border-b-neut-15 px-3">
+            <div className="runlog-toolbar" tw="flex-1 cursor-move">
+              运行日志
+            </div>
+            <div>
+              <Center
+                tw="select-text cursor-pointer"
+                onClick={() => setShowRunLog(false)}
+              >
+                <Icon name="close" type="light" />
+                关闭面板
+              </Center>
+            </div>
+          </div>
+          <div>xxxxx</div>
+        </Rnd>
       )}
     </FlexBox>
   )
