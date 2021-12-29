@@ -19,9 +19,9 @@ export const PackageTypeMap: any = {
 }
 
 export const PackageDocsHref: any = {
-  program: '',
-  function: '',
-  dependency: '',
+  program: '/manual/data_development/resource/procedures/',
+  function: '/manual/data_development/resource/functions/',
+  dependency: '/data_development/resource/dependent/',
 }
 
 export default {}

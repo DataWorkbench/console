@@ -17,7 +17,7 @@ const pageTabsData = [
     description:
       '提供自定义函数包的管理，在Flink计算中，结合自定义的函数包，将扩充自定义数据计算类型。',
     icon: 'textarea',
-    helpLink: getHelpCenterLink('/manual/data_development/resource/summary/'),
+    helpLink: getHelpCenterLink('/manual/data_development/function/summary/'),
   },
 ]
 

@@ -26,6 +26,7 @@ import {
   useQueryNetworks,
 } from 'hooks'
 import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
+import { getHelpCenterLink } from 'utils'
 
 import { pingDataSource } from 'stores/api'
 import DataSourceModal from './DataSourceModal'
@@ -55,7 +56,7 @@ const tabs = [
     description:
       '数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。',
     icon: 'blockchain',
-    helpLink: '/quickstart/add_origin_data/',
+    helpLink: getHelpCenterLink('/manual/data_up_cloud/data_summary/'),
   },
 ]
 

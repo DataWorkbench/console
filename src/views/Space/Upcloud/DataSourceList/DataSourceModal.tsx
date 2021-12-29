@@ -184,7 +184,7 @@ const DataSourceModal = observer(
                         <p tw="pt-2 pb-3 font-medium">
                           请选择一个数据库，您也可以参考
                           <HelpCenterLink
-                            href="/manual/data_up_cloud/source_data/data_summary/"
+                            href="/manual/data_up_cloud/add_data/"
                             isIframe={false}
                           >
                             数据库文档
