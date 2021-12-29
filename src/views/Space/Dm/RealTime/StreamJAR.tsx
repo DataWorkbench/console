@@ -117,7 +117,11 @@ const StreamJAR = () => {
     <FlexBox tw="h-full flex-1">
       <FlexBox tw="flex-col flex-1 pl-5">
         <StreamToolBar tw="pl-0">
-          <Button onClick={handleSave} loading={mutation.isLoading}>
+          <Button
+            tw="w-[68px] px-0"
+            onClick={handleSave}
+            loading={mutation.isLoading}
+          >
             <Icon name="data" type="dark" />
             保存
           </Button>
@@ -129,6 +133,7 @@ const StreamJAR = () => {
           >
             <Button
               type="primary"
+              tw="w-[68px] px-0"
               onClick={handleRelease}
               loading={releaseMutation.isLoading}
               disabled={!enableRelease}

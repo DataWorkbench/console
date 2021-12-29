@@ -52,8 +52,8 @@ const ReleaseModal = ({
       onCancel={onCancel}
       onOk={onOk}
       confirmLoading={releaseMutation.isLoading}
-      escClosable={false}
-      maskClosable={false}
+      escClosable={!releaseMutation.isLoading}
+      maskClosable={!releaseMutation.isLoading}
     >
       <div tw="flex">
         <Icon
