@@ -10,6 +10,7 @@ import inputStyles from './inputStyles'
 import menuStyles from './menuStyles'
 import tippyStyles from './tippyStyles'
 import pageTabStyles from './pageTabStyles'
+import HelpCenterStyle from './HelpCenterStyle'
 
 const customStyles = css`
   html {
@@ -146,6 +147,7 @@ const GlobalStyles = () => (
         menuStyles,
         tippyStyles,
         pageTabStyles,
+        HelpCenterStyle,
       ]}
     />
   </>

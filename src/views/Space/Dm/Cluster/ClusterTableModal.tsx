@@ -40,7 +40,7 @@ const ClusterTableModal = ({
       <Alert>
         <Icon name="information" size={20} tw="mr-1.5" />
         请选择运行当前作业的计算集群，请注意保证网络连通性，具体可参考：
-        <HelpCenterLink isIframe={false} href="/quickstart/create_net/">
+        <HelpCenterLink isIframe={false} href="/manual/data_up_cloud/connect/">
           网络连通文档
         </HelpCenterLink>
       </Alert>

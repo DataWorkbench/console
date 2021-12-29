@@ -22,7 +22,7 @@ import {
   useQueryResourceByPage,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
-import { FlexBox, Center, Tooltip, Icons, TextLink } from 'components'
+import { FlexBox, Center, Tooltip, Icons, HelpCenterLink } from 'components'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
@@ -31,7 +31,7 @@ import { formatBytes } from 'utils/convert'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
 import {
-  // PackageDocsHref,
+  PackageDocsHref,
   PackageName,
   PackageTypeMap,
   PackageTypeTip,
@@ -363,14 +363,9 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
               <Level as="nav">
                 <LevelLeft>{PackageTypeTip[packageType]}</LevelLeft>
                 <LevelRight>
-                  <TextLink
-                    // href={PackageDocsHref[packageType]}
-                    target="_blank"
-                    rel="noreferrer"
-                    hasIcon={false}
-                  >
+                  <HelpCenterLink href={PackageDocsHref[packageType]}>
                     查看详情 →
-                  </TextLink>
+                  </HelpCenterLink>
                 </LevelRight>
               </Level>
             }
