@@ -25,33 +25,28 @@ export const TextEllipsis = ({
     }
   }, [])
   const children = (
-    <div
-      key="mount"
-      ref={ref}
-      css={[
-        hasRender ? tw`relative visible` : tw`invisible absolute`,
-        !isOver ? '' : tw`truncate`,
-        hasRender && {
-          maxWidth: !isOver
-            ? undefined
-            : boxRef.current?.getBoundingClientRect()?.width,
-        },
-        twStyle,
-      ]}
-    >
-      {text}
+    <div tw="overflow-hidden block relative" ref={boxRef}>
+      {!hasRender && (
+        <div ref={ref} tw="invisible absolute break-normal">
+          {text}
+        </div>
+      )}
+      <div key="mount" css={[tw`truncate`, twStyle]}>
+        {text}
+      </div>
     </div>
   )
-  return (
-    <div tw="flex flex-auto" ref={boxRef}>
-      {isOver ? (
-        <Tooltip content={text} theme="dark" hasPadding>
-          {children}
-        </Tooltip>
-      ) : (
-        children
-      )}
-    </div>
+  return isOver ? (
+    <Tooltip
+      content={text}
+      theme="dark"
+      twChild={tw`block overflow-hidden`}
+      hasPadding
+    >
+      {children}
+    </Tooltip>
+  ) : (
+    children
   )
 }
 

@@ -63,7 +63,7 @@ export const baseColumns = [
     // width: 200,
     render: (value: string) => {
       return value ? (
-        <div tw="cursor-pointer flex-auto flex items-center">
+        <div tw="cursor-pointer flex-auto flex items-center overflow-hidden">
           <LetterIcon tw="flex-none items-center">
             <span>{value}</span>
           </LetterIcon>

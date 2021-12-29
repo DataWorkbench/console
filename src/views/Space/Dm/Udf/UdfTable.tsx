@@ -30,14 +30,14 @@ const getDefaultColumns = (
     render: (value: string, row: Record<string, any>) => {
       return value ? (
         <div
-          tw="cursor-pointer flex-auto flex items-center"
+          tw="cursor-pointer flex-auto flex items-center overflow-hidden"
           onClick={() => actions('detail', row)}
         >
           <LetterIcon tw="flex-none">
             <span>{value}</span>
           </LetterIcon>
           <div
-            tw="flex-auto hover:text-green-11 font-medium"
+            tw="flex-auto hover:text-green-11 font-medium overflow-hidden"
             className="column-name"
           >
             <TextEllipsis>
