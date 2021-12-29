@@ -78,17 +78,25 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                 >
                   <Icon name="project" size="small" className="list-icon" />
                 </div>
+
                 <div tw="ml-2 flex-1 overflow-hidden">
-                  <div
-                    className="row-name"
-                    tw="font-semibold cursor-pointer"
-                    title={row.name}
-                    onClick={() =>
-                      history.push(`${regionId}/workspace/${field}/upcloud`)
-                    }
+                  <Tooltip
+                    content={row.name}
+                    twChild={tw`block`}
+                    theme="dark"
+                    hasPadding
                   >
-                    {row.name}
-                  </div>
+                    <div
+                      className="row-name"
+                      tw="font-semibold cursor-pointer truncate"
+                      title={row.name}
+                      onClick={() =>
+                        history.push(`${regionId}/workspace/${field}/upcloud`)
+                      }
+                    >
+                      {row.name}
+                    </div>
+                  </Tooltip>
                   <div tw="text-neut-8">{field}</div>
                 </div>
               </div>
