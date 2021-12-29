@@ -198,20 +198,21 @@ const SpaceModal = observer(
             />
             <div tw="flex-1 overflow-hidden">
               <div tw="font-semibold text-base text-neut-15 break-all">
-                {opName}工作空间: 工作空间
-                {filterOptSpaces
-                  .map(({ name }: { name: string }) => name)
-                  .join(',')}
+                {filterOptSpaces.length === 1
+                  ? `确认要${opName}工作空间 ${filterOptSpaces[0].name} 吗？`
+                  : `确认要${opName}以下 ${filterOptSpaces.length} 个工作空间吗？`}
               </div>
               <div tw="text-neut-13 mt-2">
                 <div tw="mb-2">{desc}</div>
-                <div tw="space-y-3">
-                  <Table
-                    dataSource={filterOptSpaces}
-                    columns={columns}
-                    rowKey="id"
-                  />
-                </div>
+                {filterOptSpaces.length > 1 && (
+                  <div tw="space-y-3">
+                    <Table
+                      dataSource={filterOptSpaces}
+                      columns={columns}
+                      rowKey="id"
+                    />
+                  </div>
+                )}
                 {curSpaceOpt === 'delete' && (
                   <div tw="pt-6 space-y-1 border-t border-neut-2">
                     <div>
