@@ -123,6 +123,19 @@ export const streamJobCodeSyntax = ({
     method: 'POST',
   })
 
+export const streamJobCodeRun = ({
+  regionId,
+  spaceId,
+  jobId,
+  ...rest
+}: IWorkFlowParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/code/run`,
+    body: rest,
+    method: 'GET',
+  })
+
 export const getStreamJobCode = ({
   regionId,
   spaceId,
