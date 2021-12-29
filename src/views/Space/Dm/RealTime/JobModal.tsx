@@ -323,7 +323,7 @@ const JobModal = ({
                         const l = strlen(value)
                         return l <= 1024
                       },
-                      help: '最大自负长度1024字节',
+                      help: '最大字符长度1024字节',
                       status: 'error',
                     },
                   ]}
