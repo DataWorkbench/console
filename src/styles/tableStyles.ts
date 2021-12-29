@@ -10,6 +10,9 @@ const tableStyles = css`
       .table-col:last-child .button.is-text {
         ${tw`px-0 mr-4`}
       }
+      .table-col:not(.table-icon) {
+        ${tw`min-w-[64px]`}// BUG：解决在宽度不够情况 table td 和 th 对不齐的情况，但是会产生横向滚动条，后续可能会配合固定列
+      }
     }
   }
   .dark {
