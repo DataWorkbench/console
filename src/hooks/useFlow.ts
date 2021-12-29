@@ -21,6 +21,7 @@ import {
   getStreamJobCode,
   releaseStreamJob,
   inConnectors,
+  streamJobCodeSyntax,
 } from 'stores/api'
 
 interface IRouteParams {
@@ -174,6 +175,16 @@ export const useMutationStreamJobCode = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async (params: IWorkFlowParams) =>
     setStreamJobCode({ ...params, regionId, spaceId, jobId: curJob?.id })
+  )
+}
+
+export const useMutationStreamJobCodeSyntax = () => {
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  return useMutation(async (params: IWorkFlowParams) =>
+    streamJobCodeSyntax({ ...params, regionId, spaceId, jobId: curJob?.id })
   )
 }
 

@@ -11,6 +11,7 @@ import {
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
   useQueryStreamJobCode,
+  useMutationStreamJobCodeSyntax,
   // getStreamJobCodeKey,
   getFlowKey,
   useStore,
@@ -41,6 +42,7 @@ const StreamCode = ({ tp }: IProp) => {
   const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef(null)
   const mutation = useMutationStreamJobCode()
+  const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
   const { data, isLoading } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
@@ -96,14 +98,15 @@ def main(args: Array[String]): Unit = {
     })
   }
 
-  const save = () => {
+  const mutateCodeData = (op: 'codeSave' | 'codeSyntax') => {
     const code = editorRef.current?.getValue()
     if (trim(code) === '') {
       showWarn()
       return
     }
-
-    mutation.mutate(
+    const isSaveOp = op === 'codeSave'
+    const opMutation = isSaveOp ? mutation : syntaxMutation
+    opMutation.mutate(
       {
         [codeName]: {
           code,
@@ -116,7 +119,7 @@ def main(args: Array[String]): Unit = {
           setEnableRelease(true)
           Notify.success({
             title: '操作提示',
-            content: '代码保存成功',
+            content: isSaveOp ? '代码保存成功' : '语法检查成功',
             placement: 'bottomRight',
           })
         },
@@ -184,7 +187,9 @@ def main(args: Array[String]): Unit = {
       }
     }
     // eslint-disable-next-line no-bitwise
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, save)
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
+      mutateCodeData('codeSave')
+    )
   }
 
   useEffect(() => {
@@ -217,7 +222,12 @@ def main(args: Array[String]): Unit = {
             <Icon name="listview" type="light" />
             插入表
           </Button> */}
-          <Button type="black">
+          <Button
+            type="black"
+            tw="w-[84px] px-0"
+            onClick={() => mutateCodeData('codeSyntax')}
+            loading={syntaxMutation.isLoading}
+          >
             <Icon name="remark" type="light" />
             语法检查
           </Button>
@@ -225,12 +235,17 @@ def main(args: Array[String]): Unit = {
             <Icon name="triangle-right" type="light" />
             运行
           </Button>
-          <Button onClick={save} loading={mutation.isLoading}>
+          <Button
+            tw="w-[68px] px-0"
+            onClick={() => mutateCodeData('codeSave')}
+            loading={mutation.isLoading}
+          >
             <Icon name="data" />
             保存
           </Button>
           <Button
             type="primary"
+            tw="w-[68px] px-0"
             onClick={onRelease}
             loading={releaseMutation.isLoading}
             disabled={!enableRelease}
