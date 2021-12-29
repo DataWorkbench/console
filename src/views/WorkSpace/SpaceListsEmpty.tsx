@@ -42,19 +42,24 @@ const SpaceListsEmpty = () => {
               <SexangleImg />
               <Icon name="project" size={40} tw="absolute left-4 top-5" />
             </div>
-            <div tw="font-medium text-xl mt-5">
+            <div css={[tw`font-medium text-xl mt-5`, isModal && tw`mt-1`]}>
               {isModal ? '当前没有相关「工作空间」的数据' : '暂无工作空间'}
             </div>
-            <div tw="mt-4 text-neut-8">
-              {isModal ? (
-                <HelpCenterLink href="/intro/concept/" isIframe={!isModal}>
-                  了解更多
-                </HelpCenterLink>
-              ) : (
-                '工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。'
-              )}
-            </div>
-            <div tw="mt-6">
+            {isModal && (
+              <div tw="mt-1 text-neut-8">
+                <>
+                  工作空间是在大数据工作台管理任务的基本单元。
+                  <HelpCenterLink
+                    href="/intro/concept/"
+                    isIframe={!isModal}
+                    hasIcon={false}
+                  >
+                    了解更多
+                  </HelpCenterLink>
+                </>
+              </div>
+            )}
+            <div css={[isModal ? tw`mt-2` : tw`mt-6`]}>
               <Button
                 type="primary"
                 onClick={() => {
@@ -65,15 +70,17 @@ const SpaceListsEmpty = () => {
                 创建工作空间
               </Button>
             </div>
-            <div css={[tw`space-x-3 mt-3`, !isModal && tw`mb-8`]}>
-              <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
-                使用指南
-              </HelpCenterLink>
-              <span tw="text-deepblue-10">|</span>
-              <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
-                介绍视频
-              </HelpCenterLink>
-            </div>
+            {!isModal && (
+              <div css={[tw`space-x-3 mt-3`, !isModal && tw`mb-8`]}>
+                <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
+                  使用指南
+                </HelpCenterLink>
+                <span tw="text-deepblue-10">|</span>
+                <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
+                  介绍视频
+                </HelpCenterLink>
+              </div>
+            )}
           </div>
         </div>
         {!isModal && <Guide title={guideData.title} items={guideData.items} />}

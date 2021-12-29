@@ -23,7 +23,8 @@ import BestPractice from './BestPractice'
 const tabs = [
   {
     title: '工作空间',
-    description: '工作空间是在大数据工作台管理任务的基本单元',
+    description:
+      '工作空间是在大数据平台内管理任务、成员，分配角色和权限的基本单元。工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。',
     icon: 'project',
     key: 'workspace',
     helpLink: getHelpCenterLink('/manual/workspace_list/'),
