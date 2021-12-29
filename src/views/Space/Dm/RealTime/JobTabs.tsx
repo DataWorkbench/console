@@ -6,9 +6,10 @@ import { findIndex } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
+import tw, { theme, css, styled } from 'twin.macro'
 import { useStore } from 'stores'
 import { RouterLink } from 'components'
-import tw, { css, styled } from 'twin.macro'
+
 import StreamOperator from './StreamOperator'
 import StreamCode from './StreamCode'
 import StreamJAR from './StreamJAR'
@@ -114,29 +115,31 @@ const JobTabs = observer(() => {
   )
 
   return (
-    <div tw="flex-1 w-full overflow-x-hidden">
+    <div tw="flex-1 w-full overflow-x-hidden ">
       {showNotify && (
-        <div tw="absolute left-0 top-0 w-full pointer-events-none z-10">
-          <div tw="flex justify-center">
-            <div tw="flex items-center bg-white text-neut-15 px-3 py-2 rounded-sm">
-              <Icon
-                name="success"
-                type="light"
-                size={20}
-                tw="mr-2"
-                color={{
-                  secondary: '#15a675',
-                }}
-              />
-              <div tw="pointer-events-auto">
-                调度作业发布成功，您可前往
-                <RouterLink
-                  color="blue"
-                  to={`/${regionId}/workspace/${spaceId}/ops/release`}
-                >
-                  运维中心-已发布作业
-                </RouterLink>{' '}
-                查看作业详情
+        <div tw="relative">
+          <div tw="absolute left-0 top-0 w-full pointer-events-none z-10">
+            <div tw="flex justify-center">
+              <div tw="flex items-center bg-white text-neut-15 px-3 py-2 rounded-sm">
+                <Icon
+                  name="success"
+                  type="light"
+                  size={20}
+                  tw="mr-2"
+                  color={{
+                    secondary: theme('colors.green.11'),
+                  }}
+                />
+                <div tw="pointer-events-auto">
+                  调度作业发布成功，您可前往
+                  <RouterLink
+                    color="blue"
+                    to={`/${regionId}/workspace/${spaceId}/ops/release`}
+                  >
+                    运维中心-已发布作业
+                  </RouterLink>{' '}
+                  查看作业详情
+                </div>
               </div>
             </div>
           </div>
