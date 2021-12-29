@@ -893,6 +893,7 @@ const ScheSettingModal = ({
                 </Field>
                 <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
                   <SliderField
+                    key={disabled ? 'initSlider' : 'updateSlider'}
                     disabled={disabled}
                     name="p2"
                     label="出错重试最大次数"
@@ -915,6 +916,7 @@ const ScheSettingModal = ({
                       99: '99',
                     }}
                     hasInput
+                    inputProps={{ disabled }}
                   />
                   <Field>
                     <Label>
@@ -922,6 +924,7 @@ const ScheSettingModal = ({
                     </Label>
                     <Control>
                       <InputNumber
+                        key={disabled ? 'initInput' : 'updateInput'}
                         disabled={disabled}
                         isMini
                         min={1}
@@ -941,6 +944,7 @@ const ScheSettingModal = ({
                   <Label>超时时间</Label>
                   <Control>
                     <InputNumber
+                      key={disabled ? 'initInput' : 'updateInput'}
                       disabled={disabled}
                       isMini
                       min={0}
