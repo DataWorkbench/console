@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Tooltip, Menu } from '@QCFE/lego-ui'
 import { Icon, InputSearch, Loading, Modal } from '@QCFE/qingcloud-portal-ui'
@@ -88,12 +88,15 @@ const JobMenu = observer(() => {
     }
   }, [flows, curViewJobId, workFlowStore])
 
-  const handleItemClick = useCallback(
-    (flow) => {
+  const handleItemClick = (flow: any) => {
+    if (workFlowStore.needSaveJob) {
+      if (curJob) {
+        workFlowStore.needSave(flow.id, 'switch')
+      }
+    } else {
       workFlowStore.set({ curJob: flow })
-    },
-    [workFlowStore]
-  )
+    }
+  }
 
   const showEditModal = (job) => {
     setVisible(true)

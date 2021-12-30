@@ -4,7 +4,7 @@ import { Center, FlexBox, Modal } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
 import { theme } from 'twin.macro'
-import { useUnmount, useMeasure } from 'react-use'
+import { useUnmount, useMeasure, useBeforeUnload } from 'react-use'
 import Editor from 'react-monaco-editor'
 import { useQueryClient } from 'react-query'
 import { Rnd } from 'react-rnd'
@@ -245,6 +245,8 @@ def main(args: Array[String]): Unit = {
     })
     workFlowStore.resetNeedSave()
   })
+
+  useBeforeUnload(workFlowStore.needSaveJob, '未保存')
 
   const handleReleaseSuccess = () => {
     toggleShow(false)
