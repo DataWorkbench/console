@@ -113,7 +113,7 @@ const getUrl = (
 ) => {
   switch (type) {
     case 'hbase':
-      return urlObj.zookeeper
+      return `${urlObj.zookeeper}${urlObj.z_node}`
     case 'kafka':
       return urlObj.kafka_brokers
     case 'ftp':
