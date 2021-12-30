@@ -22,7 +22,14 @@ import {
   useQueryResourceByPage,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
-import { FlexBox, Center, Tooltip, Icons, HelpCenterLink } from 'components'
+import {
+  FlexBox,
+  Center,
+  Tooltip,
+  Icons,
+  TextEllipsis,
+  HelpCenterLink,
+} from 'components'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
@@ -206,25 +213,25 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
             //  filter.reverse ? 'asc' : 'desc',
             // eslint-disable-next-line no-nested-ternary
             filter.sort_by === 'name' ? (filter.reverse ? 'asc' : 'desc') : '',
-          render: (_: string, row: Record<string, any>) => {
+          render: (value: string) => {
             return (
-              <FlexBox tw="items-center space-x-1">
-                {packageType === 'dependency' ? (
-                  <Icons name="dependency" width={20} size={20} />
-                ) : (
-                  <Icon
-                    tw="w-5! h-5!"
-                    name={packageType === 'program' ? 'coding' : 'terminal'}
-                    type="light"
-                    color={{
-                      primary: '#219861',
-                      secondary: '#8EDABD',
-                    }}
-                  />
-                )}
-                <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
-                  <div tw="max-w-[180px] truncate">{row.name}</div>
-                </Tooltip>
+              <FlexBox tw="items-center space-x-1 overflow-hidden">
+                <div tw="w-5 h-5">
+                  {packageType === 'dependency' ? (
+                    <Icons name="dependency" width={20} size={20} />
+                  ) : (
+                    <Icon
+                      tw="w-5! h-5!"
+                      name={packageType === 'program' ? 'coding' : 'terminal'}
+                      type="light"
+                      color={{
+                        primary: '#219861',
+                        secondary: '#8EDABD',
+                      }}
+                    />
+                  )}
+                </div>
+                <TextEllipsis>{value}</TextEllipsis>
               </FlexBox>
             )
           },
@@ -243,13 +250,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: '描述',
-          width: 250,
           dataIndex: 'description',
           render: (value: string) => {
             return (
-              <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
-                <div tw="max-w-[230px] truncate text-neut-8">{value}</div>
-              </Tooltip>
+              <div tw="overflow-hidden">
+                <TextEllipsis>{value}</TextEllipsis>
+              </div>
             )
           },
         },
