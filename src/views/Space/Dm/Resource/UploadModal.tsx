@@ -20,15 +20,15 @@ import {
   Tooltip,
   Center,
   AffixLabel,
-  TextLink,
   PopConfirm,
+  HelpCenterLink,
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { formatBytes } from 'utils/convert'
 import axios from 'axios'
 import { useImmer } from 'use-immer'
 import {
-  // PackageDocsHref,
+  PackageDocsHref,
   PackageName,
   PackageTypeMap,
   PackageTypeTip,
@@ -312,14 +312,12 @@ const UploadModal = (props: any) => {
           <Level as="nav">
             <LevelLeft>{PackageTypeTip[packageType]}</LevelLeft>
             <LevelRight>
-              <TextLink
-                // href={PackageDocsHref[packageType]}
-                target="_blank"
-                rel="noreferrer"
-                hasIcon={false}
+              <HelpCenterLink
+                href={PackageDocsHref[packageType]}
+                isIframe={false}
               >
-                查看详情 →
-              </TextLink>
+                查看详情
+              </HelpCenterLink>
             </LevelRight>
           </Level>
         }
