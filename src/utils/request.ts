@@ -33,14 +33,12 @@ client.interceptors.response.use(
       loginMdalVisible = true
       const message1 = getMessage(response.data)
       response.data.message = message1
-
-      axiosList.forEach((cancel) => {
-        cancel()
-      })
-
       emitter.emit('error', {
         title: `请求错误: 登录会话已过期，请重新登录`,
         content: message1,
+      })
+      axiosList.forEach((cancel) => {
+        cancel()
       })
 
       axiosList.clear()
