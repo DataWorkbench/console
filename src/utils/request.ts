@@ -39,7 +39,7 @@ client.interceptors.response.use(
       })
 
       emitter.emit('error', {
-        title: `请求错误: [${status || retCode}]`,
+        title: `请求错误: 登录会话已过期，请重新登录`,
         content: message1,
       })
 
