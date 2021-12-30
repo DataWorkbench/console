@@ -148,12 +148,22 @@ const JobTabs = observer(() => {
       <TabWrapper
         type="card"
         activeName={curJob?.id}
-        onChange={(name) =>
-          workFlowStore.set({
-            curJob: panels.find((p) => p.id === name),
-          })
-        }
-        onClose={(name: string) => removePanel(name)}
+        onChange={(name) => {
+          if (workFlowStore.needSaveJob) {
+            workFlowStore.needSave(name, 'switch')
+          } else {
+            workFlowStore.set({
+              curJob: panels.find((p) => p.id === name),
+            })
+          }
+        }}
+        onClose={(name: string) => {
+          if (workFlowStore.needSaveJob) {
+            workFlowStore.needSave(name, 'close')
+          } else {
+            removePanel(name)
+          }
+        }}
       >
         {panels.map((flow) => (
           <TabPanel

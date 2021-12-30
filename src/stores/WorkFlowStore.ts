@@ -19,6 +19,14 @@ class WorkFlowStore {
 
   showNotify = false
 
+  needSaveJob = false
+
+  tabOp: '' | 'switch' | 'close' = ''
+
+  opTabName = ''
+
+  showSaveJobConfirm = false
+
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       rootStore: false,
@@ -42,6 +50,33 @@ class WorkFlowStore {
     } else if (this.curJob?.id === panelId) {
       this.curJob = filterPanels[len - 1]
     }
+  }
+
+  switchPanel = () => {
+    this.needSaveJob = false
+    this.showSaveJobConfirm = false
+    if (this.tabOp === 'close') {
+      this.removePanel(this.opTabName)
+    } else if (this.tabOp === 'switch') {
+      const job = this.panels.find((p) => p.id === this.opTabName)
+      if (job) {
+        this.curJob = job
+      }
+    }
+    this.tabOp = ''
+  }
+
+  resetNeedSave = () => {
+    this.needSaveJob = false
+    this.tabOp = ''
+    this.opTabName = ''
+    this.showSaveJobConfirm = false
+  }
+
+  needSave = (opTabName: string, op: 'switch' | 'close' = 'switch') => {
+    this.showSaveJobConfirm = true
+    this.opTabName = opTabName
+    this.tabOp = op
   }
 
   set(params: { [key: string]: any }) {
