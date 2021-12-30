@@ -21,9 +21,34 @@ function getMessage(ret: {}) {
 
 const client = axios.create(baseConfig)
 
+let loginMdalVisible = false
+
+const axiosList = new Map()
+
 client.interceptors.response.use(
   (response) => {
+    axiosList.delete(response.config)
     const { status, ret_code: retCode } = response.data
+    if (retCode === 2000) {
+      loginMdalVisible = true
+      const message1 = getMessage(response.data)
+      response.data.message = message1
+
+      axiosList.forEach((cancel) => {
+        cancel()
+      })
+
+      emitter.emit('error', {
+        title: `请求错误: [${status || retCode}]`,
+        content: message1,
+      })
+
+      axiosList.clear()
+      setTimeout(() => {
+        window.location.href = `/login?redirect_uri=${window.location.pathname}`
+      }, 1200)
+      throw new Error(message1)
+    }
     if (status >= 400 || retCode !== 0) {
       const message = getMessage(response.data)
       response.data.message = message
@@ -57,8 +82,11 @@ client.interceptors.response.use(
 
 const request = async (
   data: { method?: string; [params: string]: unknown },
-  options: { cancel?: () => {}; [params: string]: unknown } = {}
+  options: { cancel?: (_: any) => void; [params: string]: unknown } = {}
 ) => {
+  if (loginMdalVisible) {
+    return Promise.reject(new Error('登录会话已过期，请重新登录'))
+  }
   const { method = 'GET', action = 'Forward', ...params } = data
   const { cancel, ...config } = options
   const userId = get(window, 'USER.user_id', '')
@@ -72,11 +100,19 @@ const request = async (
     },
     ...config,
   }
-  if (isFunction(cancel)) {
-    axiosConfig.cancelToken = new axios.CancelToken(cancel)
-  }
+  let tempCancel
 
-  return client.request(axiosConfig).then((response) => response.data)
+  axiosConfig.cancelToken = new axios.CancelToken((c: any) => {
+    tempCancel = c
+    if (isFunction(cancel)) {
+      cancel(c)
+    }
+  })
+  axiosList.set(axiosConfig, tempCancel)
+
+  return client.request(axiosConfig).then((response) => {
+    return response.data
+  })
   // .catch((e) => {
   //   if (axios.isCancel(e)) {
   //     return null
