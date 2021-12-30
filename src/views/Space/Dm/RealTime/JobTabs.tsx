@@ -20,7 +20,7 @@ const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full flex flex-col`,
   css`
     .tabs {
-      ${tw`bg-neut-17`};
+      ${tw`bg-neut-17 h-8 flex-none`};
       ul {
         border: 0;
         li {
@@ -57,7 +57,7 @@ const TabWrapper = styled(Tabs)(() => [
       }
     }
     .tab-content {
-      ${tw`flex-1 h-full py-0!`}
+      ${tw`flex-1 py-0!`}
       .tab-panel {
         ${tw`flex h-full`}
       }
