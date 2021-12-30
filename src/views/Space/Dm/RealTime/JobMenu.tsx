@@ -88,13 +88,14 @@ const JobMenu = observer(() => {
     }
   }, [flows, curViewJobId, workFlowStore])
 
-  const handleItemClick = (flow: any) => {
+  const handleItemClick = (job: any) => {
     if (workFlowStore.needSaveJob) {
       if (curJob) {
-        workFlowStore.needSave(flow.id, 'switch')
+        workFlowStore.set({ nextJob: job })
+        workFlowStore.needSave(job.id, 'switch')
       }
     } else {
-      workFlowStore.set({ curJob: flow })
+      workFlowStore.set({ curJob: job })
     }
   }
 
