@@ -25,6 +25,8 @@ class WorkFlowStore {
 
   opTabName = ''
 
+  nextJob: null | IJob = null
+
   showSaveJobConfirm = false
 
   constructor(rootStore: RootStore) {
@@ -58,12 +60,13 @@ class WorkFlowStore {
     if (this.tabOp === 'close') {
       this.removePanel(this.opTabName)
     } else if (this.tabOp === 'switch') {
-      const job = this.panels.find((p) => p.id === this.opTabName)
+      const job =
+        this.panels.find((p) => p.id === this.opTabName) || this.nextJob
       if (job) {
         this.curJob = job
       }
     }
-    this.tabOp = ''
+    this.resetNeedSave()
   }
 
   resetNeedSave = () => {
@@ -71,6 +74,7 @@ class WorkFlowStore {
     this.tabOp = ''
     this.opTabName = ''
     this.showSaveJobConfirm = false
+    this.nextJob = null
   }
 
   needSave = (opTabName: string, op: 'switch' | 'close' = 'switch') => {
