@@ -26,7 +26,7 @@ class DataSourceStore {
     },
     {
       name: 'PostgreSQL',
-      desc: '开源的对象-关系数据库数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。 ',
+      desc: '开源的对象-关系数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。 ',
       source_type: 2,
     },
     // { name: 'S3', img: <S3Img />, desc: '是一种面向 Internet 的存储服务。', source_type: 4, },
@@ -49,7 +49,7 @@ class DataSourceStore {
     {
       name: 'Ftp',
       showname: 'FTP',
-      desc: '用于在网络上进行文件传输的一套标准协议，它工作在 OSI 模型中的应用层',
+      desc: '用于在网络上进行文件传输的一套标准协议，它工作在 OSI 模型中的应用层。',
       source_type: 7,
     },
     {

@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
 import { Center, FlexBox, Modal } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
@@ -35,15 +36,18 @@ interface IProp {
   tp: 2 | 4 | 5
 }
 
-const StreamCode = ({ tp }: IProp) => {
-  const { workFlowStore } = useStore()
+const StreamCode = observer(({ tp }: IProp) => {
+  const {
+    workFlowStore,
+    workFlowStore: { showSaveJobConfirm },
+  } = useStore()
   const [boxRef, boxDimensions] = useMeasure()
   const [show, toggleShow] = useState(false)
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showRunLog, setShowRunLog] = useState(false)
   const [showScheSettingModal, setShowScheSettingModal] = useState(false)
-  const editorRef = useRef(null)
+  const editorRef = useRef<any>(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
@@ -57,7 +61,7 @@ const StreamCode = ({ tp }: IProp) => {
   const defaultCode = useMemo(() => {
     let v = ''
     if (codeName === 'sql') {
-      v = `-drop table if exists pd;
+      v = `drop table if exists pd;
 create table pd
 (id bigint primary key NOT ENFORCED,id1 bigint) WITH (
 'connector' = 'jdbc',
@@ -108,7 +112,6 @@ def main(args: Array[String]): Unit = {
       {
         onSuccess: () => {
           setShowRunLog(true)
-          // console.log('in this....')
         },
         onError: () => {
           setShowRunLog(true)
@@ -117,7 +120,7 @@ def main(args: Array[String]): Unit = {
     )
   }
 
-  const mutateCodeData = (op: 'codeSave' | 'codeSyntax') => {
+  const mutateCodeData = (op: 'codeSave' | 'codeSyntax', cb?: () => void) => {
     const code = trim(editorRef.current?.getValue())
     if (code === '') {
       showWarn()
@@ -144,6 +147,9 @@ def main(args: Array[String]): Unit = {
             content: isSaveOp ? '代码保存成功' : '语法检查成功',
             placement: 'bottomRight',
           })
+          if (cb) {
+            cb()
+          }
         },
       }
     )
@@ -163,7 +169,7 @@ def main(args: Array[String]): Unit = {
     }
   }
 
-  const handleEditorWillMount = (monaco) => {
+  const handleEditorWillMount = (monaco: any) => {
     monaco.editor.defineTheme('my-theme', {
       base: 'vs-dark',
       inherit: true,
@@ -200,7 +206,7 @@ def main(args: Array[String]): Unit = {
     }
   }
 
-  const handleEditorDidMount = (editor, monaco) => {
+  const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor
     if (!isUndefined(codeStr)) {
       editor.setValue(codeStr || defaultCode)
@@ -212,6 +218,16 @@ def main(args: Array[String]): Unit = {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
       mutateCodeData('codeSave')
     )
+  }
+
+  const handleEditorChange = (v: string) => {
+    if (trim(v) === '') {
+      return
+    }
+
+    workFlowStore.set({
+      needSaveJob: v !== codeStr,
+    })
   }
 
   useEffect(() => {
@@ -227,6 +243,7 @@ def main(args: Array[String]): Unit = {
     workFlowStore.set({
       showNotify: false,
     })
+    workFlowStore.resetNeedSave()
   })
 
   const handleReleaseSuccess = () => {
@@ -247,6 +264,7 @@ def main(args: Array[String]): Unit = {
           <Button
             type="black"
             tw="w-[84px] px-0"
+            disabled={tp !== 2}
             onClick={() => mutateCodeData('codeSyntax')}
             loading={syntaxMutation.isLoading}
           >
@@ -292,6 +310,7 @@ def main(args: Array[String]): Unit = {
             }}
             editorWillMount={handleEditorWillMount}
             editorDidMount={handleEditorDidMount}
+            onChange={handleEditorChange}
           />
         </div>
       </FlexBox>
@@ -364,8 +383,48 @@ def main(args: Array[String]): Unit = {
           <div>xxxxx</div>
         </Rnd>
       )}
+      {showSaveJobConfirm && (
+        <Modal
+          visible
+          noBorder
+          width={400}
+          onCancel={() => workFlowStore.switchPanel()}
+          footer={
+            <div tw="flex justify-end">
+              <Button type="danger" onClick={() => workFlowStore.switchPanel()}>
+                不保存
+              </Button>
+              <Button
+                type="primary"
+                loading={mutation.isLoading}
+                onClick={() => {
+                  mutateCodeData('codeSave', () => {
+                    workFlowStore.switchPanel()
+                  })
+                }}
+              >
+                保存
+              </Button>
+            </div>
+          }
+        >
+          <div tw="flex">
+            <Icon
+              name="exclamation"
+              color={{ secondary: '#F5C414' }}
+              size={20}
+            />
+            <div tw="ml-3">
+              <div tw="text-base">尚未保存</div>
+              <div tw="mt-2 text-neut-8">
+                未保存时刷新、离开，将丢失已输入内容
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
     </FlexBox>
   )
-}
+})
 
 export default StreamCode
