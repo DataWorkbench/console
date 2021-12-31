@@ -149,8 +149,8 @@ const JobTabs = observer(() => {
         type="card"
         activeName={curJob?.id}
         onChange={(name) => {
-          if (workFlowStore.needSaveJob) {
-            workFlowStore.needSave(name, 'switch')
+          if (workFlowStore.isDirty) {
+            workFlowStore.showSaveConfirm(name, 'switch')
           } else {
             workFlowStore.set({
               curJob: panels.find((p) => p.id === name),
@@ -158,8 +158,8 @@ const JobTabs = observer(() => {
           }
         }}
         onClose={(name: string) => {
-          if (workFlowStore.needSaveJob) {
-            workFlowStore.needSave(name, 'close')
+          if (workFlowStore.isDirty) {
+            workFlowStore.showSaveConfirm(name, 'close')
           } else {
             removePanel(name)
           }

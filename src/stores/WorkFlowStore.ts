@@ -19,7 +19,7 @@ class WorkFlowStore {
 
   showNotify = false
 
-  needSaveJob = false
+  isDirty = false
 
   tabOp: '' | 'switch' | 'close' = ''
 
@@ -55,7 +55,7 @@ class WorkFlowStore {
   }
 
   switchPanel = () => {
-    this.needSaveJob = false
+    this.isDirty = false
     this.showSaveJobConfirm = false
     if (this.tabOp === 'close') {
       this.removePanel(this.opTabName)
@@ -70,17 +70,23 @@ class WorkFlowStore {
   }
 
   resetNeedSave = () => {
-    this.needSaveJob = false
+    this.isDirty = false
     this.tabOp = ''
     this.opTabName = ''
     this.showSaveJobConfirm = false
     this.nextJob = null
   }
 
-  needSave = (opTabName: string, op: 'switch' | 'close' = 'switch') => {
+  showSaveConfirm = (opTabName: string, op: 'switch' | 'close' = 'switch') => {
     this.showSaveJobConfirm = true
     this.opTabName = opTabName
     this.tabOp = op
+  }
+
+  hideSaveConfirm = () => {
+    this.showSaveJobConfirm = false
+    this.opTabName = ''
+    this.tabOp = ''
   }
 
   set(params: { [key: string]: any }) {

@@ -226,7 +226,7 @@ def main(args: Array[String]): Unit = {
     }
 
     workFlowStore.set({
-      needSaveJob: v !== codeStr,
+      isDirty: v !== codeStr,
     })
   }
 
@@ -246,7 +246,7 @@ def main(args: Array[String]): Unit = {
     workFlowStore.resetNeedSave()
   })
 
-  useBeforeUnload(workFlowStore.needSaveJob, '未保存')
+  useBeforeUnload(workFlowStore.isDirty, '未保存')
 
   const handleReleaseSuccess = () => {
     toggleShow(false)
@@ -392,21 +392,26 @@ def main(args: Array[String]): Unit = {
           width={400}
           onCancel={() => workFlowStore.switchPanel()}
           footer={
-            <div tw="flex justify-end">
+            <div tw="flex justify-between w-full pl-9">
               <Button type="danger" onClick={() => workFlowStore.switchPanel()}>
                 不保存
               </Button>
-              <Button
-                type="primary"
-                loading={mutation.isLoading}
-                onClick={() => {
-                  mutateCodeData('codeSave', () => {
-                    workFlowStore.switchPanel()
-                  })
-                }}
-              >
-                保存
-              </Button>
+              <div>
+                <Button onClick={() => workFlowStore.hideSaveConfirm()}>
+                  取消
+                </Button>
+                <Button
+                  type="primary"
+                  loading={mutation.isLoading}
+                  onClick={() => {
+                    mutateCodeData('codeSave', () => {
+                      workFlowStore.switchPanel()
+                    })
+                  }}
+                >
+                  保存
+                </Button>
+              </div>
             </div>
           }
         >
