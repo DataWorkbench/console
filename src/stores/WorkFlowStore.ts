@@ -21,7 +21,7 @@ class WorkFlowStore {
 
   isDirty = false
 
-  tabOp: '' | 'switch' | 'close' = ''
+  tabOp: '' | 'switch' | 'close' | 'leave' = ''
 
   opTabName = ''
 
@@ -77,7 +77,10 @@ class WorkFlowStore {
     this.nextJob = null
   }
 
-  showSaveConfirm = (opTabName: string, op: 'switch' | 'close' = 'switch') => {
+  showSaveConfirm = (
+    opTabName: string,
+    op: 'switch' | 'close' | 'leave' = 'switch'
+  ) => {
     this.showSaveJobConfirm = true
     this.opTabName = opTabName
     this.tabOp = op

@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import { useStore } from 'stores'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useLocation } from 'react-router-dom'
 import tw, { styled, css, theme } from 'twin.macro'
 import { useDarkMode } from 'hooks'
 
@@ -30,23 +31,29 @@ const FuncWrapper = styled('div')(({ current }: { current: boolean }) => [
 export const Navs = ({ mod }: NavsProps) => {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
+  const location = useLocation()
   const {
     workSpaceStore: { funcList },
     globalStore,
   } = useStore()
   const setDarkMode = useDarkMode()
-  const handNavClick = (name: string) => {
-    const darkMode = ['dm', 'ops'].includes(name)
-    setDarkMode(darkMode)
-    globalStore.set({ darkMode })
-  }
+  useEffect(() => {
+    const matched = location.pathname.match(/workspace\/[^/]+\/([^/]+)/)
+    if (matched && matched[1]) {
+      const darkMode = ['dm', 'ops'].includes(matched[1])
+      if (globalStore.darkMode !== darkMode) {
+        setDarkMode(darkMode)
+        globalStore.set({ darkMode })
+      }
+    }
+  }, [location, globalStore, setDarkMode])
+
   return (
     <div tw="flex gap-6">
       {funcList.map(({ title, name }) => (
         <FuncWrapper key={name} current={mod === name}>
           <Link
             tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
-            onClick={() => handNavClick(name)}
             to={`/${regionId}/workspace/${spaceId}/${
               name === 'ops' ? 'ops/release' : name
             }`}
