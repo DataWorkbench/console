@@ -1,5 +1,6 @@
 import { makeAutoObservable, set } from 'mobx'
 import { findIndex } from 'lodash-es'
+import emitter from 'utils/emitter'
 import type RootStore from './RootStore'
 
 interface IJob {
@@ -87,6 +88,7 @@ class WorkFlowStore {
   }
 
   hideSaveConfirm = () => {
+    emitter.emit('cancelSaveJob')
     this.showSaveJobConfirm = false
     this.opTabName = ''
     this.tabOp = ''

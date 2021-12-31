@@ -2,6 +2,8 @@ import { useParams } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import { useStore } from 'stores'
 import { SideMenu } from '@QCFE/qingcloud-portal-ui'
+import { useEffect, useReducer } from 'react'
+import emitter from 'utils/emitter'
 
 const SideMenuWrapper = styled('div')(() => [
   tw`relative`,
@@ -107,6 +109,15 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
     workSpaceStore: { funcList },
   } = useStore()
 
+  const [key, setSiderKey] = useReducer((v) => v + 1, 0)
+
+  useEffect(() => {
+    emitter.on('cancelSaveJob', setSiderKey)
+    return () => {
+      emitter.off('cancelSaveJob', setSiderKey)
+    }
+  }, [])
+
   const func = funcList.find(({ name }) => name === funcMod)
   if (!func) {
     return <div>empty</div>
@@ -136,6 +147,7 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
   return (
     <SideMenuWrapper>
       <SideMenu
+        key={key}
         darkMode={darkMode}
         menus={navMenu}
         defaultSelectedMenu={curFunc.name}
