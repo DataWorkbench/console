@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { Center, FlexBox, Modal } from 'components'
 import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
+import { Prompt, useHistory } from 'react-router-dom'
 import { theme } from 'twin.macro'
 import { useUnmount, useMeasure, useBeforeUnload } from 'react-use'
 import Editor from 'react-monaco-editor'
@@ -39,9 +40,12 @@ interface IProp {
 const StreamCode = observer(({ tp }: IProp) => {
   const {
     workFlowStore,
-    workFlowStore: { showSaveJobConfirm },
+    workFlowStore: { curJob, showSaveJobConfirm },
   } = useStore()
+  const [nextLocation, setNextLocation] = useState(null)
+  const [shouldNav, setShouldNav] = useState(false)
   const [boxRef, boxDimensions] = useMeasure()
+  const history = useHistory()
   const [show, toggleShow] = useState(false)
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
@@ -230,6 +234,18 @@ def main(args: Array[String]): Unit = {
     })
   }
 
+  const handlePrompt = (location) => {
+    workFlowStore.showSaveConfirm(curJob?.id, 'leave')
+    setNextLocation(location)
+    return false
+  }
+
+  useEffect(() => {
+    if (shouldNav && nextLocation) {
+      history.push(nextLocation.pathname)
+    }
+  }, [shouldNav, history, nextLocation])
+
   useEffect(() => {
     if (!isUndefined(codeStr)) {
       editorRef.current?.setValue(codeStr || defaultCode)
@@ -393,7 +409,17 @@ def main(args: Array[String]): Unit = {
           onCancel={() => workFlowStore.switchPanel()}
           footer={
             <div tw="flex justify-between w-full pl-9">
-              <Button type="danger" onClick={() => workFlowStore.switchPanel()}>
+              <Button
+                type="danger"
+                onClick={() => {
+                  if (workFlowStore.tabOp === 'leave') {
+                    workFlowStore.resetNeedSave()
+                    setShouldNav(true)
+                  } else {
+                    workFlowStore.switchPanel()
+                  }
+                }}
+              >
                 不保存
               </Button>
               <div>
@@ -405,7 +431,12 @@ def main(args: Array[String]): Unit = {
                   loading={mutation.isLoading}
                   onClick={() => {
                     mutateCodeData('codeSave', () => {
-                      workFlowStore.switchPanel()
+                      if (workFlowStore.tabOp === 'leave') {
+                        workFlowStore.resetNeedSave()
+                        setShouldNav(true)
+                      } else {
+                        workFlowStore.switchPanel()
+                      }
                     })
                   }}
                 >
@@ -430,6 +461,7 @@ def main(args: Array[String]): Unit = {
           </div>
         </Modal>
       )}
+      <Prompt when={workFlowStore.isDirty} message={handlePrompt} />
     </FlexBox>
   )
 })
