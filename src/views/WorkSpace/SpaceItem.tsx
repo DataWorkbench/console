@@ -55,6 +55,9 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   } = useStore()
 
   const handleCardClick = () => {
+    if (space.status !== 1) {
+      return
+    }
     if (isModal) {
       stateStore.set({ curSpace: space })
       onItemCheck(regionId, space.id)
@@ -140,7 +143,10 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
       `}
       onClick={handleCardClick}
     >
-      <div tw="px-5 pt-4 pb-5 relative cursor-pointer">
+      <div
+        tw="px-5 pt-4 pb-5 relative cursor-pointer"
+        css={space.status !== 1 && tw`cursor-default`}
+      >
         {isModal && (
           <Radio
             tw="absolute top-2 right-3"
