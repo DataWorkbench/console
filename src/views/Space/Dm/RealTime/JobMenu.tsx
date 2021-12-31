@@ -89,10 +89,10 @@ const JobMenu = observer(() => {
   }, [flows, curViewJobId, workFlowStore])
 
   const handleItemClick = (job: any) => {
-    if (workFlowStore.needSaveJob) {
+    if (workFlowStore.isDirty) {
       if (curJob) {
         workFlowStore.set({ nextJob: job })
-        workFlowStore.needSave(job.id, 'switch')
+        workFlowStore.showSaveConfirm(job.id, 'switch')
       }
     } else {
       workFlowStore.set({ curJob: job })
