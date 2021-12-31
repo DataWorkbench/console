@@ -405,6 +405,9 @@ def main(args: Array[String]): Unit = {
         <Modal
           visible
           noBorder
+          draggable
+          escClosable={false}
+          maskClosable={false}
           width={400}
           onCancel={() => workFlowStore.switchPanel()}
           footer={
