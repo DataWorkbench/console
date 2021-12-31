@@ -59,7 +59,11 @@ client.interceptors.response.use(
     return response
   },
   (error) => {
-    if (axios.isCancel(error) || error.code === 'ECONNABORTED') {
+    if (axios.isCancel(error)) {
+      emitter.emit('error', {
+        title: `已取消`,
+      })
+    } else if (error.code === 'ECONNABORTED') {
       emitter.emit('error', {
         title: `网络超时: [timeout]`,
         content: error.message,

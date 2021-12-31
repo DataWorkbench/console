@@ -127,17 +127,19 @@ export const useMutationResource = () => {
       let ret = null
       let endpoint = ''
       let headers = ''
-
       if (op === 'create') {
-        ret = await loadResourceList(params)
+        ret = await loadResourceList(params, { cancel })
         if (ret?.infos?.length > 0) return 'DUPLICATE_RESOURCE_NAME'
       }
 
       if (['create', 'enable', 'view'].includes(op)) {
-        const signature = await loadSignature({
-          region: regionId,
-          spaceId,
-        })
+        const signature = await loadSignature(
+          {
+            region: regionId,
+            spaceId,
+          },
+          { cancel }
+        )
         endpoint = signature.endpoint
         headers = signature.headers
       }

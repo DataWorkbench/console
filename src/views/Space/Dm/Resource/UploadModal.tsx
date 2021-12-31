@@ -127,7 +127,10 @@ const UploadModal = (props: any) => {
   const [fields, setFields] = useImmer<IFormFields>(defaultFields)
   const [fileTip, setFileTip] = useState('')
   const [isFailed, setIsFailed] = useState(false)
-  const [cancelUpload, setCancelUpload] = useState<() => void>()
+  const cancelRef = useRef<() => void>()
+  const setCancelUpload = (c: any) => {
+    cancelRef.current = c
+  }
 
   const form = useRef<Form>(null)
   const resourceEl = useRef<HTMLInputElement>(null)
@@ -145,8 +148,8 @@ const UploadModal = (props: any) => {
   }, [initFields, setFields])
 
   const closeModal = () => {
-    if (cancelUpload) {
-      cancelUpload()
+    if (cancelRef.current) {
+      cancelRef.current()
       setCancelUpload(undefined)
     }
 
@@ -165,8 +168,8 @@ const UploadModal = (props: any) => {
   const handleClear = () => {
     setIsFailed(false)
     setFields(defaultFields)
-    if (cancelUpload) {
-      cancelUpload()
+    if (cancelRef.current) {
+      cancelRef.current()
       setCancelUpload(undefined)
     }
   }
@@ -204,7 +207,7 @@ const UploadModal = (props: any) => {
       {
         op: operation,
         cancel: (c: any) => {
-          setCancelUpload(() => () => c())
+          setCancelUpload(c)
         },
         ...fields,
       },
@@ -363,7 +366,7 @@ const UploadModal = (props: any) => {
                       <span tw="text-red-10 ml-2">文件上传失败</span>
                     )}
                   </div>
-                  {cancelUpload ? (
+                  {cancelRef.current ? (
                     <PopConfirm
                       type="warning"
                       okText="移除"

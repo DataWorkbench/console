@@ -11,16 +11,18 @@ interface IResource {
   spaceId: string
 }
 
-export const loadResourceList = ({
-  regionId,
-  spaceId,
-  ...rest
-}: IResourceParams) =>
-  request({
-    region: regionId,
-    uri: `/v1/workspace/${spaceId}/resource`,
-    query: rest,
-  })
+export const loadResourceList = (
+  { regionId, spaceId, ...rest }: IResourceParams,
+  { cancel }: { cancel?: (_: any) => void } = {}
+) =>
+  request(
+    {
+      region: regionId,
+      uri: `/v1/workspace/${spaceId}/resource`,
+      query: rest,
+    },
+    { cancel: cancel as any }
+  )
 
 export interface IListResourceParams extends IResource {
   limit?: number
@@ -32,16 +34,22 @@ export interface IListResourceParams extends IResource {
   sort_by?: object
 }
 
-export const loadSignature = ({ region, spaceId }: any) =>
-  request({
-    region,
-    method: 'POST',
-    action: 'GenerateSign',
-    uri: `/v1/workspace/${spaceId}/resource`,
-    headers: {
-      'Content-Type': 'Multipart/Form-data',
+export const loadSignature = (
+  { region, spaceId }: any,
+  { cancel }: { cancel?: (_: any) => void } = {}
+) =>
+  request(
+    {
+      region,
+      method: 'POST',
+      action: 'GenerateSign',
+      uri: `/v1/workspace/${spaceId}/resource`,
+      headers: {
+        'Content-Type': 'Multipart/Form-data',
+      },
     },
-  })
+    { cancel: cancel as any }
+  )
 
 export const createResourceJob = ({
   endpoint,
