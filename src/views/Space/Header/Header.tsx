@@ -7,6 +7,8 @@ import { Center } from 'components'
 import { useImmer } from 'use-immer'
 import { useQueryWorkSpace } from 'hooks'
 import { css } from 'twin.macro'
+import { useEffect, useReducer } from 'react'
+import emitter from 'utils/emitter'
 import { Settings } from './Settings'
 import { Navs } from './Navs'
 import { BackMenu } from './BackMenu'
@@ -38,6 +40,15 @@ export const Header = observer(() => {
 
   const { status, data, fetchNextPage, hasNextPage } = useQueryWorkSpace(filter)
   const workspaces = flatten(data?.pages.map((page) => page.infos || []))
+  const [key, setKey] = useReducer((v) => v + 1, 0)
+
+  useEffect(() => {
+    emitter.on('cancelSaveJob', setKey)
+    return () => {
+      emitter.off('cancelSaveJob', setKey)
+    }
+  }, [])
+
   const space = workspaces?.find(({ id }) => id === spaceId)
   const spaceIndex: number = workspaces?.findIndex(({ id }) => id === spaceId)
 
@@ -64,6 +75,7 @@ export const Header = observer(() => {
           {getShortSpaceName(space?.name)}
         </Center>
         <SelectWrapper
+          key={key}
           darkMode={darkMode}
           defaultValue={spaceId}
           isLoading={status === 'loading'}
