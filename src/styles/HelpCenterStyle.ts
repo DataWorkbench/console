@@ -5,6 +5,9 @@ const HelpCenterStyle = css`
     .help-center-modal {
       background-image: none;
       ${tw`bg-neut-16`}
+      .modal-card-foot a {
+        ${tw`text-white`}
+      }
     }
   }
 `
