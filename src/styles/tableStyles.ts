@@ -2,6 +2,9 @@ import tw, { css } from 'twin.macro'
 
 const tableStyles = css`
   .portal-grid-table {
+    .grid-table-content {
+      display: flex; // NOTE:  解决 safari 兼容性 ???
+    }
     .grid-table-content .grid-table-header,
     .table-row {
       .table-icon {
@@ -38,7 +41,14 @@ const tableStyles = css`
       .table-row {
         .table-icon {
           ${tw`pr-0`}
-          .checkbox {
+          label.checkbox {
+            &.checkbox-wrapper.indeterminate::after {
+              left: 5px;
+            }
+            &.checkbox-wrapper.indeterminate::before {
+              ${tw`bg-green-11`}
+              border-color: transparent;
+            }
             &::before {
               ${tw`border-neut-13`}
               background-color: transparent;

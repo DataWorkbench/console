@@ -32,7 +32,7 @@ export const Tooltip = (
     ...omit(rest, 'data-tw'),
     content: (
       <div
-        css={hasPadding && tw`px-3 py-2`}
+        css={[hasPadding && tw`px-3 py-2`, tw`leading-5`]}
         onClick={() => {
           instance?.hide()
         }}
@@ -43,7 +43,7 @@ export const Tooltip = (
   }
   return (
     <Tippy {...combProps} onCreate={(o) => setInstance(o)}>
-      <div css={[tw`inline-block`, [twChild]]}>{children}</div>
+      <div css={[tw`inline-block `, [twChild]]}>{children}</div>
     </Tippy>
   )
 }
