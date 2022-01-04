@@ -1,9 +1,8 @@
 import { Icon } from '@QCFE/lego-ui'
 import { get } from 'lodash-es'
 import tw, { styled, css } from 'twin.macro'
-import { Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
 
-import { Center, Tooltip } from 'components'
+import { Center, Tooltip, HelpCenterLink } from 'components'
 
 const IconBox = styled(Center)(() => {
   return [
@@ -40,12 +39,12 @@ const IconBoxWithTootip = styled(Center)(() => {
   ]
 })
 export const Settings = ({ darkMode }) => {
-  const handleOpenHelpCenter = (link: string) => {
-    const openModal = Modal.open(HelpCenterModal, {
-      link,
-      onCancel: () => Modal.close(openModal),
-    })
-  }
+  // const handleOpenHelpCenter = (link: string) => {
+  //   const openModal = Modal.open(HelpCenterModal, {
+  //     link,
+  //     onCancel: () => Modal.close(openModal),
+  //   })
+  // }
 
   return (
     <Center>
@@ -73,23 +72,25 @@ export const Settings = ({ darkMode }) => {
             <div tw="text-white dark:text-neut-13 leading-5">帮助中心</div>
           }
         >
-          <IconBox
-            onClick={
-              // TODO:  设置文档 url
-              () => handleOpenHelpCenter('/')
-            }
-            className="header-icon-bg-box"
-            size={28}
-            tw=" hover:dark:bg-neut-13 hover:bg-neut-1"
-          >
-            <Icon
-              name="documentation"
-              type={darkMode ? 'light' : 'dark'}
-              changeable
-              size={20}
-              tw="cursor-pointer"
-            />
-          </IconBox>
+          <HelpCenterLink href="/intro/introduction/">
+            <IconBox
+              // onClick={
+              //   // TODO:  设置文档 url
+              //   () => handleOpenHelpCenter('/')
+              // }
+              className="header-icon-bg-box"
+              size={28}
+              tw="hover:dark:bg-neut-13 hover:bg-neut-1"
+            >
+              <Icon
+                name="documentation"
+                type={darkMode ? 'light' : 'dark'}
+                changeable
+                size={20}
+                tw="cursor-pointer"
+              />
+            </IconBox>
+          </HelpCenterLink>
         </Tooltip>
       </IconBoxWithTootip>
 

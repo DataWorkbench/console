@@ -1,5 +1,11 @@
 import { Fragment, ReactElement, useEffect, useMemo, useState } from 'react'
-import { DarkModal, FlexBox, TextHighlight, Icons, TextLink } from 'components'
+import {
+  DarkModal,
+  FlexBox,
+  TextHighlight,
+  Icons,
+  HelpCenterLink,
+} from 'components'
 import {
   Icon,
   Form,
@@ -330,9 +336,12 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                   help={
                     <div>
                       详细说明见
-                      <TextLink href="###" hasIcon>
+                      <HelpCenterLink
+                        href="/developer_sql/summary/"
+                        isIframe={false}
+                      >
                         帮助文档
-                      </TextLink>
+                      </HelpCenterLink>
                     </div>
                   }
                 />
