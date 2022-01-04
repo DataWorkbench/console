@@ -2,6 +2,9 @@ import tw, { css } from 'twin.macro'
 
 const tableStyles = css`
   .portal-grid-table {
+    .grid-table-content {
+      display: flex; // NOTE:  解决 safari 兼容性 ???
+    }
     .grid-table-content .grid-table-header,
     .table-row {
       .table-icon {
