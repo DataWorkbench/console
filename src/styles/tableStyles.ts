@@ -38,7 +38,14 @@ const tableStyles = css`
       .table-row {
         .table-icon {
           ${tw`pr-0`}
-          .checkbox {
+          label.checkbox {
+            &.checkbox-wrapper.indeterminate::after {
+              left: 5px;
+            }
+            &.checkbox-wrapper.indeterminate::before {
+              ${tw`bg-green-11`}
+              border-color: transparent;
+            }
             &::before {
               ${tw`border-neut-13`}
               background-color: transparent;
