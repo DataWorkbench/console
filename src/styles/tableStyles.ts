@@ -3,7 +3,7 @@ import tw, { css } from 'twin.macro'
 const tableStyles = css`
   .portal-grid-table {
     .grid-table-content {
-      display: flex; // NOTE:  解决 safari 兼容性 ???
+      display: unset; // NOTE:  解决 safari 兼容性 ???
     }
     .grid-table-content .grid-table-header,
     .table-row {
@@ -13,6 +13,7 @@ const tableStyles = css`
       .table-col:last-child .button.is-text {
         ${tw`px-0 mr-4`}
       }
+      .table-thead:not(.table-icon),
       .table-col:not(.table-icon) {
         ${tw`min-w-[64px]`}// BUG：解决在宽度不够情况 table td 和 th 对不齐的情况，但是会产生横向滚动条，后续可能会配合固定列
       }
