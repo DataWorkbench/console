@@ -182,6 +182,7 @@ export const InstanceTable = observer(
       },
       {
         title: '操作',
+        width: 180,
         render: (_: any, row: Record<string, any>) => {
           return (
             <FlexBox tw="items-center">

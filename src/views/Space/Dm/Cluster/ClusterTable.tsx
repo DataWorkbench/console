@@ -309,6 +309,7 @@ const ClusterTable = observer(
           title: '操作',
           dataIndex: 'id',
           hiddenInSetting: true,
+          width: 128,
           render: (v: any, row: any) => (
             <FlexBox tw="items-center">
               <Button type="text">
