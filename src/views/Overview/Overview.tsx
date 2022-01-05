@@ -39,6 +39,9 @@ const Wrapper = styled('div')(
   () => css`
     & > div {
       ${tw`mb-4`};
+      &.page-tab-container .button-list button.is-text > span {
+        color: #939ea9;
+      }
     }
   `
 )
@@ -60,7 +63,7 @@ function Overview() {
       </FlexBox>
       <FlexBox>
         <Practice tw="flex-1 mr-4" />
-        <Card tw="w-4/12 2xl:w-[360px]">
+        <Card tw="w-4/12 2xl:w-[360px]" hasBoxShadow>
           <CardHeader title="视频介绍" />
           <CardContent>
             <IconCard

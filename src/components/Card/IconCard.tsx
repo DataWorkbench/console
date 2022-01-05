@@ -1,11 +1,18 @@
 import { FC } from 'react'
-import tw, { styled } from 'twin.macro'
+import tw, { styled, css } from 'twin.macro'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 
 const Root = styled.div(({ layout }: { layout: string }) => [
   tw`bg-neut-1 cursor-pointer flex items-center  rounded-sm border border-neut-2`,
   tw`hover:(border-green-4 bg-green-0) transition-colors duration-300`,
   layout === 'vertical' ? tw`flex-col px-8 py-2` : tw`py-3 px-3`,
+  css`
+    &:hover {
+      .icon-card-title {
+        color: #15a675 !important;
+      }
+    }
+  `,
 ])
 const IconWrapper = styled.div(({ layout }: { layout: string }) => [
   tw`w-10 h-10 flex items-center justify-center  bg-gradient-to-tr from-neut-15 to-neut-10 shadow-md`,
@@ -34,7 +41,9 @@ export const IconCard: FC<IconCardProps> = (props) => {
         <Icon name={icon} type="light" size={28} />
       </IconWrapper>
       <div tw="flex-1">
-        <Title layout={layout}>{title}</Title>
+        <Title className="icon-card-title" layout={layout}>
+          {title}
+        </Title>
         {subtitle && <div>{subtitle}</div>}
       </div>
     </Root>
