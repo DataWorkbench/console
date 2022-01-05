@@ -29,6 +29,10 @@ const customStyles = css`
     --text-secondary: #1e293b;
     --color-primary: #e11d48;
   }
+  .page-tab-container {
+    ${tw`shadow-none`}
+  }
+
   .dark {
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;

@@ -24,7 +24,7 @@ const questions = [
 
 const FAQ: FC = ({ className }) => {
   return (
-    <Card className={className} tw="leading-5">
+    <Card className={className} tw="leading-5" hasBoxShadow>
       <CardHeader title="常见问题" />
       <CardContent>
         <div tw="rounded-sm border border-neut-2">
@@ -44,7 +44,7 @@ const FAQ: FC = ({ className }) => {
               </li>
             ))}
           </ul>
-          <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center">
+          <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center border-t border-[#DEE6ED]">
             <HelpCenterLink
               tw="mr-2 text-neut-15 no-underline font-normal hover:text-green-11"
               href="/intro/introduction/"

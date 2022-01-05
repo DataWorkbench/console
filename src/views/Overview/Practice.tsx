@@ -7,7 +7,7 @@ interface Props {
 
 const Practice: React.FC<Props> = ({ className }) => {
   return (
-    <Card className={className}>
+    <Card className={className} hasBoxShadow>
       <CardHeader title="最佳实践" />
       <CardContent>
         <div tw="flex justify-center space-x-2 2xl:space-x-5">
