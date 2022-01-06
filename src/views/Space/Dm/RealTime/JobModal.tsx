@@ -229,6 +229,7 @@ const JobModal = ({
                               subItems?.map((item) => (
                                 <CodeButton
                                   key={item.type}
+                                  disabled={item.type !== 3}
                                   selected={params.scheType === item.type}
                                   onClick={(e) => {
                                     e.stopPropagation()

@@ -228,9 +228,12 @@ def main(args: Array[String]): Unit = {
     if (trim(v) === '') {
       return
     }
-
+    let isDirty = v !== codeStr
+    if (v === defaultCode) {
+      isDirty = false
+    }
     workFlowStore.set({
-      isDirty: v !== codeStr,
+      isDirty,
     })
   }
 
@@ -289,15 +292,17 @@ def main(args: Array[String]): Unit = {
             <Icon name="remark" type="light" />
             语法检查
           </Button>
-          <Button
-            type="black"
-            tw="w-[60px] px-0"
-            onClick={handleRun}
-            loading={runMutation.isLoading}
-          >
-            <Icon name="triangle-right" type="light" />
-            运行
-          </Button>
+          {false && (
+            <Button
+              type="black"
+              tw="w-[60px] px-0 "
+              onClick={handleRun}
+              loading={runMutation.isLoading}
+            >
+              <Icon name="triangle-right" type="light" />
+              运行
+            </Button>
+          )}
           <Button
             tw="w-[68px] px-0"
             onClick={() => mutateCodeData('codeSave')}
