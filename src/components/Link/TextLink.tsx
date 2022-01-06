@@ -50,9 +50,16 @@ const colorThemes = {
 }
 
 export const TextLink = styled(Link)(
-  ({ color = 'blue' }: { color?: 'blue' | 'white' }) => [
+  ({
+    color = 'blue',
+    disabled = false,
+  }: {
+    color?: 'blue' | 'white'
+    disabled: Boolean
+  }) => [
     tw`font-semibold underline text-underline-offset[1px]`,
     () => colorThemes[color],
+    disabled && tw`cursor-not-allowed opacity-50`,
     css`
       & .if {
         ${tw`inline-block`}
