@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { Button } from '@QCFE/lego-ui'
+import { useEffect, useState } from 'react'
+import { Button, Menu } from '@QCFE/lego-ui'
 import {
+  Modal,
   Table,
   Icon,
   ToolBar,
   Divider,
   localstorage,
 } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, TextLink, Icons } from 'components'
+import { FlexBox, Center, TextLink, Icons, Tooltip } from 'components'
 import dayjs from 'dayjs'
 import {
   getJobInstanceKey,
@@ -32,6 +33,8 @@ interface IFilter {
   sort_by: string
   reverse: boolean
 }
+
+const { MenuItem } = Menu
 
 const columnSettingsKey = 'ASSOIATE_INSTANCE_COLUMN_SETTINGS'
 
@@ -78,9 +81,9 @@ export const InstanceTable = observer(
       queryClient.invalidateQueries(getJobInstanceKey())
     }
 
-    const handleCheckRowDetail = (row: any) => {
-      setCurrentRow(row)
-      setMessageVisible(true)
+    const handleJobView = (curViewJobId: string) => {
+      workFlowStore.set({ curViewJobId })
+      history.push(`/${regionId}/workspace/${spaceId}/dm`)
     }
 
     const handleFinkUI = (id: String) => {
@@ -100,9 +103,44 @@ export const InstanceTable = observer(
       )
     }
 
-    const handleJobView = (curViewJobId: string) => {
-      workFlowStore.set({ curViewJobId })
-      history.push(`/${regionId}/workspace/${spaceId}/dm`)
+    const handleCheckRowDetail = (row: any) => {
+      setCurrentRow(row)
+      setMessageVisible(true)
+    }
+
+    const handleTerminate = (row?: any) => {
+      Modal.warning({
+        title: '终止作业实例',
+        content: (
+          <div tw="text-neut-8">
+            实例终止后将取消运行，此操作无法撤回，您确定终止该实例吗？
+          </div>
+        ),
+        okType: 'danger',
+        okText: '终止',
+        confirmLoading: mutation.isLoading,
+        onOk: () => {
+          mutation.mutate(
+            {
+              op: 'stop',
+              instance_ids: [row.id],
+            },
+            {
+              onSuccess: () => {
+                refetchData()
+              },
+            }
+          )
+        },
+      })
+    }
+
+    const handleMenuClick = (key: String, row: any) => {
+      if (key === 'stop') {
+        handleTerminate(row)
+      } else if (key === 'view') {
+        handleCheckRowDetail(row)
+      }
     }
 
     const columns = [
@@ -197,9 +235,25 @@ export const InstanceTable = observer(
                 style={{ borderColor: '#475569', margin: '0 14px 0 5px' }}
               />
               <Center>
-                <Button type="text" onClick={() => handleCheckRowDetail(row)}>
-                  查看详情
-                </Button>
+                <Tooltip
+                  trigger="click"
+                  placement="bottom-end"
+                  arrow={false}
+                  content={
+                    <Menu
+                      onClick={(e: any, key: OP) => handleMenuClick(key, row)}
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8].includes(row.state) && (
+                        <MenuItem key="stop">终止</MenuItem>
+                      )}
+                      <MenuItem key="view">查看详情</MenuItem>
+                    </Menu>
+                  }
+                >
+                  <div tw="flex items-center">
+                    <Icon name="more" clickable changeable type="light" />
+                  </div>
+                </Tooltip>
               </Center>
             </FlexBox>
           )

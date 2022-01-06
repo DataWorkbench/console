@@ -80,14 +80,14 @@ export const offlineReleaseJob = ({
 export const terminateInstances = ({
   regionId,
   spaceId,
-  inst_ids,
+  instance_ids,
 }: IStreamParams) => {
   return request({
     region: regionId,
     method: 'POST',
     uri: `/v1/workspace/${spaceId}/stream/job/instance/terminates`,
     body: {
-      inst_ids,
+      instance_ids,
     },
   })
 }
