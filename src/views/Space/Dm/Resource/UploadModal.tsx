@@ -435,6 +435,7 @@ const UploadModal = (props: any) => {
           placeholder={`请输入${PackageNameByType}显示名`}
           label={<AffixLabel required>{PackageNameByType}显示名</AffixLabel>}
           validateOnBlur
+          validateOnChange
           disabled={operation === 'view'}
           onChange={(value: string) =>
             setFields((draft) => {
@@ -449,13 +450,8 @@ const UploadModal = (props: any) => {
               status: 'error',
             },
             {
-              rule: { matchRegex: /^(?!_)(?!.*?_$)[a-zA-Z0-9_.]+$/ },
-              help: '只允许数字、字母或下划线(_) 不能以(_)开头',
-              status: 'error',
-            },
-            {
-              rule: { matchRegex: /.jar$/ },
-              help: '请以(.jar)扩展名结尾',
+              rule: { matchRegex: /^(?!_)[a-zA-Z0-9_]+((\.jar)$)/ },
+              help: '只允许数字、字母或下划线(_) 且以(.jar)结尾 不能以(_)开头',
               status: 'error',
             },
           ]}
