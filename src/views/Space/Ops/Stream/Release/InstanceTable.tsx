@@ -86,9 +86,10 @@ export const InstanceTable = observer(
       history.push(`/${regionId}/workspace/${spaceId}/dm`)
     }
 
-    const handleFinkUI = (id: String) => {
+    const handleFinkUI = (row: any) => {
+      if (row.state === 1) return
       mutation.mutate(
-        { op: 'view', inst_id: id },
+        { op: 'view', inst_id: row.id },
         {
           onSuccess: (response: any) => {
             const ele = document.createElement('a')
@@ -225,7 +226,10 @@ export const InstanceTable = observer(
           return (
             <FlexBox tw="items-center">
               <Button type="text">
-                <TextLink onClick={() => handleFinkUI(row.id)}>
+                <TextLink
+                  onClick={() => handleFinkUI(row)}
+                  disabled={row.state === 1}
+                >
                   Flink UI
                 </TextLink>
               </Button>
