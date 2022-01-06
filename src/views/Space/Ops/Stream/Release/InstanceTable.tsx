@@ -108,9 +108,9 @@ export const InstanceTable = observer(
       setMessageVisible(true)
     }
 
-    const handleTerminate = (row?: any) => {
+    const handleTerminate = (row: any) => {
       Modal.warning({
-        title: '终止作业实例',
+        title: `终止作业实例: ${row.id}`,
         content: (
           <div tw="text-neut-8">
             实例终止后将取消运行，此操作无法撤回，您确定终止该实例吗？
@@ -243,7 +243,7 @@ export const InstanceTable = observer(
                     <Menu
                       onClick={(e: any, key: OP) => handleMenuClick(key, row)}
                     >
-                      {[1, 2, 3, 4, 5, 6, 7, 8].includes(row.state) && (
+                      {[1, 2, 3].includes(row.state) && (
                         <MenuItem key="stop">终止</MenuItem>
                       )}
                       <MenuItem key="view">查看详情</MenuItem>
