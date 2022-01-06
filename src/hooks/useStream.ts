@@ -98,7 +98,7 @@ export const useMutationInstance = () => {
     }: {
       op: OP
       inst_id?: String
-      inst_ids?: object[]
+      instance_ids?: object[]
     }) => {
       const params = {
         spaceId,
