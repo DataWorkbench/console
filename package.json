@@ -1,7 +1,7 @@
 {
-  "name": "pitrix-webconsole-dataworkbench",
-  "version": "0.1.1",
-  "description": "QingCloud 大数据控制台",
+  "name": "pitrix-webconsole-dataomnis",
+  "version": "0.8",
+  "description": "QingCloud 大数据工作台",
   "author": "QingCloud F2E Group",
   "private": true,
   "scripts": {
