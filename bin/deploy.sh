@@ -1,7 +1,8 @@
 #!/bin/bash
 NEW_TESTING=192.168.27.136
-CONSOLE_PROXY=172.31.60.2
 WORKSPACE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." &> /dev/null && pwd )"
+
+
 PRIKEY="${HOME}/.ssh/id_rsa"
 
 function sync_testing() {
@@ -21,24 +22,55 @@ function sync_docker_conf() {
 }
 
 function sync_console_testing() {
+  SERVICE=dataomnis
+  PROJECT_NAME="pitrix-webconsole-$SERVICE"
+  PROXY=172.31.60.2
+  WEBSERVICE0=testing1a-webservice0
+  WEBSERVICE1=testing1a-webservice1
+  PROXY_PATH=/root/ethan
+
   cd "$WORKSPACE_DIR" || exit
 
-  echo "copy dist to firstbox"
-  rsync -rlptDzvh --delete dist/* root@$CONSOLE_PROXY:/root/ethan/pitrix-webconsole-dataomnis
+  echo "copy configs to dist"
+  if [ -f dist/pitrix-webconsole-dataomnis.tgz ];then
+    echo 'in this'
+    rm dist/pitrix-webconsole-dataomnis.tgz
+  fi
+  cp -r configs dist/
+
+  echo "making tarball ..."
+  tar -czf dist/$PROJECT_NAME.tgz dist/*
   echo "done"
 
-  echo "sync to testing1a-webservice0"
-  ssh root@$CONSOLE_PROXY rsync -rlptDzvh --delete /root/ethan/pitrix-webconsole-dataomnis root@testing1a-webservice0:/pitrix/lib
+  echo "copy firstbox:$PROXY"
+  rsync -avz --progress dist/$PROJECT_NAME.tgz root@$PROXY:$PROXY_PATH
+  echo "done"
+
+  echo "sync to $WEBSERVICE0"
+  ssh root@$PROXY rsync -avz $PROXY_PATH/$PROJECT_NAME.tgz root@$WEBSERVICE0:$PROXY_PATH
   echo "done"
 
   echo "sync to testing1a-webservice1"
-  ssh root@$CONSOLE_PROXY rsync -rlptDzvh --delete /root/ethan/pitrix-webconsole-dataomnis root@testing1a-webservice1:/pitrix/lib
+  ssh root@$PROXY rsync -avz $PROXY_PATH/$PROJECT_NAME.tgz root@$WEBSERVICE1:$PROXY_PATH
   echo "done"
+
+  echo "backup $PROJECT_NAME on $WEBSERVICE0, copy new files"
+  ssh root@$PROXY ssh $WEBSERVICE0 sh $PROXY_PATH/refresh_console_portal.sh $SERVICE
+  echo "done"
+
+  echo "backup $PROJECT_NAME on $WEBSERVICE0, copy new files"
+  ssh root@$PROXY ssh $WEBSERVICE1 sh $PROXY_PATH/refresh_console_portal.sh $SERVICE
+  echo "done"
+
+  echo "clear dist"
+  rm -r dist/configs
+  rm dist/$PROJECT_NAME.tgz
+
 }
 
 if [ "$1" = 'testing' ]; then
   sync_testing
-elif [ "$1" = 'docker_testing' ]; then
+elif [ "$1" = 'testing_docker' ]; then
   sync_docker_conf
 elif [ "$1" = 'console_testing' ]; then
   sync_console_testing

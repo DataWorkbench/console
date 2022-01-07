@@ -22,7 +22,7 @@ function Create() {
           />
           <div tw="w-8/12 m-auto mt-5 pt-9">
             <div tw="font-medium text-xl pb-3 text-neut-19">
-              您还未开通「大数据平台」
+              您还未开通「大数据工作台」
             </div>
             <div tw="text-xs pb-6 text-neut-8 font-medium">
               大数据工作台提供一站式智能大数据开发平台，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力，并专注于解决业务计算问题，降低用户使用成本，将代码开发门槛降到最低
@@ -45,7 +45,7 @@ function Create() {
     return (
       <div tw="flex-1 bg-neut-2">
         <div tw="font-medium text-2xl py-7 leading-7 pl-32 bg-white">
-          大数据平台
+          大数据工作台
         </div>
         <div tw="flex-1 w-10/12 mx-auto">
           <Alert
@@ -58,7 +58,7 @@ function Create() {
               <div tw="flex mb-8">
                 <div tw="pr-9 text-sm leading-8">开通产品</div>
                 <div>
-                  <Button type="outlined">大数据平台</Button>
+                  <Button type="outlined">大数据工作台</Button>
                 </div>
               </div>
               <div tw="flex mb-8">
@@ -74,7 +74,7 @@ function Create() {
                   <Checkbox>
                     已阅读并同意
                     <a href="##" tw="text-link">
-                      《大数据平台服务条款》
+                      《大数据工作台服务条款》
                     </a>
                   </Checkbox>
                 </div>

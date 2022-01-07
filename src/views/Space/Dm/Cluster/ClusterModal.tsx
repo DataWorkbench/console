@@ -968,7 +968,7 @@ key02:value02`}
                   收费标准详见
                   {/* <a href="###" className="link"> */}
                   <HelpCenterLink href="/billing/price/" isIframe={false}>
-                    《大数据平台计费说明》
+                    《大数据工作台计费说明》
                   </HelpCenterLink>
                   {/* <QIcon name="if-external-link" /> */}
                 </div>
