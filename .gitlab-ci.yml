@@ -40,4 +40,4 @@ deploy_job:
   tags:
     - mrunner
   script:
-    - rsync -rlptDzvh --delete -e "ssh -p 3333" dist/* root@$NEW_TESTING:/data/webapp/pitrix-webconsole-bigdata
+    - rsync -rlptDzvh --delete -e "ssh -p 3333" dist/* root@$NEW_TESTING:/data/webapp/pitrix-webconsole-dataomnis

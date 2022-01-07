@@ -1,9 +1,9 @@
 GLOBAL_CONFIG:
-  bigdata_app_id: app-w3rfs72o
+
 ZONE_CONFIG:
   default:
-    - name: bigdata
-      title: bigdata
-      protal_name: bigdata
-      en: bigdata
+    - name: dataomnis
+      title: dataomnis
+      protal_name: dataomnis
+      en: dataomnis
       zh-cn: ‘大数据工作台’

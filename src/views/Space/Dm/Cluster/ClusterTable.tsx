@@ -96,7 +96,7 @@ interface IFilter {
   verbose: number
 }
 
-const columnSettingsKey = 'BIGDATA_CLUSTER_COLUMN_SETTINGS'
+const columnSettingsKey = 'DATAOMNIS_CLUSTER_COLUMN_SETTINGS'
 const ClusterTable = observer(
   ({
     selectMode = false,

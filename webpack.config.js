@@ -23,7 +23,7 @@ let config = {
   },
   output: {
     path: resolve('dist'),
-    publicPath: '/bigdata/',
+    publicPath: '/dataomnis/',
     filename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
     chunkFilename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
     clean: true,
@@ -126,7 +126,7 @@ let config = {
     compress: true,
     hot: true,
     historyApiFallback: {
-      index: '/bigdata/index.html',
+      index: '/dataomnis/index.html',
     },
     devMiddleware: {},
     static: {},

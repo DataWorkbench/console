@@ -91,7 +91,7 @@ echo 'PROXY_API_URL=http://139.198.116.233' > .env
 git clone git@git.internal.yunify.com:Simon/pitrix-webconsole.git
 cd pitrix-webconsole
 # 新建一个分支来开发
-git checkout -b feat/bigdata
+git checkout -b feat/dataomnis
 # 安装项目环境相关python的依赖包
 # 配置本地开发的 local_config.yaml
 # 然后进入目录启动开发服务, 启动python开发服务
