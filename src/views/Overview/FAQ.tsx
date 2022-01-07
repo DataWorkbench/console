@@ -16,7 +16,7 @@ const questions = [
     link: '/intro/development_process/',
   },
   { title: '大数据工作台的计费概述', link: '/billing/price/' },
-  // { title: '大数据平台监控与运维', link: '' },
+  // { title: '大数据工作台监控与运维', link: '' },
   // { title: '大数据工作台的计费概述11', link: '' },
   { title: '使用限制', link: '/intro/restriction/' },
   { title: '其他常见问题', link: '/databench/faq/' },

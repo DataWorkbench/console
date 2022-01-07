@@ -25,7 +25,7 @@ class GlobalStore {
   regionInfos = []
 
   menuInfo: MenuInfoType = {
-    title: '大数据平台',
+    title: '大数据工作台',
     menus: [
       {
         name: 'overview',

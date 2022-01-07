@@ -23,7 +23,7 @@ function getTabs() {
     {
       title: (
         <span tw="font-semibold">
-          {mtxt}好，{get(window, 'USER.user_name', '')}，欢迎您使用大数据平台
+          {mtxt}好，{get(window, 'USER.user_name', '')}，欢迎您使用大数据工作台
         </span>
       ),
       description:
