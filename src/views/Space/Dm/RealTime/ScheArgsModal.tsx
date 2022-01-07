@@ -22,10 +22,11 @@ import {
   useMutationStreamJobArgs,
   useQueryInConnectorsQuery,
   useQueryResource,
+  useQueryUdf,
   useQueryStreamJobArgs,
 } from 'hooks'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
-import tw, { theme } from 'twin.macro'
+import tw, { theme, css } from 'twin.macro'
 import { ScheForm } from './styled'
 
 const { CollapseItem } = Collapse
@@ -34,6 +35,7 @@ const { NumberField, SelectField } = Form
 interface ResourceSelectProps {
   type: number
   icon: ReactElement
+  isUdf?: boolean
   [propName: string]: any
 }
 
@@ -47,32 +49,35 @@ const renderLabel = (label: string, icon: ReactElement, search: string) => {
 }
 
 const ResourceSelect = (props: ResourceSelectProps) => {
-  const { type, icon } = props
+  const { type, icon, isUdf = false } = props
   const [filter, setFilter] = useImmer<{
     limit: number
     offset: number
-    resource_type: number
+    resource_type?: number
+    udf_type?: number
     search: string
   }>({
     limit: 15,
     offset: 0,
-    resource_type: type,
     search: '',
+    ...(isUdf ? { udf_type: type } : { resource_type: type }),
   })
 
-  const v = useQueryResource(filter)
+  const fn = !isUdf ? useQueryResource : useQueryUdf
+  const key = !isUdf ? 'resource_id' : 'udf_id'
+  const v = fn(filter)
   const { status, data, fetchNextPage, hasNextPage } = v
   const options = flatten(
     data?.pages.map((page: Record<string, any>) => page.infos || [])
   ).map((i) => {
     return {
       label: (
-        <Fragment key={i.resource_id}>
+        <Fragment key={i[key]}>
           {renderLabel(i.name, icon, filter.search)}
-          <span tw="text-neut-8">ID:{i.resource_id}</span>
+          <span tw="text-neut-8">ID:{i[key]}</span>
         </Fragment>
       ),
-      value: i.resource_id,
+      value: i[key],
     }
   })
 
@@ -102,6 +107,12 @@ const ResourceSelect = (props: ResourceSelectProps) => {
       onMenuScrollToBottom={loadData}
       onInputChange={onSearch}
       bottomTextVisible
+      css={css`
+        .select-control {
+          ${tw`w-[620px]`}
+        }
+      `}
+      clearable
       // valueKey="resource_id"
       // labelKey="name"
     />
@@ -294,6 +305,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 <ResourceSelect
                   name="udfs"
                   label="函数包"
+                  isUdf
                   placeholder="请选择运行所需函数包"
                   icon={
                     <Icon
@@ -315,7 +327,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                       draft.udfs = udfs
                     })
                   }
-                  type={2}
+                  type={1}
                 />
                 <SelectField
                   name="builtInConnectors"
@@ -323,6 +335,12 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                   placeholder="请选择运行所需内置 Connector"
                   multi
                   searchable
+                  css={css`
+                    .select-control {
+                      ${tw`w-[620px]`}
+                    }
+                  `}
+                  clearable
                   closeOnSelect={false}
                   openOnClick
                   onInputChange={onFilterConnectors}
