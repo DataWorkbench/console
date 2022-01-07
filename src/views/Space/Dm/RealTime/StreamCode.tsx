@@ -1,14 +1,21 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Center, FlexBox, Modal } from 'components'
-import { Icon, Notification as Notify, Button } from '@QCFE/qingcloud-portal-ui'
+import {
+  Icon,
+  Notification as Notify,
+  Button,
+  Loading,
+} from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
 import { Prompt, useHistory } from 'react-router-dom'
-import { theme } from 'twin.macro'
+import tw, { styled, theme, css } from 'twin.macro'
+import { useImmer } from 'use-immer'
 import { useUnmount, useMeasure, useBeforeUnload } from 'react-use'
 import Editor from 'react-monaco-editor'
 import { useQueryClient } from 'react-query'
 import { Rnd } from 'react-rnd'
+import SimpleBar from 'simplebar-react'
 import {
   useMutationStreamJobCode,
   useMutationReleaseStreamJob,
@@ -32,6 +39,18 @@ const CODETYPE = {
   5: 'scala',
 }
 
+const SyntaxBox = styled(Center)(() => [
+  tw`absolute text-center left-14 top-24 bg-neut-20 bg-opacity-80 w-96 h-60 rounded-b text-neut-8`,
+  css`
+    .simplebar-scrollbar:before {
+      ${tw`bg-neut-8`}
+    }
+    .portal-loading .circle span {
+      ${tw`bg-white`}
+    }
+  `,
+])
+
 interface IProp {
   /** 2: SQL 4: Python 5: Scala */
   tp: 2 | 4 | 5
@@ -44,6 +63,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   } = useStore()
   const [nextLocation, setNextLocation] = useState(null)
   const [shouldNav, setShouldNav] = useState(false)
+  const [syntaxState, setSyntaxState] = useImmer({ showBox: false, errMsg: '' })
   const [boxRef, boxDimensions] = useMeasure()
   const history = useHistory()
   const [show, toggleShow] = useState(false)
@@ -135,6 +155,12 @@ def main(args: Array[String]): Unit = {
     if (code === loadingWord || opMutation.isLoading) {
       return
     }
+    if (!isSaveOp) {
+      setSyntaxState((draft) => {
+        draft.showBox = true
+        draft.errMsg = ''
+      })
+    }
     opMutation.mutate(
       {
         [codeName]: {
@@ -143,7 +169,21 @@ def main(args: Array[String]): Unit = {
         type: tp,
       },
       {
-        onSuccess: () => {
+        onSuccess: (ret: any) => {
+          if (!isSaveOp) {
+            if (get(ret, 'result') === 2) {
+              setSyntaxState((draft) => {
+                draft.errMsg = get(ret, 'message', '')
+              })
+              if (cb) {
+                cb()
+              }
+              return
+            }
+          }
+          setSyntaxState((draft) => {
+            draft.errMsg = ''
+          })
           queryClient.invalidateQueries(getFlowKey('streamJobCode'))
           setEnableRelease(true)
           Notify.success({
@@ -154,6 +194,12 @@ def main(args: Array[String]): Unit = {
           if (cb) {
             cb()
           }
+        },
+        onError: () => {
+          setSyntaxState((draft) => {
+            draft.showBox = false
+            draft.errMsg = ''
+          })
         },
       }
     )
@@ -470,6 +516,66 @@ def main(args: Array[String]): Unit = {
         </Modal>
       )}
       <Prompt when={workFlowStore.isDirty} message={handlePrompt} />
+      {syntaxState.showBox && (
+        <SyntaxBox>
+          <div tw="absolute right-2 top-2">
+            <Icon
+              name="close"
+              type="dark"
+              color={{
+                primary: theme('colors.white'),
+              }}
+              tw="cursor-pointer"
+              onClick={() => {
+                setSyntaxState((draft) => {
+                  draft.showBox = false
+                  draft.errMsg = ''
+                })
+              }}
+            />
+          </div>
+          {syntaxMutation.isLoading && (
+            <div>
+              <Loading />
+              <div tw="mt-10">正在进行语法检查，请稍候...</div>
+            </div>
+          )}
+          {syntaxMutation.isSuccess && (
+            <>
+              {syntaxState.errMsg === '' ? (
+                <div tw="text-center">
+                  <Icon
+                    name="success"
+                    size={30}
+                    color={{
+                      primary: theme('colors.green.11'),
+                      secondary: '#9DDFC9',
+                    }}
+                  />
+                  <div>检查完毕，暂无语法错误</div>
+                </div>
+              ) : (
+                <div tw="w-full">
+                  <Icon
+                    name="information"
+                    size={30}
+                    color={{
+                      primary: theme('colors.white'),
+                      secondary: theme('colors.blue.10'),
+                    }}
+                  />
+                  <SimpleBar
+                    style={{ maxHeight: 160 }}
+                    tw="text-left px-6 break-all overflow-y-auto"
+                  >
+                    {syntaxState.errMsg}
+                  </SimpleBar>
+                </div>
+              )}
+            </>
+          )}
+        </SyntaxBox>
+      )}
     </FlexBox>
   )
 })
