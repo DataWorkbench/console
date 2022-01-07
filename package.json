@@ -1,6 +1,6 @@
 {
   "name": "pitrix-webconsole-dataomnis",
-  "version": "0.8",
+  "version": "0.8.0",
   "description": "QingCloud 大数据工作台",
   "author": "QingCloud F2E Group",
   "private": true,
