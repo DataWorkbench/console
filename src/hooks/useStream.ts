@@ -56,6 +56,7 @@ export const useQueryJobInstances = (filter: any, type?: string) => {
     async () => listStreamJobInstances(params),
     {
       keepPreviousData: true,
+      enabled: type === 'modal' ? !!filter.job_id : true,
     }
   )
 }

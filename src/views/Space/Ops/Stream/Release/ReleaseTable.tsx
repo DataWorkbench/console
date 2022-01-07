@@ -48,7 +48,7 @@ export const ReleaseTable = observer(({ query }: any) => {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
 
-  const [visible, setVisible] = useState(false)
+  const [assoiateVisible, setAssoiateVisible] = useState(false)
   const [scheVisible, setScheVisible] = useState(false)
   const [releaseVisible, setReleaseVisible] = useState(false)
   const [currentRelease, setCurrentRelease] = useState<any>({})
@@ -65,7 +65,10 @@ export const ReleaseTable = observer(({ query }: any) => {
     sort_by: '',
   })
 
-  const toggle = useCallback(() => setVisible(!visible), [visible])
+  const toggle = useCallback(
+    () => setAssoiateVisible(!assoiateVisible),
+    [assoiateVisible]
+  )
 
   const queryClient = useQueryClient()
   const mutation = useMutationReleaseJobs()
@@ -281,7 +284,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       },
       {
         title: '操作',
-        dataIndex: 'id',
+        key: 'table_actions',
         render: (value: any, row: any) => (
           <FlexBox tw="items-center">
             <Button type="text" onClick={() => handleOperation(row)}>
@@ -390,7 +393,8 @@ export const ReleaseTable = observer(({ query }: any) => {
       />
 
       <AssoiateModal
-        visible={visible}
+        type="modal"
+        visible={assoiateVisible}
         toggle={() => {
           toggle()
         }}

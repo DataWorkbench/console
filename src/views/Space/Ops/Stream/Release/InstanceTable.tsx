@@ -221,6 +221,7 @@ export const InstanceTable = observer(
       },
       {
         title: '操作',
+        key: 'table_actions',
         width: 180,
         render: (_: any, row: Record<string, any>) => {
           return (
