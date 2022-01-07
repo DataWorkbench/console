@@ -284,6 +284,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       },
       {
         title: '操作',
+        dataIndex: 'id',
         key: 'table_actions',
         render: (value: any, row: any) => (
           <FlexBox tw="items-center">
