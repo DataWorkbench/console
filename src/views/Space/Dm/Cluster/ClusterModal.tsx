@@ -338,6 +338,7 @@ const ClusterModal = observer(
                     ]}
                   />
                   <SelectField
+                    clearable
                     label={<AffixLabel required>版本</AffixLabel>}
                     name="version"
                     validateOnChange
@@ -372,6 +373,7 @@ const ClusterModal = observer(
                     ]}
                   />
                   <SelectField
+                    clearable
                     name="restart_strategy"
                     label={
                       <AffixLabel
@@ -769,6 +771,7 @@ const ClusterModal = observer(
               >
                 <Form>
                   <SelectField
+                    clearable
                     label={<AffixLabel>日志级别</AffixLabel>}
                     name="root_log_level"
                     disabled={viewMode}

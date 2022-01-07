@@ -406,6 +406,7 @@ const ScheSettingModal = ({
                       }}
                     />
                     <SelectField
+                      clearable
                       disabled={disabled}
                       name="concurrencyPolicy"
                       label={
@@ -452,6 +453,7 @@ const ScheSettingModal = ({
                     />
 
                     <SelectField
+                      clearable
                       disabled={disabled}
                       name="schePeriod"
                       label={<AffixLabel>调度周期</AffixLabel>}
@@ -648,6 +650,7 @@ const ScheSettingModal = ({
                               </Radio>
                               <Radio value={2}>
                                 <SelectField
+                                  clearable
                                   multi
                                   closeOnSelect={false}
                                   label={<AffixLabel>指定时间</AffixLabel>}
@@ -695,6 +698,7 @@ const ScheSettingModal = ({
                         return (
                           <>
                             <SelectField
+                              clearable
                               disabled={disabled}
                               label="指定时间"
                               name="weekly"
@@ -742,6 +746,7 @@ const ScheSettingModal = ({
                         return (
                           <>
                             <SelectField
+                              clearable
                               disabled={disabled}
                               label={<AffixLabel>指定时间</AffixLabel>}
                               name="monthDaily"
@@ -781,6 +786,7 @@ const ScheSettingModal = ({
                         return (
                           <>
                             <SelectField
+                              clearable
                               disabled={disabled}
                               label="指定月份"
                               name="monthly"
@@ -797,6 +803,7 @@ const ScheSettingModal = ({
                               }}
                             />
                             <SelectField
+                              clearable
                               disabled={disabled}
                               label="指定时间"
                               name="daily"

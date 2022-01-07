@@ -330,6 +330,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                   type={1}
                 />
                 <SelectField
+                  clearable
                   name="builtInConnectors"
                   label="内置 Connector"
                   placeholder="请选择运行所需内置 Connector"
@@ -340,7 +341,6 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                       ${tw`w-[620px]`}
                     }
                   `}
-                  clearable
                   closeOnSelect={false}
                   openOnClick
                   onInputChange={onFilterConnectors}
