@@ -98,7 +98,7 @@ const ModalWrapper = styled(Modal)(() => [
   `,
 ])
 
-const columnSettingsKey = 'BIGDATA_SOURCELISTS_COLUMN_SETTINGS'
+const columnSettingsKey = 'DATAOMNIS_SOURCELISTS_COLUMN_SETTINGS'
 
 const getUrl = (
   urlObj: Record<string, any>,

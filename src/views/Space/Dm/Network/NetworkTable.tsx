@@ -33,7 +33,7 @@ interface IFilter {
   sort_by: string
 }
 
-const columnSettingsKey = 'BIGDATA_NETWORK_COLUMN_SETTINGS'
+const columnSettingsKey = 'DATAOMNIS_NETWORK_COLUMN_SETTINGS'
 const NetworkTable = observer(() => {
   const {
     dmStore: { setNetWorkOp, networkOp },

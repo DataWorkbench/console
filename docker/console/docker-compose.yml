@@ -1,14 +1,14 @@
 version: '3.2'
 services:
   webconsole:
-    build: .
+    image: webconsole:latest
     command: 'gunicorn --bind :8000 --workers=4 mysite.wsgi:application'
     volumes:
       - type: bind
         source: '${CONSOLE_SRC}'
         target: /pitrix/lib/pitrix-webconsole
       - type: bind
-        source: '${BIGDATA_SRC}/configs'
+        source: '${SRC}/configs'
         target: /pitrix/lib/pitrix-webconsole/configs
       - type: bind
         source: ./web_console_settings.py
@@ -33,8 +33,8 @@ services:
         source: ./nginx.conf
         target: /etc/nginx/nginx.conf
       - type: bind
-        source: ${BIGDATA_SRC}/dist
-        target: /pitrix/lib/pitrix-webconsole-bigdata
+        source: ${SRC}
+        target: /pitrix/lib/pitrix-webconsole-dataomnis
       - type: bind
         source: ${CONSOLE_SRC}/static
         target: /pitrix/lib/pitrix-webconsole/static

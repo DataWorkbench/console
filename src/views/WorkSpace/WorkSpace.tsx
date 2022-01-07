@@ -48,7 +48,7 @@ interface IWrokSpaceProps {
   showCreate?: boolean
 }
 
-const columnSettingsKey = 'BIGDATA_SPACELISTS_COLUMN_SETTINGS'
+const columnSettingsKey = 'DATAOMNIS_SPACELISTS_COLUMN_SETTINGS'
 
 const WorkSpace = observer(
   ({ isModal, onItemCheck, onHide, showCreate = false }: IWrokSpaceProps) => {

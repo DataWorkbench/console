@@ -1,5 +1,5 @@
 const en = {
-  bigdatabench: 'big data bench',
+  bigdatabench: 'dataomnis',
   'No Data': '',
 }
 

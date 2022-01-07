@@ -52,7 +52,7 @@ const App = () => {
   }
   return (
     <PortalProvider
-      service="bigdata"
+      service="dataomnis"
       isPush={false}
       locales={locales}
       currentLocale={langMapping[window.USER?.lang] || 'zh-CN'}
@@ -69,7 +69,7 @@ const App = () => {
               <Loading size="large" />
             </div>
           ) : (
-            <Router basename="/bigdata">
+            <Router basename="/dataomnis">
               <Suspense
                 fallback={
                   <div tw="flex justify-center h-screen items-center">

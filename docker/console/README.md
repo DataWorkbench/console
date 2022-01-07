@@ -20,12 +20,12 @@
 
 # 本地console
 CONSOLE_SRC=../../pitrix-webconsole/src
-BIGDATA_SRC=..
+SRC=..
 NGINX_EXPOSE_PORT=8888
 
 # testing等环境
 CONSOLE_SRC=../pitrix-webconsole
-BIGDATA_SRC=../pitrix-webconsole-bigdata
+SRC=../pitrix-webconsole-dataomnis
 NGINX_EXPOSE_PORT=80
 ```
 
