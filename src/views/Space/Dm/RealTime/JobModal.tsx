@@ -143,7 +143,7 @@ const JobModal = ({
       <Modal
         visible
         title={`${job ? '修改' : '创建'}作业`}
-        width={1200}
+        width={job ? 600 : 1200}
         onCancel={handleCancel}
         footer={
           <div tw="flex justify-end space-x-2">
