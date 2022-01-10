@@ -320,11 +320,19 @@ const JobMenu = observer(() => {
                             }}
                           >
                             <MenuItem key="edit">
-                              <Icon name="pen" tw="mr-2" />
+                              <Icon
+                                name="pen"
+                                tw="mr-2"
+                                color={{ primary: '#fff', secondary: '#fff' }}
+                              />
                               编辑信息
                             </MenuItem>
                             <MenuItem key="delete">
-                              <Icon name="trash" tw="mr-2" />
+                              <Icon
+                                name="trash"
+                                tw="mr-2"
+                                color={{ primary: '#fff', secondary: '#fff' }}
+                              />
                               删除
                             </MenuItem>
                           </Menu>
