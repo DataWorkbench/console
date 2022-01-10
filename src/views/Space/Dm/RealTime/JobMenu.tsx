@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Tooltip, Menu } from '@QCFE/lego-ui'
+import { Tooltip, Menu, Input, Button } from '@QCFE/lego-ui'
 import { Icon, InputSearch, Loading, Modal } from '@QCFE/qingcloud-portal-ui'
 import { motion } from 'framer-motion'
 import tw, { css, styled, theme } from 'twin.macro'
@@ -12,6 +12,21 @@ import { useInfiniteQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { FlexBox, Center, HelpCenterLink } from 'components'
 import JobModal from './JobModal'
+
+const ModalWrapper = styled(Modal)(() => [
+  css`
+    .modal-card-head {
+      border-bottom: 0;
+    }
+    .modal-card-body {
+      ${tw`pt-0 pb-4`}
+    }
+    .modal-card-foot {
+      border-top: 0;
+      ${tw`pb-4`}
+    }
+  `,
+])
 
 const { MenuItem } = Menu
 
@@ -42,10 +57,11 @@ const TooltipWrapper = styled(Tooltip)(() => [
 const JobMenu = observer(() => {
   const [alterFlowId, setAlterFlowId] = useState(null)
   const [curCreateJobId, setCurCreateJobId] = useState(null)
-  const [editJob, setEditJob] = useState(null)
+  const [editJob, setEditJob] = useState<Record<string, any> | null>(null)
   const [visible, setVisible] = useState(false)
   const [isOpenHelp, setIsOpenHelp] = useState(true)
   const [delVisible, setDelVisible] = useState(false)
+  const [delBtnEnable, setDelBtnEnable] = useState(false)
 
   const [filter, setFilter] = useImmer({
     search: '',
@@ -120,6 +136,7 @@ const JobMenu = observer(() => {
   const hideDelModal = () => {
     setDelVisible(false)
     setEditJob(null)
+    setDelBtnEnable(false)
   }
 
   const refreshJobs = () => {
@@ -346,15 +363,62 @@ const JobMenu = observer(() => {
       </div>
       {visible && <JobModal job={editJob} onCancel={hideCreateEditModal} />}
       {delVisible && (
-        <Modal
+        <ModalWrapper
           visible
-          title="删除"
+          width={400}
           onCancel={hideDelModal}
-          onOk={handleDel}
-          confirmLoading={mutation.isLoading}
+          footer={
+            <>
+              <Button onClick={hideDelModal}>
+                {window.getText('LEGO_UI_CANCEL')}
+              </Button>
+              <Button
+                type="danger"
+                disabled={!delBtnEnable}
+                loading={mutation.isLoading}
+                onClick={handleDel}
+              >
+                删除
+              </Button>
+            </>
+          }
         >
-          <>删除作业操作无法撤回，确认删除吗？</>
-        </Modal>
+          <div tw="flex items-start">
+            <Icon
+              name="if-error-info"
+              size="medium"
+              css={[tw`mr-3 text-2xl leading-6 text-red-10 fill-[#fff]`]}
+            />
+            <div tw="flex-1 overflow-hidden">
+              <div tw="font-semibold text-base text-white break-all">
+                {`删除作业：${editJob?.name}`}
+              </div>
+              <div tw="text-neut-8 mt-2">
+                <div>{` 删除作业 ${editJob?.name}
+              会同时删除其所有的历史版本及所有的作业实例信息,
+              同时将其从调度系统下线并强制停止正在运行中的作业实例`}</div>
+                <div tw="pt-6 space-y-1 ">
+                  <div>
+                    <span tw="label-required">
+                      请在下方输入框中输入&quot;delete&quot;以确认操作
+                    </span>
+                  </div>
+                  <div>
+                    <Input
+                      autoComplete="off"
+                      type="text"
+                      tw="w-40 border-line-dark"
+                      placeholder="请输入"
+                      onChange={(e, value) =>
+                        setDelBtnEnable(value === 'delete')
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ModalWrapper>
       )}
     </div>
   )
