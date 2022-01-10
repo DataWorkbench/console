@@ -21,12 +21,12 @@ function sync_docker_conf() {
   echo 'done!'
 }
 
-function sync_console_testing() {
+function sync_console() {
   SERVICE=dataomnis
   PROJECT_NAME="pitrix-webconsole-$SERVICE"
-  PROXY=172.31.60.2
-  WEBSERVICE0=testing1a-webservice0
-  WEBSERVICE1=testing1a-webservice1
+  PROXY=$1
+  WEBSERVICE0=$2
+  WEBSERVICE1=$3
   PROXY_PATH=/root/ethan
 
   cd "$WORKSPACE_DIR" || exit
@@ -43,23 +43,23 @@ function sync_console_testing() {
   echo "done"
 
   echo "copy firstbox:$PROXY"
-  rsync -avz --progress dist/$PROJECT_NAME.tgz root@$PROXY:$PROXY_PATH
+  rsync -avz --progress dist/$PROJECT_NAME.tgz root@"$PROXY":$PROXY_PATH
   echo "done"
 
   echo "sync to $WEBSERVICE0"
-  ssh root@$PROXY rsync -avz $PROXY_PATH/$PROJECT_NAME.tgz root@$WEBSERVICE0:$PROXY_PATH
+  ssh root@"$PROXY" rsync -avz $PROXY_PATH/$PROJECT_NAME.tgz root@"$WEBSERVICE0":$PROXY_PATH
   echo "done"
 
-  echo "sync to testing1a-webservice1"
-  ssh root@$PROXY rsync -avz $PROXY_PATH/$PROJECT_NAME.tgz root@$WEBSERVICE1:$PROXY_PATH
-  echo "done"
-
-  echo "backup $PROJECT_NAME on $WEBSERVICE0, copy new files"
-  ssh root@$PROXY ssh $WEBSERVICE0 sh $PROXY_PATH/refresh_console_portal.sh $SERVICE
+  echo "sync to $WEBSERVICE1"
+  ssh root@"$PROXY" rsync -avz $PROXY_PATH/$PROJECT_NAME.tgz root@"$WEBSERVICE1":$PROXY_PATH
   echo "done"
 
   echo "backup $PROJECT_NAME on $WEBSERVICE0, copy new files"
-  ssh root@$PROXY ssh $WEBSERVICE1 sh $PROXY_PATH/refresh_console_portal.sh $SERVICE
+  ssh root@"$PROXY" ssh "$WEBSERVICE0" sh $PROXY_PATH/refresh_console_portal.sh $SERVICE
+  echo "done"
+
+  echo "backup $PROJECT_NAME on $WEBSERVICE0, copy new files"
+  ssh root@"$PROXY" ssh "$WEBSERVICE1" sh $PROXY_PATH/refresh_console_portal.sh $SERVICE
   echo "done"
 
   echo "clear dist"
@@ -73,5 +73,7 @@ if [ "$1" = 'testing' ]; then
 elif [ "$1" = 'testing_docker' ]; then
   sync_docker_conf
 elif [ "$1" = 'console_testing' ]; then
-  sync_console_testing
+  sync_console 172.31.60.2 testing1a-webservice0 testing1a-webservice1
+elif [ "$1" = 'console_staging' ]; then
+  sync_console 172.31.10.2 webservice0 webservice1
 fi
