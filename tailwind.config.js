@@ -91,6 +91,12 @@ module.exports = {
           lineHeight: 1,
           content: '"*"',
         },
+        '.fixed-center': {
+          position: 'fixed',
+          top: 'calc(50vh)',
+          transform: 'translateY(-50%) translateX(-50%)',
+          left: 'calc(50vw)',
+        },
       })
     }),
   ],

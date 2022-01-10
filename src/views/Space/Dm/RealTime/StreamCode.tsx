@@ -40,7 +40,7 @@ const CODETYPE = {
 }
 
 const SyntaxBox = styled(Center)(() => [
-  tw`absolute text-center left-14 top-24 bg-neut-20 bg-opacity-80 w-96 h-60 rounded-b text-neut-8`,
+  tw`fixed-center text-center bg-neut-20 bg-opacity-80 w-96 h-60 rounded-b text-neut-8`,
   css`
     .simplebar-scrollbar:before {
       ${tw`bg-neut-8`}
