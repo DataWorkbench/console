@@ -55,7 +55,7 @@ export const TextLink = styled(Link)(
     disabled = false,
   }: {
     color?: 'blue' | 'white'
-    disabled: Boolean
+    disabled?: Boolean
   }) => [
     tw`font-semibold underline text-underline-offset[1px]`,
     () => colorThemes[color],

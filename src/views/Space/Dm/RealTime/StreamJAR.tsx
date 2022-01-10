@@ -5,6 +5,7 @@ import {
   FlexBox,
   AffixLabel,
   Tooltip,
+  TextLink,
   Modal,
   SelectWithRefresh,
 } from 'components'
@@ -152,14 +153,15 @@ const StreamJAR = () => {
               help={
                 <div tw="text-neut-8">
                   如需选择新的资源，可以在资源管理中
-                  <span
-                    tw="text-green-11 cursor-pointer"
+                  <TextLink
+                    tw="text-white! ml-1"
+                    hasIcon={false}
                     onClick={() => {
                       setUploadVisible(true)
                     }}
                   >
                     上传资源
-                  </span>
+                  </TextLink>
                 </div>
               }
               valueRenderer={(option: any) => (

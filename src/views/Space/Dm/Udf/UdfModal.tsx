@@ -446,8 +446,8 @@ const UdfModal = observer(() => {
                                     请选择 Jar，如需选择新的 Jar
                                     包资源，可以在资源管理中
                                     <TextLink
-                                      linkType="button"
-                                      hasIcon
+                                      tw="text-white! ml-1"
+                                      hasIcon={false}
                                       onClick={() => {
                                         setUploadVisible(true)
                                       }}
@@ -463,8 +463,8 @@ const UdfModal = observer(() => {
                               <div>
                                 如需选择新的 Jar 包资源，可以在资源管理中
                                 <TextLink
-                                  type="button"
-                                  hasIcon
+                                  tw="text-white! ml-1"
+                                  hasIcon={false}
                                   onClick={() => {
                                     setUploadVisible(true)
                                   }}
