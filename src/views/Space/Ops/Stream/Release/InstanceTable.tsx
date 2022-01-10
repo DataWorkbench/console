@@ -280,7 +280,7 @@ export const InstanceTable = observer(
         draft.offset = 0
         draft.limit = 10
       })
-    }, [modalData.id, query, setFilter])
+    }, [modalData.id, query.state, query.jobId, query.version, setFilter])
 
     return (
       <FlexBox orient="column">
