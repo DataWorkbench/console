@@ -286,14 +286,16 @@ const JobModal = ({
                     <Control tw="space-x-2">
                       <Button onClick={() => setShow(true)}>
                         <Icon name="pod" />
-                        {cluster ? (
-                          <>
-                            {cluster.name}
-                            <span tw="text-neut-8">({cluster.id})</span>
-                          </>
-                        ) : (
-                          '选择集群'
-                        )}
+                        <span tw="ml-1!">
+                          {cluster ? (
+                            <>
+                              {cluster.name}
+                              <span tw="text-neut-8">({cluster.id})</span>
+                            </>
+                          ) : (
+                            '选择集群'
+                          )}
+                        </span>
                       </Button>
                       {cluster && (
                         <Button
