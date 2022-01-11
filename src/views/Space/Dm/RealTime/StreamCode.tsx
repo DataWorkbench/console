@@ -546,7 +546,7 @@ def main(args: Array[String]): Unit = {
                 <div tw="text-center">
                   <Icon
                     name="success"
-                    size={30}
+                    size={40}
                     color={{
                       primary: theme('colors.green.11'),
                       secondary: '#9DDFC9',
