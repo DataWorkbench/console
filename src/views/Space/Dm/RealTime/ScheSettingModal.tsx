@@ -512,7 +512,7 @@ const ScheSettingModal = ({
                                     })
                                   }}
                                 />
-                                <div tw="leading-8 ml-2">时</div>
+                                {/* <div tw="leading-8 ml-2">时</div> */}
                               </Control>
                               <div className="help">
                                 0~23 从指定时间的 0 分 0 秒开始
@@ -557,7 +557,7 @@ const ScheSettingModal = ({
                                     })
                                   }
                                 />
-                                <div tw="leading-8 ml-2">时</div>
+                                {/* <div tw="leading-8 ml-2">时</div> */}
                               </Control>
                               <div className="help">
                                 0~23 到指定时间的 59 分 59 秒结束
@@ -600,7 +600,7 @@ const ScheSettingModal = ({
                                         }}
                                       />
                                     </Control>
-                                    <div tw="leading-8 ml-2">时</div>
+                                    {/* <div tw="leading-8 ml-2">时</div> */}
                                   </Field>
                                   <Field>
                                     <Label>
@@ -644,7 +644,7 @@ const ScheSettingModal = ({
                                         }}
                                       />
                                     </Control>
-                                    <div tw="leading-8 ml-2">时</div>
+                                    {/* <div tw="leading-8 ml-2">时</div> */}
                                   </Field>
                                 </>
                               </Radio>
