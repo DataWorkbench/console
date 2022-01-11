@@ -819,7 +819,7 @@ const ClusterModal = observer(
                           `${item.ip} ${item.hostname}`
                       )
                       .join('\r\n')}
-                    placeholder={`|请输入 IP hostname ，多条配置之间换行输入。例如：
+                    placeholder={`请输入 IP hostname ，多条配置之间换行输入。例如：
 192.168.3.2 proxy.mgmt.pitrix.yunify.com
 192.168.2.8 pgpool.mgmt.pitrix.yunify.com`}
                     schemas={[
