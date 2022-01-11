@@ -276,11 +276,18 @@ export const InstanceTable = observer(
       setFilter((draft) => {
         draft.job_id = query.jobId || modalData.id || ''
         draft.state = query.state || 0
-        draft.version = query.version || ''
+        draft.version = query.version || modalData.version || ''
         draft.offset = 0
         draft.limit = 10
       })
-    }, [modalData.id, query.state, query.jobId, query.version, setFilter])
+    }, [
+      modalData.id,
+      modalData.version,
+      query.state,
+      query.jobId,
+      query.version,
+      setFilter,
+    ])
 
     return (
       <FlexBox orient="column">
