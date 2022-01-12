@@ -127,14 +127,14 @@ const NetworkModal = observer(
 
     return (
       <Modal
-        title={`${networkOp === 'create' ? '新建' : '修改'}网络`}
+        title={`${networkOp === 'create' ? '创建' : '修改'}网络`}
         confirmLoading={mutation.isLoading}
         visible
         onOk={handleOk}
         onCancel={() => setNetWorkOp('')}
         width={680}
         draggable
-        okText={networkOp === 'create' ? '新建' : '确认'}
+        okText={networkOp === 'create' ? '创建' : '确认'}
         appendToBody={appendToBody}
       >
         <FlexBox tw="h-full overflow-hidden">
