@@ -1,4 +1,5 @@
 GLOBAL_CONFIG:
+  project_name: 'dataomnis'
 
 ZONE_CONFIG:
   default:
