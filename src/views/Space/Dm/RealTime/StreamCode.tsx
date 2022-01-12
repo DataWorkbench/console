@@ -7,7 +7,7 @@ import {
   Button,
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
-import { get, trim, isUndefined } from 'lodash-es'
+import { get, trim, isUndefined, debounce } from 'lodash-es'
 import { Prompt, useHistory } from 'react-router-dom'
 import tw, { styled, theme, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
@@ -320,6 +320,22 @@ def main(args: Array[String]): Unit = {
     })
   }
 
+  const editorContainer = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (editorContainer.current) {
+      const tempRef = editorContainer.current
+      const resizeObserver = new ResizeObserver(
+        debounce(() => {
+          editorRef.current.layout()
+        })
+      )
+      resizeObserver.observe(editorContainer.current)
+      return () => resizeObserver.unobserve(tempRef)
+    }
+    return () => undefined
+  }, [])
+
   return (
     <FlexBox tw="relative h-full w-full flex-1" ref={boxRef}>
       <FlexBox tw="flex flex-col flex-1 w-full">
@@ -368,7 +384,7 @@ def main(args: Array[String]): Unit = {
             发布
           </Button>
         </StreamToolBar>
-        <div tw="flex-1 overflow-hidden flex flex-col">
+        <div tw="flex-1 overflow-hidden flex flex-col" ref={editorContainer}>
           <Editor
             language={codeName}
             defaultValue={isLoading ? loadingWord : codeStr || defaultCode}
