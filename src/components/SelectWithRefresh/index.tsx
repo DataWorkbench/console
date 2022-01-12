@@ -35,7 +35,13 @@ const SelectWithRefreshCmp = forwardRef<
   return (
     <SelectWithRefreshBox>
       <>
-        <Select {...rest} id={domId} onChange={onChange} ref={selectRef} />
+        <Select
+          clearable
+          {...rest}
+          id={domId}
+          onChange={onChange}
+          ref={selectRef}
+        />
         <Button
           tw="w-8 ml-3 p-0"
           disabled={disabled}
