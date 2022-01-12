@@ -1,5 +1,6 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components/Box'
+import tw, { styled, css } from 'twin.macro'
 import { getHelpCenterLink } from 'utils'
 import ClusterTable from './ClusterTable'
 
@@ -15,10 +16,20 @@ const pageTabsData = [
   },
 ]
 
+const PageTabWrap = styled('div')(() => [
+  css`
+    .tab-description {
+      ${tw`h-10!`}
+    }
+  `,
+])
+
 const Cluster = () => {
   return (
     <FlexBox orient="column" tw="p-5 min-h-full">
-      <PageTab tabs={pageTabsData} />
+      <PageTabWrap>
+        <PageTab tabs={pageTabsData} />
+      </PageTabWrap>
       <div tw="flex flex-1 bg-neut-16 px-5 pt-3">
         <ClusterTable />
       </div>
