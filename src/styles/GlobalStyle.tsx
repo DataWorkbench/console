@@ -99,10 +99,13 @@ const customStyles = css`
       .button.radio-button {
         ${tw`bg-neut-16 border-neut-13`}
         &:hover {
-          ${tw`bg-neut-15`}
+          ${tw`bg-neut-16 text-[#10B981]`}
+        }
+        &:active {
+          ${tw`text-[#047857]`}
         }
         &.checked {
-          ${tw`border-green-13 bg-neut-15`}
+          ${tw`border-green-11 text-green-11 bg-[rgba(21, 166, 117, 0.1)]`}
         }
       }
     }
