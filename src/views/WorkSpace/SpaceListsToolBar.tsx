@@ -121,7 +121,7 @@ const SpaceListsToolBar = observer(() => {
         <div tw="flex items-center space-x-2">
           <InputSearch
             tw="w-64"
-            placeholder="请输入工作空间名称/ID"
+            placeholder="请输入工作空间名称"
             value={searchName}
             onChange={(e, v: string | number) => {
               setSearchName(v)
