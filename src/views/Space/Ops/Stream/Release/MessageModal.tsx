@@ -100,7 +100,7 @@ export default function MessageModal({
         <CollapseItem key="p2" label="message">
           <div tw="px-5 py-3 bg-neut-17 h-full overflow-y-scroll">
             {row.message ? (
-              <div>{row.message}</div>
+              <div tw="break-normal">{row.message}</div>
             ) : (
               <div tw="text-neut-13">暂无 message</div>
             )}
