@@ -321,7 +321,7 @@ const NetworkTable = observer(() => {
                 loading={mutation.isLoading}
                 onClick={mutateData}
               >
-                确定
+                删除
               </Button>
             </FlexBox>
           }
