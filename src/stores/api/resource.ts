@@ -12,14 +12,14 @@ interface IResource {
 }
 
 export const loadResourceList = (
-  { regionId, spaceId, ...rest }: IResourceParams,
+  { regionId, spaceId, resource_name, resource_type }: IResourceParams,
   { cancel }: { cancel?: (_: any) => void } = {}
 ) =>
   request(
     {
       region: regionId,
       uri: `/v1/workspace/${spaceId}/resource`,
-      query: rest,
+      query: { resource_name, resource_type },
     },
     { cancel: cancel as any }
   )
