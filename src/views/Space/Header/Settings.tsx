@@ -48,7 +48,7 @@ export const Settings = ({ darkMode }) => {
 
   return (
     <Center>
-      <IconBoxWithTootip>
+      <IconBoxWithTootip tw="mr-3">
         {/* <IconBox size={28} tw="mr-2">
         <Icon
           name="bell"
@@ -72,12 +72,8 @@ export const Settings = ({ darkMode }) => {
             <div tw="text-white dark:text-neut-13 leading-5">帮助中心</div>
           }
         >
-          <HelpCenterLink href="/intro/introduction/">
+          <HelpCenterLink href="/intro/introduction/" tw="flex items-center">
             <IconBox
-              // onClick={
-              //   // TODO:  设置文档 url
-              //   () => handleOpenHelpCenter('/')
-              // }
               className="header-icon-bg-box"
               size={28}
               tw="hover:dark:bg-neut-13 hover:bg-neut-1"
@@ -93,12 +89,8 @@ export const Settings = ({ darkMode }) => {
           </HelpCenterLink>
         </Tooltip>
       </IconBoxWithTootip>
-
-      <span tw="ml-5 mr-2 dark:text-white font-semibold">
-        {get(window, 'USER.user_name', '')}
-      </span>
-      <span tw="leading-5 mr-5 inline-block bg-neut-2 dark:bg-neut-13 dark:text-white px-2 py-0.5 rounded-2xl">
-        项目所有者
+      <span tw="leading-5 mr-5 inline-block bg-neut-2 dark:bg-neut-13 dark:text-white px-2 py-0.5 rounded-[20px]">
+        空间创建者：{get(window, 'USER.user_name', '')}
       </span>
     </Center>
   )
