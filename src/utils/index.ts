@@ -9,7 +9,7 @@ export const getHelpCenterLink = (path: string, ifHostPrefix = false) => {
   const prefix = ifHostPrefix
     ? get(window, 'GLOBAL_CONFIG.new_docs_url', '')
     : ''
-  return `${prefix}/bigdata/databench${path}`
+  return `${prefix}/bigdata/dataomnis${path}`
 }
 
 export const getHelpCenterLinkWithHost = (path: string) =>
