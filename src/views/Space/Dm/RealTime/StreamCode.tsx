@@ -340,7 +340,7 @@ def main(args: Array[String]): Unit = {
 
   return (
     <FlexBox tw="relative h-full w-full flex-1" ref={boxRef}>
-      <FlexBox tw="flex flex-col flex-1 w-full">
+      <FlexBox tw="flex flex-col flex-1 overflow-hidden">
         <StreamToolBar tw="pb-4">
           {/* <Button type="black">
             <Icon name="listview" type="light" />
