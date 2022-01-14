@@ -13,7 +13,7 @@ const PlatformFeat = ({ className }) => {
       {
         title: '提供全托管式 Flink 集群',
         subtitle:
-          '仅提供 SQL语句即可提交Flink任务运行，并支持按照任务进行监控。',
+          '云端全托管 Flink 集群，对您的海量数据进行亚秒级处理，支持流批一体的作业处理方式，覆盖多种业务场景。',
       },
       {
         title: '工作空间隔离',

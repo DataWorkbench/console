@@ -7,7 +7,7 @@ import {
   Button,
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
-import { get, trim, isUndefined, debounce } from 'lodash-es'
+import { get, trim, isUndefined } from 'lodash-es'
 import { Prompt, useHistory } from 'react-router-dom'
 import tw, { styled, theme, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
@@ -63,6 +63,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   } = useStore()
   const [nextLocation, setNextLocation] = useState(null)
   const [shouldNav, setShouldNav] = useState(false)
+  const [showPlaceholder, setShowPlaceholder] = useState(true)
   const [syntaxState, setSyntaxState] = useImmer({ showBox: false, errMsg: '' })
   const [boxRef, boxDimensions] = useMeasure()
   const history = useHistory()
@@ -93,7 +94,8 @@ create table pd
 'table-name' = 'pd',
 'username' = 'root',
 'password' = '123456'
-);`
+);
+insert into pd values(1,2);`
     } else if (codeName === 'python') {
       v = `import os
 
@@ -186,6 +188,7 @@ def main(args: Array[String]): Unit = {
           })
           queryClient.invalidateQueries(getFlowKey('streamJobCode'))
           setEnableRelease(true)
+          setShowPlaceholder(false)
           Notify.success({
             title: '操作提示',
             content: isSaveOp ? '代码保存成功' : '语法检查成功',
@@ -196,6 +199,7 @@ def main(args: Array[String]): Unit = {
           }
         },
         onError: () => {
+          setShowPlaceholder(false)
           setSyntaxState((draft) => {
             draft.showBox = false
             draft.errMsg = ''
@@ -261,9 +265,16 @@ def main(args: Array[String]): Unit = {
     if (!isUndefined(codeStr)) {
       editor.setValue(codeStr || defaultCode)
       if (codeStr) {
+        setShowPlaceholder(false)
         setEnableRelease(true)
       }
     }
+    editor.onDidBlurEditorWidget(() => {
+      if (editor.getValue() === '') {
+        editor.setValue(defaultCode)
+        setShowPlaceholder(true)
+      }
+    })
     // eslint-disable-next-line no-bitwise
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
       mutateCodeData('codeSave')
@@ -271,11 +282,8 @@ def main(args: Array[String]): Unit = {
   }
 
   const handleEditorChange = (v: string) => {
-    if (trim(v) === '') {
-      return
-    }
     let isDirty = v !== codeStr
-    if (v === defaultCode) {
+    if (!codeStr && v === defaultCode) {
       isDirty = false
     }
     workFlowStore.set({
@@ -283,7 +291,16 @@ def main(args: Array[String]): Unit = {
     })
   }
 
-  const handlePrompt = (location) => {
+  const handleFocusClick = () => {
+    setShowPlaceholder(false)
+    const editorObj = editorRef.current
+    if (editorObj.getValue() === defaultCode) {
+      editorObj.setValue('')
+      editorObj.focus()
+    }
+  }
+
+  const handlePrompt = (location: any) => {
     workFlowStore.showSaveConfirm(curJob?.id, 'leave')
     setNextLocation(location)
     return false
@@ -299,6 +316,7 @@ def main(args: Array[String]): Unit = {
     if (!isUndefined(codeStr)) {
       editorRef.current?.setValue(codeStr || defaultCode)
       if (codeStr) {
+        setShowPlaceholder(false)
         setEnableRelease(true)
       }
     }
@@ -319,22 +337,6 @@ def main(args: Array[String]): Unit = {
       showNotify: true,
     })
   }
-
-  const editorContainer = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (editorContainer.current) {
-      const tempRef = editorContainer.current
-      const resizeObserver = new ResizeObserver(
-        debounce(() => {
-          editorRef.current.layout()
-        })
-      )
-      resizeObserver.observe(editorContainer.current)
-      return () => resizeObserver.unobserve(tempRef)
-    }
-    return () => undefined
-  }, [])
 
   return (
     <FlexBox tw="relative h-full w-full flex-1" ref={boxRef}>
@@ -384,14 +386,21 @@ def main(args: Array[String]): Unit = {
             发布
           </Button>
         </StreamToolBar>
-        <div tw="flex-1 overflow-hidden flex flex-col" ref={editorContainer}>
+        <div tw="flex-1 relative overflow-hidden flex flex-col">
+          <div
+            css={[!showPlaceholder && tw`hidden`]}
+            tw="absolute inset-0 z-50 bg-neut-18 bg-opacity-40 cursor-text"
+            onClick={handleFocusClick}
+          />
           <Editor
             language={codeName}
-            defaultValue={isLoading ? loadingWord : codeStr || defaultCode}
+            defaultValue={isLoading ? loadingWord : codeStr}
             theme="my-theme"
             tw="overflow-hidden"
             options={{
               minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              automaticLayout: true,
             }}
             editorWillMount={handleEditorWillMount}
             editorDidMount={handleEditorDidMount}
