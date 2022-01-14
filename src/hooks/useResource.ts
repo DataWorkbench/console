@@ -117,6 +117,8 @@ export const useMutationResource = () => {
       cancel?: any
       resourceIds?: String[]
       resource_id?: String
+      resource_name: String
+      resource_type: Number
     }) => {
       const formParams = { spaceId, ...rest }
       const params = {
