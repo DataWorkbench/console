@@ -41,7 +41,7 @@ const CODETYPE = {
 
 const SyntaxBox = styled(Center)(
   ({ isBigger = false }: { isBigger?: boolean }) => [
-    tw`fixed-center backdrop-blur-[6px] text-center bg-neut-20 bg-opacity-80  rounded-b text-neut-8 transition-all`,
+    tw`fixed-center backdrop-blur-[6px] text-center bg-neut-20 bg-opacity-10  rounded-b text-neut-8 transition-all`,
     isBigger ? tw`w-[600px] h-[386px]` : tw`w-96 h-60`,
     css`
       .simplebar-scrollbar:before {
