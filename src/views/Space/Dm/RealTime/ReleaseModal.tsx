@@ -1,9 +1,13 @@
-import { Input, Checkbox } from '@QCFE/lego-ui'
+import { useRef } from 'react'
+import { Checkbox, Form } from '@QCFE/lego-ui'
 import { Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import tw, { styled, css } from 'twin.macro'
 import { Modal, AffixLabel } from 'components'
 import { useImmer } from 'use-immer'
 import { useMutationReleaseStreamJob } from 'hooks'
+import { strlen } from 'utils'
+
+const { TextField } = Form
 
 const ModalWrapper = styled(Modal)(() => [
   css`
@@ -20,30 +24,33 @@ const ReleaseModal = ({
   onCancel?: () => void
   onSuccess?: () => void
 }) => {
+  const form = useRef<Form>(null)
   const releaseMutation = useMutationReleaseStreamJob()
   const [params, setParams] = useImmer({
     desc: '',
     stopRunning: false,
   })
   const onOk = () => {
-    releaseMutation.mutate(
-      {
-        desc: params.desc,
-        stop_running: params.stopRunning,
-      },
-      {
-        onSuccess: () => {
-          Notify.success({
-            title: '操作提示',
-            content: '发布成功',
-            placement: 'bottomRight',
-          })
-          if (onSuccess) {
-            onSuccess()
-          }
+    if (form.current?.validateForm()) {
+      releaseMutation.mutate(
+        {
+          desc: params.desc,
+          stop_running: params.stopRunning,
         },
-      }
-    )
+        {
+          onSuccess: () => {
+            Notify.success({
+              title: '操作提示',
+              content: '发布成功',
+              placement: 'bottomRight',
+            })
+            if (onSuccess) {
+              onSuccess()
+            }
+          },
+        }
+      )
+    }
   }
   return (
     <ModalWrapper
@@ -69,18 +76,30 @@ const ReleaseModal = ({
         </div>
       </div>
       <div tw="space-y-2">
-        <div>描述</div>
-        <div tw="w-80">
-          <Input
+        <Form layout="vertical" ref={form}>
+          <TextField
+            label="描述"
+            name="desc"
             autoComplete="off"
+            validateOnChange
+            schemas={[
+              {
+                rule: (value: string) => {
+                  const l = strlen(value)
+                  return l <= 1024
+                },
+                help: '最大字符长度1024字节',
+                status: 'error',
+              },
+            ]}
             value={params.desc}
-            onChange={(e: any, v: string | number) =>
+            onChange={(v: string | number) =>
               setParams((draft) => {
                 draft.desc = String(v)
               })
             }
           />
-        </div>
+        </Form>
         <div tw="border-b border-neut-13 pt-3" />
         <div tw="pt-2 flex items-center">
           <Checkbox

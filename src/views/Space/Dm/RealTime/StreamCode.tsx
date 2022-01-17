@@ -39,17 +39,20 @@ const CODETYPE = {
   5: 'scala',
 }
 
-const SyntaxBox = styled(Center)(() => [
-  tw`fixed-center text-center bg-neut-20 bg-opacity-80 w-96 h-60 rounded-b text-neut-8`,
-  css`
-    .simplebar-scrollbar:before {
-      ${tw`bg-neut-8`}
-    }
-    .portal-loading .circle span {
-      ${tw`bg-white`}
-    }
-  `,
-])
+const SyntaxBox = styled(Center)(
+  ({ isBigger = false }: { isBigger?: boolean }) => [
+    tw`fixed-center backdrop-blur-[6px] text-center bg-neut-20 bg-opacity-80  rounded-b text-neut-8 transition-all`,
+    isBigger ? tw`w-[600px] h-[386px]` : tw`w-96 h-60`,
+    css`
+      .simplebar-scrollbar:before {
+        ${tw`bg-neut-8`}
+      }
+      .portal-loading .circle span {
+        ${tw`bg-white`}
+      }
+    `,
+  ]
+)
 
 interface IProp {
   /** 2: SQL 4: Python 5: Scala */
@@ -485,7 +488,7 @@ def main(args: Array[String]): Unit = {
           escClosable={false}
           maskClosable={false}
           width={400}
-          onCancel={() => workFlowStore.switchPanel()}
+          onCancel={() => workFlowStore.hideSaveConfirm()}
           footer={
             <div tw="flex justify-between w-full pl-9">
               <Button
@@ -542,7 +545,9 @@ def main(args: Array[String]): Unit = {
       )}
       <Prompt when={workFlowStore.isDirty} message={handlePrompt} />
       {syntaxState.showBox && (
-        <SyntaxBox>
+        <SyntaxBox
+          isBigger={syntaxMutation.isSuccess && syntaxState.errMsg !== ''}
+        >
           <div tw="absolute right-2 top-2">
             <Icon
               name="close"
@@ -593,7 +598,13 @@ def main(args: Array[String]): Unit = {
                     style={{ maxHeight: 160 }}
                     tw="text-left px-6 break-all overflow-y-auto"
                   >
-                    {syntaxState.errMsg}
+                    <div tw="text-center">发现语法检查错误，具体内容如下：</div>
+                    {syntaxState.errMsg.split(/\n\t/).map((line, i) => {
+                      if (line) {
+                        return <div key={String(i)}>{line}</div>
+                      }
+                      return null
+                    })}
                   </SimpleBar>
                 </div>
               )}
