@@ -178,9 +178,9 @@ const NetworkModal = observer(
                 }))}
                 optionRenderer={(option: { label: string; value: string }) => (
                   <FlexBox tw="items-center">
-                    <Icon name="vpc" tw="mr-2.5" size={18} type="light" />
+                    <Icon name="vpc" tw="mr-2.5" size={18} />
                     <div>
-                      <div>{option.label || '无'}</div>
+                      <div>{option.label || option.value}</div>
                       <div tw="text-neut-8">{option.value}</div>
                     </div>
                   </FlexBox>
@@ -249,7 +249,7 @@ const NetworkModal = observer(
                   <FlexBox tw="items-center">
                     <Icon name="network" tw="mr-2.5" size={18} type="light" />
                     <div>
-                      <div>{option.label || '无'}</div>
+                      <div>{option.label || option.value}</div>
                       <div tw="text-neut-8">{option.value}</div>
                     </div>
                   </FlexBox>
