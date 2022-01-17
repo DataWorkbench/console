@@ -9,6 +9,19 @@ const tableStyles = css`
     .table-row {
       .table-icon {
         ${tw`pr-0`}
+        label.checkbox {
+          &.checkbox-wrapper.indeterminate::after {
+            left: 5px;
+          }
+          &.checked::after {
+            top: 4px;
+            left: 6px;
+            width: 2.5px;
+            height: 4.5px;
+            border-width: 0 1px 1px 0;
+            transform: rotate(45deg) scale(1.6);
+          }
+        }
       }
       .table-col:last-child .button.is-text {
         ${tw`px-0 mr-4`}
