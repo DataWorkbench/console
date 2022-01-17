@@ -163,7 +163,7 @@ const SpaceModal = observer(
         <Modal
           visible
           noBorder
-          width={720}
+          width={filterOptSpaceIds.length > 1 ? 720 : 400}
           onCancel={handleModalClose}
           footer={
             <>

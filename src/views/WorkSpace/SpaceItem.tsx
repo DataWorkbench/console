@@ -33,6 +33,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
         fill: #dff7ed;
       }
     `,
+  status !== 1 && tw`w-24`,
 ])
 
 // const Disp = tw.div`pt-0.5 pr-6 h-7 truncate`
