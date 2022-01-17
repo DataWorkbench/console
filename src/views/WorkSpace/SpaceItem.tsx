@@ -3,7 +3,7 @@ import { Link, useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import { Radio, Menu, Icon } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import { FlexBox, Center, Box, Card, Tooltip } from 'components'
+import { FlexBox, Center, Box, Card, Tooltip, TextEllipsis } from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
 import { OptButton } from './styled'
@@ -179,7 +179,9 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 </StateTag>
               </FlexBox>
               <div tw="pt-0.5 h-7 truncate" title={space.desc || ''}>
-                {space.desc || '暂无描述'}
+                <TextEllipsis twStyle={tw`text-neut-8`}>
+                  {space.desc || '暂无描述'}
+                </TextEllipsis>
               </div>
             </Box>
             {!isModal && (
