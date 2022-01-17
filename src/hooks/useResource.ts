@@ -117,10 +117,8 @@ export const useMutationResource = () => {
       cancel?: any
       resourceIds?: String[]
       resource_id?: String
-      resource_name: String
-      resource_type: Number
     }) => {
-      const formParams = { spaceId, ...rest }
+      const formParams: any = { spaceId, ...rest }
       const params = {
         ...rest,
         regionId,
@@ -130,7 +128,15 @@ export const useMutationResource = () => {
       let endpoint = ''
       let headers = ''
       if (op === 'create') {
-        ret = await loadResourceList(params, { cancel })
+        ret = await loadResourceList(
+          {
+            regionId,
+            spaceId,
+            resource_name: formParams.resource_name,
+            resource_type: formParams.resource_type,
+          },
+          { cancel }
+        )
         if (ret?.infos?.length > 0) return 'DUPLICATE_RESOURCE_NAME'
       }
 

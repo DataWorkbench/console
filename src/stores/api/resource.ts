@@ -12,14 +12,14 @@ interface IResource {
 }
 
 export const loadResourceList = (
-  { regionId, spaceId, resource_name, resource_type }: IResourceParams,
+  { regionId, spaceId, ...rest }: IResourceParams,
   { cancel }: { cancel?: (_: any) => void } = {}
 ) =>
   request(
     {
       region: regionId,
       uri: `/v1/workspace/${spaceId}/resource`,
-      query: { resource_name, resource_type },
+      query: rest,
     },
     { cancel: cancel as any }
   )
@@ -45,7 +45,7 @@ export const loadSignature = (
       action: 'GenerateSign',
       uri: `/v1/workspace/${spaceId}/resource`,
       headers: {
-        'Content-Type': 'Multipart/Form-data',
+        'Content-Type': 'multipart/form-data',
       },
     },
     { cancel: cancel as any }
