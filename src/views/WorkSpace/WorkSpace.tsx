@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { get } from 'lodash-es'
+import { useCookie } from 'react-use'
 import tw, { styled } from 'twin.macro'
 import {
   PageTab,
@@ -52,6 +53,7 @@ const columnSettingsKey = 'DATAOMNIS_SPACELISTS_COLUMN_SETTINGS'
 
 const WorkSpace = observer(
   ({ isModal, onItemCheck, onHide, showCreate = false }: IWrokSpaceProps) => {
+    const [zone] = useCookie('zone')
     const { status, refetch, data: regionInfos } = useQueryRegion()
     // const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
     const stateStore = useLocalObservable(() => ({
@@ -94,9 +96,15 @@ const WorkSpace = observer(
 
     useEffect(() => {
       if (regionInfos?.length) {
-        stateStore.set({ curRegionId: get(regionInfos, '[0].id', '') })
+        const defaultRegionId = regionInfos
+          ?.map(({ id }) => id)
+          .find((id) => id === zone)
+
+        stateStore.set({
+          curRegionId: defaultRegionId || get(regionInfos, '[0].id', ''),
+        })
       }
-    }, [regionInfos, stateStore])
+    }, [regionInfos, stateStore, zone])
 
     useEffect(() => {
       if (showCreate) {
