@@ -13,7 +13,7 @@ import {
 const SelectWithRefreshBox = styled('div')(() => [
   css`
     .qicon {
-      ${tw`text-neut-18 fill-current dark:text-white`}
+      ${tw`text-neut-18 dark:text-white`}
     }
   `,
 ])
