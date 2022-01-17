@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import { useCookie } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { FlexBox } from 'components'
 
@@ -7,6 +9,14 @@ const Header = React.lazy(
 )
 
 export const SpaceLayout = observer(({ children }) => {
+  const { regionId } = useParams<{ regionId: string }>()
+  const [zone, updateZone] = useCookie('zone')
+  useEffect(() => {
+    if (regionId && zone !== regionId) {
+      updateZone(regionId, { expires: 365 })
+    }
+  }, [regionId, zone, updateZone])
+
   return (
     <FlexBox
       orient="column"

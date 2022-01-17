@@ -22,7 +22,7 @@ const MainLayout = observer(({ children }) => {
   const match = useRouteMatch(flattenDeep(getLinks(menus)))
   return (
     <FlexBox orient="column" tw="h-screen bg-neut-2">
-      <GlobalNav />
+      <GlobalNav zoneNotSwitch />
       <FlexBox flex="1" tw="overflow-y-auto">
         {match && (
           <SideMenu title={title} menus={menus} relationMenus={relationMenus} />
