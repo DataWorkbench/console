@@ -9,7 +9,7 @@ import { Menu } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { useWorkSpaceContext } from 'contexts'
 import { useQueryPageWorkSpace } from 'hooks'
-import { Tooltip, FlexBox } from 'components'
+import { Tooltip, FlexBox, TextEllipsis } from 'components'
 import { useHistory } from 'react-router-dom'
 import TableRowOpt from './TableRowOpt'
 
@@ -212,7 +212,9 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             dataIndex,
             // width: 200,
             render: (field: string) => (
-              <div tw="truncate">{field || '暂无描述'}</div>
+              <div tw="truncate">
+                <TextEllipsis>{field || '暂无描述'}</TextEllipsis>
+              </div>
             ),
           }
         }
