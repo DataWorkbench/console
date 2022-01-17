@@ -319,6 +319,7 @@ const JobModal = ({
                   name="desc"
                   label="描述"
                   defaultValue={get(job, 'desc', '')}
+                  validateOnChange
                   placeholder="请输入作业描述"
                   schemas={[
                     {
