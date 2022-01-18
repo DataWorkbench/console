@@ -397,8 +397,17 @@ const ScheSettingModal = ({
                         help="注：调度将在有效日期内生效并自动调度，反之，在有效期外的任务将不会自动调度。"
                         onClear={() => {
                           setParams((draft) => {
-                            draft.started = 0
-                            draft.ended = 0
+                            draft.started = Math.floor(d[0].getTime() / 1000)
+                            if (d.length > 1) {
+                              if (d[0] > d[1]) {
+                                draft.ended = draft.started
+                                draft.started = Math.floor(
+                                  d[1].getTime() / 1000
+                                )
+                              } else {
+                                draft.ended = Math.floor(d[1].getTime() / 1000)
+                              }
+                            }
                           })
                         }}
                         onChange={(d: Date[]) => {
