@@ -397,10 +397,16 @@ const ScheSettingModal = ({
                         if (d.length > 0) {
                           setParams((draft) => {
                             draft.started = Math.floor(d[0].getTime() / 1000)
-                            draft.ended =
-                              d.length > 1
-                                ? Math.floor(d[1].getTime() / 1000)
-                                : 0
+                            if (d.length > 1) {
+                              if (d[0] > d[1]) {
+                                draft.ended = draft.started
+                                draft.started = Math.floor(
+                                  d[1].getTime() / 1000
+                                )
+                              } else {
+                                draft.ended = Math.floor(d[1].getTime() / 1000)
+                              }
+                            }
                           })
                         }
                       }}
