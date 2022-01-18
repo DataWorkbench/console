@@ -141,10 +141,21 @@ export const useMutationResource = () => {
       }
 
       if (['create', 'enable', 'view'].includes(op)) {
+        const uri =
+          // eslint-disable-next-line no-nested-ternary
+          op === 'create'
+            ? `/v1/workspace/${spaceId}/resource`
+            : op === 'view'
+            ? `/v1/workspace/${spaceId}/resource/${formParams.resource_id}`
+            : `/v1/workspace/${spaceId}/resource/${formParams.resource_id}/download`
         const signature = await loadSignature(
           {
             region: regionId,
-            spaceId,
+            uri,
+            method: op === 'enable' ? 'GET' : 'POST',
+            headers: {
+              'Content-Type': op === 'enable' ? '' : 'multipart/form-data',
+            },
           },
           { cancel }
         )
