@@ -35,18 +35,16 @@ export interface IListResourceParams extends IResource {
 }
 
 export const loadSignature = (
-  { region, spaceId }: any,
+  { region, uri, headers, method }: any,
   { cancel }: { cancel?: (_: any) => void } = {}
 ) =>
   request(
     {
-      region,
-      method: 'POST',
       action: 'GenerateSign',
-      uri: `/v1/workspace/${spaceId}/resource`,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      method,
+      headers,
+      region,
+      uri,
     },
     { cancel: cancel as any }
   )
