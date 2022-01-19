@@ -285,8 +285,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       {
         title: '操作',
         dataIndex: 'id',
-        key: 'table_actions',
-        render: (value: any, row: any) => (
+        render: (_: String, row: any) => (
           <FlexBox tw="items-center">
             <Button type="text" onClick={() => handleOperation(row)}>
               {row.status === 1 ? '暂停' : '恢复'}
