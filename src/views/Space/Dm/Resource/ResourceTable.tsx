@@ -281,6 +281,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: '操作',
+          dataIndex: 'table_actions',
           render: (_: string, row: Record<string, any>) => (
             <FlexBox tw="items-center">
               <Button type="text" onClick={() => handleEdit(row)}>
