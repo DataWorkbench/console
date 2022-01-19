@@ -45,7 +45,7 @@ const App = () => {
       set(
         window,
         'GLOBAL_CONFIG.new_docs_url',
-        'https://deploy-preview-654--qingcloud.netlify.app'
+        'https://deploy-preview-654--qingcloud-docs.netlify.app'
       )
     }
     setLoading(false)
