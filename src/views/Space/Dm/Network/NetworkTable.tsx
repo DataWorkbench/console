@@ -49,7 +49,7 @@ const NetworkTable = observer(() => {
     limit: 10,
     reverse: true,
     search: '',
-    sort_by: '',
+    sort_by: 'created',
   })
   const queryClient = useQueryClient()
   const mutation = useMutationNetwork()
