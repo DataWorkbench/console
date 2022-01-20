@@ -62,7 +62,7 @@ export const ReleaseTable = observer(({ query }: any) => {
     reverse: true,
     search: '',
     status: undefined,
-    sort_by: '',
+    sort_by: 'created',
   })
 
   const toggle = useCallback(
