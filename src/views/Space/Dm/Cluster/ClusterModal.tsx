@@ -152,7 +152,9 @@ const ClusterModal = observer(
     } = useStore()
 
     const [params, setParams] = useImmer(
-      opCluster ? pick(opCluster, keys(defaultParams)) : defaultParams
+      opCluster
+        ? pick(opCluster, keys(defaultParams).concat(['created']))
+        : defaultParams
     )
     const baseFormRef = useRef<Form>(null)
     const networkFormRef = useRef<Form>(null)
@@ -250,6 +252,7 @@ const ClusterModal = observer(
       })
     }
     const strategy = params.config.restart_strategy
+    console.log(params)
     const marks = useMemo(() => {
       const o = {}
       range(0, 9, 1).forEach((v) => {
@@ -771,7 +774,6 @@ const ClusterModal = observer(
               >
                 <Form>
                   <SelectField
-                    clearable
                     label={<AffixLabel>日志级别</AffixLabel>}
                     name="root_log_level"
                     disabled={viewMode}
