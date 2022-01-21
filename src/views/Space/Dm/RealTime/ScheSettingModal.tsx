@@ -397,33 +397,31 @@ const ScheSettingModal = ({
                         help="注：调度将在有效日期内生效并自动调度，反之，在有效期外的任务将不会自动调度。"
                         onClear={() => {
                           setParams((draft) => {
-                            draft.started = Math.floor(d[0].getTime() / 1000)
-                            if (d.length > 1) {
-                              if (d[0] > d[1]) {
-                                draft.ended = draft.started
-                                draft.started = Math.floor(
-                                  d[1].getTime() / 1000
-                                )
-                              } else {
-                                draft.ended = Math.floor(d[1].getTime() / 1000)
-                              }
-                            }
+                            draft.started = 0
+                            draft.ended = 0
                           })
                         }}
                         onChange={(d: Date[]) => {
-                          if (d.length > 0) {
+                          if (d && d.length) {
                             setParams((draft) => {
                               draft.started = Math.floor(d[0].getTime() / 1000)
-                              draft.ended =
-                                d.length > 1
-                                  ? Math.floor(d[1].getTime() / 1000)
-                                  : 0
+                              if (d.length > 1) {
+                                if (d[0] > d[1]) {
+                                  draft.ended = draft.started
+                                  draft.started = Math.floor(
+                                    d[1].getTime() / 1000
+                                  )
+                                } else {
+                                  draft.ended = Math.floor(
+                                    d[1].getTime() / 1000
+                                  )
+                                }
+                              }
                             })
                           }
                         }}
                       />
                       <SelectField
-                        clearable
                         disabled={disabled}
                         name="concurrencyPolicy"
                         label={
@@ -470,7 +468,6 @@ const ScheSettingModal = ({
                       />
 
                       <SelectField
-                        clearable
                         disabled={disabled}
                         name="schePeriod"
                         label={<AffixLabel>调度周期</AffixLabel>}
