@@ -365,7 +365,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       </FlexBox>
       <Table
         rowKey="id"
-        loading={isFetching}
+        loading={isFetching || mutation.isLoading}
         columns={filterColumn.length > 0 ? filterColumn : columns}
         dataSource={infos || []}
         pagination={{
