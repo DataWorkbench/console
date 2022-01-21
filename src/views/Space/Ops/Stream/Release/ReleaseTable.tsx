@@ -62,7 +62,7 @@ export const ReleaseTable = observer(({ query }: any) => {
     reverse: true,
     search: '',
     status: undefined,
-    sort_by: '',
+    sort_by: 'created',
   })
 
   const toggle = useCallback(
@@ -334,7 +334,6 @@ export const ReleaseTable = observer(({ query }: any) => {
       draft.search = query.search
       draft.status = query.status
       draft.offset = 0
-      draft.limit = 10
     })
   }, [query, setFilter])
 
@@ -365,7 +364,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       </FlexBox>
       <Table
         rowKey="id"
-        loading={isFetching}
+        loading={isFetching || mutation.isLoading}
         columns={filterColumn.length > 0 ? filterColumn : columns}
         dataSource={infos || []}
         pagination={{
