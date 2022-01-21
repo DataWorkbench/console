@@ -118,7 +118,7 @@ const JobTabs = observer(() => {
     <div tw="flex-1 w-full overflow-x-hidden ">
       {showNotify && (
         <div tw="relative">
-          <div tw="absolute left-0 top-0 w-full pointer-events-none z-10">
+          <div tw="absolute left-0 top-9 w-full pointer-events-none z-10">
             <div tw="flex justify-center">
               <div tw="flex items-center bg-white text-neut-15 px-3 py-2 rounded-sm">
                 <Icon

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { Checkbox, Form } from '@QCFE/lego-ui'
-import { Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { styled, css } from 'twin.macro'
 import { Modal, AffixLabel } from 'components'
 import { useImmer } from 'use-immer'
@@ -39,11 +39,11 @@ const ReleaseModal = ({
         },
         {
           onSuccess: () => {
-            Notify.success({
-              title: '操作提示',
-              content: '发布成功',
-              placement: 'bottomRight',
-            })
+            // Notify.success({
+            //   title: '操作提示',
+            //   content: '发布成功',
+            //   placement: 'bottomRight',
+            // })
             if (onSuccess) {
               onSuccess()
             }
