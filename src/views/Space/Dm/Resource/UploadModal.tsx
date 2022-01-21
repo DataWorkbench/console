@@ -167,7 +167,9 @@ const UploadModal = (props: any) => {
 
   const handleClear = () => {
     setIsFailed(false)
-    setFields(defaultFields)
+    setFields((draft) => {
+      draft.file = undefined
+    })
     if (cancelRef.current) {
       cancelRef.current()
       setCancelUpload(undefined)
