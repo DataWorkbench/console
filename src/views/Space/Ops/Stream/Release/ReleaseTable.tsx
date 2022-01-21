@@ -334,7 +334,6 @@ export const ReleaseTable = observer(({ query }: any) => {
       draft.search = query.search
       draft.status = query.status
       draft.offset = 0
-      draft.limit = 10
     })
   }, [query, setFilter])
 

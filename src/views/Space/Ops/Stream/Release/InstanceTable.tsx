@@ -277,7 +277,6 @@ export const InstanceTable = observer(
         draft.state = query.state || 0
         draft.version = query.version || modalData.version || ''
         draft.offset = 0
-        draft.limit = 10
       })
     }, [
       modalData.id,

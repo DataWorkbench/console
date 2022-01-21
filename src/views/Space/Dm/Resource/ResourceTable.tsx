@@ -124,6 +124,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       setPackageType(name)
       setFilter((draft) => {
         draft.resource_type = PackageTypeMap[name]
+        draft.offset = 0
       })
 
       setSelectedRows([])
@@ -399,6 +400,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                   onPressEnter={(e: React.SyntheticEvent) => {
                     setFilter((draft) => {
                       draft.search = (e.target as HTMLInputElement).value
+                      draft.offset = 0
                     })
                   }}
                   onClear={() => {
