@@ -452,7 +452,9 @@ const UploadModal = (props: any) => {
               status: 'error',
             },
             {
-              rule: { matchRegex: /^(?!_)[a-zA-Z0-9_]+((\.jar)$)/ },
+              rule: {
+                matchRegex: /^(?!_)(?!.*?(_.jar)$)[a-zA-Z0-9_]+((\.jar)$)/,
+              },
               help: '只允许数字、字母或下划线(_) 且以(.jar)结尾 不能以(_)开头',
               status: 'error',
             },
