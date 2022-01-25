@@ -155,7 +155,7 @@ const SpaceModal = observer(
         },
         delete: {
           opName: '删除',
-          desc: '',
+          desc: '该工作空间内作业等数据都将彻底删除，无法恢复，请谨慎操作。',
         },
       }
       const { opName, desc } = operateObj[curSpaceOpt]
