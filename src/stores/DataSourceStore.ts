@@ -18,6 +18,15 @@ class DataSourceStore {
 
   opSourceList: any[] = []
 
+  showPingHistories = false
+
+  itemLoadingHistories: Record<
+    string,
+    Map<string, Record<string, Record<string, any>[]>>
+  > = {}
+
+  emptyHistories: Map<string, Record<string, Record<string, any>[]>> = new Map()
+
   sourceKinds = [
     {
       name: 'MySQL',
@@ -69,6 +78,40 @@ class DataSourceStore {
   mutateOperation = (op: OP = '', sourceList: any[] = []) => {
     this.op = op
     this.opSourceList = sourceList
+  }
+
+  setShowPingHistories = (status: boolean) => {
+    this.showPingHistories = status
+  }
+
+  addItemHistories = (
+    sourceId: string,
+    loadingItem: Record<'uuid' & string, any>
+  ) => {
+    if (this.itemLoadingHistories[sourceId]) {
+      this.itemLoadingHistories[sourceId].set(loadingItem.uuid, loadingItem)
+    } else {
+      this.itemLoadingHistories[sourceId] = new Map([
+        [loadingItem.uuid, loadingItem],
+      ])
+    }
+  }
+
+  addEmptyHistories = (uuid: string, item: Record<string, any>) => {
+    this.emptyHistories.set(uuid, item)
+  }
+
+  removeItemHistories = (
+    sourceId: string,
+    loadingItem: Record<'uuid' & string, any>
+  ) => {
+    if (this.itemLoadingHistories[sourceId]?.has(loadingItem.uuid)) {
+      this.itemLoadingHistories[sourceId].delete(loadingItem.uuid)
+    }
+  }
+
+  clearEmptyHistories = () => {
+    this.emptyHistories.clear()
   }
 
   setSourceKinds = (data: any) => {
