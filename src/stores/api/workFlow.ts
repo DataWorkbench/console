@@ -157,12 +157,15 @@ export const releaseStreamJob = ({
   jobId,
   ...rest
 }: IWorkFlowParams) =>
-  request({
-    region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/release`,
-    body: rest,
-    method: 'POST',
-  })
+  request(
+    {
+      region: regionId,
+      uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/release`,
+      body: rest,
+      method: 'POST',
+    },
+    { timeout: 60000 }
+  )
 
 export const inConnectors = ({ regionId, spaceId, jobId }: IStreamParams) => {
   return request({
