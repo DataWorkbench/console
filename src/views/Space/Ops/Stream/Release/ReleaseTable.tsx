@@ -62,6 +62,7 @@ export const ReleaseTable = observer(({ query }: any) => {
     reverse: true,
     search: '',
     status: undefined,
+    job_id: '',
     sort_by: 'created',
   })
 
@@ -333,6 +334,7 @@ export const ReleaseTable = observer(({ query }: any) => {
     setFilter((draft) => {
       draft.search = query.search
       draft.status = query.status
+      draft.job_id = query.job_id
       draft.offset = 0
     })
   }, [query, setFilter])
