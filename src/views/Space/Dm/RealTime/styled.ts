@@ -1,5 +1,5 @@
 import tw, { styled, css } from 'twin.macro'
-import { Form } from '@QCFE/lego-ui'
+import { Form, DatePicker } from '@QCFE/lego-ui'
 
 const { DatePickerField } = Form
 
@@ -59,6 +59,14 @@ export const ScheSettingForm = styled(ScheForm)(() => [
           }
         }
       }
+    }
+  `,
+])
+
+export const SmallDatePicker = styled(DatePicker)(() => [
+  css`
+    > input {
+      ${tw`w-60!`}
     }
   `,
 ])
