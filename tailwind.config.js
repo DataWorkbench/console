@@ -53,6 +53,9 @@ module.exports = {
       red,
       green,
       neut,
+      error: {
+        DEFAULT: red[10],
+      },
       blue: {
         10: '#2193D3',
         12: '#1E85C7',
@@ -86,7 +89,7 @@ module.exports = {
         '.label-required::before': {
           display: 'inline-block',
           marginRight: '4px',
-          color: '#CF3B37',
+          color: red[10],
           fontSize: '12px',
           lineHeight: 1,
           content: '"*"',
