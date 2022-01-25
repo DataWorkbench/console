@@ -6,6 +6,7 @@ import { ReleaseTable } from './ReleaseTable'
 const defaultQuery = {
   search: '',
   status: 0,
+  job_id: '',
 }
 
 export const Release = () => {
@@ -50,6 +51,24 @@ export const Release = () => {
               }}
               onClear={() => {
                 handleQueryChange('search', '')
+              }}
+            />
+          </Center>
+        </FlexBox>
+        <FlexBox tw="ml-6 pl-12">
+          <Center>
+            <div tw="text-white w-16">作业 ID</div>
+            <InputSearch
+              tw="w-[216px]"
+              placeholder="搜索作业 ID"
+              onPressEnter={(e: React.SyntheticEvent) => {
+                handleQueryChange(
+                  'job_id',
+                  (e.target as HTMLInputElement).value
+                )
+              }}
+              onClear={() => {
+                handleQueryChange('job_id', '')
               }}
             />
           </Center>
