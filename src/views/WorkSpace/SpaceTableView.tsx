@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get, omitBy } from 'lodash-es'
@@ -20,11 +20,12 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const {
     defaultColumns,
     columnSettings,
-    optSpaces,
+    selectedSpaces,
     queryKeyWord,
     queryRefetch,
   } = stateStore
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  // const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const selectedRowKeys = selectedSpaces.map((i: Record<string, any>) => i.id)
   const { width: winW } = useWindowSize()
   const [sort, setSort] = useImmer<{
     name: string
@@ -276,12 +277,6 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     })
   }, [queryKeyWord, setFilter])
 
-  useEffect(() => {
-    if (optSpaces.length === 0) {
-      setSelectedRowKeys([])
-    }
-  }, [optSpaces.length])
-
   const handleSort = (sortKey: string, sortOrder: 'asc' | 'desc') => {
     setFilter((draft) => {
       draft.reverse = sortOrder === 'desc'
@@ -306,8 +301,8 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   }
 
   const handleSelect = (keys, rows) => {
-    stateStore.set({ optSpaces: rows })
-    setSelectedRowKeys(keys)
+    stateStore.set({ selectedSpaces: rows })
+    // setSelectedRowKeys(keys)
   }
 
   return (

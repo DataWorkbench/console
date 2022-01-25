@@ -79,6 +79,7 @@ const WorkSpace = observer(
         return get(this, 'curSpace.id', '')
       },
       optSpaces: [],
+      selectedSpaces: [],
       get optSpaceIds() {
         return get(this, 'optSpaces', []).map(({ id }) => id)
       },
