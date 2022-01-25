@@ -182,7 +182,7 @@ export const InstanceTable = observer(
             <div>
               {/* <div>{row.job_name}</div> */}
               <div
-                tw="hover:text-green-11 cursor-pointer"
+                tw="text-neut-8 hover:text-green-11 cursor-pointer"
                 onClick={() => handleJobView(row.job_id)}
               >
                 {value}
@@ -190,6 +190,10 @@ export const InstanceTable = observer(
             </div>
           )
         },
+      },
+      {
+        title: '作业版本',
+        dataIndex: 'version',
       },
       {
         title: '创建时间',
