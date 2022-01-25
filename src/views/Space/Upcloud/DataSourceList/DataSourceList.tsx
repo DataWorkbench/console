@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
@@ -31,12 +31,12 @@ import {
   DataSourcePingModal,
   getPingConnection,
 } from './DataSourcePing'
-import { NetworkContext } from './NetworkProvider'
 import { usePingEvent } from './DataSourcePing/hooks'
 
 const { MenuItem } = Menu
 
 const getEllipsisText = (text: string, lenght: number) => {
+  if (!text) return text
   let index = 0
   let count = 0
   while (index < text.length) {
@@ -166,8 +166,6 @@ const DataSourceList = observer(() => {
   const { isLoading, refetch, data } = useQuerySource(filter)
   const mutation = useMutationSource()
 
-  const { networkMap: networks } = useContext(NetworkContext)
-
   const shouldRefetch = useRef<string>()
   const removeItem = (sourceId: string, item: Record<'uuid' & string, any>) => {
     removeItemHistories(sourceId, item)
@@ -233,11 +231,11 @@ const DataSourceList = observer(() => {
   const defaultColumns = [
     {
       title: '数据源名称/ID',
-      dataIndex: 'source_id',
+      dataIndex: 'id',
       width: 230,
       render: (v: string, info: any) => {
         const sourceKindName = sourceKinds.find(
-          (kind) => kind.source_type === info.source_type
+          (kind) => kind.source_type === info.type
         )?.name
         return (
           <FlexBox tw="space-x-2 items-center">
@@ -278,7 +276,7 @@ const DataSourceList = observer(() => {
     },
     {
       title: '数据源类型',
-      dataIndex: 'source_type',
+      dataIndex: 'type',
       render: (v: number) => {
         return sourceKinds.find((kind) => kind.source_type === v)?.name
       },
@@ -289,14 +287,13 @@ const DataSourceList = observer(() => {
       width: 250,
       render: (v: any, row: any) => {
         const kindName = sourceKinds.find(
-          (kind) => kind.source_type === row.source_type
+          (kind) => kind.source_type === row.type
         )?.name
 
         if (kindName) {
           const key = kindName.toLowerCase()
           const urlObj = get(v, key)
           // const networkId = get(urlObj, 'network.vpc_network.network_id')
-          const networkName = get(row, 'network_name')
           return (
             <div tw="space-y-1">
               <div tw="truncate flex">
@@ -319,47 +316,6 @@ const DataSourceList = observer(() => {
                   </Tooltip>
                 </>
               </div>
-              {networkName && (
-                <div tw="truncate">
-                  <span tw="inline-block px-1.5 bg-[#F1E4FE] text-[#A855F7] rounded-sm mr-0.5 font-medium">
-                    内网
-                  </span>
-                  {networks.has(
-                    get(urlObj, 'network.vpc_network.network_id')
-                  ) ? (
-                    <Tooltip
-                      theme="darker"
-                      content={
-                        <>
-                          <div>
-                            {`VPC:   ${
-                              networks.get(
-                                get(urlObj, 'network.vpc_network.network_id')
-                              )?.router_id
-                            }`}
-                          </div>
-                          <div>
-                            {`vxnet: ${
-                              networks.get(
-                                get(urlObj, 'network.vpc_network.network_id')
-                              )?.vxnet_id
-                            }`}
-                          </div>
-                        </>
-                      }
-                      hasPadding
-                    >
-                      <span title={networkName}>
-                        {getEllipsisText(networkName, 26)}
-                      </span>
-                    </Tooltip>
-                  ) : (
-                    <span title={networkName}>
-                      {getEllipsisText(networkName, 26)}
-                    </span>
-                  )}
-                </div>
-              )}
             </div>
           )
         }
@@ -368,15 +324,16 @@ const DataSourceList = observer(() => {
     },
     {
       title: '数据源可用性',
-      dataIndex: 'connection',
-      render: (v: 1 | 3, row: Record<string, any>) => {
-        const isItemLoading = itemLoadingHistories?.[row.source_id]?.size
-        return getPingConnection(isItemLoading ? -1 : v, row)
+      dataIndex: 'last_connection',
+      render: (v?: Record<string, any>, row?: Record<string, any>) => {
+        const isItemLoading = itemLoadingHistories?.[row?.source_id]?.size
+        // eslint-disable-next-line no-nested-ternary
+        return getPingConnection(isItemLoading ? -1 : v ? v?.result : 0, row)
       },
     },
     {
       title: '数据源描述',
-      dataIndex: 'comment',
+      dataIndex: 'desc',
       render: (v: string) => {
         return (
           <Tooltip content={v} theme="dark" hasPadding>

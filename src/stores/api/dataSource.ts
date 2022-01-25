@@ -7,7 +7,10 @@ export interface IDataSourceParams {
 }
 
 export const loadSourceKind = ({ regionId, spaceId }: IDataSourceParams) =>
-  request({ region: regionId, uri: `/v1/workspace/${spaceId}/source/kind` })
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/datasource/kinds`,
+  })
 
 export const createDataSource = ({
   regionId,
@@ -16,7 +19,7 @@ export const createDataSource = ({
 }: IDataSourceParams) =>
   request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/source`,
+    uri: `/v1/workspace/${spaceId}/datasource`,
     body: rest,
     method: 'POST',
   })
@@ -41,7 +44,7 @@ export const loadDataSource = ({
 }: IDataSourceParams) =>
   request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/source`,
+    uri: `/v1/workspace/${spaceId}/datasource`,
     query: rest,
   })
 

@@ -35,6 +35,14 @@ const hostReg = /^([0-9a-zA-Z_.-]+(:\d{1,5})?,)*([0-9a-zA-Z_.-]+(:\d{1,5})?)?$/
 const { CollapseItem } = Collapse
 const { TextField, TextAreaField, NumberField, PasswordField } = Form
 
+const hiddenStyle = css`
+  ${tw`mb-0! h-0 opacity-0`}
+  transition: opacity 0.5s linear, height 0.5s linear, marge 0.5s linear;
+`
+const visibleStyle = css`
+  ${tw`mb-6 h-auto opacity-100`}
+  transition: opacity 0.5s linear, height 0.5s linear, marge 0.5s linear;
+`
 const Root = styled('div')(() => [
   css`
     div[class='help'] {
@@ -390,6 +398,8 @@ const DataSourceForm = ({
         }
   })
 
+  const [showPing, setShowPing] = useState(false)
+
   useMount(() => {
     if (sourceInfo) {
       setNetWork((draft) => {
@@ -412,23 +422,12 @@ const DataSourceForm = ({
       if (formElem?.validateForm()) {
         const {
           name,
-          comment,
-          network_id: networkId,
+          desc,
+          network_id: netWorkId,
           ...others
         } = formElem.getFieldsValue()
         let rest = omit(others, 'utype')
-        if (networkId) {
-          rest.network = {
-            type: 2,
-            vpc_network: {
-              network_id: networkId,
-            },
-          }
-        } else {
-          rest.network = {
-            type: 1,
-          }
-        }
+
         if (urlType === 'hdfs') {
           const shiftArr = ['name_node', 'port']
           rest.nodes = pick(rest, shiftArr)
@@ -436,7 +435,7 @@ const DataSourceForm = ({
         }
         const data = {
           name,
-          comment,
+          desc,
           url: {
             [urlType]: rest,
           },
@@ -532,9 +531,9 @@ const DataSourceForm = ({
               ]}
             />
             <TextAreaField
-              name="comment"
+              name="desc"
               tw="w-8/12"
-              defaultValue={get(sourceInfo, 'comment', '')}
+              defaultValue={get(sourceInfo, 'desc', '')}
               rows={4}
               label="数据源描述"
               disabled={isViewMode}
@@ -630,14 +629,18 @@ const DataSourceForm = ({
             })}
             <Field>
               <Divider>
-                <Center>
-                  <Icon name="chevron-up" />
+                <Center
+                  tw="cursor-pointer"
+                  onClick={() => setShowPing((_) => !_)}
+                >
+                  <Icon name={showPing ? 'chevron-up' : 'chevron-down'} />
                   <span tw="ml-2">网络连通及数据源可用性测试</span>
                 </Center>
               </Divider>
             </Field>
             <SelectWithRefresh
               name="network_id"
+              css={showPing ? visibleStyle : hiddenStyle}
               value={network.id}
               placeholder="请选择网络配置"
               validateOnChange
@@ -679,7 +682,7 @@ const DataSourceForm = ({
               isLoading={networksIsFetching}
               searchable={false}
             />
-            <Field>
+            <Field css={showPing ? visibleStyle : hiddenStyle}>
               <Label>
                 <AffixLabel help="检查数据源参数是否正确" required={false}>
                   数据源可用性测试

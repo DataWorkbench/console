@@ -66,7 +66,7 @@ const DataSourceModal = observer(
         if (data && curkind?.source_type) {
           const params = {
             op,
-            source_type: curkind.source_type,
+            type: curkind.source_type,
             ...data,
           }
           if (op === 'update') {
