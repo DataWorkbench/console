@@ -13,13 +13,13 @@ const SpaceListsToolBar = observer(() => {
     defaultColumns,
     cardView,
     columnSettingsKey,
-    optSpaces,
     queryRefetch,
     queryKeyWord,
     ifNoData,
+    selectedSpaces,
   } = stateStore
   const [searchName, setSearchName] = useState(queryKeyWord)
-  const curSpacesLen = optSpaces.length
+  const curSpacesLen = selectedSpaces.length
 
   const reloadWorkSpace = () => {
     stateStore.set({ queryRefetch: true })
@@ -42,7 +42,7 @@ const SpaceListsToolBar = observer(() => {
   }
 
   const handleMenuClick = (e, key, value) => {
-    stateStore.set({ curSpaceOpt: value })
+    stateStore.set({ curSpaceOpt: value, optSpaces: selectedSpaces })
   }
 
   return (
@@ -63,7 +63,9 @@ const SpaceListsToolBar = observer(() => {
               <Menu onClick={handleMenuClick}>
                 <MenuItem
                   value="update"
-                  disabled={curSpacesLen !== 1 || optSpaces[0].status === 2}
+                  disabled={
+                    curSpacesLen !== 1 || selectedSpaces[0].status === 2
+                  }
                 >
                   <Icon name="pen" />
                   修改工作空间
@@ -73,7 +75,7 @@ const SpaceListsToolBar = observer(() => {
                   disabled={
                     curSpacesLen === 0 ||
                     curSpacesLen ===
-                      optSpaces.filter((o) => o.status === 2).length
+                      selectedSpaces.filter((o) => o.status === 2).length
                   }
                 >
                   <i className="if if-minus-square" tw="text-base mr-2" />
@@ -84,7 +86,7 @@ const SpaceListsToolBar = observer(() => {
                   disabled={
                     curSpacesLen === 0 ||
                     curSpacesLen ===
-                      optSpaces.filter((o) => o.status === 1).length
+                      selectedSpaces.filter((o) => o.status === 1).length
                   }
                 >
                   <Icon name="start" />
