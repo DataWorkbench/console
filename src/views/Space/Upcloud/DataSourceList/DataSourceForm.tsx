@@ -1,22 +1,31 @@
-import React, { useRef, useCallback, useEffect, MutableRefObject } from 'react'
-import { Field, Label, Control, Collapse, RadioButton } from '@QCFE/lego-ui'
+import React, {
+  useRef,
+  useCallback,
+  useEffect,
+  MutableRefObject,
+  useContext,
+  useState,
+} from 'react'
+import { Field, Label, Control, Collapse } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get, set, trim, flatten, omit, pick, merge } from 'lodash-es'
+import { get, set, trim, omit, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
-import { Form, Button, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
-import { useQueryClient } from 'react-query'
+import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
+import { useStore } from 'hooks'
 import {
-  useStore,
-  useMutationSource,
-  useInfiniteQueryNetworks,
-  getNetworkKey,
-} from 'hooks'
-import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
+  AffixLabel,
+  Center,
+  Divider,
+  SelectWithRefresh,
+  TextLink,
+} from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
 import HdfsNodeField from './HdfsNodeField'
+import { DataSourcePingButton } from './DataSourcePing'
+import { NetworkContext } from './NetworkProvider'
 
 const ipReg =
   /(^(((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))\.){3}((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))$)|(^((([a-zA-Z0-9_-])+\.)+([a-zA-Z])+)$)/
@@ -24,13 +33,7 @@ const ipReg =
 const hostReg = /^([0-9a-zA-Z_.-]+(:\d{1,5})?,)*([0-9a-zA-Z_.-]+(:\d{1,5})?)?$/
 
 const { CollapseItem } = Collapse
-const {
-  TextField,
-  TextAreaField,
-  NumberField,
-  PasswordField,
-  RadioGroupField,
-} = Form
+const { TextField, TextAreaField, NumberField, PasswordField } = Form
 
 const Root = styled('div')(() => [
   css`
@@ -341,24 +344,27 @@ const DataSourceForm = ({
   getFormData,
   onFieldValueChange,
 }: IFormProps) => {
-  const queryClient = useQueryClient()
-  const [network, setNetWork] = useImmer<{ type: 'vpc' | 'eip'; id: string }>({
+  const [network, setNetWork] = useImmer<{
+    type: 'vpc' | 'eip'
+    id: string
+    name: string
+  }>({
     type: 'vpc',
     id: '',
+    name: '',
   })
   const ref = useRef<Form>(null)
-  const mutation = useMutationSource()
-  const networksRet = useInfiniteQueryNetworks({
-    offset: 0,
-    limit: 100,
-  })
-  const networks = flatten(
-    networksRet.data?.pages.map((page) => page.infos || [])
-  )
+
   const {
     dataSourceStore: { op, opSourceList },
     dmStore,
   } = useStore()
+
+  const {
+    networks,
+    refreshNetworks,
+    isFetching: networksIsFetching,
+  } = useContext(NetworkContext)
 
   const urlType = resInfo.name.toLowerCase()
   const sourceInfo =
@@ -368,6 +374,21 @@ const DataSourceForm = ({
   const fields = getFieldsInfo(urlType)
 
   const isViewMode = op === 'view'
+
+  const [defaultStatus, setDefaultStatus] = useState<
+    { status: boolean; message?: string } | undefined
+  >(() => {
+    if (op === 'create') {
+      return undefined
+    }
+    return get(opSourceList, '[0].connection') === 1
+      ? {
+          status: true,
+        }
+      : {
+          status: false,
+        }
+  })
 
   useMount(() => {
     if (sourceInfo) {
@@ -432,25 +453,6 @@ const DataSourceForm = ({
       getFormData.current = parseFormData
     }
   }, [getFormData, parseFormData])
-
-  const hasPingRef = useRef(false)
-  const handlePing = () => {
-    hasPingRef.current = true
-    const formData = parseFormData()
-    if (formData) {
-      mutation.mutate(
-        {
-          op: 'ping',
-          source_type: resInfo.source_type,
-          url: formData.url,
-        },
-        {
-          onSuccess: () => {},
-          onError: () => {},
-        }
-      )
-    }
-  }
 
   return (
     <Root>
@@ -567,160 +569,6 @@ const DataSourceForm = ({
               </div>
             }
           >
-            <RadioGroupField
-              name="utype"
-              value={network.type}
-              disabled={isViewMode}
-              label={<AffixLabel>网络连接方式</AffixLabel>}
-              onChange={(v) =>
-                setNetWork((draft) => {
-                  draft.type = v
-                })
-              }
-              help={
-                <>
-                  详情请见
-                  <HelpCenterLink
-                    href="/manual/data_up_cloud/connect/"
-                    isIframe={false}
-                  >
-                    网络连通文档
-                  </HelpCenterLink>
-                </>
-              }
-            >
-              <RadioButton value="vpc">内网（推荐）</RadioButton>
-              <RadioButton value="eip">公网</RadioButton>
-            </RadioGroupField>
-            {network.type === 'vpc' && (
-              <>
-                <SelectWithRefresh
-                  name="network_id"
-                  value={network.id}
-                  placeholder="请选择网络配置"
-                  validateOnChange
-                  disabled={isViewMode}
-                  label={<AffixLabel>网络配置</AffixLabel>}
-                  onChange={(v: string) => {
-                    setNetWork((draft) => {
-                      draft.id = v
-                    })
-                  }}
-                  onRefresh={() => {
-                    queryClient.invalidateQueries(getNetworkKey())
-                  }}
-                  help={
-                    <>
-                      如需选择新的网络配置，您可以
-                      <span
-                        tw="text-green-11 cursor-pointer"
-                        onClick={() => dmStore.setNetWorkOp('create')}
-                      >
-                        绑定VPC
-                      </span>
-                    </>
-                  }
-                  schemas={[
-                    {
-                      rule: {
-                        required: true,
-                        isExisty: false,
-                      },
-                      status: 'error',
-                      help: (
-                        <>
-                          请选择网络, 如没有可选择的网络配置，您可以
-                          <span
-                            tw="text-green-11 cursor-pointer"
-                            onClick={() => dmStore.setNetWorkOp('create')}
-                          >
-                            绑定 VPC
-                          </span>
-                        </>
-                      ),
-                    },
-                  ]}
-                  options={networks.map(({ name, id }) => ({
-                    label: name,
-                    value: id,
-                  }))}
-                  isLoading={networksRet.isFetching}
-                  isLoadingAtBottom
-                  searchable={false}
-                  onMenuScrollToBottom={() => {
-                    if (networksRet.hasNextPage) {
-                      networksRet.fetchNextPage()
-                    }
-                  }}
-                  bottomTextVisible
-                />
-                {/* <SelectField
-                  name="network_id"
-                  value={network.id}
-                  placeholder="请选择网络配置"
-                  validateOnChange
-                  disabled={isViewMode}
-                  label={<AffixLabel>网络配置</AffixLabel>}
-                  onChange={(v: string) => {
-                    setNetWork((draft) => {
-                      draft.id = v
-                    })
-                  }}
-                  help={
-                    <>
-                      如需选择新的网络配置，您可以
-                      <span
-                        tw="text-green-11 cursor-pointer"
-                        onClick={() => dmStore.setNetWorkOp('create')}
-                      >
-                        绑定VPC
-                      </span>
-                    </>
-                  }
-                  schemas={[
-                    {
-                      rule: {
-                        required: true,
-                        isExisty: false,
-                      },
-                      status: 'error',
-                      help: (
-                        <>
-                          请选择网络, 如没有可选择的网络配置，您可以
-                          <span
-                            tw="text-green-11 cursor-pointer"
-                            onClick={() => dmStore.setNetWorkOp('create')}
-                          >
-                            绑定 VPC
-                          </span>
-                        </>
-                      ),
-                    },
-                  ]}
-                  options={networks.map(({ name, id }) => ({
-                    label: name,
-                    value: id,
-                  }))}
-                  isLoading={networksRet.isFetching}
-                  isLoadingAtBottom
-                  searchable={false}
-                  onMenuScrollToBottom={() => {
-                    if (networksRet.hasNextPage) {
-                      networksRet.fetchNextPage()
-                    }
-                  }}
-                  bottomTextVisible
-                />
-                <Button
-                  disabled={isViewMode}
-                  onClick={() => {
-                    queryClient.invalidateQueries(getNetworkKey())
-                  }}
-                >
-                  <Icon name="refresh" size={20} />
-                </Button> */}
-              </>
-            )}
             {fields.map((field) => {
               const {
                 name,
@@ -781,57 +629,68 @@ const DataSourceForm = ({
               )
             })}
             <Field>
+              <Divider>
+                <Center>
+                  <Icon name="chevron-up" />
+                  <span tw="ml-2">网络连通及数据源可用性测试</span>
+                </Center>
+              </Divider>
+            </Field>
+            <SelectWithRefresh
+              name="network_id"
+              value={network.id}
+              placeholder="请选择网络配置"
+              validateOnChange
+              disabled={isViewMode}
+              label="网络配置"
+              onChange={(v: string, option: Record<string, any>) => {
+                setNetWork((draft) => {
+                  draft.id = v
+                  draft.name = option.label
+                })
+                setDefaultStatus(undefined)
+              }}
+              onRefresh={refreshNetworks}
+              help={
+                <>
+                  <div>
+                    <span tw="mr-0.5">详情请见</span>
+                    <TextLink color="blue" type="button" to="###">
+                      网络配置选择说明文档
+                    </TextLink>
+                  </div>
+                  <div>
+                    <span tw="mr-0.5">
+                      选择网络后可测试对应此网络的数据源可用性，如需选择新的网络配置，您可
+                    </span>
+                    <span
+                      tw="text-green-11 cursor-pointer"
+                      onClick={() => dmStore.setNetWorkOp('create')}
+                    >
+                      绑定VPC
+                    </span>
+                  </div>
+                </>
+              }
+              options={networks.map(({ name, id }) => ({
+                label: name,
+                value: id,
+              }))}
+              isLoading={networksIsFetching}
+              searchable={false}
+            />
+            <Field>
               <Label>
                 <AffixLabel help="检查数据源参数是否正确" required={false}>
                   数据源可用性测试
                 </AffixLabel>
               </Label>
-              <Control>
-                {mutation.isLoading ? (
-                  <Button
-                    // loading={mutation.isLoading}
-                    type="outlined"
-                  >
-                    <Loading size="small" tw="w-[30px]" /> 测试中
-                  </Button>
-                ) : (
-                  <Button
-                    // loading={mutation.isLoading}
-                    type="outlined"
-                    onClick={handlePing}
-                  >
-                    {hasPingRef.current ? '重新测试' : '开始测试'}
-                  </Button>
-                )}
-              </Control>
-              {mutation.isError ? (
-                <div
-                  tw="text-red-10 flex items-center mt-2"
-                  css={css`
-                    svg {
-                      ${tw`fill-[#CA2621] text-white`}
-                    }
-                  `}
-                >
-                  <Icon name="error" />
-                  不可用，${get(mutation, 'error.message', '')}
-                </div>
-              ) : (
-                hasPingRef.current &&
-                !mutation.isLoading && (
-                  <div
-                    tw="flex items-center mt-2.5"
-                    css={css`
-                      svg {
-                        ${tw`fill-[#059669] text-white`}
-                      }
-                    `}
-                  >
-                    <Icon name="success" size={16} />
-                    <span tw="ml-1 text-green-11">测试通过</span>
-                  </div>
-                )
-              )}
+              <DataSourcePingButton
+                sourceType={resInfo.source_type}
+                getValue={parseFormData}
+                defaultStatus={defaultStatus}
+                network={network}
+              />
             </Field>
           </CollapseItem>
         </CollapseWrapper>

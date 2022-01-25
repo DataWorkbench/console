@@ -45,6 +45,7 @@ const DataSourceModal = observer(
       refetch,
     } = useQuerySourceKind(regionId, spaceId)
     const mutation = useMutationSource()
+
     const curkind =
       op === 'create'
         ? sourceKinds.find((k) => k.name === state.dbName)
@@ -206,6 +207,7 @@ const DataSourceModal = observer(
                         getFormData={getFormData as any}
                         resInfo={curkind}
                         onFieldValueChange={handleFieldValueChange}
+                        connectionStatus={opSourceList[0]?.connection as number}
                       />
                     )
                   )

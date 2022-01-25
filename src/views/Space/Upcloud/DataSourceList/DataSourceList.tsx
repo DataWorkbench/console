@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useReducer } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
@@ -19,19 +19,20 @@ import {
   ToolBarRight,
   utils,
 } from '@QCFE/qingcloud-portal-ui'
-import {
-  useQuerySource,
-  useMutationSource,
-  useStore,
-  useQueryNetworks,
-} from 'hooks'
+import { useQuerySource, useMutationSource, useStore } from 'hooks'
 import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
 import { getHelpCenterLink } from 'utils'
 
-import { pingDataSource } from 'stores/api'
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
 import { SourceKindImg } from './styled'
+import {
+  DataSourcePingHistoriesModal,
+  DataSourcePingModal,
+  getPingConnection,
+} from './DataSourcePing'
+import { NetworkContext } from './NetworkProvider'
+import { usePingEvent } from './DataSourcePing/hooks'
 
 const { MenuItem } = Menu
 
@@ -131,13 +132,21 @@ const DataSourceList = observer(() => {
   const [isReFetching, setIsReFetching] = useState(false)
   const [delText, setDelText] = useState('')
   const {
-    dataSourceStore: { op, opSourceList, mutateOperation, sourceKinds },
+    dataSourceStore: {
+      op,
+      opSourceList,
+      mutateOperation,
+      sourceKinds,
+      showPingHistories,
+      addEmptyHistories,
+      addItemHistories,
+      removeItemHistories,
+      itemLoadingHistories,
+    },
   } = useStore()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
 
-  const pingIds = useRef(new Map<string, 'loading' | 'success' | 'fail'>())
-  const [, forceUpdate] = useReducer((x) => x + 1, 0)
   const [filter, setFilter] = useImmer<{
     regionId: string
     spaceId: string
@@ -157,20 +166,33 @@ const DataSourceList = observer(() => {
   const { isLoading, refetch, data } = useQuerySource(filter)
   const mutation = useMutationSource()
 
-  const { data: networkResp, isFetching } = useQueryNetworks({
-    limit: 100, // TODO: 这里暂时写死 100
-  })
-  const networks: Map<string, Record<string, any>> = useMemo(() => {
-    if (!isFetching && networkResp && networkResp?.ret_code === 0) {
-      return new Map(
-        (networkResp?.infos || []).map((info: Record<string, any>) => [
-          info.id,
-          info,
-        ])
-      )
+  const { networkMap: networks } = useContext(NetworkContext)
+
+  const shouldRefetch = useRef<string>()
+  const removeItem = (sourceId: string, item: Record<'uuid' & string, any>) => {
+    removeItemHistories(sourceId, item)
+    const shouldUpdate =
+      !itemLoadingHistories[sourceId] || !itemLoadingHistories[sourceId].size
+    if (shouldUpdate && op === '') {
+      refetch()
+    } else if (shouldUpdate) {
+      shouldRefetch.current = ''
     }
-    return new Map()
-  }, [isFetching, networkResp])
+  }
+
+  useEffect(() => {
+    if (shouldRefetch.current === op) {
+      shouldRefetch.current = undefined
+      refetch()
+    }
+  }, [op, refetch])
+
+  usePingEvent({
+    addEmpty: addEmptyHistories,
+    addItem: addItemHistories,
+    updateEmpty: addEmptyHistories,
+    removeItem,
+  })
 
   useEffect(() => {
     setFilter((draft) => {
@@ -194,32 +216,6 @@ const DataSourceList = observer(() => {
         mutateOperation()
       },
     })
-  }
-
-  const pingMutate = (params: Record<string, any>, id: string) => {
-    const refetchFn = () => {
-      const iter = pingIds.current.values()
-      let item = null
-      do {
-        item = iter.next()
-        if (item.value === 'loading') {
-          forceUpdate()
-          return
-        }
-      } while (!item.done)
-      pingIds.current.clear()
-      refetch()
-    }
-    pingDataSource({ regionId, spaceId, ...params }).then(
-      () => {
-        pingIds.current.set(id, 'success')
-        refetchFn()
-      },
-      () => {
-        pingIds.current.set(id, 'fail')
-        refetchFn()
-      }
-    )
   }
 
   const handleOk = () => {
@@ -373,36 +369,9 @@ const DataSourceList = observer(() => {
     {
       title: '数据源可用性',
       dataIndex: 'connection',
-      render: (v: number, row: any) => {
-        const renderFn = (state: 'loading' | 'success' | 'fail') => {
-          switch (state) {
-            case 'loading':
-              return (
-                <>
-                  <Icon name="if-load" tw="mr-1" size={16} />
-                  检测中
-                </>
-              )
-            case 'success':
-              return (
-                <Center tw="space-x-1">
-                  <Icons name="circle_check" size={16} />
-                  <span>可用</span>
-                </Center>
-              )
-            default:
-              return (
-                <Center tw="space-x-1">
-                  <Icons name="circle_close" size={16} />
-                  <span>不可用</span>
-                </Center>
-              )
-          }
-        }
-        if (pingIds.current.has(get(row, 'source_id'))) {
-          return renderFn(pingIds.current.get(get(row, 'source_id'))!)
-        }
-        return renderFn(v === 1 ? 'success' : 'fail')
+      render: (v: 1 | 3, row: Record<string, any>) => {
+        const isItemLoading = itemLoadingHistories?.[row.source_id]?.size
+        return getPingConnection(isItemLoading ? -1 : v, row)
       },
     },
     {
@@ -457,17 +426,18 @@ const DataSourceList = observer(() => {
               <Menu
                 onClick={(e: React.SyntheticEvent, key: any) => {
                   mutateOperation(key, [info])
-                  if (key === 'ping') {
-                    pingIds.current.set(get(info, 'source_id'), 'loading')
-                    pingMutate(
-                      {
-                        op: key,
-                        source_type: info.source_type,
-                        url: info.url,
-                      },
-                      info.source_id
-                    )
-                  }
+                  console.log(2222)
+                  // if (key === 'ping') {
+                  //   pingIds.current.set(get(info, 'source_id'), 'loading')
+                  //   pingMutate(
+                  //     {
+                  //       op: key,
+                  //       source_type: info.source_type,
+                  //       url: info.url,
+                  //     },
+                  //     info.source_id
+                  //   )
+                  // }
                 }}
               >
                 <MenuItem key="ping">
@@ -735,6 +705,8 @@ const DataSourceList = observer(() => {
         }
         return null
       })()}
+      {op === 'ping' && <DataSourcePingModal />}
+      {showPingHistories && <DataSourcePingHistoriesModal />}
     </>
   )
 })
