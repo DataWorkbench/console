@@ -368,12 +368,25 @@ const UploadModal = (props: any) => {
                       <span tw="text-red-10 ml-2">文件上传失败</span>
                     )}
                   </div>
-                  {cancelRef.current ? (
+                  <Tooltip
+                    theme="light"
+                    placement="top"
+                    content={
+                      <Center tw="h-9 px-3 text-neut-13">移除资源</Center>
+                    }
+                  >
                     <PopConfirm
                       type="warning"
                       okText="移除"
                       okType="danger"
-                      content="此时移除，将清空已上传资源，确定移除资源吗？"
+                      content={
+                        // eslint-disable-next-line no-nested-ternary
+                        cancelRef.current
+                          ? '此时移除，将清空已上传资源，确定移除资源吗？'
+                          : mutation.isLoading
+                          ? '正在上传资源，确定取消并移除资源吗？'
+                          : '确定移除资源吗？'
+                      }
                       onOk={handleClear}
                       closeAfterClick={false}
                     >
@@ -384,23 +397,7 @@ const UploadModal = (props: any) => {
                         clickable
                       />
                     </PopConfirm>
-                  ) : (
-                    <Tooltip
-                      theme="light"
-                      placement="top"
-                      content={
-                        <Center tw="h-9 px-3 text-neut-13">移除资源</Center>
-                      }
-                    >
-                      <Icon
-                        tw="hidden hover:bg-neut-13! cursor-pointer"
-                        className="is-right"
-                        name="close"
-                        clickable
-                        onClick={handleClear}
-                      />
-                    </Tooltip>
-                  )}
+                  </Tooltip>
                 </>
               )}
             </ControlWrap>
