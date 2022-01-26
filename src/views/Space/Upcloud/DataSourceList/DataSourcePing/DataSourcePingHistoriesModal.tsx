@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
-import { Table } from '@QCFE/lego-ui'
-import { Modal } from '@QCFE/qingcloud-portal-ui'
+import { Modal, Table } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
 import React, { useEffect, useMemo } from 'react'
 import { useImmer } from 'use-immer'
@@ -8,7 +7,6 @@ import { useImmer } from 'use-immer'
 import { useQuerySourceHistories } from 'hooks'
 import emitter from 'utils/emitter'
 import { useStore } from 'stores'
-import { TimeInterval } from 'components'
 import { SOURCE_PING_RESULT } from './constant'
 import { getPingConnection } from './getPingConnection'
 
@@ -19,23 +17,24 @@ const columns = [
   },
   {
     title: '可用性测试',
-    dataIndex: 'connection',
+    dataIndex: 'result',
     render: getPingConnection,
   },
   {
     title: '测试开始时间',
-    dataIndex: 'startAt',
+    dataIndex: 'created',
     render: (val: number) => {
       return dayjs(val * 1000).format('YYYY-MM-DD HH:mm:ss')
     },
   },
   {
     title: '耗时',
-    dataIndex: 'consuming',
+    dataIndex: 'elapse',
     width: 100,
-    render: (val?: number, record?: Record<string, any>) => (
-      <TimeInterval consuming={val} startTime={record?.startAt} />
-    ),
+    render: (v?: number) => (v !== undefined ? `${v} 秒` : ''),
+    // render: (val?: number, record?: Record<string, any>) => (
+    //   <TimeInterval consuming={val} startTime={record?.startAt} />
+    // ),
   },
 ]
 
@@ -52,7 +51,7 @@ export const DataSourcePingHistoriesModal = () => {
   const onClose = () => {
     setShowPingHistories(false)
   }
-  const sourceId = get(opSourceList, `[0].source_id`)
+  const sourceId = get(opSourceList, `[0].id`)
   const histories = useMemo(() => {
     if (sourceId) {
       return itemLoadingHistories[sourceId] || new Map()
@@ -64,8 +63,9 @@ export const DataSourcePingHistoriesModal = () => {
     offset: 0,
     limit: 10,
     sourceId,
+    verbose: 1,
   })
-  const { data, refetch } = useQuerySourceHistories(
+  const { data, refetch, isFetching } = useQuerySourceHistories(
     filter,
     Array.from(histories.values()).reverse()
   )
@@ -89,6 +89,7 @@ export const DataSourcePingHistoriesModal = () => {
         dataSource={data?.infos || []}
         columns={columns}
         rowKey="uuid"
+        loading={isFetching}
         pagination={{
           total: data?.total || 0,
           current: filter.offset / filter.limit + 1,

@@ -38,7 +38,10 @@ export const DataSourcePingModal = () => {
   const [defaultStatus, setDefaultStatus] = useState<
     { status: boolean; message?: string } | undefined
   >(
-    get(opSourceList, '[0].connection') === 1
+    // eslint-disable-next-line no-nested-ternary
+    !get(opSourceList, '[0].last_connection')
+      ? undefined
+      : get(opSourceList, '[0].last_connection.result') === 1
       ? {
           status: true,
         }
@@ -52,20 +55,13 @@ export const DataSourcePingModal = () => {
       setValidate('error')
       return undefined
     }
-    const res = pick(opSourceList[0], ['source_type', 'url'])
+    const res = pick(opSourceList[0], ['type', 'url'])
     return merge(res, {
-      url: {
-        [urlType]: {
-          network: {
-            type: 2,
-            vpc_network: {
-              network_id: network.id,
-            },
-          },
-        },
-      },
+      source_id: get(opSourceList[0], 'id'),
+      network_id: network.id,
+      stage: 2,
     })
-  }, [opSourceList, network, urlType])
+  }, [opSourceList, network])
   return (
     <Modal
       visible
@@ -130,7 +126,7 @@ export const DataSourcePingModal = () => {
             getValue={getValue}
             defaultStatus={defaultStatus}
             network={network}
-            sourceId={get(opSourceList[0], 'source_id', '')}
+            sourceId={get(opSourceList[0], 'id', '')}
           />
         </Field>
       </Form>

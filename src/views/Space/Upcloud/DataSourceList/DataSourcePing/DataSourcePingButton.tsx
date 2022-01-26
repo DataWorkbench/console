@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Control, Icon, Loading } from '@QCFE/lego-ui'
 import tw, { css } from 'twin.macro'
-import { merge, now } from 'lodash-es'
+import { merge, now, pick } from 'lodash-es'
 
 import emitter from 'utils/emitter'
 import { useMutationSource, useStore } from 'hooks'
@@ -10,7 +10,6 @@ import { SOURCE_PING_RESULT, SOURCE_PING_START } from './constant'
 
 interface IDataSourcePingButtonProps {
   getValue: () => Record<string, any> | undefined
-  sourceType: number
   defaultStatus?: {
     status: boolean
     message?: string
@@ -23,7 +22,7 @@ interface IDataSourcePingButtonProps {
 }
 
 export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
-  const { getValue, sourceType, defaultStatus, sourceId, network } = props
+  const { getValue, defaultStatus, sourceId, network } = props
   const mutation = useMutationSource()
   const {
     dataSourceStore: { setShowPingHistories },
@@ -49,9 +48,11 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       const item = {
         uuid: Math.random().toString(32).substring(2),
         name: network?.name,
-        id: network?.id,
-        startAt: now() / 1000,
+        network_id: network?.id,
+        source_id: sourceId,
+        created: now() / 1000,
         sourceId,
+        stage: sourceId ? 2 : 1,
       }
       try {
         emitter.emit(
@@ -62,30 +63,33 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         )
         const ret = await mutation.mutateAsync({
           op: 'ping',
-          source_type: sourceType,
-          url: formData.url,
+          ...formData,
         })
         if (ret.ret_code === 0) {
-          pingStatus = true
+          pingStatus = ret.result === 1
+          msg = ret.message
+          emitter.emit(
+            SOURCE_PING_RESULT,
+            merge(item, pick(ret, ['created', 'elapse', 'message', 'result']), {
+              last_connection: ret,
+            })
+          )
         }
       } catch (e: any) {
         pingStatus = false
-        msg = e.toString()
+        msg = e.message
+        emitter.emit(
+          SOURCE_PING_RESULT,
+          merge(item, { message: msg, result: pingStatus ? 1 : 2 })
+        )
       }
-      emitter.emit(
-        SOURCE_PING_RESULT,
-        merge(item, {
-          connection: pingStatus ? 1 : 3,
-          message: msg,
-          consuming: Math.ceil(now() / 1000 - item.startAt),
-        })
-      )
+
       setStatus({
         status: pingStatus,
         message: msg,
       })
     }
-  }, [getValue, mutation, network?.id, network?.name, sourceId, sourceType])
+  }, [getValue, mutation, network?.id, network?.name, sourceId])
 
   const pingHistory = useMemo(() => {
     return (
@@ -122,6 +126,14 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           actionButton
         )}
       </Control>
+      {mutation.isLoading && (
+        <div className="help">
+          <span>
+            正在测试数据源在当前网络配置下的可用性，如需查看更多可点击 测试记录
+          </span>
+          {pingHistory}
+        </div>
+      )}
       {!mutation.isLoading && status && !status.status && (
         <div
           className="help"
@@ -140,14 +152,6 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           </span>
         </div>
       )}
-      {mutation.isLoading && (
-        <div className="help">
-          <span>
-            正在测试数据源在当前网络配置下的可用性，如需查看更多可点击 测试记录
-          </span>
-          {pingHistory}
-        </div>
-      )}
       {!mutation.isLoading && status && status.status && (
         <div
           className="help"
@@ -160,6 +164,12 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         >
           <Icon name="success" size={16} />
           <span tw="ml-1 ">测试通过，如需查看更多可点击</span>
+          {pingHistory}
+        </div>
+      )}
+      {!mutation.isLoading && !status && defaultStatus && (
+        <div className="help">
+          <span tw="ml-1">已有测试记录，如需查看可点击</span>
           {pingHistory}
         </div>
       )}
