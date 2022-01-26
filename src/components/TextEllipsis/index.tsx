@@ -1,16 +1,15 @@
-import { ReactElement, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import tw, { TwStyle } from 'twin.macro'
 import { Tooltip } from '../Tooltip'
 
 export const TextEllipsis = ({
   children: text,
   twStyle,
-  theme = 'dark',
-}: {
-  children: ReactElement | string
+  theme = 'darker',
+}: PropsWithChildren<{
   twStyle?: TwStyle
-  theme?: 'dark' | 'light'
-}) => {
+  theme?: 'dark' | 'light' | 'darker'
+}>) => {
   const ref = useRef<HTMLDivElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
   const [isOver, setIsOver] = useState(false)
