@@ -15,6 +15,7 @@ import {
 import { get, values, omit } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Global, css } from '@emotion/react'
+import { toJS } from 'mobx'
 
 import sourceListBg from 'assets/source-list.svg'
 import DataSourceForm from './DataSourceForm'
@@ -29,7 +30,13 @@ const DataSourceModal = observer(
     const { regionId, spaceId } =
       useParams<{ regionId: string; spaceId: string }>()
     const {
-      dataSourceStore: { op, opSourceList, sourceKinds },
+      dataSourceStore: {
+        op,
+        opSourceList,
+        sourceKinds,
+        emptyHistories,
+        clearEmptyHistories,
+      },
     } = useStore()
 
     const [state, setState] = useImmer({
@@ -49,9 +56,7 @@ const DataSourceModal = observer(
     const curkind =
       op === 'create'
         ? sourceKinds.find((k) => k.name === state.dbName)
-        : sourceKinds.find(
-            (k) => k.source_type === opSourceList[0]?.source_type
-          )
+        : sourceKinds.find((k) => k.source_type === opSourceList[0]?.type)
     const handleDbSelect = (name: string) => {
       setState((draft) => {
         draft.step = 1
@@ -70,11 +75,18 @@ const DataSourceModal = observer(
             ...data,
           }
           if (op === 'update') {
-            params.sourceId = opSourceList[0].source_id
+            params.sourceId = opSourceList[0].id
           }
+          if (op === 'create' && emptyHistories.size) {
+            params.last_connection = toJS(
+              Array.from(emptyHistories.values()).pop()?.last_connection
+            )
+          }
+
           mutation.mutate(params, {
             onSuccess: () => {
               onHide()
+              clearEmptyHistories()
               const queryKey = getSourceKey()
               queryClient.invalidateQueries(queryKey)
             },
@@ -207,7 +219,6 @@ const DataSourceModal = observer(
                         getFormData={getFormData as any}
                         resInfo={curkind}
                         onFieldValueChange={handleFieldValueChange}
-                        connectionStatus={opSourceList[0]?.connection as number}
                       />
                     )
                   )

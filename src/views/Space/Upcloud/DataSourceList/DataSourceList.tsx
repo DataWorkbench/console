@@ -28,20 +28,25 @@ import {
   Icons,
   Tooltip,
   TextLink,
+  TextEllipsis,
 } from 'components'
 import { getHelpCenterLink } from 'utils'
+import { NetworkModal } from 'views/Space/Dm/Network'
 
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
-import { SourceKindImg } from './styled'
 import {
   DataSourcePingHistoriesModal,
   DataSourcePingModal,
   getPingConnection,
 } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
+import { CONNECTION_STATUS, DATASOURCE_STATUS } from './constant'
+import { SourceKindImg } from './styled'
 
 const { MenuItem } = Menu
+
+const connectionListCls = 'data-source-ping-connection-list'
 
 const getEllipsisText = (text: string, lenght: number) => {
   if (!text) return text
@@ -154,6 +159,7 @@ const DataSourceList = observer(() => {
       itemLoadingHistories,
       setShowPingHistories,
     },
+    dmStore: { networkOp },
   } = useStore()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
@@ -236,7 +242,7 @@ const DataSourceList = observer(() => {
     if (['disable', 'enable', 'delete'].includes(op)) {
       handleMutate({
         op,
-        sourceIds: opSourceList.map((r) => r.source_id),
+        sourceIds: opSourceList.map((r) => r.id),
       })
     }
   }
@@ -251,20 +257,14 @@ const DataSourceList = observer(() => {
           (kind) => kind.source_type === info.type
         )?.name
         return (
-          <FlexBox tw="space-x-2 items-center">
+          <FlexBox tw="space-x-2 items-center truncate">
             <Center>
               {sourceKindName && <SourceKindImg type={sourceKindName as any} />}
             </Center>
-            <div tw="flex-1">
-              <div>
-                <Tooltip
-                  content={<div>{info.name}</div>}
-                  hasPadding
-                  theme="darker"
-                >
-                  <span>{getEllipsisText(info.name, 20)}</span>
-                </Tooltip>
-              </div>
+            <div tw="flex-1 truncate">
+              <TextEllipsis>
+                <span>{info.name}</span>
+              </TextEllipsis>
               <div tw="text-neut-8">{v}</div>
             </div>
           </FlexBox>
@@ -275,7 +275,7 @@ const DataSourceList = observer(() => {
       title: '状态',
       dataIndex: 'status',
       render: (v: number) => {
-        if (v === 1) {
+        if (v === DATASOURCE_STATUS.ENABLED) {
           return (
             <Center tw="space-x-1">
               <Icons name="circle_enable" size={12} />
@@ -344,34 +344,36 @@ const DataSourceList = observer(() => {
       dataIndex: 'last_connection',
       render: (v?: Record<string, any>, row?: Record<string, any>) => {
         const {
-          result = 0,
+          result = CONNECTION_STATUS.UNDO,
           network_info: networkInfo,
           network_id: networkId,
         } = v ?? { result: 0 }
         const isItemLoading = itemLoadingHistories?.[row?.source_id]?.size
-        const random = Math.random().toString(32).slice(2)
         return (
           <>
             <Center
               tw="truncate space-x-1"
               css={css`
                 &:hover {
-                  .${random} {
+                  .${connectionListCls} {
                     ${tw`visible`}
                   }
                 }
                 .ping-connection-status {
                   ${tw`text-neut-15`}
                 }
-                .${random} {
+                .${connectionListCls} {
                   ${tw`invisible`}
                 }
               `}
             >
-              {getPingConnection(isItemLoading ? -1 : result, {})}
+              {getPingConnection(
+                isItemLoading ? CONNECTION_STATUS.LOADING : result,
+                {}
+              )}
               <TextLink
                 color="green"
-                className={random}
+                className={connectionListCls}
                 hasIcon={false}
                 onClick={() => {
                   mutateOperation('', [row])
@@ -456,29 +458,20 @@ const DataSourceList = observer(() => {
               <Menu
                 onClick={(e: React.SyntheticEvent, key: any) => {
                   mutateOperation(key, [info])
-                  console.log(2222)
-                  // if (key === 'ping') {
-                  //   pingIds.current.set(get(info, 'source_id'), 'loading')
-                  //   pingMutate(
-                  //     {
-                  //       op: key,
-                  //       source_type: info.source_type,
-                  //       url: info.url,
-                  //     },
-                  //     info.source_id
-                  //   )
-                  // }
                 }}
               >
                 <MenuItem key="ping">
                   <Icon name="if-doublecheck" tw="mr-2" />
                   可用性测试
                 </MenuItem>
-                <MenuItem key="update" disabled={info.status === 2}>
+                <MenuItem
+                  key="update"
+                  disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                >
                   <Icon name="pen" tw="mr-2" />
                   编辑
                 </MenuItem>
-                {info.status === 2 ? (
+                {info.status === DATASOURCE_STATUS.DISABLED ? (
                   <MenuItem key="enable">
                     <Icon name="start" tw="mr-2" />
                     启用
@@ -610,7 +603,7 @@ const DataSourceList = observer(() => {
               selectType="checkbox"
               dataSource={sourceList}
               columns={columns}
-              rowKey="source_id"
+              rowKey="id"
               tw="pb-4 "
               selectedRowKeys={selectedRowKeys}
               onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
@@ -698,13 +691,9 @@ const DataSourceList = observer(() => {
                     rowKey="source_id"
                     columns={columns
                       .filter((col: any) =>
-                        [
-                          'name',
-                          'source_type',
-                          'source_id',
-                          'url',
-                          'created',
-                        ].includes(col.dataIndex)
+                        ['name', 'type', 'id', 'url', 'created'].includes(
+                          col.dataIndex
+                        )
                       )
                       .map((col: any) =>
                         pick(col, ['title', 'dataIndex', 'render', 'width'])
@@ -737,6 +726,7 @@ const DataSourceList = observer(() => {
       })()}
       {op === 'ping' && <DataSourcePingModal />}
       {showPingHistories && <DataSourcePingHistoriesModal />}
+      {networkOp === 'create' && <NetworkModal appendToBody />}
     </>
   )
 })

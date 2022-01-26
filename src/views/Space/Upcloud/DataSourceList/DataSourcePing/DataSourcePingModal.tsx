@@ -12,20 +12,17 @@ import { NetworkContext } from '../NetworkProvider'
 
 export const DataSourcePingModal = () => {
   const {
-    dataSourceStore: { opSourceList, mutateOperation, sourceKinds },
-    dmStore,
+    dataSourceStore: { opSourceList, mutateOperation },
+    dmStore: { setNetWorkOp },
   } = useStore()
 
-  const sourceType = get(opSourceList, `[0].source_type`)
-  const urlType = (
-    sourceKinds.find((i) => i.source_type === sourceType)?.name || 'mysql'
-  ).toLowerCase()
-  const networkId = get(
-    opSourceList,
-    `[0]url.${urlType}.network.vpc_network.network_id`
-  )
+  // const sourceType = get(opSourceList, `[0].type`)
+  const networkId = get(opSourceList, `[0].last_connection.network_id`)
 
-  const networkName = get(opSourceList, `[0].network_name`)
+  const networkName = get(
+    opSourceList,
+    `[0].last_connection.network_info.network_name`
+  )
 
   const [network, setNetwork] = useImmer({
     id: networkId,
@@ -47,6 +44,7 @@ export const DataSourcePingModal = () => {
         }
       : {
           status: false,
+          message: get(opSourceList, '[0].last_connection.message'),
         }
   )
 
@@ -101,7 +99,7 @@ export const DataSourcePingModal = () => {
                 </span>
                 <span
                   tw="text-green-11 cursor-pointer"
-                  onClick={() => dmStore.setNetWorkOp('create')}
+                  onClick={() => setNetWorkOp('create')}
                 >
                   绑定VPC
                 </span>
@@ -122,7 +120,6 @@ export const DataSourcePingModal = () => {
             </AffixLabel>
           </Label>
           <DataSourcePingButton
-            sourceType={sourceType}
             getValue={getValue}
             defaultStatus={defaultStatus}
             network={network}

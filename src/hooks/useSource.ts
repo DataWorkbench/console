@@ -44,7 +44,7 @@ export const useQuerySourceHistories = (
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
   pingListKey = ['sourceHistories', localList, filter]
-  const { sourceId, offset = 0, limit = 10, verbose } = filter
+  const { sourceId, offset = 0, limit = 10, ...rest } = filter
   return useQuery(
     pingListKey,
     async () => {
@@ -78,7 +78,7 @@ export const useQuerySourceHistories = (
         spaceId,
         regionId,
         sourceId,
-        verbose,
+        ...rest,
       })
       if (res.ret_code === 0) {
         return {
@@ -111,8 +111,10 @@ interface MutationSourceParams {
   source_type?: number
   sourceIds?: string[]
   sourceId?: string
+  source_id?: string
   url?: any
-  networkName?: string
+  network_id?: string
+  stage?: 1 | 2
 }
 
 export const useMutationSource = () => {

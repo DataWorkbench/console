@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import emitter from 'utils/emitter'
-import { SOURCE_PING_RESULT, SOURCE_PING_START } from './constant'
+import { SOURCE_PING_RESULT, SOURCE_PING_START } from '../constant'
 
 type PingEvent = {
   uuid: string

@@ -6,7 +6,11 @@ import { merge, now, pick } from 'lodash-es'
 import emitter from 'utils/emitter'
 import { useMutationSource, useStore } from 'hooks'
 import { TextLink, Tooltip } from 'components'
-import { SOURCE_PING_RESULT, SOURCE_PING_START } from './constant'
+import {
+  DATASOURCE_PING_STAGE,
+  SOURCE_PING_RESULT,
+  SOURCE_PING_START,
+} from '../constant'
 
 interface IDataSourcePingButtonProps {
   getValue: () => Record<string, any> | undefined
@@ -49,21 +53,23 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         uuid: Math.random().toString(32).substring(2),
         name: network?.name,
         network_id: network?.id,
-        source_id: sourceId,
         created: now() / 1000,
         sourceId,
-        stage: sourceId ? 2 : 1,
+        stage: sourceId
+          ? DATASOURCE_PING_STAGE.UPDATE
+          : DATASOURCE_PING_STAGE.CREATE,
+        result: -1, // 测试中
       }
       try {
-        emitter.emit(
-          SOURCE_PING_START,
-          merge(item, {
-            connection: -1,
-          })
-        )
+        emitter.emit(SOURCE_PING_START, item)
         const ret = await mutation.mutateAsync({
           op: 'ping',
-          ...formData,
+          ...pick(formData, 'type', 'url'),
+          network_id: network?.id,
+          source_id: sourceId,
+          stage: sourceId
+            ? DATASOURCE_PING_STAGE.UPDATE
+            : DATASOURCE_PING_STAGE.CREATE,
         })
         if (ret.ret_code === 0) {
           pingStatus = ret.result === 1

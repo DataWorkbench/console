@@ -1,6 +1,7 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Center, Icons, TextEllipsis } from 'components'
-import { CONNECTION_STATUS } from './constant'
+import { ValueOf } from 'utils/types'
+import { CONNECTION_STATUS } from '../constant'
 
 export const getPingConnection = (
   connection?: -1 | 0 | 1 | 2,
@@ -9,16 +10,16 @@ export const getPingConnection = (
   if (connection === undefined) {
     return null
   }
-  const renderFn = (state: 'undo' | 'loading' | 'success' | 'fail') => {
+  const renderFn = (state: ValueOf<typeof CONNECTION_STATUS>) => {
     switch (state) {
-      case 'undo':
+      case CONNECTION_STATUS.UNDO:
         return (
           <Center tw="space-x-1">
             <Icon name="step" tw="mr-1" size={16} />
             <span className="ping-connection-status">未测试</span>
           </Center>
         )
-      case 'loading':
+      case CONNECTION_STATUS.LOADING:
         return (
           <Center tw="space-x-1">
             <Icon name="if-load" tw="mr-1" size={16} />
@@ -27,7 +28,7 @@ export const getPingConnection = (
             </span>
           </Center>
         )
-      case 'success':
+      case CONNECTION_STATUS.SUCCESS:
         return (
           <Center tw="space-x-1">
             <Icons name="circle_check" size={16} />
@@ -52,7 +53,7 @@ export const getPingConnection = (
         )
     }
   }
-  return renderFn(CONNECTION_STATUS[connection])
+  return renderFn(connection)
 }
 
 export default getPingConnection

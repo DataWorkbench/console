@@ -22,7 +22,6 @@ import {
   TextLink,
 } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
-import { NetworkModal } from 'views/Space/Dm/Network'
 import HdfsNodeField from './HdfsNodeField'
 import { DataSourcePingButton } from './DataSourcePing'
 import { NetworkContext } from './NetworkProvider'
@@ -342,7 +341,7 @@ interface IFormProps {
     name: string
     desc?: string
     img?: React.ReactNode
-    source_type: number
+    source_type?: number
   }
   getFormData?: MutableRefObject<() => any>
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
@@ -433,18 +432,18 @@ const DataSourceForm = ({
           rest.nodes = pick(rest, shiftArr)
           rest = omit(rest, shiftArr)
         }
-        const data = {
+        return {
           name,
           desc,
+          type: resInfo.source_type,
           url: {
             [urlType]: rest,
           },
         }
-        return data
       }
       return null
     },
-    [ref, urlType]
+    [ref, urlType, resInfo]
   )
 
   useEffect(() => {
@@ -675,7 +674,7 @@ const DataSourceForm = ({
                   </div>
                 </>
               }
-              options={networks.map(({ name, id }) => ({
+              options={(networks || []).map(({ name, id }) => ({
                 label: name,
                 value: id,
               }))}
@@ -689,7 +688,6 @@ const DataSourceForm = ({
                 </AffixLabel>
               </Label>
               <DataSourcePingButton
-                sourceType={resInfo.source_type}
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
                 network={network}
@@ -698,7 +696,6 @@ const DataSourceForm = ({
           </CollapseItem>
         </CollapseWrapper>
       </Form>
-      {dmStore.networkOp === 'create' && <NetworkModal appendToBody />}
     </Root>
   )
 }
