@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
@@ -7,20 +7,28 @@ import { get, pick } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
-  PageTab,
-  Icon,
   Button,
+  Icon,
+  InputSearch,
   Loading,
+  Modal,
+  PageTab,
   Table,
   ToolBar,
-  Modal,
-  InputSearch,
   ToolBarLeft,
   ToolBarRight,
   utils,
 } from '@QCFE/qingcloud-portal-ui'
-import { useQuerySource, useMutationSource, useStore } from 'hooks'
-import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
+import { useMutationSource, useQuerySource, useStore } from 'hooks'
+import {
+  Card,
+  Center,
+  ContentBox,
+  FlexBox,
+  Icons,
+  Tooltip,
+  TextLink,
+} from 'components'
 import { getHelpCenterLink } from 'utils'
 
 import DataSourceModal from './DataSourceModal'
@@ -90,9 +98,11 @@ const ModalWrapper = styled(Modal)(() => [
     .modal-card-head {
       border-bottom: 0;
     }
+
     .modal-card-body {
       padding-top: 0;
     }
+
     .modal-card-foot {
       border-top: 0;
     }
@@ -142,6 +152,7 @@ const DataSourceList = observer(() => {
       addItemHistories,
       removeItemHistories,
       itemLoadingHistories,
+      setShowPingHistories,
     },
   } = useStore()
   const { regionId, spaceId } =
@@ -154,6 +165,7 @@ const DataSourceList = observer(() => {
     limit: number
     reverse: boolean
     search?: string
+    verbose?: 1 | 2
     [k: string]: any
   }>({
     regionId,
@@ -162,6 +174,7 @@ const DataSourceList = observer(() => {
     reverse: true,
     offset: 0,
     limit: 10,
+    verbose: 2,
   })
   const { isLoading, refetch, data } = useQuerySource(filter)
   const mutation = useMutationSource()
@@ -244,7 +257,11 @@ const DataSourceList = observer(() => {
             </Center>
             <div tw="flex-1">
               <div>
-                <Tooltip content={info.name} hasPadding theme="dark">
+                <Tooltip
+                  content={<div>{info.name}</div>}
+                  hasPadding
+                  theme="darker"
+                >
                   <span>{getEllipsisText(info.name, 20)}</span>
                 </Tooltip>
               </div>
@@ -326,9 +343,64 @@ const DataSourceList = observer(() => {
       title: '数据源可用性',
       dataIndex: 'last_connection',
       render: (v?: Record<string, any>, row?: Record<string, any>) => {
+        const {
+          result = 0,
+          network_info: networkInfo,
+          network_id: networkId,
+        } = v ?? { result: 0 }
         const isItemLoading = itemLoadingHistories?.[row?.source_id]?.size
-        // eslint-disable-next-line no-nested-ternary
-        return getPingConnection(isItemLoading ? -1 : v ? v?.result : 0, row)
+        const random = Math.random().toString(32).slice(2)
+        return (
+          <>
+            <Center
+              tw="truncate space-x-1"
+              css={css`
+                &:hover {
+                  .${random} {
+                    ${tw`visible`}
+                  }
+                }
+                .ping-connection-status {
+                  ${tw`text-neut-15`}
+                }
+                .${random} {
+                  ${tw`invisible`}
+                }
+              `}
+            >
+              {getPingConnection(isItemLoading ? -1 : result, {})}
+              <TextLink
+                color="green"
+                className={random}
+                hasIcon={false}
+                onClick={() => {
+                  mutateOperation('', [row])
+                  setShowPingHistories(true)
+                }}
+              >
+                查看记录
+              </TextLink>
+            </Center>
+            {v && (
+              <Tooltip
+                hasPadding
+                theme="darker"
+                content={
+                  <div>
+                    <div>VPC: {networkInfo?.space_id}</div>
+                    <div>vxnet: {networkInfo?.vxnet_id}</div>
+                  </div>
+                }
+                twChild={tw`truncate`}
+              >
+                <span title={`${networkInfo?.name} (${networkId})`}>
+                  <span>{networkInfo?.name} </span>
+                  <span>({networkId})</span>
+                </span>
+              </Tooltip>
+            )}
+          </>
+        )
       },
     },
     {
@@ -336,7 +408,7 @@ const DataSourceList = observer(() => {
       dataIndex: 'desc',
       render: (v: string) => {
         return (
-          <Tooltip content={v} theme="dark" hasPadding>
+          <Tooltip content={v} theme="darker" hasPadding>
             <span>{getEllipsisText(v, 20)}</span>
           </Tooltip>
         )
@@ -374,6 +446,7 @@ const DataSourceList = observer(() => {
                 &:hover {
                   ${tw`bg-neut-2 rounded-sm`}
                 }
+
                 svg {
                   ${tw`text-black! bg-transparent! fill-[transparent]!`}
                 }

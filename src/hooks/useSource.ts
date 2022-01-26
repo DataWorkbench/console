@@ -10,6 +10,7 @@ import {
   updateDataSource,
   IDataSourceParams,
   pingDataSource,
+  pingDataSourceList,
 } from 'stores/api'
 import { get } from 'lodash-es'
 
@@ -40,12 +41,15 @@ export const useQuerySourceHistories = (
   filter: Record<string, any>,
   localList: Record<string, any>[]
 ) => {
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
   pingListKey = ['sourceHistories', localList, filter]
-  const { sourceId, offset = 0, limit = 10 } = filter
+  const { sourceId, offset = 0, limit = 10, verbose } = filter
   return useQuery(
     pingListKey,
     async () => {
       const tempList = localList.slice(offset, limit + offset)
+
       if (!sourceId) {
         return { infos: tempList, total: localList.length }
       }
@@ -64,24 +68,34 @@ export const useQuerySourceHistories = (
         newOffset = offset + tempList.length
         newLimit = limit - tempList.length
       } else {
-        newOffset = offset + limit - tempList.length
+        newOffset = offset - tempList.length
         newLimit = 10
       }
-      // todo: 接口调用
-      console.log(22222, newOffset, newLimit)
-      const res: any = {
-        total: localList.length,
-        infos: [
-          {
-            id: 1,
-            name: 'hahaha',
-          },
-        ],
+
+      const res = await pingDataSourceList({
+        offset: newOffset,
+        limit: newLimit,
+        spaceId,
+        regionId,
+        sourceId,
+        verbose,
+      })
+      if (res.ret_code === 0) {
+        return {
+          ...res,
+          infos: [
+            ...tempList,
+            ...(res.infos || []).map((i: Record<string, any>) => ({
+              ...i,
+              uuid: Math.random().toString(32).slice(2),
+            })),
+          ],
+          total: res.total + localList.length,
+        }
       }
       return {
-        ...res,
-        infos: [...tempList, ...res.infos],
-        total: res.total + localList.length,
+        infos: tempList,
+        total: localList.length,
       }
     },
     {

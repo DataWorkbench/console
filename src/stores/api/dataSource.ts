@@ -91,7 +91,21 @@ export const pingDataSource = ({
 }: IDataSourceParams) =>
   request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/source/ping`,
+    uri: `/v1/workspace/${spaceId}/datasource/ping`,
     body: rest,
     method: 'POST',
   })
+
+export const pingDataSourceList = ({
+  regionId,
+  spaceId,
+  sourceId,
+  ...rest
+}: IDataSourceParams) => {
+  return request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/datasource/${sourceId}/conn`,
+    body: rest,
+    method: 'GET',
+  })
+}
