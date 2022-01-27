@@ -12,9 +12,9 @@ import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
 import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
-import { css } from 'twin.macro'
+import tw, { css } from 'twin.macro'
 
-import { FlexBox, Center, Modal, TextLink } from 'components'
+import { FlexBox, Center, Modal, TextLink, TextEllipsis } from 'components'
 import {
   useStore,
   useQueryNetworks,
@@ -49,7 +49,7 @@ const NetworkTable = observer(() => {
     limit: 10,
     reverse: true,
     search: '',
-    sort_by: '',
+    sort_by: 'created',
   })
   const queryClient = useQueryClient()
   const mutation = useMutationNetwork()
@@ -67,12 +67,14 @@ const NetworkTable = observer(() => {
         fixedInSetting: true,
         dataIndex: 'name',
         render: (v: any, row: any) => (
-          <FlexBox tw="items-center space-x-1">
+          <FlexBox tw="items-center space-x-1 truncate">
             <Center tw="bg-neut-13 rounded-full p-1.5 mr-2">
               <Icon name="earth" type="light" />
             </Center>
-            <div>
-              <div tw="font-semibold">{row.name}</div>
+            <div tw="truncate">
+              <TextEllipsis twStyle={tw`font-semibold`}>
+                {row.name}
+              </TextEllipsis>
               <div tw="dark:text-neut-8">{row.id}</div>
             </div>
           </FlexBox>
@@ -309,7 +311,7 @@ const NetworkTable = observer(() => {
         <Modal
           noBorder
           visible
-          width={opNetworkList.length > 1 ? 600 : 400}
+          width={opNetworkList.length > 1 ? 800 : 400}
           onCancel={() => setNetWorkOp('')}
           okText="删除"
           onOk={mutateData}
@@ -373,7 +375,13 @@ const NetworkTable = observer(() => {
                 rowKey="id"
                 columns={columns
                   .filter((col) =>
-                    ['name', 'router_id', 'vxnet_id'].includes(col.dataIndex)
+                    [
+                      'name',
+                      'router_id',
+                      'vxnet_id',
+                      'created',
+                      'updated',
+                    ].includes(col.dataIndex)
                   )
                   .map((row) => pick(row, ['title', 'dataIndex', 'render']))}
               />

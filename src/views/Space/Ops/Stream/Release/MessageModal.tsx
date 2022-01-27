@@ -2,6 +2,7 @@ import { DarkModal, FlexBox, TextLink } from 'components'
 import { Collapse, Icon } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
 import dayjs from 'dayjs'
+import SimpleBar from 'simplebar-react'
 import { InstanceState } from '../constants'
 
 const { CollapseItem } = Collapse
@@ -51,62 +52,67 @@ export default function MessageModal({
       onCancel={cancel}
       footer={<div tw="h-8" />}
     >
-      <CollapseWrap tw="px-5 pt-3 pb-1 h-full" defaultActiveKey={['p1', 'p2']}>
-        <CollapseItem key="p1" label="基本信息">
-          <FlexBox tw="py-3">
-            <div tw="w-80">
-              <div tw="flex mb-1">
-                <span tw="text-neut-8 w-[60px] mr-2">ID: </span>
-                <span>{row.id}</span>
-              </div>
-              <div tw="flex mb-1">
-                <span tw="text-neut-8 w-[60px] mr-2">状态: </span>
-                <div tw="flex items-center">
-                  <Icon
-                    tw="mr-2"
-                    name="radio"
-                    color={InstanceState[row.state]?.color}
-                  />
-                  {InstanceState[row.state]?.name}
+      <SimpleBar tw="h-full">
+        <CollapseWrap
+          tw="px-5 pt-3 pb-1 h-full"
+          defaultActiveKey={['p1', 'p2']}
+        >
+          <CollapseItem key="p1" label="基本信息">
+            <FlexBox tw="py-3">
+              <div tw="w-80">
+                <div tw="flex mb-1">
+                  <span tw="text-neut-8 w-[60px] mr-2">ID: </span>
+                  <span>{row.id}</span>
+                </div>
+                <div tw="flex mb-1">
+                  <span tw="text-neut-8 w-[60px] mr-2">状态: </span>
+                  <div tw="flex items-center">
+                    <Icon
+                      tw="mr-2"
+                      name="radio"
+                      color={InstanceState[row.state]?.color}
+                    />
+                    {InstanceState[row.state]?.name}
+                  </div>
+                </div>
+                <div tw="flex">
+                  <span tw="text-neut-8 w-14 mr-3">所属作业: </span>
+                  <span tw="text-green-11 cursor-pointer">{row.job_id}</span>
                 </div>
               </div>
-              <div tw="flex">
-                <span tw="text-neut-8 w-14 mr-3">所属作业: </span>
-                <span tw="text-green-11 cursor-pointer">{row.job_id}</span>
-              </div>
-            </div>
-            <div>
-              <div tw="mb-1">
-                <span tw="text-neut-8 w-14 mr-3">开始时间: </span>
-                <span>
-                  {dayjs(row.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                </span>
-              </div>
-
-              <div tw="mb-1">
-                <span tw="text-neut-8 w-14 mr-3">更新时间: </span>
-                <span>
-                  {dayjs(row.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                </span>
-              </div>
-
               <div>
-                <span tw="text-neut-8 w-14 mr-3">其他信息:</span>
-                <TextLink onClick={() => webUI(row.id)}>Flink UI</TextLink>
+                <div tw="mb-1">
+                  <span tw="text-neut-8 w-14 mr-3">开始时间: </span>
+                  <span>
+                    {dayjs(row.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
+                  </span>
+                </div>
+
+                <div tw="mb-1">
+                  <span tw="text-neut-8 w-14 mr-3">更新时间: </span>
+                  <span>
+                    {dayjs(row.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
+                  </span>
+                </div>
+
+                <div>
+                  <span tw="text-neut-8 w-14 mr-3">其他信息:</span>
+                  <TextLink onClick={() => webUI(row)}>Flink UI</TextLink>
+                </div>
               </div>
-            </div>
-          </FlexBox>
-        </CollapseItem>
-        <CollapseItem key="p2" label="message">
-          <div tw="px-5 py-3 bg-neut-17 h-full overflow-y-scroll">
-            {row.message ? (
-              <div tw="break-normal">{row.message}</div>
-            ) : (
-              <div tw="text-neut-13">暂无 message</div>
-            )}
-          </div>
-        </CollapseItem>
-      </CollapseWrap>
+            </FlexBox>
+          </CollapseItem>
+          <CollapseItem key="p2" label="message">
+            <SimpleBar tw="px-5 py-3 bg-neut-17 h-full overflow-y-scroll">
+              {row.message ? (
+                <div tw="break-normal">{row.message}</div>
+              ) : (
+                <div tw="text-neut-13">暂无 message</div>
+              )}
+            </SimpleBar>
+          </CollapseItem>
+        </CollapseWrap>
+      </SimpleBar>
     </DarkModal>
   )
 }

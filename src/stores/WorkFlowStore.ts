@@ -8,6 +8,7 @@ interface IJob {
   name: string
   type: number
   desc: string
+  version: string
 }
 class WorkFlowStore {
   rootStore

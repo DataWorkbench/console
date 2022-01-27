@@ -4,6 +4,7 @@ export interface IWorkFlowParams {
   regionId?: string
   spaceId?: string
   jobId?: string
+  version?: string
   [k: string]: unknown
 }
 
@@ -64,15 +65,19 @@ export const setStreamJobSchedule = ({
     method: 'PUT',
   })
 
-export const getStreamJobSchedule = ({
-  regionId,
-  spaceId,
-  jobId,
-}: IWorkFlowParams) =>
-  request({
+export const getStreamJobSchedule = (
+  origin: String,
+  { regionId, spaceId, jobId, version }: IWorkFlowParams
+) => {
+  const uri =
+    origin === 'ops'
+      ? `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${version}/schedule`
+      : `/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`
+  return request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`,
+    uri,
   })
+}
 
 export const setStreamJobArgs = ({
   regionId,
@@ -152,12 +157,15 @@ export const releaseStreamJob = ({
   jobId,
   ...rest
 }: IWorkFlowParams) =>
-  request({
-    region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/release`,
-    body: rest,
-    method: 'POST',
-  })
+  request(
+    {
+      region: regionId,
+      uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/release`,
+      body: rest,
+      method: 'POST',
+    },
+    { timeout: 60000 }
+  )
 
 export const inConnectors = ({ regionId, spaceId, jobId }: IStreamParams) => {
   return request({

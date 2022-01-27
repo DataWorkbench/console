@@ -62,7 +62,8 @@ export const ReleaseTable = observer(({ query }: any) => {
     reverse: true,
     search: '',
     status: undefined,
-    sort_by: '',
+    job_id: '',
+    sort_by: 'created',
   })
 
   const toggle = useCallback(
@@ -285,8 +286,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       {
         title: '操作',
         dataIndex: 'id',
-        key: 'table_actions',
-        render: (value: any, row: any) => (
+        render: (_: String, row: any) => (
           <FlexBox tw="items-center">
             <Button type="text" onClick={() => handleOperation(row)}>
               {row.status === 1 ? '暂停' : '恢复'}
@@ -334,8 +334,8 @@ export const ReleaseTable = observer(({ query }: any) => {
     setFilter((draft) => {
       draft.search = query.search
       draft.status = query.status
+      draft.job_id = query.job_id
       draft.offset = 0
-      draft.limit = 10
     })
   }, [query, setFilter])
 
@@ -366,7 +366,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       </FlexBox>
       <Table
         rowKey="id"
-        loading={isFetching}
+        loading={isFetching || mutation.isLoading}
         columns={filterColumn.length > 0 ? filterColumn : columns}
         dataSource={infos || []}
         pagination={{

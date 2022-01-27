@@ -124,6 +124,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       setPackageType(name)
       setFilter((draft) => {
         draft.resource_type = PackageTypeMap[name]
+        draft.offset = 0
       })
 
       setSelectedRows([])
@@ -261,12 +262,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: '上传时间',
-          dataIndex: 'updated',
+          dataIndex: 'created',
           sortable: true,
           sortOrder:
             // filter.reverse ? 'asc' : 'desc',
             // eslint-disable-next-line no-nested-ternary
-            filter.sort_by === 'updated'
+            filter.sort_by === 'created'
               ? filter.reverse
                 ? 'asc'
                 : 'desc'
@@ -281,6 +282,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: '操作',
+          dataIndex: 'table_actions',
           render: (_: string, row: Record<string, any>) => (
             <FlexBox tw="items-center">
               <Button type="text" onClick={() => handleEdit(row)}>
@@ -398,6 +400,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                   onPressEnter={(e: React.SyntheticEvent) => {
                     setFilter((draft) => {
                       draft.search = (e.target as HTMLInputElement).value
+                      draft.offset = 0
                     })
                   }}
                   onClear={() => {

@@ -116,20 +116,24 @@ export const useMutationStreamJobSchedule = () => {
   })
 }
 
-export const useQueryStreamJobSchedule = (options?: UseQueryOptions) => {
+export const useQueryStreamJobSchedule = (
+  origin: String,
+  options?: UseQueryOptions
+) => {
   const {
     workFlowStore: { curJob },
   } = useStore()
   const { regionId, spaceId } = useParams<IRouteParams>()
-  const params = {
+  const params: any = {
     regionId,
     spaceId,
     jobId: curJob?.id,
   }
+  if (origin === 'ops') params.version = curJob?.version
   streamJobScheduleKey = ['jobSchedule', params]
   return useQuery(
     streamJobScheduleKey,
-    async () => getStreamJobSchedule(params),
+    async () => getStreamJobSchedule(origin, params),
     options
   )
 }

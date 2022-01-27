@@ -146,7 +146,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
         <Modal
           noBorder
           visible
-          width={udfSelectedRowKeys.length > 1 ? 800 : 400}
+          width={udfFilterRows.length > 1 ? 800 : 400}
           onCancel={() => setOp('')}
           onOk={mutateData}
           okText="删除"
