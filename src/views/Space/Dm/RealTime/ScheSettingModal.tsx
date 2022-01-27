@@ -488,6 +488,7 @@ const ScheSettingModal = ({
                         disabled={disabled}
                         name="schePeriod"
                         label={<AffixLabel>调度周期</AffixLabel>}
+                        backspaceRemoves={false}
                         value={params.periodType}
                         onChange={(v: TPeriodType) => {
                           setParams((draft) => {
@@ -533,6 +534,7 @@ const ScheSettingModal = ({
                                   <Select
                                     disabled={disabled}
                                     options={hourOpts}
+                                    backspaceRemoves={false}
                                     value={curPeriodData.startHour}
                                     onChange={(v: number) => {
                                       setPeriodData((draft) => {
@@ -557,6 +559,7 @@ const ScheSettingModal = ({
                                   <Select
                                     disabled={disabled}
                                     options={minuOpts}
+                                    backspaceRemoves={false}
                                     value={curPeriodData.stampMinu}
                                     onChange={(v: number) =>
                                       setPeriodData((draft) => {
@@ -574,6 +577,7 @@ const ScheSettingModal = ({
                                 <Control>
                                   <Select
                                     disabled={disabled}
+                                    backspaceRemoves={false}
                                     options={hourOpts.map((opt) => {
                                       return {
                                         ...opt,
@@ -620,6 +624,7 @@ const ScheSettingModal = ({
                                       <Control>
                                         <Select
                                           options={hourOpts}
+                                          backspaceRemoves={false}
                                           value={curPeriodData.startHour}
                                           onChange={(v: number) => {
                                             setPeriodData((draft) => {
@@ -639,6 +644,7 @@ const ScheSettingModal = ({
                                       </Label>
                                       <Control>
                                         <Select
+                                          backspaceRemoves={false}
                                           options={range(1, 24).map((v) => ({
                                             value: v,
                                             label: `${v}`,
@@ -659,6 +665,7 @@ const ScheSettingModal = ({
                                       </Label>
                                       <Control>
                                         <Select
+                                          backspaceRemoves={false}
                                           options={hourOpts.map((opt) => {
                                             return {
                                               ...opt,
@@ -681,11 +688,11 @@ const ScheSettingModal = ({
                                 </Radio>
                                 <Radio value={2}>
                                   <SelectField
-                                    clearable
                                     multi
                                     closeOnSelect={false}
                                     label={<AffixLabel>指定时间</AffixLabel>}
                                     name="hourlys"
+                                    backspaceRemoves={false}
                                     value={curPeriodData.hours}
                                     options={hourOpts}
                                     onChange={(v: []) => {
@@ -729,7 +736,6 @@ const ScheSettingModal = ({
                           return (
                             <>
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label="指定时间"
                                 name="weekly"
@@ -777,7 +783,6 @@ const ScheSettingModal = ({
                           return (
                             <>
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label={<AffixLabel>指定时间</AffixLabel>}
                                 name="monthDaily"
@@ -817,7 +822,6 @@ const ScheSettingModal = ({
                           return (
                             <>
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label="指定月份"
                                 name="monthly"
@@ -834,7 +838,6 @@ const ScheSettingModal = ({
                                 }}
                               />
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label="指定时间"
                                 name="daily"
@@ -935,6 +938,7 @@ const ScheSettingModal = ({
                     <SelectField
                       disabled={disabled}
                       name="concurrencyPolicy"
+                      backspaceRemoves={false}
                       label={
                         <AffixLabel
                           theme="green"
