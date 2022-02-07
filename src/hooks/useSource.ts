@@ -1,28 +1,38 @@
-import { useQuery, useMutation } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import {
-  loadSourceKind,
   createDataSource,
-  loadDataSource,
-  enableDataSource,
-  disableDataSource,
   deleteDataSource,
-  updateDataSource,
+  disableDataSource,
+  enableDataSource,
   IDataSourceParams,
+  loadDataSource,
+  loadSourceKind,
   pingDataSource,
   pingDataSourceList,
+  updateDataSource,
 } from 'stores/api'
 import { get } from 'lodash-es'
 
 let pingListKey: any
 export const getPingHistoriesKey = () => pingListKey
 
-export const useQuerySourceKind = (regionId: string, spaceId: string) => {
+export const useQuerySourceKind = (
+  regionId: string,
+  spaceId: string,
+  op?: string
+) => {
   const queryKey = 'sourcekind'
-  return useQuery(queryKey, async () => {
-    const ret = await loadSourceKind({ spaceId, regionId })
-    return get(ret, 'kinds', [])
-  })
+  return useQuery(
+    queryKey,
+    async () => {
+      const ret = await loadSourceKind({ spaceId, regionId })
+      return get(ret, 'kinds', [])
+    },
+    {
+      enabled: op !== 'create',
+    }
+  )
 }
 
 let queryKey: any = ''
@@ -59,8 +69,8 @@ export const useQuerySourceHistories = (
        * offset1    offset2    offset3
        */
 
-      let newOffset = 0
-      let newLimit = 10
+      let newOffset: number
+      let newLimit: number
       if (tempList.length >= limit) {
         newOffset = 0
         newLimit = 0
