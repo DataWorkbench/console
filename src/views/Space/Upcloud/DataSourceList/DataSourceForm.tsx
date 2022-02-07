@@ -591,14 +591,9 @@ const DataSourceForm = ({
                           if (trim(o.name_node) === '') {
                             return false
                           }
-                          if (
-                            !/^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
-                              o.port
-                            )
-                          ) {
-                            return false
-                          }
-                          return true
+                          return /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
+                            o.port
+                          )
                         },
                         help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
                         status: 'error',
@@ -644,7 +639,11 @@ const DataSourceForm = ({
               placeholder="请选择网络配置"
               validateOnChange
               disabled={isViewMode}
-              label="网络配置"
+              label={
+                <AffixLabel help="测试连通性时使用的网络配置" required={false}>
+                  网络配置
+                </AffixLabel>
+              }
               onChange={(v: string, option: Record<string, any>) => {
                 setNetWork((draft) => {
                   draft.id = v
@@ -657,7 +656,7 @@ const DataSourceForm = ({
                 <>
                   <div>
                     <span tw="mr-0.5">详情请见</span>
-                    <TextLink color="blue" type="button" to="###">
+                    <TextLink color="blue" linkType="button" to="###">
                       网络配置选择说明文档
                     </TextLink>
                   </div>
