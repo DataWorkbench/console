@@ -73,7 +73,11 @@ export const DataSourcePingModal = () => {
           name="network_id"
           placeholder="请选择网络配置"
           validateOnChange
-          label="网络配置"
+          label={
+            <AffixLabel help="测试连通性时使用的网络配置" required={false}>
+              网络配置
+            </AffixLabel>
+          }
           value={network.id}
           onChange={(id: string, option?: Record<string, any>) => {
             setDefaultStatus(undefined)
@@ -89,7 +93,7 @@ export const DataSourcePingModal = () => {
               <div>
                 {validate && <span tw="text-error">请先选择网络配置，</span>}
                 <span tw="mr-0.5">详情请见</span>
-                <TextLink color="blue" type="button" to="###">
+                <TextLink color="blue" linkType="button" to="###">
                   网络配置选择说明文档
                 </TextLink>
               </div>
