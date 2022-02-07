@@ -1,4 +1,5 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
+import tw, { css } from 'twin.macro'
 import { Center, Icons, TextEllipsis } from 'components'
 import { ValueOf } from 'utils/types'
 import { CONNECTION_STATUS } from '../constant'
@@ -41,12 +42,21 @@ export const getPingConnection = (
         return (
           <Center tw="truncate text-error leading-4 ">
             <TextEllipsis>
-              <span tw="leading-4">
-                <Icons name="circle_close" size={16} />
-                <span className="ping-connection-status" tw="ml-1 leading-4">
+              <span
+                tw="leading-4"
+                css={css`
+                  svg {
+                    ${tw`fill-[#CA2621] text-white`}
+                  }
+                `}
+              >
+                <div tw="inline-block align-middle">
+                  <Icon name="error" size={16} />
+                </div>
+                <span className="ping-connection-status" tw="ml-1 leading-4 ">
                   不可用
                 </span>
-                {row?.message && <span>，{row?.message}</span>}
+                <span>{row?.message && `，${row?.message}`}</span>
               </span>
             </TextEllipsis>
           </Center>
