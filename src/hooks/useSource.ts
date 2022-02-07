@@ -30,7 +30,7 @@ export const useQuerySourceKind = (
       return get(ret, 'kinds', [])
     },
     {
-      enabled: op !== 'create',
+      enabled: op === 'create',
     }
   )
 }
