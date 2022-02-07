@@ -50,7 +50,7 @@ const DataSourceModal = observer(
       status,
       data: kinds,
       refetch,
-    } = useQuerySourceKind(regionId, spaceId)
+    } = useQuerySourceKind(regionId, spaceId, op)
     const mutation = useMutationSource()
 
     const curkind =
