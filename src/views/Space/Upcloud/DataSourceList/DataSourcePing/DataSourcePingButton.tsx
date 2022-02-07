@@ -99,7 +99,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
 
   const pingHistory = useMemo(() => {
     return (
-      <TextLink color="green" hasIcon={false} onClick={onOpen}>
+      <TextLink color="green" hasIcon={false} onClick={onOpen} tw="ml-1">
         测试记录
       </TextLink>
     )
@@ -107,13 +107,17 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
 
   const actionButton = useMemo(() => {
     const tempButton = (
-      <Button type="outlined" onClick={handlePing} disabled={!network?.id}>
+      <Button type="outlined" onClick={handlePing}>
         {status ? '重新测试' : '开始测试'}
       </Button>
     )
     if (!network?.id) {
       return (
-        <Tooltip content="请选择网络配置" hasPadding>
+        <Tooltip
+          theme="darker"
+          content="完成数据源连接信息且选择网络配置后，可以点击“开始测试”测试数据源可用性"
+          hasPadding
+        >
           {tempButton}
         </Tooltip>
       )
@@ -134,8 +138,8 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       </Control>
       {mutation.isLoading && (
         <div className="help">
-          <span>
-            正在测试数据源在当前网络配置下的可用性，如需查看更多可点击 测试记录
+          <span tw="text-neut-15">
+            正在测试数据源在当前网络配置下的可用性，如需查看更多可点击
           </span>
           {pingHistory}
         </div>
@@ -143,7 +147,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       {!mutation.isLoading && status && !status.status && (
         <div
           className="help"
-          tw="text-red-10 flex items-center mt-2"
+          tw="text-red-10 flex items-center"
           css={css`
             svg {
               ${tw`fill-[#CA2621] text-white`}
@@ -161,7 +165,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       {!mutation.isLoading && status && status.status && (
         <div
           className="help"
-          tw="flex items-center mt-2.5"
+          tw="flex items-center"
           css={css`
             svg {
               ${tw`fill-[#059669] text-white`}
@@ -169,13 +173,13 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           `}
         >
           <Icon name="success" size={16} />
-          <span tw="ml-1 ">测试通过，如需查看更多可点击</span>
+          <span tw="ml-1 text-neut-15">测试通过，如需查看更多可点击</span>
           {pingHistory}
         </div>
       )}
       {!mutation.isLoading && !status && defaultStatus && (
         <div className="help">
-          <span tw="ml-1">已有测试记录，如需查看可点击</span>
+          <span tw="ml-1 text-neut-15">已有测试记录，如需查看可点击</span>
           {pingHistory}
         </div>
       )}
