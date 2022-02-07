@@ -17,7 +17,7 @@ const columns = [
     dataIndex: 'name',
     render: (val: string, record: Record<string, any>) => {
       const { network_info: networkInfo } = record
-      const children = networkInfo.name || val
+      const children = networkInfo?.name || val
       if (networkInfo) {
         return (
           <Tooltip
