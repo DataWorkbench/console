@@ -117,7 +117,7 @@ export const useMutationStreamJobSchedule = () => {
 }
 
 export const useQueryStreamJobSchedule = (
-  origin: String,
+  origin = '',
   options?: UseQueryOptions
 ) => {
   const {

@@ -30,13 +30,14 @@ import {
 import SimpleBar from 'simplebar-react'
 import {
   ScheSettingForm,
+  SmallDatePicker,
   SmallDatePickerField,
   HorizonFiledsWrapper,
 } from './styled'
 
 const {
   TextField,
-  DatePickerField,
+  // DatePickerField,
   SliderField,
   SelectField,
   RadioGroupField,
@@ -106,7 +107,7 @@ const ScheSettingModal = ({
     periodType: TPeriodType
     schedulePolicy: number
     executed: number | null
-    immediately: boolean
+    // immediately: boolean
   }>({
     concurrencyPolicy: '',
     started: 0,
@@ -119,7 +120,7 @@ const ScheSettingModal = ({
     periodType: 'minute',
     schedulePolicy: 0,
     executed: null,
-    immediately: false,
+    // immediately: false,
   })
 
   const {
@@ -141,7 +142,7 @@ const ScheSettingModal = ({
           draft.timeout = data.timeout
           draft.schedulePolicy = data.schedule_policy
           draft.executed = data.executed
-          draft.immediately = data.immediately
+          // draft.immediately = data.immediately
         })
         if (express !== '') {
           setPeriodData((draft) => {
@@ -252,7 +253,7 @@ const ScheSettingModal = ({
           timeout: params.timeout,
           schedule_policy: params.schedulePolicy,
           executed: params.executed || dayjs().unix(),
-          immediately: params.immediately,
+          // immediately: params.immediately,
         },
         {
           onSuccess: () => {
@@ -364,7 +365,7 @@ const ScheSettingModal = ({
                     disabled={disabled}
                     name="schedulePolicy"
                     label={<AffixLabel>调度策略</AffixLabel>}
-                    value={params.schedulePolicy}
+                    value={params.schedulePolicy === 1 ? 1 : 2}
                     onChange={(v: number) => {
                       setParams((draft) => {
                         draft.schedulePolicy = v
@@ -383,7 +384,68 @@ const ScheSettingModal = ({
                   </RadioGroupField>
                   {params.schedulePolicy === 1 && (
                     <>
-                      <DatePickerField
+                      <Field>
+                        <Label>
+                          <AffixLabel required={false}>生效时间</AffixLabel>
+                        </Label>
+                        <Control tw="items-center space-x-3">
+                          <SmallDatePicker
+                            dateFormat="Y-m-d H:i"
+                            enableTime
+                            value={
+                              params.started
+                                ? new Date(params.started * 1000)
+                                : ''
+                            }
+                            onClear={() => {
+                              setParams((draft) => {
+                                draft.started = 0
+                              })
+                            }}
+                            onChange={(d: Date[]) => {
+                              if (d.length) {
+                                setParams((draft) => {
+                                  draft.started = Math.floor(
+                                    d[0].getTime() / 1000
+                                  )
+                                  if (draft.started > draft.ended) {
+                                    draft.ended = draft.started + 60
+                                  }
+                                })
+                              }
+                            }}
+                          />
+                          <div>至</div>
+                          <SmallDatePicker
+                            dateFormat="Y-m-d H:i"
+                            enableTime
+                            value={
+                              params.ended ? new Date(params.ended * 1000) : ''
+                            }
+                            onClear={() => {
+                              setParams((draft) => {
+                                draft.ended = 0
+                              })
+                            }}
+                            onChange={(d: Date[]) => {
+                              if (d.length) {
+                                setParams((draft) => {
+                                  draft.ended = Math.floor(
+                                    d[0].getTime() / 1000
+                                  )
+                                  if (draft.started > draft.ended) {
+                                    draft.started = draft.ended - 60
+                                  }
+                                })
+                              }
+                            }}
+                          />
+                        </Control>
+                        <div className="help">
+                          注：调度将在有效日期内生效并自动调度，反之，在有效期外的任务将不会自动调度。
+                        </div>
+                      </Field>
+                      {/* <DatePickerField
                         disabled={disabled}
                         name="timeEffect"
                         label="生效时间"
@@ -420,57 +482,13 @@ const ScheSettingModal = ({
                             })
                           }
                         }}
-                      />
-                      <SelectField
-                        disabled={disabled}
-                        name="concurrencyPolicy"
-                        label={
-                          <AffixLabel
-                            theme="green"
-                            help={
-                              <ul tw="leading-5">
-                                <li>1. “允许”(即允许多个作业实例同时运行) </li>
-                                <li>
-                                  2. “禁止”(即只允许一个作业实例运行,
-                                  如果到达调度周期的执行时间点时上一个实例还没有运行完成,
-                                  则放弃本次实例的运行)
-                                </li>
-                                <li>
-                                  3. “替换“(即,
-                                  只允许一个作业实例运行，如果到达调度周期的执行点时上一个实例还没运行完成,
-                                  则将这个实例终止, 然后启动新的实例)
-                                </li>
-                              </ul>
-                            }
-                          >
-                            并发策略
-                          </AffixLabel>
-                        }
-                        value={params.concurrencyPolicy}
-                        validateOnChange
-                        onChange={(v: number) => {
-                          setParams((draft) => {
-                            draft.concurrencyPolicy = v
-                          })
-                        }}
-                        options={[
-                          { value: 1, label: '允许' },
-                          { value: 2, label: '禁止' },
-                          { value: 3, label: '替换' },
-                        ]}
-                        schemas={[
-                          {
-                            rule: { required: true, isInteger: true },
-                            help: '请选择依赖策略',
-                            status: 'error',
-                          },
-                        ]}
-                      />
+                      /> */}
 
                       <SelectField
                         disabled={disabled}
                         name="schePeriod"
                         label={<AffixLabel>调度周期</AffixLabel>}
+                        backspaceRemoves={false}
                         value={params.periodType}
                         onChange={(v: TPeriodType) => {
                           setParams((draft) => {
@@ -503,7 +521,7 @@ const ScheSettingModal = ({
                           value: v,
                           label: `${v}月`,
                         }))
-                        let curPeriodData = null
+                        let curPeriodData: any = null
                         if (periodType === 'minute') {
                           curPeriodData = periodData[periodType]
                           return (
@@ -516,6 +534,7 @@ const ScheSettingModal = ({
                                   <Select
                                     disabled={disabled}
                                     options={hourOpts}
+                                    backspaceRemoves={false}
                                     value={curPeriodData.startHour}
                                     onChange={(v: number) => {
                                       setPeriodData((draft) => {
@@ -540,6 +559,7 @@ const ScheSettingModal = ({
                                   <Select
                                     disabled={disabled}
                                     options={minuOpts}
+                                    backspaceRemoves={false}
                                     value={curPeriodData.stampMinu}
                                     onChange={(v: number) =>
                                       setPeriodData((draft) => {
@@ -557,6 +577,7 @@ const ScheSettingModal = ({
                                 <Control>
                                   <Select
                                     disabled={disabled}
+                                    backspaceRemoves={false}
                                     options={hourOpts.map((opt) => {
                                       return {
                                         ...opt,
@@ -603,6 +624,7 @@ const ScheSettingModal = ({
                                       <Control>
                                         <Select
                                           options={hourOpts}
+                                          backspaceRemoves={false}
                                           value={curPeriodData.startHour}
                                           onChange={(v: number) => {
                                             setPeriodData((draft) => {
@@ -622,6 +644,7 @@ const ScheSettingModal = ({
                                       </Label>
                                       <Control>
                                         <Select
+                                          backspaceRemoves={false}
                                           options={range(1, 24).map((v) => ({
                                             value: v,
                                             label: `${v}`,
@@ -642,6 +665,7 @@ const ScheSettingModal = ({
                                       </Label>
                                       <Control>
                                         <Select
+                                          backspaceRemoves={false}
                                           options={hourOpts.map((opt) => {
                                             return {
                                               ...opt,
@@ -664,11 +688,11 @@ const ScheSettingModal = ({
                                 </Radio>
                                 <Radio value={2}>
                                   <SelectField
-                                    clearable
                                     multi
                                     closeOnSelect={false}
                                     label={<AffixLabel>指定时间</AffixLabel>}
                                     name="hourlys"
+                                    backspaceRemoves={false}
                                     value={curPeriodData.hours}
                                     options={hourOpts}
                                     onChange={(v: []) => {
@@ -712,7 +736,6 @@ const ScheSettingModal = ({
                           return (
                             <>
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label="指定时间"
                                 name="weekly"
@@ -760,7 +783,6 @@ const ScheSettingModal = ({
                           return (
                             <>
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label={<AffixLabel>指定时间</AffixLabel>}
                                 name="monthDaily"
@@ -800,7 +822,6 @@ const ScheSettingModal = ({
                           return (
                             <>
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label="指定月份"
                                 name="monthly"
@@ -817,7 +838,6 @@ const ScheSettingModal = ({
                                 }}
                               />
                               <SelectField
-                                clearable
                                 disabled={disabled}
                                 label="指定时间"
                                 name="daily"
@@ -862,7 +882,10 @@ const ScheSettingModal = ({
                     </>
                   )}
                   {(() => {
-                    if (params.schedulePolicy === 2) {
+                    if (
+                      params.schedulePolicy === 2 ||
+                      params.schedulePolicy === 3
+                    ) {
                       const curDate = new Date()
                       const executedDate = params.executed
                         ? new Date(params.executed * 1000)
@@ -872,18 +895,18 @@ const ScheSettingModal = ({
                           <RadioGroupField
                             disabled={disabled}
                             label={<AffixLabel>执行时间</AffixLabel>}
-                            value={params.immediately}
+                            value={params.schedulePolicy}
                             name="immediately"
-                            onChange={(v: boolean) => {
+                            onChange={(v: number) => {
                               setParams((draft) => {
-                                draft.immediately = v
+                                draft.schedulePolicy = v
                               })
                             }}
                           >
-                            <Radio value>发布后立即执行</Radio>
-                            <Radio value={false}>指定时间</Radio>
+                            <Radio value={3}>发布后立即执行</Radio>
+                            <Radio value={2}>指定时间</Radio>
                           </RadioGroupField>
-                          {!params.immediately && (
+                          {params.schedulePolicy === 2 && (
                             <Field>
                               <Label />
                               <Control>
@@ -914,6 +937,53 @@ const ScheSettingModal = ({
                     }
                     return null
                   })()}
+
+                  <SelectField
+                    disabled={disabled}
+                    name="concurrencyPolicy"
+                    backspaceRemoves={false}
+                    label={
+                      <AffixLabel
+                        theme="green"
+                        help={
+                          <ul tw="leading-5">
+                            <li>1. “允许”(同一时间，允许运行多个作业实例)</li>
+                            <li>
+                              2.
+                              “禁止”(同一时间，只允许运行一个作业实例运行,如果到达调度周期的执行时间点时上一个实例还没有运行完成,则放弃本次实例的运行)
+                            </li>
+                            <li>
+                              3.
+                              “替换“(同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成,则将这个实例终止,
+                              然后启动新的实例)
+                            </li>
+                          </ul>
+                        }
+                      >
+                        并发策略
+                      </AffixLabel>
+                    }
+                    value={params.concurrencyPolicy}
+                    validateOnChange
+                    onChange={(v: number) => {
+                      setParams((draft) => {
+                        draft.concurrencyPolicy = v
+                      })
+                    }}
+                    options={[
+                      { value: 1, label: '允许' },
+                      { value: 2, label: '禁止' },
+                      { value: 3, label: '替换' },
+                    ]}
+                    schemas={[
+                      {
+                        rule: { required: true, isInteger: true },
+                        help: '请选择依赖策略',
+                        status: 'error',
+                      },
+                    ]}
+                  />
+
                   <Field>
                     <Label>
                       <AffixLabel>重试策略</AffixLabel>
