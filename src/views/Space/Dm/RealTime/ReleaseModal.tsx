@@ -69,6 +69,7 @@ const ReleaseModal = ({
       noBorder
       onCancel={onCancel}
       onOk={onOk}
+      okText="发布"
       confirmLoading={releaseMutation.isLoading}
       escClosable={!releaseMutation.isLoading}
       maskClosable={!releaseMutation.isLoading}

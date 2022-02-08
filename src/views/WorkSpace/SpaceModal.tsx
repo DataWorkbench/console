@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css } from 'twin.macro'
 import { RadioButton, Form, Input, Button } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
-import { Modal, ModalContent } from 'components'
+import { Modal, ModalContent, RouterLink } from 'components'
 import { useQueryClient } from 'react-query'
 import { useWorkSpaceContext } from 'contexts'
 import { formatDate, strlen, nameMatchRegex } from 'utils/convert'
@@ -147,15 +147,32 @@ const SpaceModal = observer(
       const operateObj: any = {
         enable: {
           opName: '启动',
-          desc: '启用该工作空间，下属服务也将被启用，是否确认该工作空间进行启用操作？',
+          desc: '是否确认启用工作空间？',
         },
         disable: {
           opName: '禁用',
-          desc: '工作空间内正在运行的任务不会强制停止，已发布调度未运行的任务将不会运行。成员无法登录，是否确认进行禁用操作？',
+          desc: (
+            <>
+              <div>
+                <b>作业实例: </b>工作空间内正在运行的作业实例不会强制停止。
+              </div>
+              <div tw="mb-3">
+                <b>计算集群: </b>
+                不会自动停用计算集群（集群继续计费），若需要停用集群，需手动操作。前往
+                <RouterLink
+                  to={`/${regionId}/workspace/${filterOptSpaceIds[0]}/dm/cluster`}
+                  color="blue"
+                >
+                  计算集群
+                </RouterLink>
+              </div>
+              <div>是否确认禁用工作空间？</div>
+            </>
+          ),
         },
         delete: {
           opName: '删除',
-          desc: '该工作空间内作业等数据都将彻底删除，无法恢复，请谨慎操作。',
+          desc: '该工作空间删除后无法恢复，请谨慎操作。',
         },
       }
       const { opName, desc } = operateObj[curSpaceOpt]
@@ -199,8 +216,8 @@ const SpaceModal = observer(
             <div tw="flex-1 overflow-hidden">
               <div tw="font-semibold text-base text-neut-15 break-all">
                 {filterOptSpaces.length === 1
-                  ? `确认要${opName}工作空间 ${filterOptSpaces[0].name} 吗？`
-                  : `确认要${opName}以下 ${filterOptSpaces.length} 个工作空间吗？`}
+                  ? `${opName}工作空间 ${filterOptSpaces[0].name} `
+                  : `${opName}以下 ${filterOptSpaces.length} 个工作空间`}
               </div>
               <div tw="text-neut-13 mt-2">
                 <div tw="mb-2">{desc}</div>
@@ -214,19 +231,20 @@ const SpaceModal = observer(
                   </div>
                 )}
                 {curSpaceOpt === 'delete' && (
-                  <div tw="pt-6 space-y-1 border-t border-neut-2">
+                  <div tw="pt-6 space-y-1">
                     <div>
                       <span tw="text-red-10">*</span>
-                      请在下方输入框中输入&quot;delete&quot;以确认操作
+                      请在下方输入框中输入&quot;{filterOptSpaces[0].name}
+                      &quot;以确认操作
                     </div>
                     <div>
                       <Input
                         autoComplete="off"
                         type="text"
                         tw="w-40"
-                        placeholder="delete"
+                        placeholder={filterOptSpaces[0].name}
                         onChange={(e, value) =>
-                          setDelBtnEnable(value === 'delete')
+                          setDelBtnEnable(value === filterOptSpaces[0].name)
                         }
                       />
                     </div>
