@@ -41,7 +41,7 @@ const App = () => {
   const [loading, setLoading] = useState(true)
   const handleGlobalData = () => {
     const { hostname } = window.location
-    if (!/console\.qingcloud\.com$/.test(hostname)) {
+    if (!/^console\.qingcloud\.com$/.test(hostname)) {
       set(
         window,
         'GLOBAL_CONFIG.new_docs_url',
