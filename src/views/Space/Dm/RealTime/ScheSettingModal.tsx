@@ -107,7 +107,7 @@ const ScheSettingModal = ({
     periodType: TPeriodType
     schedulePolicy: number
     executed: number | null
-    immediately: boolean
+    // immediately: boolean
   }>({
     concurrencyPolicy: '',
     started: 0,
@@ -120,7 +120,7 @@ const ScheSettingModal = ({
     periodType: 'minute',
     schedulePolicy: 0,
     executed: null,
-    immediately: false,
+    // immediately: false,
   })
 
   const {
@@ -142,7 +142,7 @@ const ScheSettingModal = ({
           draft.timeout = data.timeout
           draft.schedulePolicy = data.schedule_policy
           draft.executed = data.executed
-          draft.immediately = data.immediately
+          // draft.immediately = data.immediately
         })
         if (express !== '') {
           setPeriodData((draft) => {
@@ -253,7 +253,7 @@ const ScheSettingModal = ({
           timeout: params.timeout,
           schedule_policy: params.schedulePolicy,
           executed: params.executed || dayjs().unix(),
-          immediately: params.immediately,
+          // immediately: params.immediately,
         },
         {
           onSuccess: () => {
@@ -365,7 +365,7 @@ const ScheSettingModal = ({
                     disabled={disabled}
                     name="schedulePolicy"
                     label={<AffixLabel>调度策略</AffixLabel>}
-                    value={params.schedulePolicy}
+                    value={params.schedulePolicy === 1 ? 1 : 2}
                     onChange={(v: number) => {
                       setParams((draft) => {
                         draft.schedulePolicy = v
@@ -521,7 +521,7 @@ const ScheSettingModal = ({
                           value: v,
                           label: `${v}月`,
                         }))
-                        let curPeriodData = null
+                        let curPeriodData: any = null
                         if (periodType === 'minute') {
                           curPeriodData = periodData[periodType]
                           return (
@@ -882,7 +882,10 @@ const ScheSettingModal = ({
                     </>
                   )}
                   {(() => {
-                    if (params.schedulePolicy === 2) {
+                    if (
+                      params.schedulePolicy === 2 ||
+                      params.schedulePolicy === 3
+                    ) {
                       const curDate = new Date()
                       const executedDate = params.executed
                         ? new Date(params.executed * 1000)
@@ -892,18 +895,18 @@ const ScheSettingModal = ({
                           <RadioGroupField
                             disabled={disabled}
                             label={<AffixLabel>执行时间</AffixLabel>}
-                            value={params.immediately}
+                            value={params.schedulePolicy}
                             name="immediately"
-                            onChange={(v: boolean) => {
+                            onChange={(v: number) => {
                               setParams((draft) => {
-                                draft.immediately = v
+                                draft.schedulePolicy = v
                               })
                             }}
                           >
-                            <Radio value>发布后立即执行</Radio>
-                            <Radio value={false}>指定时间</Radio>
+                            <Radio value={3}>发布后立即执行</Radio>
+                            <Radio value={2}>指定时间</Radio>
                           </RadioGroupField>
-                          {!params.immediately && (
+                          {params.schedulePolicy === 2 && (
                             <Field>
                               <Label />
                               <Control>
@@ -934,53 +937,52 @@ const ScheSettingModal = ({
                     }
                     return null
                   })()}
-                  {params.schedulePolicy === 1 && (
-                    <SelectField
-                      disabled={disabled}
-                      name="concurrencyPolicy"
-                      backspaceRemoves={false}
-                      label={
-                        <AffixLabel
-                          theme="green"
-                          help={
-                            <ul tw="leading-5">
-                              <li>1. “允许”(同一时间，允许运行多个作业实例)</li>
-                              <li>
-                                2.
-                                “禁止”(同一时间，只允许运行一个作业实例运行,如果到达调度周期的执行时间点时上一个实例还没有运行完成,则放弃本次实例的运行)
-                              </li>
-                              <li>
-                                3.
-                                “替换“(同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成,则将这个实例终止,
-                                然后启动新的实例)
-                              </li>
-                            </ul>
-                          }
-                        >
-                          并发策略
-                        </AffixLabel>
-                      }
-                      value={params.concurrencyPolicy}
-                      validateOnChange
-                      onChange={(v: number) => {
-                        setParams((draft) => {
-                          draft.concurrencyPolicy = v
-                        })
-                      }}
-                      options={[
-                        { value: 1, label: '允许' },
-                        { value: 2, label: '禁止' },
-                        { value: 3, label: '替换' },
-                      ]}
-                      schemas={[
-                        {
-                          rule: { required: true, isInteger: true },
-                          help: '请选择依赖策略',
-                          status: 'error',
-                        },
-                      ]}
-                    />
-                  )}
+
+                  <SelectField
+                    disabled={disabled}
+                    name="concurrencyPolicy"
+                    backspaceRemoves={false}
+                    label={
+                      <AffixLabel
+                        theme="green"
+                        help={
+                          <ul tw="leading-5">
+                            <li>1. “允许”(同一时间，允许运行多个作业实例)</li>
+                            <li>
+                              2.
+                              “禁止”(同一时间，只允许运行一个作业实例运行,如果到达调度周期的执行时间点时上一个实例还没有运行完成,则放弃本次实例的运行)
+                            </li>
+                            <li>
+                              3.
+                              “替换“(同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成,则将这个实例终止,
+                              然后启动新的实例)
+                            </li>
+                          </ul>
+                        }
+                      >
+                        并发策略
+                      </AffixLabel>
+                    }
+                    value={params.concurrencyPolicy}
+                    validateOnChange
+                    onChange={(v: number) => {
+                      setParams((draft) => {
+                        draft.concurrencyPolicy = v
+                      })
+                    }}
+                    options={[
+                      { value: 1, label: '允许' },
+                      { value: 2, label: '禁止' },
+                      { value: 3, label: '替换' },
+                    ]}
+                    schemas={[
+                      {
+                        rule: { required: true, isInteger: true },
+                        help: '请选择依赖策略',
+                        status: 'error',
+                      },
+                    ]}
+                  />
 
                   <Field>
                     <Label>
