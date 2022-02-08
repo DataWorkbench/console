@@ -356,14 +356,14 @@ const DataSourceList = observer(() => {
               css={css`
                 &:hover {
                   .${connectionListCls} {
-                    ${tw`visible`}
+                    ${tw`block`}
                   }
                 }
                 .ping-connection-status {
                   ${tw`text-neut-15`}
                 }
                 .${connectionListCls} {
-                  ${tw`invisible`}
+                  ${tw`hidden`}
                 }
               `}
             >
@@ -371,17 +371,19 @@ const DataSourceList = observer(() => {
                 isItemLoading ? CONNECTION_STATUS.LOADING : result,
                 {}
               )}
-              <TextLink
-                color="green"
-                className={connectionListCls}
-                hasIcon={false}
-                onClick={() => {
-                  mutateOperation('', [row])
-                  setShowPingHistories(true)
-                }}
-              >
-                查看记录
-              </TextLink>
+              {(isItemLoading || v) && (
+                <TextLink
+                  color="green"
+                  className={connectionListCls}
+                  hasIcon={false}
+                  onClick={() => {
+                    mutateOperation('', [row])
+                    setShowPingHistories(true)
+                  }}
+                >
+                  查看记录
+                </TextLink>
+              )}
             </Center>
             {v && (
               <Tooltip

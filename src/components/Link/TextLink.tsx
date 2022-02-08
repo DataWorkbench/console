@@ -44,7 +44,7 @@ const Link = (
 const colorThemes = {
   blue: tw`text-deepblue-10 dark:text-blue-10 hover:text-deepblue-12 hover:dark:text-blue-12 active:text-deepblue-13 active:dark:text-blue-13`,
   white: tw`text-green-11 dark:text-white hover:text-green-12 hover:dark:text-green-11 active:text-green-13 active:dark:text-green-12`,
-  green: tw`text-green-11 hover:text-green-12 active:text-green-13`,
+  green: tw`text-green-11! hover:text-green-12 active:text-green-13`,
 }
 
 export const TextLink = styled(Link)(

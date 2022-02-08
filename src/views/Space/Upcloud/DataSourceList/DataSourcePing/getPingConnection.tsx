@@ -15,25 +15,39 @@ export const getPingConnection = (
     switch (state) {
       case CONNECTION_STATUS.UNDO:
         return (
-          <Center tw="space-x-1">
-            <Icon name="step" tw="mr-1" size={16} />
-            <span className="ping-connection-status">未测试</span>
+          <Center tw="space-x-1 truncate">
+            <Center>
+              <Icon name="step" size={16} />
+            </Center>
+            <span className="ping-connection-status" tw="truncate">
+              未测试
+            </span>
           </Center>
         )
       case CONNECTION_STATUS.LOADING:
         return (
-          <Center tw="space-x-1">
-            <Icon name="if-load" tw="mr-1" size={16} />
-            <span className="ping-connection-status" tw="text-green-11">
+          <Center tw="space-x-1 truncate">
+            <Center>
+              <Icon name="if-load" size={16} />
+            </Center>
+            <span
+              className="ping-connection-status"
+              tw="text-green-11 truncate"
+            >
               检测中
             </span>
           </Center>
         )
       case CONNECTION_STATUS.SUCCESS:
         return (
-          <Center tw="space-x-1">
-            <Icons name="circle_check" size={16} />
-            <span className="ping-connection-status" tw="text-green-11">
+          <Center tw="space-x-1 truncate">
+            <Center>
+              <Icons name="circle_check" size={16} />
+            </Center>
+            <span
+              className="ping-connection-status"
+              tw="text-green-11 truncate"
+            >
               可用
             </span>
           </Center>
