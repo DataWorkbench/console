@@ -1,13 +1,14 @@
 import { useRef } from 'react'
-import { Checkbox, Form } from '@QCFE/lego-ui'
+import { Form, RadioGroup } from '@QCFE/lego-ui'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { styled, css } from 'twin.macro'
-import { Modal, AffixLabel } from 'components'
+import { Modal } from 'components'
 import { useImmer } from 'use-immer'
-import { useMutationReleaseStreamJob } from 'hooks'
+import { get } from 'lodash-es'
+import { useMutationReleaseStreamJob, useQueryStreamJobSchedule } from 'hooks'
 import { strlen } from 'utils'
 
-const { TextField } = Form
+const { TextAreaField } = Form
 
 const ModalWrapper = styled(Modal)(() => [
   css`
@@ -26,10 +27,25 @@ const ReleaseModal = ({
 }) => {
   const form = useRef<Form>(null)
   const releaseMutation = useMutationReleaseStreamJob()
+  const { data: scheData } = useQueryStreamJobSchedule()
   const [params, setParams] = useImmer({
     desc: '',
     stopRunning: false,
   })
+  const concurrency = [
+    {
+      value: 1,
+      text: '允许',
+      desp: '同一时间，只允许运行一个作业实例, 如果到达调度周期的执行时间点时上一个实例还没有运行完成, 则放弃本次实例的运行',
+    },
+    {
+      value: 2,
+      text: '禁止',
+      desp: '同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成, 则将这个实例终止, 然后启动新的实例',
+    },
+    { value: 3, text: '替换', desp: '同一时间，允许运行多个作业实例' },
+  ].find((o) => o.value === get(scheData, 'concurrency_policy'))
+
   const onOk = () => {
     if (form.current?.validateForm()) {
       releaseMutation.mutate(
@@ -39,11 +55,6 @@ const ReleaseModal = ({
         },
         {
           onSuccess: () => {
-            // Notify.success({
-            //   title: '操作提示',
-            //   content: '发布成功',
-            //   placement: 'bottomRight',
-            // })
             if (onSuccess) {
               onSuccess()
             }
@@ -69,18 +80,20 @@ const ReleaseModal = ({
           size={20}
         />
         <div tw="ml-3">
-          <div tw="text-base">发布调度任务</div>
+          <div tw="text-base">发布此作业至调度系统</div>
           <div tw="mt-2 text-neut-8">
-            将根据当前调度配置和节点参数进行任务调度，您确定执行该操作吗？
+            调度系统将根据当前作业的调度配置和运行参数进行调度和执行作业
           </div>
         </div>
       </div>
-      <div tw="space-y-2">
-        <Form layout="vertical" ref={form}>
-          <TextField
-            label="描述"
+      <div tw="mt-4">
+        <Form layout="vertical" tw="max-w-full!" ref={form}>
+          <TextAreaField
+            label=""
             name="desc"
             autoComplete="off"
+            rows={3}
+            placeholder="请输入描述信息"
             validateOnChange
             schemas={[
               {
@@ -100,24 +113,48 @@ const ReleaseModal = ({
             }
           />
         </Form>
-        <div tw="border-b border-neut-13 pt-3" />
-        <div tw="pt-2 flex items-center">
-          <Checkbox
-            checked={params.stopRunning}
-            onChange={(e, checked) => {
+        <div tw="border-b mb-3 border-neut-13" />
+        {concurrency && (
+          <div tw="mb-3">
+            <div>当前并发策略：“{concurrency.text}”</div>
+            <div tw="text-neut-8">{concurrency.desp}</div>
+          </div>
+        )}
+        <div>
+          <RadioGroup
+            direction="column"
+            name="stoprunning"
+            value={params.stopRunning}
+            onChange={(v) => {
               setParams((draft) => {
-                draft.stopRunning = checked
+                draft.stopRunning = v
               })
             }}
+            options={[
+              {
+                label: (
+                  <>
+                    <span>不终止 当前作业正在运行中的实例</span>
+                    <div tw="ml-5 text-neut-8">
+                      如有实例正在运行，本次发布成功后，会被忽略执行
+                    </div>
+                  </>
+                ),
+                value: false,
+              },
+              {
+                label: (
+                  <>
+                    <span>终止 当前作业正在运行中的实例</span>
+                    <div tw="ml-5 text-neut-8">
+                      如有实例正在运行 ，此运行中的实例会被强制终止
+                    </div>
+                  </>
+                ),
+                value: true,
+              },
+            ]}
           />
-          <AffixLabel
-            tw="ml-2"
-            required={false}
-            theme="green"
-            help="如果当前作业有任务实例正在运行，勾选后发布，此运行中的任务实例会被强制终止"
-          >
-            终止当前作业正在运行中的实例
-          </AffixLabel>
         </div>
       </div>
     </ModalWrapper>
