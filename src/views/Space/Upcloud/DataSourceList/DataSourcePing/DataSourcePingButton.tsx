@@ -107,7 +107,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
 
   const actionButton = useMemo(() => {
     const tempButton = (
-      <Button type="outlined" onClick={handlePing}>
+      <Button type="outlined" onClick={handlePing} disabled={!network?.id}>
         {status ? '重新测试' : '开始测试'}
       </Button>
     )

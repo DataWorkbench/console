@@ -1,15 +1,15 @@
 import React, {
-  useRef,
-  useCallback,
-  useEffect,
   MutableRefObject,
+  useCallback,
   useContext,
+  useEffect,
+  useRef,
   useState,
 } from 'react'
-import { Field, Label, Control, Collapse } from '@QCFE/lego-ui'
+import { Collapse, Control, Field, Label } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get, set, trim, omit, pick, merge } from 'lodash-es'
+import { get, merge, omit, pick, set, trim } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
@@ -385,7 +385,10 @@ const DataSourceForm = ({
   const [defaultStatus, setDefaultStatus] = useState<
     { status: boolean; message?: string } | undefined
   >(() => {
-    if (op === 'create') {
+    if (
+      op === 'create' ||
+      !get(opSourceList, '[0].last_connection.network_id')
+    ) {
       return undefined
     }
     return get(opSourceList, '[0].connection') === 1
@@ -402,12 +405,9 @@ const DataSourceForm = ({
   useMount(() => {
     if (sourceInfo) {
       setNetWork((draft) => {
-        const networkId = get(
-          sourceInfo,
-          `url.${urlType}.network.vpc_network.network_id`
-        )
-        draft.id = networkId
-        draft.type = networkId ? 'vpc' : 'eip'
+        draft.id = get(sourceInfo, `last_connection.network_id`)
+        draft.name = get(sourceInfo, 'last_connection.network_info.name')
+        draft.type = 'vpc'
       })
     }
   })
@@ -587,7 +587,7 @@ const DataSourceForm = ({
                     defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
                     schemas={[
                       {
-                        rule: (o) => {
+                        rule: (o: Record<string, any>) => {
                           if (trim(o.name_node) === '') {
                             return false
                           }
