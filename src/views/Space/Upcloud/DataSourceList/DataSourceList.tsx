@@ -17,6 +17,7 @@ import {
   ToolBar,
   ToolBarLeft,
   ToolBarRight,
+  // @ts-ignore
   utils,
 } from '@QCFE/qingcloud-portal-ui'
 import { useMutationSource, useQuerySource, useStore } from 'hooks'
@@ -44,8 +45,8 @@ import { usePingEvent } from './DataSourcePing/hooks'
 import { CONNECTION_STATUS, DATASOURCE_STATUS } from './constant'
 import { SourceKindImg } from './styled'
 
-const { MenuItem } = Menu
-
+const { MenuItem } = Menu as any
+const { ColumnsSetting } = ToolBar as any
 const connectionListCls = 'data-source-ping-connection-list'
 
 const getEllipsisText = (text: string, lenght: number) => {
@@ -348,7 +349,7 @@ const DataSourceList = observer(() => {
           network_info: networkInfo,
           network_id: networkId,
         } = v ?? { result: 0 }
-        const isItemLoading = itemLoadingHistories?.[row?.source_id]?.size
+        const isItemLoading = itemLoadingHistories?.[row?.id]?.size
         return (
           <>
             <Center
@@ -555,8 +556,8 @@ const DataSourceList = observer(() => {
                 onClick={() =>
                   mutateOperation(
                     'delete',
-                    sourceList.filter(({ source_id }) =>
-                      selectedRowKeys.includes(source_id)
+                    sourceList.filter(({ id }: Record<string, any>) =>
+                      selectedRowKeys.includes(id)
                     )
                   )
                 }
@@ -590,7 +591,7 @@ const DataSourceList = observer(() => {
                   }}
                 />
               </Button>
-              <ToolBar.ColumnsSetting
+              <ColumnsSetting
                 defaultColumns={defaultColumns.map(({ title, dataIndex }) => ({
                   title,
                   dataIndex,
