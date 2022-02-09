@@ -45,7 +45,7 @@ class DataSourceStore {
       source_type: 5,
     },
     {
-      name: 'Hbase',
+      name: 'HBase',
       showname: 'HBase',
       desc: 'HBase 是一个开源的非关系型分布式数据库，实现的编程语言为 Java。它可以对稀疏文件提供极高的容错率。 ',
       source_type: 6,

@@ -18,6 +18,7 @@ import {
   AffixLabel,
   Center,
   Divider,
+  KVTextAreaField,
   SelectWithRefresh,
   TextLink,
 } from 'components'
@@ -25,7 +26,7 @@ import { nameMatchRegex, strlen } from 'utils'
 import HdfsNodeField from './HdfsNodeField'
 import { DataSourcePingButton } from './DataSourcePing'
 import { NetworkContext } from './NetworkProvider'
-import { compInfo, hostReg } from './constant'
+import { compInfo } from './constant'
 
 const { CollapseItem } = Collapse
 const { TextField, TextAreaField } = Form
@@ -43,35 +44,39 @@ const Root = styled('div')(() => [
     div[class='help'] {
       ${tw`text-neut-8`}
     }
+
     .collapse-item-content > .field {
       ${tw`block pl-6`}
     }
+
     .collapse-item-content {
       ${tw`pl-0`}
     }
   `,
 ])
 
-// const SelectFieldRefresh = styled('div')(() => [
-//   tw`relative`,
-//   css`
-//     .field {
-//       ${tw`block pl-6 mb-6`}
-//     }
-//     button {
-//       ${tw`mt-[26px] ml-2 absolute top-0 left-[284px]`}
-//       svg {
-//         ${tw`text-neut-15 fill-current`}
-//       }
-//     }
-//   `,
-// ])
+const TextAreaWrapper = styled(TextAreaField)(() => [
+  css`
+    & textarea.textarea {
+      ${tw`w-[500px]! min-w-[500px]! min-h-[160px]`}
+    }
+  `,
+])
+
+const KVTextAreaFieldWrapper = styled(KVTextAreaField)(() => [
+  css`
+    & textarea.textarea {
+      ${tw`w-[500px]! min-w-[500px]! min-h-[120px]`}
+    }
+  `,
+])
 
 const CollapseWrapper = styled(Collapse)(() => [
   tw`w-full border-0`,
   css`
     .collapse-item > .collapse-item-label {
       box-shadow: inset 0px -1px 0px #e4ebf1;
+
       ${tw`border-0 h-[52px] flex items-center justify-between`}
       .icon {
         ${tw`relative top-0 right-0`}
@@ -107,41 +112,38 @@ const getFieldsInfo = (type: string) => {
         { ...pwd, placeholder: '请输入密码' },
       ]
       break
-    case 'hbase':
+    case 'hbase': {
+      const help = (
+        <div>
+          <span tw="mr-1">
+            HBase 集群提供给客户端连接的配置信息。详情可参考
+          </span>
+          <TextLink theme="blue">HBase 配置信息说明文档</TextLink>
+        </div>
+      )
       fieldsInfo = [
         {
+          component: TextAreaWrapper,
           name: 'zookeeper',
-          label: '使用 Zookeeper 的地址（ZooKeeper Quorum）',
-          placeholder: '请输入',
-          help: '例如：zk_host1:2181,zk_host2:2181,zk_host3:2181',
+          label: '配置信息',
+          placeholder: `{
+   "hbase.zookeeper.property.clientPort": "2181",
+   "hbase.rootdir": "hdfs://ns1/hbase",
+   "hbase.cluster.distributed": "true",
+   "hbase.zookeeper.quorum": "node01,node02,node03",
+   "zookeeper.znode.parent": "/hbase"
+} 
+`,
+          help,
+          resize: true,
+          css: tw`w-auto`,
           schemas: [
             {
               rule: {
                 required: true,
-                matchRegex: hostReg,
+                // matchRegex: hostReg,
               },
-              help: '请输入zookeeper, 例如：zk_host1:2181,zk_host2:2181',
-              status: 'error',
-            },
-            {
-              rule: (value: string) => {
-                const l = strlen(value)
-                return l >= 1 && l <= 1024
-              },
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-        {
-          name: 'z_node',
-          label: '使用 ZooKeeper 的根目录（ZooKeeper Znode Parent）',
-          placeholder: '请输入',
-          help: '例如：/hbase',
-          schemas: [
-            {
-              rule: { required: true, matchRegex: /^\// },
-              help: '请输入znode, 例如：/hbase',
+              help,
               status: 'error',
             },
             {
@@ -156,6 +158,7 @@ const getFieldsInfo = (type: string) => {
         },
       ]
       break
+    }
     case 'hdfs':
       fieldsInfo = [
         {
@@ -173,13 +176,21 @@ const getFieldsInfo = (type: string) => {
     case 'kafka':
       fieldsInfo = [
         {
+          component: KVTextAreaFieldWrapper,
           name: 'kafka_brokers',
-          label: 'Broker 连接列表（Broker List）',
-          placeholder: '请输入',
-          help: '例如：kafka1:9092,kafka2:9092,kafka3:9092',
+          title: 'IP:Port',
+          label: 'Kafka 集群地址(Bootstrap Servers)',
+          placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
+10.0.0.1:9092
+10.0.0.2:9092
+          `,
+          css: tw`w-full`,
+          validateOnBlur: true,
+          division: ':',
+          kvs: ['IP', 'Port'],
           schemas: [
             {
-              rule: { required: true, matchRegex: hostReg },
+              rule: { required: true },
               help: '请输入kafkabrokers',
               status: 'error',
             },
@@ -235,6 +246,7 @@ const getInitValue = (path: string) => {
   }
   return get(initValues, path, '')
 }
+
 interface IFormProps {
   resInfo: {
     name: string
@@ -245,6 +257,7 @@ interface IFormProps {
   getFormData?: MutableRefObject<() => any>
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
 }
+
 const DataSourceForm = ({
   resInfo,
   getFormData,
