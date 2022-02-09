@@ -25,14 +25,10 @@ import { nameMatchRegex, strlen } from 'utils'
 import HdfsNodeField from './HdfsNodeField'
 import { DataSourcePingButton } from './DataSourcePing'
 import { NetworkContext } from './NetworkProvider'
-
-const ipReg =
-  /(^(((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))\.){3}((2[0-4][0-9])|(25[0-5])|([01]?\d?\d))$)|(^((([a-zA-Z0-9_-])+\.)+([a-zA-Z])+)$)/
-
-const hostReg = /^([0-9a-zA-Z_.-]+(:\d{1,5})?,)*([0-9a-zA-Z_.-]+(:\d{1,5})?)?$/
+import { compInfo, hostReg } from './constant'
 
 const { CollapseItem } = Collapse
-const { TextField, TextAreaField, NumberField, PasswordField } = Form
+const { TextField, TextAreaField } = Form
 
 const hiddenStyle = css`
   ${tw`mb-0! h-0 opacity-0`}
@@ -83,103 +79,6 @@ const CollapseWrapper = styled(Collapse)(() => [
     }
   `,
 ])
-
-const compInfo = {
-  database: {
-    name: 'database',
-    label: '数据库名称（Database Name）',
-    placeholder: '请输入数据库名称（Database Name）',
-    help: '字母、数字或下划线（_）',
-    schemas: [
-      {
-        rule: { required: true, matchRegex: nameMatchRegex },
-        help: '字母、数字或下划线（_）,不能以（_）开始结尾',
-        status: 'error',
-      },
-      {
-        rule: (value: string) => strlen(value) >= 1 && strlen(value) <= 64,
-        help: '最大长度: 64, 最小长度: 1',
-        status: 'error',
-      },
-    ],
-  },
-  host: {
-    name: 'host',
-    label: '数据库 IP 地址',
-    placeholder: '请输入 ip 或者域名，如 1.1.1.1',
-    schemas: [
-      {
-        rule: {
-          required: true,
-          matchRegex: ipReg,
-          //   /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-        },
-        help: '请输入 ip 或者域名，如 1.1.1.1',
-        status: 'error',
-      },
-    ],
-  },
-  password: {
-    name: 'password',
-    autoComplete: 'off',
-    label: '密码（Password）',
-    placeholder: '请输入数据库密码（Password）',
-    component: PasswordField,
-    schemas: [
-      {
-        rule: { required: true },
-        help: '请输入数据库密码（Password）',
-        status: 'error',
-      },
-      {
-        rule: (value: string) => {
-          const l = strlen(value)
-          return l >= 1 && l <= 64
-        },
-        help: '最大长度: 64, 最小长度: 1',
-        status: 'error',
-      },
-    ],
-  },
-  port: {
-    name: 'port',
-    label: '数据库端口号',
-    schemas: [
-      {
-        rule: {
-          required: true,
-          matchRegex:
-            /^((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}))$/,
-        },
-        help: '请输入正确的端口',
-        status: 'error',
-      },
-    ],
-    validateOnChange: true,
-    component: NumberField,
-    min: 1,
-    max: 65536,
-    showButton: false,
-  },
-  user: {
-    name: 'user',
-    label: '用户名（User Name）',
-    autoComplete: 'off',
-    placeholder: '请输入数据库用户名（User Name）',
-    schemas: [
-      {
-        rule: { required: true },
-        help: '请输入数据库用户名（User Name）',
-        status: 'error',
-      },
-      {
-        rule: (value: string) => strlen(value) >= 1 && strlen(value) <= 64,
-        help: '最大长度: 64, 最小长度: 1',
-        status: 'error',
-      },
-    ],
-  },
-}
 
 const getFieldsInfo = (type: string) => {
   const { database, host, password, port, user } = compInfo
