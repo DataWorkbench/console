@@ -63,6 +63,9 @@ declare module '@QCFE/qingcloud-portal-ui' {
     showConfirmLoading?: boolean
     draggable?: boolean
     resizable?: boolean
+    maskClosable?: boolean
+    cancelText?: string
+    escClosable?: boolean
   }
 
   export interface Modal {
