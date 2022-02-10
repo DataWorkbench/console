@@ -58,7 +58,7 @@ const Root = styled('div')(() => [
 const TextAreaWrapper = styled(TextAreaField)(() => [
   css`
     & textarea.textarea {
-      ${tw`w-[500px]! min-w-[500px]! min-h-[160px]`}
+      ${tw`w-auto min-w-[500px]! min-h-[160px]`}
     }
   `,
 ])
@@ -66,7 +66,7 @@ const TextAreaWrapper = styled(TextAreaField)(() => [
 const KVTextAreaFieldWrapper = styled(KVTextAreaField)(() => [
   css`
     & textarea.textarea {
-      ${tw`w-[500px]! min-w-[500px]! min-h-[120px]`}
+      ${tw`w-auto min-w-[500px]! min-h-[120px]`}
     }
   `,
 ])
