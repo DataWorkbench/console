@@ -31,6 +31,7 @@ const green = {
   11: '#15a675',
   4: '#9ddfc9',
   3: '#b3e7d6',
+  2: '#dff7ed',
   1: '#dff7f0',
   0: '#f5fffd',
 }

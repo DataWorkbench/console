@@ -2,6 +2,23 @@ import { lazy, useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
 import { useDarkMode } from 'hooks'
+
+// describeDataOmnis
+const DescribeDataOmnis = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "describeDataOmnis" */ 'views/DataOmnis/DescribeDataOmnis'
+    )
+)
+
+// activateDataOmnis
+const ActivateDataOmnis = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "activateDataOmnis" */ 'views/DataOmnis/ActivateDataOmnis'
+    )
+)
+
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
 // const Create = lazy(() => import(/* webpackChunkName: "home" */ 'views/Create'))
@@ -40,6 +57,20 @@ const Routes = () => {
     setDarkMode(matched)
     globalStore.set({ darkMode: matched })
   }, [matched, setDarkMode, globalStore])
+
+  if (localStorage.getItem('DATA_OMNIS') !== 'enable') {
+    return (
+      <Route>
+        <Layout>
+          <Switch>
+            <Route path="/describe" component={DescribeDataOmnis} />
+            <Route path="/activate" component={ActivateDataOmnis} />
+            <Route path="/" component={() => <Redirect to="/describe" />} />
+          </Switch>
+        </Layout>
+      </Route>
+    )
+  }
 
   return (
     <Switch>
