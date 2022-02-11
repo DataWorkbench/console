@@ -268,7 +268,7 @@ const JobModal = ({
                         required: true,
                         matchRegex: nameMatchRegex,
                       },
-                      help: '请输入名称',
+                      help: '允许包含字母、数字或下划线（_）,不能以（_）开始结尾',
                       status: 'error',
                     },
                     {
