@@ -21,7 +21,7 @@ const ActivateDataOmnis = lazy(
 
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
-// const Create = lazy(() => import(/* webpackChunkName: "home" */ 'views/Create'))
+
 const Overview = lazy(
   () => import(/* webpackChunkName: "home" */ 'views/Overview')
 )
@@ -104,7 +104,6 @@ const Routes = () => {
       <Route>
         <Layout>
           <Switch>
-            {/* <Route path="/create/:step?" component={Create} /> */}
             <Route path="/overview" component={Overview} />
             <Route path="/workspace" component={WorkSpace} />
             <Route
