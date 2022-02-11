@@ -262,12 +262,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: '上传时间',
-          dataIndex: 'created',
+          dataIndex: 'updated',
           sortable: true,
           sortOrder:
             // filter.reverse ? 'asc' : 'desc',
             // eslint-disable-next-line no-nested-ternary
-            filter.sort_by === 'created'
+            filter.sort_by === 'updated'
               ? filter.reverse
                 ? 'asc'
                 : 'desc'
