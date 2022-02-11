@@ -1,6 +1,6 @@
 import { Alert, Checkbox, Button } from '@QCFE/lego-ui'
 import { useHistory } from 'react-router-dom'
-import { TextLink, HelpCenterLink } from 'components'
+import { HelpCenterLink } from 'components'
 import { useState } from 'react'
 import { activateDataomnis } from 'stores/api'
 import DataOmnisLoading from 'assets/data_omnis_loading.svg'
@@ -62,7 +62,7 @@ const ActivateDataOmnis = () => {
             <div tw="flex mb-8">
               <div tw="pr-9 text-sm leading-8">开通产品</div>
               <div>
-                <Button type="outlined" tw="px-5 h-9 bg-green-2!">
+                <Button type="outlined" tw="px-5 h-9 bg-green-2! cursor-auto">
                   大数据工作台
                 </Button>
               </div>
@@ -85,9 +85,14 @@ const ActivateDataOmnis = () => {
                   }}
                 >
                   已阅读并同意
-                  <a href="##" tw="text-link">
+                  <HelpCenterLink
+                    tw="no-underline"
+                    href="/"
+                    isIframe={false}
+                    hasIcon={false}
+                  >
                     《大数据工作台服务条款》
-                  </a>
+                  </HelpCenterLink>
                 </Checkbox>
               </div>
             </div>
@@ -103,15 +108,16 @@ const ActivateDataOmnis = () => {
             </Button>
 
             <div>
-              <TextLink
-                href="https://deploy-preview-654--qingcloud-docs.netlify.app/bigdata/dataomnis/billing/price/"
-                target="_blank"
+              <HelpCenterLink
+                tw="no-underline"
+                href="/billing/price/"
+                isIframe={false}
               >
                 了解计费方式
-              </TextLink>
-              <TextLink target="_blank" tw="ml-5">
+              </HelpCenterLink>
+              <HelpCenterLink tw="no-underline ml-5" href="/" isIframe={false}>
                 查看接口文档
-              </TextLink>
+              </HelpCenterLink>
             </div>
           </div>
         </div>
