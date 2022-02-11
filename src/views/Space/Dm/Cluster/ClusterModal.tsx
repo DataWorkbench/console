@@ -376,7 +376,6 @@ const ClusterModal = observer(
                     ]}
                   />
                   <SelectField
-                    clearable
                     name="restart_strategy"
                     label={
                       <AffixLabel
