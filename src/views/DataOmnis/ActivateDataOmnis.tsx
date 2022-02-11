@@ -1,6 +1,6 @@
 import { Alert, Checkbox, Button } from '@QCFE/lego-ui'
 import { useHistory } from 'react-router-dom'
-import { HelpCenterLink } from 'components'
+import { TextLink, HelpCenterLink } from 'components'
 import { useState } from 'react'
 import { activateDataomnis } from 'stores/api'
 import DataOmnisLoading from 'assets/data_omnis_loading.svg'
@@ -85,13 +85,21 @@ const ActivateDataOmnis = () => {
                   }}
                 >
                   已阅读并同意
+                  <TextLink
+                    tw="no-underline"
+                    href="//www.qingcloud.com/terms#terms"
+                    target="_blank"
+                    hasIcon={false}
+                  >
+                    《QingCloud 服务条款》
+                  </TextLink>
                   <HelpCenterLink
                     tw="no-underline"
-                    href="/"
+                    href="/protocol/beta_rules/"
                     isIframe={false}
                     hasIcon={false}
                   >
-                    《大数据工作台服务条款》
+                    《大数据工作台公测规则》
                   </HelpCenterLink>
                 </Checkbox>
               </div>
@@ -104,7 +112,7 @@ const ActivateDataOmnis = () => {
               onClick={handleActivateDataOmnis}
               disabled={!checked}
             >
-              确定开通
+              申请公测
             </Button>
 
             <div>
@@ -115,9 +123,9 @@ const ActivateDataOmnis = () => {
               >
                 了解计费方式
               </HelpCenterLink>
-              <HelpCenterLink tw="no-underline ml-5" href="/" isIframe={false}>
+              {/* <HelpCenterLink tw="no-underline ml-5" href="/" isIframe={false}>
                 查看接口文档
-              </HelpCenterLink>
+              </HelpCenterLink> */}
             </div>
           </div>
         </div>
