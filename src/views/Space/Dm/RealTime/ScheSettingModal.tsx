@@ -118,7 +118,7 @@ const ScheSettingModal = ({
     retryPolicy: 1,
     timeout: 0,
     periodType: 'minute',
-    schedulePolicy: 0,
+    schedulePolicy: 3,
     executed: null,
     // immediately: false,
   })
@@ -140,7 +140,7 @@ const ScheSettingModal = ({
           draft.retryPolicy = data.retry_policy
           draft.periodType = periodType || 'minute'
           draft.timeout = data.timeout
-          draft.schedulePolicy = data.schedule_policy
+          draft.schedulePolicy = data.schedule_policy || 3
           draft.executed = data.executed
           // draft.immediately = data.immediately
         })
