@@ -48,15 +48,15 @@ const App = () => {
         'GLOBAL_CONFIG.new_docs_url',
         'https://deploy-preview-654--qingcloud-docs.netlify.app'
       )
-    }
 
-    const registerUser = localStorage.getItem('DATA_OMNIS_USER')
-    const currentUser = get(window, 'USER.user_id', '')
-    if (!registerUser || registerUser !== currentUser) {
-      const ret = await describeDataomnis()
-      if (ret.ret_code === 0) {
-        localStorage.setItem('DATA_OMNIS', ret.status)
-        localStorage.setItem('DATA_OMNIS_USER', currentUser)
+      // TODO remove location condition after PEK2
+      const registerUser = localStorage.getItem('DATA_OMNIS_USER')
+      const currentUser = get(window, 'USER.user_id', '')
+      if (!registerUser || registerUser !== currentUser) {
+        const ret = await describeDataomnis()
+        if (ret.ret_code === 0 && ret.status === 'enable') {
+          localStorage.setItem('DATA_OMNIS_USER', currentUser)
+        }
       }
     }
 
