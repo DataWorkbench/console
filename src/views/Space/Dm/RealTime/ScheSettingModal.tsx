@@ -882,10 +882,7 @@ const ScheSettingModal = ({
                     </>
                   )}
                   {(() => {
-                    if (
-                      params.schedulePolicy === 2 ||
-                      params.schedulePolicy === 3
-                    ) {
+                    if (params.schedulePolicy !== 1) {
                       const curDate = new Date()
                       const executedDate = params.executed
                         ? new Date(params.executed * 1000)
