@@ -9,7 +9,7 @@ import React, {
 import { Collapse, Control, Field, Label } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get, merge, omit, pick, set, trim } from 'lodash-es'
+import { get, merge, omit, pick, set } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
@@ -18,18 +18,19 @@ import {
   AffixLabel,
   Center,
   Divider,
+  InputField,
   KVTextAreaField,
   SelectWithRefresh,
   TextLink,
 } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
-import HdfsNodeField from './HdfsNodeField'
+// import HdfsNodeField from './HdfsNodeField'
 import { DataSourcePingButton } from './DataSourcePing'
 import { NetworkContext } from './NetworkProvider'
 import { compInfo } from './constant'
 
 const { CollapseItem } = Collapse
-const { TextField, TextAreaField } = Form
+const { TextField, TextAreaField, NumberField } = Form
 
 const hiddenStyle = css`
   ${tw`mb-0! h-0 opacity-0`}
@@ -58,7 +59,7 @@ const Root = styled('div')(() => [
 const TextAreaWrapper = styled(TextAreaField)(() => [
   css`
     & textarea.textarea {
-      ${tw`w-auto min-w-[500px]! min-h-[160px]`}
+      ${tw`w-auto min-w-[550px]! min-h-[160px]`}
     }
   `,
 ])
@@ -66,7 +67,7 @@ const TextAreaWrapper = styled(TextAreaField)(() => [
 const KVTextAreaFieldWrapper = styled(KVTextAreaField)(() => [
   css`
     & textarea.textarea {
-      ${tw`w-auto min-w-[500px]! min-h-[120px]`}
+      ${tw`w-auto min-w-[550px]! min-h-[120px]`}
     }
   `,
 ])
@@ -80,6 +81,17 @@ const CollapseWrapper = styled(Collapse)(() => [
       ${tw`border-0 h-[52px] flex items-center justify-between`}
       .icon {
         ${tw`relative top-0 right-0`}
+      }
+    }
+  `,
+])
+
+const MultiFieldWrapper = styled.div(() => [
+  tw`flex gap-2`,
+  css`
+    & {
+      .control {
+        ${tw`w-full`}
       }
     }
   `,
@@ -162,14 +174,39 @@ const getFieldsInfo = (type: string) => {
     case 'hdfs':
       fieldsInfo = [
         {
-          name: 'name_node',
-          label: '主节点主机名（NameNode Host）',
-          placeholder: '请输入主节点主机名（NameNode Host）',
+          fieldType: 'dbUrl',
+          label: '主节点地址（NameNode Host : Port）',
+          items: [
+            {
+              name: 'name_ip',
+              label: null,
+              placeholder: '请输入主节点地址',
+              tw: `w-[330px]`,
+              component: InputField,
+              prefix: 'hdfs://',
+            },
+            {
+              name: 'name_port',
+              label: null,
+              placeholder: '请输入',
+              component: NumberField,
+            },
+          ],
+          space: [':'],
         },
         {
-          ...port,
-          label: '端口（Port）',
-          // defaultValue: 9000,
+          name: 'high_config',
+          label: 'Hadoop 高级配置',
+          component: TextAreaWrapper,
+          placeholder:
+            'Hadoop 相关的高级参数，比如 HA 配置（集群 HA 模式时需要填写的 core-site.xml 及 hdfs-site.xml 中的配置，开启 kerberos 时包含 kerberos 相关配置）',
+          tw: 'min-h-20',
+          help: (
+            <div>
+              <span>可参考</span>
+              <TextLink color="blue">Hadoop 参数说明文档</TextLink>
+            </div>
+          ),
         },
       ]
       break
@@ -480,58 +517,94 @@ const DataSourceForm = ({
             }
           >
             {fields.map((field) => {
-              const {
-                name,
-                label,
-                placeholder,
-                component,
-                schemas = [],
-                ...rest
-              } = field
-              const FieldComponent = component || TextField
-              if (name === 'nodes') {
+              // if (name === 'nodes') {
+              //   return (
+              //     <HdfsNodeField
+              //       key={name}
+              //       name={name}
+              //       validateOnBlur
+              //       label={<AffixLabel required>{label}</AffixLabel>}
+              //       defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
+              //       schemas={[
+              //         {
+              //           rule: (o: Record<string, any>) => {
+              //             if (trim(o.name_node) === '') {
+              //               return false
+              //             }
+              //             return /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
+              //               o.port
+              //             )
+              //           },
+              //           help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
+              //           status: 'error',
+              //         },
+              //       ]}
+              //     />
+              //   )
+              // }
+              const getField = (fieldData: Record<string, any>) => {
+                const {
+                  name,
+                  label,
+                  placeholder,
+                  component,
+                  schemas = [],
+                  ...rest
+                } = fieldData
+                const FieldComponent = component || TextField
                 return (
-                  <HdfsNodeField
+                  <FieldComponent
                     key={name}
                     name={name}
-                    validateOnBlur
-                    label={<AffixLabel required>{label}</AffixLabel>}
-                    defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
-                    schemas={[
-                      {
-                        rule: (o: Record<string, any>) => {
-                          if (trim(o.name_node) === '') {
-                            return false
-                          }
-                          return /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
-                            o.port
-                          )
-                        },
-                        help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
-                        status: 'error',
-                      },
-                    ]}
+                    disabled={isViewMode}
+                    defaultValue={get(
+                      sourceInfo,
+                      `url.${urlType}.${name}`,
+                      getInitValue(`url.${urlType}.${name}`)
+                    )}
+                    validateOnChange
+                    schemas={schemas}
+                    css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
+                    {...rest}
+                    label={
+                      label ? (
+                        <AffixLabel required>{label}</AffixLabel>
+                      ) : undefined
+                    }
+                    placeholder={placeholder}
                   />
                 )
               }
-              return (
-                <FieldComponent
-                  key={name}
-                  name={name}
-                  disabled={isViewMode}
-                  defaultValue={get(
-                    sourceInfo,
-                    `url.${urlType}.${name}`,
-                    getInitValue(`url.${urlType}.${name}`)
-                  )}
-                  validateOnChange
-                  schemas={schemas}
-                  css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
-                  {...rest}
-                  label={<AffixLabel required>{label}</AffixLabel>}
-                  placeholder={placeholder}
-                />
-              )
+              if (field.fieldType === 'dbUrl') {
+                return (
+                  <Field>
+                    <label htmlFor="__" className="label">
+                      <AffixLabel required>{field.label}</AffixLabel>
+                    </label>
+                    <MultiFieldWrapper>
+                      {field.items.reduce(
+                        (
+                          acc: Record<string, any>[],
+                          cur: Record<string, any>,
+                          curIndex: number
+                        ) => {
+                          acc.push(getField(cur))
+                          if (field.space && field.space[curIndex]) {
+                            acc.push(
+                              <span tw="leading-8">
+                                {field.space[curIndex]}
+                              </span>
+                            )
+                          }
+                          return acc
+                        },
+                        []
+                      )}
+                    </MultiFieldWrapper>
+                  </Field>
+                )
+              }
+              return getField(field)
             })}
             <Field>
               <Divider>
