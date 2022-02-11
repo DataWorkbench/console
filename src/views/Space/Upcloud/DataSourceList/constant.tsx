@@ -130,3 +130,9 @@ export const compInfo = {
     ],
   },
 }
+
+export const hadoopLink = '/manual/data_up_cloud/add_data/#连接信息-hdfs'
+
+export const networkLink = '/manual/data_development/network/create_network/'
+
+export const hbaseLink = '/manual/data_up_cloud/add_data/#连接信息-hbase'

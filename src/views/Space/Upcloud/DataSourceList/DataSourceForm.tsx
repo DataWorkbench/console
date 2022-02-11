@@ -18,16 +18,16 @@ import {
   AffixLabel,
   Center,
   Divider,
+  HelpCenterLink,
   InputField,
   KVTextAreaField,
   SelectWithRefresh,
-  TextLink,
 } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { DataSourcePingButton } from './DataSourcePing'
 import { NetworkContext } from './NetworkProvider'
-import { compInfo } from './constant'
+import { compInfo, hadoopLink, hbaseLink, networkLink } from './constant'
 
 const { CollapseItem } = Collapse
 const { TextField, TextAreaField, NumberField } = Form
@@ -127,10 +127,13 @@ const getFieldsInfo = (type: string) => {
     case 'hbase': {
       const help = (
         <div>
-          <span tw="mr-1">
+          <span tw="mr-0.5">
             HBase 集群提供给客户端连接的配置信息。详情可参考
           </span>
-          <TextLink theme="blue">HBase 配置信息说明文档</TextLink>
+          {/* <TextLink theme="blue">HBase 配置信息说明文档</TextLink> */}
+          <HelpCenterLink href={hbaseLink} isIframe={false}>
+            HBase 配置信息说明文档
+          </HelpCenterLink>
         </div>
       )
       fieldsInfo = [
@@ -181,7 +184,7 @@ const getFieldsInfo = (type: string) => {
               name: 'name_ip',
               label: null,
               placeholder: '请输入主节点地址',
-              tw: `w-[330px]`,
+              css: tw`w-[330px]`,
               component: InputField,
               prefix: 'hdfs://',
             },
@@ -190,6 +193,10 @@ const getFieldsInfo = (type: string) => {
               label: null,
               placeholder: '请输入',
               component: NumberField,
+              css: tw`w-24`,
+              min: 1,
+              max: 65536,
+              showButton: false,
             },
           ],
           space: [':'],
@@ -203,8 +210,11 @@ const getFieldsInfo = (type: string) => {
           tw: 'min-h-20',
           help: (
             <div>
-              <span>可参考</span>
-              <TextLink color="blue">Hadoop 参数说明文档</TextLink>
+              <span tw="mr-0.5">可参考</span>
+              {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
+              <HelpCenterLink href={hadoopLink} isIframe={false}>
+                Hadoop 参数说明文档
+              </HelpCenterLink>
             </div>
           ),
         },
@@ -641,9 +651,9 @@ const DataSourceForm = ({
                 <>
                   <div>
                     <span tw="mr-0.5">详情请见</span>
-                    <TextLink color="blue" linkType="button" to="###">
+                    <HelpCenterLink href={networkLink} isIframe={false}>
                       网络配置选择说明文档
-                    </TextLink>
+                    </HelpCenterLink>
                   </div>
                   <div>
                     <span tw="mr-0.5">

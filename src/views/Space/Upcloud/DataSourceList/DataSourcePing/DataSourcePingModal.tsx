@@ -4,9 +4,10 @@ import React, { useCallback, useContext, useState } from 'react'
 import { Modal } from '@QCFE/qingcloud-portal-ui'
 import { Field, Form, Label } from '@QCFE/lego-ui'
 
-import { AffixLabel, SelectWithRefresh, TextLink } from 'components'
+import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
 import { useStore } from 'stores'
 
+import { networkLink } from 'views/Space/Upcloud/DataSourceList/constant'
 import { DataSourcePingButton } from './DataSourcePingButton'
 import { NetworkContext } from '../NetworkProvider'
 
@@ -93,9 +94,9 @@ export const DataSourcePingModal = () => {
               <div>
                 {validate && <span tw="text-error">请先选择网络配置，</span>}
                 <span tw="mr-0.5">详情请见</span>
-                <TextLink color="blue" linkType="button" to="###">
+                <HelpCenterLink href={networkLink} isIframe={false}>
                   网络配置选择说明文档
-                </TextLink>
+                </HelpCenterLink>
               </div>
               <div>
                 <span tw="mr-0.5">
