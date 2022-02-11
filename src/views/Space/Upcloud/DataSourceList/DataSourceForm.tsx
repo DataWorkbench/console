@@ -516,7 +516,7 @@ const DataSourceForm = ({
               schemas={[
                 {
                   rule: { matchRegex: nameMatchRegex },
-                  help: '允许包含字母、数字 及 "_"，长度 2-64',
+                  help: '允许包含字母、数字 及 "_"，不能以（_）开始结尾，长度 2-64',
                   status: 'error',
                 },
                 {
