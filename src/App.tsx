@@ -8,8 +8,9 @@ import {
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
 import { RootStore, StoreContext } from 'stores'
-import { set } from 'lodash-es'
+import { get, set } from 'lodash-es'
 import emitter from 'utils/emitter'
+import { describeDataomnis } from 'stores/api'
 import locales from './locales'
 import Routes from './Routes'
 
@@ -39,7 +40,7 @@ const queryClient = new QueryClient({
 
 const App = () => {
   const [loading, setLoading] = useState(true)
-  const handleGlobalData = () => {
+  const handleGlobalData = async () => {
     const { hostname } = window.location
     if (!/^console\.qingcloud\.com$/.test(hostname)) {
       set(
@@ -47,9 +48,21 @@ const App = () => {
         'GLOBAL_CONFIG.new_docs_url',
         'https://deploy-preview-654--qingcloud-docs.netlify.app'
       )
+
+      // TODO remove location condition after PEK2
+      const registerUser = localStorage.getItem('DATA_OMNIS_USER')
+      const currentUser = get(window, 'USER.user_id', '')
+      if (!registerUser || registerUser !== currentUser) {
+        const ret = await describeDataomnis()
+        if (ret.ret_code === 0 && ret.status === 'enable') {
+          localStorage.setItem('DATA_OMNIS_USER', currentUser)
+        }
+      }
     }
+
     setLoading(false)
   }
+
   return (
     <PortalProvider
       service="dataomnis"
