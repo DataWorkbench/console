@@ -58,7 +58,11 @@ const Routes = () => {
     globalStore.set({ darkMode: matched })
   }, [matched, setDarkMode, globalStore])
 
-  if (localStorage.getItem('DATA_OMNIS') !== 'enable') {
+  // TODO remove location condition after PEK2
+  if (
+    localStorage.getItem('DATA_OMNIS_USER') &&
+    !/^console\.qingcloud\.com$/.test(window.location.hostname)
+  ) {
     return (
       <Route>
         <Layout>
