@@ -26,6 +26,7 @@ import MessageModal from './MessageModal'
 
 interface IFilter {
   state?: number
+  instance_id?: string
   job_id?: string
   version?: string
   limit: number
@@ -59,13 +60,14 @@ export const InstanceTable = observer(
       localstorage.getItem(columnSettingsKey) || []
     )
     const [filter, setFilter] = useImmer<IFilter>({
+      state: 0,
+      instance_id: '',
       job_id: '',
       version: '',
-      state: 0,
-      limit: 10,
-      offset: 0,
-      reverse: true,
       sort_by: '',
+      reverse: true,
+      offset: 0,
+      limit: 10,
     })
 
     const queryClient = useQueryClient()
@@ -277,17 +279,19 @@ export const InstanceTable = observer(
 
     useEffect(() => {
       setFilter((draft) => {
-        draft.job_id = query.jobId || modalData.id || ''
         draft.state = query.state || 0
+        draft.instance_id = query.instanceId || ''
+        draft.job_id = query.jobId || modalData.id || ''
         draft.version = query.version || modalData.version || ''
         draft.offset = 0
       })
     }, [
-      modalData.id,
-      modalData.version,
       query.state,
+      query.instanceId,
       query.jobId,
+      modalData.id,
       query.version,
+      modalData.version,
       setFilter,
     ])
 
