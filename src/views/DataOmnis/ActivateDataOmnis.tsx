@@ -4,6 +4,7 @@ import { TextLink, HelpCenterLink } from 'components'
 import { useState } from 'react'
 import { activateDataomnis } from 'stores/api'
 import DataOmnisLoading from 'assets/data_omnis_loading.svg'
+import { get } from 'lodash-es'
 
 const ActivateDataOmnis = () => {
   const history = useHistory()
@@ -15,6 +16,7 @@ const ActivateDataOmnis = () => {
 
     const ret = await activateDataomnis()
     if (ret.ret_code === 0) {
+      localStorage.setItem('DATA_OMNIS_OPENED', get(window, 'USER.user_id', ''))
       history.push('/overview')
     }
 
