@@ -60,7 +60,7 @@ const Routes = () => {
 
   // TODO remove location condition after PEK2
   if (
-    !localStorage.getItem('DATA_OMNIS_USER') &&
+    !localStorage.getItem('DATA_OMNIS_OPENED') &&
     !/^console\.qingcloud\.com$/.test(window.location.hostname)
   ) {
     return (

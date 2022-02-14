@@ -50,12 +50,12 @@ const App = () => {
       )
 
       // TODO remove location condition after PEK2
-      const registerUser = localStorage.getItem('DATA_OMNIS_USER')
+      const registerUser = localStorage.getItem('DATA_OMNIS_OPENED')
       const currentUser = get(window, 'USER.user_id', '')
       if (!registerUser || registerUser !== currentUser) {
         const ret = await describeDataomnis()
         if (ret.ret_code === 0 && ret.status === 'enable') {
-          localStorage.setItem('DATA_OMNIS_USER', currentUser)
+          localStorage.setItem('DATA_OMNIS_OPENED', currentUser)
         }
       }
     }
