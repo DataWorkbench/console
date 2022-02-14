@@ -8,10 +8,12 @@ import { InstanceState } from '../constants'
 
 const defaultQuery: {
   state: number
+  instanceId: string
   jobId: string
   version: string
 } = {
   state: 0,
+  instanceId: '',
   jobId: '',
   version: '',
 }
@@ -22,11 +24,11 @@ export const Job = () => {
   return (
     <div tw="p-5">
       <FlexBox tw="py-6 bg-neut-16 border-b border-neut-13" orient="row">
-        <FlexBox tw="ml-6 pl-7">
+        <FlexBox tw="ml-5">
           <Center>
-            <div tw="text-white w-16">实例状态</div>
+            <div tw="text-white w-14">实例状态</div>
             <Select
-              tw="w-[216px]"
+              tw="w-[200px]"
               placeholder="请选择"
               options={Object.keys(InstanceState).map((el) => ({
                 value: Number(el),
@@ -41,11 +43,30 @@ export const Job = () => {
             />
           </Center>
         </FlexBox>
-        <FlexBox tw="ml-6 pl-12">
+        <FlexBox tw="ml-5">
           <Center>
-            <div tw="text-white w-16">作业ID</div>
+            <div tw="text-white w-14">实例ID</div>
             <InputSearch
-              tw="w-[216px]"
+              tw="w-[200px]"
+              placeholder="搜索实例ID"
+              onPressEnter={(e: React.SyntheticEvent) => {
+                setQuery((draft) => {
+                  draft.instanceId = (e.target as HTMLInputElement).value
+                })
+              }}
+              onClear={() => {
+                setQuery((draft) => {
+                  draft.instanceId = ''
+                })
+              }}
+            />
+          </Center>
+        </FlexBox>
+        <FlexBox tw="ml-5">
+          <Center>
+            <div tw="text-white w-14">作业ID</div>
+            <InputSearch
+              tw="w-[200px]"
               placeholder="搜索作业ID"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setQuery((draft) => {
@@ -60,11 +81,11 @@ export const Job = () => {
             />
           </Center>
         </FlexBox>
-        <FlexBox tw="ml-6 pl-12">
+        <FlexBox tw="ml-5">
           <Center>
-            <div tw="text-white w-16">作业版本</div>
+            <div tw="text-white w-14">作业版本</div>
             <InputSearch
-              tw="w-[216px]"
+              tw="w-[200px]"
               placeholder="搜索作业版本"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setQuery((draft) => {
