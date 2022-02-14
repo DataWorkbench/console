@@ -58,11 +58,11 @@ const Routes = () => {
     globalStore.set({ darkMode: matched })
   }, [matched, setDarkMode, globalStore])
 
-  // TODO remove location condition after PEK2
-  if (
-    !localStorage.getItem('DATA_OMNIS_OPENED') &&
-    !/^console\.qingcloud\.com$/.test(window.location.hostname)
-  ) {
+  const isActivated =
+    localStorage.getItem('DATA_OMNIS_OPENED') ||
+    /^(pek[23])?console\.qingcloud\.com$/.test(window.location.hostname)
+
+  if (!isActivated) {
     return (
       <Route>
         <Layout>
