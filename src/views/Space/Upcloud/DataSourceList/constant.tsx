@@ -136,3 +136,48 @@ export const hadoopLink = '/manual/data_up_cloud/add_data/#连接信息-hdfs'
 export const networkLink = '/manual/data_development/network/create_network/'
 
 export const hbaseLink = '/manual/data_up_cloud/add_data/#连接信息-hbase'
+
+export const ftpProtocolValue = 1
+export const sFtpProtocolValue = 2
+
+export const ftpProtocol = {
+  [ftpProtocolValue]: {
+    label: 'FTP',
+    value: ftpProtocolValue,
+  },
+  [sFtpProtocolValue]: {
+    label: 'SFTP',
+    value: sFtpProtocolValue,
+  },
+}
+
+export const ftpConnectionMode = {
+  FTP: {
+    label: '被动模式',
+    value: 2,
+  },
+  SFTP: {
+    label: '主动模式',
+    value: 1,
+  },
+}
+
+export const ftpFilters = new Set([
+  'connection_mode',
+  'host',
+  'password',
+  'port',
+  '__dbUrl',
+  'protocol',
+  'user',
+])
+
+export const sftpFilters = new Set([
+  'private_key',
+  'host',
+  'password',
+  '__dbUrl',
+  'port',
+  'protocol',
+  'user',
+])
