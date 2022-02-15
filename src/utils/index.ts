@@ -15,4 +15,7 @@ export const getHelpCenterLink = (path: string, ifHostPrefix = false) => {
 export const getHelpCenterLinkWithHost = (path: string) =>
   getHelpCenterLink(path, true)
 
+export const getIsFormalEnv = () =>
+  /console\.qingcloud\.com$/.test(window.location.hostname)
+
 export { request, customRequest, emitter }

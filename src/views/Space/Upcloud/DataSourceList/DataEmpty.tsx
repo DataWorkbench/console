@@ -1,7 +1,7 @@
 import { Button, Icon, Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
 import { ContentBox, FlexBox } from 'components'
 import SexangleImg from 'assets/svgr/sexangle.svg'
-import { getHelpCenterLink } from 'utils/'
+import { getHelpCenterLink, getIsFormalEnv } from 'utils'
 
 const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => (
   <ContentBox tw="py-20 rounded-sm bg-white">
@@ -33,9 +33,12 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => (
           <Icon name="if-book" type="light" />
           使用指南
         </Button>
-        <Button type="primary" onClick={onAddClick}>
+        <Button
+          type="primary"
+          onClick={getIsFormalEnv() ? undefined : onAddClick}
+        >
           <Icon name="add" type="light" />
-          新增数据源
+          {getIsFormalEnv() ? '敬请期待' : '新增数据源'}
         </Button>
       </div>
     </FlexBox>
