@@ -48,7 +48,7 @@ const App = () => {
     if (!isOnlineEnv) {
       const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
       set(window, 'GLOBAL_CONFIG.new_docs_url', docsUrl)
-      set(window, 'GLOBAL_CONFIG.docs_url', docsUrl)
+      set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
     }
 
     if (!isPekEnv) {
