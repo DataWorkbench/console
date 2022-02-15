@@ -9,7 +9,7 @@ import React, {
 import { Collapse, Control, Field, Label } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { get, merge, omit, pick, set } from 'lodash-es'
+import { get, omit, toLower } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
@@ -19,18 +19,23 @@ import {
   Center,
   Divider,
   HelpCenterLink,
-  InputField,
-  KVTextAreaField,
   SelectWithRefresh,
 } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { DataSourcePingButton } from './DataSourcePing'
 import { NetworkContext } from './NetworkProvider'
-import { compInfo, hadoopLink, hbaseLink, networkLink } from './constant'
+import {
+  ftpFilters,
+  ftpProtocol,
+  ftpProtocolValue,
+  networkLink,
+  sftpFilters,
+} from './constant'
+import getFieldsInfo from './getDatasourceFormConfig'
 
 const { CollapseItem } = Collapse
-const { TextField, TextAreaField, NumberField } = Form
+const { TextField, TextAreaField } = Form
 
 const hiddenStyle = css`
   ${tw`mb-0! h-0 opacity-0`}
@@ -56,22 +61,6 @@ const Root = styled('div')(() => [
   `,
 ])
 
-const TextAreaWrapper = styled(TextAreaField)(() => [
-  css`
-    & textarea.textarea {
-      ${tw`w-auto min-w-[550px]! min-h-[160px]`}
-    }
-  `,
-])
-
-const KVTextAreaFieldWrapper = styled(KVTextAreaField)(() => [
-  css`
-    & textarea.textarea {
-      ${tw`w-auto min-w-[550px]! min-h-[120px]`}
-    }
-  `,
-])
-
 const CollapseWrapper = styled(Collapse)(() => [
   tw`w-full border-0`,
   css`
@@ -90,6 +79,9 @@ const MultiFieldWrapper = styled.div(() => [
   tw`flex gap-2`,
   css`
     & {
+      .field {
+        ${tw`block`}
+      }
       .control {
         ${tw`w-full`}
       }
@@ -97,186 +89,22 @@ const MultiFieldWrapper = styled.div(() => [
   `,
 ])
 
-const getFieldsInfo = (type: string) => {
-  const { database, host, password, port, user } = compInfo
-  let fieldsInfo: any[] = []
-  let pwd = { name: '' }
-  switch (type) {
-    case 'clickhouse':
-    case 'mysql':
-    case 'postgresql':
-      fieldsInfo = [host, port, database, user, password]
-      break
-    case 'ftp':
-      pwd = { ...password }
-      set(pwd, 'schemas[0].help', '请输入密码')
-      fieldsInfo = [
-        {
-          ...host,
-          label: '主机别名（Host）',
-          placeholder: '请输入 FTP 的主机别名（Host）',
-        },
-        {
-          ...port,
-          label: '端口（Port）',
-        },
-        { ...user, placeholder: '请输入用户名' },
-        { ...pwd, placeholder: '请输入密码' },
-      ]
-      break
-    case 'hbase': {
-      const help = (
-        <div>
-          <span tw="mr-0.5">
-            HBase 集群提供给客户端连接的配置信息。详情可参考
-          </span>
-          {/* <TextLink theme="blue">HBase 配置信息说明文档</TextLink> */}
-          <HelpCenterLink href={hbaseLink} isIframe={false}>
-            HBase 配置信息说明文档
-          </HelpCenterLink>
-        </div>
-      )
-      fieldsInfo = [
-        {
-          component: TextAreaWrapper,
-          name: 'zookeeper',
-          label: '配置信息',
-          placeholder: `{
-   "hbase.zookeeper.property.clientPort": "2181",
-   "hbase.rootdir": "hdfs://ns1/hbase",
-   "hbase.cluster.distributed": "true",
-   "hbase.zookeeper.quorum": "node01,node02,node03",
-   "zookeeper.znode.parent": "/hbase"
-} 
-`,
-          help,
-          resize: true,
-          css: tw`w-auto`,
-          schemas: [
-            {
-              rule: {
-                required: true,
-                // matchRegex: hostReg,
-              },
-              help,
-              status: 'error',
-            },
-            {
-              rule: (value: string) => {
-                const l = strlen(value)
-                return l >= 1 && l <= 1024
-              },
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-      ]
-      break
-    }
-    case 'hdfs':
-      fieldsInfo = [
-        {
-          fieldType: 'dbUrl',
-          label: '主节点地址（NameNode Host : Port）',
-          items: [
-            {
-              name: 'name_ip',
-              label: null,
-              placeholder: '请输入主节点地址',
-              css: tw`w-[330px]`,
-              component: InputField,
-              prefix: 'hdfs://',
-            },
-            {
-              name: 'name_port',
-              label: null,
-              placeholder: '请输入',
-              component: NumberField,
-              css: tw`w-24`,
-              min: 1,
-              max: 65536,
-              showButton: false,
-            },
-          ],
-          space: [':'],
-        },
-        {
-          name: 'high_config',
-          label: 'Hadoop 高级配置',
-          component: TextAreaWrapper,
-          placeholder:
-            'Hadoop 相关的高级参数，比如 HA 配置（集群 HA 模式时需要填写的 core-site.xml 及 hdfs-site.xml 中的配置，开启 kerberos 时包含 kerberos 相关配置）',
-          tw: 'min-h-20',
-          help: (
-            <div>
-              <span tw="mr-0.5">可参考</span>
-              {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
-              <HelpCenterLink href={hadoopLink} isIframe={false}>
-                Hadoop 参数说明文档
-              </HelpCenterLink>
-            </div>
-          ),
-        },
-      ]
-      break
-    case 'kafka':
-      fieldsInfo = [
-        {
-          component: KVTextAreaFieldWrapper,
-          name: 'kafka_brokers',
-          title: 'IP:Port',
-          label: 'Kafka 集群地址(Bootstrap Servers)',
-          placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
-10.0.0.1:9092
-10.0.0.2:9092
-          `,
-          css: tw`w-full`,
-          validateOnBlur: true,
-          division: ':',
-          kvs: ['IP', 'Port'],
-          schemas: [
-            {
-              rule: { required: true },
-              help: '请输入kafkabrokers',
-              status: 'error',
-            },
-            {
-              rule: (value: string) => {
-                const l = strlen(value)
-                return l >= 1 && l <= 1024
-              },
-              help: '最大长度: 1024, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-      ]
-      break
-    case 's3':
-      break
-    default:
-      break
-  }
-  return fieldsInfo
-}
-
 const parseRemoteData = (
-  data: Record<'url' & string, any>,
-  urlType: string
+  data: Record<'url' & string, any>
+  // urlType: string
 ) => {
-  const { url } = data
-  if (urlType === 'hdfs') {
-    const pushArr = ['name_node', 'port']
-    return omit(
-      merge(data, {
-        url: {
-          hdfs: pick(get(url, 'hdfs.nodes'), pushArr),
-        },
-      }),
-      'url.hdfs.nodes'
-    )
-  }
+  // const { url } = data
+  // if (urlType === 'hdfs') {
+  //   const pushArr = ['name_node', 'port']
+  //   return omit(
+  //     merge(data, {
+  //       url: {
+  //         hdfs: pick(get(url, 'hdfs.nodes'), pushArr),
+  //       },
+  //     }),
+  //     'url.hdfs.nodes'
+  //   )
+  // }
   return data
 }
 
@@ -288,6 +116,12 @@ const getInitValue = (path: string) => {
     url: {
       hdfs: {
         port: 9000,
+      },
+      ftp: {
+        port: 21,
+      },
+      sftp: {
+        port: 22,
       },
     },
   }
@@ -336,8 +170,19 @@ const DataSourceForm = ({
   const sourceInfo =
     ['update', 'view'].includes(op) &&
     opSourceList.length > 0 &&
-    parseRemoteData(opSourceList[0], urlType)
-  const fields = getFieldsInfo(urlType)
+    parseRemoteData(opSourceList[0])
+
+  const [filters, setFilters] = useState<Set<string> | undefined>(() => {
+    if (urlType !== 'ftp') {
+      return undefined
+    }
+    if (get(sourceInfo, 'url.ftp.protocol') === 2) {
+      return sftpFilters
+    }
+    return ftpFilters
+  })
+
+  const fields = getFieldsInfo(urlType, filters)
 
   const isViewMode = op === 'view'
 
@@ -360,6 +205,32 @@ const DataSourceForm = ({
   })
 
   const [showPing, setShowPing] = useState(false)
+  const [ftpProtocolType, setFtpProtocol] = useState(() => {
+    return get(opSourceList, 'url.ftp.protocol', ftpProtocolValue)
+  })
+  const [ftpPortConfig, setFtpPortConfig] = useImmer({
+    key: ftpProtocolType,
+    changed: false,
+  })
+
+  const handleChange = {
+    ftp_protocol: (onChange?: Function) => (type: number) => {
+      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFilters)
+      setFtpProtocol(type)
+      if (!ftpPortConfig.changed) {
+        setFtpPortConfig((_) => {
+          _.key = type
+        })
+      }
+      onChange?.(type)
+    },
+    ftp_port: (onChange?: Function) => (v: number) => {
+      setFtpPortConfig((_) => {
+        _.changed = true
+      })
+      onChange?.(v)
+    },
+  }
 
   useMount(() => {
     if (sourceInfo) {
@@ -384,13 +255,13 @@ const DataSourceForm = ({
           network_id: netWorkId,
           ...others
         } = formElem.getFieldsValue()
-        let rest = omit(others, 'utype')
+        const rest = omit(others, 'utype')
 
-        if (urlType === 'hdfs') {
-          const shiftArr = ['name_node', 'port']
-          rest.nodes = pick(rest, shiftArr)
-          rest = omit(rest, shiftArr)
-        }
+        // if (urlType === 'hdfs') {
+        //   const shiftArr = ['name_node', 'port']
+        //   rest.nodes = pick(rest, shiftArr)
+        //   rest = omit(rest, shiftArr)
+        // }
         return {
           name,
           desc,
@@ -558,27 +429,48 @@ const DataSourceForm = ({
                   label,
                   placeholder,
                   component,
+                  onChange,
                   schemas = [],
                   ...rest
                 } = fieldData
                 const FieldComponent = component || TextField
                 return (
                   <FieldComponent
-                    key={name}
+                    key={
+                      // eslint-disable-next-line no-nested-ternary
+                      urlType === 'ftp' && name === 'port'
+                        ? ftpPortConfig.changed
+                          ? ftpPortConfig.key
+                          : ftpProtocolType
+                        : name
+                    }
                     name={name}
                     disabled={isViewMode}
                     defaultValue={get(
                       sourceInfo,
                       `url.${urlType}.${name}`,
-                      getInitValue(`url.${urlType}.${name}`)
+                      getInitValue(
+                        urlType === 'ftp' && name === 'port'
+                          ? `url.${toLower(
+                              get(ftpProtocol, `${ftpProtocolType}.label`)
+                            )}.${name}`
+                          : `url.${urlType}.${name}`
+                      )
                     )}
                     validateOnChange
                     schemas={schemas}
                     css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
                     {...rest}
+                    onChange={
+                      get(handleChange, `${urlType}_${name}`)
+                        ? get(handleChange, `${urlType}_${name}`)(onChange)
+                        : onChange
+                    }
                     label={
                       label ? (
-                        <AffixLabel required>{label}</AffixLabel>
+                        <AffixLabel required={rest.required !== false}>
+                          {label}
+                        </AffixLabel>
                       ) : undefined
                     }
                     placeholder={placeholder}
@@ -587,7 +479,7 @@ const DataSourceForm = ({
               }
               if (field.fieldType === 'dbUrl') {
                 return (
-                  <Field>
+                  <Field key={field.name}>
                     <label htmlFor="__" className="label">
                       <AffixLabel required>{field.label}</AffixLabel>
                     </label>
@@ -601,7 +493,13 @@ const DataSourceForm = ({
                           acc.push(getField(cur))
                           if (field.space && field.space[curIndex]) {
                             acc.push(
-                              <span tw="leading-8">
+                              <span
+                                key={
+                                  // eslint-disable-next-line react/no-array-index-key
+                                  field.space[curIndex] + curIndex
+                                }
+                                tw="leading-10"
+                              >
                                 {field.space[curIndex]}
                               </span>
                             )
