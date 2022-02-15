@@ -1,41 +1,55 @@
-import React, { useState, useEffect, useMemo, useRef, useReducer } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, pick } from 'lodash-es'
+import { get, lowerCase, pick } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
-  PageTab,
-  Icon,
   Button,
+  Icon,
+  InputSearch,
   Loading,
+  Modal,
+  PageTab,
   Table,
   ToolBar,
-  Modal,
-  InputSearch,
   ToolBarLeft,
   ToolBarRight,
   utils,
 } from '@QCFE/qingcloud-portal-ui'
+import { useMutationSource, useQuerySource, useStore } from 'hooks'
 import {
-  useQuerySource,
-  useMutationSource,
-  useStore,
-  useQueryNetworks,
-} from 'hooks'
-import { Card, Center, ContentBox, FlexBox, Icons, Tooltip } from 'components'
+  Card,
+  Center,
+  ContentBox,
+  FlexBox,
+  Icons,
+  TextEllipsis,
+  TextLink,
+  Tooltip,
+} from 'components'
 import { getHelpCenterLink } from 'utils'
+import { NetworkModal } from 'views/Space/Dm/Network'
 
-import { pingDataSource } from 'stores/api'
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
+import {
+  DataSourcePingHistoriesModal,
+  DataSourcePingModal,
+  getPingConnection,
+} from './DataSourcePing'
+import { usePingEvent } from './DataSourcePing/hooks'
+import { CONNECTION_STATUS, DATASOURCE_STATUS, ftpProtocol } from './constant'
 import { SourceKindImg } from './styled'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
+const { ColumnsSetting } = ToolBar as any
+const connectionListCls = 'data-source-ping-connection-list'
 
 const getEllipsisText = (text: string, lenght: number) => {
+  if (!text) return text
   let index = 0
   let count = 0
   while (index < text.length) {
@@ -89,9 +103,11 @@ const ModalWrapper = styled(Modal)(() => [
     .modal-card-head {
       border-bottom: 0;
     }
+
     .modal-card-body {
       padding-top: 0;
     }
+
     .modal-card-foot {
       border-top: 0;
     }
@@ -112,14 +128,27 @@ const getUrl = (
     | 'postgresql'
 ) => {
   switch (type) {
-    case 'hbase':
-      return `${urlObj.zookeeper}${urlObj.z_node}`
+    case 'hbase': {
+      try {
+        return `hbase.zookeeper.quorum: ${
+          JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']
+        }`
+      } catch (e) {
+        return ''
+      }
+    }
     case 'kafka':
       return urlObj.kafka_brokers
+        .map(
+          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
+        )
+        .join(';')
     case 'ftp':
-      return `ftp://${urlObj?.host}:${urlObj?.port}`
+      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
+        urlObj?.host
+      }:${urlObj?.port}`
     case 'hdfs':
-      return `${urlObj?.nodes?.name_node}:${urlObj?.nodes?.port}`
+      return `${urlObj?.name_node}:${urlObj?.port}`
     default:
       return `${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
   }
@@ -131,13 +160,23 @@ const DataSourceList = observer(() => {
   const [isReFetching, setIsReFetching] = useState(false)
   const [delText, setDelText] = useState('')
   const {
-    dataSourceStore: { op, opSourceList, mutateOperation, sourceKinds },
+    dataSourceStore: {
+      op,
+      opSourceList,
+      mutateOperation,
+      sourceKinds,
+      showPingHistories,
+      addEmptyHistories,
+      addItemHistories,
+      removeItemHistories,
+      itemLoadingHistories,
+      setShowPingHistories,
+    },
+    dmStore: { networkOp },
   } = useStore()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
 
-  const pingIds = useRef(new Map<string, 'loading' | 'success' | 'fail'>())
-  const [, forceUpdate] = useReducer((x) => x + 1, 0)
   const [filter, setFilter] = useImmer<{
     regionId: string
     spaceId: string
@@ -145,6 +184,7 @@ const DataSourceList = observer(() => {
     limit: number
     reverse: boolean
     search?: string
+    verbose?: 1 | 2
     [k: string]: any
   }>({
     regionId,
@@ -153,24 +193,36 @@ const DataSourceList = observer(() => {
     reverse: true,
     offset: 0,
     limit: 10,
+    verbose: 2,
   })
   const { isLoading, refetch, data } = useQuerySource(filter)
   const mutation = useMutationSource()
 
-  const { data: networkResp, isFetching } = useQueryNetworks({
-    limit: 100, // TODO: 这里暂时写死 100
-  })
-  const networks: Map<string, Record<string, any>> = useMemo(() => {
-    if (!isFetching && networkResp && networkResp?.ret_code === 0) {
-      return new Map(
-        (networkResp?.infos || []).map((info: Record<string, any>) => [
-          info.id,
-          info,
-        ])
-      )
+  const shouldRefetch = useRef<string>()
+  const removeItem = (sourceId: string, item: Record<'uuid' & string, any>) => {
+    removeItemHistories(sourceId, item)
+    const shouldUpdate =
+      !itemLoadingHistories[sourceId] || !itemLoadingHistories[sourceId].size
+    if (shouldUpdate && op === '') {
+      refetch()
+    } else if (shouldUpdate) {
+      shouldRefetch.current = ''
     }
-    return new Map()
-  }, [isFetching, networkResp])
+  }
+
+  useEffect(() => {
+    if (shouldRefetch.current === op) {
+      shouldRefetch.current = undefined
+      refetch()
+    }
+  }, [op, refetch])
+
+  usePingEvent({
+    addEmpty: addEmptyHistories,
+    addItem: addItemHistories,
+    updateEmpty: addEmptyHistories,
+    removeItem,
+  })
 
   useEffect(() => {
     setFilter((draft) => {
@@ -196,32 +248,6 @@ const DataSourceList = observer(() => {
     })
   }
 
-  const pingMutate = (params: Record<string, any>, id: string) => {
-    const refetchFn = () => {
-      const iter = pingIds.current.values()
-      let item = null
-      do {
-        item = iter.next()
-        if (item.value === 'loading') {
-          forceUpdate()
-          return
-        }
-      } while (!item.done)
-      pingIds.current.clear()
-      refetch()
-    }
-    pingDataSource({ regionId, spaceId, ...params }).then(
-      () => {
-        pingIds.current.set(id, 'success')
-        refetchFn()
-      },
-      () => {
-        pingIds.current.set(id, 'fail')
-        refetchFn()
-      }
-    )
-  }
-
   const handleOk = () => {
     if (op === '') {
       return
@@ -229,7 +255,7 @@ const DataSourceList = observer(() => {
     if (['disable', 'enable', 'delete'].includes(op)) {
       handleMutate({
         op,
-        sourceIds: opSourceList.map((r) => r.source_id),
+        sourceIds: opSourceList.map((r) => r.id),
       })
     }
   }
@@ -237,23 +263,21 @@ const DataSourceList = observer(() => {
   const defaultColumns = [
     {
       title: '数据源名称/ID',
-      dataIndex: 'source_id',
+      dataIndex: 'id',
       width: 230,
       render: (v: string, info: any) => {
         const sourceKindName = sourceKinds.find(
-          (kind) => kind.source_type === info.source_type
+          (kind) => kind.source_type === info.type
         )?.name
         return (
-          <FlexBox tw="space-x-2 items-center">
+          <FlexBox tw="space-x-2 items-center truncate">
             <Center>
               {sourceKindName && <SourceKindImg type={sourceKindName as any} />}
             </Center>
-            <div tw="flex-1">
-              <div>
-                <Tooltip content={info.name} hasPadding theme="dark">
-                  <span>{getEllipsisText(info.name, 20)}</span>
-                </Tooltip>
-              </div>
+            <div tw="flex-1 truncate">
+              <TextEllipsis>
+                <span>{info.name}</span>
+              </TextEllipsis>
               <div tw="text-neut-8">{v}</div>
             </div>
           </FlexBox>
@@ -264,7 +288,7 @@ const DataSourceList = observer(() => {
       title: '状态',
       dataIndex: 'status',
       render: (v: number) => {
-        if (v === 1) {
+        if (v === DATASOURCE_STATUS.ENABLED) {
           return (
             <Center tw="space-x-1">
               <Icons name="circle_enable" size={12} />
@@ -282,7 +306,7 @@ const DataSourceList = observer(() => {
     },
     {
       title: '数据源类型',
-      dataIndex: 'source_type',
+      dataIndex: 'type',
       render: (v: number) => {
         return sourceKinds.find((kind) => kind.source_type === v)?.name
       },
@@ -293,14 +317,13 @@ const DataSourceList = observer(() => {
       width: 250,
       render: (v: any, row: any) => {
         const kindName = sourceKinds.find(
-          (kind) => kind.source_type === row.source_type
+          (kind) => kind.source_type === row.type
         )?.name
 
         if (kindName) {
           const key = kindName.toLowerCase()
           const urlObj = get(v, key)
           // const networkId = get(urlObj, 'network.vpc_network.network_id')
-          const networkName = get(row, 'network_name')
           return (
             <div tw="space-y-1">
               <div tw="truncate flex">
@@ -308,62 +331,27 @@ const DataSourceList = observer(() => {
                   <span tw="inline-block px-1.5 bg-[#E0EBFE] text-center text-[#3B82F6] h-5 w-9 rounded-sm mr-0.5 font-medium">
                     URL
                   </span>
-                  <Tooltip
-                    theme="darker"
-                    content={getUrl(urlObj, key as 'mysql')}
-                    hasPadding
-                  >
-                    <span tw="truncate max-w-[180px] inline-block">
-                      {!['mysql', 'clickhouse', 'postgresql'].includes(key)
-                        ? getUrl(urlObj, key as 'mysql')
-                        : `${getEllipsisText(`${key}://${urlObj.host}`, 16)}:${
-                            urlObj.port
-                          }/${urlObj.database}`}
-                    </span>
-                  </Tooltip>
+
+                  <span tw="truncate max-w-[180px] inline-block">
+                    {!['mysql', 'clickhouse', 'postgresql'].includes(key) ? (
+                      <TextEllipsis>
+                        {getUrl(urlObj, key as 'mysql')}
+                      </TextEllipsis>
+                    ) : (
+                      <Tooltip
+                        theme="darker"
+                        content={getUrl(urlObj, key as 'mysql')}
+                        hasPadding
+                      >
+                        <span>{`${getEllipsisText(
+                          `${key}://${urlObj.host}`,
+                          16
+                        )}:${urlObj.port}/${urlObj.database}`}</span>
+                      </Tooltip>
+                    )}
+                  </span>
                 </>
               </div>
-              {networkName && (
-                <div tw="truncate">
-                  <span tw="inline-block px-1.5 bg-[#F1E4FE] text-[#A855F7] rounded-sm mr-0.5 font-medium">
-                    内网
-                  </span>
-                  {networks.has(
-                    get(urlObj, 'network.vpc_network.network_id')
-                  ) ? (
-                    <Tooltip
-                      theme="darker"
-                      content={
-                        <>
-                          <div>
-                            {`VPC:   ${
-                              networks.get(
-                                get(urlObj, 'network.vpc_network.network_id')
-                              )?.router_id
-                            }`}
-                          </div>
-                          <div>
-                            {`vxnet: ${
-                              networks.get(
-                                get(urlObj, 'network.vpc_network.network_id')
-                              )?.vxnet_id
-                            }`}
-                          </div>
-                        </>
-                      }
-                      hasPadding
-                    >
-                      <span title={networkName}>
-                        {getEllipsisText(networkName, 26)}
-                      </span>
-                    </Tooltip>
-                  ) : (
-                    <span title={networkName}>
-                      {getEllipsisText(networkName, 26)}
-                    </span>
-                  )}
-                </div>
-              )}
             </div>
           )
         }
@@ -372,45 +360,80 @@ const DataSourceList = observer(() => {
     },
     {
       title: '数据源可用性',
-      dataIndex: 'connection',
-      render: (v: number, row: any) => {
-        const renderFn = (state: 'loading' | 'success' | 'fail') => {
-          switch (state) {
-            case 'loading':
-              return (
-                <>
-                  <Icon name="if-load" tw="mr-1" size={16} />
-                  检测中
-                </>
-              )
-            case 'success':
-              return (
-                <Center tw="space-x-1">
-                  <Icons name="circle_check" size={16} />
-                  <span>可用</span>
-                </Center>
-              )
-            default:
-              return (
-                <Center tw="space-x-1">
-                  <Icons name="circle_close" size={16} />
-                  <span>不可用</span>
-                </Center>
-              )
-          }
-        }
-        if (pingIds.current.has(get(row, 'source_id'))) {
-          return renderFn(pingIds.current.get(get(row, 'source_id'))!)
-        }
-        return renderFn(v === 1 ? 'success' : 'fail')
+      dataIndex: 'last_connection',
+      render: (v?: Record<string, any>, row?: Record<string, any>) => {
+        const {
+          result = CONNECTION_STATUS.UNDO,
+          network_info: networkInfo,
+          network_id: networkId,
+        } = v ?? { result: 0 }
+        const isItemLoading = itemLoadingHistories?.[row?.id]?.size
+        return (
+          <>
+            <Center
+              tw="truncate space-x-1"
+              css={css`
+                &:hover {
+                  .${connectionListCls} {
+                    ${tw`block`}
+                  }
+                }
+
+                .ping-connection-status {
+                  ${tw`text-neut-15`}
+                }
+
+                .${connectionListCls} {
+                  ${tw`hidden`}
+                }
+              `}
+            >
+              {getPingConnection(
+                isItemLoading ? CONNECTION_STATUS.LOADING : result,
+                {}
+              )}
+              {(isItemLoading || v) && (
+                <TextLink
+                  color="green"
+                  className={connectionListCls}
+                  hasIcon={false}
+                  onClick={() => {
+                    mutateOperation('', [row])
+                    setShowPingHistories(true)
+                  }}
+                >
+                  查看记录
+                </TextLink>
+              )}
+            </Center>
+            {v && (
+              <Tooltip
+                hasPadding
+                theme="darker"
+                content={
+                  <div>
+                    <div>VPC: {networkInfo?.space_id}</div>
+                    <div>vxnet: {networkInfo?.vxnet_id}</div>
+                  </div>
+                }
+                twChild={tw`truncate`}
+              >
+                <span title={`${networkInfo?.name} (${networkId})`}>
+                  <span>{networkInfo?.name} </span>
+                  <span>({networkId})</span>
+                </span>
+              </Tooltip>
+            )}
+          </>
+        )
       },
     },
     {
       title: '数据源描述',
-      dataIndex: 'comment',
+      dataIndex: 'desc',
       render: (v: string) => {
         return (
-          <Tooltip content={v} theme="dark" hasPadding>
+          <Tooltip content={v} theme="darker" hasPadding>
             <span>{getEllipsisText(v, 20)}</span>
           </Tooltip>
         )
@@ -448,6 +471,7 @@ const DataSourceList = observer(() => {
                 &:hover {
                   ${tw`bg-neut-2 rounded-sm`}
                 }
+
                 svg {
                   ${tw`text-black! bg-transparent! fill-[transparent]!`}
                 }
@@ -457,28 +481,20 @@ const DataSourceList = observer(() => {
               <Menu
                 onClick={(e: React.SyntheticEvent, key: any) => {
                   mutateOperation(key, [info])
-                  if (key === 'ping') {
-                    pingIds.current.set(get(info, 'source_id'), 'loading')
-                    pingMutate(
-                      {
-                        op: key,
-                        source_type: info.source_type,
-                        url: info.url,
-                      },
-                      info.source_id
-                    )
-                  }
                 }}
               >
                 <MenuItem key="ping">
                   <Icon name="if-doublecheck" tw="mr-2" />
                   可用性测试
                 </MenuItem>
-                <MenuItem key="update" disabled={info.status === 2}>
+                <MenuItem
+                  key="update"
+                  disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                >
                   <Icon name="pen" tw="mr-2" />
                   编辑
                 </MenuItem>
-                {info.status === 2 ? (
+                {info.status === DATASOURCE_STATUS.DISABLED ? (
                   <MenuItem key="enable">
                     <Icon name="start" tw="mr-2" />
                     启用
@@ -560,8 +576,8 @@ const DataSourceList = observer(() => {
                 onClick={() =>
                   mutateOperation(
                     'delete',
-                    sourceList.filter(({ source_id }) =>
-                      selectedRowKeys.includes(source_id)
+                    sourceList.filter(({ id }: Record<string, any>) =>
+                      selectedRowKeys.includes(id)
                     )
                   )
                 }
@@ -595,7 +611,7 @@ const DataSourceList = observer(() => {
                   }}
                 />
               </Button>
-              <ToolBar.ColumnsSetting
+              <ColumnsSetting
                 defaultColumns={defaultColumns.map(({ title, dataIndex }) => ({
                   title,
                   dataIndex,
@@ -610,7 +626,7 @@ const DataSourceList = observer(() => {
               selectType="checkbox"
               dataSource={sourceList}
               columns={columns}
-              rowKey="source_id"
+              rowKey="id"
               tw="pb-4 "
               selectedRowKeys={selectedRowKeys}
               onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
@@ -695,16 +711,12 @@ const DataSourceList = observer(() => {
                   <div tw="mt-2">{info.desc}</div>
 
                   <Table
-                    rowKey="source_id"
+                    rowKey="id"
                     columns={columns
                       .filter((col: any) =>
-                        [
-                          'name',
-                          'source_type',
-                          'source_id',
-                          'url',
-                          'created',
-                        ].includes(col.dataIndex)
+                        ['name', 'type', 'id', 'url', 'created'].includes(
+                          col.dataIndex
+                        )
                       )
                       .map((col: any) =>
                         pick(col, ['title', 'dataIndex', 'render', 'width'])
@@ -735,6 +747,9 @@ const DataSourceList = observer(() => {
         }
         return null
       })()}
+      {op === 'ping' && <DataSourcePingModal />}
+      {showPingHistories && <DataSourcePingHistoriesModal />}
+      {networkOp === 'create' && <NetworkModal appendToBody />}
     </>
   )
 })

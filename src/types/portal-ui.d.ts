@@ -42,6 +42,8 @@ declare module '@QCFE/qingcloud-portal-ui' {
   export function PageTab(props: any): JSX.Element
   export function ToolBar(props: any): JSX.Element
   export function Divider(props: any): JSX.Element
+  export function ToolBarLeft(props: any): JSX.Element
+  export function ToolBarRight(props: any): JSX.Element
 
   export interface ModalProps {
     css?: Record<string, Record<string, unknown>>
@@ -63,6 +65,9 @@ declare module '@QCFE/qingcloud-portal-ui' {
     showConfirmLoading?: boolean
     draggable?: boolean
     resizable?: boolean
+    maskClosable?: boolean
+    cancelText?: string
+    escClosable?: boolean
   }
 
   export interface Modal {
