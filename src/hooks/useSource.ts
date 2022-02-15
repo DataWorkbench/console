@@ -12,6 +12,7 @@ import {
   pingDataSource,
 } from 'stores/api'
 import { get } from 'lodash-es'
+import { getIsFormalEnv } from 'utils/index'
 
 export const useQuerySourceKind = (regionId: string, spaceId: string) => {
   const queryKey = 'sourcekind'
@@ -29,6 +30,7 @@ export const useQuerySource = (filter: IDataSourceParams) => {
   queryKey = ['sources', filter]
   return useQuery(queryKey, async () => loadDataSource(filter), {
     keepPreviousData: true,
+    enabled: !getIsFormalEnv(),
   })
 }
 
