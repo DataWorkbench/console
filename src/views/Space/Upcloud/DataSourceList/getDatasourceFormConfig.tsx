@@ -131,7 +131,7 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
           `,
           schemas: [
             {
-              required: true,
+              rule: { required: true },
               help: '请输入 SFTP 私钥（Private Key）',
               status: 'error',
             },
@@ -244,7 +244,7 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
               validateOnBlur: true,
               schemas: [
                 {
-                  required: true,
+                  rule: { required: true },
                   help: '请输入主节点地址',
                   status: 'error',
                 },
@@ -261,7 +261,7 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
               showButton: false,
               schemas: [
                 {
-                  required: true,
+                  rule: { required: true },
                   help: '请输入 port',
                   status: 'error',
                 },

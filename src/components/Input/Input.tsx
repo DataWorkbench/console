@@ -27,7 +27,10 @@ interface IControlRef {
 const InputWrapper = styled(Control)(
   ({ 'data-focused': focused }: { 'data-focused': boolean }) => [
     css`
-      ${tw`flex px-3 space-x-1 hover:border-green-11 border border-neut-3 bg-white focus:border-green-11 dark:bg-neut-16 `},
+      &.is-danger {
+        ${tw`border-red-10`}
+      }
+      ${tw`flex px-3 space-x-1 hover:border-neut-5 border border-neut-3 bg-white focus:border-green-11 dark:bg-neut-16 `},
       & {
         & input.input {
           ${tw`border-none p-0 bg-transparent h-[30px]`}
@@ -41,7 +44,7 @@ const InputWrapper = styled(Control)(
 export const Input = forwardRef<IControlRef, IInputProps>((props, ref) => {
   const [focused, setFocused] = useState(false)
   const inputRef = useRef()
-  const { prefix, suffix, onBlur, onFocus, ...rest } = props
+  const { prefix, suffix, onBlur, onFocus, className, ...rest } = props
 
   const handleBlur: FocusEventHandler = useCallback(
     (e) => {
@@ -65,7 +68,7 @@ export const Input = forwardRef<IControlRef, IInputProps>((props, ref) => {
   }))
 
   return (
-    <InputWrapper data-focused={focused}>
+    <InputWrapper className={className} data-focused={focused}>
       {prefix && <span tw="flex items-center flex-none ">{prefix}</span>}
       <LInput {...rest} onBlur={handleBlur} onFocus={handleFocus} ref={ref} />
       {suffix && <span tw="flex items-center flex-none ">{suffix}</span>}
