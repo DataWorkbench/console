@@ -79,7 +79,10 @@ const parseToKV = (v: string) => {
   return arr.length > 0 ? arr : defArr
 }
 
-const parseFromKv = (arr: string[][], division = ' ') => {
+export const parseFromKv = (arr: string[][], division = ' ') => {
+  if (!Array.isArray(arr)) {
+    return undefined
+  }
   if (arr.length > 0) {
     return arr
       .map((item) => {
@@ -96,7 +99,7 @@ const parseFromKv = (arr: string[][], division = ' ') => {
   return ''
 }
 
-const formatKvStr = (str: string, division = ' ') => {
+export const formatKvStr = (str: string, division = ' ') => {
   const arr: string[] = []
   trim(str)
     .split(/[\r\n]/)

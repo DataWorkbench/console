@@ -24,17 +24,19 @@ interface IControlRef {
   getControlRef: () => IElement
 }
 
-const InputWrapper = styled(Control)(({ focused }: { focused: boolean }) => [
-  css`
-    ${tw`flex px-3 space-x-1 hover:border-green-11 border border-neut-3 bg-white focus:border-green-11 dark:bg-neut-16 `},
-    & {
-      & input.input {
-        ${tw`border-none p-0 bg-transparent`}
+const InputWrapper = styled(Control)(
+  ({ 'data-focused': focused }: { 'data-focused': boolean }) => [
+    css`
+      ${tw`flex px-3 space-x-1 hover:border-green-11 border border-neut-3 bg-white focus:border-green-11 dark:bg-neut-16 `},
+      & {
+        & input.input {
+          ${tw`border-none p-0 bg-transparent h-[30px]`}
+        }
       }
-    }
-  `,
-  focused && tw`border-green-11`,
-])
+    `,
+    focused && tw`border-green-11`,
+  ]
+)
 
 export const Input = forwardRef<IControlRef, IInputProps>((props, ref) => {
   const [focused, setFocused] = useState(false)
@@ -63,7 +65,7 @@ export const Input = forwardRef<IControlRef, IInputProps>((props, ref) => {
   }))
 
   return (
-    <InputWrapper focused={focused}>
+    <InputWrapper data-focused={focused}>
       {prefix && <span tw="flex items-center flex-none ">{prefix}</span>}
       <LInput {...rest} onBlur={handleBlur} onFocus={handleFocus} ref={ref} />
       {suffix && <span tw="flex items-center flex-none ">{suffix}</span>}
