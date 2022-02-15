@@ -185,6 +185,7 @@ const DataSourceModal = observer(
                   )
                 case 'error':
                   return <Button onClick={() => refetch()}>重试</Button>
+                case 'idle':
                 case 'success':
                   if (state.step === 0) {
                     const items = kinds

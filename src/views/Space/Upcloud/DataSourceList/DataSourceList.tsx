@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, pick } from 'lodash-es'
+import { get, lowerCase, pick } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
@@ -17,7 +17,6 @@ import {
   ToolBar,
   ToolBarLeft,
   ToolBarRight,
-  // @ts-ignore
   utils,
 } from '@QCFE/qingcloud-portal-ui'
 import { useMutationSource, useQuerySource, useStore } from 'hooks'
@@ -27,9 +26,9 @@ import {
   ContentBox,
   FlexBox,
   Icons,
-  Tooltip,
-  TextLink,
   TextEllipsis,
+  TextLink,
+  Tooltip,
 } from 'components'
 import { getHelpCenterLink } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
@@ -42,7 +41,7 @@ import {
   getPingConnection,
 } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
-import { CONNECTION_STATUS, DATASOURCE_STATUS } from './constant'
+import { CONNECTION_STATUS, DATASOURCE_STATUS, ftpProtocol } from './constant'
 import { SourceKindImg } from './styled'
 
 const { MenuItem } = Menu as any
@@ -129,14 +128,27 @@ const getUrl = (
     | 'postgresql'
 ) => {
   switch (type) {
-    case 'hbase':
-      return `${urlObj.zookeeper}${urlObj.z_node}`
+    case 'hbase': {
+      try {
+        return `hbase.zookeeper.quorum: ${
+          JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']
+        }`
+      } catch (e) {
+        return ''
+      }
+    }
     case 'kafka':
       return urlObj.kafka_brokers
+        .map(
+          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
+        )
+        .join(';')
     case 'ftp':
-      return `ftp://${urlObj?.host}:${urlObj?.port}`
+      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
+        urlObj?.host
+      }:${urlObj?.port}`
     case 'hdfs':
-      return `${urlObj?.nodes?.name_node}:${urlObj?.nodes?.port}`
+      return `${urlObj?.name_node}:${urlObj?.port}`
     default:
       return `${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
   }
@@ -319,19 +331,25 @@ const DataSourceList = observer(() => {
                   <span tw="inline-block px-1.5 bg-[#E0EBFE] text-center text-[#3B82F6] h-5 w-9 rounded-sm mr-0.5 font-medium">
                     URL
                   </span>
-                  <Tooltip
-                    theme="darker"
-                    content={getUrl(urlObj, key as 'mysql')}
-                    hasPadding
-                  >
-                    <span tw="truncate max-w-[180px] inline-block">
-                      {!['mysql', 'clickhouse', 'postgresql'].includes(key)
-                        ? getUrl(urlObj, key as 'mysql')
-                        : `${getEllipsisText(`${key}://${urlObj.host}`, 16)}:${
-                            urlObj.port
-                          }/${urlObj.database}`}
-                    </span>
-                  </Tooltip>
+
+                  <span tw="truncate max-w-[180px] inline-block">
+                    {!['mysql', 'clickhouse', 'postgresql'].includes(key) ? (
+                      <TextEllipsis>
+                        {getUrl(urlObj, key as 'mysql')}
+                      </TextEllipsis>
+                    ) : (
+                      <Tooltip
+                        theme="darker"
+                        content={getUrl(urlObj, key as 'mysql')}
+                        hasPadding
+                      >
+                        <span>{`${getEllipsisText(
+                          `${key}://${urlObj.host}`,
+                          16
+                        )}:${urlObj.port}/${urlObj.database}`}</span>
+                      </Tooltip>
+                    )}
+                  </span>
                 </>
               </div>
             </div>
@@ -360,9 +378,11 @@ const DataSourceList = observer(() => {
                     ${tw`block`}
                   }
                 }
+
                 .ping-connection-status {
                   ${tw`text-neut-15`}
                 }
+
                 .${connectionListCls} {
                   ${tw`hidden`}
                 }
@@ -691,7 +711,7 @@ const DataSourceList = observer(() => {
                   <div tw="mt-2">{info.desc}</div>
 
                   <Table
-                    rowKey="source_id"
+                    rowKey="id"
                     columns={columns
                       .filter((col: any) =>
                         ['name', 'type', 'id', 'url', 'created'].includes(
