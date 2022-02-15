@@ -4,6 +4,7 @@ import { TextLink, HelpCenterLink } from 'components'
 import { useState } from 'react'
 import { activateDataomnis } from 'stores/api'
 import DataOmnisLoading from 'assets/data_omnis_loading.svg'
+import { get } from 'lodash-es'
 
 const ActivateDataOmnis = () => {
   const history = useHistory()
@@ -15,6 +16,7 @@ const ActivateDataOmnis = () => {
 
     const ret = await activateDataomnis()
     if (ret.ret_code === 0) {
+      localStorage.setItem('DATA_OMNIS_OPENED', get(window, 'USER.user_id', ''))
       history.push('/overview')
     }
 
@@ -62,7 +64,7 @@ const ActivateDataOmnis = () => {
             <div tw="flex mb-8">
               <div tw="pr-9 text-sm leading-8">开通产品</div>
               <div>
-                <Button type="outlined" tw="px-5 h-9 bg-green-2!">
+                <Button type="outlined" tw="px-5 h-9 bg-green-2! cursor-auto">
                   大数据工作台
                 </Button>
               </div>
@@ -85,9 +87,22 @@ const ActivateDataOmnis = () => {
                   }}
                 >
                   已阅读并同意
-                  <a href="##" tw="text-link">
-                    《大数据工作台服务条款》
-                  </a>
+                  <TextLink
+                    tw="no-underline"
+                    href="//www.qingcloud.com/terms#terms"
+                    target="_blank"
+                    hasIcon={false}
+                  >
+                    《QingCloud 服务条款》
+                  </TextLink>
+                  <HelpCenterLink
+                    tw="no-underline"
+                    href="/protocol/beta_rules/"
+                    isIframe={false}
+                    hasIcon={false}
+                  >
+                    《大数据工作台公测规则》
+                  </HelpCenterLink>
                 </Checkbox>
               </div>
             </div>
@@ -99,19 +114,20 @@ const ActivateDataOmnis = () => {
               onClick={handleActivateDataOmnis}
               disabled={!checked}
             >
-              确定开通
+              申请公测
             </Button>
 
             <div>
-              <TextLink
-                href="https://deploy-preview-654--qingcloud-docs.netlify.app/bigdata/dataomnis/billing/price/"
-                target="_blank"
+              <HelpCenterLink
+                tw="no-underline"
+                href="/billing/price/"
+                isIframe={false}
               >
                 了解计费方式
-              </TextLink>
-              <TextLink target="_blank" tw="ml-5">
+              </HelpCenterLink>
+              {/* <HelpCenterLink tw="no-underline ml-5" href="/" isIframe={false}>
                 查看接口文档
-              </TextLink>
+              </HelpCenterLink> */}
             </div>
           </div>
         </div>

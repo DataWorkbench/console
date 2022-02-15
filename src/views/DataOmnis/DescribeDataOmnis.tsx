@@ -33,7 +33,7 @@ const DescribeDataOmnis = () => {
               tw="text-xs font-medium px-6 h-8 box-border"
               onClick={() => history.push('/activate')}
             >
-              立即开通
+              申请公测
             </Button>
           </div>
         </div>

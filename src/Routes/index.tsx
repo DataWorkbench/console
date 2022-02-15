@@ -21,7 +21,7 @@ const ActivateDataOmnis = lazy(
 
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
-// const Create = lazy(() => import(/* webpackChunkName: "home" */ 'views/Create'))
+
 const Overview = lazy(
   () => import(/* webpackChunkName: "home" */ 'views/Overview')
 )
@@ -58,11 +58,11 @@ const Routes = () => {
     globalStore.set({ darkMode: matched })
   }, [matched, setDarkMode, globalStore])
 
-  // TODO remove location condition after PEK2
-  if (
-    localStorage.getItem('DATA_OMNIS_USER') &&
-    !/^console\.qingcloud\.com$/.test(window.location.hostname)
-  ) {
+  const isActivated =
+    localStorage.getItem('DATA_OMNIS_OPENED') ||
+    /^(pek[23])?console\.qingcloud\.com$/.test(window.location.hostname)
+
+  if (!isActivated) {
     return (
       <Route>
         <Layout>
@@ -104,7 +104,6 @@ const Routes = () => {
       <Route>
         <Layout>
           <Switch>
-            {/* <Route path="/create/:step?" component={Create} /> */}
             <Route path="/overview" component={Overview} />
             <Route path="/workspace" component={WorkSpace} />
             <Route
