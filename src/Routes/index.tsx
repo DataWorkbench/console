@@ -60,7 +60,7 @@ const Routes = () => {
 
   const isActivated =
     localStorage.getItem('DATA_OMNIS_OPENED') ||
-    /^(pek[23])?console\.qingcloud\.com$/.test(window.location.hostname)
+    /^pek[^.]*\.qingcloud\.com$/.test(window.location.hostname)
 
   if (!isActivated) {
     return (
