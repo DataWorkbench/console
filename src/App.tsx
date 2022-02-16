@@ -43,7 +43,7 @@ const App = () => {
   const handleGlobalData = async () => {
     const { hostname } = window.location
     const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
-    const isPekEnv = /^pek[23]console\.qingcloud\.com$/.test(hostname)
+    const isPekEnv = /^pek[^.]*\.qingcloud\.com$/.test(hostname)
 
     if (!isOnlineEnv) {
       const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
