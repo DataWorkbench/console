@@ -68,6 +68,7 @@ export const DataSourcePingModal = () => {
       title={`${get(opSourceList, `[0].name`)} 可用性测试记录`}
       onCancel={() => mutateOperation('', [])}
       okText="确认"
+      onOk={() => mutateOperation('', [])}
     >
       <Form>
         <SelectWithRefresh
