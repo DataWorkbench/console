@@ -23,6 +23,7 @@ import {
 } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
+import { toJS } from 'mobx'
 import { DataSourcePingButton } from './DataSourcePing'
 import { NetworkContext } from './NetworkProvider'
 import {
@@ -82,6 +83,7 @@ const MultiFieldWrapper = styled.div(() => [
       .field {
         ${tw`block`}
       }
+
       .control {
         ${tw`w-full`}
       }
@@ -148,10 +150,12 @@ const DataSourceForm = ({
     type: 'vpc' | 'eip'
     id: string
     name: string
+    network_info: Record<string, any>
   }>({
     type: 'vpc',
     id: '',
     name: '',
+    network_info: {},
   })
   const ref = useRef<Form>(null)
 
@@ -201,6 +205,7 @@ const DataSourceForm = ({
         }
       : {
           status: false,
+          message: toJS(get(opSourceList, '[0].last_connection.message')),
         }
   })
 
@@ -541,6 +546,7 @@ const DataSourceForm = ({
                 setNetWork((draft) => {
                   draft.id = v
                   draft.name = option.label
+                  draft.network_info = option
                 })
                 setDefaultStatus(undefined)
               }}

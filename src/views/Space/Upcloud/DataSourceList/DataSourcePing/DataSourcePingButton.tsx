@@ -22,6 +22,7 @@ interface IDataSourcePingButtonProps {
   network?: {
     id: string
     name: string
+    network_info: Record<string, any>
   }
 }
 
@@ -53,6 +54,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         uuid: Math.random().toString(32).substring(2),
         name: network?.name,
         network_id: network?.id,
+        network_info: network?.network_info,
         created: now() / 1000,
         sourceId,
         stage: sourceId
@@ -95,7 +97,14 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         message: msg,
       })
     }
-  }, [getValue, mutation, network?.id, network?.name, sourceId])
+  }, [
+    getValue,
+    mutation,
+    network?.id,
+    network?.network_info,
+    network?.name,
+    sourceId,
+  ])
 
   const pingHistory = useMemo(() => {
     return (
