@@ -77,10 +77,10 @@ export const useQuerySourceHistories = (
         newOffset = 0
         newLimit = 0
       } else if (tempList.length) {
-        newOffset = offset + tempList.length
+        newOffset = 0
         newLimit = limit - tempList.length
       } else {
-        newOffset = offset - tempList.length
+        newOffset = offset - localList.length
         newLimit = 10
       }
 

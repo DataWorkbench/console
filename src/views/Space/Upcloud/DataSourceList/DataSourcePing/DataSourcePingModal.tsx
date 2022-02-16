@@ -6,6 +6,7 @@ import { Field, Form, Label } from '@QCFE/lego-ui'
 
 import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
 import { useStore } from 'stores'
+import { toJS } from 'mobx'
 
 import { networkLink } from 'views/Space/Upcloud/DataSourceList/constant'
 import { DataSourcePingButton } from './DataSourcePingButton'
@@ -20,14 +21,12 @@ export const DataSourcePingModal = () => {
   // const sourceType = get(opSourceList, `[0].type`)
   const networkId = get(opSourceList, `[0].last_connection.network_id`)
 
-  const networkName = get(
-    opSourceList,
-    `[0].last_connection.network_info.network_name`
-  )
+  const networkName = get(opSourceList, `[0].last_connection.network_info.name`)
 
   const [network, setNetwork] = useImmer({
     id: networkId,
     name: networkName,
+    network_info: toJS(get(opSourceList, `[0].last_connection.network_info`)),
   })
 
   const [validate, setValidate] = useState<'error'>()
@@ -86,6 +85,7 @@ export const DataSourcePingModal = () => {
             setNetwork((_) => {
               _.id = id
               _.name = option?.label
+              _.network_info = option
             })
             setValidate(undefined)
           }}
