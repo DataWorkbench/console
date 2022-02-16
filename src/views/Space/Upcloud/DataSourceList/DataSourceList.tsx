@@ -130,9 +130,7 @@ const getUrl = (
   switch (type) {
     case 'hbase': {
       try {
-        return `hbase.zookeeper.quorum: ${
-          JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']
-        }`
+        return `${JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']}`
       } catch (e) {
         return ''
       }
@@ -142,15 +140,15 @@ const getUrl = (
         .map(
           ({ host, port }: { host: string; port: number }) => `${host}:${port}`
         )
-        .join(';')
+        .join(',')
     case 'ftp':
       return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
         urlObj?.host
       }:${urlObj?.port}`
     case 'hdfs':
-      return `${urlObj?.name_node}:${urlObj?.port}`
+      return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
     default:
-      return `${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      return `jdbc:${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
   }
 }
 const DataSourceList = observer(() => {
@@ -344,7 +342,7 @@ const DataSourceList = observer(() => {
                         hasPadding
                       >
                         <span>{`${getEllipsisText(
-                          `${key}://${urlObj.host}`,
+                          `jdbc:${key}://${urlObj.host}`,
                           16
                         )}:${urlObj.port}/${urlObj.database}`}</span>
                       </Tooltip>
