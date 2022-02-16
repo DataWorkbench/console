@@ -13,6 +13,7 @@ import {
   updateDataSource,
 } from 'stores/api'
 import { get } from 'lodash-es'
+import { getIsFormalEnv } from 'utils/index'
 
 let pingListKey: any
 export const getPingHistoriesKey = () => pingListKey
@@ -43,6 +44,7 @@ export const useQuerySource = (filter: IDataSourceParams) => {
   queryKey = ['sources', filter]
   return useQuery(queryKey, async () => loadDataSource(filter), {
     keepPreviousData: true,
+    enabled: !getIsFormalEnv(),
   })
 }
 
