@@ -8,6 +8,7 @@ import { useQuerySourceHistories } from 'hooks'
 import emitter from 'utils/emitter'
 import { useStore } from 'stores'
 import { Tooltip } from 'components'
+import { timeFormat } from 'utils/convert'
 import { SOURCE_PING_RESULT } from '../constant'
 import { getPingConnection } from './getPingConnection'
 
@@ -53,7 +54,7 @@ const columns = [
     title: '耗时',
     dataIndex: 'elapse',
     width: 100,
-    render: (v?: number) => (v !== undefined ? `${v} 秒` : ''),
+    render: (v?: number) => (v !== undefined ? timeFormat(v) : ''),
     // render: (val?: number, record?: Record<string, any>) => (
     //   <TimeInterval consuming={val} startTime={record?.startAt} />
     // ),
