@@ -58,9 +58,7 @@ const Routes = () => {
     globalStore.set({ darkMode: matched })
   }, [matched, setDarkMode, globalStore])
 
-  const isActivated =
-    localStorage.getItem('DATA_OMNIS_OPENED') ||
-    /^pek[^.]*\.qingcloud\.com$/.test(window.location.hostname)
+  const isActivated = localStorage.getItem('DATA_OMNIS_OPENED')
 
   if (!isActivated) {
     return (
