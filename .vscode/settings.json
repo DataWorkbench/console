@@ -7,22 +7,6 @@
     "source.fixAll.eslint": true,
     "source.fixAll.stylelint": true
   },
-  "tailwindCSS.experimental.classRegex": [
-    // ":(?:.|\n)*?[\"'`]([^\"'`]*).*?,",
-    "\\w+ClassName=[\"']([^\"']*)[\"']",
-    "tw`([^`]*)", // tw`...`
-    "tw=\"([^\"]*)", // <div tw="..." />
-    "tw={\"([^\"}]*)", // <div tw={"..."} />
-    "tw\\.\\w+`([^`]*)", // tw.xxx`...`
-    "tw\\(\\n?.*?\\n?\\)`([^`]*)" // tw(Component)`...`
-  ],
-  "tailwindCSS.includeLanguages": {
-    "typescript": "javascript",
-    "typescriptreact": "javascript"
-  },
   "tailwindcss.jsxPropImportChecking": false,
-  "emmet.includeLanguages": {
-    "postcss": "css"
-  },
-  "svg.preview.background": "dark-transparent"
+  "tailwindcss.hoverColorHint": "hex"
 }

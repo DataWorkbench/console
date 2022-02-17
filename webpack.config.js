@@ -59,7 +59,9 @@ let config = {
                   symbolId: 'bdicon-[name]',
                 },
               },
-              { loader: 'svgo-loader', options: {} },
+              {
+                loader: 'svgo-loader',
+              },
             ],
           },
           {
