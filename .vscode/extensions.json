@@ -3,7 +3,7 @@
     "stylelint.vscode-stylelint",
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
-    "bradlc.vscode-tailwindcss",
-    "eamodio.gitlens"
+    "eamodio.gitlens",
+    "lightyen.tailwindcss-intellisense-twin"
   ]
 }
