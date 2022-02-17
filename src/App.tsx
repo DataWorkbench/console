@@ -43,7 +43,6 @@ const App = () => {
   const handleGlobalData = async () => {
     const { hostname } = window.location
     const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
-    const isPekEnv = /^pek[^.]*\.qingcloud\.com$/.test(hostname)
 
     if (!isOnlineEnv) {
       const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
@@ -51,15 +50,13 @@ const App = () => {
       set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
     }
 
-    if (!isPekEnv) {
-      const currentUser = get(window, 'USER.user_id', '')
-      const registerUser = localStorage.getItem('DATA_OMNIS_OPENED')
-      const isActivated = registerUser && registerUser === currentUser
-      if (!isActivated) {
-        const ret = await describeDataomnis()
-        if (ret.ret_code === 0 && ret.status === 'enable') {
-          localStorage.setItem('DATA_OMNIS_OPENED', currentUser)
-        }
+    const currentUser = get(window, 'USER.user_id', '')
+    const registerUser = localStorage.getItem('DATA_OMNIS_OPENED')
+    const isActivated = registerUser && registerUser === currentUser
+    if (!isActivated) {
+      const ret = await describeDataomnis()
+      if (ret.ret_code === 0 && ret.status === 'enable') {
+        localStorage.setItem('DATA_OMNIS_OPENED', currentUser)
       }
     }
 
