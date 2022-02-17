@@ -259,7 +259,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 </Field>
                 <NumberField
                   isMini
-                  min={0}
+                  min={1}
                   labelClassName="label-required"
                   max={100}
                   name="id"
