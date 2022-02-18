@@ -202,7 +202,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
         confirmLoading={mutation.isLoading}
       >
         <Loading spinning={isFetching}>
-          <Collapse defaultActiveKey={['p1']}>
+          <Collapse defaultActiveKey={['p1', 'p2']}>
             <CollapseItem
               key="p1"
               label={
