@@ -57,6 +57,8 @@ const App = () => {
       const ret = await describeDataomnis()
       if (ret.ret_code === 0 && ret.status === 'enable') {
         localStorage.setItem('DATA_OMNIS_OPENED', currentUser)
+      } else {
+        localStorage.removeItem('DATA_OMNIS_OPENED')
       }
     }
 
