@@ -18,7 +18,7 @@ export const loadResourceList = (
   request(
     {
       region: regionId,
-      uri: `/v1/workspace/${spaceId}/resource`,
+      uri: `/v1/workspace/${spaceId}/file`,
       query: rest,
     },
     { cancel: cancel as any }
@@ -27,8 +27,8 @@ export const loadResourceList = (
 export interface IListResourceParams extends IResource {
   limit?: number
   offset?: number
-  resource_name?: string
-  resource_type?: string
+  name?: string
+  type?: string
   reverse?: boolean
   search?: string
   sort_by?: object
@@ -60,7 +60,7 @@ export const createResourceJob = ({
   Object.keys(rest).map((key: any) => params.append(key, rest[key]))
   return customRequest(
     {
-      url: `${endpoint}/v1/workspace/${spaceId}/resource`,
+      url: `${endpoint}/v1/workspace/${spaceId}/file`,
       headers,
       params,
     },
@@ -73,14 +73,14 @@ export const reuploadResource = ({
   spaceId,
   headers,
   cancel,
-  resource_id,
+  id,
   ...rest
 }: any) => {
   const params = new FormData()
   params.append('file', rest.file)
   return customRequest(
     {
-      url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}`,
+      url: `${endpoint}/v1/workspace/${spaceId}/file/${id}`,
       headers,
       params,
     },
@@ -96,34 +96,24 @@ export const deleteResource = ({
   request({
     region: regionId,
     method: 'POST',
-    uri: `/v1/workspace/${spaceId}/resource/deletes`,
+    uri: `/v1/workspace/${spaceId}/file/deletes`,
     body: {
-      resource_ids: resourceIds,
+      file_ids: resourceIds,
     },
   })
 
-export const updateResource = ({
-  regionId,
-  spaceId,
-  resource_id,
-  ...rest
-}: any) =>
+export const updateResource = ({ regionId, spaceId, id, ...rest }: any) =>
   request({
     region: regionId,
     method: 'PUT',
-    uri: `/v1/workspace/${spaceId}/resource/${resource_id}`,
+    uri: `/v1/workspace/${spaceId}/file/${id}`,
     body: { ...rest },
   })
 
-export const downloadFile = ({
-  endpoint,
-  spaceId,
-  headers,
-  resource_id,
-}: any) =>
+export const downloadFile = ({ endpoint, spaceId, headers, id }: any) =>
   customRequest(
     {
-      url: `${endpoint}/v1/workspace/${spaceId}/resource/${resource_id}/download`,
+      url: `${endpoint}/v1/workspace/${spaceId}/file/${id}/download`,
       method: 'GET',
       headers,
     },

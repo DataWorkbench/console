@@ -53,18 +53,18 @@ const ResourceSelect = (props: ResourceSelectProps) => {
   const [filter, setFilter] = useImmer<{
     limit: number
     offset: number
-    resource_type?: number
+    type?: number
     udf_type?: number
     search: string
   }>({
     limit: 15,
     offset: 0,
     search: '',
-    ...(isUdf ? { udf_type: type } : { resource_type: type }),
+    ...(isUdf ? { udf_type: type } : { type }),
   })
 
   const fn = !isUdf ? useQueryResource : useQueryUdf
-  const key = !isUdf ? 'resource_id' : 'udf_id'
+  const key = !isUdf ? 'id' : 'udf_id'
   const v = fn(filter)
   const { status, data, fetchNextPage, hasNextPage } = v
   const options = flatten(
