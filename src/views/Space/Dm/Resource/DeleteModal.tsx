@@ -21,7 +21,7 @@ export default function DeleteModal(props: any) {
     mutation.mutate(
       {
         op: 'delete',
-        resourceIds: Array.from(selectedList, (el: any) => el.resource_id),
+        resourceIds: Array.from(selectedList, (el: any) => el.id),
       },
       {
         onSuccess: async () => {
@@ -60,7 +60,7 @@ export default function DeleteModal(props: any) {
     },
     {
       title: 'ID',
-      dataIndex: 'resource_id',
+      dataIndex: 'id',
       render: (value: string) => <div tw="text-neut-8">{value}</div>,
     },
     {
@@ -70,7 +70,7 @@ export default function DeleteModal(props: any) {
     },
     {
       title: '描述',
-      dataIndex: 'description',
+      dataIndex: 'desc',
       render: (value: string) => {
         return (
           <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
@@ -117,7 +117,7 @@ export default function DeleteModal(props: any) {
               selectedList.length === 1 ? (
                 <>
                   删除{PackageName[packageType]}
-                  {selectedList[0].name}({selectedList[0].resource_id})注意事项
+                  {selectedList[0].name}({selectedList[0].id})注意事项
                 </>
               ) : (
                 <>
@@ -137,8 +137,7 @@ export default function DeleteModal(props: any) {
                       </>
                     ) : (
                       <>
-                        删除程序包{selectedList[0].name}(
-                        {selectedList[0].resource_id}
+                        删除程序包{selectedList[0].name}({selectedList[0].id}
                         后，代码开发模式下将无法引用此 Jar
                         包，不影响已运行的作业实例，但重新运行相关作业时会报错，且该操作无法撤回。确认删除吗？
                       </>
@@ -150,8 +149,7 @@ export default function DeleteModal(props: any) {
                       </>
                     ) : (
                       <>
-                        删除函数包{selectedList[0].name}(
-                        {selectedList[0].resource_id}
+                        删除函数包{selectedList[0].name}({selectedList[0].id}
                         )后，相关作业将无法引用，已引用的作业将受到影响，且该操作无法撤回。确认删除吗？
                       </>
                     ))}
@@ -160,8 +158,7 @@ export default function DeleteModal(props: any) {
                       <>删除以下依赖包后，操作无法撤回。确认删除吗？</>
                     ) : (
                       <>
-                        删除依赖包{selectedList[0].name}(
-                        {selectedList[0].resource_id}
+                        删除依赖包{selectedList[0].name}({selectedList[0].id}
                         )后，操作无法撤回。确认删除吗？
                       </>
                     ))}
@@ -178,7 +175,7 @@ export default function DeleteModal(props: any) {
               (page - 1) * pageSize,
               page * pageSize
             )}
-            rowKey="resource_id"
+            rowKey="id"
             columns={columns}
             pagination={{
               total: selectedList.length,

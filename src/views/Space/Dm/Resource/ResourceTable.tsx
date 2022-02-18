@@ -76,8 +76,8 @@ const DarkTabs = styled(Tabs)(
 interface IFilter {
   limit: number
   offset: number
-  resource_name: string
-  resource_type: number
+  name: string
+  type: number
   reverse: boolean
   search?: string
   sort_by: string
@@ -101,8 +101,8 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const [filter, setFilter] = useImmer<IFilter>({
       limit: 10,
       offset: 0,
-      resource_name: '',
-      resource_type: PackageTypeMap[packageType],
+      name: '',
+      type: PackageTypeMap[packageType],
       reverse: true,
       search: '',
       sort_by: '',
@@ -123,7 +123,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const handleTabChange = (name: string) => {
       setPackageType(name)
       setFilter((draft) => {
-        draft.resource_type = PackageTypeMap[name]
+        draft.type = PackageTypeMap[name]
         draft.offset = 0
       })
 
@@ -145,10 +145,10 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         setSelectedRows([])
       } else {
         const newSelectedRows = selectedRows.filter(
-          (el: any) => el.resource_id !== deleteData.value[0].resource_id
+          (el: any) => el.id !== deleteData.value[0].id
         )
         const newSelectedKeys = selectedRowKeys.filter(
-          (el: string) => el !== deleteData.value[0].resource_id
+          (el: string) => el !== deleteData.value[0].id
         )
         setSelectedRows(newSelectedRows)
         setSelectedRowKeys(newSelectedKeys)
@@ -176,7 +176,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         mutation.mutate(
           {
             op: 'enable',
-            resource_id: row.resource_id,
+            id: row.id,
           },
           {
             onSuccess: (data) => {
@@ -239,7 +239,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: 'ID',
-          dataIndex: 'resource_id',
+          dataIndex: 'id',
           render: (value: string) => {
             return <div tw="text-neut-8">{value}</div>
           },
@@ -251,7 +251,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: '描述',
-          dataIndex: 'description',
+          dataIndex: 'desc',
           render: (value: string) => {
             return (
               <div tw="overflow-hidden">
@@ -434,7 +434,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
             </FlexBox>
           </div>
           <Table
-            rowKey="resource_id"
+            rowKey="id"
             selectType="checkbox"
             loading={isFetching || mutation.isLoading}
             dataSource={infos || []}
@@ -443,7 +443,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
             onSelect={(keys: string[], rows: any) => {
               setSelectedRowKeys(keys)
               const rowsMap = rows.reduce((acc: any, cur: any) => {
-                acc[cur.resource_id] = cur
+                acc[cur.id] = cur
                 return acc
               }, {})
               setSelectedMap({ ...selectedMap, ...rowsMap })

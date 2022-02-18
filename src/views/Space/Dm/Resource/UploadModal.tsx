@@ -96,19 +96,19 @@ const LoadingWrap = styled(Loading)(() => [
 type IPackageType = 'program' | 'function' | 'dependency'
 
 interface IFormFields {
-  resource_id?: String | undefined
-  resource_type: Number
+  id?: String | undefined
+  type: Number
   file?: File | undefined
-  resource_name: String
-  description: String
+  name: String
+  desc: String
 }
 
 const getDefaultFields = (type: IPackageType) => ({
-  resource_id: undefined,
-  resource_type: PackageTypeMap[type],
+  id: undefined,
+  type: PackageTypeMap[type],
   file: undefined,
-  resource_name: '',
-  description: '',
+  name: '',
+  desc: '',
 })
 
 const UploadModal = (props: any) => {
@@ -139,10 +139,10 @@ const UploadModal = (props: any) => {
   useEffect(() => {
     if (initFields) {
       setFields((draft) => {
-        draft.resource_id = initFields.resource_id
-        draft.resource_type = initFields.type
-        draft.resource_name = initFields.name
-        draft.description = initFields.description
+        draft.id = initFields.id
+        draft.type = initFields.type
+        draft.name = initFields.name
+        draft.desc = initFields.desc
       })
     }
   }, [initFields, setFields])
@@ -197,7 +197,7 @@ const UploadModal = (props: any) => {
 
     setFields((draft) => {
       draft.file = resource
-      if (!fields.resource_name) draft.resource_name = name
+      if (!fields.name) draft.name = name
     })
   }
 
@@ -429,7 +429,7 @@ const UploadModal = (props: any) => {
         <TextFieldWrapper
           maxLength="128"
           autoComplete="off"
-          name="resource_name"
+          name="name"
           labelClassName="medium"
           placeholder={`请输入${PackageNameByType}显示名`}
           label={<AffixLabel required>{PackageNameByType}显示名</AffixLabel>}
@@ -438,10 +438,10 @@ const UploadModal = (props: any) => {
           disabled={operation === 'view'}
           onChange={(value: string) =>
             setFields((draft) => {
-              draft.resource_name = value
+              draft.name = value
             })
           }
-          value={fields.resource_name}
+          value={fields.name}
           schemas={[
             {
               rule: { required: true },
@@ -464,10 +464,10 @@ const UploadModal = (props: any) => {
           placeholder={`请输入${PackageNameByType}描述`}
           maxLength="500"
           disabled={operation === 'view'}
-          value={fields.description}
+          value={fields.desc}
           onChange={(value: String) =>
             setFields((draft) => {
-              draft.description = value
+              draft.desc = value
             })
           }
         />
