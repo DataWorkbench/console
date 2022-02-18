@@ -36,7 +36,7 @@ const Practice: React.FC<Props> = ({ className }) => {
             <IconCard
               icon="templet"
               title="实时计算 uv、pv、转化率（SQL 作业）"
-              subtitle="本小节为您介绍如何通过 SQL 作业对接网站的点击流数据，并对点击流数据进行实时分析，计算出独立访客数（uv）、页面访问数（pv）、转化率等指标"
+              subtitle="本实践为您介绍如何通过 SQL 作业对接网站的点击流数据，并对点击流数据进行实时分析，计算出独立访客数（uv）、页面访问数（pv）、转化率等指标"
             />
           </HelpCenterLink>
         </div>
