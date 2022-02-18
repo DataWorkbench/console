@@ -55,7 +55,7 @@ const ActivateDataOmnis = () => {
       </div>
       <div tw="flex-1 w-10/12 mx-auto">
         <Alert
-          message="购买前建议详细了解 QingCloud 青云的《服务协议》，如违反该协议，QingCloud 青云将有权随时单方采取限制，中止或者终止服务、封号等措施，并不予退订/退款。"
+          message="购买前建议详细了解青云QingCloud 的《QingCloud 服务条款》，如违反该协议，青云QingCloud 将有权随时单方采取限制，中止或者终止服务、封号等措施，并不予退订/退款。"
           type="warning"
           tw="mt-5"
         />
@@ -73,7 +73,7 @@ const ActivateDataOmnis = () => {
               <div tw="pr-9 text-sm">开通说明</div>
               <div>
                 完成个人认证且账户余额大于 0
-                元的用户可以直接开通，开通后按实际使用量计费。
+                元的用户可以直接开通，开通后按实际用量收费 。
               </div>
             </div>
             <div tw="flex mb-8 border-t border-neut-2 pt-5">
@@ -95,6 +95,7 @@ const ActivateDataOmnis = () => {
                   >
                     《QingCloud 服务条款》
                   </TextLink>
+                  和
                   <HelpCenterLink
                     tw="no-underline"
                     href="/protocol/beta_rules/"
