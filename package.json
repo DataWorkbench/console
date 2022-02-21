@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development webpack serve",
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production webpack && cp -r configs ./dist",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
     "deploy:testing": "bash bin/deploy.sh testing",
