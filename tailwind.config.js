@@ -101,6 +101,17 @@ module.exports = {
           transform: 'translateY(-50%) translateX(-50%)',
           left: 'calc(50vw)',
         },
+        '.table-instance-name': {
+          fontSize: '12px',
+          lineHeight: '20px',
+          fontWeight: 600,
+          color: neut[15],
+        },
+        '.table-instance-id': {
+          color: neut[8],
+          fontSize: '12px',
+          lineHeight: '20px',
+        },
       })
     }),
   ],

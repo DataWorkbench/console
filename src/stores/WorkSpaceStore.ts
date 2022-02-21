@@ -65,7 +65,12 @@ class WorkSpaceStore {
     this.rootStore = rootStore
   }
 
-  set(params: { [key: string]: any }) {
+  space?: { name: string; id: string }
+
+  spaceIndex = 0
+
+  set = (params: { [key: string]: any }) => {
+    console.log(1111, params)
     set(this, { ...params })
   }
 }
