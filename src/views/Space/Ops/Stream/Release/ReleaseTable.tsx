@@ -63,7 +63,7 @@ export const ReleaseTable = observer(({ query }: any) => {
     search: '',
     status: undefined,
     job_id: '',
-    sort_by: 'created',
+    sort_by: 'updated',
   })
 
   const toggle = useCallback(
@@ -256,7 +256,7 @@ export const ReleaseTable = observer(({ query }: any) => {
         render: (value: number) => <>{JobTypes[value]}</>,
       },
       {
-        title: '发布时间',
+        title: '首次发布时间',
         dataIndex: 'created',
         sortable: true,
         sortOrder:
@@ -270,7 +270,7 @@ export const ReleaseTable = observer(({ query }: any) => {
         ),
       },
       {
-        title: '最后修改时间',
+        title: '最近发布时间',
         dataIndex: 'updated',
         sortable: true,
         // filter.reverse ? 'asc' : 'desc',
