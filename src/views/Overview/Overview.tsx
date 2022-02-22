@@ -2,9 +2,16 @@ import { observer } from 'mobx-react-lite'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
 import tw, { styled, css } from 'twin.macro'
-import { FlexBox, Card, CardHeader, CardContent, IconCard } from 'components'
+import {
+  FlexBox,
+  Card,
+  CardHeader,
+  CardContent,
+  IconCard,
+  HelpCenterLink,
+} from 'components'
 import { useStore } from 'stores'
-import { getHelpCenterLink } from 'utils/'
+import { getHelpCenterLink } from 'utils'
 import SpaceListModal from './SpaceListModal'
 import Services from './Services'
 import PlatformFeat from './PlatformFeat/PlatformFeat'
@@ -66,11 +73,19 @@ function Overview() {
         <Card tw="w-4/12 2xl:w-[360px]" hasBoxShadow>
           <CardHeader title="视频介绍" />
           <CardContent>
-            <IconCard
-              icon="laptop"
-              title="大数据工作台数据开发实操视频"
-              subtitle="大数据开发的全流程实操演示"
-            />
+            <HelpCenterLink
+              href="/video/video/"
+              isIframe={false}
+              hasIcon={false}
+              color=""
+              tw="flex-1 no-underline font-normal text-left"
+            >
+              <IconCard
+                icon="laptop"
+                title="大数据工作台数据开发实操视频"
+                subtitle={<div tw="h-10">大数据开发的全流程实操演示</div>}
+              />
+            </HelpCenterLink>
           </CardContent>
         </Card>
       </FlexBox>
