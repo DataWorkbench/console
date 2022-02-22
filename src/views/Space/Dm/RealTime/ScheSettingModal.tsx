@@ -156,6 +156,9 @@ const ScheSettingModal = ({
                 ;[hourRange, draft.hour.stampMinu] = hour.split('/')
                 ;[draft.hour.startHour, draft.hour.endHour] =
                   hourRange.split('-')
+              } else {
+                draft.hour.hours = hour.split(',')
+                draft.hour.tp = 2
               }
             } else if (periodType === 'day') {
               draft.day.scheDate = dayjs().hour(hour).minute(minute).toDate()
