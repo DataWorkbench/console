@@ -52,7 +52,7 @@ const getDefaultColumns = (
   },
   {
     title: 'ID',
-    dataIndex: 'udf_id',
+    dataIndex: 'id',
     render(val: string) {
       return (
         <span tw="dark:text-neut-8">
@@ -63,7 +63,7 @@ const getDefaultColumns = (
   },
   {
     title: '语言类型',
-    dataIndex: 'udf_language',
+    dataIndex: 'language',
     // filters: languageFilters, // 语言不用过滤
     // filterValue: filter.udf_language,
     render: (val: number) =>
@@ -72,7 +72,7 @@ const getDefaultColumns = (
   {
     title: '描述',
     // width: 190,
-    dataIndex: 'comment',
+    dataIndex: 'desc',
     render: (val: string) => {
       return <TextEllipsis twStyle={tw`text-neut-8`}>{val}</TextEllipsis>
     },
@@ -122,7 +122,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
     offset: 0,
     limit: 10,
     reverse: true,
-    udf_type: udfTypes[tp] as 1,
+    type: udfTypes[tp] as 1,
     sort_by: 'updated',
   })
 
@@ -157,7 +157,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
           setModalData(detail)
           break
         case 'delete':
-          setUdfFilterRowKeys([detail.udf_id])
+          setUdfFilterRowKeys([detail.id])
           setOp(actionType)
           break
         default:
@@ -236,7 +236,7 @@ const UdfTable = observer(({ tp }: IUdfTable) => {
         columns={columns}
         onSort={handleSort}
         onFilterChange={handleFilterChange}
-        rowKey="udf_id"
+        rowKey="id"
         title={tp}
         pagination={{
           total: data?.total || 0,
