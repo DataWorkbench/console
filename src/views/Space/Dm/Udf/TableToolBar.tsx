@@ -18,7 +18,7 @@ interface ITableToolBarProps {
   defaultColumns: Record<string, any>[]
   setFilter: (_: (_: IUdfFilterInterface) => void) => void
   refetch: () => Promise<any>
-  data: { name: string; udf_id: string }[]
+  data: { name: string; id: string }[]
 }
 
 const TableToolBar = observer((props: ITableToolBarProps) => {
@@ -67,11 +67,11 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
   }
 
   const udfFilterRows = useMemo(
-    () => data.filter((i) => udfFilterRowKeys.includes(i.udf_id)),
+    () => data.filter((i) => udfFilterRowKeys.includes(i.id)),
     [udfFilterRowKeys, data]
   )
   const deleteText = useMemo(
-    () => udfFilterRows.map((i) => `${i.name}(${i.udf_id})`).join('、'),
+    () => udfFilterRows.map((i) => `${i.name}(${i.id})`).join('、'),
     [udfFilterRows]
   )
   return (
@@ -181,7 +181,7 @@ const TableToolBar = observer((props: ITableToolBarProps) => {
             {udfFilterRows.length > 1 && (
               <Table
                 dataSource={toJS(udfFilterRows)}
-                rowKey="udf_id"
+                rowKey="id"
                 columns={baseColumns}
                 key="delete-table"
               />

@@ -102,7 +102,7 @@ const UdfModal = observer(() => {
   const [uploadVisible, setUploadVisible] = useState(false)
   const [step, setStep] = useState(op === 'create' ? 0 : 1)
   const [params, setParams] = useImmer({
-    type: modalData?.udf_language || javaType,
+    type: modalData?.language || javaType,
   })
 
   const formData = useRef<Record<string, any>>(modalData || {})
@@ -174,8 +174,8 @@ const UdfModal = observer(() => {
         {
           op,
           ...formData.current,
-          udf_language: params.type,
-          udf_type: udfTypes[udfType],
+          language: params.type,
+          type: udfTypes[udfType],
         },
         {
           onSuccess: () => {
@@ -371,10 +371,10 @@ const UdfModal = observer(() => {
                     ]}
                   />
                   <TextAreaField
-                    name="comment"
+                    name="desc"
                     label="描述"
                     disabled={op === 'detail'}
-                    defaultValue={modalData?.comment}
+                    defaultValue={modalData?.desc}
                     validateOnBlur
                     placeholder="请输入函数描述"
                     schemas={[
@@ -426,7 +426,7 @@ const UdfModal = observer(() => {
                           <SelectWithRefresh
                             onRefresh={() => refetchResource()}
                             placeholder="请选择要引用的 Jar 包资源"
-                            name="define"
+                            name="file_id"
                             label="引用 Jar 包"
                             labelClassName="label-required"
                             options={options}
@@ -474,17 +474,17 @@ const UdfModal = observer(() => {
                               </div>
                             }
                             disabled={op === 'detail'}
-                            defaultValue={modalData?.define}
+                            defaultValue={modalData?.file_id}
                           />
                         )
                       }
                       return (
                         <TextAreaField
-                          name="define"
+                          name="code"
                           label={`${text}语句`}
                           labelClassName="label-required"
                           disabled={op === 'detail'}
-                          defaultValue={modalData?.define}
+                          defaultValue={modalData?.code}
                           placeholder="请输入（或将已编辑好的语句粘贴于此处）"
                           validateOnBlur
                           schemas={[
