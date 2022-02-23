@@ -10,8 +10,10 @@ import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import { useInfiniteQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { Rnd } from 'react-rnd'
 import { FlexBox, Center, HelpCenterLink } from 'components'
 import JobModal from './JobModal'
+import { JobTree } from './JobTree'
 
 const ModalWrapper = styled(Modal)(() => [
   css`
@@ -162,7 +164,31 @@ const JobMenu = observer(() => {
   }
 
   return (
-    <div tw="w-56 bg-neut-16 rounded dark:text-white flex flex-col">
+    <Rnd
+      tw="w-56 bg-neut-16 rounded dark:text-white (relative flex flex-col translate-x-0 translate-y-0)!"
+      disableDragging
+      defaultSize={{
+        width: 224,
+      }}
+      minWidth={224}
+      maxWidth={480}
+      enableResizing={{
+        top: false,
+        right: true,
+        bottom: false,
+        left: false,
+        topRight: false,
+        bottomRight: false,
+        bottomLeft: false,
+        topLeft: false,
+      }}
+      scale={1}
+      style={{
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <div tw="flex justify-between items-center h-11 px-2 border-b dark:border-neut-15">
         <span tw="text-xs font-semibold">作业</span>
         <div tw="flex items-center">
@@ -344,6 +370,7 @@ const JobMenu = observer(() => {
               </>
             )
           })()}
+          <JobTree />
         </SimpleBar>
       </div>
       {visible && <JobModal job={editJob} onCancel={hideCreateEditModal} />}
@@ -405,7 +432,7 @@ const JobMenu = observer(() => {
           </div>
         </ModalWrapper>
       )}
-    </div>
+    </Rnd>
   )
 })
 export default JobMenu
