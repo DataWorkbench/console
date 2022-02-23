@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import tw, { css, styled } from 'twin.macro'
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
+import JobVersionsModal from './JobVersionsModal'
 
 const MenuRoot = styled('div')(() => [
   tw`pt-3 space-y-4 align-middle bg-neut-17`,
@@ -22,17 +23,21 @@ const StreamRightMenu = ({
 }) => {
   const [showSetting, setShowSetting] = useState(false)
   const [showArgs, setShowArgs] = useState(false)
+  const [showVersions, setShowVersions] = useState(false)
+
   useEffect(() => {
     if (showScheSetting) {
       setShowSetting(true)
     }
   }, [showScheSetting, setShowSetting])
+
   return (
     <>
       <MenuRoot>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">操 作 记 录</span> */}
         <span onClick={() => setShowArgs(true)}>运 行 参 数</span>
         <span onClick={() => setShowSetting(true)}>调 度 设 置</span>
+        <span onClick={() => setShowVersions(true)}>历 史 版 本</span>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">历 史 版 本</span> */}
       </MenuRoot>
       {showSetting && (
@@ -45,6 +50,9 @@ const StreamRightMenu = ({
         />
       )}
       {showArgs && <ScheArgsModal onCancel={() => setShowArgs(false)} />}
+      {showVersions && (
+        <JobVersionsModal onCancel={() => setShowVersions(false)} />
+      )}
     </>
   )
 }

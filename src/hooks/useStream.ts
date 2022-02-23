@@ -1,8 +1,10 @@
 import { useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
+import { useStore } from 'stores'
 import {
   describeFlinkUI,
   listReleaseStreamJobs,
+  listReleaseJobVersions,
   listStreamJobInstances,
   offlineReleaseJob,
   resumeReleaseJob,
@@ -30,6 +32,25 @@ export const useQueryReleaseJobs = (filter: any) => {
   }
   releaseQueryKey = ['RELEASE_STREAM_JOBS', params]
   return useQuery(releaseQueryKey, async () => listReleaseStreamJobs(params), {
+    keepPreviousData: true,
+  })
+}
+
+export const useQueryReleaseJobVersions = (filter: any) => {
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  const { regionId: region, spaceId } = useParams<IRouteParams>()
+  const params = {
+    region,
+    spaceId,
+    jobId: curJob?.id,
+    limit: 10,
+    offset: 0,
+    ...filter,
+  }
+  const jobVersionsKey = ['RELEASE_JOB_VERSIONS', params]
+  return useQuery(jobVersionsKey, async () => listReleaseJobVersions(params), {
     keepPreviousData: true,
   })
 }
