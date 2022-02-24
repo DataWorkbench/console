@@ -580,11 +580,11 @@ const DataSourceForm = ({
               searchable={false}
             />
             <Field css={showPing ? visibleStyle : hiddenStyle}>
-              <Label>
-                <AffixLabel help="检查数据源参数是否正确" required={false}>
-                  数据源可用性测试
-                </AffixLabel>
-              </Label>
+              {/* <Label> */}
+              {/*  <AffixLabel help="检查数据源参数是否正确" required={false}> */}
+              {/*    数据源可用性测试 */}
+              {/*  </AffixLabel> */}
+              {/* </Label> */}
               <DataSourcePingButton
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
