@@ -21,7 +21,7 @@ const kindImgObj: { [k: string]: any } = {
   MySQL: mySQLImg,
   PostgreSQL: PostgreSQLImg,
   ClickHouse: clickHouseImg,
-  Hbase: hbaseImg,
+  HBase: hbaseImg,
   Kafka: kafkaImg,
   Ftp: ftpImg,
   HDFS: hdfsImg,
