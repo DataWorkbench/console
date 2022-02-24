@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { activateDataomnis } from 'stores/api'
 import DataOmnisLoading from 'assets/data_omnis_loading.svg'
 import { get } from 'lodash-es'
+import { Modal } from '@QCFE/qingcloud-portal-ui'
 
 const ActivateDataOmnis = () => {
   const history = useHistory()
@@ -15,9 +16,23 @@ const ActivateDataOmnis = () => {
     setLoading(true)
 
     const ret = await activateDataomnis()
+    // debugger
     if (ret.ret_code === 0) {
       localStorage.setItem('DATA_OMNIS_OPENED', get(window, 'USER.user_id', ''))
       history.push('/overview')
+    } else if (ret.ret_code === 1400) {
+      Modal.warning({
+        title: '开通失败',
+        content: (
+          <div tw="text-neut-13">
+            需要完成个人/企业认证且余额大于 0 方可开通
+          </div>
+        ),
+        okText: '跳转至控制台',
+        onOk: () => {
+          window.location.href = '/'
+        },
+      })
     }
 
     setLoading(false)
