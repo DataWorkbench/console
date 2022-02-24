@@ -20,7 +20,7 @@ const ActivateDataOmnis = () => {
     if (ret.ret_code === 0) {
       localStorage.setItem('DATA_OMNIS_OPENED', get(window, 'USER.user_id', ''))
       history.push('/overview')
-    } else if (ret.ret_code === 1400) {
+    } else if ([1102, 1400].includes(ret.ret_code)) {
       Modal.warning({
         title: '开通失败',
         content: (
