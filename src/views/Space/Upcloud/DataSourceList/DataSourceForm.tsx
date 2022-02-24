@@ -30,8 +30,12 @@ import {
   ftpFilters,
   ftpProtocol,
   ftpProtocolValue,
+  HiveAnonymousFilters,
+  hivePwdFilters,
   networkLink,
   sftpFilters,
+  sFtpProtocolValue,
+  SourceType,
 } from './constant'
 import getFieldsInfo from './getDatasourceFormConfig'
 
@@ -91,22 +95,7 @@ const MultiFieldWrapper = styled.div(() => [
   `,
 ])
 
-const parseRemoteData = (
-  data: Record<'url' & string, any>
-  // urlType: string
-) => {
-  // const { url } = data
-  // if (urlType === 'hdfs') {
-  //   const pushArr = ['name_node', 'port']
-  //   return omit(
-  //     merge(data, {
-  //       url: {
-  //         hdfs: pick(get(url, 'hdfs.nodes'), pushArr),
-  //       },
-  //     }),
-  //     'url.hdfs.nodes'
-  //   )
-  // }
+const parseRemoteData = (data: Record<'url' & string, any>) => {
   return data
 }
 
@@ -125,6 +114,9 @@ const getInitValue = (path: string) => {
       sftp: {
         port: 22,
       },
+      hive: {
+        auth: 1,
+      },
     },
   }
   return get(initValues, path, '')
@@ -135,7 +127,7 @@ interface IFormProps {
     name: string
     desc?: string
     img?: React.ReactNode
-    source_type?: number
+    source_type?: SourceType
   }
   getFormData?: MutableRefObject<() => any>
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
@@ -177,16 +169,23 @@ const DataSourceForm = ({
     parseRemoteData(opSourceList[0])
 
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
-    if (urlType !== 'ftp') {
-      return undefined
+    if (urlType === 'ftp') {
+      if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
+        return sftpFilters
+      }
+      return ftpFilters
     }
-    if (get(sourceInfo, 'url.ftp.protocol') === 2) {
-      return sftpFilters
+    if (urlType === 'hive') {
+      // TODO: 后续支持hive, auth 待确定
+      if (get(sourceInfo, 'url.hive.auth') === 2) {
+        return HiveAnonymousFilters
+      }
+      return hivePwdFilters
     }
-    return ftpFilters
+    return undefined
   })
 
-  const fields = getFieldsInfo(urlType, filters)
+  const fields = getFieldsInfo(resInfo.source_type!, filters)
 
   const isViewMode = op === 'view'
 
@@ -233,6 +232,14 @@ const DataSourceForm = ({
       setFtpPortConfig((_) => {
         _.changed = true
       })
+      onChange?.(v)
+    },
+    hive_auth: (onChange?: Function) => (v: number) => {
+      if (v === 2) {
+        setFilters(HiveAnonymousFilters)
+      } else {
+        setFilters(hivePwdFilters)
+      }
       onChange?.(v)
     },
   }
@@ -484,7 +491,7 @@ const DataSourceForm = ({
               }
               if (field.fieldType === 'dbUrl') {
                 return (
-                  <Field key={field.name}>
+                  <Field key={field.name} tw="mb-0!">
                     <label htmlFor="__" className="label">
                       <AffixLabel required>{field.label}</AffixLabel>
                     </label>
@@ -580,11 +587,11 @@ const DataSourceForm = ({
               searchable={false}
             />
             <Field css={showPing ? visibleStyle : hiddenStyle}>
-              <Label>
-                <AffixLabel help="检查数据源参数是否正确" required={false}>
-                  数据源可用性测试
-                </AffixLabel>
-              </Label>
+              {/* <Label> */}
+              {/*  <AffixLabel help="检查数据源参数是否正确" required={false}> */}
+              {/*    数据源可用性测试 */}
+              {/*  </AffixLabel> */}
+              {/* </Label> */}
               <DataSourcePingButton
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}

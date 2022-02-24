@@ -41,7 +41,12 @@ import {
   getPingConnection,
 } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
-import { CONNECTION_STATUS, DATASOURCE_STATUS, ftpProtocol } from './constant'
+import {
+  CONNECTION_STATUS,
+  DATASOURCE_STATUS,
+  ftpProtocol,
+  sourceKinds,
+} from './constant'
 import { SourceKindImg } from './styled'
 
 const { MenuItem } = Menu as any
@@ -162,7 +167,7 @@ const DataSourceList = observer(() => {
       op,
       opSourceList,
       mutateOperation,
-      sourceKinds,
+      // sourceKinds,
       showPingHistories,
       addEmptyHistories,
       addItemHistories,

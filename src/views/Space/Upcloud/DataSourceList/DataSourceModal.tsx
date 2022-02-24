@@ -20,6 +20,7 @@ import { toJS } from 'mobx'
 import sourceListBg from 'assets/source-list.svg'
 import DataSourceForm from './DataSourceForm'
 import DbList from './DbList'
+import { sourceKinds } from './constant'
 
 interface DataSourceModalProp {
   onHide?: () => void
@@ -33,7 +34,7 @@ const DataSourceModal = observer(
       dataSourceStore: {
         op,
         opSourceList,
-        sourceKinds,
+        // sourceKinds,
         emptyHistories,
         clearEmptyHistories,
       },
