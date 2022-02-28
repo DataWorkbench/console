@@ -333,9 +333,9 @@ const ClusterModal = observer(
                       {
                         rule: (value: string) => {
                           const l = strlen(value)
-                          return l >= 1 && l <= 128
+                          return l >= 2 && l <= 128
                         },
-                        help: '最小长度1,最大长度128',
+                        help: '最小长度2,最大长度128',
                         status: 'error',
                       },
                     ]}
