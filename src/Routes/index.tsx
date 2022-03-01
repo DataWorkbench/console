@@ -38,7 +38,7 @@ const Manage = lazy(
   () => import(/* webpackChunkName: "space" */ 'views/Space/Manage')
 )
 const Member = lazy(
-  () => import(/* webpackChunkName: "space" */ 'views/Space/Member') // 成员管理
+  () => import(/* webpackChunkName: "space" */ 'views/Space/Manage/Member') // 成员管理
 )
 const Ops = lazy(
   () => import(/* webpackChunkName: "space" */ 'views/Space/Ops')
