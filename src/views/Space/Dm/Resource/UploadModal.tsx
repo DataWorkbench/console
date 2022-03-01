@@ -215,7 +215,19 @@ const UploadModal = (props: any) => {
           <div className="modal-card-title">
             {operation === 'edit' ? '编辑' : '上传'}程序包
           </div>
-          <Icon name="close" tw="cursor-pointer" onClick={closeModal} />
+          {!fields.file ? (
+            <Icon name="close" tw="cursor-pointer" onClick={closeModal} />
+          ) : (
+            <PopConfirm
+              type="warning"
+              okType="danger"
+              okText="确认"
+              content="此时取消，将清空已上传资源并关闭弹窗，确认清空并关闭弹窗吗？"
+              onOk={closeModal}
+            >
+              <Icon name="close" tw="cursor-pointer" />
+            </PopConfirm>
+          )}
         </FlexBox>
       }
       visible={visible}
