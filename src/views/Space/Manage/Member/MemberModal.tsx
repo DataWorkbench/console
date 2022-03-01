@@ -1,73 +1,153 @@
 import {
   ArrayInputField,
+  Divider,
   HelpCenterLink,
   Modal,
   ModalContent,
-  Divider,
+  PopConfirm,
 } from 'components'
-import { Button, Field, Form, Label } from '@QCFE/lego-ui'
-import tw, { css, styled } from 'twin.macro'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
+import { Button, Field, Label } from '@QCFE/lego-ui'
+import tw, { css } from 'twin.macro'
 import { useStore } from 'stores/index'
 import { useMemberStore } from 'views/Space/Manage/Member/store'
 import { observer } from 'mobx-react-lite'
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { useImmer } from 'use-immer'
-
-const { TextAreaField } = Form
+import {
+  checkboxButtonStyles,
+  DisableTextField,
+  FormWrapper,
+  TextAreaFieldWrapper,
+} from 'views/Space/Manage/Member/styled'
+import { RoleType } from 'views/Space/Manage/Member/constants'
+import { useQueryClient } from 'react-query'
+import { getMemberKeys, useMutationMember } from 'hooks'
+import { get } from 'lodash-es'
 
 const memberDescPlaceHolder = '请输入成员描述'
 
-const FormWrapper = styled(Form)(() => [css``])
+interface Role {
+  id: string
+  name: string
+  type: number
+}
 
-const DisableTextField = styled.div(() => [
-  tw`w-[330px] h-9 bg-neut-1 border-neut-3 border flex p-2 cursor-not-allowed rounded-sm gap-1`,
-  css`
-    & {
-      span:first-of-type {
-        ${tw`text-neut-15`}
-      }
+interface IMemberModalProps {
+  roleList: Role[]
+  data?: {
+    user_id: string
+    desc: string
+    system_roles: Role[]
+  }
+}
 
-      span:last-child {
-        ${tw`text-neut-8`}
-      }
-    }
-  `,
-])
-
-const TextAreaFieldWrapper = styled(TextAreaField)(() => [
-  css`
-    & {
-      textarea.textarea {
-        ${tw`min-w-[550px] min-h-[84px] w-auto`}
-      }
-    }
-  `,
-])
-
-const MemberModal = observer(() => {
+const MemberModal = observer((props: IMemberModalProps) => {
   const {
     workSpaceStore: { space },
   } = useStore()
-  const { setOp } = useMemberStore()
+  const { op, setOp } = useMemberStore()
+  const { roleList, data } = props
   const ref = useRef()
-  console.log(2222, space)
   const [value, setValue] = useImmer({
-    users: [''] as string[],
-    roles: [] as string[],
-    desc: '',
+    user_ids: data ? [data.user_id] : [''],
+    system_role_ids: data ? data.system_roles.map((i) => i.id) : [],
+    desc: data ? data.desc : '',
+    user_id: data ? data.user_id : '',
   })
+
+  const mutation = useMutationMember()
+  const queryClient = useQueryClient()
+
+  const refetch = useCallback(() => {
+    queryClient.invalidateQueries(getMemberKeys())
+  }, [queryClient])
+
+  const handleOk = useCallback(() => {
+    mutation.mutate(
+      {
+        op,
+        ...value,
+      },
+      {
+        onSuccess: () => {
+          refetch()
+          setOp('')
+        },
+      }
+    )
+  }, [op, value, mutation, refetch, setOp])
+  const handleClickRole = (roleId: string) => {
+    if (value.system_role_ids.includes(roleId)) {
+      setValue((draft) => {
+        draft.system_role_ids = draft.system_role_ids.filter(
+          (item) => item !== roleId
+        )
+      })
+    } else {
+      setValue((draft) => {
+        draft.system_role_ids.push(roleId)
+      })
+    }
+  }
+
+  const footer = (
+    <div>
+      <Button
+        key="cancel"
+        onClick={() => {
+          setOp('')
+        }}
+      >
+        取消
+      </Button>
+      {op === 'create' ? (
+        <Button
+          key="submit"
+          type="primary"
+          onClick={() => {
+            handleOk()
+          }}
+        >
+          添加
+        </Button>
+      ) : (
+        <PopConfirm
+          key="submit"
+          type="warning"
+          content={
+            <div>
+              <div tw="text-neut-15 font-semibold text-base mb-2">
+                <span>修改该成员的角色信息</span>
+              </div>
+              <div tw="text-neut-13 leading-[20px]">
+                成员角色信息修改后，所对应的访问权限将会进行变更，您确定修改吗？
+              </div>
+            </div>
+          }
+          theme="light"
+          onOk={() => {
+            handleOk()
+          }}
+        >
+          {/* @ts-ignore */}
+          <Button key="submit-btn" type="primary" onClick={null}>
+            修改
+          </Button>
+        </PopConfirm>
+      )}
+    </div>
+  )
   return (
     <Modal
-      title="添加成员"
+      title={op === 'create' ? '添加成员' : '修改成员'}
       visible
       orient="fullright"
       width={700}
-      onOk={() => {
-        setOp('')
-      }}
       onCancel={() => {
         setOp('')
       }}
+      footer={footer}
     >
       <ModalContent>
         <FormWrapper tw="max-w-full!" layout="vertical" ref={ref}>
@@ -78,27 +158,44 @@ const MemberModal = observer(() => {
               <span>{`(${space?.id})`}</span>
             </DisableTextField>
           </Field>
-          <ArrayInputField
-            label="成员"
-            css={css`
-              &.field .control .input {
-                ${tw`w-[330px]`}
-              }
-            `}
-            value={value.users}
-            onChange={(arr: string[]) => {
-              setValue((draft) => {
-                draft.users = arr
-              })
-            }}
-            name="userId"
-            placeholder="请输入成员"
-          />
+          {op === 'update' ? (
+            <Field name="user_id">
+              <Label>成员</Label>
+              <DisableTextField>
+                <span>{get(data, 'user_info.user_name')}</span>
+                <span>{`(${get(data, 'user_id')})`}</span>
+              </DisableTextField>
+            </Field>
+          ) : (
+            <ArrayInputField
+              label="成员"
+              css={css`
+                &.field .control .input {
+                  ${tw`w-[330px]`}
+                }
+              `}
+              disabled={op === 'update'}
+              value={value.user_ids}
+              onChange={(arr: string[]) => {
+                setValue((draft) => {
+                  draft.user_ids = arr
+                })
+              }}
+              name="userId"
+              placeholder="请输入成员"
+            />
+          )}
 
           <TextAreaFieldWrapper
             label="成员描述"
             name="desc"
+            value={value.desc}
             placeholder={memberDescPlaceHolder}
+            onChange={(desc: string) => {
+              setValue((draft) => {
+                draft.desc = desc
+              })
+            }}
           />
           <Field>
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
@@ -113,8 +210,25 @@ const MemberModal = observer(() => {
             </div>
             <Divider tw="mt-4 mb-4" />
             <div tw="flex gap-3">
-              <Button>空间管理员</Button>
-              <Button>空间管理员</Button>
+              {(roleList || []).map((item) => {
+                const checked = value.system_role_ids.includes(item.id)
+                return (
+                  <Button
+                    key={item.id}
+                    css={checkboxButtonStyles.wrapper({
+                      checked,
+                    })}
+                    onClick={() => handleClickRole(item.id)}
+                  >
+                    <Icon
+                      name={
+                        item.type === RoleType.SpaceAdmin ? 'admin' : 'human'
+                      }
+                    />
+                    {item.name}
+                  </Button>
+                )
+              })}
             </div>
           </Field>
         </FormWrapper>

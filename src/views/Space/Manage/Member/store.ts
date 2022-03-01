@@ -1,12 +1,27 @@
 import { createContext, useContext } from 'react'
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, set } from 'mobx'
 
 export class MemberStore {
   op: string = ''
 
+  selectedKeys: string[] = []
+
+  activeKeys: string[] = []
+
+  set = (params: { [key: string]: any }) => {
+    set(this, { ...params })
+  }
+
   setOp = (op: string) => {
-    console.log('setOp', op)
     this.op = op
+  }
+
+  setSelectedKeys = (selectedKeys: string[]) => {
+    this.selectedKeys = selectedKeys
+  }
+
+  setActiveKeys = (activeKeys: string[]) => {
+    this.activeKeys = activeKeys
   }
 
   constructor() {

@@ -12,4 +12,17 @@ export const memberTabs = [
   },
 ]
 
-export const a = 1
+export enum RoleType {
+  SpaceAdmin = 1,
+  SpaceDeveloper,
+  SpaceOperator,
+  SpaceVisitor,
+}
+
+// export enum MemberOpType {
+//   LIST = 1 << 0,
+//   Create = 1 << 1,
+//   Update = 1 << 2,
+//   UpdatePending = 1 << 3,
+//   Delete = 1 << 4,
+// }

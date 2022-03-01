@@ -13,32 +13,45 @@ const { ColumnsSetting } = ToolBar as any
 
 interface IMemberTableBarProps {
   columns: Record<string, any>[]
+  setFilter: (_: (draft: { search: string }) => void) => void
 }
 
 const MemberTableBar = observer((props: IMemberTableBarProps) => {
-  const { columns = [] } = props
-  console.log(columns)
-  const { op, setOp } = useMemberStore()
+  const { columns = [], setFilter } = props
+  const { set, selectedKeys } = useMemberStore()
   const [searchName, setSearchName] = React.useState('')
   const handleQuery = (_searchName: string) => {
-    console.log('query', _searchName)
+    setFilter((filter: Record<string, any>) => {
+      filter.search = _searchName
+    })
   }
-  console.log(op)
+
   const [isReFetching, setIsReFetching] = useState(false)
-  // const handleRefresh = () => {}
   return (
     <ToolBar tw="bg-white">
       <ToolBarLeft>
         <Button
           type="primary"
           onClick={() => {
-            setOp('add')
+            set({
+              op: 'create',
+              activeKeys: [],
+            })
           }}
         >
           <Icon name="add" />
           添加成员
         </Button>
-        <Button type="default" disabled onClick={() => console.log('delete')}>
+        <Button
+          type="default"
+          disabled={!selectedKeys.length}
+          onClick={() => {
+            set({
+              op: 'delete',
+              activeKeys: selectedKeys,
+            })
+          }}
+        >
           <Icon name="trash" />
           移除成员
         </Button>
