@@ -50,6 +50,7 @@ export const ArrayInputField = forwardRef<IControlRef, IArrayInputProps>(
       onBlur,
       itemProps,
       placeholder,
+      disabled,
       ...rest
     } = props
 
@@ -115,6 +116,7 @@ export const ArrayInputField = forwardRef<IControlRef, IArrayInputProps>(
           >
             <div tw="flex gap-3 items-start">
               <TextField
+                disabled={disabled}
                 name={`${name}.${index}`}
                 placeholder={placeholder ?? '请输入'}
                 props={itemProps}
@@ -125,7 +127,7 @@ export const ArrayInputField = forwardRef<IControlRef, IArrayInputProps>(
                 onBlur={handleBlur}
               />
 
-              <div css={[curIptIdx !== index && tw`invisible`]}>
+              <div css={[(curIptIdx !== index || disabled) && tw`invisible`]}>
                 <Tooltip
                   hasPadding
                   // tw="leading-[32px]"
@@ -135,7 +137,7 @@ export const ArrayInputField = forwardRef<IControlRef, IArrayInputProps>(
                   <Icon name="if-add" onClick={() => handleAdd(index)} />
                 </Tooltip>
               </div>
-              <div css={[curIptIdx !== index && tw`invisible`]}>
+              <div css={[(curIptIdx !== index || disabled) && tw`invisible`]}>
                 <Tooltip
                   hasPadding
                   // tw="leading-[32px]"
@@ -153,4 +155,4 @@ export const ArrayInputField = forwardRef<IControlRef, IArrayInputProps>(
   }
 )
 
-export default Form.getFormField(ArrayInputField)
+export default (Form as any).getFormField(ArrayInputField)

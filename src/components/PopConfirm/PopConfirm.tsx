@@ -174,6 +174,7 @@ export const PopConfirm = (
       default:
         Object.assign(newProps, {
           onClick: (e: MouseEvent) => {
+            // BUG: 这里回导致死循环
             if (typeof children.props?.onClick === 'function') {
               newProps.onClick(e)
             }
