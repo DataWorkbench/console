@@ -320,7 +320,6 @@ const StreamJAR = () => {
 
       {uploadVisible && (
         <UploadModal
-          type="program"
           operation="create"
           visible={uploadVisible}
           handleCancel={() => setUploadVisible(false)}
