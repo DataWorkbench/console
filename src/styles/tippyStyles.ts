@@ -116,6 +116,12 @@ const tippyStyles = css`
   .tippy-box.popconfirm-box {
     ${tw`bg-neut-16 text-white leading-5`}
   }
+  .tippy-box.popconfirm-box[data-theme~='light'] {
+    ${tw`bg-white text-neut-13`}
+    .tippy-arrow::before {
+      ${tw`border-t-white`}
+    }
+  }
 `
 
 export default tippyStyles
