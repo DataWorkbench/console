@@ -58,10 +58,9 @@ export const Header = observer(() => {
   }
 
   useEffect(() => {
-    console.log('space', space)
     if (space) {
       set({
-        space: pick(space, ['id', 'name']),
+        space: pick(space, ['id', 'name', 'owner']),
         spaceIndex,
       })
     }

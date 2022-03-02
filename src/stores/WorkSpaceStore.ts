@@ -65,7 +65,7 @@ class WorkSpaceStore {
     this.rootStore = rootStore
   }
 
-  space?: { name: string; id: string }
+  space?: { name: string; id: string; owner: string }
 
   spaceIndex = 0
 
