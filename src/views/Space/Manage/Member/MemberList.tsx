@@ -7,10 +7,11 @@ import MemberModal from 'views/Space/Manage/Member/MemberModal'
 import { observer } from 'mobx-react-lite'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
-import { Button, Tag } from '@QCFE/lego-ui'
+import { Button } from '@QCFE/lego-ui'
 import { emitter } from 'utils/index'
 import { useMutationMember, useQueryMemberList, useQueryRoleList } from 'hooks'
 
+import Tags from './components/Tags'
 import MemberDeleteModal from './MemberDeleteModal'
 import { memberTabs } from './constants'
 import MemberTableBar from './MemberTableBar'
@@ -174,37 +175,38 @@ const Member = observer(() => {
     },
     [handleUpdate]
   )
+  const handleAddRole = useCallback(
+    (record: Record<string, any>, roleId: string) => {
+      const { user_id: userId, system_roles: systemRoles } = record
+      const newRoleIds = [
+        ...systemRoles.map(({ id }: { id: string }) => id),
+        roleId,
+      ]
+      handleUpdate({
+        user_id: userId,
+        system_role_ids: newRoleIds,
+        desc: record.desc,
+      })
+    },
+    [handleUpdate]
+  )
 
   const columnsRender: Record<string, any> = useMemo(
     () => ({
       role: {
         render: (_: any, record: Record<string, any>) => {
-          const { system_roles: systemRoles } = record
           return (
-            <FlexBox tw="gap-1">
-              {systemRoles.map((role: any) => {
-                return (
-                  <Tag
-                    closable
-                    css={[tw`text-neut-15!`]}
-                    onClose={(e: { preventDefault: Function }) =>
-                      handleRemoveRole(record, role.id, () =>
-                        e.preventDefault()
-                      )
-                    }
-                    key={role.id}
-                    tw="text-sm"
-                  >
-                    {role.name}
-                  </Tag>
-                )
-              })}
-            </FlexBox>
+            <Tags
+              data={record}
+              list={roleList?.infos || []}
+              handleAdd={handleAddRole}
+              handleRemove={handleRemoveRole}
+            />
           )
         },
       },
     }),
-    [handleRemoveRole]
+    [handleAddRole, handleRemoveRole, roleList?.infos]
   )
 
   const columnsWithRender: Record<string, any>[] = useMemo(
