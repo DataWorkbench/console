@@ -69,3 +69,17 @@ export const ModalWrapper = styled(Modal)(() => [
     }
   `,
 ])
+
+export const OwnerWrapper = {
+  isOwner: ({ isOwner = true }: { isOwner: boolean }) => {
+    return [
+      !isOwner &&
+        css`
+          .tag .icon.close,
+          .tag-no-more {
+            ${tw`hidden`}
+          }
+        `,
+    ]
+  },
+}

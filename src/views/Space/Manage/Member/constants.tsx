@@ -26,3 +26,5 @@ export enum RoleType {
 //   UpdatePending = 1 << 3,
 //   Delete = 1 << 4,
 // }
+
+export const columnSettingsKey = 'member-table-bar-columns'

@@ -36,7 +36,10 @@ const Tags = (props: ITagsProps) => {
   const { handleRemove, data, list, handleAdd } = props
   const { system_roles: systemRoles } = data
   const addTag = (text?: string | number, tagStyle?: SerializedStyles) => (
-    <Tag css={[tw`text-neut-15!`, tagStyle]}>
+    <Tag
+      css={[tw`text-neut-15!`, tagStyle]}
+      className={systemRoles.length > 2 ? 'tag-has-more' : 'tag-no-more'}
+    >
       <Center>
         <Icon name="add" size={14} css={[tw`text-neut-15! m-0!`]} />
         {!!text && <span tw="ml-1">{text}</span>}

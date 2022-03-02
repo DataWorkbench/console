@@ -1,7 +1,8 @@
 import { Table, Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { css } from 'twin.macro'
 import { FlexBox } from 'components/Box'
-import { ModalWrapper } from './styled'
+import { Global } from '@emotion/react'
+import { ModalWrapper, OwnerWrapper } from './styled'
 
 interface IMemberDeleteModal {
   data: Record<string, any>[]
@@ -23,6 +24,7 @@ const MemberDeleteModal = (props: IMemberDeleteModal) => {
       okText="移除"
       okType="danger"
     >
+      <Global styles={OwnerWrapper.isOwner({ isOwner: false })} />
       <FlexBox tw="gap-3">
         <div>
           <Icon
@@ -42,12 +44,15 @@ const MemberDeleteModal = (props: IMemberDeleteModal) => {
           </div>
           {!justOne && (
             <Table
-              css={css`
-                ${tw`mb-4`}
-                & .add-member-item {
-                  ${tw`hidden`}
-                }
-              `}
+              css={[
+                css`
+                  ${tw`mb-4`}
+                  & .add-member-item {
+                    ${tw`hidden`}
+                  }
+                `,
+                OwnerWrapper.isOwner({ isOwner: false }),
+              ]}
               dataSource={data}
               columns={columns}
               rowKey="user_id"

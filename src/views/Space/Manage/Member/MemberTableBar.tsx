@@ -5,8 +5,11 @@ import {
   ToolBarRight,
 } from '@QCFE/qingcloud-portal-ui'
 import { Button, InputSearch } from '@QCFE/lego-ui'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { observer } from 'mobx-react-lite'
+import { useQueryClient } from 'react-query'
+import { columnSettingsKey } from 'views/Space/Manage/Member/constants'
+import { getMemberKeys } from 'hooks'
 import { useMemberStore } from './store'
 
 const { ColumnsSetting } = ToolBar as any
@@ -14,24 +17,41 @@ const { ColumnsSetting } = ToolBar as any
 interface IMemberTableBarProps {
   columns: Record<string, any>[]
   setFilter: (_: (draft: { search: string }) => void) => void
+  filter: { search: string }
+  setColumnSettings: (_: Record<string, any>[]) => void
+  isOwner: boolean
 }
 
 const MemberTableBar = observer((props: IMemberTableBarProps) => {
-  const { columns = [], setFilter } = props
+  const {
+    columns = [],
+    setFilter,
+    filter,
+    setColumnSettings,
+    isOwner = true,
+  } = props
   const { set, selectedKeys } = useMemberStore()
   const [searchName, setSearchName] = React.useState('')
   const handleQuery = (_searchName: string) => {
-    setFilter((filter: Record<string, any>) => {
-      filter.search = _searchName
+    setFilter((_filter: Record<string, any>) => {
+      _filter.search = _searchName
     })
   }
 
   const [isReFetching, setIsReFetching] = useState(false)
+
+  const queryClient = useQueryClient()
+
+  const refetch = useCallback(async () => {
+    await queryClient.invalidateQueries(getMemberKeys())
+  }, [queryClient])
+
   return (
     <ToolBar tw="bg-white">
       <ToolBarLeft>
         <Button
           type="primary"
+          disabled={!isOwner}
           onClick={() => {
             set({
               op: 'create',
@@ -44,7 +64,7 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
         </Button>
         <Button
           type="default"
-          disabled={!selectedKeys.length}
+          disabled={!isOwner || !selectedKeys.length}
           onClick={() => {
             set({
               op: 'delete',
@@ -64,9 +84,9 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
           onPressEnter={() => handleQuery(searchName)}
           onClear={() => {
             setSearchName('')
-            // if (filter.search) {
-            //   handleQuery('')
-            // }
+            if (filter.search) {
+              handleQuery('')
+            }
           }}
         />
         <Button loading={isReFetching} tw="px-[5px]">
@@ -75,9 +95,9 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
             tw="text-xl"
             onClick={() => {
               setIsReFetching(true)
-              // refetch().then(() => {
-              //   setIsReFetching(false)
-              // })
+              refetch().then(() => {
+                setIsReFetching(false)
+              })
             }}
           />
         </Button>
@@ -86,8 +106,8 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
             title,
             dataIndex,
           }))}
-          onSave={() => console.log('save')}
-          storageKey="member-table-columns"
+          onSave={setColumnSettings}
+          storageKey={columnSettingsKey}
         />
       </ToolBarRight>
     </ToolBar>
