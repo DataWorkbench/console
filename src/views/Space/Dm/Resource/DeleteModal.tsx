@@ -114,24 +114,15 @@ export default function DeleteModal(props: any) {
                   {selectedList[0].name}({selectedList[0].id})注意事项
                 </>
               ) : (
-                <>删除以下{selectedList.length}个程序包 注意事项</>
+                <>删除以下 {selectedList.length} 个程序包 注意事项</>
               )
             return (
               <>
                 <div tw="font-medium mb-2 text-base">{deleteTitle}</div>
                 <div className="modal-content-message" tw="text-neut-8">
-                  {selectedList.length > 1 ? (
-                    <>
-                      删除以下程序包后，代码开发模式下将无法引用相关 Jar
-                      包，不影响已运行的作业实例，但重新运行相关作业时会报错，且该操作无法撤回。确认删除吗？
-                    </>
-                  ) : (
-                    <>
-                      删除程序包{selectedList[0].name}({selectedList[0].id}
-                      后，代码开发模式下将无法引用此 Jar
-                      包，不影响已运行的作业实例，但重新运行相关作业时会报错，且该操作无法撤回。确认删除吗？
-                    </>
-                  )}
+                  {selectedList.length > 1
+                    ? '删除以下程序包后，不影响已运行的作业实例，重新运行引用了该资源的作业时会报错。删除资源后无法找回，确定删除吗？'
+                    : '删除程序包后，不影响已运行的作业实例，重新运行引用了该资源的作业时会报错。删除资源后无法找回，确定删除吗？'}
                 </div>
               </>
             )
