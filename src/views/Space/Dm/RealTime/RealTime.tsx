@@ -1,8 +1,10 @@
 import { useMemo } from 'react'
+import { useMount, useLocalStorage } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import tw, { css, theme } from 'twin.macro'
 import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
+import emitter from 'utils/emitter'
 import JobMenu from './JobMenu'
 import JobTabs from './JobTabs'
 
@@ -10,6 +12,17 @@ const RealTime = observer(() => {
   const {
     workFlowStore: { curJob },
   } = useStore()
+  const [sideCollapsed, setSideCollapsed] = useLocalStorage(
+    'NAV_SIDER_COLLAPSED',
+    false
+  )
+
+  useMount(() => {
+    if (!sideCollapsed) {
+      setSideCollapsed(true)
+      emitter.emit('cancelSaveJob')
+    }
+  })
 
   const steps = useMemo(
     () => [
@@ -58,37 +71,41 @@ const RealTime = observer(() => {
   }
 
   return (
-    <div tw="flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
-      <JobMenu />
-      {curJob ? (
-        <JobTabs />
-      ) : (
-        <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
-          <div tw="space-y-2">
-            <FlexBox tw="space-x-1">
-              {steps.slice(0, 3).map((step, i) => renderStep(step, i, i !== 2))}
-            </FlexBox>
-            <FlexBox tw="justify-end">
-              <div tw="flex flex-col items-center pr-5">
-                <div tw="border-l border-neut-13 h-16" />
-                <div
-                  tw="w-0 h-0"
-                  css={`
-                    border-left: 4px solid transparent;
-                    border-right: 4px solid transparent;
-                    border-top: 4px solid ${theme('colors.line.dark')};
-                  `}
-                />
-              </div>
-            </FlexBox>
-            <FlexBox tw="space-x-1 flex-row-reverse">
-              {steps
-                .slice(3)
-                .map((step, i) => renderStep(step, i + 3, i + 3 !== 4, true))}
-            </FlexBox>
-          </div>
-        </Center>
-      )}
+    <div tw="flex min-h-[600px] w-full h-full overflow-auto p-2 pr-0 ">
+      <div tw="flex w-full">
+        <JobMenu tw="mr-2" />
+        {curJob ? (
+          <JobTabs />
+        ) : (
+          <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
+            <div tw="space-y-2">
+              <FlexBox tw="space-x-1">
+                {steps
+                  .slice(0, 3)
+                  .map((step, i) => renderStep(step, i, i !== 2))}
+              </FlexBox>
+              <FlexBox tw="justify-end">
+                <div tw="flex flex-col items-center pr-5">
+                  <div tw="border-l border-neut-13 h-16" />
+                  <div
+                    tw="w-0 h-0"
+                    css={`
+                      border-left: 4px solid transparent;
+                      border-right: 4px solid transparent;
+                      border-top: 4px solid ${theme('colors.line.dark')};
+                    `}
+                  />
+                </div>
+              </FlexBox>
+              <FlexBox tw="space-x-1 flex-row-reverse">
+                {steps
+                  .slice(3)
+                  .map((step, i) => renderStep(step, i + 3, i + 3 !== 4, true))}
+              </FlexBox>
+            </div>
+          </Center>
+        )}
+      </div>
     </div>
   )
 })

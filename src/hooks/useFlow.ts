@@ -67,7 +67,7 @@ export const getFlowKey = (tp: FlowKeyType = '') => {
   }
 }
 
-export const useInfiniteQueryFlow = (filter = {}) => {
+export const useInfiniteQueryFlow = (filter = {}, options = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
@@ -99,6 +99,7 @@ export const useInfiniteQueryFlow = (filter = {}) => {
 
         return undefined
       },
+      ...options,
     }
   )
 }

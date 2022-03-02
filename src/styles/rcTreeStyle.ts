@@ -10,6 +10,7 @@ const rcTreeStyle = css`
       line-height: 28px;
       white-space: nowrap;
       list-style: none;
+      ${tw`flex items-center w-full`}
       outline: 0;
       &:hover {
         ${tw`bg-neut-15`}
@@ -50,22 +51,17 @@ const rcTreeStyle = css`
         cursor: pointer;
       }
 
-      span.rc-tree-iconEle {
-        vertical-align: 1px;
-      }
-
-      span.rc-tree-switcher {
-        vertical-align: -3px;
-      }
-
       .rc-tree-node-content-wrapper {
         position: relative;
-        display: inline-block;
+        ${tw`inline-flex items-center flex-1`}
         height: 28px;
         margin: 0;
         padding: 0;
         text-decoration: none;
         cursor: pointer;
+        .rc-tree-title {
+          ${tw`flex-1`}
+        }
       }
     }
   }
@@ -140,9 +136,7 @@ const rcTreeStyle = css`
     margin-right: 2px;
     vertical-align: top;
   }
-  .rc-tree-title {
-    display: inline-block;
-  }
+
   .rc-tree-indent {
     display: inline-block;
     height: 0;

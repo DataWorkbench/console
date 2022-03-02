@@ -18,10 +18,12 @@ const ClusterTableModal = ({
   onCancel,
   onOk,
   selectedIds = [],
+  visible = true,
 }: {
   onCancel?: () => void
   onOk?: (cluster: any) => void
   selectedIds?: string[]
+  visible: boolean
 }) => {
   const [cluster, setCluster] = useState(null)
   return (
@@ -29,6 +31,8 @@ const ClusterTableModal = ({
       visible
       draggable
       width={1200}
+      appendToBody
+      css={!visible && tw`hidden!`}
       onCancel={onCancel}
       title="选择计算集群"
       onOk={() => {
