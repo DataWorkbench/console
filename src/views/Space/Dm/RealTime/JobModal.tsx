@@ -240,8 +240,8 @@ const JobModal = ({
                             {disp ||
                               subItems?.map((item) => (
                                 <Tooltip
-                                  content={item.desc}
                                   key={item.type}
+                                  content={item.desc}
                                   theme="light"
                                   hasPadding
                                 >
