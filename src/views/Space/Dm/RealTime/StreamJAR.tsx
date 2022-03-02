@@ -45,7 +45,6 @@ const StreamJAR = () => {
     resourceId: '',
   })
   const resouceRet = useQueryResource({
-    type: 1,
     limit: 100,
   })
   const { data: scheData } = useQueryStreamJobSchedule()
@@ -154,8 +153,8 @@ const StreamJAR = () => {
                   width: 555px;
                 }
               `}
-              label={<AffixLabel>引用 Jar 包（程序包）</AffixLabel>}
-              placeholder="请选择要引用的 Jar 包（程序包）"
+              label={<AffixLabel>JAR （程序包）</AffixLabel>}
+              placeholder="请选择 JAR 程序包"
               help={
                 <div tw="text-neut-8">
                   如需选择新的资源，可以在资源管理中
