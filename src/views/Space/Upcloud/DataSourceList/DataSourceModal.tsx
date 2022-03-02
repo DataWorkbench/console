@@ -15,6 +15,7 @@ import {
 import { get, values, omit } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Global, css } from '@emotion/react'
+import { toJS } from 'mobx'
 
 import sourceListBg from 'assets/source-list.svg'
 import DataSourceForm from './DataSourceForm'
@@ -29,7 +30,13 @@ const DataSourceModal = observer(
     const { regionId, spaceId } =
       useParams<{ regionId: string; spaceId: string }>()
     const {
-      dataSourceStore: { op, opSourceList, sourceKinds },
+      dataSourceStore: {
+        op,
+        opSourceList,
+        sourceKinds,
+        emptyHistories,
+        clearEmptyHistories,
+      },
     } = useStore()
 
     const [state, setState] = useImmer({
@@ -43,14 +50,13 @@ const DataSourceModal = observer(
       status,
       data: kinds,
       refetch,
-    } = useQuerySourceKind(regionId, spaceId)
+    } = useQuerySourceKind(regionId, spaceId, op)
     const mutation = useMutationSource()
+
     const curkind =
       op === 'create'
         ? sourceKinds.find((k) => k.name === state.dbName)
-        : sourceKinds.find(
-            (k) => k.source_type === opSourceList[0]?.source_type
-          )
+        : sourceKinds.find((k) => k.source_type === opSourceList[0]?.type)
     const handleDbSelect = (name: string) => {
       setState((draft) => {
         draft.step = 1
@@ -65,15 +71,22 @@ const DataSourceModal = observer(
         if (data && curkind?.source_type) {
           const params = {
             op,
-            source_type: curkind.source_type,
+            type: curkind.source_type,
             ...data,
           }
           if (op === 'update') {
-            params.sourceId = opSourceList[0].source_id
+            params.sourceId = opSourceList[0].id
           }
+          if (op === 'create' && emptyHistories.size) {
+            params.last_connection = toJS(
+              Array.from(emptyHistories.values()).pop()?.last_connection
+            )
+          }
+
           mutation.mutate(params, {
             onSuccess: () => {
               onHide()
+              clearEmptyHistories()
               const queryKey = getSourceKey()
               queryClient.invalidateQueries(queryKey)
             },
@@ -172,6 +185,7 @@ const DataSourceModal = observer(
                   )
                 case 'error':
                   return <Button onClick={() => refetch()}>重试</Button>
+                case 'idle':
                 case 'success':
                   if (state.step === 0) {
                     const items = kinds

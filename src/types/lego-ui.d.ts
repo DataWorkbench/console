@@ -161,7 +161,7 @@ declare module '@QCFE/lego-ui' {
     value?: string | number
     placeholder?: string
     size?: 'small' | 'default' | 'large'
-    onChange?: (e: React.MouseEvent, value: string | number) => void
+    onChange?: (e: React.ChangeEvent, value: string | number) => void
     onKeyDown?: (e: React.KeyboardEvent) => void
     onPressEnter?: (e: React.KeyboardEvent) => void
     readOnly?: boolean

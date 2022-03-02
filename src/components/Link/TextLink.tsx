@@ -1,4 +1,4 @@
-import { ButtonProps, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import React, { PropsWithChildren } from 'react'
 import tw, { styled, css } from 'twin.macro'
 import { Link as ReactRouterLink } from 'react-router-dom'
@@ -11,11 +11,8 @@ interface LinkInterface {
 const Link = (
   props: PropsWithChildren<
     Partial<
-      React.DetailedHTMLProps<
-        React.AnchorHTMLAttributes<HTMLAnchorElement>,
-        HTMLAnchorElement
-      > &
-        ButtonProps &
+      Record<string, any> &
+        React.HTMLProps<HTMLAnchorElement | HTMLButtonElement> &
         LinkInterface
     >
   >
@@ -36,17 +33,18 @@ const Link = (
   )
   if (type !== 'a') {
     return (
-      <button type="button" {...rest}>
+      <button {...(rest as any)} type="button">
         {children}
       </button>
     )
   }
-  return <a {...rest}>{children}</a>
+  return <a {...(rest as any)}>{children}</a>
 }
 
 const colorThemes = {
   blue: tw`text-deepblue-10 dark:text-blue-10 hover:text-deepblue-12 hover:dark:text-blue-12 active:text-deepblue-13 active:dark:text-blue-13`,
   white: tw`text-green-11 dark:text-white hover:text-green-12 hover:dark:text-green-11 active:text-green-13 active:dark:text-green-12`,
+  green: tw`text-green-11! hover:text-green-12 active:text-green-13`,
 }
 
 export const TextLink = styled(Link)(
@@ -54,7 +52,7 @@ export const TextLink = styled(Link)(
     color = 'blue',
     disabled = false,
   }: {
-    color?: 'blue' | 'white'
+    color?: 'blue' | 'white' | 'green'
     disabled?: Boolean
   }) => [
     tw`font-semibold underline text-underline-offset[1px]`,
@@ -69,7 +67,7 @@ export const TextLink = styled(Link)(
 )
 
 export const RouterLink = styled(ReactRouterLink)(
-  ({ color = 'white' }: { color?: 'blue' | 'white' }) => [
+  ({ color = 'white' }: { color?: 'blue' | 'white' | 'green' }) => [
     tw`font-semibold underline text-underline-offset[1px]`,
     () => colorThemes[color],
   ]

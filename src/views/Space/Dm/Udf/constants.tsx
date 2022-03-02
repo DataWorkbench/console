@@ -76,20 +76,20 @@ export const baseColumns = [
   },
   {
     title: 'ID',
-    dataIndex: 'udf_id',
+    dataIndex: 'id',
     render: (val: string) => {
       return <span tw="text-neut-8">{val}</span>
     },
   },
   {
     title: '语言类型',
-    dataIndex: 'udf_language',
+    dataIndex: 'language',
     render: (val: number) =>
       languageFilters.find((i) => i.value === val)?.text || val,
   },
   {
     title: '描述',
-    dataIndex: 'comment',
+    dataIndex: 'desc',
     render: (val: string) => {
       return <TextEllipsis twStyle={tw`text-neut-8`}>{val}</TextEllipsis>
     },
