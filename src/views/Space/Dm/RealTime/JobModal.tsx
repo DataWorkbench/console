@@ -241,11 +241,11 @@ const JobModal = ({
                               subItems?.map((item) => (
                                 <Tooltip
                                   content={item.desc}
+                                  key={item.type}
                                   theme="light"
                                   hasPadding
                                 >
                                   <CodeButton
-                                    key={item.type}
                                     disabled={item.type !== 3}
                                     selected={params.scheType === item.type}
                                     onClick={(e) => {
