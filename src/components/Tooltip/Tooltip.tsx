@@ -25,11 +25,12 @@ export const Tooltip = (
   const combProps: TippyProps = {
     interactive: true,
     theme: 'dark',
-    appendTo: () => document.body,
     animation: 'fade',
     delay: 100,
     // arrow: roundArrow,
     ...omit(rest, 'data-tw'),
+    appendTo:
+      rest.appendTo ?? (rest.interactive ? 'parent' : () => document.body),
     content: (
       <div
         css={[hasPadding && tw`px-3 py-2`, tw`leading-5`]}
