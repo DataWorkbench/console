@@ -147,7 +147,7 @@ const StreamJAR = () => {
         <div tw="mt-5 flex-1">
           <Form tw="w-[600px]! max-w-[600px]!" ref={form} layout="vertical">
             <SelectWithRefresh
-              name="id"
+              name="file_id"
               css={css`
                 .select {
                   width: 555px;
