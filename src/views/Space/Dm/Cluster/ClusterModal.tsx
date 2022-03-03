@@ -252,7 +252,6 @@ const ClusterModal = observer(
       })
     }
     const strategy = params.config.restart_strategy
-    console.log(params)
     const marks = useMemo(() => {
       const o = {}
       range(0, 9, 1).forEach((v) => {
@@ -773,7 +772,24 @@ const ClusterModal = observer(
               >
                 <Form>
                   <SelectField
-                    label={<AffixLabel>日志级别</AffixLabel>}
+                    label={
+                      <AffixLabel
+                        theme="green"
+                        help={
+                          <>
+                            <div>
+                              TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR
+                            </div>
+                            <div>
+                              TRACE 级别最小，打印信息最为详细，ERROR
+                              级别最大，打印信息最为简略
+                            </div>
+                          </>
+                        }
+                      >
+                        日志级别
+                      </AffixLabel>
+                    }
                     name="root_log_level"
                     disabled={viewMode}
                     value={params.config.logger.root_log_level}
@@ -783,11 +799,11 @@ const ClusterModal = observer(
                       })
                     }}
                     options={[
-                      { label: 'TRACE', value: 'TRACE' },
-                      { label: 'DEBUG', value: 'DEBUG' },
-                      { label: 'INFO', value: 'INFO' },
-                      { label: 'WARN', value: 'WARN' },
-                      { label: 'ERROR', value: 'ERROR' },
+                      { label: 'TRACE：追踪级别', value: 'TRACE' },
+                      { label: 'DEBUG：调试级别', value: 'DEBUG' },
+                      { label: 'INFO：信息级别', value: 'INFO' },
+                      { label: 'WARN：警告级别', value: 'WARN' },
+                      { label: 'ERROR：错误级别', value: 'ERROR' },
                     ]}
                     help={<div>默认与并行度一致</div>}
                   />

@@ -173,6 +173,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         },
         {
           title: 'ID',
+          width: 160,
           dataIndex: 'id',
           render: (value: string) => {
             return <div tw="text-neut-8">{value}</div>
