@@ -146,10 +146,11 @@ const ClusterTable = observer(
         {
           title: '名称/ID',
           dataIndex: 'name',
+          width: 186,
           fixedInSetting: true,
           render: (v: any, row: any) => (
-            <FlexBox tw="items-center space-x-1">
-              <Center tw="bg-neut-13 rounded-full w-6 h-6">
+            <FlexBox tw="items-center">
+              <Center tw="bg-neut-13 rounded-full w-6 h-6 mr-2">
                 <Icon name="pod" type="light" size={16} />
               </Center>
               <div tw="flex-1 break-all">
@@ -210,6 +211,7 @@ const ClusterTable = observer(
         },
         {
           title: '网络配置名称/ID',
+          width: 160,
           dataIndex: 'network_id',
           render: (v: string, row: any) => {
             const networkInfo = get(row, 'network_info')
@@ -309,7 +311,7 @@ const ClusterTable = observer(
           title: '操作',
           dataIndex: 'id',
           hiddenInSetting: true,
-          width: 128,
+          width: 150,
           render: (v: any, row: any) => (
             <FlexBox tw="items-center">
               <Button type="text">
@@ -464,11 +466,12 @@ const ClusterTable = observer(
         <div tw="mb-3">
           <FlexBox tw="justify-between">
             {selectMode ? (
-              <div>
-                如需选择新的计算集群，您可以
+              <div tw="text-neut-8">
+                如需选择新的计算集群，您可以到
                 <RouterLink to={`/${regionId}/workspace/${spaceId}/dm/cluster`}>
-                  新建计算集群
+                  计算集群列表
                 </RouterLink>
+                进行创建
               </div>
             ) : (
               <Center tw="space-x-3">
