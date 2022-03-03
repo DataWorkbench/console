@@ -199,7 +199,7 @@ const DataSourceForm = ({
     ) {
       return undefined
     }
-    return get(opSourceList, '[0].connection') === 1
+    return get(opSourceList, '[0].last_connection.result') === 1
       ? {
           status: true,
         }
