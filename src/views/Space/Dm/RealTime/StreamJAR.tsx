@@ -42,7 +42,7 @@ const StreamJAR = () => {
   const [params, setParams] = useImmer({
     jarArgs: '',
     jarEntry: '',
-    resourceId: '',
+    fileId: '',
   })
   const resouceRet = useQueryResource({
     limit: 100,
@@ -57,7 +57,7 @@ const StreamJAR = () => {
       setParams((draft) => {
         draft.jarArgs = jarInfo.jar_args
         draft.jarEntry = jarInfo.jar_entry
-        draft.resourceId = jarInfo.id
+        draft.fileId = jarInfo.file_id
       })
     }
   }, [data, setParams])
@@ -197,7 +197,7 @@ const StreamJAR = () => {
                   <span tw="text-neut-8">ID: {option.value}</span>
                 </div>
               )}
-              value={params.resourceId}
+              value={params.fileId}
               options={resources.map((res) => ({
                 label: res.name,
                 value: res.id,
@@ -220,7 +220,7 @@ const StreamJAR = () => {
               }}
               onChange={(v: string) => {
                 setParams((draft) => {
-                  draft.resourceId = v
+                  draft.fileId = v
                 })
               }}
               onRefresh={() => {
