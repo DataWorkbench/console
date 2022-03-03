@@ -24,10 +24,11 @@ interface IDataSourcePingButtonProps {
     name: string
     network_info: Record<string, any>
   }
+  hasPing?: boolean
 }
 
 export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
-  const { getValue, defaultStatus, sourceId, network } = props
+  const { getValue, defaultStatus, sourceId, network, hasPing = false } = props
   const mutation = useMutationSource()
   const {
     dataSourceStore: { setShowPingHistories },
@@ -43,6 +44,8 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
   useEffect(() => {
     setStatus(defaultStatus)
   }, [defaultStatus, network])
+
+  const [hasPingStatus, setHasPingStatus] = useState(hasPing)
 
   const handlePing = useCallback(async () => {
     hasPingRef.current = true
@@ -91,7 +94,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           merge(item, { message: msg, result: pingStatus ? 1 : 2 })
         )
       }
-
+      setHasPingStatus(true)
       setStatus({
         status: pingStatus,
         message: msg,
@@ -186,7 +189,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           {pingHistory}
         </div>
       )}
-      {!mutation.isLoading && !status && defaultStatus && (
+      {!mutation.isLoading && !status && hasPingStatus && (
         <div className="help">
           <span tw="ml-1 text-neut-15">已有测试记录，如需查看可点击</span>
           {pingHistory}

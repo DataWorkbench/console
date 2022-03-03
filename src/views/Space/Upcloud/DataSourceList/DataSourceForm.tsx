@@ -484,7 +484,7 @@ const DataSourceForm = ({
               }
               if (field.fieldType === 'dbUrl') {
                 return (
-                  <Field key={field.name}>
+                  <Field key={field.name} tw="mb-0!">
                     <label htmlFor="__" className="label">
                       <AffixLabel required>{field.label}</AffixLabel>
                     </label>
@@ -589,6 +589,7 @@ const DataSourceForm = ({
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
                 network={network}
+                hasPing={!!get(sourceInfo, 'last_connection')}
               />
             </Field>
           </CollapseItem>
