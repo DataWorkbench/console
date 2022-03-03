@@ -85,7 +85,8 @@ const SideMenuWrapper = styled('div')(() => [
                 ${tw`dark:text-white text[#fff6] fill-[#fff] dark:fill-[#fff6]`}
               }
             }
-            &.selected {
+            &.selected,
+            &.item-selected {
               ${tw`bg-neut-2 dark:(bg-neut-13) rounded-sm`}
               span.icon {
                 ${tw`border-l-2 border-green-11`}

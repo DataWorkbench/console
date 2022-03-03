@@ -172,28 +172,11 @@ const JobMenu = observer(() => {
             clickable
             onClick={() => setVisible(true)}
           />
-          {/* <Button
-            onClick={refreshJobs}
-            type="text"
-            loading={flowsRet.isRefetching}
-          >
-          </Button> */}
-          {/* <Icon
-            name="refresh"
-            type="light"
-            color={{
-              primary: theme('colors.white'),
-              secondary: theme('colors.white'),
-            }}
-            clickable
-            onClick={refreshJobs}
-          /> */}
         </div>
       </div>
       <div tw="border-b dark:border-neut-15">
         <div tw="mt-3 px-2 flex items-center">
           <InputSearch
-            tw="dark:bg-neut-17 dark:text-white dark:border-neut-13 dark:hover:border-neut-13"
             placeholder="搜索作业名称"
             onPressEnter={(evt) => {
               setFilter((draft) => {
@@ -206,12 +189,6 @@ const JobMenu = observer(() => {
               })
             }}
           />
-          {/* <Icon
-            tw="ml-2 cursor-pointer"
-            name="filter"
-            changeable
-            type="light"
-          /> */}
         </div>
         <motion.div
           tw="mx-2 mt-3 bg-neut-17 p-2"

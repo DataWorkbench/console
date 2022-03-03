@@ -6,6 +6,12 @@ const inputStyles = css`
   }
   .dark {
     .input,
+    .input-search {
+      &:focus {
+        ${tw`caret-white!`}
+      }
+    }
+    .input,
     .textarea {
       ${tw`bg-neut-16 text-white border-neut-13`}
       &::placeholder {
@@ -36,9 +42,6 @@ const inputStyles = css`
         ${tw`bg-neut-16 text-white border-neut-13!`}
         &:hover {
           ${tw`border-neut-11!`}
-        }
-        &:focus {
-          ${tw`border-green-13!`}
         }
       }
       i.icon {

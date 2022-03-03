@@ -14,13 +14,14 @@ import HelpCenterStyle from './HelpCenterStyle'
 
 const customStyles = css`
   html {
-    ${tw`text-base overflow-hidden!`};
+    ${tw`text-base overflow-x-auto overflow-y-hidden!`};
     font-family: 'Roboto', 'PingFang SC', 'Noto Sans CJK', 'WenQuanYi Micro Hei',
       'Microsoft YaHei', sans-serif;
   }
 
   body {
-    ${tw`overflow-hidden min-h-screen h-screen`}
+    ${tw`overflow-y-hidden min-h-screen h-screen`};
+    min-width: 1280px;
   }
   .light {
     --bg-primary: #fff;
@@ -28,9 +29,6 @@ const customStyles = css`
     --text-primary: #475569;
     --text-secondary: #1e293b;
     --color-primary: #e11d48;
-  }
-  .page-tab-container {
-    ${tw`shadow-none`}
   }
 
   .dark {
@@ -71,23 +69,6 @@ const customStyles = css`
       }
     }
 
-    .page-tab-container {
-      ${tw`mb-5`}
-      .collapse-panel {
-        ${tw`bg-neut-16`}
-        .tab-title {
-          ${tw`text-white font-medium`}
-        }
-        button.is-text,
-        .tab-description {
-          ${tw`text-neut-8`}
-        }
-        svg {
-          color: hsla(0, 0%, 100%, 0.9);
-          fill: hsla(0, 0%, 100%, 0.4);
-        }
-      }
-    }
     .icon.icon-clickable:hover {
       ${tw`bg-neut-13`}
     }

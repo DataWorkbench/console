@@ -16,6 +16,7 @@ import {
   useQueryReleaseJobs,
   useStore,
 } from 'hooks'
+import tw, { css } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import dayjs from 'dayjs'
@@ -195,6 +196,7 @@ export const ReleaseTable = observer(({ query }: any) => {
     () => [
       {
         title: '作业名称/ID',
+        width: 200,
         dataIndex: 'name',
         render: (value: string, row: Record<string, any>) => {
           return (
@@ -207,7 +209,7 @@ export const ReleaseTable = observer(({ query }: any) => {
               </Center>
               <div tw="flex-1 break-all">
                 <div>{row.name}</div>
-                <div>{row.id}</div>
+                <div tw="text-neut-8">{row.id}</div>
               </div>
             </FlexBox>
           )
@@ -239,7 +241,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       {
         title: '发布描述',
         dataIndex: 'desc',
-        width: 250,
+        // width: 250,
         render: (value: string) => (
           <Tooltip theme="light" content={<Center tw="p-3">{value}</Center>}>
             <div tw="max-w-[200px] truncate">{value}</div>
@@ -248,6 +250,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       },
       {
         title: '作业版本',
+        width: 186,
         dataIndex: 'version',
       },
       {
@@ -301,6 +304,16 @@ export const ReleaseTable = observer(({ query }: any) => {
                 arrow={false}
                 trigger="click"
                 placement="bottom-end"
+                twChild={
+                  css`
+                    &[aria-expanded='true'] {
+                      ${tw`bg-line-dark`}
+                    }
+                    svg {
+                      ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                    }
+                  ` as any
+                }
                 content={
                   <Menu
                     onClick={(e: any, key: OP) => hanldeMenuClick(key, row)}
@@ -312,8 +325,14 @@ export const ReleaseTable = observer(({ query }: any) => {
                   </Menu>
                 }
               >
-                <div tw="flex items-center">
-                  <Icon name="more" clickable changeable type="light" />
+                <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
+                  <Icon
+                    name="more"
+                    clickable
+                    changeable
+                    type="light"
+                    size={20}
+                  />
                 </div>
               </Tooltip>
             </Center>
