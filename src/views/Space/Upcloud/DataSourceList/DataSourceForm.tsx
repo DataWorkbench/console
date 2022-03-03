@@ -118,12 +118,30 @@ const getInitValue = (path: string) => {
     url: {
       hdfs: {
         port: 9000,
+        config: `{
+  "dfs.nameservices": "ns",
+  "dfs.ha.namenodes.ns": "nn1,nn2",
+  "fs.defaultFS": "hdfs://ns",
+  "dfs.namenode.rpc-address.ns.nn1": "ip1:9000",
+  "dfs.namenode.http-address.ns.nn1": "ip1:50070",
+  "dfs.namenode.rpc-address.ns.nn2": "ip2:9000",
+  "dfs.namenode.http-address.ns.nn2": "ip2:50070"
+}`,
       },
       ftp: {
         port: 21,
       },
       sftp: {
         port: 22,
+      },
+      hbase: {
+        config: `{
+   "hbase.zookeeper.property.clientPort": "2181",
+   "hbase.rootdir": "hdfs://ns1/hbase",
+   "hbase.cluster.distributed": "true",
+   "hbase.zookeeper.quorum": "node01,node02,node03",
+   "zookeeper.znode.parent": "/hbase"
+}`,
       },
     },
   }
@@ -199,7 +217,7 @@ const DataSourceForm = ({
     ) {
       return undefined
     }
-    return get(opSourceList, '[0].connection') === 1
+    return get(opSourceList, '[0].last_connection.result') === 1
       ? {
           status: true,
         }
@@ -484,7 +502,7 @@ const DataSourceForm = ({
               }
               if (field.fieldType === 'dbUrl') {
                 return (
-                  <Field key={field.name}>
+                  <Field key={field.name} tw="mb-0!">
                     <label htmlFor="__" className="label">
                       <AffixLabel required>{field.label}</AffixLabel>
                     </label>
@@ -589,6 +607,7 @@ const DataSourceForm = ({
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
                 network={network}
+                hasPing={!!get(sourceInfo, 'last_connection')}
               />
             </Field>
           </CollapseItem>

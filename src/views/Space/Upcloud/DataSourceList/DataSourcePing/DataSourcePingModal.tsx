@@ -130,6 +130,7 @@ export const DataSourcePingModal = () => {
             defaultStatus={defaultStatus}
             network={network}
             sourceId={get(opSourceList[0], 'id', '')}
+            hasPing={!!get(opSourceList[0], 'last_connection')}
           />
         </Field>
       </Form>
