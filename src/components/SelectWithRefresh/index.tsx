@@ -43,7 +43,7 @@ const SelectWithRefreshCmp = forwardRef<
           ref={selectRef}
         />
         <Button
-          tw="w-8 ml-3 p-0"
+          tw="w-8 ml-3 p-0 dark:bg-neut-16!"
           disabled={disabled}
           onClick={() => onRefresh && onRefresh()}
         >
