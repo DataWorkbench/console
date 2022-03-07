@@ -12,7 +12,7 @@ import { useMutationStreamJob, getFlowKey } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { Rnd } from 'react-rnd'
 import { HelpCenterLink } from 'components'
-import JobModal from './JobModal'
+import { JobModal } from './JobModal'
 import { JobTree } from './JobTree'
 
 const ModalWrapper = styled(Modal)(() => [
@@ -277,7 +277,7 @@ const JobMenu = observer((props: JobMenuProps) => {
           <JobTree />
         </SimpleBar>
       </div>
-      {visible && <JobModal job={editJob} onCancel={hideCreateEditModal} />}
+      {visible && <JobModal job={editJob} onClose={hideCreateEditModal} />}
       {delVisible && (
         <ModalWrapper
           visible

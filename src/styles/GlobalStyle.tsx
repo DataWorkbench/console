@@ -11,7 +11,6 @@ import menuStyles from './menuStyles'
 import tippyStyles from './tippyStyles'
 import pageTabStyles from './pageTabStyles'
 import HelpCenterStyle from './HelpCenterStyle'
-import rcTreeStyle from './rcTreeStyle'
 
 const customStyles = css`
   html {
@@ -137,7 +136,6 @@ const GlobalStyles = () => (
         tippyStyles,
         pageTabStyles,
         HelpCenterStyle,
-        rcTreeStyle,
       ]}
     />
   </>

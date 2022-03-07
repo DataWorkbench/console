@@ -6,9 +6,10 @@ import { Select } from '@QCFE/lego-ui'
 interface JobModeItemProps {
   selected?: boolean
   disabled?: boolean
-  onClick?: (itemData: any, jobType: string | number) => void
+  onClick?: (jobModeData: any, jobType: string | number) => void
   onTypeItemChange?: (item: any) => void
-  itemData: any
+  defaultType?: string
+  jobModeData: any
 }
 
 const Root = styled('div')(
@@ -40,14 +41,15 @@ const JobModeIconWrapper = styled('div')(
 )
 
 export const JobModeItem = ({
-  itemData,
+  jobModeData,
   selected,
   disabled,
+  defaultType = -1,
   onClick,
   onTypeItemChange,
 }: JobModeItemProps) => {
-  const { title, desc, icon, items } = itemData
-  const [jobType, setJobType] = useState<number | string>(-1)
+  const { title, desc, icon, items } = jobModeData
+  const [jobType, setJobType] = useState<number | string>(defaultType)
 
   const optionRenderer = (option) => (
     <div tw="flex items-center">
@@ -75,7 +77,7 @@ export const JobModeItem = ({
       disabled={disabled}
       onClick={() => {
         if (!disabled && onClick) {
-          onClick(itemData, jobType)
+          onClick(jobModeData, jobType)
         }
       }}
     >

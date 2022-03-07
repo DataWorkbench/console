@@ -6,115 +6,20 @@ import {
   ModalContent,
   AffixLabel,
   SelectTreeField,
-  Icons,
 } from 'components'
 import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, assign } from 'lodash-es'
 import { useWindowSize } from 'react-use'
 import tw, { css, styled } from 'twin.macro'
-import { useMutationStreamJob, getFlowKey } from 'hooks'
-import { useQueryClient } from 'react-query'
-
-// import NodeTypeImg from 'assets/svgr/sourcetype_node.svg'
-// import SQLTypeImg from 'assets/svgr/sourcetype_sql.svg'
-// import CodeTypeImg from 'assets/svgr/sourcetype_code.svg'
+import { useMutationStreamJob } from 'hooks'
+// import { useQueryClient } from 'react-query'
 import { Control, Field, Label } from '@QCFE/lego-ui'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { nameMatchRegex, strlen } from 'utils/convert'
 import { JobModeItem } from './JobModeItem'
+import { JobMode, jobModeData, RtType } from './JobConstant'
 
 const { TextField, TextAreaField } = Form
-
-enum JobMode {
-  DI = 'DI',
-  RT = 'RT',
-  OLE = 'OLE',
-}
-
-enum DiType {
-  OFFLINE_BATCH = 'OFFLINE_BATCH',
-  REALTIME_FLOW = 'REALTIME_FLOW',
-}
-
-enum RtType {
-  OPERATOR = 1,
-  SQL = 2,
-  JAR = 3,
-  PYTHON = 4,
-  SCALA = 5,
-}
-
-// enum OleType {}
-
-const jobModeData = [
-  {
-    mode: JobMode.DI,
-    title: '数据集成',
-    desc: '提供异构数据源之间的数据搬运和数据同步的能力',
-    icon: 'equalizer',
-    selTitle: '同步方式',
-    items: [
-      {
-        icon: 'inbox1',
-        title: '离线-批量同步作业',
-        desc: '离线批量同步的描述文案，尽量简短，一句话内',
-        value: DiType.OFFLINE_BATCH,
-      },
-      {
-        icon: 'inbox0',
-        title: '实时-流式同步作业',
-        desc: '实时-流式的描述文案，尽量简短，一句话内',
-        value: DiType.REALTIME_FLOW,
-      },
-    ],
-  },
-  {
-    mode: JobMode.RT,
-    title: '实时-流式开发',
-    desc: '实时开发说明占位文字实时开发说明占位文字实时开发说明占位文字。占位文字',
-    icon: 'flash',
-    selTitle: '实时开发模式',
-    items: [
-      {
-        icon: 'sql',
-        title: 'SQL 模式',
-        desc: 'SQL 模式的描述文案，尽量简短，一句话内',
-        value: RtType.SQL,
-      },
-      {
-        icon: 'jar',
-        title: '代码开发-Jar 包模式',
-        desc: 'Jar 模式的描述文案，尽量简短，一句话内',
-        value: RtType.JAR,
-      },
-      {
-        icon: 'python',
-        title: '代码开发-Python 模式',
-        desc: 'Python 模式的描述文案，尽量简短，一句话内',
-        value: RtType.PYTHON,
-      },
-      {
-        icon: 'scala',
-        title: '代码开发-Scala 模式 ',
-        desc: 'scala 模式的描述文案，尽量简短，一句话内',
-        value: RtType.SCALA,
-      },
-      {
-        icon: 'operator',
-        title: '算子编排模式',
-        desc: '算子编排模式描述文案，尽量简短，一句话内',
-        value: RtType.OPERATOR,
-      },
-    ],
-  },
-  {
-    mode: JobMode.OLE,
-    title: '离线-批量开发（敬请期待）',
-    desc: '离线开发说明占位文字离线开发说明占位文字离线开发说明占位文字。占位文字',
-    icon: 'inbox1',
-    items: [],
-  },
-]
 
 const FormWrapper = styled('div')(() => [
   tw`w-[450px]`,
@@ -140,39 +45,52 @@ const FormWrapper = styled('div')(() => [
 ])
 
 interface JobModalProps {
-  job: any
-  onCancel: (data?: any) => void
+  op?: 'create' | 'edit'
+  jobType?: string | number
+  jobMode?: string
+  pid?: string
+  job?: any
+  treeData: any[]
+  onClose?: (data?: any) => void
 }
 
-const JobModal = ({ job, onCancel }: JobModalProps) => {
+export const JobModal = ({
+  op = 'create',
+  jobMode,
+  jobType,
+  pid = '',
+  job,
+  treeData = [],
+  onClose,
+}: JobModalProps) => {
   const form = useRef<Form>(null)
   const [showCluster, setShowCluster] = useState(false)
   const [cluster, setCluster] = useState(null)
   const { width: winWidth } = useWindowSize()
   const [params, setParams] = useImmer({
-    step: job ? 1 : 0,
-    jobMode: job ? job.job_mode : JobMode.DI,
-    jobType: -1,
-    scheType: job ? job.type : 0,
-    pid: '',
+    step: op === 'create' && !jobMode ? 0 : 1,
+    jobMode: jobMode || JobMode.RT,
+    jobType: jobType || RtType.SQL,
+    pid,
+    job,
   })
 
   const mutation = useMutationStreamJob()
-  const queryClient = useQueryClient()
+  // const queryClient = useQueryClient()
 
-  const handleCancel = (data?: any) => {
+  const handleClose = (created = false) => {
     setParams((draft) => {
       draft.step = 0
     })
-    if (onCancel) {
-      onCancel(data)
+    if (onClose) {
+      onClose(created)
     }
   }
 
-  const handleItemClick = ({ mode }, jobType) => {
+  const handleItemClick = ({ mode }, type) => {
     setParams((draft) => {
       draft.jobMode = mode
-      draft.jobType = jobType
+      draft.jobType = type
     })
   }
 
@@ -189,21 +107,23 @@ const JobModal = ({ job, onCancel }: JobModalProps) => {
       })
     } else if (form.current?.validateForm()) {
       const fields = form.current.getFieldsValue()
+      const isRootNode = ['rt-root', 'sql-root'].includes(fields.pid)
       const data = assign(
         {
           op: job ? 'update' : 'create',
           type: params.jobType,
           ...fields,
-          pid: fields.pid === '/' ? '' : fields.pid,
+          is_directory: false,
+          pid: isRootNode ? '' : fields.pid,
         },
         job && { jobId: job.id },
         cluster && { cluster_id: cluster.id }
       )
-
       mutation.mutate(data, {
-        onSuccess: (ret) => {
-          handleCancel(ret)
-          queryClient.invalidateQueries(getFlowKey())
+        onSuccess: () => {
+          handleClose(true)
+          // queryClient
+          // queryClient.invalidateQueries(getFlowKey())
         },
       })
     }
@@ -225,11 +145,11 @@ const JobModal = ({ job, onCancel }: JobModalProps) => {
         maskClosable={false}
         appendToBody
         draggable
-        onCancel={handleCancel}
+        onCancel={() => handleClose(false)}
         footer={
           <div tw="flex justify-end space-x-2">
             {params.step === 0 || job ? (
-              <Button onClick={handleCancel}>取消</Button>
+              <Button onClick={() => handleClose(false)}>取消</Button>
             ) : (
               <Button
                 onClick={() =>
@@ -271,7 +191,8 @@ const JobModal = ({ job, onCancel }: JobModalProps) => {
                 return (
                   <JobModeItem
                     key={modeItem.mode}
-                    itemData={modeItem}
+                    jobModeData={modeItem}
+                    defaultType={params.jobType}
                     selected={selected}
                     disabled={modeItem.mode === JobMode.OLE}
                     onClick={handleItemClick}
@@ -318,22 +239,15 @@ const JobModal = ({ job, onCancel }: JobModalProps) => {
                     validateOnChange
                     schemas={[
                       {
-                        rule: (pid: string) => {
-                          return pid !== ''
+                        rule: (v: string) => {
+                          return v !== ''
                         },
                         help: '请选择作业所在目录',
                         status: 'error',
                       },
                     ]}
-                    treeData={[
-                      {
-                        key: 'key-1',
-                        icon: <Icons name="flash" size={16} />,
-                        title: '实时-流式开发',
-                        pid: '/',
-                      },
-                    ]}
-                    // value={params.pid}
+                    treeData={treeData}
+                    value={params.pid}
                     onChange={(v: string) => {
                       setParams((draft) => {
                         draft.pid = v

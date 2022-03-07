@@ -96,7 +96,7 @@
     "webpackbar": "^5.0.0-3"
   },
   "dependencies": {
-    "@QCFE/lego-ui": "^0.1.40",
+    "@QCFE/lego-ui": "^0.1.56",
     "@QCFE/qingcloud-portal-ui": "^1.1.53",
     "@babel/runtime": "^7.14.0",
     "@emotion/react": "^11.4.1",
