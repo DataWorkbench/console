@@ -12,6 +12,7 @@ import { useInfiniteQueryFlow, useMutationStreamJob, getFlowKey } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { FlexBox, Center, HelpCenterLink } from 'components'
 import JobModal from './JobModal'
+import { Tag } from './styled'
 
 const ModalWrapper = styled(Modal)(() => [
   css`
@@ -29,12 +30,6 @@ const ModalWrapper = styled(Modal)(() => [
 ])
 
 const { MenuItem } = Menu
-
-const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
-  tw`border border-neut-13 rounded-sm leading-5 px-1.5 text-neut-8 scale-75 origin-left`,
-  tw`group-hover:(bg-white text-neut-13 border-white)`,
-  selected && tw`bg-white text-neut-13 border-white`,
-])
 
 const TooltipWrapper = styled(Tooltip)(() => [
   tw`bg-neut-17 border! border-solid border-neut-13 p-0`,

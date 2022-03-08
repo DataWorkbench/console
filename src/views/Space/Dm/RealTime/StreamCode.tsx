@@ -32,6 +32,7 @@ import * as scalaMod from 'utils/languages/scala'
 import { StreamToolBar } from './styled'
 import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
+import VersionHeader from './VersionHeader'
 
 const CODETYPE = {
   2: 'sql',
@@ -62,8 +63,10 @@ interface IProp {
 const StreamCode = observer(({ tp }: IProp) => {
   const {
     workFlowStore,
-    workFlowStore: { curJob, showSaveJobConfirm },
+    workFlowStore: { curJob, curVersion, showSaveJobConfirm },
   } = useStore()
+  const readOnly = !!curVersion
+
   const [nextLocation, setNextLocation] = useState(null)
   const [shouldNav, setShouldNav] = useState(false)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
@@ -344,51 +347,55 @@ def main(args: Array[String]): Unit = {
   return (
     <FlexBox tw="relative h-full w-full flex-1" ref={boxRef}>
       <FlexBox tw="flex flex-col flex-1 overflow-hidden">
-        <StreamToolBar tw="pb-4">
-          {/* <Button type="black">
-            <Icon name="listview" type="light" />
-            插入表
-          </Button> */}
-          <Button
-            type="black"
-            tw="w-[84px] px-0"
-            disabled={tp !== 2}
-            onClick={() => mutateCodeData('codeSyntax')}
-            loading={syntaxMutation.isLoading}
-          >
-            <Icon name="remark" type="light" />
-            语法检查
-          </Button>
-          {false && (
+        {readOnly ? (
+          <VersionHeader />
+        ) : (
+          <StreamToolBar tw="pb-4">
+            {/* <Button type="black">
+                <Icon name="listview" type="light" />
+                插入表
+              </Button> */}
             <Button
               type="black"
-              tw="w-[60px] px-0 "
-              onClick={handleRun}
-              loading={runMutation.isLoading}
+              tw="w-[84px] px-0"
+              disabled={tp !== 2}
+              onClick={() => mutateCodeData('codeSyntax')}
+              loading={syntaxMutation.isLoading}
             >
-              <Icon name="triangle-right" type="light" />
-              运行
+              <Icon name="remark" type="light" />
+              语法检查
             </Button>
-          )}
-          <Button
-            tw="w-[68px] px-0"
-            onClick={() => mutateCodeData('codeSave')}
-            loading={mutation.isLoading}
-          >
-            <Icon name="data" />
-            保存
-          </Button>
-          <Button
-            type="primary"
-            tw="w-[68px] px-0"
-            onClick={onRelease}
-            loading={releaseMutation.isLoading}
-            disabled={!enableRelease}
-          >
-            <Icon name="export" />
-            发布
-          </Button>
-        </StreamToolBar>
+            {false && (
+              <Button
+                type="black"
+                tw="w-[60px] px-0 "
+                onClick={handleRun}
+                loading={runMutation.isLoading}
+              >
+                <Icon name="triangle-right" type="light" />
+                运行
+              </Button>
+            )}
+            <Button
+              tw="w-[68px] px-0"
+              onClick={() => mutateCodeData('codeSave')}
+              loading={mutation.isLoading}
+            >
+              <Icon name="data" />
+              保存
+            </Button>
+            <Button
+              type="primary"
+              tw="w-[68px] px-0"
+              onClick={onRelease}
+              loading={releaseMutation.isLoading}
+              disabled={!enableRelease}
+            >
+              <Icon name="export" />
+              发布
+            </Button>
+          </StreamToolBar>
+        )}
         <div tw="flex-1 relative overflow-hidden flex flex-col">
           <div
             css={[!showPlaceholder && tw`hidden`]}
@@ -404,6 +411,7 @@ def main(args: Array[String]): Unit = {
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               automaticLayout: true,
+              readOnly,
             }}
             editorWillMount={handleEditorWillMount}
             editorDidMount={handleEditorDidMount}

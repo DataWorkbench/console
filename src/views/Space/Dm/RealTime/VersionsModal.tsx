@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 import { DarkModal } from 'components/Modal'
 import { Button, InputSearch, Table } from '@QCFE/qingcloud-portal-ui'
@@ -6,6 +6,7 @@ import tw, { css } from 'twin.macro'
 import { useQueryReleaseJobVersions } from 'hooks'
 import { omitBy } from 'lodash-es'
 import dayjs from 'dayjs'
+import { useStore } from 'stores'
 
 interface IFilter {
   limit: number
@@ -15,6 +16,7 @@ interface IFilter {
 }
 
 const JobVersions = (props: any) => {
+  const { workFlowStore } = useStore()
   const { onCancel } = props
 
   const [filter, setFilter] = useImmer<IFilter>({
@@ -22,9 +24,13 @@ const JobVersions = (props: any) => {
     offset: 0,
   })
 
-  const handleCheckJobByVersion = (row: Record<string, any>) => {
-    console.log(row)
-  }
+  const handleCheckJobByVersion = useCallback(
+    (row: Record<string, any>) => {
+      workFlowStore.set({ curVersion: row })
+      onCancel()
+    },
+    [workFlowStore, onCancel]
+  )
 
   const columns = useMemo(
     () => [
@@ -38,7 +44,7 @@ const JobVersions = (props: any) => {
       },
       {
         title: '操作人',
-        dataIndex: 'user',
+        dataIndex: 'created_by',
       },
       {
         title: '提交时间',
@@ -63,7 +69,7 @@ const JobVersions = (props: any) => {
         ),
       },
     ],
-    []
+    [handleCheckJobByVersion]
   )
 
   const { isFetching, data } = useQueryReleaseJobVersions(
@@ -95,8 +101,10 @@ const JobVersions = (props: any) => {
             placeholder="搜索操作人、版本、备注"
           />
           <Table
+            rowKey="version"
             columns={columns}
             loading={isFetching}
+            dataSource={data?.infos || []}
             pagination={{
               total: data?.total || 0,
               current: filter.offset / filter.limit + 1,

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import tw, { css, styled } from 'twin.macro'
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
-import JobVersionsModal from './JobVersionsModal'
+import VersionsModal from './VersionsModal'
 
 const MenuRoot = styled('div')(() => [
   tw`pt-3 space-y-4 align-middle bg-neut-17`,
@@ -51,7 +51,7 @@ const StreamRightMenu = ({
       )}
       {showArgs && <ScheArgsModal onCancel={() => setShowArgs(false)} />}
       {showVersions && (
-        <JobVersionsModal onCancel={() => setShowVersions(false)} />
+        <VersionsModal onCancel={() => setShowVersions(false)} />
       )}
     </>
   )

@@ -17,6 +17,8 @@ class WorkFlowStore {
 
   curJob: null | IJob = null
 
+  curVersion: null | IJob = null
+
   panels: IJob[] = []
 
   showNotify = false
