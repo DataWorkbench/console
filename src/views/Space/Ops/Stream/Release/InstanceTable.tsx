@@ -150,6 +150,7 @@ export const InstanceTable = observer(
       {
         title: '实例ID',
         dataIndex: 'id',
+        width: 200,
         render: (value: string) => {
           return (
             <FlexBox tw="items-center space-x-1">
@@ -167,6 +168,7 @@ export const InstanceTable = observer(
       {
         title: '状态',
         dataIndex: 'state',
+        width: 120,
         render: (value: number) => {
           return (
             <div tw="flex items-center">
