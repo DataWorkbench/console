@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { Card, CardHeader, CardContent, HelpCenterLink } from 'components'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
+import tw, { css, styled, theme } from 'twin.macro'
 
 const questions = [
   {
@@ -22,6 +23,18 @@ const questions = [
   { title: '其他常见问题', link: '/databench/faq/' },
 ]
 
+const Question = styled('li')(() => [
+  tw`flex items-center mt-2 cursor-pointer`,
+  css`
+    &:hover {
+      svg {
+        ${tw`text-green-11`}
+        fill: ${theme('colors.green.4')};
+      }
+    }
+  `,
+])
+
 const FAQ: FC = ({ className }) => {
   return (
     <Card className={className} tw="leading-5" hasBoxShadow>
@@ -30,18 +43,15 @@ const FAQ: FC = ({ className }) => {
         <div tw="rounded-sm border border-neut-2">
           <ul tw="text-neut-15 p-4">
             {questions.map((quest) => (
-              <li
-                key={quest.title}
-                tw="flex items-center mt-2 cursor-pointer hover:text-green-11 hover:font-medium"
-              >
+              <Question key={quest.title}>
                 <Icon name="file" tw="mr-2" />
                 <HelpCenterLink
-                  tw="text-neut-15 no-underline font-normal hover:text-green-11"
+                  tw="text-neut-15 no-underline font-normal hover:text-green-11 hover:font-medium"
                   href={quest.link}
                 >
                   {quest.title}
                 </HelpCenterLink>
-              </li>
+              </Question>
             ))}
           </ul>
           <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center border-t border-[#DEE6ED]">
