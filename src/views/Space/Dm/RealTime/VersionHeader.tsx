@@ -1,14 +1,75 @@
-import { useStore } from 'hooks'
+import { useInfiniteQueryJobVersions, useStore } from 'hooks'
 import { FlexBox } from 'components'
-import { Level, LevelLeft } from '@QCFE/lego-ui'
+import { Level, LevelLeft, Select } from '@QCFE/lego-ui'
 import { Icon, Divider } from '@QCFE/qingcloud-portal-ui'
+import { flatten } from 'lodash-es'
+import tw, { css, styled } from 'twin.macro'
 import { AlertWrapper, Tag } from './styled'
+
+const SelectWrapper = styled(Select)(() => [
+  css`
+    ${tw`w-[150px]`}
+    .select-menu-outer {
+      .select-option.is-selected {
+        .option-selected-area {
+          ${tw`inline-flex!`}
+        }
+      }
+    }
+
+    &.is-open {
+      .select-control {
+        .select-value {
+          .select-value-label {
+            ${tw`text-[#15A675]!`}
+          }
+        }
+      }
+    }
+    .select-control {
+      ${tw`border-none bg-transparent! p-0`}
+      .select-multi-value-wrapper {
+      }
+      .select-value {
+        ${tw`pl-0`}
+      }
+      .select-value-label {
+      }
+    }
+    .select-menu-outer {
+      ${tw`w-[180px]!`}
+    }
+  `,
+])
 
 export default function VersionHeader() {
   const {
     workFlowStore,
     workFlowStore: { curVersion },
   } = useStore()
+
+  const versionRet = useInfiniteQueryJobVersions()
+
+  const versions = flatten(
+    versionRet.data?.pages.map((page) => page.infos || [])
+  )
+
+  const handleVersionChange = (value: any) => {
+    workFlowStore.set({
+      curVersion: versions.find((el: any) => el.version === value),
+    })
+  }
+
+  const arrowRenderer = ({ onMouseDown, isOpen }: any) => (
+    <span className="select-arrow" onMouseDown={onMouseDown}>
+      <Icon
+        name="caret-down"
+        size="small"
+        clickable
+        color={isOpen && { primary: '#15A675', secondary: '#15A675' }}
+      />
+    </span>
+  )
 
   return (
     <div tw="w-full">
@@ -36,7 +97,17 @@ export default function VersionHeader() {
             {curVersion?.name}{' '}
           </div>
         </FlexBox>
-        <div>{curVersion?.version}</div>
+        <SelectWrapper
+          placeholder={curVersion?.version}
+          options={versions.map(({ version }) => ({
+            value: version,
+            label: version,
+          }))}
+          backspaceRemoves={false}
+          value={curVersion?.version}
+          onChange={handleVersionChange}
+          arrowRenderer={arrowRenderer}
+        />
         <Divider
           type="vertical"
           height={12}

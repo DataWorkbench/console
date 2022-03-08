@@ -107,9 +107,10 @@ const RealTime = observer(() => {
     )
   }
 
+  const showVersion = curVersion && curJob?.id === curVersion.id
   return (
     <div tw="flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
-      {curVersion ? (
+      {showVersion ? (
         <VersionDisplay />
       ) : (
         <>
