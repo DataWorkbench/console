@@ -62,7 +62,7 @@ const StreamJAR = () => {
     }
   }, [data, setParams])
   useEffect(() => {
-    if (get(data, 'jar.id')) {
+    if (get(data, 'jar.file_id')) {
       setEnableRelease(true)
     }
   }, [data, scheData])
