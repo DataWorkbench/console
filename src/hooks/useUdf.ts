@@ -83,7 +83,7 @@ export const useMutationUdf = (options?: {}) => {
       if (op === 'create') {
         ret = await createUdf({ ...rest, regionId, spaceId })
       } else if (op === 'edit') {
-        ret = await updateUdf({ ...rest, regionId, spaceId })
+        ret = await updateUdf({ ...rest, udf_id: rest.id, regionId, spaceId })
       } else if (op === 'delete') {
         ret = await deleteUdf({ ...rest, regionId, spaceId })
       }

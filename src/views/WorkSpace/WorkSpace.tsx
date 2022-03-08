@@ -15,7 +15,7 @@ import {
 import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
 import { WorkSpaceContext } from 'contexts'
-import { useQueryRegion } from 'hooks'
+import { useQueryRegion, useStore } from 'hooks'
 import { getHelpCenterLink } from 'utils'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
@@ -55,6 +55,7 @@ const WorkSpace = observer(
   ({ isModal, onItemCheck, onHide, showCreate = false }: IWrokSpaceProps) => {
     const [zone] = useCookie('zone')
     const { status, refetch, data: regionInfos } = useQueryRegion()
+    const { globalStore } = useStore()
     // const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
     const stateStore = useLocalObservable(() => ({
       isModal,
@@ -97,15 +98,16 @@ const WorkSpace = observer(
 
     useEffect(() => {
       if (regionInfos?.length) {
-        const defaultRegionId = regionInfos
-          ?.map(({ id }) => id)
-          .find((id) => id === zone)
-
-        stateStore.set({
-          curRegionId: defaultRegionId || get(regionInfos, '[0].id', ''),
-        })
+        const defaultRegion = regionInfos.find(({ id }) => id === zone)
+        const curRegionInfo = defaultRegion || get(regionInfos, '[0]')
+        if (curRegionInfo) {
+          stateStore.set({
+            curRegionId: curRegionInfo.id,
+          })
+          globalStore.set({ curRegionInfo })
+        }
       }
-    }, [regionInfos, stateStore, zone])
+    }, [regionInfos, stateStore, zone, globalStore])
 
     useEffect(() => {
       if (showCreate) {
@@ -117,6 +119,9 @@ const WorkSpace = observer(
 
     const handleTabClick = (tabName: string) => {
       stateStore.set({ curRegionId: tabName })
+      globalStore.set({
+        curRegionInfo: regionInfos?.find((region) => region.id === tabName),
+      })
     }
 
     const reloadWorkSpace = () => {

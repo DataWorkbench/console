@@ -9,7 +9,7 @@ const Root = styled.div(({ layout }: { layout: string }) => [
   css`
     &:hover {
       .icon-card-title {
-        color: #15a675 !important;
+        ${tw`text-green-11!`}
       }
     }
   `,

@@ -101,14 +101,18 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
               <Icon name="pen" />
               修改工作空间
             </MenuItem>
-            <MenuItem value="disable" disabled={disableStatus}>
-              <i className="if if-minus-square" tw="text-base mr-2" />
-              禁用工作空间
-            </MenuItem>
-            <MenuItem value="enable" disabled={space.status === 1}>
-              <Icon name="start" />
-              启动工作空间
-            </MenuItem>
+            {!disableStatus && (
+              <MenuItem value="disable" disabled={disableStatus}>
+                <i className="if if-minus-square" tw="text-base mr-2" />
+                禁用工作空间
+              </MenuItem>
+            )}
+            {space.status !== 1 && (
+              <MenuItem value="enable" disabled={space.status === 1}>
+                <Icon name="start" />
+                启动工作空间
+              </MenuItem>
+            )}
             <MenuItem value="delete">
               <Icon name="trash" />
               删除

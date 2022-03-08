@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState } from 'react'
 import { useImmer } from 'use-immer'
-import { Modal, ModalStep, ModalContent, AffixLabel } from 'components'
+import { Modal, ModalStep, ModalContent, AffixLabel, Tooltip } from 'components'
 import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
 import { get, assign } from 'lodash-es'
 import tw, { css, styled, theme } from 'twin.macro'
@@ -53,7 +53,13 @@ const ScheduleItem = styled('div')(
 const CodeButton = styled(Button)(({ selected }: { selected?: boolean }) => [
   // tw`bg-neut-17! hover:border-white! hover:bg-neut-18!`,
   selected &&
-    tw`border-green-11! hover:border-green-11! text-green-11! font-medium`,
+    tw`border-green-11! hover:border-green-11! text-green-11! font-medium bg-neut-17!`,
+  selected &&
+    css`
+      svg {
+        ${tw`text-green-11`}
+      }
+    `,
 ])
 
 const JobModal = ({
@@ -68,7 +74,7 @@ const JobModal = ({
   const [cluster, setCluster] = useState(null)
   const [params, setParams] = useImmer({
     step: job ? 1 : 0,
-    scheType: job ? job.type : 0,
+    scheType: job ? job.type : 2,
   })
 
   const mutation = useMutationStreamJob()
@@ -123,9 +129,14 @@ const JobModal = ({
         subType: [3, 4, 5],
         title: '代码开发',
         subItems: [
-          { type: 3, text: 'Jar', icon: 'java' },
-          { type: 4, text: 'Python', icon: 'python' },
-          { type: 5, text: 'Scala', icon: 'coding' },
+          {
+            type: 3,
+            text: 'JAR',
+            icon: 'java',
+            desc: 'JAR 模式，同时支持 java 包和 scala 包',
+          },
+          { type: 4, text: 'Python', icon: 'python', desc: '敬请期待' },
+          // { type: 5, text: 'Scala', icon: 'coding' },
         ],
         icon: <CodeTypeImg />,
       },
@@ -224,24 +235,30 @@ const JobModal = ({
                             selected && tw`bg-neut-15`,
                           ]}
                         >
-                          <div tw="font-semibold ">{title}</div>
+                          <div tw="font-semibold">{title}</div>
                           <div tw="mt-2 text-neut-8 space-x-2">
                             {disp ||
                               subItems?.map((item) => (
-                                <CodeButton
+                                <Tooltip
                                   key={item.type}
-                                  disabled={item.type !== 3}
-                                  selected={params.scheType === item.type}
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    setParams((draft) => {
-                                      draft.scheType = item.type
-                                    })
-                                  }}
+                                  content={item.desc}
+                                  theme="light"
+                                  hasPadding
                                 >
-                                  <Icon name={item.icon} type="light" />
-                                  {item.text}
-                                </CodeButton>
+                                  <CodeButton
+                                    disabled={item.type !== 3}
+                                    selected={params.scheType === item.type}
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      setParams((draft) => {
+                                        draft.scheType = item.type
+                                      })
+                                    }}
+                                  >
+                                    <Icon name={item.icon} type="light" />
+                                    {item.text}
+                                  </CodeButton>
+                                </Tooltip>
                               ))}
                           </div>
                         </div>

@@ -10,6 +10,7 @@ import {
 } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, TextLink, Icons, Tooltip } from 'components'
 import dayjs from 'dayjs'
+import tw, { css } from 'twin.macro'
 import {
   getJobInstanceKey,
   useMutationInstance,
@@ -181,6 +182,7 @@ export const InstanceTable = observer(
       {
         title: '所属作业/ID',
         dataIndex: 'job_id',
+        width: 185,
         render: (value: string, row: Record<string, any>) => {
           return (
             <div>
@@ -197,6 +199,7 @@ export const InstanceTable = observer(
       },
       {
         title: '作业版本',
+        width: 185,
         dataIndex: 'version',
       },
       {
@@ -251,6 +254,16 @@ export const InstanceTable = observer(
                   trigger="click"
                   placement="bottom-end"
                   arrow={false}
+                  twChild={
+                    css`
+                      &[aria-expanded='true'] {
+                        ${tw`bg-line-dark`}
+                      }
+                      svg {
+                        ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                      }
+                    ` as any
+                  }
                   content={
                     <Menu
                       onClick={(e: any, key: OP) => handleMenuClick(key, row)}
@@ -262,7 +275,7 @@ export const InstanceTable = observer(
                     </Menu>
                   }
                 >
-                  <div tw="flex items-center">
+                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
                     <Icon name="more" clickable changeable type="light" />
                   </div>
                 </Tooltip>

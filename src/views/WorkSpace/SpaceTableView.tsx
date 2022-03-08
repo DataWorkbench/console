@@ -70,6 +70,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             dataIndex,
             sortable: true,
             sortKey: 'name',
+            width: 200,
             sortOrder: sort.name,
             render: (field: string, row: any) => (
               <div tw="flex items-center w-full">

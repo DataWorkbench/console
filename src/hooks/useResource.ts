@@ -116,10 +116,10 @@ export const useMutationResource = () => {
       op: OP
       cancel?: any
       resourceIds?: String[]
-      resource_id?: String
+      id?: String
     }) => {
       const formParams: any = { spaceId, ...rest }
-      const params = {
+      const params: any = {
         ...rest,
         regionId,
         spaceId,
@@ -132,8 +132,8 @@ export const useMutationResource = () => {
           {
             regionId,
             spaceId,
-            resource_name: formParams.resource_name,
-            resource_type: formParams.resource_type,
+            name: formParams.name,
+            type: formParams.type,
           },
           { cancel }
         )
@@ -144,10 +144,10 @@ export const useMutationResource = () => {
         const uri =
           // eslint-disable-next-line no-nested-ternary
           op === 'create'
-            ? `/v1/workspace/${spaceId}/resource`
+            ? `/v1/workspace/${spaceId}/file`
             : op === 'view'
-            ? `/v1/workspace/${spaceId}/resource/${formParams.resource_id}`
-            : `/v1/workspace/${spaceId}/resource/${formParams.resource_id}/download`
+            ? `/v1/workspace/${spaceId}/file/${formParams.id}`
+            : `/v1/workspace/${spaceId}/file/${formParams.id}/download`
         const signature = await loadSignature(
           {
             region: regionId,
@@ -170,6 +170,7 @@ export const useMutationResource = () => {
           ...formParams,
         })
       } else if (op === 'edit') {
+        params.type = undefined
         ret = await updateResource(params)
       } else if (op === 'delete') {
         ret = await deleteResource(params)

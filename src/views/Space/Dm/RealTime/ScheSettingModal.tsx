@@ -285,7 +285,6 @@ const ScheSettingModal = ({
       onOk={save}
       footer={
         <>
-          <Button onClick={handleCancel}>取消</Button>
           {origin === 'ops' && disabled ? (
             <Button
               type="primary"
@@ -296,14 +295,17 @@ const ScheSettingModal = ({
               编辑
             </Button>
           ) : (
-            <Button
-              type="primary"
-              disabled={params.schedulePolicy === 0}
-              onClick={save}
-              loading={mutation.isLoading}
-            >
-              确定
-            </Button>
+            <>
+              <Button onClick={handleCancel}>取消</Button>
+              <Button
+                type="primary"
+                disabled={params.schedulePolicy === 0}
+                onClick={save}
+                loading={mutation.isLoading}
+              >
+                确定
+              </Button>
+            </>
           )}
         </>
       }

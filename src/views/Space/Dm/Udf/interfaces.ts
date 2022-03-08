@@ -4,8 +4,8 @@ export interface IUdfFilterInterface {
   reverse: boolean
   search?: string
   sort_by?: string
-  udf_type: 1 | 2 | 3 // UDF Type one of 1/2/3 1=>UDF/2=>UDTF/3=>UDTTF, default is 1
-  udf_language?: number
+  type: 1 | 2 | 3 // UDF Type one of 1/2/3 1=>UDF/2=>UDTF/3=>UDTTF, default is 1
+  language?: number
   [k: string]: any
 }
 
