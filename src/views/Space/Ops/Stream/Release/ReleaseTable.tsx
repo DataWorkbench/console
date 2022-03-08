@@ -206,7 +206,7 @@ export const ReleaseTable = observer(({ query }: any) => {
                 <Icons name="stream-release" size={16} />
               </Center>
               <div tw="flex-1 break-all">
-                <div>{row.name}</div>
+                <div tw="font-medium">{row.name}</div>
                 <div>{row.id}</div>
               </div>
             </FlexBox>

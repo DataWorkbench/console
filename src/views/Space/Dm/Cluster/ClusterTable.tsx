@@ -153,7 +153,7 @@ const ClusterTable = observer(
                 <Icon name="pod" type="light" size={16} />
               </Center>
               <div tw="flex-1 break-all">
-                <div>{row.name}</div>
+                <div tw="font-medium">{row.name}</div>
                 <div>{row.id}</div>
               </div>
             </FlexBox>
