@@ -232,7 +232,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                     />
                   )}
                 </div>
-                <TextEllipsis>{value}</TextEllipsis>
+                <TextEllipsis tw="font-medium">{value}</TextEllipsis>
               </FlexBox>
             )
           },
