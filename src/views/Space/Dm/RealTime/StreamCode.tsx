@@ -83,7 +83,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
   const runMutation = useMutationStreamJobCodeRun()
-  const { data, isLoading } = useQueryStreamJobCode()
+  const { data, isFetching } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
   const codeStr = get(data, `${codeName}.code`)
@@ -326,7 +326,10 @@ def main(args: Array[String]): Unit = {
         setEnableRelease(true)
       }
     }
-  }, [codeStr, defaultCode])
+    if (curVersion?.version) {
+      editorRef.current?.setValue(isFetching ? loadingWord : codeStr)
+    }
+  }, [codeStr, defaultCode, curVersion?.version, isFetching])
 
   useUnmount(() => {
     workFlowStore.set({
@@ -404,7 +407,7 @@ def main(args: Array[String]): Unit = {
           />
           <Editor
             language={codeName}
-            defaultValue={isLoading ? loadingWord : codeStr}
+            defaultValue={isFetching ? loadingWord : codeStr}
             theme="my-theme"
             tw="overflow-hidden"
             options={{
