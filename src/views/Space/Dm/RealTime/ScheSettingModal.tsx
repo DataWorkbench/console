@@ -985,24 +985,25 @@ const ScheSettingModal = ({
                       },
                     ]}
                   />
-
-                  <Field>
-                    <Label>
-                      <AffixLabel>重试策略</AffixLabel>
-                    </Label>
-                    <Control>
-                      <Toggle
-                        disabled={disabled}
-                        checked={params.retryPolicy === 2}
-                        onChange={(checked: boolean) => {
-                          setParams((draft) => {
-                            draft.retryPolicy = checked ? 2 : 1
-                          })
-                        }}
-                      />
-                    </Control>
-                    <div tw="leading-6 ml-2">出错自动重试</div>
-                  </Field>
+                  {false && (
+                    <Field>
+                      <Label>
+                        <AffixLabel>重试策略</AffixLabel>
+                      </Label>
+                      <Control>
+                        <Toggle
+                          disabled={disabled}
+                          checked={params.retryPolicy === 2}
+                          onChange={(checked: boolean) => {
+                            setParams((draft) => {
+                              draft.retryPolicy = checked ? 2 : 1
+                            })
+                          }}
+                        />
+                      </Control>
+                      <div tw="leading-6 ml-2">出错自动重试</div>
+                    </Field>
+                  )}
                   <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
                     <SliderField
                       key={disabled ? 'initSlider' : 'updateSlider'}

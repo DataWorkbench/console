@@ -310,7 +310,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                   }
                   type={3}
                 />
-                {curJob?.type === 2 && (
+                {curJob?.type === 2 && false && (
                   <SelectField
                     clearable
                     name="builtInConnectors"
