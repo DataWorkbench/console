@@ -23,8 +23,8 @@ const questions = [
   { title: '其他常见问题', link: '/databench/faq/' },
 ]
 
-const Question = styled('li')(() => [
-  tw`flex items-center mt-2 cursor-pointer`,
+const Question = styled('div')(() => [
+  tw`flex items-center cursor-pointer`,
   css`
     &:hover {
       svg {
@@ -41,7 +41,7 @@ const FAQ: FC = ({ className }) => {
       <CardHeader title="常见问题" />
       <CardContent>
         <div tw="rounded-sm border border-neut-2">
-          <ul tw="text-neut-15 p-4">
+          <div tw="text-neut-15 p-4 space-y-2">
             {questions.map((quest) => (
               <Question key={quest.title}>
                 <Icon name="file" tw="mr-2" />
@@ -53,15 +53,17 @@ const FAQ: FC = ({ className }) => {
                 </HelpCenterLink>
               </Question>
             ))}
-          </ul>
+          </div>
           <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center border-t border-[#DEE6ED]">
-            <HelpCenterLink
-              tw="mr-2 text-neut-15 no-underline font-normal hover:text-green-11"
-              href="/intro/introduction/"
-            >
-              更多帮助指引
-            </HelpCenterLink>
-            <Icon name="next" />
+            <Question>
+              <HelpCenterLink
+                tw="mr-2 text-neut-15 no-underline font-medium hover:text-green-11"
+                href="/intro/introduction/"
+              >
+                更多帮助指引
+              </HelpCenterLink>
+              <Icon name="next" />
+            </Question>
           </div>
         </div>
       </CardContent>
