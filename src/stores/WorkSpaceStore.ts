@@ -7,7 +7,7 @@ class WorkSpaceStore {
   funcList = [
     {
       name: 'upcloud',
-      title: '数据源管理',
+      title: '数据上云',
       subFuncList: [
         { name: 'dsl', title: '数据源列表', icon: 'blockchain' },
         // { name: 'tools', title: '网络连通工具', icon: 'earth' },
@@ -16,7 +16,7 @@ class WorkSpaceStore {
     },
     {
       name: 'dm',
-      title: '数据开发',
+      title: '云上加工',
       subFuncList: [
         { name: 'realtime', title: '实时计算', icon: 'cogwheel' },
         { name: 'network', title: '网络配置', icon: 'earth' },
@@ -46,16 +46,16 @@ class WorkSpaceStore {
         // { name: 'logs', title: '操作日志', icon: 'blockchain' },
       ],
     },
-    // {
-    //   name: 'manage',
-    //   title: '空间管理',
-    //   subFuncList: [
-    //     { name: 'setting', title: '空间配置', icon: 'blockchain' },
-    //     { name: 'engine', title: '引擎管理', icon: 'blockchain' },
-    //     { name: 'users', title: '成员管理', icon: 'blockchain' },
-    //     { name: 'permissions', title: '列表权限', icon: 'blockchain' },
-    //   ],
-    // },
+    {
+      name: 'manage',
+      title: '空间管理',
+      subFuncList: [
+        // { name: 'setting', title: '空间配置', icon: 'blockchain' },
+        // { name: 'engine', title: '引擎管理', icon: 'blockchain' },
+        { name: 'member', title: '成员管理', icon: 'blockchain' },
+        { name: 'permissions', title: '列表权限', icon: 'blockchain' },
+      ],
+    },
   ]
 
   constructor(rootStore: RootStore) {
