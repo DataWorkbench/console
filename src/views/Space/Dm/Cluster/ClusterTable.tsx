@@ -29,11 +29,28 @@ import {
 } from 'hooks'
 import { get, omitBy, pick } from 'lodash-es'
 import dayjs from 'dayjs'
-import tw, { css } from 'twin.macro'
-
+import tw, { styled, css, theme } from 'twin.macro'
+import { useWindowSize } from 'react-use'
 import ClusterModal from './ClusterModal'
 
 const { MenuItem } = Menu
+
+const TableWrapper = styled(Table)(() => [
+  css`
+    .table-row:hover {
+      .cluster-name {
+        ${tw`text-green-11`}
+      }
+      .cluster-icon {
+        ${tw`bg-green-12 bg-opacity-50 border-green-4 border-opacity-40`}
+        svg {
+          ${tw`text-green-11`}
+          fill: ${theme`colors.green.4`};
+        }
+      }
+    }
+  `,
+])
 
 const statusFilters = [
   // {
@@ -107,6 +124,7 @@ const ClusterTable = observer(
     onSelect?: (clusterId?: any[]) => void
     selectedIds?: string[]
   }) => {
+    const { width } = useWindowSize()
     const {
       dmStore: { setOp, op },
     } = useStore()
@@ -141,21 +159,34 @@ const ClusterTable = observer(
       }
     }, [op])
 
+    const isSmallScreen = useMemo(() => width < 1280, [width])
+
     const columns = useMemo(() => {
       return [
         {
           title: '名称/ID',
           dataIndex: 'name',
-          width: 186,
+          width: 192,
           fixedInSetting: true,
           render: (v: any, row: any) => (
-            <FlexBox tw="items-center">
-              <Center tw="bg-neut-13 rounded-full w-6 h-6 mr-2">
+            <FlexBox
+              tw="items-center cursor-pointer"
+              onClick={() => {
+                setOp('view')
+                setOpClusterList([row])
+              }}
+            >
+              <Center
+                className="cluster-icon"
+                tw="bg-neut-13 rounded-full box-content border-2 border-neut-16 w-6 h-6 mr-1.5"
+              >
                 <Icon name="pod" type="light" size={16} />
               </Center>
               <div tw="flex-1 break-all">
-                <div tw="font-medium">{row.name}</div>
-                <div>{row.id}</div>
+                <div tw="font-semibold" className="cluster-name">
+                  {row.name}
+                </div>
+                <div tw="text-neut-8">{row.id}</div>
               </div>
             </FlexBox>
           ),
@@ -198,6 +229,7 @@ const ClusterTable = observer(
               )}
             </FlexBox>
           ),
+          width: 90,
           dataIndex: 'status',
           render: (v: number) => {
             const statusObj = statusFilters.find((o) => o.value === v)
@@ -242,6 +274,7 @@ const ClusterTable = observer(
         },
         {
           title: '版本',
+          width: !isSmallScreen && 160,
           dataIndex: 'version',
         },
         {
@@ -297,6 +330,7 @@ const ClusterTable = observer(
           title: '最近更新时间',
           dataIndex: 'updated',
           sortable: true,
+          width: !isSmallScreen && 150,
           // filter.reverse ? 'asc' : 'desc',
           sortOrder:
             // eslint-disable-next-line no-nested-ternary
@@ -416,6 +450,7 @@ const ClusterTable = observer(
       filter.status,
       setFilter,
       selectMode,
+      isSmallScreen,
     ])
 
     const refetchData = () => {
@@ -551,7 +586,7 @@ const ClusterTable = observer(
             </Center>
           </FlexBox>
         </div>
-        <Table
+        <TableWrapper
           // selectType={selectMode ? 'radio' : 'checkbox'}
           selectType={selectMode && 'radio'}
           dataSource={infos || []}
