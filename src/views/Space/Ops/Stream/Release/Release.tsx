@@ -29,6 +29,7 @@ export const Release = () => {
                 { value: 0, label: '全部' },
                 { value: 1, label: '调度中' },
                 { value: 2, label: '已暂停' },
+                { value: 4, label: '已完成' },
               ]}
               onChange={(value) => {
                 handleQueryChange('status', value)
