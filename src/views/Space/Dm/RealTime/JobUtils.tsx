@@ -1,3 +1,9 @@
+import { Icon } from '@QCFE/lego-ui'
+import { Loading } from '@QCFE/qingcloud-portal-ui'
+import { get } from 'lodash-es'
+import tw, { styled } from 'twin.macro'
+import { Icons, Center } from 'components'
+
 export enum JobMode {
   /** 数据集成 */
   DI = 'DI',
@@ -109,3 +115,73 @@ export const jobModeData = [
     items: [],
   },
 ]
+
+export const findTreeNode: any = (treeData: any[], nodeKey: string) => {
+  let find = null
+  treeData.forEach((node) => {
+    if (node.key === nodeKey) {
+      find = node
+    } else if (node.children?.length) {
+      const findInChildren = findTreeNode(node.children, nodeKey)
+      if (findInChildren) {
+        find = findInChildren
+      }
+    }
+  })
+  return find
+}
+
+const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
+  tw`w-4 h-4 rounded-sm`,
+  theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
+  theme === TreeIconTheme.GREEN && tw`bg-green-11`,
+  theme === TreeIconTheme.GREY && tw`bg-white bg-opacity-20 `,
+  theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`,
+])
+
+export const getSwitcherIcon = (props) => {
+  const { expanded, isLeaf } = props
+  if (isLeaf) {
+    return null
+  }
+  return <Icon name={expanded ? 'chevron-up' : 'chevron-down'} type="light" />
+}
+
+export const renderIcon = (props) => {
+  const { data, loading } = props
+  if (loading) {
+    return <Loading size={16} />
+  }
+  let iconName = 'folder'
+  let theme: TreeIconTheme = TreeIconTheme.GREY
+  if (data) {
+    const { key } = data
+
+    if (key === 'rt-root') {
+      iconName = 'flash'
+      theme = TreeIconTheme.BLUE
+    } else if (key === 'di-root') {
+      iconName = 'equalizer'
+      theme = TreeIconTheme.GREEN
+    } else if (data.isLeaf) {
+      if (data.rootKey === 'rt-root') {
+        const type = get(data, 'job.type')
+        if (type === RtType.SQL) {
+          iconName = 'sql'
+        } else if (type === RtType.JAR) {
+          iconName = 'jar'
+        } else if (type === RtType.PYTHON) {
+          iconName = 'python'
+        }
+      }
+    } else if (!data.isLeaf || data.children?.length) {
+      iconName = 'folder'
+      theme = TreeIconTheme.YELLOW
+    }
+  }
+  return (
+    <IconWrapper theme={theme}>
+      <Icons name={iconName} size={12} />
+    </IconWrapper>
+  )
+}

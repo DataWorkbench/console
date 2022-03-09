@@ -12,7 +12,7 @@ import { useQueryClient } from 'react-query'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { nameMatchRegex, strlen } from 'utils'
-import { TreeIconTheme, RtType, JobMode } from './JobConstant'
+import { TreeIconTheme, RtType, JobMode, findTreeNode } from './JobUtils'
 import { JobModal } from './JobModal'
 
 const { MenuItem } = Menu
@@ -36,21 +36,6 @@ const TreeWrapper = styled('div')(() => [
     }
   `,
 ])
-
-const findTreeNode: any = (treeData: any[], nodeKey: string) => {
-  let find = null
-  treeData.forEach((node) => {
-    if (node.key === nodeKey) {
-      find = node
-    } else if (node.children?.length) {
-      const findInChildren = findTreeNode(node.children, nodeKey)
-      if (findInChildren) {
-        find = findInChildren
-      }
-    }
-  })
-  return find
-}
 
 const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
   tw`w-4 h-4 rounded-sm`,
@@ -241,6 +226,14 @@ export const JobTree = () => {
     )
   }, [])
 
+  const renderSwitcherIcon = useCallback((props) => {
+    const { expanded, isLeaf } = props
+    if (isLeaf) {
+      return null
+    }
+    return <Icon name={expanded ? 'chevron-up' : 'chevron-down'} type="light" />
+  }, [])
+
   const fetchJobTreeData = (node: any) => {
     const isRoot = isRootNode(node)
     const params = {
@@ -359,18 +352,7 @@ export const JobTree = () => {
             expandedKeys={expandedKeys}
             tw="ml-2"
             icon={renderIcon}
-            switcherIcon={(props) => {
-              const { expanded, isLeaf } = props
-              if (isLeaf) {
-                return null
-              }
-              return (
-                <Icon
-                  name={expanded ? 'chevron-up' : 'chevron-down'}
-                  type="light"
-                />
-              )
-            }}
+            switcherIcon={renderSwitcherIcon}
             onRightClick={onRightClick}
             draggable={(props) => {
               const { key } = props

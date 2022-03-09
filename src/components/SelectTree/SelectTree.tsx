@@ -9,7 +9,7 @@ export interface SelectTreeProps {
   value?: string | null
   placeholder?: string
   onChange: (value: any) => void
-  renderIcon: (node: any) => React.ReactNode
+  renderIcon?: (node: any) => React.ReactNode
   treeData: any[]
 }
 
@@ -55,7 +55,7 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
       value,
       placeholder = '请选择',
       treeData = [],
-      renderIcon = () => null,
+      renderIcon,
       onChange,
       ...restProps
     },

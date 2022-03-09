@@ -17,7 +17,7 @@ import { Control, Field, Label } from '@QCFE/lego-ui'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { nameMatchRegex, strlen } from 'utils/convert'
 import { JobModeItem } from './JobModeItem'
-import { JobMode, jobModeData, RtType } from './JobConstant'
+import { JobMode, jobModeData, RtType } from './JobUtils'
 
 const { TextField, TextAreaField } = Form
 
