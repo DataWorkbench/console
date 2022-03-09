@@ -1,13 +1,11 @@
 import { Button, Icon, Table } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Modal, Icons, Tooltip, Center } from 'components'
+import { FlexBox, Modal, Tooltip, Center } from 'components'
 import { useState } from 'react'
 import { css } from 'twin.macro'
-import { PackageName } from './constants'
 
 export default function DeleteModal(props: any) {
   const {
     visible,
-    packageType,
     toggle,
     mutation,
     deleteData: { value: selectedList = [] },
@@ -21,7 +19,7 @@ export default function DeleteModal(props: any) {
     mutation.mutate(
       {
         op: 'delete',
-        resourceIds: Array.from(selectedList, (el: any) => el.resource_id),
+        resourceIds: Array.from(selectedList, (el: any) => el.id),
       },
       {
         onSuccess: async () => {
@@ -33,24 +31,20 @@ export default function DeleteModal(props: any) {
 
   const columns = [
     {
-      title: `${PackageName[packageType]}名称`,
+      title: '程序包名称',
       dataIndex: 'name',
       render: (_: string, row: Record<string, any>) => {
         return (
           <FlexBox tw="items-center space-x-1">
-            {packageType === 'dependency' ? (
-              <Icons name="dependency" width={20} size={20} />
-            ) : (
-              <Icon
-                tw="w-5! h-5!"
-                name={packageType === 'program' ? 'coding' : 'terminal'}
-                type="light"
-                color={{
-                  primary: '#219861',
-                  secondary: '#8EDABD',
-                }}
-              />
-            )}
+            <Icon
+              tw="w-5! h-5!"
+              name="coding"
+              type="light"
+              color={{
+                primary: '#219861',
+                secondary: '#8EDABD',
+              }}
+            />
             <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
               <div tw="max-w-[130px] truncate">{row.name}</div>
             </Tooltip>
@@ -60,7 +54,7 @@ export default function DeleteModal(props: any) {
     },
     {
       title: 'ID',
-      dataIndex: 'resource_id',
+      dataIndex: 'id',
       render: (value: string) => <div tw="text-neut-8">{value}</div>,
     },
     {
@@ -70,7 +64,7 @@ export default function DeleteModal(props: any) {
     },
     {
       title: '描述',
-      dataIndex: 'description',
+      dataIndex: 'desc',
       render: (value: string) => {
         return (
           <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
@@ -116,55 +110,19 @@ export default function DeleteModal(props: any) {
             const deleteTitle =
               selectedList.length === 1 ? (
                 <>
-                  删除{PackageName[packageType]}
-                  {selectedList[0].name}({selectedList[0].resource_id})注意事项
+                  删除程序包
+                  {selectedList[0].name}({selectedList[0].id})注意事项
                 </>
               ) : (
-                <>
-                  删除以下{selectedList.length}个{PackageName[packageType]}
-                  注意事项
-                </>
+                <>删除以下 {selectedList.length} 个程序包 注意事项</>
               )
             return (
               <>
                 <div tw="font-medium mb-2 text-base">{deleteTitle}</div>
                 <div className="modal-content-message" tw="text-neut-8">
-                  {packageType === 'program' &&
-                    (selectedList.length > 1 ? (
-                      <>
-                        删除以下程序包后，代码开发模式下将无法引用相关 Jar
-                        包，不影响已运行的作业实例，但重新运行相关作业时会报错，且该操作无法撤回。确认删除吗？
-                      </>
-                    ) : (
-                      <>
-                        删除程序包{selectedList[0].name}(
-                        {selectedList[0].resource_id}
-                        后，代码开发模式下将无法引用此 Jar
-                        包，不影响已运行的作业实例，但重新运行相关作业时会报错，且该操作无法撤回。确认删除吗？
-                      </>
-                    ))}
-                  {packageType === 'function' &&
-                    (selectedList.length > 1 ? (
-                      <>
-                        函数包删除后，相关作业将无法引用，已引用的作业将受到影响，且该操作无法撤回。确认删除吗？
-                      </>
-                    ) : (
-                      <>
-                        删除函数包{selectedList[0].name}(
-                        {selectedList[0].resource_id}
-                        )后，相关作业将无法引用，已引用的作业将受到影响，且该操作无法撤回。确认删除吗？
-                      </>
-                    ))}
-                  {packageType === 'dependency' &&
-                    (selectedList.length > 1 ? (
-                      <>删除以下依赖包后，操作无法撤回。确认删除吗？</>
-                    ) : (
-                      <>
-                        删除依赖包{selectedList[0].name}(
-                        {selectedList[0].resource_id}
-                        )后，操作无法撤回。确认删除吗？
-                      </>
-                    ))}
+                  {selectedList.length > 1
+                    ? '删除以下程序包后，不影响已运行的作业实例，重新运行引用了该资源的作业时会报错。删除资源后无法找回，确定删除吗？'
+                    : '删除程序包后，不影响已运行的作业实例，重新运行引用了该资源的作业时会报错。删除资源后无法找回，确定删除吗？'}
                 </div>
               </>
             )
@@ -178,7 +136,7 @@ export default function DeleteModal(props: any) {
               (page - 1) * pageSize,
               page * pageSize
             )}
-            rowKey="resource_id"
+            rowKey="id"
             columns={columns}
             pagination={{
               total: selectedList.length,

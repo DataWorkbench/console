@@ -45,7 +45,6 @@ const StreamJAR = () => {
     resourceId: '',
   })
   const resouceRet = useQueryResource({
-    resource_type: 1,
     limit: 100,
   })
   const { data: scheData } = useQueryStreamJobSchedule()
@@ -58,12 +57,12 @@ const StreamJAR = () => {
       setParams((draft) => {
         draft.jarArgs = jarInfo.jar_args
         draft.jarEntry = jarInfo.jar_entry
-        draft.resourceId = jarInfo.resource_id
+        draft.resourceId = jarInfo.id
       })
     }
   }, [data, setParams])
   useEffect(() => {
-    if (get(data, 'jar.resource_id')) {
+    if (get(data, 'jar.id')) {
       setEnableRelease(true)
     }
   }, [data, scheData])
@@ -148,14 +147,14 @@ const StreamJAR = () => {
         <div tw="mt-5 flex-1">
           <Form tw="w-[600px]! max-w-[600px]!" ref={form} layout="vertical">
             <SelectWithRefresh
-              name="resource_id"
+              name="id"
               css={css`
                 .select {
                   width: 555px;
                 }
               `}
-              label={<AffixLabel>引用 Jar 包（程序包）</AffixLabel>}
-              placeholder="请选择要引用的 Jar 包（程序包）"
+              label={<AffixLabel>JAR （程序包）</AffixLabel>}
+              placeholder="请选择 JAR 程序包"
               help={
                 <div tw="text-neut-8">
                   如需选择新的资源，可以在资源管理中
@@ -201,7 +200,7 @@ const StreamJAR = () => {
               value={params.resourceId}
               options={resources.map((res) => ({
                 label: res.name,
-                value: res.resource_id,
+                value: res.id,
                 type: res.type,
               }))}
               schemas={[
@@ -320,7 +319,6 @@ const StreamJAR = () => {
 
       {uploadVisible && (
         <UploadModal
-          type="program"
           operation="create"
           visible={uploadVisible}
           handleCancel={() => setUploadVisible(false)}

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  Alert,
   Button,
   Form,
   Field,
@@ -9,9 +8,6 @@ import {
   Icon,
   Input,
   Message,
-  Level,
-  LevelLeft,
-  LevelRight,
 } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { useMutationResource } from 'hooks'
@@ -21,18 +17,12 @@ import {
   Center,
   AffixLabel,
   PopConfirm,
-  HelpCenterLink,
+  FlexBox,
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { formatBytes } from 'utils/convert'
 import axios from 'axios'
 import { useImmer } from 'use-immer'
-import {
-  PackageDocsHref,
-  PackageName,
-  PackageTypeMap,
-  PackageTypeTip,
-} from './constants'
 
 const { TextField, TextAreaField } = Form
 
@@ -93,38 +83,22 @@ const LoadingWrap = styled(Loading)(() => [
   `,
 ])
 
-type IPackageType = 'program' | 'function' | 'dependency'
-
 interface IFormFields {
-  resource_id?: String | undefined
-  resource_type: Number
+  id?: String | undefined
   file?: File | undefined
-  resource_name: String
-  description: String
+  name: String
+  desc: String
 }
 
-const getDefaultFields = (type: IPackageType) => ({
-  resource_id: undefined,
-  resource_type: PackageTypeMap[type],
-  file: undefined,
-  resource_name: '',
-  description: '',
-})
-
 const UploadModal = (props: any) => {
-  const {
-    visible,
-    operation,
-    handleCancel,
-    handleSuccess,
-    type: packageType,
-    initFields,
-  } = props
+  const { visible, operation, handleCancel, handleSuccess, initFields } = props
 
-  const PackageNameByType = PackageName[packageType]
-  const defaultFields = getDefaultFields(packageType)
-
-  const [fields, setFields] = useImmer<IFormFields>(defaultFields)
+  const [fields, setFields] = useImmer<IFormFields>({
+    id: undefined,
+    file: undefined,
+    name: '',
+    desc: '',
+  })
   const [fileTip, setFileTip] = useState('')
   const [isFailed, setIsFailed] = useState(false)
   const cancelRef = useRef<() => void>()
@@ -139,10 +113,9 @@ const UploadModal = (props: any) => {
   useEffect(() => {
     if (initFields) {
       setFields((draft) => {
-        draft.resource_id = initFields.resource_id
-        draft.resource_type = initFields.type
-        draft.resource_name = initFields.name
-        draft.description = initFields.description
+        draft.id = initFields.id
+        draft.name = initFields.name
+        draft.desc = initFields.desc
       })
     }
   }, [initFields, setFields])
@@ -154,7 +127,6 @@ const UploadModal = (props: any) => {
     }
 
     handleCancel()
-    setFields(defaultFields)
     setFileTip('')
     setIsFailed(false)
   }
@@ -197,7 +169,7 @@ const UploadModal = (props: any) => {
 
     setFields((draft) => {
       draft.file = resource
-      if (!fields.resource_name) draft.resource_name = name
+      if (!fields.name) draft.name = name
     })
   }
 
@@ -238,7 +210,26 @@ const UploadModal = (props: any) => {
       closable={false}
       escClosable={false}
       maskClosable={false}
-      title={`${operation === 'edit' ? '编辑' : '上传'}${PackageNameByType}`}
+      title={
+        <FlexBox>
+          <div className="modal-card-title">
+            {operation === 'edit' ? '编辑' : '上传'}程序包
+          </div>
+          {!fields.file ? (
+            <Icon name="close" tw="cursor-pointer" onClick={closeModal} />
+          ) : (
+            <PopConfirm
+              type="warning"
+              okType="danger"
+              okText="确认"
+              content="此时取消，将清空已上传资源并关闭弹窗，确认清空并关闭弹窗吗？"
+              onOk={closeModal}
+            >
+              <Icon name="close" tw="cursor-pointer" />
+            </PopConfirm>
+          )}
+        </FlexBox>
+      }
       visible={visible}
       onCancel={closeModal}
       footer={
@@ -274,7 +265,7 @@ const UploadModal = (props: any) => {
               placement="top-end"
               content={
                 <Center tw="h-9 px-3 text-neut-13">
-                  请先添加符合要求的{PackageNameByType}
+                  请先添加符合要求的程序包
                 </Center>
               }
             >
@@ -310,28 +301,11 @@ const UploadModal = (props: any) => {
         </>
       }
     >
-      <Alert
-        type="info"
-        tw="mb-4"
-        message={
-          <Level as="nav">
-            <LevelLeft>{PackageTypeTip[packageType]}</LevelLeft>
-            <LevelRight>
-              <HelpCenterLink
-                href={PackageDocsHref[packageType]}
-                isIframe={false}
-              >
-                查看详情
-              </HelpCenterLink>
-            </LevelRight>
-          </Level>
-        }
-      />
       <Form ref={form} tw="pl-0!">
         {operation !== 'edit' && (
           <Field tw="mb-0!">
             <Label className="medium">
-              <AffixLabel required>添加{PackageNameByType}</AffixLabel>
+              <AffixLabel required>添加程序包</AffixLabel>
             </Label>
             <ControlWrap
               tw="max-w-none! w-auto!"
@@ -352,7 +326,7 @@ const UploadModal = (props: any) => {
                     onChange={handleResourceChange}
                   />
                   <ColoredIcon name="add" />
-                  添加{PackageNameByType}
+                  添加程序包
                 </Button>
               ) : (
                 <>
@@ -429,23 +403,23 @@ const UploadModal = (props: any) => {
         <TextFieldWrapper
           maxLength="128"
           autoComplete="off"
-          name="resource_name"
+          name="name"
           labelClassName="medium"
-          placeholder={`请输入${PackageNameByType}显示名`}
-          label={<AffixLabel required>{PackageNameByType}显示名</AffixLabel>}
+          placeholder="请输入程序包显示名"
+          label={<AffixLabel required>程序包显示名</AffixLabel>}
           validateOnBlur
           validateOnChange
           disabled={operation === 'view'}
           onChange={(value: string) =>
             setFields((draft) => {
-              draft.resource_name = value
+              draft.name = value
             })
           }
-          value={fields.resource_name}
+          value={fields.name}
           schemas={[
             {
               rule: { required: true },
-              help: `请输入${PackageNameByType}显示名`,
+              help: '请输入程序包显示名',
               status: 'error',
             },
             {
@@ -461,13 +435,13 @@ const UploadModal = (props: any) => {
           name="description"
           labelClassName="medium"
           label="描述"
-          placeholder={`请输入${PackageNameByType}描述`}
+          placeholder="请输入程序包描述"
           maxLength="500"
           disabled={operation === 'view'}
-          value={fields.description}
+          value={fields.desc}
           onChange={(value: String) =>
             setFields((draft) => {
-              draft.description = value
+              draft.desc = value
             })
           }
         />

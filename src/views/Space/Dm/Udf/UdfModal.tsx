@@ -115,11 +115,11 @@ const UdfModal = observer(() => {
     limit: number
     offset: number
     // udf_type: number
-    resource_type: number
+    type: number
   }>({
     limit: 15,
     offset: 0,
-    resource_type: 2, //
+    type: 2, //
     // udf_type: 1,
   })
 
@@ -436,7 +436,7 @@ const UdfModal = observer(() => {
                             onMenuScrollToBottom={loadData}
                             bottomTextVisible
                             validateOnBlur
-                            valueKey="resource_id"
+                            valueKey="id"
                             clearable
                             schemas={[
                               {
