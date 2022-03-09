@@ -47,7 +47,7 @@ function Overview() {
   } = useStore()
 
   return (
-    <div tw="p-5">
+    <div tw="p-5 space-y-5">
       <PageTab tabs={getTabs()} />
       <Services />
       <FlexBox>
