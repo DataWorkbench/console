@@ -39,10 +39,19 @@ export const useQueryMemberList = (
   return useQuery(queryKey, async () => loadMemberList(params), options)
 }
 
-export const useQueryRoleList = () => {
+export const useQueryRoleList = (
+  params: Record<string, any> = {},
+  option: Record<string, any> = {}
+) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  const queryKey = ['role', { regionId, spaceId }]
-  return useQuery(queryKey, async () => loadRoleList({ regionId, spaceId }))
+  const queryKey = ['role', { regionId, spaceId, ...params }]
+  return useQuery(
+    queryKey,
+    async () => loadRoleList({ regionId, spaceId, ...params }),
+    {
+      ...option,
+    }
+  )
 }
 
 export const useMutationMember = () => {
@@ -50,9 +59,9 @@ export const useMutationMember = () => {
   return useMutation(async ({ op, ...rest }: Record<string, any>) => {
     let ret = null
     const params = {
-      ...rest,
       regionId,
       spaceId,
+      ...rest,
     }
     if (op === 'create') {
       ret = await addMember(params)
