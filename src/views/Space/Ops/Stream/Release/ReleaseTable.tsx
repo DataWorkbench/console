@@ -225,7 +225,7 @@ export const ReleaseTable = observer(({ query }: any) => {
                 tw="mr-2"
                 name="radio"
                 color={
-                  value === 1
+                  [1, 4].includes(value)
                     ? {
                         primary: '#15A675',
                         secondary: '#C6F4E4',
@@ -233,7 +233,8 @@ export const ReleaseTable = observer(({ query }: any) => {
                     : ''
                 }
               />
-              {value === 1 ? '调度中' : '已暂停'}
+              {/* eslint-disable-next-line no-nested-ternary */}
+              {value === 1 ? '调度中' : value === 4 ? '已完成' : '已暂停'}
             </div>
           )
         },
