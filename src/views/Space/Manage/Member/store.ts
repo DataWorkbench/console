@@ -8,6 +8,12 @@ export class MemberStore {
 
   activeKeys: string[] = []
 
+  spaceItem: { id: string; name: string; regionId: string } = {
+    id: '',
+    name: '',
+    regionId: '',
+  }
+
   set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }

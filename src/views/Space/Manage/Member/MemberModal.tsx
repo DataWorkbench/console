@@ -22,7 +22,7 @@ import {
 } from 'views/Space/Manage/Member/styled'
 import { RoleType } from 'views/Space/Manage/Member/constants'
 import { useQueryClient } from 'react-query'
-import { getMemberKeys, useMutationMember } from 'hooks'
+import { getMemberKeys, useMutationMember, useQueryRoleList } from 'hooks'
 import { get } from 'lodash-es'
 
 const memberDescPlaceHolder = '请输入成员描述'
@@ -34,20 +34,21 @@ interface Role {
 }
 
 interface IMemberModalProps {
-  roleList: Role[]
+  roleList?: Role[]
   data?: {
     user_id: string
     desc: string
     system_roles: Role[]
   }
+  cb?: () => void
 }
 
 const MemberModal = observer((props: IMemberModalProps) => {
   const {
-    workSpaceStore: { space },
+    workSpaceStore: { space: spaceStore },
   } = useStore()
-  const { op, setOp } = useMemberStore()
-  const { roleList, data } = props
+  const { op, setOp, spaceItem } = useMemberStore()
+  const { roleList: roleListProp, data, cb } = props
   const ref = useRef()
   const [value, setValue] = useImmer({
     user_ids: data ? [data.user_id] : [''],
@@ -56,27 +57,43 @@ const MemberModal = observer((props: IMemberModalProps) => {
     user_id: data ? data.user_id : '',
   })
 
+  const { data: roles } = useQueryRoleList(
+    spaceStore
+      ? undefined
+      : { spaceId: spaceItem.id, regionId: spaceItem.regionId },
+    {
+      enabled: !roleListProp,
+    }
+  )
+
+  const roleList = roleListProp ?? roles?.infos
+  const space = spaceStore?.id ? spaceStore : spaceItem
   const mutation = useMutationMember()
   const queryClient = useQueryClient()
 
   const refetch = useCallback(() => {
     queryClient.invalidateQueries(getMemberKeys())
   }, [queryClient])
-
   const handleOk = useCallback(() => {
     mutation.mutate(
       {
         op,
         ...value,
+        spaceId: space.id,
+        regionId: (space as any)?.regionId || undefined,
       },
       {
         onSuccess: () => {
-          refetch()
+          if (typeof cb === 'function') {
+            cb()
+          } else {
+            refetch()
+          }
           setOp('')
         },
       }
     )
-  }, [op, value, mutation, refetch, setOp])
+  }, [mutation, op, value, space, cb, refetch, setOp])
   const handleClickRole = (roleId: string) => {
     if (value.system_role_ids.includes(roleId)) {
       setValue((draft) => {
@@ -91,6 +108,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
     }
   }
 
+  console.log(111, roleList)
   const footer = (
     <div>
       <Button
@@ -210,7 +228,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
             </div>
             <Divider tw="mt-4 mb-4" />
             <div tw="flex gap-3">
-              {(roleList || []).map((item) => {
+              {(roleList || []).map((item: Record<string, any>) => {
                 const checked = value.system_role_ids.includes(item.id)
                 return (
                   <Button

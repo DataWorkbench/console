@@ -20,6 +20,8 @@ interface IMemberTableBarProps {
   filter: { search: string }
   setColumnSettings: (_: Record<string, any>[]) => void
   isOwner: boolean
+  modalView?: boolean
+  spaceItem?: Record<string, any>
 }
 
 const MemberTableBar = observer((props: IMemberTableBarProps) => {
@@ -29,8 +31,10 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
     filter,
     setColumnSettings,
     isOwner = true,
+    modalView = false,
+    spaceItem,
   } = props
-  const { set, selectedKeys } = useMemberStore()
+  const { set, selectedKeys = [] } = useMemberStore()
   const [searchName, setSearchName] = React.useState('')
   const handleQuery = (_searchName: string) => {
     setFilter((_filter: Record<string, any>) => {
@@ -56,6 +60,7 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
             set({
               op: 'create',
               activeKeys: [],
+              spaceItem,
             })
           }}
         >
@@ -89,26 +94,30 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
             }
           }}
         />
-        <Button loading={isReFetching} tw="px-[5px]">
-          <Icon
-            name="if-refresh"
-            tw="text-xl"
-            onClick={() => {
-              setIsReFetching(true)
-              refetch().then(() => {
-                setIsReFetching(false)
-              })
-            }}
-          />
-        </Button>
-        <ColumnsSetting
-          defaultColumns={columns.map(({ title, dataIndex }) => ({
-            title,
-            dataIndex,
-          }))}
-          onSave={setColumnSettings}
-          storageKey={columnSettingsKey}
-        />
+        {!modalView && (
+          <>
+            <Button loading={isReFetching} tw="px-[5px]">
+              <Icon
+                name="if-refresh"
+                tw="text-xl"
+                onClick={() => {
+                  setIsReFetching(true)
+                  refetch().then(() => {
+                    setIsReFetching(false)
+                  })
+                }}
+              />
+            </Button>
+            <ColumnsSetting
+              defaultColumns={columns.map(({ title, dataIndex }) => ({
+                title,
+                dataIndex,
+              }))}
+              onSave={setColumnSettings}
+              storageKey={columnSettingsKey}
+            />
+          </>
+        )}
       </ToolBarRight>
     </ToolBar>
   )
