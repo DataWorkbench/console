@@ -166,6 +166,7 @@ const StreamJAR = () => {
                   width: 555px;
                 }
               `}
+              disabled={readOnly}
               label={<AffixLabel>JAR （程序包）</AffixLabel>}
               placeholder="请选择 JAR 程序包"
               help={
@@ -251,6 +252,7 @@ const StreamJAR = () => {
               autoComplete="off"
               placeholder="请输入入口类（Entry Class）"
               value={params.jarEntry}
+              disabled={readOnly}
               onChange={(v: string) => {
                 setParams((draft) => {
                   draft.jarEntry = v
@@ -272,6 +274,7 @@ const StreamJAR = () => {
               autoComplete="off"
               placeholder="请输入程序参数（Program Arguments）"
               value={params.jarArgs}
+              disabled={readOnly}
               onChange={(v: string) => {
                 setParams((draft) => {
                   draft.jarArgs = v
