@@ -49,13 +49,19 @@ const SpaceListsToolBar = observer(() => {
     <FlexBox tw="justify-between mb-5">
       <div>
         {!ifNoData && (
-          <Button
-            type="primary"
-            tw="font-medium px-5 mr-2"
-            onClick={toggleShowModal}
-          >
-            创建工作空间
-          </Button>
+          <>
+            <RadioGroup name="states" defaultValue={1} tw="mr-3 inline-block">
+              <RadioButton value={1}>我创建的</RadioButton>
+              <RadioButton value={2}>我加入的</RadioButton>
+            </RadioGroup>
+            <Button
+              type="primary"
+              tw="font-medium px-5 mr-2"
+              onClick={toggleShowModal}
+            >
+              创建工作空间
+            </Button>
+          </>
         )}
         {!cardView && (
           <Dropdown

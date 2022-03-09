@@ -1,15 +1,18 @@
 import { useRef, useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css } from 'twin.macro'
-import { RadioButton, Form, Input, Button } from '@QCFE/lego-ui'
+import { RadioButton, Form, Input, Button, Collapse } from '@QCFE/lego-ui'
 import { Icon, Table } from '@QCFE/qingcloud-portal-ui'
 import { Modal, ModalContent, RouterLink } from 'components'
 import { useQueryClient } from 'react-query'
 import { useWorkSpaceContext } from 'contexts'
 import { formatDate, strlen, nameMatchRegex } from 'utils/convert'
 import { useMutationWorkSpace, getWorkSpaceKey } from 'hooks'
+import MemberList from 'views/Space/Manage/Member/MemberList'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
+
+const { CollapseItem } = Collapse
 
 const columns = [
   {
@@ -271,65 +274,111 @@ const SpaceModal = observer(
         okText={curSpaceOpt === 'create' ? '创建' : '修改'}
         cancelText="取消"
       >
-        <ModalContent>
-          <Form ref={form} layout="vertical" style={{ maxWidth: '450px' }}>
-            {curSpaceOpt === 'create' && (
-              <RadioGroupField
-                name="regionId"
-                label="区域"
-                defaultValue={regionId}
-              >
-                <RadioButton value={regionId}>
-                  <Icon name="zone" />
-                  {region.name}
-                </RadioButton>
-              </RadioGroupField>
-            )}
-            <TextField
-              name="name"
-              autoComplete="off"
-              label="工作空间名称"
-              validateOnChange
-              placeholder="字母、数字或下划线（_）"
-              labelClassName="medium"
-              schemas={[
-                {
-                  rule: {
-                    required: true,
-                    matchRegex: nameMatchRegex,
-                  },
-                  help: '字母、数字或下划线（_）,不能以（_）开始结尾',
-                  status: 'error',
-                },
-                {
-                  rule: (value: string) => {
-                    const l = strlen(value)
-                    return l >= 2 && l <= 128
-                  },
-                  help: '最小长度2,最大长度128',
-                  status: 'error',
-                },
-              ]}
-              defaultValue={curSpaceOpt === 'create' ? '' : curSpace.name}
-            />
-            <TextAreaField
-              name="desc"
-              label="工作空间描述"
-              placeholder="请填写工作空间的描述"
-              rows="5"
-              validateOnChange
-              schemas={[
-                {
-                  rule: (value: string) => strlen(value) <= 1024,
-                  help: '超过最大长度1024字节',
-                  status: 'error',
-                },
-              ]}
-              defaultValue={
-                curSpaceOpt === 'create' ? '' : curSpace.desc || '暂无描述'
+        <ModalContent css={tw`px-0 pt-0`}>
+          <Collapse
+            css={css`
+              ${tw`w-full border-0!`}
+              .collapse-item-label {
+                ${tw`border-0!`}
               }
-            />
-          </Form>
+            `}
+            defaultActiveKey={['p1', 'p2']}
+          >
+            <CollapseItem
+              label={
+                <div tw="inline-flex items-center">
+                  <Icon
+                    style={{ position: 'unset' }}
+                    tw="mr-2"
+                    name="project"
+                  />
+                  空间信息
+                </div>
+              }
+              key="p1"
+            >
+              <Form ref={form} layout="vertical" style={{ maxWidth: '450px' }}>
+                {curSpaceOpt === 'create' && (
+                  <RadioGroupField
+                    name="regionId"
+                    label="区域"
+                    defaultValue={regionId}
+                  >
+                    <RadioButton value={regionId}>
+                      <Icon name="zone" />
+                      {region.name}
+                    </RadioButton>
+                  </RadioGroupField>
+                )}
+                <TextField
+                  name="name"
+                  autoComplete="off"
+                  label="工作空间名称"
+                  validateOnChange
+                  placeholder="字母、数字或下划线（_）"
+                  labelClassName="medium"
+                  schemas={[
+                    {
+                      rule: {
+                        required: true,
+                        matchRegex: nameMatchRegex,
+                      },
+                      help: '字母、数字或下划线（_）,不能以（_）开始结尾',
+                      status: 'error',
+                    },
+                    {
+                      rule: (value: string) => {
+                        const l = strlen(value)
+                        return l >= 2 && l <= 128
+                      },
+                      help: '最小长度2,最大长度128',
+                      status: 'error',
+                    },
+                  ]}
+                  defaultValue={curSpaceOpt === 'create' ? '' : curSpace.name}
+                />
+                <TextAreaField
+                  name="desc"
+                  label="工作空间描述"
+                  placeholder="请填写工作空间的描述"
+                  rows="5"
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: (value: string) => strlen(value) <= 1024,
+                      help: '超过最大长度1024字节',
+                      status: 'error',
+                    },
+                  ]}
+                  defaultValue={
+                    curSpaceOpt === 'create' ? '' : curSpace.desc || '暂无描述'
+                  }
+                />
+              </Form>
+            </CollapseItem>
+            {curSpaceOpt === 'update' && (
+              <CollapseItem
+                key="p2"
+                label={
+                  <div tw="inline-flex items-center">
+                    <Icon
+                      style={{ position: 'unset' }}
+                      tw="mr-2"
+                      name="group"
+                    />
+                    成员管理
+                  </div>
+                }
+                css={css`
+                  .collapse-item-content {
+                    padding: 0;
+                  }
+                `}
+              >
+                <MemberList modalView space={curSpace} regionId={regionId} />
+              </CollapseItem>
+            )}
+          </Collapse>
         </ModalContent>
       </Modal>
     )

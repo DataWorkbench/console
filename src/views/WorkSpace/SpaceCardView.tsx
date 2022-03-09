@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { throttle, flatten } from 'lodash-es'
+import { flatten, throttle } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled } from 'twin.macro'
@@ -7,6 +7,8 @@ import { useEvent } from 'react-use'
 import { useImmer } from 'use-immer'
 import { useWorkSpaceContext } from 'contexts'
 import { useQueryWorkSpace } from 'hooks'
+import MemberModal from 'views/Space/Manage/Member/MemberModal'
+import { useMemberStore } from 'views/Space/Manage/Member/store'
 import SpaceItem from './SpaceItem'
 import SpaceListsEmpty from './SpaceListsEmpty'
 
@@ -16,7 +18,7 @@ const colorVars = {
 }
 
 const Content = styled('div')(() => [
-  tw`grid grid-cols-2 flex-wrap 2xl:grid-cols-3 gap-x-4`,
+  tw`grid grid-cols-2 flex-wrap 2xl:grid-cols-2 gap-x-4`,
   css`
     & > div {
       ${tw`mb-4`}
@@ -27,6 +29,7 @@ const Content = styled('div')(() => [
 const SpaceItemWrapper = styled(SpaceItem)<{ idx: number }>(({ idx }) => [
   css`
     border-top-color: ${colorVars.backColors[idx]};
+
     .profile {
       background-color: ${colorVars.backColors[idx]};
       color: ${colorVars.fontColors[idx]};
@@ -60,8 +63,12 @@ const SpaceCardView = observer(() => {
     isFetchingNextPage,
   } = useQueryWorkSpace(filter)
 
-  const workspaces = flatten(data?.pages.map((page) => page.infos || []))
+  const memberStore = useMemberStore()
 
+  const workspaces = flatten(data?.pages.map((page) => page.infos || []))
+  const reloadWorkSpace = () => {
+    stateStore.set({ queryRefetch: true })
+  }
   const ifNoData =
     status === 'success' &&
     filter.offset === 0 &&
@@ -126,6 +133,7 @@ const SpaceCardView = observer(() => {
       <div css={[tw`h-40`, !isFetchingNextPage && tw`hidden`]}>
         <Loading size="medium" />
       </div>
+      {memberStore.op === 'create' && <MemberModal cb={reloadWorkSpace} />}
     </>
   )
 })

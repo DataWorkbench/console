@@ -13,7 +13,7 @@ import { Tooltip, FlexBox, TextEllipsis } from 'components'
 import { useHistory } from 'react-router-dom'
 import TableRowOpt from './TableRowOpt'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
 const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
@@ -198,10 +198,13 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             ),
           }
         }
-        if (dataIndex === 'name') {
+        if (dataIndex === 'user_number') {
           return {
             title,
             dataIndex,
+            sortable: true,
+            sortKey: 'user_number',
+            sortOrder: sort.user_number,
             render: () => {},
           }
         }
@@ -231,8 +234,8 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
           return {
             title,
             dataIndex,
-            // width: ifExceedMaxWidth ? 380 : 330,
-            width: ifExceedMaxWidth ? 320 : 280,
+            width: ifExceedMaxWidth ? 380 : 330,
+            // width: ifExceedMaxWidth ? 320 : 280,
             render: (filed: any, row: any) => (
               <TableRowOpt space={row} regionId={regionId} />
             ),
@@ -244,6 +247,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   }, [
     defaultColumns,
     sort.name,
+    sort.user_number,
     sort.created,
     filter.status,
     ifExceedMaxWidth,
