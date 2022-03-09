@@ -49,6 +49,50 @@ const renderLabel = (label: string, icon: ReactElement, search: string) => {
   )
 }
 
+const renderReadOnlyOption = (
+  label: string,
+  icon: ReactElement,
+  id?: string
+) => {
+  return (
+    <div tw="inline-flex items-center rounded-sm bg-neut-13 px-2 mr-1 tracking-wider text-2xs">
+      {icon}
+      <TextHighlight key={label} text={label} tw="ml-1" />
+      <span tw="text-neut-8">ID: {id}</span>
+    </div>
+  )
+}
+
+const ResourceOption = ({ files }: { files: string[] }) => {
+  const { data } = useQueryResource({ limit: 100 })
+
+  return (
+    <div tw="w-[620px]">
+      {flatten(data?.pages.map((page: Record<string, any>) => page.infos || []))
+        .filter((i) => files.includes(i.id))
+        .map((i) =>
+          renderReadOnlyOption(i.name, <Icons name="icon_dependency" />, i.id)
+        )}
+    </div>
+  )
+}
+
+const ConnectorOption = ({
+  builtInConnectors,
+  value,
+}: {
+  builtInConnectors: string[]
+  value: string[]
+}) => (
+  <div tw="w-[620px]">
+    {builtInConnectors
+      .filter((i: any) => value?.includes(i.value))
+      .map((i: any) =>
+        renderReadOnlyOption(i.value, <Icons name="connector" />)
+      )}
+  </div>
+)
+
 const ResourceSelect = (props: ResourceSelectProps) => {
   const { icon, isUdf = false } = props
   const [filter, setFilter] = useImmer<{
@@ -135,7 +179,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   const { data, isFetching } = useQueryStreamJobArgs()
 
   const {
-    workFlowStore: { curJob },
+    workFlowStore: { curJob, curVersion },
   } = useStore()
 
   const [connectorsKeyword, setConnectorsKeyword] = useState('')
@@ -194,6 +238,8 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
       }
     )
   }
+
+  const readOnly = !!curVersion
   return (
     <>
       <DarkModal
@@ -224,36 +270,42 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                 <Field>
                   <Label tw="label-required">计算集群</Label>
                   <Control>
-                    <>
-                      <Button
-                        onClick={() => {
-                          setShowCluster(true)
-                          setShowMsg(true)
-                        }}
-                        type={
-                          showMsg && !params.clusterId ? 'outlined' : 'default'
-                        }
-                        css={[
-                          showMsg && !params.clusterId
-                            ? tw`border-red-10! border`
-                            : '',
-                        ]}
-                      >
-                        <Icon name="pod" />
-                        {(() => {
-                          if (cluster) {
-                            return (
-                              <>
-                                {cluster.name}
-                                <span tw="text-neut-8">({cluster.id})</span>
-                              </>
-                            )
+                    {readOnly ? (
+                      <span>{params.clusterId}</span>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={() => {
+                            setShowCluster(true)
+                            setShowMsg(true)
+                          }}
+                          type={
+                            showMsg && !params.clusterId
+                              ? 'outlined'
+                              : 'default'
                           }
+                          css={[
+                            showMsg && !params.clusterId
+                              ? tw`border-red-10! border`
+                              : '',
+                          ]}
+                        >
+                          <Icon name="pod" />
+                          {(() => {
+                            if (cluster) {
+                              return (
+                                <>
+                                  {cluster.name}
+                                  <span tw="text-neut-8">({cluster.id})</span>
+                                </>
+                              )
+                            }
 
-                          return params.clusterId || '选择集群'
-                        })()}
-                      </Button>
-                    </>
+                            return params.clusterId || '选择集群'
+                          })()}
+                        </Button>
+                      </>
+                    )}
                   </Control>
                   {showMsg && !params.clusterId && (
                     <div className="help is-danger has-danger-help">
@@ -261,20 +313,27 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     </div>
                   )}
                 </Field>
-                <NumberField
-                  isMini
-                  min={1}
-                  labelClassName="label-required"
-                  max={100}
-                  name="id"
-                  label="并行度"
-                  value={params.parallelism}
-                  onChange={(v: number) => {
-                    setParams((draft) => {
-                      draft.parallelism = v
-                    })
-                  }}
-                />
+                {readOnly ? (
+                  <Field>
+                    <Label tw="label-required">并行度</Label>
+                    <Control>{params.parallelism}</Control>
+                  </Field>
+                ) : (
+                  <NumberField
+                    isMini
+                    min={1}
+                    labelClassName="label-required"
+                    max={100}
+                    name="id"
+                    label="并行度"
+                    value={params.parallelism}
+                    onChange={(v: number) => {
+                      setParams((draft) => {
+                        draft.parallelism = v
+                      })
+                    }}
+                  />
+                )}
               </ScheForm>
             </CollapseItem>
             <CollapseItem
@@ -291,61 +350,83 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
               }
             >
               <ScheForm layout="horizon">
-                <ResourceSelect
-                  name="connectors"
-                  label="资源引用"
-                  icon={<Icons name="icon_dependency" />}
-                  placeholder={
-                    curJob?.type === 2
-                      ? '请选择运行所需的函数包及自定义 connector 包'
-                      : '请选择运行所需依赖资源'
-                  }
-                  value={params.files}
-                  multi
-                  closeOnSelect={false}
-                  onChange={(files: string[]) =>
-                    setParams((draft) => {
-                      draft.files = files
-                    })
-                  }
-                  type={3}
-                />
-                {curJob?.type === 2 && (
-                  <SelectField
-                    clearable
-                    name="builtInConnectors"
-                    label="内置 Connector"
-                    placeholder="请选择运行所需内置 Connector 包"
+                {readOnly ? (
+                  <Field>
+                    <Label>资源引用</Label>
+                    <Control>
+                      <ResourceOption files={params.files} />
+                    </Control>
+                  </Field>
+                ) : (
+                  <ResourceSelect
+                    name="connectors"
+                    label="资源引用"
+                    icon={<Icons name="icon_dependency" />}
+                    placeholder={
+                      curJob?.type === 2
+                        ? '请选择运行所需的函数包及自定义 connector 包'
+                        : '请选择运行所需依赖资源'
+                    }
+                    value={params.files}
                     multi
-                    searchable
-                    css={css`
-                      .select-control {
-                        ${tw`w-[620px]`}
-                      }
-                    `}
                     closeOnSelect={false}
-                    openOnClick
-                    onInputChange={onFilterConnectors}
-                    value={params.builtInConnectors}
-                    onChange={(_builtInConnectors: string[]) =>
+                    onChange={(files: string[]) =>
                       setParams((draft) => {
-                        draft.builtInConnectors = _builtInConnectors
+                        draft.files = files
                       })
                     }
-                    options={builtInConnectors || []}
-                    help={
-                      <div>
-                        详细说明见
-                        <HelpCenterLink
-                          href="/developer_sql/summary/"
-                          isIframe={false}
-                        >
-                          帮助文档
-                        </HelpCenterLink>
-                      </div>
-                    }
+                    type={3}
                   />
                 )}
+                {/* eslint-disable-next-line no-nested-ternary */}
+                {curJob?.type === 2 ? (
+                  readOnly ? (
+                    <Field>
+                      <Label>内置 Connector</Label>
+                      <Control>
+                        <ConnectorOption
+                          builtInConnectors={builtInConnectors}
+                          value={params.builtInConnectors}
+                        />
+                      </Control>
+                    </Field>
+                  ) : (
+                    <SelectField
+                      clearable
+                      name="builtInConnectors"
+                      label="内置 Connector"
+                      placeholder="请选择运行所需内置 Connector 包"
+                      multi
+                      searchable
+                      css={css`
+                        .select-control {
+                          ${tw`w-[620px]`}
+                        }
+                      `}
+                      closeOnSelect={false}
+                      openOnClick
+                      onInputChange={onFilterConnectors}
+                      value={params.builtInConnectors}
+                      onChange={(_builtInConnectors: string[]) =>
+                        setParams((draft) => {
+                          draft.builtInConnectors = _builtInConnectors
+                        })
+                      }
+                      options={builtInConnectors || []}
+                      help={
+                        <div>
+                          详细说明见
+                          <HelpCenterLink
+                            href="/developer_sql/summary/"
+                            isIframe={false}
+                          >
+                            帮助文档
+                          </HelpCenterLink>
+                        </div>
+                      }
+                    />
+                  )
+                ) : null}
               </ScheForm>
             </CollapseItem>
           </Collapse>
