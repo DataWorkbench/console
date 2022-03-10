@@ -202,7 +202,7 @@ export const ReleaseTable = observer(({ query }: any) => {
           return (
             <FlexBox tw="items-center space-x-1">
               <Center
-                tw="bg-neut-13 rounded-full w-7 h-7 mr-2 border-2 border-solid border-neut-16"
+                tw="bg-neut-13 rounded-full w-7 h-7 mr-1.5 border-2 border-solid border-neut-16"
                 className="release-icon"
               >
                 <Icons name="stream-release" size={16} />
