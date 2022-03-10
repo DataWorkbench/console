@@ -244,7 +244,9 @@ export const JobTree = () => {
     }
 
     return queryClient
-      .fetchQuery(['job', params], async () => loadWorkFlow(params))
+      .fetchQuery(['job', params], async () => loadWorkFlow(params), {
+        retry: 3,
+      })
       .then((data) => {
         const jobs = get(data, 'infos') || []
         const newTreeData = [...treeData]
