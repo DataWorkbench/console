@@ -1,18 +1,27 @@
 import { useRef, useState, useCallback } from 'react'
-import { Icon, Menu, Form, Modal } from '@QCFE/lego-ui'
-import { Loading } from '@QCFE/qingcloud-portal-ui'
-import { Icons, Center, AffixLabel, Confirm, Tree } from 'components'
-import tw, { css, styled } from 'twin.macro'
-import { useParams } from 'react-router-dom'
+import { observer } from 'mobx-react-lite'
+import { Icon, Menu, Form, Modal, Control, Field, Label } from '@QCFE/lego-ui'
+import { Icons, AffixLabel, Confirm, Tree, SelectTreeField } from 'components'
+import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { get } from 'lodash-es'
-import { useMutationStreamJob } from 'hooks'
-import { loadWorkFlow } from 'stores/api'
-import { useQueryClient } from 'react-query'
+import { useMutationStreamJob, useFetchJob } from 'hooks'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
+import { useUnmount } from 'react-use'
+import { get, cloneDeep } from 'lodash-es'
+import { useStore } from 'stores'
 import { nameMatchRegex, strlen } from 'utils'
-import { TreeIconTheme, RtType, JobMode, findTreeNode } from './JobUtils'
+import { TreeNodeProps } from 'rc-tree'
+import {
+  JobType,
+  findTreeNode,
+  getNewTreeData,
+  removeTreeNode,
+  filterFolderOfTreeData,
+  isRootNode,
+  renderIcon,
+  renderSwitcherIcon,
+} from './JobUtils'
 import { JobModal } from './JobModal'
 
 const { MenuItem } = Menu
@@ -37,263 +46,216 @@ const TreeWrapper = styled('div')(() => [
   `,
 ])
 
-const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
-  tw`w-4 h-4 rounded-sm`,
-  theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
-  theme === TreeIconTheme.GREEN && tw`bg-green-11`,
-  theme === TreeIconTheme.GREY && tw`bg-white bg-opacity-20 `,
-  theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`,
-])
+export const JobTree = observer(() => {
+  const fetchJob = useFetchJob()
+  const {
+    workFlowStore,
+    workFlowStore: { treeData, loadedKeys },
+  } = useStore()
 
-export const JobTree = () => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
-  const [filter, setFilter] = useImmer({
-    search: '',
-    offset: 0,
-    limit: 100,
-    pid: '',
-    reverse: false,
-    sort_by: 'created',
-  })
-  const [treeData, setTreeData] = useState([
-    {
-      key: 'di-root',
-      pid: '',
-      title: '数据集成',
-      isLeaf: false,
-      children: [],
-    },
-    {
-      key: 'rt-root',
-      pid: '',
-      title: '实时-流式开发',
-      isLeaf: false,
-      children: [],
-    },
-  ])
-  const [curOpNode, setCurOpNode] = useState(treeData[1])
-  const [loadedKeys, setLoadedKeys] = useState<string[]>([])
   const [expandedKeys, setExpandedKeys] = useState<string[]>([])
-
+  const [curOpNode, setCurOpNode] = useState(treeData[1])
+  const [targetNodeKey, setTargetNodeKey] = useState<string>('')
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([])
+  const [curOp, setCurOp] = useState<'create' | 'edit' | 'move'>('create')
   const form = useRef<Form>(null)
   const treeEl = useRef(null)
   const [visible, setVisible] = useState<any>(null)
   const [showFolderModal, setShowFolderModal] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [showJobModal, setShowJobModal] = useState(false)
-  const [jobParams, setJobParams] = useImmer<{
+  const [isOpened, setIsOpened] = useState(false)
+  const [jobInfo, setJobInfo] = useImmer<{
     op: 'create' | 'edit'
-    jobType: RtType
-    jobMode: JobMode
-    pid: string
-    job: any
+    type?: JobType
+    node?: TreeNodeProps
   }>({
     op: 'create',
-    jobType: RtType.SQL,
-    jobMode: JobMode.RT,
-    pid: 'rt-root',
-    job: null,
+    type: JobType.SQL,
+    node: undefined,
   })
 
-  const queryClient = useQueryClient()
   const mutation = useMutationStreamJob()
 
-  const isRootNode = useCallback(
-    (node) => ['di-root', 'rt-root'].includes(node.key),
-    []
-  )
+  useUnmount((): void => {
+    workFlowStore.resetTreeData()
+  })
 
   const onRightClick = useCallback(({ node }) => {
     setCurOpNode(node)
-
     setVisible(false)
     setTimeout(() => {
       setVisible(true)
     }, 200)
   }, [])
 
-  const onRmbMenuClick = useCallback(
-    (e, key: string, value) => {
+  const onRightMenuClick = useCallback(
+    (e, key: string, val) => {
       setVisible(false)
-      if (value === 'folder') {
+      if (val === 'create' || val === 'edit' || val === 'move') {
         setShowFolderModal(true)
-      } else if (value === 'delete') {
+        setCurOp(val)
+      } else if (val === 'delete') {
         setShowConfirm(true)
-      } else if ([RtType.SQL, RtType.JAR, RtType.PYTHON].includes(value)) {
-        setShowJobModal(true)
-        setJobParams((draft) => {
-          draft.jobType = value
-          draft.jobMode = JobMode.RT
-          draft.op = 'create'
-          draft.pid = curOpNode.key
+      } else if (
+        [
+          JobType.SQL,
+          JobType.JAR,
+          JobType.PYTHON,
+          JobType.SCALA,
+          JobType.OPERATOR,
+        ].includes(val) ||
+        val === 'editJob'
+      ) {
+        setJobInfo((draft) => {
+          const isEdit = val === 'editJob'
+          draft.op = isEdit ? 'edit' : 'create'
+          draft.type = isEdit ? get(curOpNode, 'job.type') : val
+          draft.node = curOpNode
         })
+
+        setShowJobModal(true)
       }
     },
-    [setJobParams, curOpNode.key]
+    [curOpNode, setJobInfo]
   )
 
-  const renderRmbMenu = useCallback(
+  const renderRightMenu = useCallback(
     (node) => {
-      if (node) {
-        if (!node.isLeaf) {
-          const isRoot = isRootNode(node)
-          return (
-            <Menu onClick={onRmbMenuClick}>
-              <MenuItem value="folder">
-                <Icons name="folderAdd" size={14} tw="mr-2" />
-                <span>创建{isRoot ? '' : '子'}文件夹</span>
-              </MenuItem>
-              {!isRoot && (
-                <>
-                  <MenuItem value="move">
-                    <Icons name="folderHistory" size={14} tw="mr-2" />
-                    <span>移动文件夹</span>
-                  </MenuItem>
-                  <MenuItem value="edit">
-                    <Icon name="edit" size={14} type="light" tw="mr-2" />
-                    <span>编辑文件夹</span>
-                  </MenuItem>
-                </>
-              )}
-              <MenuItem value={RtType.SQL}>
-                <Icons name="sql" size={14} tw="mr-2" />
-                <span>SQL 模式</span>
-              </MenuItem>
-              <MenuItem value={RtType.PYTHON}>
-                <Icons name="python" size={14} tw="mr-2" />
-                <span>Python 模式</span>
-              </MenuItem>
-              <MenuItem value={RtType.JAR}>
-                <Icons name="jar" size={14} tw="mr-2" />
-                <span>Jar 包模式</span>
-              </MenuItem>
-              <MenuItem disabled>
-                <Icons name="operator" size={14} tw="mr-2" />
-                <span>算子编排模式</span>
-              </MenuItem>
-              {!isRoot && (
-                <MenuItem value="delete">
-                  <Icon name="delete" size={14} type="light" />
-                  <span>删除</span>
-                </MenuItem>
-              )}
-            </Menu>
-          )
-        }
+      if (!node) {
+        return null
       }
-      return null
+      if (node.isLeaf) {
+        return (
+          <Menu onClick={onRightMenuClick}>
+            <MenuItem value="editJob">
+              <Icon name="edit" size={14} type="light" tw="mr-2" />
+              <span>编辑信息</span>
+            </MenuItem>
+            <MenuItem value="moveJob">
+              <Icons name="NoteGearFill" size={14} tw="mr-2" />
+              <span>移动作业</span>
+            </MenuItem>
+            <MenuItem value="association">
+              <Icon
+                name="listview"
+                size={14}
+                tw="mr-2"
+                color={{
+                  primary: theme('colors.white'),
+                  secondary: theme('colors.white'),
+                }}
+              />
+              <span>关联实例</span>
+            </MenuItem>
+            <MenuItem value="sche">
+              <Icons name="Topology2Fill" size={14} tw="mr-2" />
+              <span>调度设置</span>
+            </MenuItem>
+            <MenuItem value="args">
+              <Icons name="Topology3Fill" size={14} tw="mr-2" />
+              <span>运行参数配置</span>
+            </MenuItem>
+            <MenuItem value="history">
+              <Icons name="Book3Fill" size={14} tw="mr-2" />
+              <span>历史版本</span>
+            </MenuItem>
+            <MenuItem value="delete">
+              <Icon name="delete" size={14} type="light" />
+              <span>删除</span>
+            </MenuItem>
+          </Menu>
+        )
+      }
+      const isRoot = isRootNode(node.key)
+      return (
+        <Menu onClick={onRightMenuClick}>
+          <MenuItem value="create">
+            <Icons name="folderAdd" size={14} tw="mr-2" />
+            <span>创建{isRoot ? '' : '子'}文件夹</span>
+          </MenuItem>
+          {!isRoot && (
+            <MenuItem value="move">
+              <Icons name="folderHistory" size={14} tw="mr-2" />
+              <span>移动文件夹</span>
+            </MenuItem>
+          )}
+          {!isRoot && (
+            <MenuItem value="edit">
+              <Icon name="edit" size={14} type="light" tw="mr-2" />
+              <span>编辑文件夹</span>
+            </MenuItem>
+          )}
+          <MenuItem value={JobType.SQL}>
+            <Icons name="sql" size={14} tw="mr-2" />
+            <span>SQL 模式</span>
+          </MenuItem>
+          <MenuItem value={JobType.PYTHON}>
+            <Icons name="python" size={14} tw="mr-2" />
+            <span>Python 模式</span>
+          </MenuItem>
+          <MenuItem value={JobType.JAR}>
+            <Icons name="jar" size={14} tw="mr-2" />
+            <span>Jar 包模式</span>
+          </MenuItem>
+          <MenuItem disabled>
+            <Icons name="operator" size={14} tw="mr-2" />
+            <span>算子编排模式</span>
+          </MenuItem>
+          {!isRoot && (
+            <MenuItem value="delete">
+              <Icon name="delete" size={14} type="light" />
+              <span>删除</span>
+            </MenuItem>
+          )}
+        </Menu>
+      )
     },
-    [onRmbMenuClick, isRootNode]
+    [onRightMenuClick]
   )
-
-  const renderIcon = useCallback((props) => {
-    const { data, loading } = props
-    if (loading) {
-      return <Loading size={16} />
-    }
-    let iconName = 'folder'
-    let theme: TreeIconTheme = TreeIconTheme.GREY
-    if (data) {
-      const { key } = data
-
-      if (key === 'rt-root') {
-        iconName = 'flash'
-        theme = TreeIconTheme.BLUE
-      } else if (key === 'di-root') {
-        iconName = 'equalizer'
-        theme = TreeIconTheme.GREEN
-      } else if (data.isLeaf) {
-        if (data.rootKey === 'rt-root') {
-          const type = get(data, 'job.type')
-          if (type === RtType.SQL) {
-            iconName = 'sql'
-          } else if (type === RtType.JAR) {
-            iconName = 'jar'
-          } else if (type === RtType.PYTHON) {
-            iconName = 'python'
-          }
-        }
-      } else if (!data.isLeaf || data.children?.length) {
-        iconName = 'folder'
-        theme = TreeIconTheme.YELLOW
-      }
-    }
-    return (
-      <IconWrapper theme={theme}>
-        <Icons name={iconName} size={12} />
-      </IconWrapper>
-    )
-  }, [])
-
-  const renderSwitcherIcon = useCallback((props) => {
-    const { expanded, isLeaf } = props
-    if (isLeaf) {
-      return null
-    }
-    return <Icon name={expanded ? 'chevron-up' : 'chevron-down'} type="light" />
-  }, [])
-
-  const fetchJobTreeData = (node: any) => {
-    const isRoot = isRootNode(node)
-    const params = {
-      regionId,
-      spaceId,
-      ...filter,
-      pid: isRoot ? '' : node.key,
-    }
-
-    return queryClient
-      .fetchQuery(['job', params], async () => loadWorkFlow(params), {
-        retry: 3,
-      })
+  const fetchJobTreeData = (node: any, movingNode = null) => {
+    const isRoot = isRootNode(node.key)
+    const pid = isRoot ? '' : node.key
+    return fetchJob({
+      pid,
+    })
       .then((data) => {
         const jobs = get(data, 'infos') || []
-        const newTreeData = [...treeData]
-        const pNode = findTreeNode(newTreeData, node.key)
-        if (pNode) {
-          const children = jobs.map((job) => {
-            const childNode = pNode.children?.find((c: any) => c.key === job.id)
-            if (childNode) {
-              return childNode
-            }
-            return {
-              key: job.id,
-              rootKey: isRoot ? node.key : node.rootKey,
-              pid: node.key,
-              title: job.name,
-              isLeaf: !job.is_directory,
-              job,
-            }
-          })
-          pNode.children = children
-          setLoadedKeys([...loadedKeys, node.key])
-          setExpandedKeys([...expandedKeys, node.key])
-          setTreeData(newTreeData)
-        }
-        return data
+        const newTreeData = getNewTreeData(
+          workFlowStore.treeData,
+          node,
+          jobs,
+          movingNode
+        )
+        workFlowStore.set({
+          treeData: newTreeData,
+        })
+        // setExpandedKeys([...expandedKeys, node.key])
+      })
+      .catch((e) => {
+        setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
+        throw e
       })
   }
-
-  const handleTreeExpand = (keys: string[]) => {
-    setExpandedKeys(keys)
-  }
-
-  const handleTreeload = (keys: any[]) => {
-    setLoadedKeys(keys)
-  }
-
-  const handleMutate = (op: 'create' | 'delete') => {
-    let data = { op }
-    const { key, pid } = curOpNode
-    if (op === 'create') {
+  const handleMutate = (op: 'create' | 'edit' | 'move' | 'delete') => {
+    let data: any = { op }
+    const { key } = curOpNode
+    if (op === 'create' || op === 'edit' || op === 'move') {
       if (form.current?.validateForm()) {
         const fields = form.current.getFieldsValue()
+        const pid = op === 'move' ? targetNodeKey : curOpNode.key
         data = {
           ...data,
           ...fields,
-          pid: key,
-          is_directory: true,
+        }
+        if (op === 'create') {
+          data.pid = isRootNode(pid) ? '' : pid
+          data.is_directory = true
+        } else if (op === 'edit') {
+          data.jobId = key
+        } else if (op === 'move') {
+          data.job_ids = [key]
+          data.target = targetNodeKey
         }
       }
     } else if (op === 'delete') {
@@ -307,17 +269,23 @@ export const JobTree = () => {
       onSuccess: () => {
         setShowFolderModal(false)
         setShowConfirm(false)
-        const pNode = op === 'create' ? curOpNode : findTreeNode(treeData, pid)
-        fetchJobTreeData(pNode)
+        const pNode =
+          op === 'create'
+            ? curOpNode
+            : findTreeNode(workFlowStore.treeData, curOpNode.pid)
+        if (op === 'create' || op === 'edit') {
+          fetchJobTreeData(pNode)
+        } else if (op === 'move' || op === 'delete') {
+          const node = findTreeNode(workFlowStore.treeData, key)
+          const newTreeData = removeTreeNode(workFlowStore.treeData, curOpNode)
+          workFlowStore.set({
+            treeData: newTreeData,
+          })
+          const targetNode = findTreeNode(workFlowStore.treeData, targetNodeKey)
+          fetchJobTreeData(targetNode, node)
+        }
       },
     })
-  }
-
-  const handleLoadData = (node) => {
-    setFilter((draft) => {
-      draft.pid = node.pid
-    })
-    return fetchJobTreeData(node)
   }
 
   const handleJobModalClose = (created: boolean) => {
@@ -343,7 +311,7 @@ export const JobTree = () => {
         appendTo={() => document.body}
         content={
           <div tw="border border-neut-13 rounded-sm">
-            {renderRmbMenu(curOpNode)}
+            {renderRightMenu(curOpNode)}
           </div>
         }
       >
@@ -352,13 +320,14 @@ export const JobTree = () => {
             treeData={treeData}
             loadedKeys={loadedKeys}
             expandedKeys={expandedKeys}
+            selectedKeys={selectedKeys}
             tw="ml-2"
             icon={renderIcon}
             switcherIcon={renderSwitcherIcon}
             onRightClick={onRightClick}
             draggable={(props) => {
               const { key } = props
-              if (key === 'rt-root' || key === 'di-root') {
+              if (isRootNode(String(key))) {
                 return false
               }
               return true
@@ -371,52 +340,134 @@ export const JobTree = () => {
                 />
               )
             }}
-            loadData={handleLoadData}
-            onExpand={handleTreeExpand}
-            onLoad={handleTreeload}
+            loadData={fetchJobTreeData}
+            onExpand={(keys) => setExpandedKeys(keys)}
+            onLoad={(keys) => workFlowStore.set({ loadedKeys: keys })}
+            onSelect={(keys: string[], { selected, node }) => {
+              if (selected) {
+                setSelectedKeys([keys[0]])
+              }
+              if (!node.isLeaf) {
+                if (node.expanded) {
+                  setExpandedKeys(
+                    expandedKeys.filter((key) => key !== node.key)
+                  )
+                } else {
+                  setExpandedKeys([...expandedKeys, node.key as string])
+                }
+              }
+            }}
           />
         </TreeWrapper>
       </Tippy>
-      {showFolderModal && (
-        <Modal
-          title="创建文件夹"
-          visible
-          appendToBody
-          width={600}
-          onCancel={() => setShowFolderModal(false)}
-          okText="创建"
-          onOk={() => handleMutate('create')}
-          confirmLoading={mutation.isLoading}
-          showConfirmLoading={mutation.isLoading}
-        >
-          <Form layout="horizon" ref={form}>
-            <TextField
-              name="name"
-              label={<AffixLabel>文件夹名称</AffixLabel>}
-              validateOnBlur
-              schemas={[
-                {
-                  rule: {
-                    required: true,
-                    matchRegex: nameMatchRegex,
-                  },
-                  help: '允许包含字母、数字或下划线（_）,不能以（_）开始结尾',
-                  status: 'error',
-                },
-                {
-                  rule: (value: string) => {
-                    const l = strlen(value)
-                    return l >= 2 && l <= 128
-                  },
-                  help: '允许包含字母、数字 及 "_"，长度2～128',
-                  status: 'error',
-                },
-              ]}
-            />
-          </Form>
-        </Modal>
-      )}
-
+      {showFolderModal &&
+        (() => {
+          const opTxt = {
+            create: '创建',
+            edit: '编辑',
+            move: '移动',
+          }[curOp]
+          const okTxt = {
+            create: '创建',
+            edit: '保存',
+            move: '移动',
+          }[curOp]
+          return (
+            <Modal
+              title={`${opTxt}文件夹`}
+              visible
+              appendToBody
+              width={600}
+              onCancel={() => setShowFolderModal(false)}
+              okText={okTxt}
+              onOk={() => handleMutate(curOp)}
+              confirmLoading={mutation.isLoading}
+              showConfirmLoading={mutation.isLoading}
+            >
+              <Form layout="horizon" ref={form}>
+                {(curOp === 'create' || curOp === 'edit') && (
+                  <TextField
+                    name="name"
+                    label={<AffixLabel>文件夹名称</AffixLabel>}
+                    validateOnBlur
+                    defaultValue={curOpNode.title}
+                    schemas={[
+                      {
+                        rule: {
+                          required: true,
+                          matchRegex: nameMatchRegex,
+                        },
+                        help: '允许包含字母、数字或下划线（_）,不能以（_）开始结尾',
+                        status: 'error',
+                      },
+                      {
+                        rule: (value: string) => {
+                          const l = strlen(value)
+                          return l >= 2 && l <= 128
+                        },
+                        help: '允许包含字母、数字 及 "_"，长度2～128',
+                        status: 'error',
+                      },
+                    ]}
+                  />
+                )}
+                {curOp === 'move' && (
+                  <>
+                    <Field>
+                      <Label>
+                        <AffixLabel>文件夹名称</AffixLabel>
+                      </Label>
+                      <Control>
+                        <Label>{curOpNode.title}</Label>
+                      </Control>
+                    </Field>
+                    <SelectTreeField
+                      name="pid"
+                      tw="z-50 transition-all"
+                      css={[isOpened && tw`mb-40!`]}
+                      label={<AffixLabel>目标文件夹</AffixLabel>}
+                      placeholder="选择作业所在目录"
+                      validateOnChange
+                      treeHeight={160}
+                      schemas={[
+                        {
+                          rule: (v: string) => {
+                            return v !== ''
+                          },
+                          help: '请选择作业所在目录',
+                          status: 'error',
+                        },
+                      ]}
+                      icon={renderIcon}
+                      switcherIcon={renderSwitcherIcon}
+                      treeData={filterFolderOfTreeData(
+                        cloneDeep(
+                          treeData.filter(
+                            (item) => item.key === curOpNode.rootKey
+                          )
+                        ),
+                        curOpNode.key
+                      )}
+                      loadData={fetchJobTreeData}
+                      loadedKeys={loadedKeys}
+                      onLoad={(keys: string | number) =>
+                        workFlowStore.set({ loadedKeys: keys })
+                      }
+                      value={targetNodeKey || ''}
+                      onChange={(v: string) => {
+                        setTargetNodeKey(v)
+                      }}
+                      onOpened={(v) => {
+                        setIsOpened(v)
+                        // console.log('opened', v)
+                      }}
+                    />
+                  </>
+                )}
+              </Form>
+            </Modal>
+          )
+        })()}
       {showConfirm && (
         <Confirm
           visible
@@ -437,15 +488,13 @@ export const JobTree = () => {
       )}
       {showJobModal && (
         <JobModal
-          treeData={treeData}
-          op={jobParams.op}
-          pid={jobParams.pid}
-          jobMode={jobParams.jobMode}
-          jobType={jobParams.jobType}
+          op={jobInfo.op}
+          jobNode={jobInfo.node}
+          jobType={jobInfo.type}
           onClose={handleJobModalClose}
         />
       )}
     </>
   )
-}
+})
 export default JobTree

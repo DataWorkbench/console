@@ -1,6 +1,6 @@
 import { Icon } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
-import { get } from 'lodash-es'
+import { get, cloneDeep } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
 import { Icons, Center } from 'components'
 
@@ -12,31 +12,25 @@ export enum JobMode {
   /** 离线批量开发 */
   OLE = 'OLE',
 }
-
-/**  数据集成类型 */
-export enum DiType {
+/**  作业类型 */
+export enum JobType {
   /** 离线批量 */
-  OFFLINE_BATCH = 'OFFLINE_BATCH',
+  OFFLINE_BATCH = -1,
   /** 实时流式 */
-  REALTIME_FLOW = 'REALTIME_FLOW',
-}
-
-/** 实时流式开发类型  */
-export enum RtType {
+  REALTIME_FLOW = -2,
   /** 算子编排 */
   OPERATOR = 1,
   /** SQL模式 */
   SQL = 2,
   /** JAR包 */
   JAR = 3,
-  /** python */
+  /** python模式 */
   PYTHON = 4,
-  /** scala */
+  /** scala模式 */
   SCALA = 5,
 }
 
-/** 离线-批量开发 */
-export enum OleType {}
+export type JobTypeId = -1 | -2 | 1 | 2 | 3 | 4 | 5
 
 /** 作业树icon主题 */
 export enum TreeIconTheme {
@@ -58,13 +52,13 @@ export const jobModeData = [
         icon: 'inbox1',
         title: '离线-批量同步作业',
         desc: '离线批量同步的描述文案，尽量简短，一句话内',
-        value: DiType.OFFLINE_BATCH,
+        value: JobType.OFFLINE_BATCH,
       },
       {
         icon: 'inbox0',
         title: '实时-流式同步作业',
         desc: '实时-流式的描述文案，尽量简短，一句话内',
-        value: DiType.REALTIME_FLOW,
+        value: JobType.REALTIME_FLOW,
       },
     ],
   },
@@ -79,31 +73,31 @@ export const jobModeData = [
         icon: 'sql',
         title: 'SQL 模式',
         desc: 'SQL 模式的描述文案，尽量简短，一句话内',
-        value: RtType.SQL,
+        value: JobType.SQL,
       },
       {
         icon: 'jar',
         title: '代码开发-Jar 包模式',
         desc: 'Jar 模式的描述文案，尽量简短，一句话内',
-        value: RtType.JAR,
+        value: JobType.JAR,
       },
       {
         icon: 'python',
         title: '代码开发-Python 模式',
         desc: 'Python 模式的描述文案，尽量简短，一句话内',
-        value: RtType.PYTHON,
+        value: JobType.PYTHON,
       },
       {
         icon: 'scala',
         title: '代码开发-Scala 模式 ',
         desc: 'scala 模式的描述文案，尽量简短，一句话内',
-        value: RtType.SCALA,
+        value: JobType.SCALA,
       },
       {
         icon: 'operator',
         title: '算子编排模式',
         desc: '算子编排模式描述文案，尽量简短，一句话内',
-        value: RtType.OPERATOR,
+        value: JobType.OPERATOR,
       },
     ],
   },
@@ -115,6 +109,26 @@ export const jobModeData = [
     items: [],
   },
 ]
+
+export const getJobMode = (jobType?: JobType) => {
+  if (jobType === JobType.OFFLINE_BATCH || jobType === JobType.REALTIME_FLOW) {
+    return JobMode.DI
+  }
+  if (
+    jobType === JobType.SQL ||
+    jobType === JobType.JAR ||
+    jobType === JobType.PYTHON ||
+    jobType === JobType.SCALA
+  ) {
+    return JobMode.RT
+  }
+  if (jobType === JobType.OPERATOR) {
+    return JobMode.OLE
+  }
+  return null
+}
+
+export const isRootNode = (key: any) => ['di-root', 'rt-root'].includes(key)
 
 export const findTreeNode: any = (treeData: any[], nodeKey: string) => {
   let find = null
@@ -131,6 +145,68 @@ export const findTreeNode: any = (treeData: any[], nodeKey: string) => {
   return find
 }
 
+export const filterFolderOfTreeData = (
+  treeNodeData: any[],
+  excludeKey?: string | number
+) => {
+  const newTreeData = treeNodeData.filter((node) => {
+    if (node.key === excludeKey) {
+      return false
+    }
+    if (node.children?.length) {
+      node.children = filterFolderOfTreeData(node.children, excludeKey)
+      // return node.children.length > 0
+      return true
+    }
+    return !node.isLeaf
+  })
+  return newTreeData
+}
+
+export const getNewTreeData = (
+  treeData: any[],
+  node: any,
+  jobs: any[],
+  movingNode: { key: string } | null = null
+) => {
+  const newTreeData = cloneDeep(treeData)
+  const pNode = findTreeNode(newTreeData, node.key)
+  if (pNode) {
+    const children = jobs.map((job) => {
+      const childNode = pNode.children?.find((c: any) => c.key === job.id)
+      if (childNode) {
+        if (childNode.title !== job.name) {
+          return { ...childNode, title: job.name }
+        }
+        return childNode
+      }
+      if (movingNode && movingNode.key === job.id) {
+        return { ...movingNode, pid: node.key }
+      }
+      return {
+        key: job.id,
+        pid: node.key,
+        rootKey: isRootNode(node.key) ? node.key : node.rootKey,
+        title: job.name,
+        isLeaf: !job.is_directory,
+        job,
+      }
+    })
+    pNode.children = children
+  }
+  return newTreeData
+}
+
+export const removeTreeNode = (treeData: any[], node: any) => {
+  const newTreeData = cloneDeep(treeData)
+  const { pid, key } = node
+  const pNode = findTreeNode(newTreeData, pid)
+  if (pNode) {
+    pNode.children = pNode.children.filter((c: any) => c.key !== key)
+  }
+  return newTreeData
+}
+
 const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
   tw`w-4 h-4 rounded-sm`,
   theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
@@ -139,7 +215,7 @@ const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
   theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`,
 ])
 
-export const getSwitcherIcon = (props) => {
+export const renderSwitcherIcon = (props) => {
   const { expanded, isLeaf } = props
   if (isLeaf) {
     return null
@@ -166,11 +242,11 @@ export const renderIcon = (props) => {
     } else if (data.isLeaf) {
       if (data.rootKey === 'rt-root') {
         const type = get(data, 'job.type')
-        if (type === RtType.SQL) {
+        if (type === JobType.SQL) {
           iconName = 'sql'
-        } else if (type === RtType.JAR) {
+        } else if (type === JobType.JAR) {
           iconName = 'jar'
-        } else if (type === RtType.PYTHON) {
+        } else if (type === JobType.PYTHON) {
           iconName = 'python'
         }
       }

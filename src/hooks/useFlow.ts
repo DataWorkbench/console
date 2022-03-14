@@ -3,13 +3,17 @@ import {
   useQuery,
   useInfiniteQuery,
   UseQueryOptions,
+  useQueryClient,
 } from 'react-query'
+import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
 import { omit } from 'lodash-es'
+
 import {
   createStreamJob,
   updateStreamJob,
+  moveStreamJob,
   deleteStreamJobs,
   IWorkFlowParams,
   loadWorkFlow,
@@ -31,6 +35,34 @@ interface IRouteParams {
   op?: string
 }
 
+export const useFetchJob = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const queryClient = useQueryClient()
+  return useCallback(
+    (filter = {}, options = {}) => {
+      const params = {
+        regionId,
+        spaceId,
+        search: '',
+        limit: 100,
+        offset: 0,
+        reverse: false,
+        sort_by: 'created',
+        ...filter,
+      }
+      return queryClient.fetchQuery(
+        ['job', params],
+        async () => loadWorkFlow(params),
+        {
+          // retry: 3,
+          ...options,
+        }
+      )
+    },
+    [queryClient, regionId, spaceId]
+  )
+}
+
 export const useMutationStreamJob = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async ({ op, ...rest }: IWorkFlowParams) => {
@@ -38,8 +70,11 @@ export const useMutationStreamJob = () => {
     if (op === 'create') {
       return createStreamJob(params)
     }
-    if (op === 'update') {
+    if (op === 'update' || op === 'edit') {
       return updateStreamJob(params)
+    }
+    if (op === 'move') {
+      return moveStreamJob(params)
     }
     if (op === 'delete') {
       return deleteStreamJobs(params)

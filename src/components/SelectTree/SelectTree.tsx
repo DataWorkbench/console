@@ -1,16 +1,16 @@
 import tw, { css, styled } from 'twin.macro'
 import { Form, Icon, Control } from '@QCFE/lego-ui'
-import { useState, forwardRef, useCallback } from 'react'
-import { uniq } from 'lodash-es'
+import { useState, forwardRef, useCallback, useEffect } from 'react'
+import { uniq, isFunction } from 'lodash-es'
 import { Tree } from 'components/Tree'
 
 export interface SelectTreeProps {
   name: string
   value?: string | null
   placeholder?: string
-  onChange: (value: any) => void
-  renderIcon?: (node: any) => React.ReactNode
-  treeData: any[]
+  onChange?: (value: any) => void
+  onOpened?: (value: boolean) => void
+  treeHeight?: number
 }
 
 const SelectInputWrapper = styled('div')(
@@ -28,10 +28,16 @@ const SelectInputWrapper = styled('div')(
   ]
 )
 
-const TreeWrapper = styled('div')(({ show = false }: { show?: boolean }) => [
-  tw`absolute left-0 top-9 border border-solid border-neut-15 rounded-sm py-1 z-10 w-full bg-neut-17`,
-  !show && tw`hidden`,
-])
+const TreeWrapper = styled('div')(
+  ({ show = false, treeHeight }: { show?: boolean; treeHeight?: number }) => [
+    tw`absolute max-w-[328px] left-0 top-9 border border-solid border-neut-15 rounded-sm py-1 z-10 w-full bg-neut-17`,
+    !show && tw`hidden`,
+    treeHeight && {
+      maxHeight: `${treeHeight}px`,
+      overflowY: 'auto',
+    },
+  ]
+)
 
 const findTreeNode: any = (treeData: any[], nodeKey: string) => {
   let find = null
@@ -55,8 +61,9 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
       value,
       placeholder = '请选择',
       treeData = [],
-      renderIcon,
       onChange,
+      onOpened,
+      treeHeight,
       ...restProps
     },
     ref
@@ -66,6 +73,12 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
     const [opened, setOpened] = useState(false)
     const [selectedKeys, setSelectedKeys] = useState<string[]>([])
     const folderName = findTreeNode(treeData, val)?.title || ''
+
+    useEffect(() => {
+      if (isFunction(onOpened)) {
+        onOpened(opened)
+      }
+    }, [opened, onOpened])
 
     const handleSelect = useCallback(
       (keys: string[], { node }) => {
@@ -101,7 +114,6 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
           onClick={() => {
             setOpened(!opened)
           }}
-          {...restProps}
         >
           <input
             autoComplete="off"
@@ -119,13 +131,13 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
             size={16}
           />
         </SelectInputWrapper>
-        <TreeWrapper show={opened}>
+        <TreeWrapper show={opened} treeHeight={treeHeight}>
           <Tree
             focusable={false}
             selectedKeys={selectedKeys}
             treeData={treeData}
-            icon={renderIcon}
             onSelect={handleSelect}
+            {...restProps}
           />
         </TreeWrapper>
       </Control>
@@ -135,5 +147,6 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
 
 export default SelectTree
 
-export const SelectTreeField: (props: SelectTreeProps) => any =
-  Form.getFormField(SelectTree)
+export const SelectTreeField: (props: SelectTreeProps) => any = (
+  Form as any
+).getFormField(SelectTree)

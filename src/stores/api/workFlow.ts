@@ -33,6 +33,18 @@ export const updateStreamJob = ({
     method: 'PUT',
   })
 
+export const moveStreamJob = ({
+  regionId,
+  spaceId,
+  ...rest
+}: IWorkFlowParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/stream/job/moves`,
+    body: rest,
+    method: 'POST',
+  })
+
 export const deleteStreamJobs = ({
   regionId,
   spaceId,
