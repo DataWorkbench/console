@@ -7,6 +7,7 @@ import { Center, FlexBox } from 'components'
 import emitter from 'utils/emitter'
 import JobMenu from './JobMenu'
 import JobTabs from './JobTabs'
+import StreamRightMenu from './StreamRightMenu'
 
 const RealTime = observer(() => {
   const {
@@ -75,7 +76,15 @@ const RealTime = observer(() => {
       <div tw="flex w-full">
         <JobMenu tw="mr-2" />
         {curJob ? (
-          <JobTabs />
+          <>
+            <JobTabs />
+            <StreamRightMenu
+            // showScheSetting={showScheSettingModal}
+            // onScheSettingClose={() => {
+            //   setShowScheSettingModal(false)
+            // }}
+            />
+          </>
         ) : (
           <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
             <div tw="space-y-2">

@@ -130,6 +130,8 @@ export const getJobMode = (jobType?: JobType) => {
 
 export const isRootNode = (key: any) => ['di-root', 'rt-root'].includes(key)
 
+export const getJobIdByKey = (key: string) => (isRootNode(key) ? '' : key)
+
 export const findTreeNode: any = (treeData: any[], nodeKey: string) => {
   let find = null
   treeData.forEach((node) => {
@@ -175,8 +177,8 @@ export const getNewTreeData = (
     const children = jobs.map((job) => {
       const childNode = pNode.children?.find((c: any) => c.key === job.id)
       if (childNode) {
-        if (childNode.title !== job.name) {
-          return { ...childNode, title: job.name }
+        if (get(childNode, 'job.updated') !== job.updated) {
+          return { ...childNode, title: job.name, job }
         }
         return childNode
       }

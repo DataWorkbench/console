@@ -24,7 +24,6 @@ import {
 import { strlen } from 'utils/convert'
 import { get, flatten } from 'lodash-es'
 import { css } from 'twin.macro'
-import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
 import { StreamToolBar } from './styled'
 import UploadModal from '../Resource/UploadModal'
@@ -37,7 +36,7 @@ const StreamJAR = () => {
   const [show, toggleShow] = useState(false)
   const [uploadVisible, setUploadVisible] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
-  const [showScheSettingModal, setShowScheSettingModal] = useState(false)
+  // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const queryClient = useQueryClient()
   const [params, setParams] = useImmer({
     jarArgs: '',
@@ -290,7 +289,8 @@ const StreamJAR = () => {
             onCancel={() => toggleScheModal(false)}
             okText="调度配置"
             onOk={() => {
-              setShowScheSettingModal(true)
+              // setShowScheSettingModal(true)
+              workFlowStore.set({ showScheSetting: true })
               toggleScheModal(false)
             }}
           >
@@ -310,12 +310,6 @@ const StreamJAR = () => {
           </Modal>
         )}
       </FlexBox>
-      <StreamRightMenu
-        showScheSetting={showScheSettingModal}
-        onScheSettingClose={() => {
-          setShowScheSettingModal(false)
-        }}
-      />
 
       {uploadVisible && (
         <UploadModal

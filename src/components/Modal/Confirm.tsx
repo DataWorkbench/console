@@ -1,5 +1,5 @@
 import React from 'react'
-import tw, { css, styled } from 'twin.macro'
+import tw, { css, styled, theme } from 'twin.macro'
 import { Icon } from '@QCFE/lego-ui'
 import { Modal, ModalProps } from '@QCFE/qingcloud-portal-ui'
 
@@ -22,6 +22,9 @@ export const ModalWrapper = styled(Modal)(() => [
     .modal-card-foot {
       ${tw`border-none`}
     }
+    .modal-card-body {
+      ${tw`pt-0 px-6`}
+    }
   `,
 ])
 
@@ -34,7 +37,7 @@ export const Confirm = ({
   const getIcon = () => {
     switch (type) {
       case ConfirmType.INFO:
-        return <Icon name="info-circle" />
+        return <Icon name="info-circle" size={24} />
       case ConfirmType.WARN:
         return (
           <Icon
@@ -46,9 +49,18 @@ export const Confirm = ({
           />
         )
       case ConfirmType.ERROR:
-        return <Icon name="error" />
+        return (
+          <Icon
+            name="error"
+            size={24}
+            color={{
+              primary: theme('colors.white'),
+              secondary: theme('colors.red.10'),
+            }}
+          />
+        )
       case ConfirmType.SUCCESS:
-        return <Icon name="success" />
+        return <Icon name="success" size={24} />
       default:
         return null
     }

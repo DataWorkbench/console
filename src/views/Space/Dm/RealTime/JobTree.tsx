@@ -1,6 +1,16 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { Icon, Menu, Form, Modal, Control, Field, Label } from '@QCFE/lego-ui'
+import {
+  Icon,
+  Menu,
+  Form,
+  Modal,
+  Control,
+  Field,
+  Label,
+  Input,
+  Button,
+} from '@QCFE/lego-ui'
 import { Icons, AffixLabel, Confirm, Tree, SelectTreeField } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
@@ -19,6 +29,7 @@ import {
   removeTreeNode,
   filterFolderOfTreeData,
   isRootNode,
+  getJobIdByKey,
   renderIcon,
   renderSwitcherIcon,
 } from './JobUtils'
@@ -61,10 +72,11 @@ export const JobTree = observer(() => {
   const form = useRef<Form>(null)
   const treeEl = useRef(null)
   const [visible, setVisible] = useState<any>(null)
-  const [showFolderModal, setShowFolderModal] = useState(false)
+  const [showOpModal, setShowOpModal] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [showJobModal, setShowJobModal] = useState(false)
   const [isOpened, setIsOpened] = useState(false)
+  const [delBtnEnable, setDelBtnEnable] = useState(false)
   const [jobInfo, setJobInfo] = useImmer<{
     op: 'create' | 'edit'
     type?: JobType
@@ -74,12 +86,19 @@ export const JobTree = observer(() => {
     type: JobType.SQL,
     node: undefined,
   })
+  const curOpWord = curOpNode.isLeaf ? '作业' : '文件夹'
 
   const mutation = useMutationStreamJob()
 
   useUnmount((): void => {
     workFlowStore.resetTreeData()
   })
+
+  useEffect(() => {
+    if (workFlowStore.curJob) {
+      setSelectedKeys([workFlowStore.curJob.id])
+    }
+  }, [workFlowStore.curJob])
 
   const onRightClick = useCallback(({ node }) => {
     setCurOpNode(node)
@@ -90,10 +109,10 @@ export const JobTree = observer(() => {
   }, [])
 
   const onRightMenuClick = useCallback(
-    (e, key: string, val) => {
+    (e, key: string, val: string | number) => {
       setVisible(false)
       if (val === 'create' || val === 'edit' || val === 'move') {
-        setShowFolderModal(true)
+        setShowOpModal(true)
         setCurOp(val)
       } else if (val === 'delete') {
         setShowConfirm(true)
@@ -104,7 +123,7 @@ export const JobTree = observer(() => {
           JobType.PYTHON,
           JobType.SCALA,
           JobType.OPERATOR,
-        ].includes(val) ||
+        ].includes(+val) ||
         val === 'editJob'
       ) {
         setJobInfo((draft) => {
@@ -115,11 +134,12 @@ export const JobTree = observer(() => {
         })
 
         setShowJobModal(true)
+      } else if (val === 'sche') {
+        workFlowStore.set({ curJob: get(curOpNode, 'job') })
       }
     },
-    [curOpNode, setJobInfo]
+    [curOpNode, setJobInfo, workFlowStore]
   )
-
   const renderRightMenu = useCallback(
     (node) => {
       if (!node) {
@@ -132,7 +152,7 @@ export const JobTree = observer(() => {
               <Icon name="edit" size={14} type="light" tw="mr-2" />
               <span>编辑信息</span>
             </MenuItem>
-            <MenuItem value="moveJob">
+            <MenuItem value="move">
               <Icons name="NoteGearFill" size={14} tw="mr-2" />
               <span>移动作业</span>
             </MenuItem>
@@ -214,8 +234,7 @@ export const JobTree = observer(() => {
     [onRightMenuClick]
   )
   const fetchJobTreeData = (node: any, movingNode = null) => {
-    const isRoot = isRootNode(node.key)
-    const pid = isRoot ? '' : node.key
+    const pid = getJobIdByKey(node.key)
     return fetchJob({
       pid,
     })
@@ -249,13 +268,13 @@ export const JobTree = observer(() => {
           ...fields,
         }
         if (op === 'create') {
-          data.pid = isRootNode(pid) ? '' : pid
+          data.pid = getJobIdByKey(pid)
           data.is_directory = true
         } else if (op === 'edit') {
           data.jobId = key
         } else if (op === 'move') {
           data.job_ids = [key]
-          data.target = targetNodeKey
+          data.target = getJobIdByKey(targetNodeKey)
         }
       }
     } else if (op === 'delete') {
@@ -267,7 +286,7 @@ export const JobTree = observer(() => {
 
     mutation.mutate(data, {
       onSuccess: () => {
-        setShowFolderModal(false)
+        setShowOpModal(false)
         setShowConfirm(false)
         const pNode =
           op === 'create'
@@ -288,10 +307,15 @@ export const JobTree = observer(() => {
     })
   }
 
-  const handleJobModalClose = (created: boolean) => {
+  const handleJobModalClose = (created: boolean, op: 'create' | 'edit') => {
     setShowJobModal(false)
     if (created === true) {
-      fetchJobTreeData(curOpNode)
+      const pNode =
+        op === 'create'
+          ? curOpNode
+          : findTreeNode(workFlowStore.treeData, curOpNode.pid)
+
+      fetchJobTreeData(pNode)
     }
   }
 
@@ -341,31 +365,40 @@ export const JobTree = observer(() => {
               )
             }}
             loadData={fetchJobTreeData}
-            onExpand={(keys) => setExpandedKeys(keys)}
+            onExpand={(keys) => setExpandedKeys(keys as string[])}
             onLoad={(keys) => workFlowStore.set({ loadedKeys: keys })}
-            onSelect={(keys: string[], { selected, node }) => {
-              if (selected) {
-                setSelectedKeys([keys[0]])
+            onSelect={(keys: (string | number)[], { selected, node }) => {
+              const job = get(node, 'job')
+              if (
+                workFlowStore.curJob?.id !== job.id &&
+                workFlowStore.isDirty
+              ) {
+                workFlowStore.set({ nextJob: job })
+                workFlowStore.showSaveConfirm(job.id, 'switch')
+                return
               }
-              if (!node.isLeaf) {
-                if (node.expanded) {
-                  setExpandedKeys(
-                    expandedKeys.filter((key) => key !== node.key)
-                  )
-                } else {
-                  setExpandedKeys([...expandedKeys, node.key as string])
-                }
+              if (node.isLeaf) {
+                workFlowStore.set({ curJob: job })
+              } else if (node.expanded) {
+                setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
+              } else {
+                setExpandedKeys([...expandedKeys, node.key as string])
+              }
+
+              if (selected) {
+                setSelectedKeys([String(keys[0])])
               }
             }}
           />
         </TreeWrapper>
       </Tippy>
-      {showFolderModal &&
+      {showOpModal &&
         (() => {
+          const { isLeaf, key } = curOpNode
           const opTxt = {
-            create: '创建',
-            edit: '编辑',
-            move: '移动',
+            create: `创建文件夹`,
+            edit: `编辑文件夹`,
+            move: `移动${curOpWord}${isLeaf ? `: ${key}` : ''}`,
           }[curOp]
           const okTxt = {
             create: '创建',
@@ -374,11 +407,11 @@ export const JobTree = observer(() => {
           }[curOp]
           return (
             <Modal
-              title={`${opTxt}文件夹`}
+              title={opTxt}
               visible
               appendToBody
               width={600}
-              onCancel={() => setShowFolderModal(false)}
+              onCancel={() => setShowOpModal(false)}
               okText={okTxt}
               onOk={() => handleMutate(curOp)}
               confirmLoading={mutation.isLoading}
@@ -415,7 +448,7 @@ export const JobTree = observer(() => {
                   <>
                     <Field>
                       <Label>
-                        <AffixLabel>文件夹名称</AffixLabel>
+                        <AffixLabel>{curOpWord}名称</AffixLabel>
                       </Label>
                       <Control>
                         <Label>{curOpNode.title}</Label>
@@ -468,24 +501,73 @@ export const JobTree = observer(() => {
             </Modal>
           )
         })()}
-      {showConfirm && (
-        <Confirm
-          visible
-          width={400}
-          type="warn"
-          okText="确认"
-          onCancel={() => setShowConfirm(false)}
-          onOk={() => handleMutate('delete')}
-          title={`确认删除文件夹: ${curOpNode?.title}`}
-          appendToBody
-          confirmLoading={mutation.isLoading}
-          showConfirmLoading={mutation.isLoading}
-        >
-          <div>
-            确认删除文件夹：{curOpNode?.title}，该操作无法撤回。确认删除吗？
-          </div>
-        </Confirm>
-      )}
+      {showConfirm &&
+        (() => {
+          const { isLeaf, title } = curOpNode
+          return (
+            <Confirm
+              visible
+              width={400}
+              okText="删除"
+              okType="danger"
+              type={isLeaf ? 'error' : 'warn'}
+              onCancel={() => setShowConfirm(false)}
+              onOk={() => handleMutate('delete')}
+              title={`确认删除${curOpWord}: ${curOpNode?.title}`}
+              appendToBody
+              confirmLoading={mutation.isLoading}
+              showConfirmLoading={mutation.isLoading}
+              footer={
+                <>
+                  <Button onClick={() => setShowConfirm(false)}>
+                    {window.getText('LEGO_UI_CANCEL')}
+                  </Button>
+                  <Button
+                    type="danger"
+                    disabled={isLeaf ? !delBtnEnable : false}
+                    loading={mutation.isLoading}
+                    onClick={() => handleMutate('delete')}
+                  >
+                    删除
+                  </Button>
+                </>
+              }
+            >
+              <div>
+                {!isLeaf ? (
+                  <span>
+                    确认删除{curOpWord}：{title}
+                    ，该操作无法撤回。确认删除吗？
+                  </span>
+                ) : (
+                  <div>
+                    <div tw="font-medium">{` 删除作业 ${title}
+              会同时删除其所有的历史版本及所有的作业实例信息,
+              同时将其从调度系统下线并强制停止正在运行中的作业实例`}</div>
+                    <div tw="pt-6 space-y-1 ">
+                      <div>
+                        <span tw="label-required">
+                          请在下方输入框中输入&quot;delete&quot;以确认操作
+                        </span>
+                      </div>
+                      <div>
+                        <Input
+                          autoComplete="off"
+                          type="text"
+                          tw="w-40 border-line-dark"
+                          placeholder="请输入"
+                          onChange={(e, value) => {
+                            setDelBtnEnable(value === 'delete')
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Confirm>
+          )
+        })()}
       {showJobModal && (
         <JobModal
           op={jobInfo.op}

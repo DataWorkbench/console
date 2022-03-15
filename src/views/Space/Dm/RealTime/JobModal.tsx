@@ -58,7 +58,7 @@ interface JobModalProps {
   op: 'create' | 'edit'
   jobType?: JobType
   jobNode?: TreeNodeProps
-  onClose?: (data?: any) => void
+  onClose?: (created: boolean, op: 'create' | 'edit') => void
 }
 
 export const JobModal = observer(
@@ -80,7 +80,7 @@ export const JobModal = observer(
         jobMode: jobMode || JobMode.RT,
         jobType: jobType || JobType.SQL,
         pid: get(jobNode, isEdit ? 'pid' : 'key') || 'rt-root',
-        job: get(jobNode, 'job'),
+        job: isEdit ? get(jobNode, 'job') : null,
       }
     })
     const { job } = params
@@ -105,7 +105,7 @@ export const JobModal = observer(
         draft.step = 0
       })
       if (onClose) {
-        onClose(created)
+        onClose(created, op)
       }
     }
 
@@ -131,7 +131,8 @@ export const JobModal = observer(
         const fields = form.current.getFieldsValue()
         const data = assign(
           {
-            op: job ? 'update' : 'create',
+            // op: job ? 'update' : 'create',
+            op,
             type: params.jobType,
             ...fields,
             is_directory: false,

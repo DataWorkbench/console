@@ -38,6 +38,10 @@ class WorkFlowStore {
 
   showNotify = false
 
+  showScheSetting = false
+
+  showArgsSetting = false
+
   isDirty = false
 
   tabOp: '' | 'switch' | 'close' | 'leave' = ''
