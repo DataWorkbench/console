@@ -292,7 +292,11 @@ export const ReleaseTable = observer(({ query }: any) => {
         dataIndex: 'id',
         render: (_: String, row: any) => (
           <FlexBox tw="items-center">
-            <Button type="text" onClick={() => handleOperation(row)}>
+            <Button
+              type="text"
+              disabled={row.status === 4}
+              onClick={() => handleOperation(row)}
+            >
               {row.status === 1 ? '暂停' : '恢复'}
             </Button>
             <Divider
