@@ -65,7 +65,7 @@ export const InstanceTable = observer(
       instance_id: '',
       job_id: '',
       version: '',
-      sort_by: '',
+      sort_by: 'created',
       reverse: true,
       offset: 0,
       limit: 10,
