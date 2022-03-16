@@ -23,7 +23,7 @@ const ClusterTableModal = ({
   onCancel?: () => void
   onOk?: (cluster: any) => void
   selectedIds?: string[]
-  visible: boolean
+  visible?: boolean
 }) => {
   const [cluster, setCluster] = useState(null)
   return (

@@ -15,9 +15,9 @@ export enum JobMode {
 /**  作业类型 */
 export enum JobType {
   /** 离线批量 */
-  OFFLINE_BATCH = -1,
+  OFFLINE = 'OFFLINE',
   /** 实时流式 */
-  REALTIME_FLOW = -2,
+  REALTIME = 'REALTIME',
   /** 算子编排 */
   OPERATOR = 1,
   /** SQL模式 */
@@ -40,25 +40,32 @@ export enum TreeIconTheme {
   YELLOW = 'yellow',
 }
 
+export enum RootKey {
+  /** 数据集成 */
+  DI = 'di-root',
+  /** 实时流式开发 */
+  RT = 'rt-root',
+}
+
 export const jobModeData = [
   {
     mode: JobMode.DI,
     title: '数据集成',
     desc: '提供异构数据源之间的数据搬运和数据同步的能力',
-    icon: 'equalizer',
+    icon: 'EqualizerFill',
     selTitle: '同步方式',
     items: [
       {
-        icon: 'inbox1',
+        icon: 'LayerFill',
         title: '离线-批量同步作业',
         desc: '离线批量同步的描述文案，尽量简短，一句话内',
-        value: JobType.OFFLINE_BATCH,
+        value: JobType.OFFLINE,
       },
       {
-        icon: 'inbox0',
+        icon: 'DownloadBoxFill',
         title: '实时-流式同步作业',
         desc: '实时-流式的描述文案，尽量简短，一句话内',
-        value: JobType.REALTIME_FLOW,
+        value: JobType.REALTIME,
       },
     ],
   },
@@ -66,7 +73,7 @@ export const jobModeData = [
     mode: JobMode.RT,
     title: '实时-流式开发',
     desc: '实时开发说明占位文字实时开发说明占位文字实时开发说明占位文字。占位文字',
-    icon: 'flash',
+    icon: 'EventFill',
     selTitle: '实时开发模式',
     items: [
       {
@@ -76,13 +83,13 @@ export const jobModeData = [
         value: JobType.SQL,
       },
       {
-        icon: 'jar',
+        icon: 'JavaFill',
         title: '代码开发-Jar 包模式',
         desc: 'Jar 模式的描述文案，尽量简短，一句话内',
         value: JobType.JAR,
       },
       {
-        icon: 'python',
+        icon: 'PythonFill',
         title: '代码开发-Python 模式',
         desc: 'Python 模式的描述文案，尽量简短，一句话内',
         value: JobType.PYTHON,
@@ -94,7 +101,7 @@ export const jobModeData = [
         value: JobType.SCALA,
       },
       {
-        icon: 'operator',
+        icon: 'Branch2Fill',
         title: '算子编排模式',
         desc: '算子编排模式描述文案，尽量简短，一句话内',
         value: JobType.OPERATOR,
@@ -105,13 +112,13 @@ export const jobModeData = [
     mode: JobMode.OLE,
     title: '离线-批量开发（敬请期待）',
     desc: '离线开发说明占位文字离线开发说明占位文字离线开发说明占位文字。占位文字',
-    icon: 'inbox1',
+    icon: 'DownloadBox2Fill',
     items: [],
   },
 ]
 
 export const getJobMode = (jobType?: JobType) => {
-  if (jobType === JobType.OFFLINE_BATCH || jobType === JobType.REALTIME_FLOW) {
+  if (jobType === JobType.OFFLINE || jobType === JobType.REALTIME) {
     return JobMode.DI
   }
   if (
@@ -128,7 +135,7 @@ export const getJobMode = (jobType?: JobType) => {
   return null
 }
 
-export const isRootNode = (key: any) => ['di-root', 'rt-root'].includes(key)
+export const isRootNode = (key: any) => [RootKey.DI, RootKey.RT].includes(key)
 
 export const getJobIdByKey = (key: string) => (isRootNode(key) ? '' : key)
 
@@ -230,16 +237,16 @@ export const renderIcon = (props) => {
   if (loading) {
     return <Loading size={16} />
   }
-  let iconName = 'folder'
+  let iconName = 'FolderFill'
   let theme: TreeIconTheme = TreeIconTheme.GREY
   if (data) {
     const { key } = data
 
     if (key === 'rt-root') {
-      iconName = 'flash'
+      iconName = 'EventFill'
       theme = TreeIconTheme.BLUE
     } else if (key === 'di-root') {
-      iconName = 'equalizer'
+      iconName = 'EqualizerFill'
       theme = TreeIconTheme.GREEN
     } else if (data.isLeaf) {
       if (data.rootKey === 'rt-root') {
@@ -247,13 +254,13 @@ export const renderIcon = (props) => {
         if (type === JobType.SQL) {
           iconName = 'sql'
         } else if (type === JobType.JAR) {
-          iconName = 'jar'
+          iconName = 'JavaFill'
         } else if (type === JobType.PYTHON) {
-          iconName = 'python'
+          iconName = 'PythonFill'
         }
       }
     } else if (!data.isLeaf || data.children?.length) {
-      iconName = 'folder'
+      iconName = 'FolderFill'
       theme = TreeIconTheme.YELLOW
     }
   }

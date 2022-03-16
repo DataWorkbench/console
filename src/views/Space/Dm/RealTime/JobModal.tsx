@@ -28,12 +28,13 @@ import {
   isRootNode,
   getNewTreeData,
 } from './JobUtils'
+import { SyncTypeRadioGroupField } from './SyncTypeRadioGroup'
 
 const { TextField, TextAreaField } = Form
 
 const FormWrapper = styled('div')(() => [
-  tw`w-[450px]`,
   css`
+    ${tw`w-[668px]`}
     .form {
       ${tw`pl-0`}
       &.is-horizon-layout>.field {
@@ -41,13 +42,16 @@ const FormWrapper = styled('div')(() => [
           ${tw`w-28`}
         }
         > .control {
-          ${tw`max-w-[328px] flex-1`}
+          ${tw`flex-1 max-w-[556px]`}
           .select {
             ${tw`w-full`}
           }
+          .textarea {
+            ${tw`w-[556px] max-w-[556px]`}
+          }
         }
         > .help {
-          ${tw`w-full ml-28`}
+          ${tw`w-full  ml-28`}
         }
       }
     }
@@ -81,6 +85,7 @@ export const JobModal = observer(
         jobType: jobType || JobType.SQL,
         pid: get(jobNode, isEdit ? 'pid' : 'key') || 'rt-root',
         job: isEdit ? get(jobNode, 'job') : null,
+        syncType: 1,
       }
     })
     const { job } = params
@@ -110,6 +115,7 @@ export const JobModal = observer(
     }
 
     const handleItemClick = ({ mode }, type) => {
+      console.log('type', type)
       setParams((draft) => {
         draft.jobMode = mode
         draft.jobType = type
@@ -185,7 +191,7 @@ export const JobModal = observer(
                 type="primary"
                 loading={mutation.isLoading}
                 onClick={handleNext}
-                disabled={params.jobType === -1}
+                disabled={params.jobType === JobType.REALTIME}
               >
                 {params.step === 0 ? '下一步' : '确定'}
               </Button>
@@ -208,11 +214,20 @@ export const JobModal = observer(
               <div tw="flex justify-between space-x-3 2xl:space-x-5 mb-5">
                 {jobModeData.map((modeItem) => {
                   const selected = params.jobMode === modeItem.mode
+                  let defaultType: string | number = -1
+                  if (modeItem.mode === JobMode.DI) {
+                    defaultType = JobType.OFFLINE
+                  } else if (modeItem.mode === JobMode.RT) {
+                    defaultType = JobType.SQL
+                  }
+                  if (selected) {
+                    defaultType = params.jobType
+                  }
                   return (
                     <JobModeItem
                       key={modeItem.mode}
                       jobModeData={modeItem}
-                      defaultType={params.jobType}
+                      defaultType={defaultType}
                       selected={selected}
                       disabled={modeItem.mode === JobMode.OLE}
                       onClick={handleItemClick}
@@ -226,6 +241,33 @@ export const JobModal = observer(
               <div css={[tw`flex justify-center mb-10`]}>
                 <FormWrapper>
                   <Form layout="horizon" ref={form}>
+                    {params.jobMode === JobMode.DI && (
+                      <>
+                        <Field>
+                          <Label>
+                            <AffixLabel>开发模式</AffixLabel>
+                          </Label>
+                          <Control>
+                            {params.jobType === JobType.OFFLINE && (
+                              <span>数据集成-离线同步</span>
+                            )}
+                            {params.jobType === JobType.REALTIME && (
+                              <span>数据集成-实时同步</span>
+                            )}
+                          </Control>
+                        </Field>
+                        <SyncTypeRadioGroupField
+                          label={<AffixLabel>同步类型</AffixLabel>}
+                          name="syncType"
+                          value={params.syncType}
+                          onChange={(v: number) => {
+                            setParams((draft) => {
+                              draft.syncType = v
+                            })
+                          }}
+                        />
+                      </>
+                    )}
                     <TextField
                       autoComplete="off"
                       name="name"

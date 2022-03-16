@@ -24,6 +24,7 @@ import { nameMatchRegex, strlen } from 'utils'
 import { TreeNodeProps } from 'rc-tree'
 import {
   JobType,
+  RootKey,
   findTreeNode,
   getNewTreeData,
   removeTreeNode,
@@ -134,8 +135,16 @@ export const JobTree = observer(() => {
         })
 
         setShowJobModal(true)
-      } else if (val === 'sche') {
-        workFlowStore.set({ curJob: get(curOpNode, 'job') })
+      } else if (val === 'scheSetting') {
+        workFlowStore.set({
+          curJob: get(curOpNode, 'job'),
+          showScheSetting: true,
+        })
+      } else if (val === 'argsSetting') {
+        workFlowStore.set({
+          curJob: get(curOpNode, 'job'),
+          showArgsSetting: true,
+        })
       }
     },
     [curOpNode, setJobInfo, workFlowStore]
@@ -156,7 +165,7 @@ export const JobTree = observer(() => {
               <Icons name="NoteGearFill" size={14} tw="mr-2" />
               <span>移动作业</span>
             </MenuItem>
-            <MenuItem value="association">
+            <MenuItem value="association" disabled>
               <Icon
                 name="listview"
                 size={14}
@@ -168,15 +177,15 @@ export const JobTree = observer(() => {
               />
               <span>关联实例</span>
             </MenuItem>
-            <MenuItem value="sche">
+            <MenuItem value="scheSetting">
               <Icons name="Topology2Fill" size={14} tw="mr-2" />
               <span>调度设置</span>
             </MenuItem>
-            <MenuItem value="args">
+            <MenuItem value="scheSetting">
               <Icons name="Topology3Fill" size={14} tw="mr-2" />
               <span>运行参数配置</span>
             </MenuItem>
-            <MenuItem value="history">
+            <MenuItem value="history" disabled>
               <Icons name="Book3Fill" size={14} tw="mr-2" />
               <span>历史版本</span>
             </MenuItem>
@@ -188,40 +197,59 @@ export const JobTree = observer(() => {
         )
       }
       const isRoot = isRootNode(node.key)
+      const isRtRoot = node.key === RootKey.RT
+      const isDiRoot = node.key === RootKey.DI
       return (
         <Menu onClick={onRightMenuClick}>
           <MenuItem value="create">
-            <Icons name="folderAdd" size={14} tw="mr-2" />
+            <Icons name="FolderAddFill" size={14} tw="mr-2" />
             <span>创建{isRoot ? '' : '子'}文件夹</span>
           </MenuItem>
           {!isRoot && (
-            <MenuItem value="move">
-              <Icons name="folderHistory" size={14} tw="mr-2" />
-              <span>移动文件夹</span>
-            </MenuItem>
+            <>
+              <MenuItem value="move" onClick={onRightMenuClick}>
+                <Icons name="FolderHistoryFill" size={14} tw="mr-2" />
+                <span>移动文件夹</span>
+              </MenuItem>
+              <MenuItem value="edit" onClick={onRightMenuClick}>
+                <Icon name="edit" size={14} type="light" tw="mr-2" />
+                <span>编辑文件夹</span>
+              </MenuItem>
+            </>
           )}
-          {!isRoot && (
-            <MenuItem value="edit">
-              <Icon name="edit" size={14} type="light" tw="mr-2" />
-              <span>编辑文件夹</span>
-            </MenuItem>
+          {isDiRoot && (
+            <>
+              <MenuItem value={JobType.REALTIME} onClick={onRightMenuClick}>
+                <Icons name="LayerFill" size={14} tw="mr-2" />
+                <span>创建实时同步作业</span>
+              </MenuItem>
+              <MenuItem value={JobType.OFFLINE} onClick={onRightMenuClick}>
+                <Icons name="DownloadBoxFill" size={14} tw="mr-2" />
+                <span>创建离线同步作业</span>
+              </MenuItem>
+            </>
           )}
-          <MenuItem value={JobType.SQL}>
-            <Icons name="sql" size={14} tw="mr-2" />
-            <span>SQL 模式</span>
-          </MenuItem>
-          <MenuItem value={JobType.PYTHON}>
-            <Icons name="python" size={14} tw="mr-2" />
-            <span>Python 模式</span>
-          </MenuItem>
-          <MenuItem value={JobType.JAR}>
-            <Icons name="jar" size={14} tw="mr-2" />
-            <span>Jar 包模式</span>
-          </MenuItem>
-          <MenuItem disabled>
-            <Icons name="operator" size={14} tw="mr-2" />
-            <span>算子编排模式</span>
-          </MenuItem>
+          {isRtRoot && (
+            <>
+              <MenuItem value={JobType.SQL} onClick={onRightMenuClick}>
+                <Icons name="sql" size={14} tw="mr-2" />
+                <span>SQL 模式</span>
+              </MenuItem>
+              <MenuItem value={JobType.PYTHON} onClick={onRightMenuClick}>
+                <Icons name="PythonFill" size={14} tw="mr-2" />
+                <span>Python 模式</span>
+              </MenuItem>
+              <MenuItem value={JobType.JAR} onClick={onRightMenuClick}>
+                <Icons name="JavaFill" size={14} tw="mr-2" />
+                <span>Jar 包模式</span>
+              </MenuItem>
+              <MenuItem disabled onClick={onRightMenuClick}>
+                <Icons name="Branch2Fill" size={14} tw="mr-2" />
+                <span>算子编排模式</span>
+              </MenuItem>
+            </>
+          )}
+
           {!isRoot && (
             <MenuItem value="delete">
               <Icon name="delete" size={14} type="light" />

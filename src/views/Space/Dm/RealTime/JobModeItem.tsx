@@ -8,7 +8,7 @@ interface JobModeItemProps {
   disabled?: boolean
   onClick?: (jobModeData: any, jobType: string | number) => void
   onTypeItemChange?: (item: any) => void
-  defaultType?: string
+  defaultType?: string | number
   jobModeData: any
 }
 
