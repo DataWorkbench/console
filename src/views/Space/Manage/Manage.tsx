@@ -3,6 +3,7 @@ import { ContentBox } from 'components'
 import Setting from './Setting'
 import { Sider } from '../Sider'
 import Member from './Member'
+import PermissionList from './Permissions'
 
 function Manage() {
   const { mod } = useParams<{ mod: string }>()
@@ -13,6 +14,7 @@ function Manage() {
         <div tw="p-5">
           {(mod === 'setting' || !mod) && <Setting />}
           {mod === 'member' && <Member />}
+          {mod === 'permissions' && <PermissionList />}
         </div>
       </ContentBox>
     </div>

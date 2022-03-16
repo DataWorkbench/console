@@ -6,6 +6,7 @@ import {
   deleteMember,
   loadMemberList,
   loadRoleList,
+  loadRolePermissionList,
   updateMember,
 } from 'stores/api'
 
@@ -54,6 +55,20 @@ export const useQueryRoleList = (
   )
 }
 
+export const useQueryRolePermissionList = (
+  params: Record<string, any> = {},
+  option: Record<string, any> = {}
+) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const queryKey = ['rolePermissions', { regionId, spaceId, ...params }]
+  return useQuery(
+    queryKey,
+    async () => loadRolePermissionList({ regionId, spaceId, ...params }),
+    {
+      ...option,
+    }
+  )
+}
 export const useMutationMember = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async ({ op, ...rest }: Record<string, any>) => {
