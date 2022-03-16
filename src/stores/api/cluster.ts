@@ -12,6 +12,19 @@ export const listAvailableFlinkVersions = ({ regionId, spaceId }: IParams) =>
     uri: `/v1/workspace/${spaceId}/cluster/flink/versions`,
   })
 
+export const describeResourceBinding = ({
+  regionId,
+  spaceId,
+  ids = [],
+}: IParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/binding/resources?${(ids as string[])
+      .map((id) => `ids=${id}`)
+      .join('&')}`,
+    method: 'GET',
+  })
+
 export const listFlinkClusters = ({ regionId, spaceId, ...rest }: IParams) =>
   request({
     region: regionId,

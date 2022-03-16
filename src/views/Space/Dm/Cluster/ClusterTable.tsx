@@ -1,6 +1,6 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { useImmer } from 'use-immer'
-import { Menu } from '@QCFE/lego-ui'
+import { Menu, Checkbox } from '@QCFE/lego-ui'
 import { useParams } from 'react-router-dom'
 import {
   Button,
@@ -9,6 +9,8 @@ import {
   Table,
   ToolBar,
   localstorage,
+  Loading,
+  Modal as LegoModal,
 } from '@QCFE/qingcloud-portal-ui'
 import {
   FlexBox,
@@ -26,8 +28,10 @@ import {
   useQueryFlinkClusters,
   getFlinkClusterKey,
   useMutationCluster,
+  useMutationReleaseJobs,
+  useQueryBindResouce,
 } from 'hooks'
-import { get, omitBy, pick } from 'lodash-es'
+import { get, omitBy, pick, concat } from 'lodash-es'
 import dayjs from 'dayjs'
 import tw, { styled, css, theme } from 'twin.macro'
 import { useWindowSize } from 'react-use'
@@ -133,9 +137,18 @@ const ClusterTable = observer(
     const [opclusterList, setOpClusterList] = useState<any[]>([])
     const [selectedRowKeys, setSelectedRowKeys] =
       useState<string[]>(selectedIds)
+    const stopRunningRef = useRef<boolean>(false)
     const [columnSettings, setColumnSettings] = useState(
       localstorage.getItem(columnSettingsKey) || []
     )
+
+    const { ret: bindResourceRet, key: bindResKey } = useQueryBindResouce(
+      opclusterList.map((row) => row.id),
+      {
+        enabled: (op === 'delete' || op === 'stop') && opclusterList.length > 0,
+      }
+    )
+
     const [filter, setFilter] = useImmer<IFilter>({
       offset: 0,
       limit: 10,
@@ -147,6 +160,8 @@ const ClusterTable = observer(
     })
     const queryClient = useQueryClient()
     const mutation = useMutationCluster()
+    const releaseMutation = useMutationReleaseJobs()
+
     useEffect(() => {
       if (selectMode) {
         // && selectedIds.length
@@ -489,13 +504,60 @@ const ClusterTable = observer(
     //       info.status !== 4
     //   ) || []
 
+    const handleJobOffLine = (job) => {
+      LegoModal.warning({
+        confirmLoading: mutation.isLoading,
+        title: `下线作业 ${job.name}`,
+        okType: 'danger',
+        okText: '下线',
+        content: (
+          <>
+            <div tw="text-neut-8 mb-2">
+              作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?
+            </div>
+            <Checkbox
+              tw="text-white!"
+              defaultChecked={stopRunningRef.current}
+              onChange={(_: any, checked: boolean) => {
+                stopRunningRef.current = checked
+              }}
+            >
+              同时停止运行中的实例
+            </Checkbox>
+          </>
+        ),
+        onOk: () => {
+          releaseMutation.mutate(
+            {
+              op: 'stop',
+              jobId: job.id,
+              stopRunning: stopRunningRef.current,
+            },
+            {
+              onSuccess: () => {
+                queryClient.invalidateQueries(bindResKey)
+              },
+            }
+          )
+        },
+      })
+    }
+
+    // console.log('onRender stopRunningRef: ', stopRunningRef.current)
     const filterColumn = columnSettings
       .map((o: { key: string; checked: boolean }) => {
         return o.checked && columns.find((col) => col.dataIndex === o.key)
       })
       .filter((o) => o)
     const opWordInfo = { start: '启动', stop: '停用', delete: '删除' }
+    const { data: bindResData } = bindResourceRet
 
+    const bindResDataJobs = useMemo(() => {
+      const streamJob = get(bindResData, 'infos[0].stream_job') || []
+      const syncJob = get(bindResData, 'infos[0].sync_job') || []
+      return concat(streamJob, syncJob).filter((job) => job.status === 1)
+    }, [bindResData])
+    const hasBindRes = bindResDataJobs.length > 0
     return (
       <FlexBox tw="w-full flex-1" orient="column">
         <div tw="mb-3">
@@ -626,17 +688,39 @@ const ClusterTable = observer(
         {(op === 'create' || op === 'update' || op === 'view') && (
           <ClusterModal opCluster={opclusterList[0]} />
         )}
+
         {(op === 'start' || op === 'stop' || op === 'delete') && (
           <Modal
             noBorder
             visible
             draggable
-            width={opclusterList.length > 1 ? 600 : 400}
+            width={
+              opclusterList.length > 1 || (op !== 'start' && hasBindRes)
+                ? 800
+                : 400
+            }
             onCancel={() => setOp('')}
-            okText={opWordInfo[op]}
-            onOk={mutateData}
-            okType={op === 'start' ? 'primary' : 'danger'}
-            confirmLoading={mutation.isLoading}
+            footer={
+              <>
+                {(op === 'start' ||
+                  (!bindResourceRet.isFetching && !hasBindRes)) && (
+                  <div tw="flex justify-end">
+                    <Button onClick={() => setOp('')}>取消</Button>
+                    <Button
+                      type={op === 'start' ? 'primary' : 'danger'}
+                      onClick={mutateData}
+                      loading={mutation.isLoading}
+                    >
+                      {opWordInfo[op]}
+                    </Button>
+                  </div>
+                )}
+              </>
+            }
+            // okText={opWordInfo[op]}
+            // onOk={mutateData}
+            // okType={op === 'start' ? 'primary' : 'danger'}
+            // confirmLoading={mutation.isLoading}
           >
             <FlexBox tw="mb-3">
               <Icon
@@ -682,13 +766,90 @@ const ClusterTable = observer(
                   return (
                     <>
                       <div tw="font-medium mb-2 text-base break-all">
-                        {clusterText}注意事项
+                        {clusterText}
+                        {hasBindRes && '注意事项'}
                       </div>
-                      <div className="modal-content-message" tw="break-all">
-                        {clusterText}后，已发布的作业和正在运行中实例会受到影响
-                        {op === 'stop'
-                          ? `。确认${opText}吗？`
-                          : ', 且该操作无法撤回。确认删除吗？'}
+                      <div
+                        className="modal-content-message"
+                        tw="break-all text-neut-8"
+                      >
+                        {bindResourceRet.isFetching ? (
+                          <div tw="h-20">
+                            <Loading />
+                          </div>
+                        ) : (
+                          <>
+                            {hasBindRes ? (
+                              <>
+                                <div tw="mb-6">
+                                  当前集群存在已发布作业，将已发布作业下线后，可
+                                  {opText}计算集群
+                                </div>
+                                <div tw="text-white leading-[48px]">
+                                  <Table
+                                    dataSource={bindResDataJobs}
+                                    rowKey="id"
+                                    columns={[
+                                      { title: '作业名称', dataIndex: 'name' },
+                                      { title: '作业ID', dataIndex: 'id' },
+                                      {
+                                        title: '操作',
+                                        dataIndex: '',
+                                        render: (field, row) => (
+                                          <Button
+                                            loading={releaseMutation.isLoading}
+                                            onClick={() => {
+                                              handleJobOffLine(row)
+                                            }}
+                                          >
+                                            下线
+                                          </Button>
+                                        ),
+                                      },
+                                    ]}
+                                  />
+                                  {/* <div tw="border-b border-b-neut-13 pl-4">
+                                    作业ID
+                                  </div>
+                                  <>
+                                    {bindResDataJobs.map((item: any) => (
+                                      <div
+                                        key={item.id}
+                                        tw="flex items-center border-b border-b-neut-13 pl-4 font-medium"
+                                      >
+                                        <Center
+                                          tw="bg-neut-13 rounded-full w-7 h-7 mr-1.5 border-2 border-solid border-neut-16 "
+                                          className="release-icon"
+                                        >
+                                          <Icons
+                                            name="stream-release"
+                                            size={16}
+                                          />
+                                        </Center>
+                                        <div>
+                                          {item.name} : {item.id}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </> */}
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                {op === 'stop'
+                                  ? `确认${opText}计算集群`
+                                  : `${opText}后无法恢复，确认删除计算集群`}
+                                {opclusterList
+                                  .map(
+                                    (cluster) =>
+                                      `${cluster.name}(${cluster.id})`
+                                  )
+                                  .join(' ')}
+                                {` ?`}
+                              </>
+                            )}
+                          </>
+                        )}
                       </div>
                     </>
                   )
