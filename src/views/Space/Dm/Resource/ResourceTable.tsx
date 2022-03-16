@@ -166,7 +166,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
                     }}
                   />
                 </div>
-                <TextEllipsis tw="font-medium">{value}</TextEllipsis>
+                <TextEllipsis twStyle={tw`font-medium`}>{value}</TextEllipsis>
               </FlexBox>
             )
           },
