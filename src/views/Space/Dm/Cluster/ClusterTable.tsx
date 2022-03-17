@@ -553,9 +553,9 @@ const ClusterTable = observer(
     const { data: bindResData } = bindResourceRet
 
     const bindResDataJobs = useMemo(() => {
-      const streamJob = get(bindResData, 'infos[0].stream_job') || []
-      const syncJob = get(bindResData, 'infos[0].sync_job') || []
-      return concat(streamJob, syncJob).filter((job) => job.status === 1)
+      const streamJob = get(bindResData, 'infos[0].stream_job_version') || []
+      const syncJob = get(bindResData, 'infos[0].sync_job_version') || []
+      return concat(streamJob, syncJob)
     }, [bindResData])
     const hasBindRes = bindResDataJobs.length > 0
     return (
