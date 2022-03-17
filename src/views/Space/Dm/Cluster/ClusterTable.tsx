@@ -137,7 +137,10 @@ const ClusterTable = observer(
     const [opclusterList, setOpClusterList] = useState<any[]>([])
     const [selectedRowKeys, setSelectedRowKeys] =
       useState<string[]>(selectedIds)
-    const stopRunningRef = useRef<boolean>(false)
+    const offLineRef = useRef({
+      stopRunning: false,
+      jobId: null,
+    })
     const [columnSettings, setColumnSettings] = useState(
       localstorage.getItem(columnSettingsKey) || []
     )
@@ -505,6 +508,7 @@ const ClusterTable = observer(
     //   ) || []
 
     const handleJobOffLine = (job) => {
+      offLineRef.current.jobId = job.id
       LegoModal.warning({
         confirmLoading: mutation.isLoading,
         title: `下线作业 ${job.name}`,
@@ -517,9 +521,9 @@ const ClusterTable = observer(
             </div>
             <Checkbox
               tw="text-white!"
-              defaultChecked={stopRunningRef.current}
+              defaultChecked={get(offLineRef.current, 'stopRunning') || false}
               onChange={(_: any, checked: boolean) => {
-                stopRunningRef.current = checked
+                offLineRef.current.stopRunning = checked
               }}
             >
               同时停止运行中的实例
@@ -531,7 +535,7 @@ const ClusterTable = observer(
             {
               op: 'stop',
               jobId: job.id,
-              stopRunning: stopRunningRef.current,
+              stopRunning: get(offLineRef.current, 'stopRunning') || false,
             },
             {
               onSuccess: () => {
@@ -543,7 +547,7 @@ const ClusterTable = observer(
       })
     }
 
-    // console.log('onRender stopRunningRef: ', stopRunningRef.current)
+    // console.log('onRender offLineRef: ', offLineRef.current)
     const filterColumn = columnSettings
       .map((o: { key: string; checked: boolean }) => {
         return o.checked && columns.find((col) => col.dataIndex === o.key)
@@ -553,8 +557,8 @@ const ClusterTable = observer(
     const { data: bindResData } = bindResourceRet
 
     const bindResDataJobs = useMemo(() => {
-      const streamJob = get(bindResData, 'infos[0].stream_job_version') || []
-      const syncJob = get(bindResData, 'infos[0].sync_job_version') || []
+      const streamJob = get(bindResData, 'infos[0].stream_job_release') || []
+      const syncJob = get(bindResData, 'infos[0].sync_job_release') || []
       return concat(streamJob, syncJob)
     }, [bindResData])
     const hasBindRes = bindResDataJobs.length > 0
@@ -797,7 +801,13 @@ const ClusterTable = observer(
                                         dataIndex: '',
                                         render: (field, row) => (
                                           <Button
-                                            loading={releaseMutation.isLoading}
+                                            loading={
+                                              get(
+                                                offLineRef,
+                                                'current.jobId'
+                                              ) === row.id &&
+                                              releaseMutation.isLoading
+                                            }
                                             onClick={() => {
                                               handleJobOffLine(row)
                                             }}
