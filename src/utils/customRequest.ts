@@ -30,10 +30,13 @@ client.interceptors.response.use(
         content: error.message,
       })
     } else if (error.response) {
-      const message = getMessage(error.response.data)
-      error.response.data.message = message
+      const msg = getMessage(error.response.data)
+      if (msg) {
+        error.response.data.message = msg
+      }
       const {
         response: { status },
+        message,
       } = error
       emitter.emit('error', {
         title: `网络错误: [${status}]`,
