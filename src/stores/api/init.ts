@@ -11,15 +11,13 @@ export const describeDataomnis = () => {
     console_id: console,
   }
 
-  const formdata = new FormData()
-  formdata.append('params', JSON.stringify(params))
   return customRequest({
     url: '/api/?action=DescribeDataomnis',
-    params: formdata,
+    params: `params=${encodeURIComponent(JSON.stringify(params))}`,
     headers: {
       'X-CSRFToken': Cookies.get('csrftoken'),
     },
-  })
+  }).catch(() => null)
 }
 
 export const activateDataomnis = () => {
@@ -31,11 +29,9 @@ export const activateDataomnis = () => {
     console_id: console,
   }
 
-  const formdata = new FormData()
-  formdata.append('params', JSON.stringify(params))
   return customRequest({
     url: '/api/?action=ActivateDataomnis',
-    params: formdata,
+    params: `params=${encodeURIComponent(JSON.stringify(params))}`,
     headers: {
       'X-CSRFToken': Cookies.get('csrftoken'),
     },
