@@ -43,6 +43,16 @@ const red = {
   0: '#fff9fa',
 }
 
+const enfiBlue = {
+  13: '#013E74',
+  12: '#014581',
+  11: '#024D8E',
+  4: '#85B0D6',
+  3: '#9FC2E0',
+  1: '#D8E7F5',
+  0: '#F7FBFF',
+}
+
 module.exports = {
   darkMode: 'class',
   theme: {
@@ -52,7 +62,7 @@ module.exports = {
       black: colors.black,
       white: colors.white,
       red,
-      green,
+      green: enfiBlue,
       neut,
       error: {
         DEFAULT: red[10],

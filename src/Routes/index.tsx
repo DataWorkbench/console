@@ -4,20 +4,20 @@ import { useStore } from 'stores'
 import { useDarkMode } from 'hooks'
 
 // describeDataOmnis
-const DescribeDataOmnis = lazy(
-  () =>
-    import(
-      /* webpackChunkName: "describeDataOmnis" */ 'views/DataOmnis/DescribeDataOmnis'
-    )
-)
+// const DescribeDataOmnis = lazy(
+//   () =>
+//     import(
+//       /* webpackChunkName: "describeDataOmnis" */ 'views/DataOmnis/DescribeDataOmnis'
+//     )
+// )
 
-// activateDataOmnis
-const ActivateDataOmnis = lazy(
-  () =>
-    import(
-      /* webpackChunkName: "activateDataOmnis" */ 'views/DataOmnis/ActivateDataOmnis'
-    )
-)
+// // activateDataOmnis
+// const ActivateDataOmnis = lazy(
+//   () =>
+//     import(
+//       /* webpackChunkName: "activateDataOmnis" */ 'views/DataOmnis/ActivateDataOmnis'
+//     )
+// )
 
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
@@ -58,21 +58,21 @@ const Routes = () => {
     globalStore.set({ darkMode: matched })
   }, [matched, setDarkMode, globalStore])
 
-  const isActivated = localStorage.getItem('DATA_OMNIS_OPENED')
+  // const isActivated = localStorage.getItem('DATA_OMNIS_OPENED')
 
-  if (!isActivated) {
-    return (
-      <Route>
-        <Layout>
-          <Switch>
-            <Route path="/describe" component={DescribeDataOmnis} />
-            <Route path="/activate" component={ActivateDataOmnis} />
-            <Route path="/" component={() => <Redirect to="/describe" />} />
-          </Switch>
-        </Layout>
-      </Route>
-    )
-  }
+  // if (!isActivated) {
+  //   return (
+  //     <Route>
+  //       <Layout>
+  //         <Switch>
+  //           <Route path="/describe" component={DescribeDataOmnis} />
+  //           <Route path="/activate" component={ActivateDataOmnis} />
+  //           <Route path="/" component={() => <Redirect to="/describe" />} />
+  //         </Switch>
+  //       </Layout>
+  //     </Route>
+  //   )
+  // }
 
   return (
     <Switch>

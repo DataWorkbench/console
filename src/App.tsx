@@ -1,23 +1,15 @@
 import { useState, Suspense } from 'react'
+import { useMount } from 'react-use'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
-import {
-  PortalProvider,
-  Notification as Notify,
-  Loading,
-} from '@QCFE/qingcloud-portal-ui'
+import { Notification as Notify, Loading } from '@QCFE/qingcloud-portal-ui'
 import { RootStore, StoreContext } from 'stores'
-import { get, set } from 'lodash-es'
+import { set } from 'lodash-es'
 import emitter from 'utils/emitter'
-import { describeDataomnis } from 'stores/api'
+import { LocaleProvider } from '@QCFE/lego-ui'
 import locales from './locales'
 import Routes from './Routes'
-
-const langMapping: { [key: string]: string | undefined } = {
-  'zh-cn': 'zh-CN',
-  en: 'en-US',
-}
 
 emitter.off('error')
 emitter.on('error', ({ title, content }: any) =>
@@ -50,29 +42,15 @@ const App = () => {
       set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
     }
 
-    const currentUser = get(window, 'USER.user_id', '')
-    const registerUser = localStorage.getItem('DATA_OMNIS_OPENED')
-    const isActivated = registerUser && registerUser === currentUser
-    if (!isActivated) {
-      const ret = await describeDataomnis()
-      if (ret?.ret_code === 0 && ret.status === 'enable') {
-        localStorage.setItem('DATA_OMNIS_OPENED', currentUser)
-      } else {
-        localStorage.removeItem('DATA_OMNIS_OPENED')
-      }
-    }
-
     setLoading(false)
   }
 
+  useMount(() => {
+    handleGlobalData()
+  })
+
   return (
-    <PortalProvider
-      service="dataomnis"
-      isPush={false}
-      locales={locales}
-      currentLocale={langMapping[window.USER?.lang] || 'zh-CN'}
-      handleGlobalData={handleGlobalData}
-    >
+    <LocaleProvider locales={locales} currentLocale="zh-CN" ignoreWarnings>
       <StoreContext.Provider value={store}>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools
@@ -98,7 +76,7 @@ const App = () => {
           )}
         </QueryClientProvider>
       </StoreContext.Provider>
-    </PortalProvider>
+    </LocaleProvider>
   )
 }
 
