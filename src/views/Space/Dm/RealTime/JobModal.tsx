@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState } from 'react'
+import { useRef, useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import {
   Modal,
@@ -8,7 +8,7 @@ import {
   SelectTreeField,
 } from 'components'
 import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
-import { get, assign } from 'lodash-es'
+import { get, assign, cloneDeep } from 'lodash-es'
 import { useWindowSize } from 'react-use'
 import tw, { css, styled } from 'twin.macro'
 import { TreeNodeProps } from 'rc-tree'
@@ -27,8 +27,10 @@ import {
   renderSwitcherIcon,
   isRootNode,
   getNewTreeData,
+  filterFolderOfTreeData,
+  RootKey,
 } from './JobUtils'
-import { SyncTypeRadioGroupField } from './SyncTypeRadioGroup'
+import { SyncTypeRadioGroupField, SyncTypeVal } from './SyncTypeRadioGroup'
 
 const { TextField, TextAreaField } = Form
 
@@ -66,7 +68,12 @@ interface JobModalProps {
 }
 
 export const JobModal = observer(
-  ({ op = 'create', jobType, jobNode, onClose }: JobModalProps) => {
+  ({
+    op = 'create',
+    jobType = JobType.SQL,
+    jobNode,
+    onClose,
+  }: JobModalProps) => {
     const fetchJob = useFetchJob()
     const {
       workFlowStore,
@@ -80,16 +87,42 @@ export const JobModal = observer(
       const jobMode = getJobMode(jobType)
       const isEdit = op === 'edit'
       return {
-        step: !isEdit && !jobMode ? 0 : 1,
-        jobMode: jobMode || JobMode.RT,
-        jobType: jobType || JobType.SQL,
-        pid: get(jobNode, isEdit ? 'pid' : 'key') || 'rt-root',
+        step: !isEdit && !jobNode ? 0 : 1,
+        jobMode,
+        jobType,
+        pid: jobNode ? get(jobNode, isEdit ? 'pid' : 'key') : '',
         job: isEdit ? get(jobNode, 'job') : null,
-        syncType: 1,
+        syncTypeInfo: {
+          type: 1,
+          source: '',
+          target: '',
+        },
       }
     })
+    const sources = useRef([
+      'MySQL',
+      'SQLServer',
+      'PostgreSQL',
+      'Oracle',
+      'DB2',
+      'ClickHouse',
+      'MongoDB',
+      'ElasticSearch',
+      'SAP HANA',
+      'FTP',
+      'HDFS',
+      'HBase',
+    ])
     const { job } = params
     const mutation = useMutationStreamJob()
+
+    useEffect(() => {
+      if (jobType) {
+        setParams((draft) => {
+          draft.jobMode = getJobMode(jobType)
+        })
+      }
+    }, [jobType, setParams])
 
     const fetchJobTreeData = (node: any) => {
       return fetchJob({
@@ -115,7 +148,6 @@ export const JobModal = observer(
     }
 
     const handleItemClick = ({ mode }, type) => {
-      console.log('type', type)
       setParams((draft) => {
         draft.jobMode = mode
         draft.jobType = type
@@ -259,12 +291,37 @@ export const JobModal = observer(
                         <SyncTypeRadioGroupField
                           label={<AffixLabel>同步类型</AffixLabel>}
                           name="syncType"
-                          value={params.syncType}
-                          onChange={(v: number) => {
+                          value={params.syncTypeInfo as SyncTypeVal}
+                          sourceData={sources.current.map((item) => ({
+                            label: item,
+                            value: item,
+                          }))}
+                          targetData={sources.current.map((item) => ({
+                            label: item,
+                            value: item,
+                          }))}
+                          onChange={(v) => {
                             setParams((draft) => {
-                              draft.syncType = v
+                              draft.syncTypeInfo = v
                             })
                           }}
+                          validateOnChange
+                          schemas={[
+                            {
+                              rule: (value: SyncTypeVal) => {
+                                // console.log(value)
+                                if (
+                                  value.type === 1 &&
+                                  (value.source === '' || value.target === '')
+                                ) {
+                                  return false
+                                }
+                                return true
+                              },
+                              help: '请选择同步数据源',
+                              status: 'error',
+                            },
+                          ]}
                         />
                       </>
                     )}
@@ -310,7 +367,13 @@ export const JobModal = observer(
                       ]}
                       icon={renderIcon}
                       switcherIcon={renderSwitcherIcon}
-                      treeData={treeData}
+                      treeData={filterFolderOfTreeData(
+                        cloneDeep(
+                          treeData.filter(
+                            (item) => item.key === RootKey[params.jobMode]
+                          )
+                        )
+                      )}
                       loadData={fetchJobTreeData}
                       loadedKeys={loadedKeys}
                       onLoad={(keys: string | number) =>

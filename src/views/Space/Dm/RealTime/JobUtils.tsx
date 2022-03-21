@@ -45,6 +45,8 @@ export enum RootKey {
   DI = 'di-root',
   /** 实时流式开发 */
   RT = 'rt-root',
+  /** 离线批量开发 */
+  OLE = 'ole-root',
 }
 
 export const jobModeData = [
@@ -132,7 +134,7 @@ export const getJobMode = (jobType?: JobType) => {
   if (jobType === JobType.OPERATOR) {
     return JobMode.OLE
   }
-  return null
+  return JobMode.RT
 }
 
 export const isRootNode = (key: any) => [RootKey.DI, RootKey.RT].includes(key)
@@ -156,7 +158,7 @@ export const findTreeNode: any = (treeData: any[], nodeKey: string) => {
 
 export const filterFolderOfTreeData = (
   treeNodeData: any[],
-  excludeKey?: string | number
+  excludeKey: string | number = ''
 ) => {
   const newTreeData = treeNodeData.filter((node) => {
     if (node.key === excludeKey) {

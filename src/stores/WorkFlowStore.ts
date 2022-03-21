@@ -14,14 +14,14 @@ interface IJob {
 const initTreeData = [
   {
     key: 'di-root',
-    pid: '',
+    pid: 'di-root',
     title: '数据集成',
     isLeaf: false,
     children: [],
   },
   {
     key: 'rt-root',
-    pid: '',
+    pid: 'rt-root',
     title: '实时-流式开发',
     isLeaf: false,
     children: [],

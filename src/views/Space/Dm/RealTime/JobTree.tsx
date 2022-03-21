@@ -197,8 +197,8 @@ export const JobTree = observer(() => {
         )
       }
       const isRoot = isRootNode(node.key)
-      const isRtRoot = node.key === RootKey.RT
-      const isDiRoot = node.key === RootKey.DI
+      const isRt = node.key === RootKey.RT || node.rootKey === RootKey.RT
+      const isDi = node.key === RootKey.DI || node.rootKey === RootKey.DI
       return (
         <Menu onClick={onRightMenuClick}>
           <MenuItem value="create">
@@ -217,7 +217,7 @@ export const JobTree = observer(() => {
               </MenuItem>
             </>
           )}
-          {isDiRoot && (
+          {isDi && (
             <>
               <MenuItem value={JobType.REALTIME} onClick={onRightMenuClick}>
                 <Icons name="LayerFill" size={14} tw="mr-2" />
@@ -229,7 +229,7 @@ export const JobTree = observer(() => {
               </MenuItem>
             </>
           )}
-          {isRtRoot && (
+          {isRt && (
             <>
               <MenuItem value={JobType.SQL} onClick={onRightMenuClick}>
                 <Icons name="sql" size={14} tw="mr-2" />
@@ -262,9 +262,8 @@ export const JobTree = observer(() => {
     [onRightMenuClick]
   )
   const fetchJobTreeData = (node: any, movingNode = null) => {
-    const pid = getJobIdByKey(node.key)
     return fetchJob({
-      pid,
+      pid: getJobIdByKey(node.key),
     })
       .then((data) => {
         const jobs = get(data, 'infos') || []
