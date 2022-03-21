@@ -12,6 +12,7 @@ import { omit } from 'lodash-es'
 
 import {
   createStreamJob,
+  CreateSyncJob,
   updateStreamJob,
   moveStreamJob,
   deleteStreamJobs,
@@ -28,6 +29,7 @@ import {
   streamJobCodeSyntax,
   streamJobCodeRun,
 } from 'stores/api'
+import { JobMode } from 'views/Space/Dm/RealTime/JobUtils'
 
 interface IRouteParams {
   regionId: string
@@ -65,22 +67,34 @@ export const useFetchJob = () => {
 
 export const useMutationStreamJob = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  return useMutation(async ({ op, ...rest }: IWorkFlowParams) => {
-    const params = { ...rest, regionId, spaceId }
-    if (op === 'create') {
-      return createStreamJob(params)
+  return useMutation(
+    async ({
+      op,
+      jobMode,
+      ...rest
+    }: IWorkFlowParams & { jobMode: JobMode }) => {
+      const params = { ...rest, regionId, spaceId }
+      if (op === 'create') {
+        if (jobMode === JobMode.OLE) {
+          return createStreamJob(params)
+        }
+        if (jobMode === JobMode.DI) {
+          return CreateSyncJob(params)
+        }
+        return null
+      }
+      if (op === 'update' || op === 'edit') {
+        return updateStreamJob(params)
+      }
+      if (op === 'move') {
+        return moveStreamJob(params)
+      }
+      if (op === 'delete') {
+        return deleteStreamJobs(params)
+      }
+      return null
     }
-    if (op === 'update' || op === 'edit') {
-      return updateStreamJob(params)
-    }
-    if (op === 'move') {
-      return moveStreamJob(params)
-    }
-    if (op === 'delete') {
-      return deleteStreamJobs(params)
-    }
-    return null
-  })
+  )
 }
 
 let infiniteQueryKey: any = ''
