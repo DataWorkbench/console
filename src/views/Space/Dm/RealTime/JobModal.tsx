@@ -8,7 +8,7 @@ import {
   SelectTreeField,
 } from 'components'
 import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
-import { get, assign, cloneDeep } from 'lodash-es'
+import { get, cloneDeep } from 'lodash-es'
 import { useWindowSize } from 'react-use'
 import tw, { css, styled } from 'twin.macro'
 import { TreeNodeProps } from 'rc-tree'
@@ -93,26 +93,14 @@ export const JobModal = observer(
         pid: jobNode ? get(jobNode, isEdit ? 'pid' : 'key') : '',
         job: isEdit ? get(jobNode, 'job') : null,
         syncTypeInfo: {
-          type: 1,
-          source: '',
-          target: '',
-        },
+          type: 'full',
+          fullSource: '',
+          fullSink: '',
+          incrSource: '',
+          incrSink: '',
+        } as SyncTypeVal,
       }
     })
-    const sources = useRef([
-      'MySQL',
-      'SQLServer',
-      'PostgreSQL',
-      'Oracle',
-      'DB2',
-      'ClickHouse',
-      'MongoDB',
-      'ElasticSearch',
-      'SAP HANA',
-      'FTP',
-      'HDFS',
-      'HBase',
-    ])
     const { job } = params
     const mutation = useMutationStreamJob()
 
@@ -167,18 +155,42 @@ export const JobModal = observer(
         })
       } else if (form.current?.validateForm()) {
         const fields = form.current.getFieldsValue()
-        const data = assign(
-          {
-            // op: job ? 'update' : 'create',
-            op,
-            type: params.jobType,
-            ...fields,
-            is_directory: false,
-            pid: isRootNode(fields.pid) ? '' : fields.pid,
-          },
-          job && { jobId: job.id },
-          cluster && { cluster_id: cluster.id }
-        )
+        const { syncTypeInfo, ...rest }: { syncTypeInfo: SyncTypeVal } = fields
+        const data: any = {
+          op,
+          jobMode: params.jobMode,
+          type: params.jobType,
+          ...rest,
+          is_directory: false,
+          pid: isRootNode(fields.pid) ? '' : fields.pid,
+        }
+        // job && { jobId: job.id },
+        // cluster && { cluster_id: cluster.id }
+        // type: params.jobMode === JobMode.RT ? params.jobType :
+
+        if (job) {
+          data.jobId = job.id
+        }
+        if (cluster) {
+          data.cluster_id = cluster.id
+        }
+        if (params.jobMode === JobMode.RT) {
+          data.type = params.jobType
+        } else if (params.jobMode === JobMode.DI) {
+          if (params.jobType === JobType.OFFLINE) {
+            data.type = syncTypeInfo.type === 'full' ? 0 : 1
+          }
+          if (params.jobType === JobType.REALTIME) {
+            data.type = syncTypeInfo.type === 'full' ? 2 : 3
+          }
+          if (syncTypeInfo.type === 'full') {
+            data.source_type = syncTypeInfo.fullSource
+            data.target_type = syncTypeInfo.fullSink
+          } else {
+            data.source_type = syncTypeInfo.incrSource
+            data.target_type = syncTypeInfo.incrSink
+          }
+        }
         mutation.mutate(data, {
           onSuccess: () => {
             handleClose(true)
@@ -223,7 +235,7 @@ export const JobModal = observer(
                 type="primary"
                 loading={mutation.isLoading}
                 onClick={handleNext}
-                disabled={params.jobType === JobType.REALTIME}
+                // disabled={params.jobType === JobType.REALTIME}
               >
                 {params.step === 0 ? '下一步' : '确定'}
               </Button>
@@ -290,16 +302,8 @@ export const JobModal = observer(
                         </Field>
                         <SyncTypeRadioGroupField
                           label={<AffixLabel>同步类型</AffixLabel>}
-                          name="syncType"
-                          value={params.syncTypeInfo as SyncTypeVal}
-                          sourceData={sources.current.map((item) => ({
-                            label: item,
-                            value: item,
-                          }))}
-                          targetData={sources.current.map((item) => ({
-                            label: item,
-                            value: item,
-                          }))}
+                          name="syncTypeInfo"
+                          value={params.syncTypeInfo}
                           onChange={(v) => {
                             setParams((draft) => {
                               draft.syncTypeInfo = v
@@ -309,10 +313,13 @@ export const JobModal = observer(
                           schemas={[
                             {
                               rule: (value: SyncTypeVal) => {
-                                // console.log(value)
                                 if (
-                                  value.type === 1 &&
-                                  (value.source === '' || value.target === '')
+                                  (value.type === 'full' &&
+                                    (value.fullSource === '' ||
+                                      value.fullSink === '')) ||
+                                  (value.type === 'incr' &&
+                                    (value.incrSource === '' ||
+                                      value.incrSink === ''))
                                 ) {
                                   return false
                                 }

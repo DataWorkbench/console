@@ -20,6 +20,18 @@ export const createStreamJob = ({
     method: 'POST',
   })
 
+export const CreateSyncJob = ({
+  regionId,
+  spaceId,
+  ...rest
+}: IWorkFlowParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/sync/job`,
+    body: rest,
+    method: 'POST',
+  })
+
 export const updateStreamJob = ({
   regionId,
   spaceId,
