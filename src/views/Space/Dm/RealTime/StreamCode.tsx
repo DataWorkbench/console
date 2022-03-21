@@ -30,7 +30,6 @@ import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
 import { StreamToolBar } from './styled'
-import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
 
 const CODETYPE = {
@@ -74,7 +73,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showRunLog, setShowRunLog] = useState(false)
-  const [showScheSettingModal, setShowScheSettingModal] = useState(false)
+  // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef<any>(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
@@ -419,12 +418,12 @@ def main(args: Array[String]): Unit = {
           />
         </div>
       </FlexBox>
-      <StreamRightMenu
+      {/* <StreamRightMenu
         showScheSetting={showScheSettingModal}
         onScheSettingClose={() => {
           setShowScheSettingModal(false)
         }}
-      />
+      /> */}
       {showScheModal && (
         <Modal
           visible
@@ -433,7 +432,10 @@ def main(args: Array[String]): Unit = {
           onCancel={() => toggleScheModal(false)}
           okText="调度配置"
           onOk={() => {
-            setShowScheSettingModal(true)
+            workFlowStore.set({
+              showScheSetting: true,
+            })
+            // setShowScheSettingModal(true)
             toggleScheModal(false)
           }}
         >

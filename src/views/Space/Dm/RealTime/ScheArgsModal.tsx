@@ -351,21 +351,20 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
           </Collapse>
         </Loading>
       </DarkModal>
-      <div css={!showCluster && tw`hidden`}>
-        <ClusterTableModal
-          selectedIds={[params.clusterId]}
-          onCancel={() => setShowCluster(false)}
-          onOk={(clusterItem) => {
-            if (clusterItem) {
-              setCluster(clusterItem)
-              setParams((draft) => {
-                draft.clusterId = clusterItem.id
-              })
-            }
-            setShowCluster(false)
-          }}
-        />
-      </div>
+      <ClusterTableModal
+        visible={showCluster}
+        selectedIds={[params.clusterId]}
+        onCancel={() => setShowCluster(false)}
+        onOk={(clusterItem) => {
+          if (clusterItem) {
+            setCluster(clusterItem)
+            setParams((draft) => {
+              draft.clusterId = clusterItem.id
+            })
+          }
+          setShowCluster(false)
+        }}
+      />
     </>
   )
 }
