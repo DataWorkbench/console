@@ -33,6 +33,7 @@ import {
   getJobIdByKey,
   renderIcon,
   renderSwitcherIcon,
+  JobMode,
 } from './JobUtils'
 import { JobModal } from './JobModal'
 
@@ -119,12 +120,14 @@ export const JobTree = observer(() => {
         setShowConfirm(true)
       } else if (
         [
+          JobType.OFFLINE,
+          JobType.REALTIME,
           JobType.SQL,
           JobType.JAR,
           JobType.PYTHON,
           JobType.SCALA,
           JobType.OPERATOR,
-        ].includes(+val) ||
+        ].includes(val as JobType) ||
         val === 'editJob'
       ) {
         setJobInfo((draft) => {
@@ -154,6 +157,9 @@ export const JobTree = observer(() => {
       if (!node) {
         return null
       }
+      const isRoot = isRootNode(node.key)
+      const isRt = node.jobMode === JobMode.RT
+      const isDi = node.jobMode === JobMode.DI
       if (node.isLeaf) {
         return (
           <Menu onClick={onRightMenuClick}>
@@ -165,26 +171,35 @@ export const JobTree = observer(() => {
               <Icons name="NoteGearFill" size={14} tw="mr-2" />
               <span>移动作业</span>
             </MenuItem>
-            <MenuItem value="association" disabled>
-              <Icon
-                name="listview"
-                size={14}
-                tw="mr-2"
-                color={{
-                  primary: theme('colors.white'),
-                  secondary: theme('colors.white'),
-                }}
-              />
-              <span>关联实例</span>
-            </MenuItem>
-            <MenuItem value="scheSetting">
+            {isRt && (
+              <MenuItem value="association" disabled>
+                <Icon
+                  name="listview"
+                  size={14}
+                  tw="mr-2"
+                  color={{
+                    primary: theme('colors.white'),
+                    secondary: theme('colors.white'),
+                  }}
+                />
+                <span>关联实例</span>
+              </MenuItem>
+            )}
+            <MenuItem
+              value="scheSetting"
+              disabled={isDi}
+              onClick={onRightMenuClick}
+            >
               <Icons name="Topology2Fill" size={14} tw="mr-2" />
               <span>调度设置</span>
             </MenuItem>
-            <MenuItem value="scheSetting">
-              <Icons name="Topology3Fill" size={14} tw="mr-2" />
-              <span>运行参数配置</span>
-            </MenuItem>
+            {isRt && (
+              <MenuItem value="scheSetting">
+                <Icons name="Topology3Fill" size={14} tw="mr-2" />
+                <span>运行参数配置</span>
+              </MenuItem>
+            )}
+
             <MenuItem value="history" disabled>
               <Icons name="Book3Fill" size={14} tw="mr-2" />
               <span>历史版本</span>
@@ -196,9 +211,6 @@ export const JobTree = observer(() => {
           </Menu>
         )
       }
-      const isRoot = isRootNode(node.key)
-      const isRt = node.key === RootKey.RT || node.rootKey === RootKey.RT
-      const isDi = node.key === RootKey.DI || node.rootKey === RootKey.DI
       return (
         <Menu onClick={onRightMenuClick}>
           <MenuItem value="create">
@@ -262,8 +274,10 @@ export const JobTree = observer(() => {
     [onRightMenuClick]
   )
   const fetchJobTreeData = (node: any, movingNode = null) => {
-    return fetchJob({
-      pid: getJobIdByKey(node.key),
+    const pid = getJobIdByKey(node.key)
+    const rootKey = node.key === node.pid ? node.key : node.rootKey
+    return fetchJob(rootKey === RootKey.DI ? 'sync' : 'stream', {
+      pid,
     })
       .then((data) => {
         const jobs = get(data, 'infos') || []
@@ -276,7 +290,7 @@ export const JobTree = observer(() => {
         workFlowStore.set({
           treeData: newTreeData,
         })
-        // setExpandedKeys([...expandedKeys, node.key])
+        setExpandedKeys([...expandedKeys, node.key])
       })
       .catch((e) => {
         setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
@@ -284,8 +298,8 @@ export const JobTree = observer(() => {
       })
   }
   const handleMutate = (op: 'create' | 'edit' | 'move' | 'delete') => {
-    let data: any = { op }
     const { key } = curOpNode
+    let data: any = { op, jobMode: curOpNode.jobMode }
     if (op === 'create' || op === 'edit' || op === 'move') {
       if (form.current?.validateForm()) {
         const fields = form.current.getFieldsValue()
@@ -372,7 +386,6 @@ export const JobTree = observer(() => {
             loadedKeys={loadedKeys}
             expandedKeys={expandedKeys}
             selectedKeys={selectedKeys}
-            tw="ml-2"
             icon={renderIcon}
             switcherIcon={renderSwitcherIcon}
             onRightClick={onRightClick}
@@ -383,28 +396,26 @@ export const JobTree = observer(() => {
               }
               return true
             }}
-            dropIndicatorRender={({ dropLevelOffset }) => {
-              return (
-                <div
-                  tw="absolute bg-red-10 h-0.5 right-0 pointer-events-none"
-                  style={{ left: dropLevelOffset }}
-                />
-              )
-            }}
+            dropIndicatorRender={({ dropLevelOffset }) => (
+              <div
+                tw="absolute bg-red-10 h-0.5 bottom-0 right-0 pointer-events-none"
+                style={{ left: dropLevelOffset }}
+              />
+            )}
             loadData={fetchJobTreeData}
             onExpand={(keys) => setExpandedKeys(keys as string[])}
             onLoad={(keys) => workFlowStore.set({ loadedKeys: keys })}
             onSelect={(keys: (string | number)[], { selected, node }) => {
               const job = get(node, 'job')
               if (
-                workFlowStore.curJob?.id !== job.id &&
+                workFlowStore.curJob?.id !== job?.id &&
                 workFlowStore.isDirty
               ) {
                 workFlowStore.set({ nextJob: job })
                 workFlowStore.showSaveConfirm(job.id, 'switch')
                 return
               }
-              if (node.isLeaf) {
+              if (node.isLeaf && node.jobMode === JobMode.RT) {
                 workFlowStore.set({ curJob: job })
               } else if (node.expanded) {
                 setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
@@ -450,7 +461,7 @@ export const JobTree = observer(() => {
                     name="name"
                     label={<AffixLabel>文件夹名称</AffixLabel>}
                     validateOnBlur
-                    defaultValue={curOpNode.title}
+                    defaultValue={curOp === 'create' ? '' : curOpNode.title}
                     schemas={[
                       {
                         rule: {

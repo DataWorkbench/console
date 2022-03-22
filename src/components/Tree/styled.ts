@@ -9,6 +9,7 @@ const rcTreeStyle = css`
     .rc-tree-treenode {
       margin: 0;
       padding: 0;
+      padding-left: 8px;
       line-height: 28px;
       white-space: nowrap;
       list-style: none;

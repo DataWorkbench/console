@@ -1,23 +1,20 @@
 import {
   useMutation,
   useQuery,
-  useInfiniteQuery,
   UseQueryOptions,
   useQueryClient,
 } from 'react-query'
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
-import { omit } from 'lodash-es'
 
 import {
-  createStreamJob,
-  CreateSyncJob,
-  updateStreamJob,
-  moveStreamJob,
-  deleteStreamJobs,
+  createJob,
+  updateJob,
+  moveJob,
+  deleteJobs,
   IWorkFlowParams,
-  loadWorkFlow,
+  listJobs,
   setStreamJobSchedule,
   getStreamJobSchedule,
   setStreamJobArgs,
@@ -41,10 +38,11 @@ export const useFetchJob = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const queryClient = useQueryClient()
   return useCallback(
-    (filter = {}, options = {}) => {
+    (tp: 'sync' | 'stream' = 'stream', filter = {}, options = {}) => {
       const params = {
         regionId,
         spaceId,
+        tp,
         search: '',
         limit: 100,
         offset: 0,
@@ -54,7 +52,7 @@ export const useFetchJob = () => {
       }
       return queryClient.fetchQuery(
         ['job', params],
-        async () => loadWorkFlow(params),
+        async () => listJobs(params),
         {
           // retry: 3,
           ...options,
@@ -74,30 +72,32 @@ export const useMutationStreamJob = () => {
       ...rest
     }: IWorkFlowParams & { jobMode: JobMode }) => {
       const params = { ...rest, regionId, spaceId }
-      if (op === 'create') {
-        if (jobMode === JobMode.OLE) {
-          return createStreamJob(params)
+      if (jobMode === JobMode.RT) {
+        params.tp = 'stream'
+      }
+      if (jobMode === JobMode.DI) {
+        params.tp = 'sync'
+      }
+      if (params.tp) {
+        if (op === 'create') {
+          return createJob(params)
         }
-        if (jobMode === JobMode.DI) {
-          return CreateSyncJob(params)
+        if (op === 'update' || op === 'edit') {
+          return updateJob(params)
         }
-        return null
-      }
-      if (op === 'update' || op === 'edit') {
-        return updateStreamJob(params)
-      }
-      if (op === 'move') {
-        return moveStreamJob(params)
-      }
-      if (op === 'delete') {
-        return deleteStreamJobs(params)
+        if (op === 'move') {
+          return moveJob(params)
+        }
+        if (op === 'delete') {
+          return deleteJobs(params)
+        }
       }
       return null
     }
   )
 }
 
-let infiniteQueryKey: any = ''
+const infiniteQueryKey: any = ''
 let streamJobCodeKey: any = ''
 let streamJobScheduleKey: any = ''
 
@@ -116,42 +116,42 @@ export const getFlowKey = (tp: FlowKeyType = '') => {
   }
 }
 
-export const useInfiniteQueryFlow = (filter = {}, options = {}) => {
-  const { regionId, spaceId } = useParams<IRouteParams>()
-  const params = {
-    regionId,
-    spaceId,
-    limit: 100,
-    offset: 0,
-    ...filter,
-  }
-  infiniteQueryKey = ['job', omit(params, 'offset')]
-  return useInfiniteQuery(
-    infiniteQueryKey,
-    async ({ pageParam = params }) => loadWorkFlow(pageParam),
-    {
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+// export const useInfiniteQueryFlow = (filter = {}, options = {}) => {
+//   const { regionId, spaceId } = useParams<IRouteParams>()
+//   const params = {
+//     regionId,
+//     spaceId,
+//     limit: 100,
+//     offset: 0,
+//     ...filter,
+//   }
+//   infiniteQueryKey = ['job', omit(params, 'offset')]
+//   return useInfiniteQuery(
+//     infiniteQueryKey,
+//     async ({ pageParam = params }) => listJobs(pageParam),
+//     {
+//       getNextPageParam: (lastPage, allPages) => {
+//         if (lastPage.has_more) {
+//           const nextOffset = allPages.reduce(
+//             (acc, cur) => acc + cur.infos.length,
+//             0
+//           )
 
-          if (nextOffset < lastPage.total) {
-            const nextParams = {
-              ...params,
-              offset: nextOffset,
-            }
-            return nextParams
-          }
-        }
+//           if (nextOffset < lastPage.total) {
+//             const nextParams = {
+//               ...params,
+//               offset: nextOffset,
+//             }
+//             return nextParams
+//           }
+//         }
 
-        return undefined
-      },
-      ...options,
-    }
-  )
-}
+//         return undefined
+//       },
+//       ...options,
+//     }
+//   )
+// }
 
 export const useMutationStreamJobSchedule = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()

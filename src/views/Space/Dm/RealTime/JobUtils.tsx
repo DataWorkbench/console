@@ -30,8 +30,6 @@ export enum JobType {
   SCALA = 5,
 }
 
-export type JobTypeId = -1 | -2 | 1 | 2 | 3 | 4 | 5
-
 /** 作业树icon主题 */
 export enum TreeIconTheme {
   BLUE = 'blue',
@@ -58,13 +56,13 @@ export const jobModeData = [
     selTitle: '同步方式',
     items: [
       {
-        icon: 'LayerFill',
+        icon: 'DownloadBoxFill',
         title: '离线-批量同步作业',
         desc: '离线批量同步的描述文案，尽量简短，一句话内',
         value: JobType.OFFLINE,
       },
       {
-        icon: 'DownloadBoxFill',
+        icon: 'LayerFill',
         title: '实时-流式同步作业',
         desc: '实时-流式的描述文案，尽量简短，一句话内',
         value: JobType.REALTIME,
@@ -118,6 +116,14 @@ export const jobModeData = [
     items: [],
   },
 ]
+// 0 => "OfflineFull" 1 => "OfflineIncrement" 2 => "RealTimeFull" 3 => "RealTimeIncrement"
+type DiType = 0 | 1 | 2 | 3
+export const getDiJobType = (type: DiType) => {
+  if (type === 0 || type === 1) {
+    return JobType.OFFLINE
+  }
+  return JobType.REALTIME
+}
 
 export const getJobMode = (jobType?: JobType) => {
   if (jobType === JobType.OFFLINE || jobType === JobType.REALTIME) {
@@ -134,7 +140,7 @@ export const getJobMode = (jobType?: JobType) => {
   if (jobType === JobType.OPERATOR) {
     return JobMode.OLE
   }
-  return JobMode.RT
+  return null
 }
 
 export const isRootNode = (key: any) => [RootKey.DI, RootKey.RT].includes(key)
@@ -197,6 +203,7 @@ export const getNewTreeData = (
       return {
         key: job.id,
         pid: node.key,
+        jobMode: pNode.jobMode,
         rootKey: isRootNode(node.key) ? node.key : node.rootKey,
         title: job.name,
         isLeaf: !job.is_directory,
@@ -246,19 +253,25 @@ export const renderIcon = (props) => {
 
     if (key === 'rt-root') {
       iconName = 'EventFill'
-      theme = TreeIconTheme.BLUE
+      theme = TreeIconTheme.GREEN
     } else if (key === 'di-root') {
       iconName = 'EqualizerFill'
-      theme = TreeIconTheme.GREEN
+      theme = TreeIconTheme.BLUE
     } else if (data.isLeaf) {
+      const type = get(data, 'job.type')
       if (data.rootKey === 'rt-root') {
-        const type = get(data, 'job.type')
         if (type === JobType.SQL) {
           iconName = 'sql'
         } else if (type === JobType.JAR) {
           iconName = 'JavaFill'
         } else if (type === JobType.PYTHON) {
           iconName = 'PythonFill'
+        }
+      } else if (data.rootKey === 'di-root') {
+        if (getDiJobType(type) === JobType.OFFLINE) {
+          iconName = 'DownloadBoxFill'
+        } else {
+          iconName = 'LayerFill'
         }
       }
     } else if (!data.isLeaf || data.children?.length) {
