@@ -1,0 +1,35 @@
+server {
+    listen       80;
+    server_name  localhost;
+    root         /pitrix/lib/pitrix-webconsole-dataomnis/;
+    charset      utf-8;
+
+    location ^~ /data_api {
+        proxy_pass   http://${APIGLOBAL_HOST};
+        proxy_redirect     off;
+        # proxy_set_header   Host             $proxy_host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    }
+
+    location /dataomnis {
+        alias /pitrix/lib/pitrix-webconsole-dataomnis/;
+        index index.html;
+        try_files /index.html =404;
+    }
+
+    location /dataomnis/favicon.ico {
+        alias /pitrix/lib/pitrix-webconsole-dataomnis/favicon.ico;
+    }
+
+    location ~ ^/(dataomnis)/static/(.*)$ {
+        alias /pitrix/lib/pitrix-webconsole-$1/static/$2;
+        gzip on;
+        gzip_min_length 1k;
+        gzip_comp_level 4;
+        gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg image/gif image/png application/vnd.ms-fontobject font/ttf font/opentype font/x-woff font/woff2 image/svg+xml;
+        gzip_vary on;
+        gzip_buffers 32 4k;
+        expires 30d;
+    }
+}

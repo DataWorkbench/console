@@ -39,7 +39,7 @@ function rebuild_run() {
   docker build -t enfiweb .
   echo 'build sucess! start run enfi-web container'
   # docker run -p 9999:80 --add-host global.databench.io:192.168.27.90 --name enfi-web -d enfiweb
-  docker run -p 9999:80 --name enfi-web -d enfiweb
+  docker run -p 80:80 -e APIGLOBAL_HOST=global.dataomnis.192.168.27.90.nip.io --name enfi-web -d enfiweb
   echo 'done'
 }
 

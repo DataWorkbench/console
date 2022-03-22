@@ -162,6 +162,7 @@ let config = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      favicon: path.resolve(__dirname, 'favicon.ico'),
       filename: 'index.html',
       inject: false,
       template: path.resolve(__dirname, 'index.html'),
