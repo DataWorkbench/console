@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState, useEffect } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { useImmer } from 'use-immer'
 import {
   Modal,
@@ -28,7 +28,7 @@ import {
   isRootNode,
   getNewTreeData,
   filterFolderOfTreeData,
-  RootKey,
+  getDiJobType,
 } from './JobUtils'
 import { SyncTypeRadioGroupField, SyncTypeVal } from './SyncTypeRadioGroup'
 
@@ -79,17 +79,21 @@ export const JobModal = observer(
       workFlowStore,
       workFlowStore: { treeData, loadedKeys },
     } = useStore()
+    const isEdit = op === 'edit'
     const form = useRef<Form>(null)
     const [showCluster, setShowCluster] = useState(false)
     const [cluster, setCluster] = useState(null)
     const { width: winWidth } = useWindowSize()
     const [params, setParams] = useImmer(() => {
-      const jobMode = getJobMode(jobType)
-      const isEdit = op === 'edit'
+      const jobMode = isEdit ? get(jobNode, 'jobMode') : getJobMode(jobType)
+      let type = jobType
+      if (isEdit && jobMode === JobMode.DI) {
+        type = getDiJobType(get(jobNode, 'job.type'))
+      }
       return {
         step: !isEdit && !jobNode ? 0 : 1,
         jobMode,
-        jobType,
+        jobType: type,
         pid: jobNode ? get(jobNode, isEdit ? 'pid' : 'key') : '',
         job: isEdit ? get(jobNode, 'job') : null,
         syncTypeInfo: {
@@ -101,24 +105,25 @@ export const JobModal = observer(
         } as SyncTypeVal,
       }
     })
+
     const { job } = params
     const mutation = useMutationStreamJob()
 
-    useEffect(() => {
-      if (jobType) {
-        setParams((draft) => {
-          draft.jobMode = getJobMode(jobType)
-        })
-      }
-    }, [jobType, setParams])
+    // useEffect(() => {
+    //   if (jobType) {
+    //     setParams((draft) => {
+    //       draft.jobMode = getJobMode(jobType)
+    //     })
+    //   }
+    // }, [jobType, setParams])
 
     const fetchJobTreeData = (node: any) => {
-      return fetchJob({
+      const tp = params.jobMode === JobMode.DI ? 'sync' : 'stream'
+      return fetchJob(tp, {
         pid: isRootNode(node.key) ? '' : node.key,
       }).then((data) => {
         const jobs = get(data, 'infos') || []
         const newTreeData = getNewTreeData(treeData, node, jobs)
-        // setTreeData(newTreeData)
         workFlowStore.set({
           treeData: newTreeData,
           loadedKeys: [...loadedKeys, node.key],
@@ -159,36 +164,33 @@ export const JobModal = observer(
         const data: any = {
           op,
           jobMode: params.jobMode,
-          type: params.jobType,
           ...rest,
-          is_directory: false,
-          pid: isRootNode(fields.pid) ? '' : fields.pid,
         }
-        // job && { jobId: job.id },
-        // cluster && { cluster_id: cluster.id }
-        // type: params.jobMode === JobMode.RT ? params.jobType :
-
-        if (job) {
+        if (isEdit) {
           data.jobId = job.id
-        }
-        if (cluster) {
-          data.cluster_id = cluster.id
-        }
-        if (params.jobMode === JobMode.RT) {
+        } else {
           data.type = params.jobType
-        } else if (params.jobMode === JobMode.DI) {
-          if (params.jobType === JobType.OFFLINE) {
-            data.type = syncTypeInfo.type === 'full' ? 0 : 1
+          data.is_directory = false
+          data.pid = isRootNode(fields.pid) ? '' : fields.pid
+          if (cluster) {
+            data.cluster_id = cluster.id
           }
-          if (params.jobType === JobType.REALTIME) {
-            data.type = syncTypeInfo.type === 'full' ? 2 : 3
-          }
-          if (syncTypeInfo.type === 'full') {
-            data.source_type = syncTypeInfo.fullSource
-            data.target_type = syncTypeInfo.fullSink
-          } else {
-            data.source_type = syncTypeInfo.incrSource
-            data.target_type = syncTypeInfo.incrSink
+          if (params.jobMode === JobMode.RT) {
+            data.type = params.jobType
+          } else if (params.jobMode === JobMode.DI) {
+            if (params.jobType === JobType.OFFLINE) {
+              data.type = syncTypeInfo.type === 'full' ? 0 : 1
+            }
+            if (params.jobType === JobType.REALTIME) {
+              data.type = syncTypeInfo.type === 'full' ? 2 : 3
+            }
+            if (syncTypeInfo.type === 'full') {
+              data.source_type = syncTypeInfo.fullSource
+              data.target_type = syncTypeInfo.fullSink
+            } else {
+              data.source_type = syncTypeInfo.incrSource
+              data.target_type = syncTypeInfo.incrSink
+            }
           }
         }
         mutation.mutate(data, {
@@ -201,11 +203,11 @@ export const JobModal = observer(
 
     const isXl = winWidth >= 1280
     const modalWidth = useMemo(() => {
-      if (job) {
+      if (job && params.jobMode === JobMode.RT) {
         return 700
       }
       return isXl ? 1200 : 900
-    }, [isXl, job])
+    }, [isXl, job, params.jobMode])
     return (
       <>
         <Modal
@@ -300,36 +302,38 @@ export const JobModal = observer(
                             )}
                           </Control>
                         </Field>
-                        <SyncTypeRadioGroupField
-                          label={<AffixLabel>同步类型</AffixLabel>}
-                          name="syncTypeInfo"
-                          value={params.syncTypeInfo}
-                          onChange={(v) => {
-                            setParams((draft) => {
-                              draft.syncTypeInfo = v
-                            })
-                          }}
-                          validateOnChange
-                          schemas={[
-                            {
-                              rule: (value: SyncTypeVal) => {
-                                if (
-                                  (value.type === 'full' &&
-                                    (value.fullSource === '' ||
-                                      value.fullSink === '')) ||
-                                  (value.type === 'incr' &&
-                                    (value.incrSource === '' ||
-                                      value.incrSink === ''))
-                                ) {
-                                  return false
-                                }
-                                return true
+                        {!isEdit && (
+                          <SyncTypeRadioGroupField
+                            label={<AffixLabel>同步类型</AffixLabel>}
+                            name="syncTypeInfo"
+                            value={params.syncTypeInfo}
+                            onChange={(v) => {
+                              setParams((draft) => {
+                                draft.syncTypeInfo = v
+                              })
+                            }}
+                            validateOnChange
+                            schemas={[
+                              {
+                                rule: (value: SyncTypeVal) => {
+                                  if (
+                                    (value.type === 'full' &&
+                                      (value.fullSource === '' ||
+                                        value.fullSink === '')) ||
+                                    (value.type === 'incr' &&
+                                      (value.incrSource === '' ||
+                                        value.incrSink === ''))
+                                  ) {
+                                    return false
+                                  }
+                                  return true
+                                },
+                                help: '请选择同步数据源',
+                                status: 'error',
                               },
-                              help: '请选择同步数据源',
-                              status: 'error',
-                            },
-                          ]}
-                        />
+                            ]}
+                          />
+                        )}
                       </>
                     )}
                     <TextField
@@ -363,6 +367,7 @@ export const JobModal = observer(
                       label={<AffixLabel>作业所在目录</AffixLabel>}
                       placeholder="选择作业所在目录"
                       validateOnChange
+                      disabled={isEdit}
                       schemas={[
                         {
                           rule: (v: string) => {
@@ -377,7 +382,7 @@ export const JobModal = observer(
                       treeData={filterFolderOfTreeData(
                         cloneDeep(
                           treeData.filter(
-                            (item) => item.key === RootKey[params.jobMode]
+                            (item) => item.jobMode === params.jobMode
                           )
                         )
                       )}

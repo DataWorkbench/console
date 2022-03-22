@@ -15,6 +15,7 @@ const initTreeData = [
   {
     key: 'di-root',
     pid: 'di-root',
+    jobMode: 'DI',
     title: '数据集成',
     isLeaf: false,
     children: [],
@@ -22,6 +23,7 @@ const initTreeData = [
   {
     key: 'rt-root',
     pid: 'rt-root',
+    jobMode: 'RT',
     title: '实时-流式开发',
     isLeaf: false,
     children: [],

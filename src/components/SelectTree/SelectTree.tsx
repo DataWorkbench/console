@@ -8,21 +8,31 @@ export interface SelectTreeProps {
   name: string
   value?: string | null
   placeholder?: string
+  disabled?: boolean
   onChange?: (value: any) => void
   onOpened?: (value: boolean) => void
   treeHeight?: number
 }
 
 const SelectInputWrapper = styled('div')(
-  ({ focused = false }: { focused?: boolean }) => [
+  ({
+    focused = false,
+    disabled,
+  }: {
+    focused?: boolean
+    disabled?: boolean
+  }) => [
     tw`flex-1 flex max-w-[328px] items-center w-full px-3 py-2 rounded-sm cursor-pointer h-8 border border-neut-13  border-solid hover:border-neut-5`,
     focused && tw`border-green-11!`,
+    disabled && tw`bg-neut-11 cursor-not-allowed`,
     css`
       &.is-danger {
         ${tw`border-red-11!`}
       }
       input {
-        ${tw`flex-1 cursor-pointer (bg-neut-16 text-white)! focus:outline-none`}
+        ${disabled
+          ? tw`(bg-neut-11 text-neut-8)! focus:outline-none cursor-not-allowed`
+          : tw`flex-1 cursor-pointer (bg-neut-16 text-white)! focus:outline-none`}
       }
     `,
   ]
@@ -63,6 +73,7 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
       treeData = [],
       onChange,
       onOpened,
+      disabled,
       treeHeight,
       ...restProps
     },
@@ -111,8 +122,11 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
       >
         <SelectInputWrapper
           focused={focused}
+          disabled={disabled}
           onClick={() => {
-            setOpened(!opened)
+            if (!disabled) {
+              setOpened(!opened)
+            }
           }}
         >
           <input
@@ -128,6 +142,7 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
           <Icon
             name={`caret-${opened ? 'up' : 'down'}`}
             type="light"
+            disabled={disabled}
             size={16}
           />
         </SelectInputWrapper>

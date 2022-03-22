@@ -133,7 +133,10 @@ const SyncTypeRadioGroup = forwardRef<
           <div tw="text-neut-8 mb-1">
             全量同步的简短说明（文案暂时占位文案暂时占位文案暂时占位）
           </div>
-          <div tw="flex py-4 items-center space-x-2">
+          <div
+            tw="flex py-4 items-center space-x-2"
+            css={params.type !== 'full' && tw`hidden`}
+          >
             <Select
               placeholder="请选择来源端数据源类型"
               options={geneOpts(fullSourceData)}
@@ -164,7 +167,10 @@ const SyncTypeRadioGroup = forwardRef<
           <div tw="text-neut-8 mb-1">
             增量同步的简短说明（文案暂时占位文案暂时占位文案暂时占位）
           </div>
-          <div tw="flex py-4 items-center space-x-2">
+          <div
+            tw="flex py-4 items-center space-x-2"
+            css={params.type !== 'incr' && tw`hidden`}
+          >
             <Select
               placeholder="请选择来源端数据源类型"
               options={geneOpts(incrSourceData)}
