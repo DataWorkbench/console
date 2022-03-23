@@ -18,6 +18,18 @@ export const listReleaseStreamJobs = ({
   })
 }
 
+export const listReleaseJobVersions = ({
+  region,
+  spaceId,
+  jobId,
+  ...rest
+}: IStreamParams) =>
+  request({
+    region,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version`,
+    query: rest,
+  })
+
 export const listStreamJobInstances = ({
   regionId,
   spaceId,

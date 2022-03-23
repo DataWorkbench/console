@@ -1,23 +1,44 @@
 import { useMemo } from 'react'
-import { useMount, useLocalStorage } from 'react-use'
+import {
+  useMount,
+  useUnmount,
+  useLocalStorage,
+  useUpdateEffect,
+} from 'react-use'
 import { observer } from 'mobx-react-lite'
 import tw, { css, theme } from 'twin.macro'
 import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
 import emitter from 'utils/emitter'
+import { useParams } from 'react-router-dom'
 import JobMenu from './JobMenu'
 import JobTabs from './JobTabs'
 import StreamRightMenu from './StreamRightMenu'
+import VersionDisplay from './VersionDisplay'
 
 const RealTime = observer(() => {
+  const { spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const {
-    workFlowStore: { curJob },
+    workFlowStore,
+    workFlowStore: { curJob, curVersion },
   } = useStore()
   const [sideCollapsed, setSideCollapsed] = useLocalStorage(
     'NAV_SIDER_COLLAPSED',
     false
   )
 
+  useUpdateEffect(() => {
+    workFlowStore.set({ panels: [], curJob: null, curVersion: null })
+  }, [spaceId, workFlowStore])
+
+  useUnmount(() => {
+    workFlowStore.set({
+      panels: [],
+      curJob: null,
+      curViewJobId: null,
+      curVersion: null,
+    })
+  })
   useMount(() => {
     if (!sideCollapsed) {
       setSideCollapsed(true)
@@ -68,6 +89,14 @@ const RealTime = observer(() => {
           </Center>
         )}
       </Center>
+    )
+  }
+  const showVersion = curVersion && curJob?.id === curVersion.id
+  if (showVersion) {
+    return (
+      <div tw="flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
+        <VersionDisplay />
+      </div>
     )
   }
 

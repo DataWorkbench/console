@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { useUpdateEffect, useUnmount } from 'react-use'
 import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { findIndex } from 'lodash-es'
@@ -94,14 +93,6 @@ const JobTabs = observer(() => {
       }, 5000)
     }
   }, [showNotify, notifyTmRef, workFlowStore])
-
-  useUpdateEffect(() => {
-    workFlowStore.set({ panels: [], curJob: null })
-  }, [spaceId, workFlowStore])
-
-  useUnmount(() => {
-    workFlowStore.set({ panels: [], curJob: null, curViewJobId: null })
-  })
 
   const showNames: any = useMemo(
     () => ({

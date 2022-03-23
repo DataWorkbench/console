@@ -81,10 +81,9 @@ export const getStreamJobSchedule = (
   origin: String,
   { regionId, spaceId, jobId, version }: IWorkFlowParams
 ) => {
-  const uri =
-    origin === 'ops'
-      ? `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${version}/schedule`
-      : `/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`
+  const uri = version
+    ? `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${version}/schedule`
+    : `/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`
   return request({
     region: regionId,
     uri,
@@ -157,11 +156,16 @@ export const getStreamJobCode = ({
   regionId,
   spaceId,
   jobId,
-}: IWorkFlowParams) =>
-  request({
+  version,
+}: IWorkFlowParams) => {
+  const uri = version
+    ? `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${version}/code`
+    : `/v1/workspace/${spaceId}/stream/job/${jobId}/code`
+  return request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/code`,
+    uri,
   })
+}
 
 export const releaseStreamJob = ({
   regionId,

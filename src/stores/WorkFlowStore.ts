@@ -36,6 +36,8 @@ class WorkFlowStore {
 
   curJob: null | IJob = null
 
+  curVersion: null | IJob = null
+
   panels: IJob[] = []
 
   showNotify = false
@@ -43,6 +45,8 @@ class WorkFlowStore {
   showScheSetting = false
 
   showArgsSetting = false
+
+  showVersions = false
 
   isDirty = false
 

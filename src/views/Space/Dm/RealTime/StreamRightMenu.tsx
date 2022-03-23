@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
+import VersionsModal from './VersionsModal'
 
 const MenuRoot = styled('div')(() => [
   tw`pt-8 space-y-4 align-middle bg-neut-17 w-10`,
@@ -17,7 +18,7 @@ const MenuRoot = styled('div')(() => [
 const StreamRightMenu = observer(() => {
   const {
     workFlowStore,
-    workFlowStore: { showScheSetting, showArgsSetting },
+    workFlowStore: { showScheSetting, showArgsSetting, showVersions },
   } = useStore()
   return (
     <>
@@ -28,6 +29,9 @@ const StreamRightMenu = observer(() => {
         </span>
         <span onClick={() => workFlowStore.set({ showScheSetting: true })}>
           调 度 设 置
+        </span>
+        <span onClick={() => workFlowStore.set({ showVersions: true })}>
+          历 史 版 本
         </span>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">历 史 版 本</span> */}
       </MenuRoot>
@@ -43,6 +47,13 @@ const StreamRightMenu = observer(() => {
         <ScheArgsModal
           onCancel={() => {
             workFlowStore.set({ showArgsSetting: false })
+          }}
+        />
+      )}
+      {showVersions && (
+        <VersionsModal
+          onCancel={() => {
+            workFlowStore.set({ showVersions: false })
           }}
         />
       )}

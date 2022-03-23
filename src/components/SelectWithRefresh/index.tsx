@@ -15,6 +15,9 @@ const SelectWithRefreshBox = styled('div')(() => [
     .qicon {
       ${tw`text-neut-18 dark:text-white`}
     }
+    .is-disabled .select-control {
+      ${tw`opacity-100 bg-neut-13! hover:border-neut-13`}
+    }
   `,
 ])
 interface ISelectWithRefreshProps {

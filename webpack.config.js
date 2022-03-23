@@ -125,7 +125,6 @@ let config = {
   optimization: {},
   devServer: {
     host: 'localhost',
-    allowedHosts: ['local.testing.com'],
     compress: true,
     hot: true,
     historyApiFallback: {
@@ -140,23 +139,18 @@ let config = {
     proxy: {
       '/*_api': {
         target: apiUrl,
-        changeOrigin: true,
       },
       '/api': {
         target: apiUrl,
-        changeOrigin: true,
       },
       '/login': {
         target: apiUrl,
-        changeOrigin: true,
       },
       '/static': {
         target: apiUrl,
-        changeOrigin: true,
       },
       '/captcha': {
         target: apiUrl,
-        changeOrigin: true,
       },
     },
   },
