@@ -18,7 +18,7 @@ import tw, { css, styled } from 'twin.macro'
 import { isEqual, pick } from 'lodash-es'
 
 import { FlexBox } from '../Box'
-import { Tooltip } from '../ToolTip'
+import { Tooltip } from '../Tooltip'
 import { HelpCenterLink } from '../Link'
 
 const tuple = <T extends string[]>(...args: T) => args
@@ -93,17 +93,14 @@ export const ConditionParameter = React.forwardRef(
       columns,
     } = props
 
-    const [value, setValue] = useImmer(
-      defaultValue || { type: 'visual', config: {} }
-    )
+    const [value, setValue] = useImmer(defaultValue || { type: 'visual' })
     const prevValue = useRef(value)
 
-    console.log(11111, value)
     useEffect(() => {
-      console.log(defaultValue, prevValue.current)
-      if (!isEqual(defaultValue, prevValue.current)) {
-        setValue(() => defaultValue)
-        prevValue.current = defaultValue
+      const v = defaultValue || { type: 'visual' }
+      if (!isEqual(v, prevValue.current)) {
+        setValue(() => v)
+        prevValue.current = v
       }
     }, [defaultValue, setValue])
 
@@ -112,7 +109,7 @@ export const ConditionParameter = React.forwardRef(
     useEffect(() => {
       if (value && onChange) {
         const tempValue =
-          value.type === 'visual'
+          value?.type === 'visual'
             ? pick(value, [
                 'type',
                 'column',
@@ -156,7 +153,7 @@ export const ConditionParameter = React.forwardRef(
       <div className={className} tw="flex-auto" style={{ width }}>
         <FlexBox>
           <RadioGroup
-            value={value.type}
+            value={value?.type}
             onChange={handleTypeChange}
             style={{ marginBottom: 4 }}
           >

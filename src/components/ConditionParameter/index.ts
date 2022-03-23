@@ -1,6 +1,4 @@
-import {
+export {
   ConditionParameter,
   ConditionParameterField,
 } from './ConditionParameter'
-
-export { ConditionParameter, ConditionParameterField }
