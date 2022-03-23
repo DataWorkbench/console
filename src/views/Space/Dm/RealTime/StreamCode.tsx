@@ -30,7 +30,6 @@ import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
 import { StreamToolBar } from './styled'
-import StreamRightMenu from './StreamRightMenu'
 import ReleaseModal from './ReleaseModal'
 import VersionHeader from './VersionHeader'
 
@@ -77,7 +76,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showRunLog, setShowRunLog] = useState(false)
-  const [showScheSettingModal, setShowScheSettingModal] = useState(false)
+  // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef<any>(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
@@ -92,16 +91,24 @@ const StreamCode = observer(({ tp }: IProp) => {
   const defaultCode = useMemo(() => {
     let v = ''
     if (codeName === 'sql') {
-      v = `drop table if exists pd;
-create table pd
-(id bigint primary key NOT ENFORCED,id1 bigint) WITH (
-'connector' = 'jdbc',
-'url' = 'jdbc:mysql://127.0.0.1:3306/data_workbench',
-'table-name' = 'pd',
-'username' = 'root',
-'password' = '123456'
+      v = `-- 如果在 Flink SQL 里存在 flink_test 表则删除，防止重复创建
+drop table if exists flink_test;
+-- 在 Flink SQL 里注册 MySQL 数据库的 test 表，需提前在 MySQL 中创建该表
+create table flink_test (
+  id BIGINT,
+  name STRING,
+  age INT,
+  PRIMARY KEY (id) NOT ENFORCED
+) WITH (
+  'connector' = 'jdbc',
+  'url' = 'jdbc:mysql://127.0.0.1:3306/database',
+  'table-name' = 'test',
+  'username' = 'root',
+  'password' = '123456'
 );
-insert into pd values(1,2);`
+-- 通过 Flink SQL 向 MySQL 的 test 表中插入数据
+insert into flink_test values(1, 'Jack', 22);
+insert into flink_test values(2, 'Tom', 23);`
     } else if (codeName === 'python') {
       v = `import os
 
@@ -422,12 +429,12 @@ def main(args: Array[String]): Unit = {
           />
         </div>
       </FlexBox>
-      <StreamRightMenu
+      {/* <StreamRightMenu
         showScheSetting={showScheSettingModal}
         onScheSettingClose={() => {
           setShowScheSettingModal(false)
         }}
-      />
+      /> */}
       {showScheModal && (
         <Modal
           visible
@@ -436,7 +443,10 @@ def main(args: Array[String]): Unit = {
           onCancel={() => toggleScheModal(false)}
           okText="调度配置"
           onOk={() => {
-            setShowScheSettingModal(true)
+            workFlowStore.set({
+              showScheSetting: true,
+            })
+            // setShowScheSettingModal(true)
             toggleScheModal(false)
           }}
         >

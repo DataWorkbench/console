@@ -202,13 +202,13 @@ export const ReleaseTable = observer(({ query }: any) => {
           return (
             <FlexBox tw="items-center space-x-1">
               <Center
-                tw="bg-neut-13 rounded-full w-6 h-6 mr-2 border-2 border-solid border-neut-16"
+                tw="bg-neut-13 rounded-full w-7 h-7 mr-1.5 border-2 border-solid border-neut-16"
                 className="release-icon"
               >
-                <Icons name="stream-release" size={14} />
+                <Icons name="stream-release" size={16} />
               </Center>
               <div tw="flex-1 break-all">
-                <div>{row.name}</div>
+                <div tw="font-medium">{row.name}</div>
                 <div tw="text-neut-8">{row.id}</div>
               </div>
             </FlexBox>
@@ -225,7 +225,7 @@ export const ReleaseTable = observer(({ query }: any) => {
                 tw="mr-2"
                 name="radio"
                 color={
-                  value === 1
+                  [1, 4].includes(value)
                     ? {
                         primary: '#15A675',
                         secondary: '#C6F4E4',
@@ -233,7 +233,8 @@ export const ReleaseTable = observer(({ query }: any) => {
                     : ''
                 }
               />
-              {value === 1 ? '调度中' : '已暂停'}
+              {/* eslint-disable-next-line no-nested-ternary */}
+              {value === 1 ? '调度中' : value === 4 ? '已完成' : '已暂停'}
             </div>
           )
         },
@@ -291,7 +292,11 @@ export const ReleaseTable = observer(({ query }: any) => {
         dataIndex: 'id',
         render: (_: String, row: any) => (
           <FlexBox tw="items-center">
-            <Button type="text" onClick={() => handleOperation(row)}>
+            <Button
+              type="text"
+              disabled={row.status === 4}
+              onClick={() => handleOperation(row)}
+            >
               {row.status === 1 ? '暂停' : '恢复'}
             </Button>
             <Divider

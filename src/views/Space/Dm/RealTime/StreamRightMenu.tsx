@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
 import tw, { css, styled } from 'twin.macro'
+import { observer } from 'mobx-react-lite'
+import { useStore } from 'hooks'
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
 import VersionsModal from './VersionsModal'
 
 const MenuRoot = styled('div')(() => [
-  tw`pt-3 space-y-4 align-middle bg-neut-17`,
+  tw`pt-8 space-y-4 align-middle bg-neut-17 w-10`,
   css`
     writing-mode: vertical-lr;
     span {
@@ -14,47 +15,50 @@ const MenuRoot = styled('div')(() => [
   `,
 ])
 
-const StreamRightMenu = ({
-  showScheSetting = false,
-  onScheSettingClose = () => {},
-}: {
-  showScheSetting?: boolean
-  onScheSettingClose?: () => void
-}) => {
-  const [showSetting, setShowSetting] = useState(false)
-  const [showArgs, setShowArgs] = useState(false)
-  const [showVersions, setShowVersions] = useState(false)
-
-  useEffect(() => {
-    if (showScheSetting) {
-      setShowSetting(true)
-    }
-  }, [showScheSetting, setShowSetting])
-
+const StreamRightMenu = observer(() => {
+  const {
+    workFlowStore,
+    workFlowStore: { showScheSetting, showArgsSetting, showVersions },
+  } = useStore()
   return (
     <>
       <MenuRoot>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">操 作 记 录</span> */}
-        <span onClick={() => setShowArgs(true)}>运 行 参 数</span>
-        <span onClick={() => setShowSetting(true)}>调 度 设 置</span>
-        <span onClick={() => setShowVersions(true)}>历 史 版 本</span>
+        <span onClick={() => workFlowStore.set({ showArgsSetting: true })}>
+          运 行 参 数
+        </span>
+        <span onClick={() => workFlowStore.set({ showScheSetting: true })}>
+          调 度 设 置
+        </span>
+        <span onClick={() => workFlowStore.set({ showVersions: true })}>
+          历 史 版 本
+        </span>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">历 史 版 本</span> */}
       </MenuRoot>
-      {showSetting && (
+      {showScheSetting && (
         <ScheSettingModal
           onCancel={() => {
-            setShowSetting(false)
-            onScheSettingClose()
+            workFlowStore.set({ showScheSetting: false })
           }}
           visible
         />
       )}
-      {showArgs && <ScheArgsModal onCancel={() => setShowArgs(false)} />}
+      {showArgsSetting && (
+        <ScheArgsModal
+          onCancel={() => {
+            workFlowStore.set({ showArgsSetting: false })
+          }}
+        />
+      )}
       {showVersions && (
-        <VersionsModal onCancel={() => setShowVersions(false)} />
+        <VersionsModal
+          onCancel={() => {
+            workFlowStore.set({ showVersions: false })
+          }}
+        />
       )}
     </>
   )
-}
+})
 
 export default StreamRightMenu

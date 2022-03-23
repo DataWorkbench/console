@@ -27,7 +27,7 @@ export const udfTypes = {
 
 export const languageData = [
   { text: 'Java', icon: 'java', type: 2, /*    */ bit: 0b0001 },
-  { text: 'Python', icon: 'python', type: 3, /**/ bit: 0b0010 },
+  { text: 'Python', icon: 'PythonFill', type: 3, /**/ bit: 0b0010 },
   { text: 'Scala', icon: 'coding', type: 1, /* */ bit: 0b0100 },
 ]
 

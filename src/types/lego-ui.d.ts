@@ -126,8 +126,8 @@ declare module '@QCFE/lego-ui' {
     size?: 'small' | 'medium' | 'large' | number
     color?:
       | {
-          primary: string
-          secondary: string
+          primary?: string
+          secondary?: string
         }
       | string
     changeable?: boolean
