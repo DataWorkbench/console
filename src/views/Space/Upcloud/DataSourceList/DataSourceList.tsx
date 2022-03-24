@@ -151,7 +151,14 @@ const getUrl = (
       return `jdbc:${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
   }
 }
-const DataSourceList = observer(() => {
+
+export interface DataSourceListProps {
+  selectMode?: boolean
+  onCheck?: (source: any) => void
+}
+
+const DataSourceList = observer((props: DataSourceListProps) => {
+  const { selectMode = false, onCheck = () => {} } = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
@@ -174,7 +181,6 @@ const DataSourceList = observer(() => {
   } = useStore()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
-
   const [filter, setFilter] = useImmer<{
     regionId: string
     spaceId: string
@@ -536,8 +542,8 @@ const DataSourceList = observer(() => {
   if (isLoading) {
     return (
       <Root>
-        <PageTab tabs={tabs} />
-        <ContentBox tw="bg-white h-80">
+        {!selectMode && <PageTab tabs={tabs} />}
+        <ContentBox tw="bg-white dark:bg-neut-16 h-80">
           <Loading />
         </ContentBox>
       </Root>
@@ -550,8 +556,8 @@ const DataSourceList = observer(() => {
     <>
       {sourceList?.length || filter.search !== '' ? (
         <Root>
-          <PageTab tabs={tabs} />
-          <ToolBar tw="bg-white">
+          {!selectMode && <PageTab tabs={tabs} />}
+          <ToolBar tw="bg-white dark:bg-neut-16">
             <ToolBarLeft>
               <Button type="primary" onClick={() => mutateOperation('create')}>
                 <Icon name="add" />
@@ -619,15 +625,20 @@ const DataSourceList = observer(() => {
               />
             </ToolBarRight>
           </ToolBar>
-          <Card tw="flex-1 pb-5 px-5">
+          <Card tw="flex-1 pb-5 px-5 dark:bg-neut-16">
             <Table
-              selectType="checkbox"
+              selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
               columns={columns}
               rowKey="id"
               tw="pb-4 "
               selectedRowKeys={selectedRowKeys}
-              onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
+              onSelect={(rowKeys: string[]) => {
+                if (selectMode && rowKeys.length) {
+                  onCheck(sourceList.find((v: any) => v.id === rowKeys[0]))
+                }
+                setSelectedRowKeys(rowKeys)
+              }}
               onSort={(sortKey: string, sortOrder: string) => {
                 setFilter((draft) => {
                   draft.order_by = sortKey

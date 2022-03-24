@@ -47,6 +47,26 @@ export enum RootKey {
   OLE = 'ole-root',
 }
 
+export const dataSourceTypes = {
+  MySQL: 1,
+  // TIDB: 2,
+  Oracle: 10,
+  SQLServer: 9,
+  PostgreSQL: 2,
+  DB2: 11,
+  'SAP HANA': 12,
+  ClickHouse: 5,
+  Hive: 13,
+  HBase: 6,
+  HDFS: 8,
+  FTP: 7,
+  MongoDB: 15,
+  Redis: 16,
+  ElasticSearch: 14,
+  Kafka: 3,
+  // S3: 4
+}
+
 export const jobModeData = [
   {
     mode: JobMode.DI,
@@ -225,13 +245,15 @@ export const removeTreeNode = (treeData: any[], node: any) => {
   return newTreeData
 }
 
-const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
-  tw`w-4 h-4 rounded-sm`,
-  theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
-  theme === TreeIconTheme.GREEN && tw`bg-green-11`,
-  theme === TreeIconTheme.GREY && tw`bg-white bg-opacity-20 `,
-  theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`,
-])
+export const IconWrapper = styled(Center)(
+  ({ theme }: { theme: TreeIconTheme }) => [
+    tw`w-4 h-4 rounded-sm`,
+    theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
+    theme === TreeIconTheme.GREEN && tw`bg-green-11`,
+    theme === TreeIconTheme.GREY && tw`bg-white bg-opacity-20 `,
+    theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`,
+  ]
+)
 
 export const renderSwitcherIcon = (props) => {
   const { expanded, isLeaf } = props

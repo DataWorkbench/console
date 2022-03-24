@@ -263,7 +263,10 @@ export const JobTree = observer(() => {
           )}
 
           {!isRoot && (
-            <MenuItem value="delete">
+            <MenuItem
+              value="delete"
+              disabled={!node.isLeaf && node.children?.length > 0}
+            >
               <Icon name="delete" size={14} type="light" />
               <span>删除</span>
             </MenuItem>
@@ -415,8 +418,10 @@ export const JobTree = observer(() => {
                 workFlowStore.showSaveConfirm(job.id, 'switch')
                 return
               }
-              if (node.isLeaf && node.jobMode === JobMode.RT) {
-                workFlowStore.set({ curJob: job })
+              if (node.isLeaf) {
+                workFlowStore.set({
+                  curJob: { ...job, jobMode: get(node, 'jobMode', null) },
+                })
               } else if (node.expanded) {
                 setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
               } else {

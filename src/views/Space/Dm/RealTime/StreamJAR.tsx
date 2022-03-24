@@ -25,7 +25,7 @@ import { strlen } from 'utils/convert'
 import { get, flatten } from 'lodash-es'
 import { css } from 'twin.macro'
 import ReleaseModal from './ReleaseModal'
-import { StreamToolBar } from './styled'
+import { JobToolBar } from './styled'
 import UploadModal from '../Resource/UploadModal'
 
 const { TextField } = Form
@@ -116,7 +116,7 @@ const StreamJAR = () => {
   return (
     <FlexBox tw="h-full flex-1">
       <FlexBox tw="flex-col flex-1 pl-5">
-        <StreamToolBar tw="pl-0">
+        <JobToolBar tw="pl-0">
           <Button
             tw="w-[68px] px-0"
             onClick={handleSave}
@@ -142,7 +142,7 @@ const StreamJAR = () => {
               发布
             </Button>
           </Tooltip>
-        </StreamToolBar>
+        </JobToolBar>
         <div tw="mt-5 flex-1">
           <Form tw="w-[600px]! max-w-[600px]!" ref={form} layout="vertical">
             <SelectWithRefresh
