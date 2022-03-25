@@ -1,8 +1,10 @@
 import React, { forwardRef, useCallback, useEffect } from 'react'
-import { Control, Form, Select, Icon } from '@QCFE/lego-ui'
+import { Control, Form, Select } from '@QCFE/lego-ui'
 import tw, { styled } from 'twin.macro'
-import { isFunction } from 'lodash-es'
+import { isFunction, keys } from 'lodash-es'
 import { useImmer } from 'use-immer'
+import { ArrowLine } from 'components'
+import { dataSourceTypes } from '../JobUtils'
 
 type SyncType = 'full' | 'incr'
 type SyncSourceType = 'fullSource' | 'fullSink' | 'incrSource' | 'incrSink'
@@ -30,24 +32,7 @@ const SyncItem = styled('div')(({ selected = true }: { selected: boolean }) => [
   selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`,
 ])
 
-const sources = [
-  'MySQL',
-  'TIDB',
-  'Oracle',
-  'SQLServer',
-  'PostgreSQL',
-  'DB2',
-  'SAP HANA',
-  'ClickHouse',
-  'Hive',
-  'HBase',
-  'HDFS',
-  'FTP',
-  'MongoDB',
-  'Redis',
-  'ElasticSearch',
-  'Kafka',
-]
+const sources = keys(dataSourceTypes)
 const filterfullSources = ['TiDB', 'Hive', 'Redis', 'Kafka']
 const filterIncrSources = [
   'TiDB',
@@ -141,17 +126,20 @@ const SyncTypeRadioGroup = forwardRef<
               placeholder="请选择来源端数据源类型"
               options={geneOpts(fullSourceData)}
               value={params.fullSource}
+              tw="flex-1"
               onChange={(v: SyncSourceType) => handleChange(v, 'fullSource')}
             />
-            <div tw="relative">
+            {/* <div tw="relative">
               <div tw="w-9 border-b border-dashed border-white" />
               <Icon
                 name="caret-right"
                 type="light"
                 tw="absolute -top-2 -right-2"
               />
-            </div>
+            </div> */}
+            <ArrowLine tw="w-9 flex-none" />
             <Select
+              tw="flex-1"
               placeholder="请选择目的端数据源类型"
               options={geneOpts(fullSinkData)}
               value={params.fullSink}
@@ -177,14 +165,7 @@ const SyncTypeRadioGroup = forwardRef<
               value={params.incrSource}
               onChange={(v: SyncSourceType) => handleChange(v, 'incrSource')}
             />
-            <div tw="relative">
-              <div tw="w-9 border-b border-dashed border-white" />
-              <Icon
-                name="caret-right"
-                type="light"
-                tw="absolute -top-2 -right-2"
-              />
-            </div>
+            <ArrowLine tw="w-9 flex-none" />
             <Select
               placeholder="请选择目的端数据源类型"
               options={geneOpts(incrSinkData)}

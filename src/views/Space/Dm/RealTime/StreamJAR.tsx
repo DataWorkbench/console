@@ -25,7 +25,7 @@ import { strlen } from 'utils/convert'
 import { get, flatten } from 'lodash-es'
 import { css } from 'twin.macro'
 import ReleaseModal from './ReleaseModal'
-import { StreamToolBar } from './styled'
+import { JobToolBar } from './styled'
 import UploadModal from '../Resource/UploadModal'
 import VersionHeader from './VersionHeader'
 
@@ -128,7 +128,7 @@ const StreamJAR = () => {
         {readOnly ? (
           <VersionHeader />
         ) : (
-          <StreamToolBar tw="pl-5 pb-5">
+          <JobToolBar tw="pl-0">
             <Button
               tw="w-[68px] px-0"
               onClick={handleSave}
@@ -154,7 +154,7 @@ const StreamJAR = () => {
                 发布
               </Button>
             </Tooltip>
-          </StreamToolBar>
+          </JobToolBar>
         )}
         <div tw="flex-1 pl-5">
           <Form tw="w-[600px]! max-w-[600px]!" ref={form} layout="vertical">

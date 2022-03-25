@@ -14,11 +14,28 @@ export const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
   selected && tw`bg-white text-neut-13 border-white`,
 ])
 
-export const StreamToolBar = styled('div')(
+export const JobToolBar = styled('div')(
   () => [tw`flex px-2 pt-4 space-x-2`],
   css`
     button.button {
       ${tw`h-7`}
+      &.is-black {
+        svg.qicon {
+          color: rgba(255, 255, 255, 0.9);
+          fill: rgba(255, 255, 255, 0.4);
+        }
+      }
+      &.is-primary {
+        svg.qicon.qicon-export {
+          color: rgba(255, 255, 255, 0.4);
+        }
+      }
+      &.is-default {
+        svg.qicon.qicon-data {
+          color: rgba(255, 255, 255, 0.4);
+          fill: rgba(255, 255, 255);
+        }
+      }
     }
   `
 )

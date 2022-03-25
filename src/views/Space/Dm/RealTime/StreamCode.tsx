@@ -29,7 +29,7 @@ import {
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
-import { StreamToolBar } from './styled'
+import { JobToolBar } from './styled'
 import ReleaseModal from './ReleaseModal'
 import VersionHeader from './VersionHeader'
 
@@ -360,14 +360,13 @@ def main(args: Array[String]): Unit = {
         {readOnly ? (
           <VersionHeader />
         ) : (
-          <StreamToolBar tw="pb-4">
+          <JobToolBar tw="pb-4">
             {/* <Button type="black">
                 <Icon name="listview" type="light" />
                 插入表
               </Button> */}
             <Button
               type="black"
-              tw="w-[84px] px-0"
               disabled={tp !== 2}
               onClick={() => mutateCodeData('codeSyntax')}
               loading={syntaxMutation.isLoading}
@@ -378,7 +377,6 @@ def main(args: Array[String]): Unit = {
             {false && (
               <Button
                 type="black"
-                tw="w-[60px] px-0 "
                 onClick={handleRun}
                 loading={runMutation.isLoading}
               >
@@ -387,7 +385,6 @@ def main(args: Array[String]): Unit = {
               </Button>
             )}
             <Button
-              tw="w-[68px] px-0"
               onClick={() => mutateCodeData('codeSave')}
               loading={mutation.isLoading}
             >
@@ -396,7 +393,6 @@ def main(args: Array[String]): Unit = {
             </Button>
             <Button
               type="primary"
-              tw="w-[68px] px-0"
               onClick={onRelease}
               loading={releaseMutation.isLoading}
               disabled={!enableRelease}
@@ -404,7 +400,7 @@ def main(args: Array[String]): Unit = {
               <Icon name="export" />
               发布
             </Button>
-          </StreamToolBar>
+          </JobToolBar>
         )}
         <div tw="flex-1 relative overflow-hidden flex flex-col">
           <div

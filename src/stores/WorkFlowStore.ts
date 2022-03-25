@@ -9,6 +9,8 @@ interface IJob {
   type: number
   desc: string
   version: string
+  source_type?: number
+  target_type?: number
 }
 
 const initTreeData = [

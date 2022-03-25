@@ -30,7 +30,10 @@ import {
   filterFolderOfTreeData,
   getDiJobType,
 } from './JobUtils'
-import { SyncTypeRadioGroupField, SyncTypeVal } from './SyncTypeRadioGroup'
+import {
+  SyncTypeRadioGroupField,
+  SyncTypeVal,
+} from './SyncJob/SyncTypeRadioGroup'
 
 const { TextField, TextAreaField } = Form
 
@@ -398,7 +401,7 @@ export const JobModal = observer(
                         })
                       }}
                     />
-                    {!job && (
+                    {params.jobMode === JobMode.RT && !job && (
                       <Field>
                         <Label>计算集群</Label>
                         <Control tw="space-x-2">
