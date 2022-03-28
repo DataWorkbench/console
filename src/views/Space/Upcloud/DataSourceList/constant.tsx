@@ -224,11 +224,11 @@ export const HiveAnonymousFilters = new Set([
 ])
 
 export enum DbType {
-  Sql,
-  Nosql,
-  Mq,
-  Storage,
-  DW,
+  Sql = '关系型数据库',
+  Nosql = 'NoSQL 数据库',
+  Mq = '消息队列',
+  Storage = '存储',
+  DW = '数据仓库',
 }
 
 export enum SourceType {
@@ -265,7 +265,7 @@ export const sourceKinds = [
   },
   {
     name: 'TiDB',
-    desc: '',
+    desc: 'TiDB 是一款结合了传统的关系型数据库和 NoSQL 数据库特性的新型分布式数据库。',
     source_type: SourceType.TiDB,
     type: DbType.Sql,
   },
@@ -288,7 +288,8 @@ export const sourceKinds = [
     type: DbType.Sql,
   },
   {
-    name: 'SAP HANA',
+    name: 'SapHana',
+    showname: 'SPA HANA',
     desc: '',
     source_type: SourceType.SapHana,
     type: DbType.Sql,
@@ -338,7 +339,8 @@ export const sourceKinds = [
     type: DbType.Nosql,
   },
   {
-    name: 'MongoDB',
+    name: 'MongoDb',
+    showname: 'MongoDB',
     desc: '',
     source_type: SourceType.MongoDB,
     type: DbType.Nosql,

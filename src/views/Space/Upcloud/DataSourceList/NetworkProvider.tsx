@@ -38,7 +38,7 @@ export const NetworkProvider = ({ children }: PropsWithChildren<unknown>) => {
 
   const networks = useMemo(() => {
     if (!isFetching && networkResp && networkResp?.ret_code === 0) {
-      return networkResp.infos
+      return networkResp.infos || []
     }
     return []
   }, [isFetching, networkResp])
