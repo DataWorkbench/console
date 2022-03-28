@@ -171,16 +171,20 @@ export const PopConfirm = (
       //     },
       //   })
       //   break
-      default:
+      default: {
+        const click = (e: MouseEvent) => {
+          if (typeof children.props?.onClick === 'function') {
+            children.props?.onClick(e)
+          }
+          show()
+        }
+
         Object.assign(newProps, {
-          onClick: (e: MouseEvent) => {
-            if (typeof children.props?.onClick === 'function') {
-              newProps.onClick(e)
-            }
-            show()
-          },
+          onClick: newProps?.datadone ? newProps.onClick : click,
+          datadone: 'done',
         })
         break
+      }
     }
     return cloneElement(children, { ...newProps })
   }

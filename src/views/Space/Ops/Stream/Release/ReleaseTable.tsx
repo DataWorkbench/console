@@ -16,6 +16,7 @@ import {
   useQueryReleaseJobs,
   useStore,
 } from 'hooks'
+import tw, { css } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import dayjs from 'dayjs'
@@ -195,19 +196,20 @@ export const ReleaseTable = observer(({ query }: any) => {
     () => [
       {
         title: '作业名称/ID',
+        width: 200,
         dataIndex: 'name',
         render: (value: string, row: Record<string, any>) => {
           return (
             <FlexBox tw="items-center space-x-1">
               <Center
-                tw="bg-neut-13 rounded-full w-6 h-6 mr-2 border-2 border-solid border-neut-16"
+                tw="bg-neut-13 rounded-full w-7 h-7 mr-1.5 border-2 border-solid border-neut-16"
                 className="release-icon"
               >
-                <Icons name="stream-release" size={14} />
+                <Icons name="stream-release" size={16} />
               </Center>
               <div tw="flex-1 break-all">
-                <div>{row.name}</div>
-                <div>{row.id}</div>
+                <div tw="font-medium">{row.name}</div>
+                <div tw="text-neut-8">{row.id}</div>
               </div>
             </FlexBox>
           )
@@ -223,7 +225,7 @@ export const ReleaseTable = observer(({ query }: any) => {
                 tw="mr-2"
                 name="radio"
                 color={
-                  value === 1
+                  [1, 4].includes(value)
                     ? {
                         primary: '#15A675',
                         secondary: '#C6F4E4',
@@ -231,7 +233,8 @@ export const ReleaseTable = observer(({ query }: any) => {
                     : ''
                 }
               />
-              {value === 1 ? '调度中' : '已暂停'}
+              {/* eslint-disable-next-line no-nested-ternary */}
+              {value === 1 ? '调度中' : value === 4 ? '已完成' : '已暂停'}
             </div>
           )
         },
@@ -239,7 +242,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       {
         title: '发布描述',
         dataIndex: 'desc',
-        width: 250,
+        // width: 250,
         render: (value: string) => (
           <Tooltip theme="light" content={<Center tw="p-3">{value}</Center>}>
             <div tw="max-w-[200px] truncate">{value}</div>
@@ -248,6 +251,7 @@ export const ReleaseTable = observer(({ query }: any) => {
       },
       {
         title: '作业版本',
+        width: 186,
         dataIndex: 'version',
       },
       {
@@ -288,7 +292,11 @@ export const ReleaseTable = observer(({ query }: any) => {
         dataIndex: 'id',
         render: (_: String, row: any) => (
           <FlexBox tw="items-center">
-            <Button type="text" onClick={() => handleOperation(row)}>
+            <Button
+              type="text"
+              disabled={row.status === 4}
+              onClick={() => handleOperation(row)}
+            >
               {row.status === 1 ? '暂停' : '恢复'}
             </Button>
             <Divider
@@ -301,6 +309,16 @@ export const ReleaseTable = observer(({ query }: any) => {
                 arrow={false}
                 trigger="click"
                 placement="bottom-end"
+                twChild={
+                  css`
+                    &[aria-expanded='true'] {
+                      ${tw`bg-line-dark`}
+                    }
+                    svg {
+                      ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                    }
+                  ` as any
+                }
                 content={
                   <Menu
                     onClick={(e: any, key: OP) => hanldeMenuClick(key, row)}
@@ -312,8 +330,14 @@ export const ReleaseTable = observer(({ query }: any) => {
                   </Menu>
                 }
               >
-                <div tw="flex items-center">
-                  <Icon name="more" clickable changeable type="light" />
+                <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
+                  <Icon
+                    name="more"
+                    clickable
+                    changeable
+                    type="light"
+                    size={20}
+                  />
                 </div>
               </Tooltip>
             </Center>

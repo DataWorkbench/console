@@ -1,4 +1,4 @@
-import { makeAutoObservable, set } from 'mobx'
+import { makeAutoObservable, observable, set } from 'mobx'
 import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
 import type RootStore from './RootStore'
@@ -9,7 +9,28 @@ interface IJob {
   type: number
   desc: string
   version: string
+  source_type?: number
+  target_type?: number
 }
+
+const initTreeData = [
+  {
+    key: 'di-root',
+    pid: 'di-root',
+    jobMode: 'DI',
+    title: '数据集成',
+    isLeaf: false,
+    children: [],
+  },
+  {
+    key: 'rt-root',
+    pid: 'rt-root',
+    jobMode: 'RT',
+    title: '实时-流式开发',
+    isLeaf: false,
+    children: [],
+  },
+]
 class WorkFlowStore {
   rootStore
 
@@ -17,9 +38,17 @@ class WorkFlowStore {
 
   curJob: null | IJob = null
 
+  curVersion: null | IJob = null
+
   panels: IJob[] = []
 
   showNotify = false
+
+  showScheSetting = false
+
+  showArgsSetting = false
+
+  showVersions = false
 
   isDirty = false
 
@@ -31,9 +60,15 @@ class WorkFlowStore {
 
   showSaveJobConfirm = false
 
+  treeData = initTreeData
+
+  loadedKeys: (string | number)[] = []
+
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       rootStore: false,
+      treeData: observable.ref,
+      loadedKeys: observable.ref,
     })
     this.rootStore = rootStore
   }
@@ -97,6 +132,11 @@ class WorkFlowStore {
 
   set(params: { [key: string]: any }) {
     set(this, { ...params })
+  }
+
+  resetTreeData = () => {
+    this.treeData = initTreeData
+    this.loadedKeys = []
   }
 }
 

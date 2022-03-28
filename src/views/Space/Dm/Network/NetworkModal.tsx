@@ -13,6 +13,7 @@ import {
   AffixLabel,
   SelectWithRefresh,
   TextLink,
+  HelpCenterLink,
 } from 'components'
 
 import {
@@ -39,17 +40,24 @@ const FormWrapper = styled('div')(() => [
           ${tw`pr-2`}
         }
         > .control {
-          ${tw`w-auto`}
-          .select-control {
-            ${tw`w-[328px]`}
+          &,
+          & > input {
+            ${tw`w-[416px] max-w-[416px]`}
           }
         }
+        .select {
+          ${tw`w-[416px] max-w-[416px]`}
+        }
         > .help {
-          ${tw`w-[328px]`}
+          ${tw`w-[420px] flex-wrap`}
         }
       }
     }
   `,
+])
+
+const WarnWrapper = styled('div')(() => [
+  tw`w-full border rounded border-[#F5C414] bg-[rgba(254, 249, 195, 0.1)] mt-2 px-4 py-2 text-[#FACC15]`,
 ])
 
 const defaultParams = {
@@ -68,6 +76,7 @@ const NetworkModal = observer(
   }) => {
     const {
       dmStore: { setNetWorkOp, networkOp },
+      globalStore: { curRegionInfo },
     } = useStore()
     const [params, setParams] = useImmer(opNetwork || defaultParams)
 
@@ -125,6 +134,36 @@ const NetworkModal = observer(
       refetctNetwork(getVxnetsKey)
     }, [refetctNetwork])
 
+    const renderVpcWarn = () => {
+      if (curRegionInfo) {
+        const { name } = curRegionInfo
+        return (
+          <WarnWrapper>
+            <div>
+              1. 当前工作空间所在区域为 <b>{name}</b>，仅支持使用<b>{name}</b>
+              VPC
+            </div>
+            <div>
+              2. 不支持使用免费型 VPC（由于免费型 VPC
+              不具备公网访问能力，暂时不支持在免费型 VPC 中创建计算集群）
+            </div>
+          </WarnWrapper>
+        )
+      }
+      return null
+    }
+
+    const renderVxnetWarn = () => (
+      <WarnWrapper>
+        <div>
+          详情请查看
+          <HelpCenterLink href="/intro/restriction/" isIframe={false}>
+            私有网络限制
+          </HelpCenterLink>
+        </div>
+      </WarnWrapper>
+    )
+
     return (
       <Modal
         title={`${networkOp === 'create' ? '创建' : '修改'}网络`}
@@ -132,7 +171,7 @@ const NetworkModal = observer(
         visible
         onOk={handleOk}
         onCancel={() => setNetWorkOp('')}
-        width={680}
+        width={800}
         draggable
         okText={networkOp === 'create' ? '创建' : '确认'}
         appendToBody={appendToBody}
@@ -206,6 +245,7 @@ const NetworkModal = observer(
                     <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
                       新建 VPC 网络
                     </TextLink>
+                    {renderVpcWarn()}
                   </>
                 }
                 schemas={[
@@ -228,11 +268,13 @@ const NetworkModal = observer(
                         >
                           新建 VPC 网络
                         </TextLink>
+                        {renderVpcWarn()}
                       </>
                     ),
                   },
                 ]}
               />
+
               <SelectWithRefresh
                 label={<AffixLabel>私有网络</AffixLabel>}
                 placeholder="请选择私有网络"
@@ -291,6 +333,7 @@ const NetworkModal = observer(
                         >
                           新建私有网络
                         </TextLink>
+                        {renderVxnetWarn()}
                       </>
                     ),
                   },
@@ -312,6 +355,7 @@ const NetworkModal = observer(
                     >
                       新建私有网络
                     </TextLink>
+                    {renderVxnetWarn()}
                   </>
                 }
               />

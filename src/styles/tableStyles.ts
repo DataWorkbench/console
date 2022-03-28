@@ -42,7 +42,7 @@ const tableStyles = css`
       }
     }
     .portal-grid-table {
-      ${tw`w-full text-white`}
+      ${tw`w-full text-white bg-neut-16`}
       .empty-placeholder {
         ${tw`text-white`}
         .icon {

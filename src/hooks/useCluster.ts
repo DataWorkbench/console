@@ -8,6 +8,7 @@ import {
   deleteFlinkClusters,
   startFlinkClusters,
   stopFlinkClusters,
+  describeResourceBinding,
 } from 'stores/api'
 import { get, omit } from 'lodash-es'
 
@@ -42,6 +43,20 @@ export const useQueryFlinkClusters = (filter: any) => {
   return useQuery(queryKey, async () => listFlinkClusters(params), {
     keepPreviousData: true,
   })
+}
+
+export const useQueryBindResouce = (ids: string[], options = {}) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const params = {
+    regionId,
+    spaceId,
+    ids,
+  }
+  const key = ['bindResource', params]
+  return {
+    ret: useQuery(key, async () => describeResourceBinding(params), options),
+    key,
+  }
 }
 
 export const useQueryInfiniteFlinkClusters = ({

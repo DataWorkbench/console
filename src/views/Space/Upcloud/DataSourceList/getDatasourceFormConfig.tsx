@@ -47,6 +47,7 @@ const mapProps = (props: Record<string, any>) => {
   }
   return {
     ...props,
+    theme: 'light',
     value: parseValue(props.value),
     onChange: (v: string) => {
       if (props.onChange) {

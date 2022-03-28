@@ -6,30 +6,15 @@ import {
   Icon,
   InputSearch,
 } from '@QCFE/qingcloud-portal-ui'
-import {
-  Tabs,
-  Alert,
-  Button,
-  Menu,
-  Level,
-  LevelLeft,
-  LevelRight,
-} from '@QCFE/lego-ui'
-import tw, { styled, css } from 'twin.macro'
+import { Button, Menu } from '@QCFE/lego-ui'
+import tw, { css } from 'twin.macro'
 import {
   getResourcePageQueryKey,
   useMutationResource,
   useQueryResourceByPage,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
-import {
-  FlexBox,
-  Center,
-  Tooltip,
-  Icons,
-  TextEllipsis,
-  HelpCenterLink,
-} from 'components'
+import { FlexBox, Center, Tooltip, TextEllipsis } from 'components'
 import { useQueryClient } from 'react-query'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
@@ -37,47 +22,14 @@ import { observer } from 'mobx-react-lite'
 import { formatBytes } from 'utils/convert'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
-import {
-  PackageDocsHref,
-  PackageName,
-  PackageTypeMap,
-  PackageTypeTip,
-} from './constants'
 
-const columnSettingsKey = 'RESOURCE_TABLE_COLUMN_SETTINGS'
-
-const { TabPanel } = Tabs
 const { MenuItem } = Menu
 
-const DarkTabs = styled(Tabs)(
-  () => css`
-    .tabs ul {
-      ${tw`text-neut-8 border-0 bg-[#1E2F41]`}
-      li {
-        ${tw`px-0! py-4!  ml-5! mr-4! mb-0! leading-6 h-14`}
-        ${tw`border-b-4! border-transparent!`}
-      &:hover {
-          ${tw`text-white border-0 font-medium`}
-        }
-        & + li {
-          ${tw`ml-4! mr-5!`}
-        }
-      }
-      > li.is-active {
-        ${tw`border-b-4 border-white! text-white`}
-      }
-    }
-    .tab-content {
-      ${tw`p-0`}
-    }
-  `
-)
-
+const columnSettingsKey = 'RESOURCE_TABLE_COLUMN_SETTINGS'
 interface IFilter {
   limit: number
   offset: number
   name: string
-  type: number
   reverse: boolean
   search?: string
   sort_by: string
@@ -90,7 +42,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const [deleteVisible, setDeleteVisible] = useState(false)
     const [deleteData, setDeleteData] = useState<any>({})
     const [defaultFields, setDefaultFields] = useState(undefined)
-    const [packageType, setPackageType] = useState('program')
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
     const [selectedRows, setSelectedRows] = useState<any>([])
     const [selectedMap, setSelectedMap] = useState<any>({})
@@ -102,7 +53,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       limit: 10,
       offset: 0,
       name: '',
-      type: PackageTypeMap[packageType],
       reverse: true,
       search: '',
       sort_by: '',
@@ -118,18 +68,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const handleUploadClick = () => {
       setOperation('create')
       setUploadVisible(true)
-    }
-
-    const handleTabChange = (name: string) => {
-      setPackageType(name)
-      setFilter((draft) => {
-        draft.type = PackageTypeMap[name]
-        draft.offset = 0
-      })
-
-      setSelectedRows([])
-      setSelectedRowKeys([])
-      setSelectedMap([])
     }
 
     const handleEdit = useCallback((row) => {
@@ -206,7 +144,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     const columns = useMemo(() => {
       return [
         {
-          title: `${PackageName[packageType]}名称`,
+          title: '程序包名称',
           width: 200,
           dataIndex: 'name',
           sortable: true,
@@ -218,27 +156,24 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
             return (
               <FlexBox tw="items-center space-x-1 overflow-hidden">
                 <div tw="w-5 h-5">
-                  {packageType === 'dependency' ? (
-                    <Icons name="dependency" width={20} size={20} />
-                  ) : (
-                    <Icon
-                      tw="w-5! h-5!"
-                      name={packageType === 'program' ? 'coding' : 'terminal'}
-                      type="light"
-                      color={{
-                        primary: '#219861',
-                        secondary: '#8EDABD',
-                      }}
-                    />
-                  )}
+                  <Icon
+                    tw="w-5! h-5!"
+                    name="coding"
+                    type="light"
+                    color={{
+                      primary: '#219861',
+                      secondary: '#8EDABD',
+                    }}
+                  />
                 </div>
-                <TextEllipsis>{value}</TextEllipsis>
+                <TextEllipsis twStyle={tw`font-medium`}>{value}</TextEllipsis>
               </FlexBox>
             )
           },
         },
         {
           title: 'ID',
+          width: 160,
           dataIndex: 'id',
           render: (value: string) => {
             return <div tw="text-neut-8">{value}</div>
@@ -339,7 +274,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
     }, [
       filter.reverse,
       filter.sort_by,
-      packageType,
       handleEdit,
       handleDownload,
       handleReupload,
@@ -358,32 +292,13 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
 
     return (
       <>
-        <DarkTabs defaultActiveName={packageType} onChange={handleTabChange}>
-          <TabPanel key="program" label="程序包" name="program" />
-          <TabPanel key="function" label="函数包" name="function" />
-          <TabPanel key="dependency" label="依赖包" name="dependency" />
-        </DarkTabs>
         <div tw="bg-neut-16 p-5" className={className}>
-          <Alert
-            type="info"
-            tw="mb-4"
-            message={
-              <Level as="nav">
-                <LevelLeft>{PackageTypeTip[packageType]}</LevelLeft>
-                <LevelRight>
-                  <HelpCenterLink href={PackageDocsHref[packageType]}>
-                    查看详情 →
-                  </HelpCenterLink>
-                </LevelRight>
-              </Level>
-            }
-          />
           <div tw="mt-4 mb-3">
             <FlexBox tw="justify-between">
               <Center tw="space-x-3">
                 <Button type="primary" onClick={handleUploadClick}>
                   <Icon name="upload" />
-                  上传{PackageName[packageType]}
+                  上传程序包
                 </Button>
                 <Button
                   disabled={!selectedRowKeys.length}
@@ -475,7 +390,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
 
         {uploadVisible && (
           <UploadModal
-            type={packageType}
             operation={operation}
             visible={uploadVisible}
             initFields={defaultFields}
@@ -491,7 +405,6 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
         {Object.keys(deleteData).length && (
           <DeleteModal
             visible={deleteVisible}
-            packageType={packageType}
             deleteData={deleteData}
             toggle={() => setDeleteVisible(!deleteVisible)}
             mutation={mutation}

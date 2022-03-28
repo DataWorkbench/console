@@ -3,7 +3,7 @@ import RealTime from './RealTime'
 import Network from './Network'
 import Resource from './Resource'
 import Cluster from './Cluster'
-import Udf from './Udf'
+// import Udf from './Udf'
 import { Sider } from '../Sider'
 
 function Dm() {
@@ -16,7 +16,7 @@ function Dm() {
         {(mod === 'realtime' || !mod) && <RealTime />}
         {mod === 'network' && <Network />}
         {mod === 'resource' && <Resource />}
-        {mod === 'udf' && <Udf />}
+        {/* {mod === 'udf' && <Udf />} */}
         {mod === 'cluster' && <Cluster />}
       </div>
     </div>

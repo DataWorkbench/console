@@ -30,7 +30,7 @@ export const DataSourcePingModal = () => {
   })
 
   const [validate, setValidate] = useState<'error'>()
-  const { networks, refreshNetworks } = useContext(NetworkContext)
+  const { networks, refreshNetworks, networkMap } = useContext(NetworkContext)
 
   const [defaultStatus, setDefaultStatus] = useState<
     { status: boolean; message?: string } | undefined
@@ -85,7 +85,7 @@ export const DataSourcePingModal = () => {
             setNetwork((_) => {
               _.id = id
               _.name = option?.label
-              _.network_info = option
+              _.network_info = networkMap.get(id)
             })
             setValidate(undefined)
           }}
@@ -130,6 +130,8 @@ export const DataSourcePingModal = () => {
             defaultStatus={defaultStatus}
             network={network}
             sourceId={get(opSourceList[0], 'id', '')}
+            hasPing={!!get(opSourceList[0], 'last_connection')}
+            withNetwork={false}
           />
         </Field>
       </Form>

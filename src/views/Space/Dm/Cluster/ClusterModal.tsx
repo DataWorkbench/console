@@ -252,7 +252,6 @@ const ClusterModal = observer(
       })
     }
     const strategy = params.config.restart_strategy
-    console.log(params)
     const marks = useMemo(() => {
       const o = {}
       range(0, 9, 1).forEach((v) => {
@@ -333,9 +332,9 @@ const ClusterModal = observer(
                       {
                         rule: (value: string) => {
                           const l = strlen(value)
-                          return l >= 1 && l <= 128
+                          return l >= 2 && l <= 128
                         },
-                        help: '最小长度1,最大长度128',
+                        help: '最小长度2,最大长度128',
                         status: 'error',
                       },
                     ]}
@@ -381,7 +380,7 @@ const ClusterModal = observer(
                       <AffixLabel
                         required
                         theme="green"
-                        help="如果您没有配置该参数，则按Apache Flink默认的重启策略，即当有Task失败时，如果没有开启Checkpoint，JobManager进程不会重启。如果开启了Checkpoint，则JobManager进程会重启。"
+                        help="重启策略是指在 Flink Job 发生故障时，如何处理 Job。包括 No Restarts:不重启、Fixed Delay:固定延迟、Failure Rate:故障率，默认为不重启。"
                       >
                         重启策略
                       </AffixLabel>
@@ -407,7 +406,17 @@ const ClusterModal = observer(
                         value: 'failure-rate',
                       },
                     ]}
-                    help="当 Flink Task 发生故障时的默认重启策略，具体作业也可以通过单独定义覆盖该默认配置。"
+                    help={
+                      <>
+                        {{
+                          none: '故障发生时不重启 Job',
+                          'fixed-delay':
+                            '选择该选项后，您还需要配置尝试重启次数和重启时间间隔。如果重启次数超过了配置的尝试重启次数，Job 将运行失败。',
+                          'failure-rate':
+                            '选择该选项后，您还需要配置配置检查故障率时间间隔、时间间隔内最大失败次数、重启时间间隔。当时间间隔内发生故障的次数超过设置的最大失败次数，Job 将运行失败。',
+                        }[strategy.restart_strategy] || ''}
+                      </>
+                    }
                   />
                   {strategy.restart_strategy === 'fixed-delay' && (
                     <RestartWrapper>
@@ -773,7 +782,24 @@ const ClusterModal = observer(
               >
                 <Form>
                   <SelectField
-                    label={<AffixLabel>日志级别</AffixLabel>}
+                    label={
+                      <AffixLabel
+                        theme="green"
+                        help={
+                          <>
+                            <div>
+                              TRACE &lt; DEBUG &lt; INFO &lt; WARN &lt; ERROR
+                            </div>
+                            <div>
+                              TRACE 级别最小，打印信息最为详细，ERROR
+                              级别最大，打印信息最为简略
+                            </div>
+                          </>
+                        }
+                      >
+                        日志级别
+                      </AffixLabel>
+                    }
                     name="root_log_level"
                     disabled={viewMode}
                     value={params.config.logger.root_log_level}
@@ -783,11 +809,11 @@ const ClusterModal = observer(
                       })
                     }}
                     options={[
-                      { label: 'TRACE', value: 'TRACE' },
-                      { label: 'DEBUG', value: 'DEBUG' },
-                      { label: 'INFO', value: 'INFO' },
-                      { label: 'WARN', value: 'WARN' },
-                      { label: 'ERROR', value: 'ERROR' },
+                      { label: 'TRACE：追踪级别', value: 'TRACE' },
+                      { label: 'DEBUG：调试级别', value: 'DEBUG' },
+                      { label: 'INFO：信息级别', value: 'INFO' },
+                      { label: 'WARN：警告级别', value: 'WARN' },
+                      { label: 'ERROR：错误级别', value: 'ERROR' },
                     ]}
                     help={<div>默认与并行度一致</div>}
                   />

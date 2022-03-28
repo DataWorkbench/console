@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
-import tw, { styled, css } from 'twin.macro'
 import {
   FlexBox,
   Card,
@@ -42,24 +41,13 @@ function getTabs() {
   ]
 }
 
-const Wrapper = styled('div')(
-  () => css`
-    & > div {
-      ${tw`mb-4`};
-      &.page-tab-container .button-list button.is-text > span {
-        color: #939ea9;
-      }
-    }
-  `
-)
-
 function Overview() {
   const {
     overViewStore: { showSpaceModal },
   } = useStore()
 
   return (
-    <Wrapper tw="p-5">
+    <div tw="p-5 space-y-5">
       <PageTab tabs={getTabs()} />
       <Services />
       <FlexBox>
@@ -90,7 +78,7 @@ function Overview() {
         </Card>
       </FlexBox>
       {showSpaceModal && <SpaceListModal />}
-    </Wrapper>
+    </div>
   )
 }
 

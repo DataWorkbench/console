@@ -70,6 +70,7 @@ const SideMenuWrapper = styled('div')(() => [
       }
       .side-menu-pickup {
         box-shadow: none;
+        height: calc(100vh - 60px);
         ${tw`border-r border-neut-3 bg-neut-2 dark:(bg-neut-17 border-neut-15) shadow-none`}
         .side-title,
         .divider-horizon {
@@ -85,7 +86,8 @@ const SideMenuWrapper = styled('div')(() => [
                 ${tw`dark:text-white text[#fff6] fill-[#fff] dark:fill-[#fff6]`}
               }
             }
-            &.selected {
+            &.selected,
+            &.item-selected {
               ${tw`bg-neut-2 dark:(bg-neut-13) rounded-sm`}
               span.icon {
                 ${tw`border-l-2 border-green-11`}

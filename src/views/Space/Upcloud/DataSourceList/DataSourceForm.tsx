@@ -14,13 +14,7 @@ import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
 import { useStore } from 'hooks'
-import {
-  AffixLabel,
-  Center,
-  Divider,
-  HelpCenterLink,
-  SelectWithRefresh,
-} from 'components'
+import { AffixLabel, Center, Divider } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { toJS } from 'mobx'
@@ -32,7 +26,6 @@ import {
   ftpProtocolValue,
   HiveAnonymousFilters,
   hivePwdFilters,
-  networkLink,
   sftpFilters,
   sFtpProtocolValue,
   SourceType,
@@ -107,6 +100,15 @@ const getInitValue = (path: string) => {
     url: {
       hdfs: {
         port: 9000,
+        config: `{
+  "dfs.nameservices": "ns",
+  "dfs.ha.namenodes.ns": "nn1,nn2",
+  "fs.defaultFS": "hdfs://ns",
+  "dfs.namenode.rpc-address.ns.nn1": "ip1:9000",
+  "dfs.namenode.http-address.ns.nn1": "ip1:50070",
+  "dfs.namenode.rpc-address.ns.nn2": "ip2:9000",
+  "dfs.namenode.http-address.ns.nn2": "ip2:50070"
+}`,
       },
       ftp: {
         port: 21,
@@ -114,8 +116,14 @@ const getInitValue = (path: string) => {
       sftp: {
         port: 22,
       },
-      hive: {
-        auth: 1,
+      hbase: {
+        config: `{
+   "hbase.zookeeper.property.clientPort": "2181",
+   "hbase.rootdir": "hdfs://ns1/hbase",
+   "hbase.cluster.distributed": "true",
+   "hbase.zookeeper.quorum": "node01,node02,node03",
+   "zookeeper.znode.parent": "/hbase"
+}`,
       },
     },
   }
@@ -198,7 +206,7 @@ const DataSourceForm = ({
     ) {
       return undefined
     }
-    return get(opSourceList, '[0].connection') === 1
+    return get(opSourceList, '[0].last_connection.result') === 1
       ? {
           status: true,
         }
@@ -537,55 +545,6 @@ const DataSourceForm = ({
                 </Center>
               </Divider>
             </Field>
-            <SelectWithRefresh
-              name="network_id"
-              css={showPing ? visibleStyle : hiddenStyle}
-              value={network.id}
-              placeholder="请选择网络配置"
-              validateOnChange
-              disabled={isViewMode}
-              label={
-                <AffixLabel help="测试连通性时使用的网络配置" required={false}>
-                  网络配置
-                </AffixLabel>
-              }
-              onChange={(v: string, option: Record<string, any>) => {
-                setNetWork((draft) => {
-                  draft.id = v
-                  draft.name = option.label
-                  draft.network_info = option
-                })
-                setDefaultStatus(undefined)
-              }}
-              onRefresh={refreshNetworks}
-              help={
-                <>
-                  <div>
-                    <span tw="mr-0.5">详情请见</span>
-                    <HelpCenterLink href={networkLink} isIframe={false}>
-                      网络配置选择说明文档
-                    </HelpCenterLink>
-                  </div>
-                  <div>
-                    <span tw="mr-0.5">
-                      选择网络后可测试对应此网络的数据源可用性，如需选择新的网络配置，您可
-                    </span>
-                    <span
-                      tw="text-green-11 cursor-pointer"
-                      onClick={() => dmStore.setNetWorkOp('create')}
-                    >
-                      绑定VPC
-                    </span>
-                  </div>
-                </>
-              }
-              options={(networks || []).map(({ name, id }) => ({
-                label: name,
-                value: id,
-              }))}
-              isLoading={networksIsFetching}
-              searchable={false}
-            />
             <Field css={showPing ? visibleStyle : hiddenStyle}>
               {/* <Label> */}
               {/*  <AffixLabel help="检查数据源参数是否正确" required={false}> */}
@@ -596,6 +555,8 @@ const DataSourceForm = ({
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
                 network={network}
+                hasPing={!!get(sourceInfo, 'last_connection')}
+                withNetwork
               />
             </Field>
           </CollapseItem>

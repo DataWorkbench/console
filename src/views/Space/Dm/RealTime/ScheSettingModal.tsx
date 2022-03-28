@@ -285,7 +285,6 @@ const ScheSettingModal = ({
       onOk={save}
       footer={
         <>
-          <Button onClick={handleCancel}>取消</Button>
           {origin === 'ops' && disabled ? (
             <Button
               type="primary"
@@ -296,14 +295,17 @@ const ScheSettingModal = ({
               编辑
             </Button>
           ) : (
-            <Button
-              type="primary"
-              disabled={params.schedulePolicy === 0}
-              onClick={save}
-              loading={mutation.isLoading}
-            >
-              确定
-            </Button>
+            <>
+              <Button onClick={handleCancel}>取消</Button>
+              <Button
+                type="primary"
+                disabled={params.schedulePolicy === 0}
+                onClick={save}
+                loading={mutation.isLoading}
+              >
+                确定
+              </Button>
+            </>
           )}
         </>
       }
@@ -983,24 +985,25 @@ const ScheSettingModal = ({
                       },
                     ]}
                   />
-
-                  <Field>
-                    <Label>
-                      <AffixLabel>重试策略</AffixLabel>
-                    </Label>
-                    <Control>
-                      <Toggle
-                        disabled={disabled}
-                        checked={params.retryPolicy === 2}
-                        onChange={(checked: boolean) => {
-                          setParams((draft) => {
-                            draft.retryPolicy = checked ? 2 : 1
-                          })
-                        }}
-                      />
-                    </Control>
-                    <div tw="leading-6 ml-2">出错自动重试</div>
-                  </Field>
+                  {false && (
+                    <Field>
+                      <Label>
+                        <AffixLabel>重试策略</AffixLabel>
+                      </Label>
+                      <Control>
+                        <Toggle
+                          disabled={disabled}
+                          checked={params.retryPolicy === 2}
+                          onChange={(checked: boolean) => {
+                            setParams((draft) => {
+                              draft.retryPolicy = checked ? 2 : 1
+                            })
+                          }}
+                        />
+                      </Control>
+                      <div tw="leading-6 ml-2">出错自动重试</div>
+                    </Field>
+                  )}
                   <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
                     <SliderField
                       key={disabled ? 'initSlider' : 'updateSlider'}

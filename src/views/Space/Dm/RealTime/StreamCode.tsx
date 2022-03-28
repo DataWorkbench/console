@@ -29,9 +29,9 @@ import {
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
-import { StreamToolBar } from './styled'
-import StreamRightMenu from './StreamRightMenu'
+import { JobToolBar } from './styled'
 import ReleaseModal from './ReleaseModal'
+import VersionHeader from './VersionHeader'
 
 const CODETYPE = {
   2: 'sql',
@@ -62,8 +62,10 @@ interface IProp {
 const StreamCode = observer(({ tp }: IProp) => {
   const {
     workFlowStore,
-    workFlowStore: { curJob, showSaveJobConfirm },
+    workFlowStore: { curJob, curVersion, showSaveJobConfirm },
   } = useStore()
+  const readOnly = !!curVersion
+
   const [nextLocation, setNextLocation] = useState(null)
   const [shouldNav, setShouldNav] = useState(false)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
@@ -74,13 +76,13 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showRunLog, setShowRunLog] = useState(false)
-  const [showScheSettingModal, setShowScheSettingModal] = useState(false)
+  // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef<any>(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
   const runMutation = useMutationStreamJobCodeRun()
-  const { data, isLoading } = useQueryStreamJobCode()
+  const { data, isFetching } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
   const codeStr = get(data, `${codeName}.code`)
@@ -89,16 +91,24 @@ const StreamCode = observer(({ tp }: IProp) => {
   const defaultCode = useMemo(() => {
     let v = ''
     if (codeName === 'sql') {
-      v = `drop table if exists pd;
-create table pd
-(id bigint primary key NOT ENFORCED,id1 bigint) WITH (
-'connector' = 'jdbc',
-'url' = 'jdbc:mysql://127.0.0.1:3306/data_workbench',
-'table-name' = 'pd',
-'username' = 'root',
-'password' = '123456'
+      v = `-- 如果在 Flink SQL 里存在 flink_test 表则删除，防止重复创建
+drop table if exists flink_test;
+-- 在 Flink SQL 里注册 MySQL 数据库的 test 表，需提前在 MySQL 中创建该表
+create table flink_test (
+  id BIGINT,
+  name STRING,
+  age INT,
+  PRIMARY KEY (id) NOT ENFORCED
+) WITH (
+  'connector' = 'jdbc',
+  'url' = 'jdbc:mysql://127.0.0.1:3306/database',
+  'table-name' = 'test',
+  'username' = 'root',
+  'password' = '123456'
 );
-insert into pd values(1,2);`
+-- 通过 Flink SQL 向 MySQL 的 test 表中插入数据
+insert into flink_test values(1, 'Jack', 22);
+insert into flink_test values(2, 'Tom', 23);`
     } else if (codeName === 'python') {
       v = `import os
 
@@ -323,7 +333,10 @@ def main(args: Array[String]): Unit = {
         setEnableRelease(true)
       }
     }
-  }, [codeStr, defaultCode])
+    if (curVersion?.version) {
+      editorRef.current?.setValue(isFetching ? loadingWord : codeStr)
+    }
+  }, [codeStr, defaultCode, curVersion?.version, isFetching])
 
   useUnmount(() => {
     workFlowStore.set({
@@ -344,51 +357,51 @@ def main(args: Array[String]): Unit = {
   return (
     <FlexBox tw="relative h-full w-full flex-1" ref={boxRef}>
       <FlexBox tw="flex flex-col flex-1 overflow-hidden">
-        <StreamToolBar tw="pb-4">
-          {/* <Button type="black">
-            <Icon name="listview" type="light" />
-            插入表
-          </Button> */}
-          <Button
-            type="black"
-            tw="w-[84px] px-0"
-            disabled={tp !== 2}
-            onClick={() => mutateCodeData('codeSyntax')}
-            loading={syntaxMutation.isLoading}
-          >
-            <Icon name="remark" type="light" />
-            语法检查
-          </Button>
-          {false && (
+        {readOnly ? (
+          <VersionHeader />
+        ) : (
+          <JobToolBar tw="pb-4">
+            {/* <Button type="black">
+                <Icon name="listview" type="light" />
+                插入表
+              </Button> */}
             <Button
               type="black"
-              tw="w-[60px] px-0 "
-              onClick={handleRun}
-              loading={runMutation.isLoading}
+              disabled={tp !== 2}
+              onClick={() => mutateCodeData('codeSyntax')}
+              loading={syntaxMutation.isLoading}
             >
-              <Icon name="triangle-right" type="light" />
-              运行
+              <Icon name="remark" type="light" />
+              语法检查
             </Button>
-          )}
-          <Button
-            tw="w-[68px] px-0"
-            onClick={() => mutateCodeData('codeSave')}
-            loading={mutation.isLoading}
-          >
-            <Icon name="data" />
-            保存
-          </Button>
-          <Button
-            type="primary"
-            tw="w-[68px] px-0"
-            onClick={onRelease}
-            loading={releaseMutation.isLoading}
-            disabled={!enableRelease}
-          >
-            <Icon name="export" />
-            发布
-          </Button>
-        </StreamToolBar>
+            {false && (
+              <Button
+                type="black"
+                onClick={handleRun}
+                loading={runMutation.isLoading}
+              >
+                <Icon name="triangle-right" type="light" />
+                运行
+              </Button>
+            )}
+            <Button
+              onClick={() => mutateCodeData('codeSave')}
+              loading={mutation.isLoading}
+            >
+              <Icon name="data" />
+              保存
+            </Button>
+            <Button
+              type="primary"
+              onClick={onRelease}
+              loading={releaseMutation.isLoading}
+              disabled={!enableRelease}
+            >
+              <Icon name="export" />
+              发布
+            </Button>
+          </JobToolBar>
+        )}
         <div tw="flex-1 relative overflow-hidden flex flex-col">
           <div
             css={[!showPlaceholder && tw`hidden`]}
@@ -397,13 +410,14 @@ def main(args: Array[String]): Unit = {
           />
           <Editor
             language={codeName}
-            defaultValue={isLoading ? loadingWord : codeStr}
+            defaultValue={isFetching ? loadingWord : codeStr}
             theme="my-theme"
             tw="overflow-hidden"
             options={{
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               automaticLayout: true,
+              readOnly,
             }}
             editorWillMount={handleEditorWillMount}
             editorDidMount={handleEditorDidMount}
@@ -411,12 +425,12 @@ def main(args: Array[String]): Unit = {
           />
         </div>
       </FlexBox>
-      <StreamRightMenu
+      {/* <StreamRightMenu
         showScheSetting={showScheSettingModal}
         onScheSettingClose={() => {
           setShowScheSettingModal(false)
         }}
-      />
+      /> */}
       {showScheModal && (
         <Modal
           visible
@@ -425,7 +439,10 @@ def main(args: Array[String]): Unit = {
           onCancel={() => toggleScheModal(false)}
           okText="调度配置"
           onOk={() => {
-            setShowScheSettingModal(true)
+            workFlowStore.set({
+              showScheSetting: true,
+            })
+            // setShowScheSettingModal(true)
             toggleScheModal(false)
           }}
         >

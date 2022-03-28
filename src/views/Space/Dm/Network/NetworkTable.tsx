@@ -66,9 +66,13 @@ const NetworkTable = observer(() => {
         title: '名称/ID',
         fixedInSetting: true,
         dataIndex: 'name',
+        width: 200,
         render: (v: any, row: any) => (
           <FlexBox tw="items-center space-x-1 truncate">
-            <Center tw="bg-neut-13 rounded-full p-1.5 mr-2">
+            <Center
+              className="clusterIcon"
+              tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
+            >
               <Icon name="earth" type="light" />
             </Center>
             <div tw="truncate">

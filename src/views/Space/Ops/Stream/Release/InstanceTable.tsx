@@ -10,6 +10,7 @@ import {
 } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, TextLink, Icons, Tooltip } from 'components'
 import dayjs from 'dayjs'
+import tw, { css } from 'twin.macro'
 import {
   getJobInstanceKey,
   useMutationInstance,
@@ -64,7 +65,7 @@ export const InstanceTable = observer(
       instance_id: '',
       job_id: '',
       version: '',
-      sort_by: '',
+      sort_by: 'created',
       reverse: true,
       offset: 0,
       limit: 10,
@@ -150,14 +151,15 @@ export const InstanceTable = observer(
       {
         title: '实例ID',
         dataIndex: 'id',
+        width: 200,
         render: (value: string) => {
           return (
             <FlexBox tw="items-center space-x-1">
               <Center
-                tw="bg-neut-13 rounded-full w-6 h-6 mr-2 border-2 border-solid border-neut-16"
+                tw="bg-neut-13 rounded-full w-7 h-7 mr-1.5 border-2 border-solid border-neut-16"
                 className="release-icon"
               >
-                <Icons name="stream-job" size={14} />
+                <Icons name="stream-job" size={16} />
               </Center>
               <div tw="flex-1 break-all">{value}</div>
             </FlexBox>
@@ -167,6 +169,7 @@ export const InstanceTable = observer(
       {
         title: '状态',
         dataIndex: 'state',
+        width: 120,
         render: (value: number) => {
           return (
             <div tw="flex items-center">
@@ -179,6 +182,7 @@ export const InstanceTable = observer(
       {
         title: '所属作业/ID',
         dataIndex: 'job_id',
+        width: 185,
         render: (value: string, row: Record<string, any>) => {
           return (
             <div>
@@ -195,6 +199,7 @@ export const InstanceTable = observer(
       },
       {
         title: '作业版本',
+        width: 185,
         dataIndex: 'version',
       },
       {
@@ -249,6 +254,16 @@ export const InstanceTable = observer(
                   trigger="click"
                   placement="bottom-end"
                   arrow={false}
+                  twChild={
+                    css`
+                      &[aria-expanded='true'] {
+                        ${tw`bg-line-dark`}
+                      }
+                      svg {
+                        ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                      }
+                    ` as any
+                  }
                   content={
                     <Menu
                       onClick={(e: any, key: OP) => handleMenuClick(key, row)}
@@ -260,7 +275,7 @@ export const InstanceTable = observer(
                     </Menu>
                   }
                 >
-                  <div tw="flex items-center">
+                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
                     <Icon name="more" clickable changeable type="light" />
                   </div>
                 </Tooltip>

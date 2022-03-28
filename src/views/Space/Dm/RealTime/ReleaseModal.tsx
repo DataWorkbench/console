@@ -36,17 +36,22 @@ const ReleaseModal = ({
     {
       value: 1,
       text: '允许',
-      desp: '同一时间，允许运行多个作业实例',
+      desc: '同一时间，允许运行多个作业实例',
+      ntEndDesc:
+        '如有实例正在运行，本次发布并执行后，新生成的实例会与当前正在运行中的实例同时运行',
     },
     {
       value: 2,
       text: '禁止',
-      desp: '同一时间，只允许运行一个作业实例, 如果到达调度周期的执行时间点时上一个实例还没有运行完成, 则放弃本次实例的运行',
+      desc: '同一时间，只允许运行一个作业实例, 如果到达调度周期的执行时间点时上一个实例还没有运行完成, 则放弃本次实例的运行',
+      ntEndDesc: '如有实例正在运行，本次发布成功后，会被忽略执行',
     },
     {
       value: 3,
       text: '替换',
-      desp: '同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成, 则将这个实例终止, 然后启动新的实例',
+      desc: '同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成, 则将这个实例终止, 然后启动新的实例',
+      ntEndDesc:
+        '如有实例正在运行，本次发布并执行后，当前运行中的实例会被强制终止, 并启动新的实例',
     },
   ].find((o) => o.value === get(scheData, 'concurrency_policy'))
 
@@ -122,7 +127,7 @@ const ReleaseModal = ({
         {concurrency && (
           <div tw="mb-3">
             <div>当前并发策略：“{concurrency.text}”</div>
-            <div tw="text-neut-8">{concurrency.desp}</div>
+            <div tw="text-neut-8">{concurrency.desc}</div>
           </div>
         )}
         <div>
@@ -140,9 +145,7 @@ const ReleaseModal = ({
                 label: (
                   <>
                     <span>不终止 当前作业正在运行中的实例</span>
-                    <div tw="ml-5 text-neut-8">
-                      如有实例正在运行，本次发布成功后，会被忽略执行
-                    </div>
+                    <div tw="ml-5 text-neut-8">{concurrency?.ntEndDesc}</div>
                   </>
                 ),
                 value: false,
