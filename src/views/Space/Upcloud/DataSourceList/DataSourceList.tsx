@@ -131,8 +131,53 @@ const getUrl = (
     | 'mysql'
     | 'clickhouse'
     | 'postgresql'
+    | 'sap_hana'
+    | 'tidb'
+    | 'oracle'
+    | 'mssql'
+    | 'sqlserver'
+    | 'mongo_db'
+    | 'elastic_search'
+    | 'redis'
+    | 'db2'
+    | 'hive'
 ) => {
   switch (type) {
+    // mysql default
+    case 'tidb':
+      return `jdbc:mysql://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+    case 'oracle':
+      return `jdbc:oracle:thin:@${urlObj.host}:${urlObj.port}:${urlObj.database}`
+    case 'sqlserver':
+      return `jdbc:jtds:sqlserver://${urlObj.host}:${urlObj.port};DatabaseName=${urlObj.database}`
+    // PostgreSQL default
+    case 'db2':
+      return `jdbc:db2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+    // ClickHouse default
+    case 'mongo_db':
+      return `mongodb://${urlObj.mongodb_brokers
+        .map(
+          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
+        )
+        .join(',')}`
+    case 'sap_hana':
+      return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
+    case 'elastic_search':
+      return `elasticsearch://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+    case 'ftp':
+      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
+        urlObj?.host
+      }:${urlObj?.port}`
+    case 'hdfs':
+      return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
+    case 'redis':
+      return `redis://${urlObj.redis_brokers
+        .map(
+          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
+        )
+        .join(',')}`
+    case 'hive':
+      return `jdbc:hive2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
     case 'hbase': {
       try {
         return `${JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']}`
@@ -146,12 +191,7 @@ const getUrl = (
           ({ host, port }: { host: string; port: number }) => `${host}:${port}`
         )
         .join(',')
-    case 'ftp':
-      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
-        urlObj?.host
-      }:${urlObj?.port}`
-    case 'hdfs':
-      return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
+
     default:
       return `jdbc:${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
   }

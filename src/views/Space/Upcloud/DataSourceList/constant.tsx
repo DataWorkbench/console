@@ -233,21 +233,21 @@ export enum DbType {
 
 export enum SourceType {
   Mysql = 1,
-  PostgreSQL,
-  Kafka,
+  PostgreSQL = 2,
+  Kafka = 3,
   ClickHouse = 5,
-  HBase,
-  Ftp,
-  HDFS,
-  TiDB,
-  Oracle,
-  SqlServer,
-  Hive,
-  ElasticSearch,
-  Redis,
-  MongoDB,
-  DB2,
-  SapHana,
+  HBase = 6,
+  Ftp = 7,
+  HDFS = 8,
+  SqlServer = 9,
+  Oracle = 10,
+  DB2 = 11,
+  SapHana = 12,
+  Hive = 13,
+  ElasticSearch = 14,
+  MongoDB = 15,
+  Redis = 16,
+  TiDB = 1000000000000,
 }
 
 export const sourceKinds = [
@@ -352,3 +352,7 @@ export const sourceKinds = [
     type: DbType.Mq,
   },
 ]
+
+export const urlType2Api = {
+  saphana: 'sap_hana',
+}

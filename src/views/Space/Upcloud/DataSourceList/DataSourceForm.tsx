@@ -1,7 +1,8 @@
 import React, {
   MutableRefObject,
   useCallback,
-  useContext,
+  // useContext,
+  useMemo,
   useEffect,
   useRef,
   useState,
@@ -19,7 +20,7 @@ import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { toJS } from 'mobx'
 import { DataSourcePingButton } from './DataSourcePing'
-import { NetworkContext } from './NetworkProvider'
+// import { NetworkContext } from './NetworkProvider'
 import {
   ftpFilters,
   ftpProtocol,
@@ -29,6 +30,7 @@ import {
   sftpFilters,
   sFtpProtocolValue,
   SourceType,
+  urlType2Api,
 } from './constant'
 import getFieldsInfo from './getDatasourceFormConfig'
 
@@ -161,14 +163,7 @@ const DataSourceForm = ({
 
   const {
     dataSourceStore: { op, opSourceList },
-    dmStore,
   } = useStore()
-
-  const {
-    networks,
-    refreshNetworks,
-    isFetching: networksIsFetching,
-  } = useContext(NetworkContext)
 
   const urlType = resInfo.name.toLowerCase()
   const sourceInfo =
@@ -197,7 +192,7 @@ const DataSourceForm = ({
 
   const isViewMode = op === 'view'
 
-  const [defaultStatus, setDefaultStatus] = useState<
+  const defaultStatus = useMemo<
     { status: boolean; message?: string } | undefined
   >(() => {
     if (
@@ -214,7 +209,7 @@ const DataSourceForm = ({
           status: false,
           message: toJS(get(opSourceList, '[0].last_connection.message')),
         }
-  })
+  }, [op, opSourceList])
 
   const [showPing, setShowPing] = useState(false)
   const [ftpProtocolType, setFtpProtocol] = useState(() => {
@@ -287,7 +282,7 @@ const DataSourceForm = ({
           desc,
           type: resInfo.source_type,
           url: {
-            [urlType]: rest,
+            [urlType2Api[urlType as 'saphana'] ?? urlType]: rest,
           },
         }
       }

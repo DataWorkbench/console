@@ -315,7 +315,8 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
               placeholder: '端口号',
             },
             {
-              name: 'schema',
+              ...database,
+              name: 'database',
               label: null,
               component: InputField,
               prefix: 'currentschema=',
