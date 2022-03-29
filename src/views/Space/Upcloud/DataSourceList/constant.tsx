@@ -208,7 +208,6 @@ export const sftpFilters = new Set([
 ])
 
 export const hivePwdFilters = new Set([
-  // TODO: 字段需要调整
   'defaultFS',
   '__dbUrl',
   'hiveAuth',
@@ -216,12 +215,22 @@ export const hivePwdFilters = new Set([
   'password',
 ])
 
-export const HiveAnonymousFilters = new Set([
+export const hiveAnonymousFilters = new Set([
   'defaultFS',
   '__dbUrl',
   'hiveAuth',
   'hadoop_config',
 ])
+
+export const esPwdFilters = new Set([
+  '__dbUrl',
+  'esAuth',
+  'version',
+  'user',
+  'password',
+])
+
+export const esAnonymousFilters = new Set(['version', '__dbUrl', 'esAuth'])
 
 export enum DbType {
   Sql = '关系型数据库',
@@ -250,21 +259,25 @@ export enum SourceType {
   TiDB = 1000000000000,
 }
 
+// WRANNING: sourceKinds 里 name 和 后端接口 kinds name 统一，无法和 列表 urlType 和创建接口统一
 export const sourceKinds = [
   {
     name: 'MySQL',
+    urlType: 'mysql',
     desc: '是一个完全托管的数据库服务，可使用世界上最受欢迎的开源数据库来部署云原生应用程序。',
     source_type: SourceType.Mysql,
     type: DbType.Sql,
   },
   {
     name: 'PostgreSQL',
+    urlType: 'postgresql',
     desc: '开源的对象-关系数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。 ',
     source_type: SourceType.PostgreSQL,
     type: DbType.Sql,
   },
   {
     name: 'TiDB',
+    urlType: 'tidb',
     desc: 'TiDB 是一款结合了传统的关系型数据库和 NoSQL 数据库特性的新型分布式数据库。',
     source_type: SourceType.TiDB,
     type: DbType.Sql,
@@ -272,17 +285,20 @@ export const sourceKinds = [
   {
     name: 'Oracle',
     desc: '',
+    urlType: 'oracle',
     source_type: SourceType.Oracle,
     type: DbType.Sql,
   },
   {
     name: 'SqlServer',
+    urlType: 'sqlserver',
     desc: '',
     source_type: SourceType.SqlServer,
     type: DbType.Sql,
   },
   {
     name: 'DB2',
+    urlType: 'db2',
     desc: '',
     source_type: SourceType.DB2,
     type: DbType.Sql,
@@ -290,24 +306,28 @@ export const sourceKinds = [
   {
     name: 'SapHana',
     showname: 'SPA HANA',
+    urlType: 'sap_hana',
     desc: '',
     source_type: SourceType.SapHana,
     type: DbType.Sql,
   },
   {
     name: 'ClickHouse',
+    urlType: 'clickhouse',
     desc: '用于联机分析处理的开源列式数据库。 ClickHouse允许分析实时更新的数据。该系统以高性能为目标。',
     source_type: SourceType.ClickHouse,
     type: DbType.DW,
   },
   {
     name: 'Hive',
+    urlType: 'hive',
     desc: '',
     source_type: SourceType.Hive,
     type: DbType.DW,
   },
   {
     name: 'Ftp',
+    urlType: 'ftp',
     showname: 'FTP',
     desc: '用于在网络上进行文件传输的一套标准协议，它工作在 OSI 模型中的应用层。',
     source_type: SourceType.Ftp,
@@ -315,6 +335,7 @@ export const sourceKinds = [
   },
   {
     name: 'HDFS',
+    urlType: 'hdfs',
     desc: '在通用硬件上的分布式文件系统，提供高吞吐量的数据访问，适合大规模数据集上的应用。',
     source_type: SourceType.HDFS,
     type: DbType.Storage,
@@ -322,24 +343,28 @@ export const sourceKinds = [
   {
     name: 'HBase',
     showname: 'HBase',
+    urlType: 'hbase',
     desc: 'HBase 是一个开源的非关系型分布式数据库，实现的编程语言为 Java。它可以对稀疏文件提供极高的容错率。 ',
     source_type: SourceType.HBase,
     type: DbType.Nosql,
   },
   {
     name: 'ElasticSearch',
+    urlType: 'elastic_search',
     desc: '',
     source_type: SourceType.ElasticSearch,
     type: DbType.Nosql,
   },
   {
     name: 'Redis',
+    urlType: 'redis',
     desc: '',
     source_type: SourceType.Redis,
     type: DbType.Nosql,
   },
   {
     name: 'MongoDb',
+    urlType: 'mongo_db',
     showname: 'MongoDB',
     desc: '',
     source_type: SourceType.MongoDB,
@@ -347,12 +372,21 @@ export const sourceKinds = [
   },
   {
     name: 'Kafka',
+    urlType: 'kafka',
     desc: '由Scala和Java编写，目标是为处理实时数据提供一个统一、高吞吐、低延迟的平台。',
     source_type: SourceType.Kafka,
     type: DbType.Mq,
   },
 ]
 
-export const urlType2Api = {
-  saphana: 'sap_hana',
-}
+//
+// // 处理后端 url type 字段
+// export const urlType2Api = {
+//   saphana: 'sap_hana',
+//   elasticsearch: 'elastic_search',
+// }
+//
+// export const api2UrlType = {
+//   sap_hana: 'saphana',
+//   elastic_search: 'elasticsearch',
+// }
