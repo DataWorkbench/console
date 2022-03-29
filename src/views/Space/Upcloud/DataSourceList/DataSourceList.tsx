@@ -17,6 +17,7 @@ import {
   ToolBar,
   ToolBarLeft,
   ToolBarRight,
+  // @ts-ignore
   utils,
 } from '@QCFE/qingcloud-portal-ui'
 import { useMutationSource, useQuerySource, useStore } from 'hooks'
@@ -163,7 +164,7 @@ const getUrl = (
     case 'sap_hana':
       return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
     case 'elastic_search':
-      return `elasticsearch://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      return `elasticsearch://${urlObj.host}:${urlObj.port}`
     case 'ftp':
       return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
         urlObj?.host
@@ -365,12 +366,11 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       dataIndex: 'url',
       width: 250,
       render: (v: any, row: any) => {
-        const kindName = sourceKinds.find(
-          (kind) => kind.source_type === row.type
-        )?.name
+        const item = sourceKinds.find((kind) => kind.source_type === row.type)
+        const kindName = item?.urlType ?? item?.name
 
         if (kindName) {
-          const key = kindName.toLowerCase()
+          const key = kindName
           const urlObj = get(v, key)
           // const networkId = get(urlObj, 'network.vpc_network.network_id')
           return (
