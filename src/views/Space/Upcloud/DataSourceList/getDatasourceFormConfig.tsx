@@ -5,13 +5,14 @@ import { strlen } from 'utils/convert'
 import { InputField } from 'components/Input'
 import { Form } from '@QCFE/lego-ui'
 import { getKvTextAreaFieldByMap } from 'components/KVTextArea'
+import { ReactElement } from 'react'
 import {
   compInfo,
   ftpConnectionMode,
   ftpProtocol,
   hadoopLink,
   hbaseLink,
-  hostReg,
+  ipReg,
   SourceType,
 } from './constant'
 
@@ -368,21 +369,21 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
     case SourceType.Hive:
       fieldsInfo = [
         {
-          name: 'nameNode',
+          name: 'defaultFS',
           component: TextField,
           label: '主节点地址（NameNode 节点地址）',
-          required: true,
+          required: false,
           placeholder: 'hdfs://127.0.0.1:9000',
           help: 'hdfs://ServerIP:Port',
-          schemas: [
-            {
-              rule: {
-                required: true,
-              },
-              message: '请输入 NameNode 节点地址',
-              status: 'error',
-            },
-          ],
+          // schemas: [ // defaultFS 非必填
+          //   {
+          //     rule: {
+          //       required: true,
+          //     },
+          //     message: '请输入 NameNode 节点地址',
+          //     status: 'error',
+          //   },
+          // ],
         },
         {
           fieldType: 'dbUrl',
@@ -413,11 +414,11 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             },
           ],
         },
-        auth,
+        { ...auth, name: 'hiveAuth' },
         user,
         password,
         {
-          name: 'config',
+          name: 'hadoop_config',
           label: 'Hadoop 高级配置',
           component: TextAreaWrapper,
           placeholder:
@@ -521,7 +522,19 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
         { ...pwd, placeholder: '请输入密码' },
       ]
       break
-    case SourceType.HDFS:
+    case SourceType.HDFS: {
+      const help = (error?: ReactElement | string) => {
+        return (
+          <div>
+            {error && <span tw="mr-0.5">{error}</span>}
+            <span tw="mr-0.5 text-neut-8">可参考</span>
+            {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
+            <HelpCenterLink href={hadoopLink} isIframe={false}>
+              Hadoop 参数说明文档
+            </HelpCenterLink>
+          </div>
+        )
+      }
       fieldsInfo = [
         {
           fieldType: 'dbUrl',
@@ -586,22 +599,14 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             }
           `,
           resize: true,
-          help: (
-            <div>
-              <span tw="mr-0.5">可参考</span>
-              {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
-              <HelpCenterLink href={hadoopLink} isIframe={false}>
-                Hadoop 参数说明文档
-              </HelpCenterLink>
-            </div>
-          ),
+          help: help(),
           schemas: [
             {
               rule: (value: string) => {
                 const l = strlen(value)
                 return l >= 0 && l <= 1048576
               },
-              help: '最大长度: 16KB, 最小长度: 0',
+              help: help('最大长度: 16KB, 最小长度: 0。'),
               status: 'error',
             },
             {
@@ -615,17 +620,19 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                   return false
                 }
               },
-              help: '配置必须为 JSON 格式',
+              help: help('配置必须为 JSON 格式。'),
             },
           ],
         },
       ]
       break
-
+    }
     case SourceType.HBase: {
-      const help = (
+      // eslint-disable-next-line @typescript-eslint/no-redeclare
+      const help = (error?: ReactElement | string) => (
         <div>
-          <span tw="mr-0.5">
+          {error && <span tw="text-red-10">{error}</span>}
+          <span tw="mr-0.5 text-neut-8">
             HBase 集群提供给客户端连接的配置信息。详情可参考
           </span>
           {/* <TextLink theme="blue">HBase 配置信息说明文档</TextLink> */}
@@ -647,7 +654,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
    "zookeeper.znode.parent": "/hbase"
 } 
 `,
-          help,
+          help: help(),
           resize: true,
           css: tw`w-auto`,
           schemas: [
@@ -656,7 +663,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                 required: true,
                 // matchRegex: hostReg,
               },
-              help,
+              help: help('配置信息不能为空。'),
               status: 'error',
             },
             {
@@ -664,7 +671,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                 const l = strlen(value)
                 return l >= 1 && l <= 1048576
               },
-              help: '最大长度: 16KB, 最小长度: 1',
+              help: help('最大长度: 16KB, 最小长度: 1。'),
               status: 'error',
             },
             {
@@ -675,7 +682,9 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                   return false
                 }
               },
-              help: '配置必须为 JSON 格式，且 hbase.zookeeper.quorum 不能为空',
+              help: help(
+                '配置必须为 JSON 格式，且 hbase.zookeeper.quorum 不能为空。'
+              ),
             },
           ],
         },
@@ -700,7 +709,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                 {
                   rule: {
                     required: true,
-                    matchRegex: hostReg,
+                    matchRegex: ipReg,
                   },
                   help: '请输入 ElasticSearch 地址',
                   status: 'error',
@@ -751,7 +760,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             },
           ],
         },
-        auth,
+        { ...auth, name: 'esAuth' },
         user,
         password,
       ]
