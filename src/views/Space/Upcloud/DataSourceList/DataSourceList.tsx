@@ -193,7 +193,7 @@ const getUrl = (
         .join(',')
 
     default:
-      return `jdbc:${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      return `jdbc:${type}://${urlObj?.host}:${urlObj?.port}/${urlObj?.database}`
   }
 }
 

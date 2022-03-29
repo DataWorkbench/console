@@ -209,18 +209,18 @@ export const sftpFilters = new Set([
 
 export const hivePwdFilters = new Set([
   // TODO: 字段需要调整
-  'nameNode',
+  'defaultFS',
   '__dbUrl',
-  'auth',
+  'hiveAuth',
   'user',
   'password',
 ])
 
 export const HiveAnonymousFilters = new Set([
-  'nameNode',
+  'defaultFS',
   '__dbUrl',
-  'auth',
-  'config',
+  'hiveAuth',
+  'hadoop_config',
 ])
 
 export enum DbType {

@@ -127,6 +127,10 @@ const getInitValue = (path: string) => {
    "zookeeper.znode.parent": "/hbase"
 }`,
       },
+      hive: {
+        auth01: 1,
+        auth02: 2,
+      },
     },
   }
   return get(initValues, path, '')
@@ -180,7 +184,7 @@ const DataSourceForm = ({
     }
     if (urlType === 'hive') {
       // TODO: 后续支持hive, auth 待确定
-      if (get(sourceInfo, 'url.hive.auth') === 2) {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
         return HiveAnonymousFilters
       }
       return hivePwdFilters
@@ -237,7 +241,7 @@ const DataSourceForm = ({
       })
       onChange?.(v)
     },
-    hive_auth: (onChange?: Function) => (v: number) => {
+    hive_hiveAuth: (onChange?: Function) => (v: number) => {
       if (v === 2) {
         setFilters(HiveAnonymousFilters)
       } else {
@@ -271,7 +275,12 @@ const DataSourceForm = ({
           ...others
         } = formElem.getFieldsValue()
         const rest = omit(others, 'utype')
-
+        // TODO 连通性测试那里需要同步修改
+        if (urlType === 'hdfs') {
+          Object.assign(rest, {
+            default_fs: `hdfs://${rest.name_node}:${rest.port}`,
+          })
+        }
         // if (urlType === 'hdfs') {
         //   const shiftArr = ['name_node', 'port']
         //   rest.nodes = pick(rest, shiftArr)
@@ -296,6 +305,21 @@ const DataSourceForm = ({
       getFormData.current = parseFormData
     }
   }, [getFormData, parseFormData])
+
+  function getDefaultValue(name: string) {
+    // 如果 hive ，有 hadoop config auth 取 2， 后端未存储值。 默认为 1
+    if (urlType === 'hive' && name === 'hiveAuth') {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+        return 2
+      }
+      return 1
+    }
+    const defaultPath =
+      urlType === 'ftp' && name === 'port'
+        ? `url.${toLower(get(ftpProtocol, `${ftpProtocolType}.label`))}.${name}`
+        : `url.${urlType}.${name}`
+    return get(sourceInfo, `url.${urlType}.${name}`, getInitValue(defaultPath))
+  }
 
   return (
     <Root>
@@ -461,17 +485,7 @@ const DataSourceForm = ({
                     }
                     name={name}
                     disabled={isViewMode}
-                    defaultValue={get(
-                      sourceInfo,
-                      `url.${urlType}.${name}`,
-                      getInitValue(
-                        urlType === 'ftp' && name === 'port'
-                          ? `url.${toLower(
-                              get(ftpProtocol, `${ftpProtocolType}.label`)
-                            )}.${name}`
-                          : `url.${urlType}.${name}`
-                      )
-                    )}
+                    defaultValue={getDefaultValue(name)}
                     validateOnChange
                     schemas={schemas}
                     css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
