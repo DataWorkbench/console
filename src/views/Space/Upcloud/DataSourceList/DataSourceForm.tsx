@@ -22,15 +22,17 @@ import { toJS } from 'mobx'
 import { DataSourcePingButton } from './DataSourcePing'
 // import { NetworkContext } from './NetworkProvider'
 import {
+  esAnonymousFilters,
+  esPwdFilters,
   ftpFilters,
   ftpProtocol,
   ftpProtocolValue,
-  HiveAnonymousFilters,
+  hiveAnonymousFilters,
   hivePwdFilters,
   sftpFilters,
   sFtpProtocolValue,
   SourceType,
-  urlType2Api,
+  // urlType2Api,
 } from './constant'
 import getFieldsInfo from './getDatasourceFormConfig'
 
@@ -139,6 +141,7 @@ const getInitValue = (path: string) => {
 interface IFormProps {
   resInfo: {
     name: string
+    urlType?: string
     desc?: string
     img?: React.ReactNode
     source_type?: SourceType
@@ -169,7 +172,7 @@ const DataSourceForm = ({
     dataSourceStore: { op, opSourceList },
   } = useStore()
 
-  const urlType = resInfo.name.toLowerCase()
+  const urlType = resInfo?.urlType ?? resInfo.name.toLowerCase()
   const sourceInfo =
     ['update', 'view'].includes(op) &&
     opSourceList.length > 0 &&
@@ -183,9 +186,8 @@ const DataSourceForm = ({
       return ftpFilters
     }
     if (urlType === 'hive') {
-      // TODO: 后续支持hive, auth 待确定
       if (get(sourceInfo, 'url.hive.hadoop_config')) {
-        return HiveAnonymousFilters
+        return hiveAnonymousFilters
       }
       return hivePwdFilters
     }
@@ -243,9 +245,17 @@ const DataSourceForm = ({
     },
     hive_hiveAuth: (onChange?: Function) => (v: number) => {
       if (v === 2) {
-        setFilters(HiveAnonymousFilters)
+        setFilters(hiveAnonymousFilters)
       } else {
         setFilters(hivePwdFilters)
+      }
+      onChange?.(v)
+    },
+    elastic_search_esAuth: (onChange?: Function) => (v: number) => {
+      if (v === 2) {
+        setFilters(esAnonymousFilters)
+      } else {
+        setFilters(esPwdFilters)
       }
       onChange?.(v)
     },
@@ -275,7 +285,6 @@ const DataSourceForm = ({
           ...others
         } = formElem.getFieldsValue()
         const rest = omit(others, 'utype')
-        // TODO 连通性测试那里需要同步修改
         if (urlType === 'hdfs') {
           Object.assign(rest, {
             default_fs: `hdfs://${rest.name_node}:${rest.port}`,
@@ -291,7 +300,7 @@ const DataSourceForm = ({
           desc,
           type: resInfo.source_type,
           url: {
-            [urlType2Api[urlType as 'saphana'] ?? urlType]: rest,
+            [urlType]: rest,
           },
         }
       }
@@ -314,6 +323,16 @@ const DataSourceForm = ({
       }
       return 1
     }
+    if (urlType === 'elastic_search' && name === 'esAuth') {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return 2
+      }
+      return 1
+    }
+
     const defaultPath =
       urlType === 'ftp' && name === 'port'
         ? `url.${toLower(get(ftpProtocol, `${ftpProtocolType}.label`))}.${name}`
