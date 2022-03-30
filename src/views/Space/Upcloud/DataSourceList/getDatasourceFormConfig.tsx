@@ -742,12 +742,12 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           component: SelectField,
           options: [
             {
-              label: '7.x',
-              value: '7.x',
+              label: '6.x',
+              value: '6',
             },
             {
-              label: '6.x',
-              value: '6.x',
+              label: '7.x',
+              value: '7',
             },
           ],
           schemas: [
