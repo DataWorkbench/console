@@ -590,7 +590,7 @@ def main(args: Array[String]): Unit = {
                       secondary: '#9DDFC9',
                     }}
                   />
-                  <div>检查完毕，暂无语法错误</div>
+                  <div>检查完毕，未发现语法错误</div>
                 </div>
               ) : (
                 <div tw="w-full">
