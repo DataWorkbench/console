@@ -33,7 +33,7 @@ const SpaceListsEmpty = () => {
       <div css={[tw`bg-white`, !isModal && tw`pb-2`]}>
         <div
           css={[
-            tw`border-b border-neut-2 flex items-center justify-center`,
+            tw`flex items-center justify-center`,
             isModal ? tw`h-80 border-b-0` : tw`h-auto`,
           ]}
         >
@@ -83,7 +83,9 @@ const SpaceListsEmpty = () => {
             )}
           </div>
         </div>
-        {!isModal && <Guide title={guideData.title} items={guideData.items} />}
+        {!isModal && (
+          <Guide tw="hidden" title={guideData.title} items={guideData.items} />
+        )}
       </div>
     </div>
   )

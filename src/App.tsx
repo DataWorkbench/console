@@ -8,7 +8,7 @@ import {
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
 import { RootStore, StoreContext } from 'stores'
-import { get, set } from 'lodash-es'
+import { get } from 'lodash-es'
 import emitter from 'utils/emitter'
 import { describeDataomnis } from 'stores/api'
 import locales from './locales'
@@ -41,14 +41,14 @@ const queryClient = new QueryClient({
 const App = () => {
   const [loading, setLoading] = useState(true)
   const handleGlobalData = async () => {
-    const { hostname } = window.location
-    const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
+    // const { hostname } = window.location
+    // const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
 
-    if (!isOnlineEnv) {
-      const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
-      set(window, 'GLOBAL_CONFIG.new_docs_url', docsUrl)
-      set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
-    }
+    // if (!isOnlineEnv) {
+    //   const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
+    //   set(window, 'GLOBAL_CONFIG.new_docs_url', docsUrl)
+    //   set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
+    // }
 
     const currentUser = get(window, 'USER.user_id', '')
     const registerUser = localStorage.getItem('DATA_OMNIS_OPENED')

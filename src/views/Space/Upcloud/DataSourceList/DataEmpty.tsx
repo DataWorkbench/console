@@ -43,9 +43,7 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => {
             tw="mr-4"
             onClick={() => {
               const openModal = Modal.open(HelpCenterModal, {
-                link: getHelpCenterLink(
-                  '/manual/data_up_cloud/source_data/data_summary/'
-                ),
+                link: getHelpCenterLink('/manual/data_up_cloud/data_summary/'),
                 onCancel: () => Modal.close(openModal),
               })
             }}
