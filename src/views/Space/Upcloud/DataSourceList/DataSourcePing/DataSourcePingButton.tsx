@@ -196,7 +196,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       </Control>
       {mutation.isLoading && (
         <div className="help">
-          <span tw="text-neut-15">
+          <span tw="text-neut-15 dark:text-neut-8">
             正在测试数据源在当前网络配置下的可用性，如需查看更多可点击
           </span>
           {pingHistory}
@@ -213,7 +213,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           `}
         >
           <Icon name="error" />
-          <span tw="text-neut-15">
+          <span tw="text-neut-15 dark:text-neut-8">
             不可用，{status.message ? `${status.message}，` : ''}
             如需查看更多可点击
             {pingHistory}
@@ -231,13 +231,17 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           `}
         >
           <Icon name="success" size={16} />
-          <span tw="ml-1 text-neut-15">测试通过，如需查看更多可点击</span>
+          <span tw="ml-1 text-neut-15 dark:text-neut-8">
+            测试通过，如需查看更多可点击
+          </span>
           {pingHistory}
         </div>
       )}
       {!mutation.isLoading && !status && hasPingStatus && (
         <div className="help">
-          <span tw="ml-1 text-neut-15">已有测试记录，如需查看可点击</span>
+          <span tw="ml-1 text-neut-15 dark:text-neut-8">
+            已有测试记录，如需查看可点击
+          </span>
           {pingHistory}
         </div>
       )}

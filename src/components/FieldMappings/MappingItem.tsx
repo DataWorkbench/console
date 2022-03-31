@@ -1,34 +1,31 @@
-import { PropsWithChildren, useContext, useEffect, useRef } from 'react'
-import JsplumbContext from './Context'
+import { Interpolation, Theme } from '@emotion/react'
+import { AnchorSpec, Endpoint, jsPlumbInstance } from 'jsplumb'
+import { PropsWithChildren, useEffect, useRef } from 'react'
+import { useUnmount } from 'react-use'
 
-function capitalize(sentence: string) {
-  return sentence && sentence[0].toUpperCase() + sentence.slice(1)
+interface MappingItemProps {
+  anchor: AnchorSpec
+  data: Record<string, any>
+  css: Interpolation<Theme>
+  jsplumb?: jsPlumbInstance
 }
 
-// TODO: props type
-function MappingItem(props: PropsWithChildren<any>) {
-  const ref = useRef()
-  const { instance, addNode } = useContext(JsplumbContext)
-  const { type, data, children } = props
-  const unmoundRef = useRef<Function>()
+function MappingItem(props: PropsWithChildren<MappingItemProps>) {
+  const ref = useRef<HTMLDivElement>(null)
+  const { jsplumb, anchor, data, children } = props
+  const endPointRef = useRef<Endpoint | null>(null)
+
   useEffect(() => {
-    if (ref.current && instance) {
-      const common = {
-        isSource: type !== 'left',
-        isTarget: type === 'left',
-        connector: ['Straight'],
-        id: data.uuid,
-        connectorOverlays: [
-          [
-            'Arrow',
-            {
-              location: 1,
-              width: 13,
-              length: 13,
-              cssClass: 'mapping-arrow',
-            },
-          ],
-        ],
+    if (ref.current && jsplumb) {
+      const endPoint = endPointRef.current
+      if (endPoint) {
+        jsplumb.deleteEndpoint(endPoint)
+      }
+      endPointRef.current = jsplumb.addEndpoint(ref.current, {
+        anchor,
+        parameters: { [String(anchor)]: data },
+        isSource: anchor !== 'Left',
+        isTarget: anchor === 'Left',
         connectorStyle: {
           gradient: {
             stops: [
@@ -38,58 +35,34 @@ function MappingItem(props: PropsWithChildren<any>) {
           },
           strokeWidth: 2,
           stroke: '#fff',
-          zIndex: 2,
         },
-
+        connectorHoverStyle: {
+          strokeWidth: 3,
+        },
         endpoint: [
           'Dot',
           {
-            cssClass: `${type}-mapping-point mapping-point`,
-            // hoverClass: `${type}-hover-mapping-point `,
+            cssClass: `point-${anchor}`,
+            radius: 6,
           },
         ],
-        endpointStyle: {
-          radius: 7,
+        paintStyle: {
+          fill: anchor === 'Left' ? '#15a675' : '#229ce9',
+          stroke: '#fff',
+          strokeWidth: 2,
         },
-      }
-      // if (instance.getEndpoints(data.uuid)) {
-      //   instance.deleteEndpoint(data.uuid)
-      // }
-
-      unmoundRef.current = () => instance.deleteEndpoint(data.uuid)
-      if (!instance!.getEndpoint(data.uuid)) {
-        instance.addEndpoint(
-          ref.current,
-          {
-            anchors: [capitalize(type)],
-            uuid: data.uuid,
-            data: {
-              ...data,
-              type,
-            },
-            ...common,
-          },
-          {
-            uuid: data.uuid,
-            data: {
-              ...data,
-              type,
-            },
-            ...common,
-          }
-        )
-        addNode?.(data.uuid)
-      }
+        'connector-pointer-events': 'visible',
+        uuid: `${anchor}-${data.name}`,
+      } as any) as Endpoint
     }
-  }, [addNode, data, instance, type])
+  }, [data, jsplumb, anchor])
 
-  useEffect(() => {
-    return () => {
-      if (unmoundRef.current) {
-        unmoundRef.current?.()
-      }
+  useUnmount(() => {
+    const endPoint = endPointRef.current
+    if (jsplumb && endPoint) {
+      jsplumb.deleteEndpoint(endPoint)
     }
-  }, [])
+  })
 
   return (
     <div {...props} ref={ref}>

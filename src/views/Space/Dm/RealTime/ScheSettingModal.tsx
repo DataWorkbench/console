@@ -64,7 +64,7 @@ const ScheSettingModal = ({
 
   // const [period, setPeriod] = useState<TPeriodType>('minute')
   const [defCurDate] = useState(dayjs().hour(0).minute(20).toDate())
-  // const { regionId, spaceId } = useParams<IUseParms>()
+  // const { regionId, spaceId } = useParams<IUseParams>()
   const [periodData, setPeriodData] = useImmer({
     minute: {
       startHour: 0,
