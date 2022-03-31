@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import { Notification as Notify, Loading } from '@QCFE/qingcloud-portal-ui'
 import { RootStore, StoreContext } from 'stores'
-import { set } from 'lodash-es'
 import emitter from 'utils/emitter'
 import { LocaleProvider } from '@QCFE/lego-ui'
 import locales from './locales'
@@ -33,14 +32,14 @@ const queryClient = new QueryClient({
 const App = () => {
   const [loading, setLoading] = useState(true)
   const handleGlobalData = async () => {
-    const { hostname } = window.location
-    const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
+    // const { hostname } = window.location
+    // const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
 
-    if (!isOnlineEnv) {
-      const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
-      set(window, 'GLOBAL_CONFIG.new_docs_url', docsUrl)
-      set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
-    }
+    // if (!isOnlineEnv) {
+    //   const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
+    //   set(window, 'GLOBAL_CONFIG.new_docs_url', docsUrl)
+    //   set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
+    // }
 
     setLoading(false)
   }
