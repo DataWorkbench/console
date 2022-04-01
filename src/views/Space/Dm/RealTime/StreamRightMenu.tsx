@@ -1,6 +1,9 @@
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
+import MonitorModal from 'views/Space/Dm/RealTime/Monitor/MonitorModal'
+import MonitorAddModal from 'views/Space/Dm/RealTime/Monitor/MonitorAddModal'
+import MonitorAddFormModal from 'views/Space/Dm/RealTime/Monitor/MonitorAddFormModal'
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
 import VersionsModal from './VersionsModal'
@@ -18,7 +21,15 @@ const MenuRoot = styled('div')(() => [
 const StreamRightMenu = observer(() => {
   const {
     workFlowStore,
-    workFlowStore: { showScheSetting, showArgsSetting, showVersions },
+    workFlowStore: {
+      showScheSetting,
+      showArgsSetting,
+      showVersions,
+      showMonitor,
+      showAddMonitor,
+      showAddMonitorDetail,
+      showAddMonitorForm,
+    },
   } = useStore()
   return (
     <>
@@ -29,6 +40,9 @@ const StreamRightMenu = observer(() => {
         </span>
         <span onClick={() => workFlowStore.set({ showScheSetting: true })}>
           调 度 设 置
+        </span>
+        <span onClick={() => workFlowStore.set({ showMonitor: true })}>
+          告 警 策 略
         </span>
         <span onClick={() => workFlowStore.set({ showVersions: true })}>
           历 史 版 本
@@ -54,6 +68,27 @@ const StreamRightMenu = observer(() => {
         <VersionsModal
           onCancel={() => {
             workFlowStore.set({ showVersions: false })
+          }}
+        />
+      )}
+      {showMonitor && (
+        <MonitorModal
+          onCancel={() => {
+            workFlowStore.set({ showMonitor: false })
+          }}
+        />
+      )}
+      {showAddMonitor && (
+        <MonitorAddModal
+          onCancel={() => {
+            workFlowStore.set({ showAddMonitor: false })
+          }}
+        />
+      )}
+      {showAddMonitorForm && (
+        <MonitorAddFormModal
+          onCancel={() => {
+            workFlowStore.set({ showAddMonitorForm: false })
           }}
         />
       )}
