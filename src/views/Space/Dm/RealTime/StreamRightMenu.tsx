@@ -7,6 +7,7 @@ import MonitorAddFormModal from 'views/Space/Dm/RealTime/Monitor/MonitorAddFormM
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
 import VersionsModal from './VersionsModal'
+import MonitorAddFormDetail from './Monitor/MonitorAddFormDetail'
 
 const MenuRoot = styled('div')(() => [
   tw`pt-8 space-y-4 align-middle bg-neut-17 w-10`,
@@ -90,6 +91,14 @@ const StreamRightMenu = observer(() => {
           onCancel={() => {
             workFlowStore.set({ showAddMonitorForm: false })
           }}
+        />
+      )}
+      {showAddMonitorDetail && (
+        <MonitorAddFormDetail
+          onCancel={() => {
+            workFlowStore.set({ showAddMonitorDetail: false })
+          }}
+          data={{}}
         />
       )}
     </>

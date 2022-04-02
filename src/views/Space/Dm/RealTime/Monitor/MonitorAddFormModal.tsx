@@ -1,24 +1,9 @@
-import {
-  Button,
-  Form,
-  Icon,
-  Select,
-  InputNumber,
-  Input,
-} from '@QCFE/qingcloud-portal-ui'
-import {
-  Center,
-  FlexBox,
-  HelpCenterLink,
-  InputField,
-  Modal,
-  ModalContent,
-} from 'components'
-import { Field, Label, Checkbox } from '@QCFE/lego-ui'
+import { Form, InputNumber, Select } from '@QCFE/qingcloud-portal-ui'
+import { FlexBox, Modal, ModalContent } from 'components'
+import { Checkbox, Field, Label } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { Table } from 'views/Space/styled'
-import { useStore } from 'stores/index'
-import tw from 'twin.macro'
+import tw, { css } from 'twin.macro'
+import AdduserField from 'views/Space/Dm/RealTime/Monitor/AdduserField'
 
 const { TextField, TextAreaField } = Form
 
@@ -26,15 +11,17 @@ interface IMonitorAddProps {
   onCancel: () => void
 }
 
-const columns: Record<string, any>[] = []
-
 const formStyle = {
-  wrapper: tw`pl-0`,
+  wrapper: tw`pl-0!`,
   itemWrapper: tw`w-full h-12 bg-neut-17 rounded-[2px] items-center pl-4`,
+  textarea: css`
+    & textarea.textarea {
+      ${tw`min-w-[500px]!`}
+    }
+  `,
 }
 
 const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
-  const { workFlowStore } = useStore()
   const { onCancel } = props
   return (
     <Modal
@@ -59,7 +46,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
             <span>流式计算作业</span>
           </Field>
           <Field>
-            <Label tw="label-required">监控项</Label>
+            <Label tw="label-required mt-2 items-baseline!	">监控项</Label>
             {(() => (
               <div tw="w-[640px]">
                 <FlexBox css={formStyle.itemWrapper} tw="mb-2">
@@ -96,7 +83,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                     placeholder="请输入"
                     tw="w-24"
                   />
-                  秒
+                  <span tw="ml-2">秒</span>
                 </FlexBox>
               </div>
             ))()}
@@ -109,17 +96,30 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
             <Label tw="label-required">触发行为</Label>
             <span>发送通知</span>
           </Field>
-          <Field>
-            <Label tw="label-required">消息接收人</Label>
-            {
-              (() => {
-                return (
-                  <Select options={[]} placeholder={'请选择消息接收人'} />
+          {/* <Field> */}
+          {/*  <Label tw="label-required">消息接收人</Label> */}
+          {/*  {(() => { */}
+          {/*    return <Select options={[]} placeholder="请选择消息接收人" /> */}
+          {/*  })()} */}
+          {/* </Field> */}
+          <AdduserField label="消息接受人" labelClasName="label-required" />
+          <TextAreaField
+            label="策略描述"
+            placeholder="请输入策略描述"
+            css={formStyle.textarea}
+            schemas={[
+              {
+                rules: [
+                  {
+                    maxLength: 1024,
+                  },
+                ],
 
-                )
-              })()
-            }
-          </Field>
+                help: '策略描述不能超过1024个字符',
+                status: 'error',
+              },
+            ]}
+          />
         </Form>
       </ModalContent>
     </Modal>

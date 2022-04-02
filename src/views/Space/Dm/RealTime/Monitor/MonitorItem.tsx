@@ -1,6 +1,6 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 
-import { Center, FlexBox, Tooltip } from 'components'
+import { FlexBox, Tooltip } from 'components'
 import tw, { styled } from 'twin.macro'
 
 interface IMonitorItemProps {}
@@ -17,6 +17,7 @@ const Tag = styled.div`
 `
 
 const MonitorItem = (props: IMonitorItemProps) => {
+  console.log(props)
   return (
     <div>
       <FlexBox tw="items-center">
