@@ -1,6 +1,7 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon } from '@QCFE/qingcloud-portal-ui'
 import { HelpCenterLink, FieldMappings } from 'components'
+import { pick } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { JobToolBar } from '../styled'
@@ -126,8 +127,12 @@ const SyncJob = () => {
               )}
               {index === 1 && (
                 <FieldMappings
-                  leftFields={fields.source}
-                  rightFields={fields.target}
+                  leftFields={fields.source.map((field) =>
+                    pick(field, ['name', 'type', 'is_primary_key'])
+                  )}
+                  rightFields={fields.target.map((field) =>
+                    pick(field, ['name', 'type', 'is_primary_key'])
+                  )}
                   topHelp={
                     <HelpCenterLink href="/xxx" isIframe={false}>
                       字段映射说明文档

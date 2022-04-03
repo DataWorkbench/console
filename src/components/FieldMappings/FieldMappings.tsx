@@ -1,25 +1,33 @@
-import { ReactNode, useEffect, useRef, useState } from 'react'
-import { jsPlumb, jsPlumbInstance } from 'jsplumb'
-import { useMount, useUnmount } from 'react-use'
-import tw, { styled } from 'twin.macro'
-import { intersectionBy } from 'lodash-es'
-import { Button, Icon } from '@QCFE/lego-ui'
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
+import { useMount, useUnmount, useMeasure } from 'react-use'
+import tw, { css, styled } from 'twin.macro'
+import { intersectionBy, isEmpty, get } from 'lodash-es'
+import { Button, Icon, Alert, Select, Input } from '@QCFE/lego-ui'
+import Tippy from '@tippyjs/react'
+import { nanoid } from 'nanoid'
+import { followCursor } from 'tippy.js'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
-import MappingItem from './MappingItem'
+import { HelpCenterLink } from 'components/Link'
+import MappingItem, { TMappingField } from './MappingItem'
 import { PopConfirm } from '../PopConfirm'
 /* @refresh reset */
 const styles = {
   wrapper: tw`border flex-1 border-neut-13 text-center`,
   grid: tw`grid grid-cols-[1fr 2fr 100px] border-b border-neut-13 last:border-b-0 p-1.5 leading-5`,
   header: tw`bg-neut-16`,
-  row: tw`hover:bg-[#1E2F41]`,
+  row: tw`hover:bg-[#1E2F41] cursor-move`,
   add: tw`bg-neut-16 text-white`,
 }
 
 const Root = styled.div`
   ${tw`text-white space-y-2`}
 `
+const EmptyFieldWrapper = styled(Center)(() => [
+  styles.wrapper,
+  tw`self-stretch text-neut-8`,
+])
 
 const Container = styled.div`
   ${tw`relative`}
@@ -36,7 +44,7 @@ const Container = styled.div`
       &.jtk-endpoint-connected {
         ${tw`opacity-0`}
         &.jtk-hover {
-          ${tw`opacity-100`}
+          ${tw`z-10 opacity-80!`}
         }
       }
       &.jtk-endpoint-drop-allowed {
@@ -45,24 +53,26 @@ const Container = styled.div`
     }
   }
   .jtk-connector {
-    ${tw`z-10`}
   }
   [anchor='Left'].jtk-managed {
     ${tw`select-none`}
   }
+  .jtk-source-hover,
+  .jtk-target-hover {
+    ${tw`bg-[#1E2F41]`}
+  }
 `
 
-export type TField = {
-  type: string
-  name: string
-  uuid: string
-  is_primary_key?: boolean
-}
+// export type TMappingField = {
+//   type: string
+//   name: string
+//   is_primary_key?: boolean
+// }
 
 export interface IFieldMappingsProps {
-  onChange: (value: Record<string, any>) => void
-  leftFields: TField[]
-  rightFields: TField[]
+  onChange?: (value: Record<string, any>) => void
+  leftFields: TMappingField[]
+  rightFields: TMappingField[]
   topHelp?: ReactNode
   mappings?: [string, string][]
 }
@@ -83,18 +93,29 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
 
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
-  const [jsPlumbInst, setJsPlumbInst] = useState<jsPlumbInstance>()
+  const [extralFields, setExtralFields] = useState<TMappingField[]>([])
+  const jsPlumbInstRef = useRef<jsPlumbInstance>()
   const [mappings, setMappings] = useState<[string, string][]>(mappingsProp)
+  const [visible, setVisible] = useState<boolean>(false)
+  const selectedConnection = useRef<Connection>()
 
-  const containerRef = useRef(null)
+  const [containerRef, rect] = useMeasure<HTMLDivElement>()
 
   useEffect(() => {
     setLeftFields(leftFieldsProp)
+    setMappings([])
   }, [leftFieldsProp])
 
   useEffect(() => {
     setRightFields(rightFieldsProp)
+    setMappings([])
   }, [rightFieldsProp])
+
+  useEffect(() => {
+    if (jsPlumbInstRef.current) {
+      jsPlumbInstRef.current.repaintEverything()
+    }
+  }, [rect.width])
 
   // console.log(mappings)
 
@@ -122,25 +143,27 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
         return [...mappingFields, ...filterFields]
       })
     }
-  }, [mappings, jsPlumbInst])
+  }, [mappings])
 
   useEffect(() => {
-    if (jsPlumbInst) {
-      if (jsPlumbInst.getAllConnections().length === 0 && mappings.length > 0) {
-        mappings.forEach(([left, right]) => {
-          const leftField = leftFields.find((f) => f.name === left)
-          const rightField = rightFields.find((f) => f.name === right)
-          if (leftField && rightField) {
-            // console.log('in 3', leftUUID, rightUUID)
-            jsPlumbInst.connect({
-              uuids: [`Right-${leftField.name}`, `Left-${rightField.name}`],
-            })
-          }
-        })
-      }
-      jsPlumbInst.repaintEverything()
+    const jsPlumbInst = jsPlumbInstRef.current
+    if (!jsPlumbInst) {
+      return
     }
-  }, [leftFields, rightFields, mappings, jsPlumbInst])
+    if (jsPlumbInst.getAllConnections().length === 0 && mappings.length > 0) {
+      mappings.forEach(([left, right]) => {
+        const leftField = leftFields.find((f) => f.name === left)
+        const rightField = rightFields.find((f) => f.name === right)
+        if (leftField && rightField) {
+          // console.log('in 3', leftUUID, rightUUID)
+          jsPlumbInst.connect({
+            uuids: [`Right-${leftField.name}`, `Left-${rightField.name}`],
+          })
+        }
+      })
+    }
+    jsPlumbInst.repaintEverything()
+  }, [leftFields, rightFields, mappings])
 
   useMount(() => {
     const instance = jsPlumb.getInstance({
@@ -161,21 +184,20 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
         ],
       ],
     })
+    jsPlumbInstRef.current = instance
+
     instance.bind('connection', (info, event) => {
       if (event) {
         const { connection } = info
         const { Left: leftAnchor, Right: rightAnchor } =
           connection.getParameters()
-        const added = mappings.find(
-          ([left, right]) =>
-            left === rightAnchor.name || right === leftAnchor.name
-        )
-        if (!added) {
-          setMappings((items) => [
-            ...items,
-            [rightAnchor.name, leftAnchor.name],
-          ])
-        }
+
+        setMappings((items) => {
+          const filterItems = items.filter(
+            ([l, r]) => l !== rightAnchor.name && r !== leftAnchor.name
+          )
+          return [...filterItems, [rightAnchor.name, leftAnchor.name]]
+        })
       }
     })
     instance.bind('connectionDetached', ({ connection }, event) => {
@@ -184,30 +206,43 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
           connection.getParameters()
         setMappings((items) =>
           items.filter(
-            ([l, r]) => l !== rightAnchor.name || r !== leftAnchor.name
+            ([l, r]) => l !== rightAnchor.name && r !== leftAnchor.name
           )
         )
       }
     })
-    setJsPlumbInst(instance)
+    instance.bind('contextmenu', (component, event) => {
+      const conIds = instance.getAllConnections().map((c) => c.id)
+      const compId = get(component, 'id')
+      event.preventDefault()
+      if (compId && conIds.includes(compId)) {
+        selectedConnection.current = component as any
+        setVisible(true)
+      }
+    })
   })
+
   useUnmount(() => {
+    const jsPlumbInst = jsPlumbInstRef.current
     if (jsPlumbInst) {
       jsPlumbInst.cleanupListeners()
-      setJsPlumbInst(undefined)
+      jsPlumbInst.reset()
+      jsPlumbInstRef.current = undefined
     }
     setMappings([])
   })
 
   const handleNameMapping = () => {
+    const jsPlumbInst = jsPlumbInstRef.current
     jsPlumbInst?.deleteEveryConnection()
     const filterMapping = intersectionBy(leftFields, rightFields, 'name')
-    if (filterMapping) {
+    if (!isEmpty(filterMapping)) {
       setMappings(filterMapping.map((v) => [v.name, v.name]))
     }
   }
 
   const handleRowMapping = () => {
+    const jsPlumbInst = jsPlumbInstRef.current
     jsPlumbInst?.deleteEveryConnection()
     const len = Math.min(leftFields.length, rightFields.length)
 
@@ -219,6 +254,7 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
   }
 
   const handleClearMapping = () => {
+    const jsPlumbInst = jsPlumbInstRef.current
     jsPlumbInst?.deleteEveryConnection()
     setMappings([])
   }
@@ -227,6 +263,69 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
     handleClearMapping()
     setLeftFields(leftFieldsProp)
     setRightFields(rightFieldsProp)
+  }
+
+  const handleDeleteConnection = () => {
+    const connection = selectedConnection.current
+    if (connection) {
+      const jsPlumbInst = jsPlumbInstRef.current
+      const { Left: leftAnchor, Right: rightAnchor } =
+        connection.getParameters()
+      setMappings((items) =>
+        items.filter(
+          ([l, r]) => l !== rightAnchor.name && r !== leftAnchor.name
+        )
+      )
+      jsPlumbInst?.deleteConnection(connection)
+      setVisible(false)
+    }
+  }
+
+  const moveItem = useCallback(
+    (dragId: string, hoverId: string, isTop = false) => {
+      setLeftFields((fields) => {
+        const dragFieldIndex = fields.findIndex(
+          (field) => field.name === dragId
+        )!
+        const dragField = fields[dragFieldIndex]
+        const newFields = [...fields]
+
+        newFields.splice(dragFieldIndex, 1)
+        const hoverFieldIndex = newFields.findIndex(
+          (field) => field.name === hoverId
+        )!
+        newFields.splice(isTop ? 0 : hoverFieldIndex + 1, 0, dragField)
+        return newFields
+      })
+    },
+    []
+  )
+
+  const addField = () => {
+    const hasUnFinish = extralFields.find((field) => !field.name)
+    if (!hasUnFinish) {
+      setExtralFields((fields) => {
+        return [...fields, { name: '', type: '', id: nanoid() }]
+      })
+    }
+  }
+
+  // console.log('extralFields', extralFields)
+
+  if (leftFields.length === 0 && rightFields.length === 0) {
+    return (
+      <Root>
+        <Alert
+          message="提示：选择来源端与目的端的数据源与表，才会显示字段映射。"
+          type="info"
+          linkBtn={
+            <HelpCenterLink href="/xxx" isIframe={false} hasIcon={false}>
+              查看详情 →
+            </HelpCenterLink>
+          }
+        />
+      </Root>
+    )
   }
 
   return (
@@ -271,57 +370,129 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
           </PopConfirm>
         </Center>
       </div>
-      <Container
-        // tw="relative"
-        ref={containerRef}
-        // mappings={mappings}
-        // onChange={changeMappings}
-      >
-        <FlexBox tw="flex gap-[10%] items-start">
-          <div css={styles.wrapper}>
-            <div css={[styles.grid, styles.header]}>
-              <div>类型</div>
-              <div>来源字段</div>
-            </div>
-            {leftFields.map((item) => {
-              return (
+      <Container ref={containerRef}>
+        <FlexBox tw="flex items-start transition-all duration-500">
+          {leftFields.length ? (
+            <div css={styles.wrapper}>
+              <div css={[styles.grid, styles.header]}>
+                <div>类型</div>
+                <div>来源表字段</div>
+              </div>
+              {leftFields.map((item, i) => (
                 <MappingItem
-                  jsplumb={jsPlumbInst}
-                  data={item}
+                  jsplumb={jsPlumbInstRef.current}
+                  item={item}
                   key={item.name}
+                  index={i}
+                  hasConnection={!!mappings.find(([l]) => l === item.name)}
                   css={[styles.grid, styles.row]}
                   anchor="Right"
+                  moveItem={moveItem}
                 >
                   <div>{item.type}</div>
                   <div>{item.name}</div>
                 </MappingItem>
-              )
-            })}
-            <Center tw="bg-neut-16 cursor-pointer h-8">
-              <Icon name="add" type="light" />
-              添加字段
-            </Center>
-          </div>
-          <div css={styles.wrapper}>
-            <div css={[styles.grid, styles.header]}>
-              <div>来源字段</div>
-              <div>类型</div>
+              ))}
+              {extralFields.map((item) => (
+                <div
+                  css={[styles.grid, styles.row, tw`cursor-text`]}
+                  key={item.id}
+                >
+                  <div>
+                    <Select
+                      css={css`
+                        .select-control {
+                          ${tw`h-7`}
+                        }
+                        .select-input {
+                          ${tw`h-auto`}
+                        }
+                      `}
+                      options={[
+                        {
+                          value: 'VARCHAR',
+                          label: 'VARCHAR',
+                        },
+                        {
+                          value: 'INT',
+                          label: 'INT',
+                        },
+                        {
+                          value: 'BIGINT',
+                          label: 'BIGINT',
+                        },
+                      ]}
+                    />
+                  </div>
+                  <div>
+                    <Input type="text" placeholder="请输入用户名" />
+                  </div>
+                </div>
+              ))}
+              <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addField}>
+                <Icon name="add" type="light" />
+                添加字段
+              </Center>
             </div>
-            {rightFields.map((item) => {
-              return (
-                <MappingItem
-                  jsplumb={jsPlumbInst}
-                  key={item.name}
-                  css={[styles.grid, styles.row]}
-                  anchor="Left"
-                  data={item}
-                >
-                  <div>{item.name}</div>
-                  <div>{item.type}</div>
-                </MappingItem>
-              )
-            })}
-          </div>
+          ) : (
+            <EmptyFieldWrapper>
+              选择来源端数据源表（可获取表结构）后显示字段
+            </EmptyFieldWrapper>
+          )}
+          <Tippy
+            followCursor="initial"
+            plugins={[followCursor]}
+            visible={visible}
+            onClickOutside={() => setVisible(false)}
+            content={
+              <div
+                tw="border border-neut-13 rounded-sm p-2.5 cursor-pointer flex items-center gap-1.5 hover:bg-neut-16"
+                onClick={handleDeleteConnection}
+              >
+                <Icon name="trash" type="light" />
+                <span>解除映射</span>
+              </div>
+            }
+            interactive
+            arrow={false}
+            placement="right-start"
+            theme="darker"
+            duration={[100, 0]}
+            offset={[5, 5]}
+            appendTo={() => document.body}
+          >
+            <div
+              tw="w-1/12 self-stretch"
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </Tippy>
+          {rightFields.length ? (
+            <div css={styles.wrapper}>
+              <div css={[styles.grid, styles.header]}>
+                <div>目标表字段</div>
+                <div>类型</div>
+              </div>
+              {rightFields.map((item, i) => {
+                return (
+                  <MappingItem
+                    jsplumb={jsPlumbInstRef.current}
+                    key={item.name}
+                    css={[styles.grid, styles.row]}
+                    anchor="Left"
+                    item={item}
+                    index={i}
+                  >
+                    <div>{item.name}</div>
+                    <div>{item.type}</div>
+                  </MappingItem>
+                )
+              })}
+            </div>
+          ) : (
+            <EmptyFieldWrapper>
+              选择目的端数据源表（可获取表结构）后显示字段
+            </EmptyFieldWrapper>
+          )}
         </FlexBox>
       </Container>
     </Root>
