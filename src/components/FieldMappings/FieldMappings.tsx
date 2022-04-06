@@ -1,21 +1,21 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
 import { useMount, useUnmount, useMeasure } from 'react-use'
-import tw, { css, styled } from 'twin.macro'
+import tw, { styled } from 'twin.macro'
 import { intersectionBy, isEmpty, get } from 'lodash-es'
-import { Button, Icon, Alert, Select, Input } from '@QCFE/lego-ui'
+import { Button, Icon, Alert } from '@QCFE/lego-ui'
 import Tippy from '@tippyjs/react'
-import { nanoid } from 'nanoid'
 import { followCursor } from 'tippy.js'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
+import FieldRow from './FieldRow'
 import MappingItem, { TMappingField } from './MappingItem'
 import { PopConfirm } from '../PopConfirm'
 /* @refresh reset */
 const styles = {
   wrapper: tw`border flex-1 border-neut-13 text-center`,
-  grid: tw`grid grid-cols-[1fr 2fr 100px] border-b border-neut-13 last:border-b-0 p-1.5 leading-5`,
+  grid: tw`grid grid-cols-[1fr 1fr]  border-b border-neut-13 last:border-b-0 p-1.5 leading-5`,
   header: tw`bg-neut-16`,
   row: tw`hover:bg-[#1E2F41] cursor-move`,
   add: tw`bg-neut-16 text-white`,
@@ -28,6 +28,8 @@ const EmptyFieldWrapper = styled(Center)(() => [
   styles.wrapper,
   tw`self-stretch text-neut-8`,
 ])
+
+const OutlinedGreenButton = styled(Button)(() => tw`text-green-11!`)
 
 const Container = styled.div`
   ${tw`relative`}
@@ -93,7 +95,7 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
 
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
-  const [extralFields, setExtralFields] = useState<TMappingField[]>([])
+  // const [extralFields, setExtralFields] = useState<TMappingField[]>([])
   const jsPlumbInstRef = useRef<jsPlumbInstance>()
   const [mappings, setMappings] = useState<[string, string][]>(mappingsProp)
   const [visible, setVisible] = useState<boolean>(false)
@@ -119,31 +121,31 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
 
   // console.log(mappings)
 
-  useEffect(() => {
-    if (mappings.length > 0) {
-      setLeftFields((fields) => {
-        const leftMappings = mappings.map(([left]) => left)
-        const mappingFields = leftMappings.map(
-          (v) => fields.find((field) => field.name === v)!
-        )
-        const filterFields = fields.filter(
-          (field) => !leftMappings.includes(field.name)
-        )
-        return [...mappingFields, ...filterFields]
-      })
+  // useEffect(() => {
+  //   if (mappings.length > 0) {
+  //     setLeftFields((fields) => {
+  //       const leftMappings = mappings.map(([left]) => left)
+  //       const mappingFields = leftMappings.map(
+  //         (v) => fields.find((field) => field.name === v)!
+  //       )
+  //       const filterFields = fields.filter(
+  //         (field) => !leftMappings.includes(field.name)
+  //       )
+  //       return [...mappingFields, ...filterFields]
+  //     })
 
-      setRightFields((fields) => {
-        const rightMappings = mappings.map(([, right]) => right)
-        const mappingFields = rightMappings.map(
-          (v) => fields.find((field) => field.name === v)!
-        )
-        const filterFields = fields.filter(
-          (field) => !rightMappings.includes(field.name)
-        )
-        return [...mappingFields, ...filterFields]
-      })
-    }
-  }, [mappings])
+  //     setRightFields((fields) => {
+  //       const rightMappings = mappings.map(([, right]) => right)
+  //       const mappingFields = rightMappings.map(
+  //         (v) => fields.find((field) => field.name === v)!
+  //       )
+  //       const filterFields = fields.filter(
+  //         (field) => !rightMappings.includes(field.name)
+  //       )
+  //       return [...mappingFields, ...filterFields]
+  //     })
+  //   }
+  // }, [mappings])
 
   useEffect(() => {
     const jsPlumbInst = jsPlumbInstRef.current
@@ -232,6 +234,32 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
     setMappings([])
   })
 
+  const handleParallel = () => {
+    if (mappings.length > 0) {
+      setLeftFields((fields) => {
+        const leftMappings = mappings.map(([left]) => left)
+        const mappingFields = leftMappings.map(
+          (v) => fields.find((field) => field.name === v)!
+        )
+        const filterFields = fields.filter(
+          (field) => !leftMappings.includes(field.name)
+        )
+        return [...mappingFields, ...filterFields]
+      })
+
+      setRightFields((fields) => {
+        const rightMappings = mappings.map(([, right]) => right)
+        const mappingFields = rightMappings.map(
+          (v) => fields.find((field) => field.name === v)!
+        )
+        const filterFields = fields.filter(
+          (field) => !rightMappings.includes(field.name)
+        )
+        return [...mappingFields, ...filterFields]
+      })
+    }
+  }
+
   const handleNameMapping = () => {
     const jsPlumbInst = jsPlumbInstRef.current
     jsPlumbInst?.deleteEveryConnection()
@@ -302,15 +330,16 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
   )
 
   const addField = () => {
-    const hasUnFinish = extralFields.find((field) => !field.name)
+    const hasUnFinish = leftFields.find(
+      (field) => field.custom && field.default === ''
+    )
     if (!hasUnFinish) {
-      setExtralFields((fields) => {
-        return [...fields, { name: '', type: '', id: nanoid() }]
-      })
+      setLeftFields((fields) => [
+        ...fields,
+        { name: '', type: '', custom: true, default: '' },
+      ])
     }
   }
-
-  // console.log('extralFields', extralFields)
 
   if (leftFields.length === 0 && rightFields.length === 0) {
     return (
@@ -333,6 +362,9 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
       <div tw="relative">
         {topHelp && <Center tw="absolute left-0 bottom-0">{topHelp}</Center>}
         <Center tw="gap-4">
+          <OutlinedGreenButton type="outlined" onClick={handleParallel}>
+            全部平行
+          </OutlinedGreenButton>
           <PopConfirm
             type="warning"
             okType="danger"
@@ -340,7 +372,7 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
             content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
             onOk={handleNameMapping}
           >
-            <Button type="black">同名映射</Button>
+            <OutlinedGreenButton type="outlined">同名映射</OutlinedGreenButton>
           </PopConfirm>
           <PopConfirm
             type="warning"
@@ -348,7 +380,7 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
             content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
             onOk={handleRowMapping}
           >
-            <Button type="black">同行映射</Button>
+            <OutlinedGreenButton type="outlined">同行映射</OutlinedGreenButton>
           </PopConfirm>
           <PopConfirm
             content="取消映射会去除所有现有映射，确定取消映射么？"
@@ -389,45 +421,8 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
                   anchor="Right"
                   moveItem={moveItem}
                 >
-                  <div>{item.type}</div>
-                  <div>{item.name}</div>
+                  <FieldRow field={item} />
                 </MappingItem>
-              ))}
-              {extralFields.map((item) => (
-                <div
-                  css={[styles.grid, styles.row, tw`cursor-text`]}
-                  key={item.id}
-                >
-                  <div>
-                    <Select
-                      css={css`
-                        .select-control {
-                          ${tw`h-7`}
-                        }
-                        .select-input {
-                          ${tw`h-auto`}
-                        }
-                      `}
-                      options={[
-                        {
-                          value: 'VARCHAR',
-                          label: 'VARCHAR',
-                        },
-                        {
-                          value: 'INT',
-                          label: 'INT',
-                        },
-                        {
-                          value: 'BIGINT',
-                          label: 'BIGINT',
-                        },
-                      ]}
-                    />
-                  </div>
-                  <div>
-                    <Input type="text" placeholder="请输入用户名" />
-                  </div>
-                </div>
               ))}
               <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addField}>
                 <Icon name="add" type="light" />

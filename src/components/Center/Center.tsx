@@ -12,3 +12,5 @@ export const Center = styled('div')(({ size }: CenterProps) => [
       height: ${size}px;
     `,
 ])
+
+export default Center

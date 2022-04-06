@@ -10,6 +10,9 @@ export type TMappingField = {
   type: string
   name: string
   is_primary_key?: boolean
+  custom?: boolean
+  default?: string
+  formatter?: string
 }
 
 export type DragItem = TMappingField & { id: string | number; index: number }
@@ -88,7 +91,9 @@ const MappingItem = (props: PropsWithChildren<MappingItemProps>) => {
       if (!ref.current) {
         return
       }
-      moveItem(draggedId, item.name, isTop)
+      if (draggedId !== item.name) {
+        moveItem(draggedId, item.name, isTop)
+      }
     },
   })
 
