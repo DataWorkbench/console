@@ -2,6 +2,7 @@ import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Menu } from '@QCFE/lego-ui'
 import React, { SyntheticEvent } from 'react'
 import tw, { css } from 'twin.macro'
+import { FlexBox } from 'components/Box'
 import { Center } from '../Center'
 import { Tooltip } from '../Tooltip'
 
@@ -59,9 +60,18 @@ export const MoreAction = (props: IMoreActionProps) => {
         twChild={moreActionStyle.child({ theme }) as any}
         content={
           <Menu onClick={handleMenuClick}>
-            {items.map(({ key, value, text }) => (
+            {items.map(({ key, value, text, icon }) => (
               <MenuItem key={key} value={value}>
-                {text}
+                <FlexBox tw="justify-between items-center">
+                  {icon ? (
+                    <Icon
+                      name={icon}
+                      size={16}
+                      type={theme !== 'light' ? 'light' : 'dark'}
+                    />
+                  ) : null}
+                  {text}
+                </FlexBox>
               </MenuItem>
             ))}
           </Menu>
