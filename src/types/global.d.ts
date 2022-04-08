@@ -5,7 +5,7 @@ declare global {
     USER: any
   }
 
-  interface IUseParms {
+  interface IUseParams {
     regionId: string
     spaceId: string
     [k: string]: string

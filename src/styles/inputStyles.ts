@@ -20,6 +20,9 @@ const inputStyles = css`
       &[disabled] {
         ${tw`bg-neut-13`}
       }
+      &.is-danger {
+        ${tw`border-red-10!`}
+      }
     }
     .input-number.is-mini {
       & > .input-number-controls {

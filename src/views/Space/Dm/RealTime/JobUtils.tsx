@@ -47,7 +47,26 @@ export enum RootKey {
   OLE = 'ole-root',
 }
 
-export const dataSourceTypes = {
+export type DataSourceType =
+  | 'MySQL'
+  | 'TIDB'
+  | 'Oracle'
+  | 'SQLServer'
+  | 'PostgreSQL'
+  | 'DB2'
+  | 'SAP HANA'
+  | 'ClickHouse'
+  | 'Hive'
+  | 'HBase'
+  | 'HDFS'
+  | 'FTP'
+  | 'MongoDB'
+  | 'Redis'
+  | 'ElasticSearch'
+  | 'Kafka'
+  | 'S3'
+
+export const dataSourceTypes: { [key in DataSourceType]?: number } = {
   MySQL: 1,
   // TIDB: 2,
   Oracle: 10,

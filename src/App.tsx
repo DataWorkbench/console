@@ -1,6 +1,8 @@
 import { useState, Suspense } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { DndProvider } from 'react-dnd'
 import { ReactQueryDevtools } from 'react-query/devtools'
 import {
   PortalProvider,
@@ -73,31 +75,33 @@ const App = () => {
       currentLocale={langMapping[window.USER?.lang] || 'zh-CN'}
       handleGlobalData={handleGlobalData}
     >
-      <StoreContext.Provider value={store}>
-        <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools
-            initialIsOpen={false}
-            toggleButtonProps={{ style: { bottom: '36px' } }}
-          />
-          {loading ? (
-            <div tw="flex justify-center h-screen items-center">
-              <Loading size="large" />
-            </div>
-          ) : (
-            <Router basename="/dataomnis">
-              <Suspense
-                fallback={
-                  <div tw="flex justify-center h-screen items-center">
-                    <Loading />
-                  </div>
-                }
-              >
-                <Routes />
-              </Suspense>
-            </Router>
-          )}
-        </QueryClientProvider>
-      </StoreContext.Provider>
+      <DndProvider backend={HTML5Backend}>
+        <StoreContext.Provider value={store}>
+          <QueryClientProvider client={queryClient}>
+            <ReactQueryDevtools
+              initialIsOpen={false}
+              toggleButtonProps={{ style: { bottom: '36px' } }}
+            />
+            {loading ? (
+              <div tw="flex justify-center h-screen items-center">
+                <Loading size="large" />
+              </div>
+            ) : (
+              <Router basename="/dataomnis">
+                <Suspense
+                  fallback={
+                    <div tw="flex justify-center h-screen items-center">
+                      <Loading />
+                    </div>
+                  }
+                >
+                  <Routes />
+                </Suspense>
+              </Router>
+            )}
+          </QueryClientProvider>
+        </StoreContext.Provider>
+      </DndProvider>
     </PortalProvider>
   )
 }

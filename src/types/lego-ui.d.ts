@@ -281,6 +281,7 @@ declare module '@QCFE/lego-ui' {
     getFieldsValue: () => any
     getFieldValue: (name: string) => any
     validateFields: () => boolean
+    getFormField: (c: React.ComponentElement) => React.ReactComponentElement
   }
 
   export const Form: Form

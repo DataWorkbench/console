@@ -47,7 +47,6 @@ export const Navs = ({ mod }: NavsProps) => {
       }
     }
   }, [location, globalStore, setDarkMode])
-
   return (
     <div tw="flex gap-6">
       {funcList.map(({ title, name }) => (
