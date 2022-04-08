@@ -1,17 +1,21 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon } from '@QCFE/qingcloud-portal-ui'
-import { HelpCenterLink } from 'components/Link'
+import { HelpCenterLink, FieldMappings } from 'components'
+import { pick } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
+import { useImmer } from 'use-immer'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
-import SyncFieldMapping from './SyncFieldMapping'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
-  tw`flex-1 px-2 pt-2`,
+  tw`flex-1 px-2 py-2 bg-neut-18`,
   css`
     li.collapse-item {
       ${tw`mt-2 rounded-[3px] overflow-hidden`}
+      .collapse-transition {
+        ${tw`transition-none`}
+      }
       .collapse-item-label {
         ${tw`h-11 border-none hover:bg-neut-16`}
       }
@@ -65,6 +69,14 @@ const stepsData = [
 ]
 
 const SyncJob = () => {
+  const [fields, setFields] = useImmer<{
+    source: Record<string, any>[]
+    target: Record<string, any>[]
+  }>({
+    source: [],
+    target: [],
+  })
+  // console.log('fields', fields)
   return (
     <div tw="flex flex-col flex-1">
       <JobToolBar>
@@ -97,8 +109,37 @@ const SyncJob = () => {
                 </>
               }
             >
-              {index === 0 && <SyncDataSource />}
-              {index === 1 && <SyncFieldMapping />}
+              {index === 0 && (
+                <SyncDataSource
+                  onFetchedFields={(
+                    tp: 'source' | 'target',
+                    data: Record<string, any>[]
+                  ) => {
+                    setFields((draft) => {
+                      if (tp === 'source') {
+                        draft.source = data || []
+                      } else {
+                        draft.target = data || []
+                      }
+                    })
+                  }}
+                />
+              )}
+              {index === 1 && (
+                <FieldMappings
+                  leftFields={fields.source.map((field) =>
+                    pick(field, ['name', 'type', 'is_primary_key'])
+                  )}
+                  rightFields={fields.target.map((field) =>
+                    pick(field, ['name', 'type', 'is_primary_key'])
+                  )}
+                  topHelp={
+                    <HelpCenterLink href="/xxx" isIframe={false}>
+                      字段映射说明文档
+                    </HelpCenterLink>
+                  }
+                />
+              )}
               {index === 2 && <>3</>}
               {index === 3 && <>4</>}
             </CollapseItem>

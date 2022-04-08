@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { get, lowerCase, pick } from 'lodash-es'
 import { useImmer } from 'use-immer'
@@ -28,6 +28,7 @@ import {
   Icons,
   TextEllipsis,
   TextLink,
+  RouterLink,
   Tooltip,
 } from 'components'
 import { getHelpCenterLink } from 'utils'
@@ -164,6 +165,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
   const [searchName, setSearchName] = useState('')
   const [isReFetching, setIsReFetching] = useState(false)
   const [delText, setDelText] = useState('')
+  const history = useHistory()
   const {
     dataSourceStore: {
       op,
@@ -454,74 +456,88 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       title: '操作',
       key: 'table_actions',
       width: 150,
-      render: (v: string, info: any) => (
-        <>
-          <Button
-            type="text"
-            tw="text-green-11! font-semibold"
-            onClick={() => {
-              mutateOperation('view', [info])
-            }}
-          >
-            查看详情
-          </Button>
-          <Tooltip
-            theme="light"
-            trigger="click"
-            arrow={false}
-            twChild={
-              css`
-                &[aria-expanded='true'],
-                &:hover {
-                  ${tw`bg-neut-2 rounded-sm`}
-                }
+      render: (v: string, info: any) => {
+        if (selectMode) {
+          return (
+            <span
+              tw="cursor-pointer"
+              onClick={() => {
+                mutateOperation('ping', [info])
+              }}
+            >
+              可用性测试
+            </span>
+          )
+        }
+        return (
+          <>
+            <Button
+              type="text"
+              tw="text-green-11! font-semibold"
+              onClick={() => {
+                mutateOperation('view', [info])
+              }}
+            >
+              查看详情
+            </Button>
+            <Tooltip
+              theme="light"
+              trigger="click"
+              arrow={false}
+              twChild={
+                css`
+                  &[aria-expanded='true'],
+                  &:hover {
+                    ${tw`bg-neut-2 rounded-sm`}
+                  }
 
-                svg {
-                  ${tw`text-black! bg-transparent! fill-[transparent]!`}
-                }
-              ` as any
-            }
-            content={
-              <Menu
-                onClick={(e: React.SyntheticEvent, key: any) => {
-                  mutateOperation(key, [info])
-                }}
-              >
-                <MenuItem key="ping">
-                  <Icon name="if-doublecheck" tw="mr-2" />
-                  可用性测试
-                </MenuItem>
-                <MenuItem
-                  key="update"
-                  disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                  svg {
+                    ${tw`text-black! bg-transparent! fill-[transparent]!`}
+                  }
+                ` as any
+              }
+              content={
+                <Menu
+                  onClick={(e: React.SyntheticEvent, key: any) => {
+                    mutateOperation(key, [info])
+                  }}
                 >
-                  <Icon name="pen" tw="mr-2" />
-                  编辑
-                </MenuItem>
-                {info.status === DATASOURCE_STATUS.DISABLED ? (
-                  <MenuItem key="enable">
-                    <Icon name="start" tw="mr-2" />
-                    启用
+                  <MenuItem key="ping">
+                    <Icon name="if-doublecheck" tw="mr-2" />
+                    可用性测试
                   </MenuItem>
-                ) : (
-                  <MenuItem key="disable">
-                    <Icon name="stop" tw="mr-2" />
-                    停用
+                  <MenuItem
+                    key="update"
+                    disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                  >
+                    <Icon name="pen" tw="mr-2" />
+                    编辑
                   </MenuItem>
-                )}
-                <MenuItem key="delete">
-                  <Icon name="trash" tw="mr-2" />
-                  删除
-                </MenuItem>
-              </Menu>
-            }
-          >
-            <Center tw="w-6 h-6">
-              <Icon name="more" size={20} clickable />
-            </Center>
-          </Tooltip>
-        </>
-      ),
+                  {info.status === DATASOURCE_STATUS.DISABLED ? (
+                    <MenuItem key="enable">
+                      <Icon name="start" tw="mr-2" />
+                      启用
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key="disable">
+                      <Icon name="stop" tw="mr-2" />
+                      停用
+                    </MenuItem>
+                  )}
+                  <MenuItem key="delete">
+                    <Icon name="trash" tw="mr-2" />
+                    删除
+                  </MenuItem>
+                </Menu>
+              }
+            >
+              <Center tw="w-6 h-6">
+                <Icon name="more" size={20} clickable />
+              </Center>
+            </Tooltip>
+          </>
+        )
+      },
     },
   ]
 
@@ -559,36 +575,52 @@ const DataSourceList = observer((props: DataSourceListProps) => {
           {!selectMode && <PageTab tabs={tabs} />}
           <ToolBar tw="bg-white dark:bg-neut-16">
             <ToolBarLeft>
-              <Button type="primary" onClick={() => mutateOperation('create')}>
-                <Icon name="add" />
-                新增数据源
-              </Button>
-              <Button
-                type="default"
-                disabled={
-                  // .filter(
-                  // ({
-                  // source_id,
-                  // status,
-                  // }: {
-                  // source_id: string
-                  // status: number
-                  // }) => selectedRowKeys.includes(source_id) && status !== 2
-                  // ).
-                  selectedRowKeys.length === 0
-                }
-                onClick={() =>
-                  mutateOperation(
-                    'delete',
-                    sourceList.filter(({ id }: Record<string, any>) =>
-                      selectedRowKeys.includes(id)
-                    )
-                  )
-                }
-              >
-                <Icon name="trash" />
-                删除
-              </Button>
+              {!selectMode ? (
+                <>
+                  <Button
+                    type="primary"
+                    onClick={() => mutateOperation('create')}
+                  >
+                    <Icon name="add" />
+                    新增数据源
+                  </Button>
+                  <Button
+                    type="default"
+                    disabled={
+                      // .filter(
+                      // ({
+                      // source_id,
+                      // status,
+                      // }: {
+                      // source_id: string
+                      // status: number
+                      // }) => selectedRowKeys.includes(source_id) && status !== 2
+                      // ).
+                      selectedRowKeys.length === 0
+                    }
+                    onClick={() =>
+                      mutateOperation(
+                        'delete',
+                        sourceList.filter(({ id }: Record<string, any>) =>
+                          selectedRowKeys.includes(id)
+                        )
+                      )
+                    }
+                  >
+                    <Icon name="trash" />
+                    删除
+                  </Button>
+                </>
+              ) : (
+                <div tw="text-neut-8">
+                  如需选择新的数据源，您可以前往
+                  <RouterLink
+                    to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                  >
+                    新建 MySQL 数据源
+                  </RouterLink>
+                </div>
+              )}
             </ToolBarLeft>
             <ToolBarRight>
               <InputSearch
@@ -665,7 +697,15 @@ const DataSourceList = observer((props: DataSourceListProps) => {
           </Card>
         </Root>
       ) : (
-        <DataEmpty onAddClick={() => mutateOperation('create')} />
+        <DataEmpty
+          onAddClick={() => {
+            if (selectMode) {
+              history.push(`/${regionId}/workspace/${spaceId}/upload/dsl`)
+            } else {
+              mutateOperation('create')
+            }
+          }}
+        />
       )}
       {(() => {
         if (['create', 'update', 'view'].includes(op)) {

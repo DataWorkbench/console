@@ -6,12 +6,13 @@ import DataSourceList from './DataSourceList'
 
 interface DataSourceSelectModalProps {
   visible?: boolean | null
+  title: string
   onCancel?: () => void
   onOk?: (source: any) => void
 }
 
 const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
-  const { onCancel, onOk = noop, visible: show } = props
+  const { title, onCancel, onOk = noop, visible: show } = props
   const [visible, setVisible] = useState(show)
   const [source, setSource] = useState(null)
 
@@ -21,13 +22,13 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
 
   return (
     <Modal
+      title={title}
       visible={visible !== null}
       draggable
       width={1200}
       appendToBody
       css={!visible && tw`hidden!`}
       onCancel={onCancel}
-      title="选择数据源"
       onOk={() => {
         onOk(source)
       }}

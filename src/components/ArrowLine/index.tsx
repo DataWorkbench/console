@@ -1,3 +1,3 @@
-import ArrowLine from './ArrowLine'
+export * from './ArrowLine'
 
-export default ArrowLine
+export { default } from './ArrowLine'

@@ -1,6 +1,6 @@
 import tw, { styled, css } from 'twin.macro'
 
-const ArrowLine = styled('div')(
+export const ArrowLine = styled('div')(
   ({
     direction = 'right',
     dotWidth = 4,

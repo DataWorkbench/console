@@ -104,7 +104,8 @@ const SyncTypeRadioGroup = forwardRef<
     }, [value, setParams])
 
     const geneOpts = useCallback(
-      (data: string[]) => data.map((v) => ({ label: v, value: v })),
+      (data: string[]) =>
+        data.map((v) => ({ label: v, value: dataSourceTypes[v] })),
       []
     )
 
