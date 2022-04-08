@@ -113,6 +113,19 @@ const tippyStyles = css`
       ${tw`fill-current text-green-11`}
     }
   }
+
+  .tippy-box[data-theme~='popconfirm'] {
+    font-size: 12px;
+    line-height: 1.25;
+    ${tw`bg-neut-16 text-white border rounded-[3px] border-neut-13`}
+    > .tippy-backdrop {
+      ${tw`bg-neut-16`}
+    }
+    > .tippy-arrow {
+      ${tw`fill-current text-neut-14`}
+    }
+  }
+
   .tippy-box.popconfirm-box {
     ${tw`bg-neut-16 text-white leading-5`}
   }

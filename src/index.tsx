@@ -1,4 +1,4 @@
-import { createRoot } from 'react-dom/client'
+import { render } from 'react-dom'
 import App from './App'
 import '@QCFE/qingcloud-portal-ui/lib/scss/qingcloud-portal-ui.min.css'
 import GlobalStyles from './styles/GlobalStyle'
@@ -7,10 +7,10 @@ import 'simplebar-react/dist/simplebar.min.css'
 // import 'tippy.js/dist/svg-arrow.css'
 // import 'tippy.js/animations/scale-subtle.css'
 
-const root = createRoot(document.getElementById('root')!)
-root.render(
+render(
   <>
     <GlobalStyles />
     <App />
-  </>
+  </>,
+  document.getElementById('root')
 )

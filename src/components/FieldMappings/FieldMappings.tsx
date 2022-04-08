@@ -2,22 +2,24 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
 import { useMount, useUnmount, useMeasure } from 'react-use'
 import tw, { styled } from 'twin.macro'
-import { intersectionBy, isEmpty, get } from 'lodash-es'
+import { intersectionBy, isEmpty, get, omit } from 'lodash-es'
 import { Button, Icon, Alert } from '@QCFE/lego-ui'
 import Tippy from '@tippyjs/react'
 import { followCursor } from 'tippy.js'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
-import FieldRow from './FieldRow'
-import MappingItem, { TMappingField } from './MappingItem'
+import MappingItem, { TMappingField, FieldRow } from './MappingItem'
 import { PopConfirm } from '../PopConfirm'
 /* @refresh reset */
 const styles = {
-  wrapper: tw`border flex-1 border-neut-13 text-center`,
-  grid: tw`grid grid-cols-[1fr 1fr]  border-b border-neut-13 last:border-b-0 p-1.5 leading-5`,
+  wrapper: tw`border flex-1 border-neut-13`,
+  fieldType: tw`w-44 pl-5 xl:pl-12`,
+  row: tw`flex border-b border-neut-13 last:border-b-0 p-1.5`,
+  // row: tw`grid grid-template-columns[1fr 1.5fr 48px] text-left border-b border-neut-13 last:border-b-0 p-1.5`,
   header: tw`bg-neut-16`,
-  row: tw`hover:bg-[#1E2F41] cursor-move`,
+  rowbody: tw`hover:bg-[#1E2F41]`,
+  // column: tw`w-44`,
   add: tw`bg-neut-16 text-white`,
 }
 
@@ -329,16 +331,46 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
     []
   )
 
-  const addField = () => {
+  const addCustomField = () => {
     const hasUnFinish = leftFields.find(
       (field) => field.custom && field.default === ''
     )
     if (!hasUnFinish) {
       setLeftFields((fields) => [
         ...fields,
-        { name: '', type: '', custom: true, default: '' },
+        { name: '', type: '', custom: true, default: '', isEditing: true },
       ])
     }
+  }
+
+  // console.log(leftFields)
+
+  const keepEditingField = (field: TMappingField, index?: number) => {
+    setLeftFields((fields) => {
+      const newFields = [...fields]
+      const itemIndex = index === undefined ? newFields.length - 1 : index
+
+      newFields[itemIndex] = omit(
+        {
+          ...newFields[itemIndex],
+          ...field,
+        },
+        field.custom ? ['isEditing'] : ['isEditing', 'custom', 'default']
+      )
+      return newFields
+    })
+  }
+  const cancelAddCustomField = (field: TMappingField, index: number) => {
+    // setLeftFields((fields) => fields.slice(0, -1))
+
+    setLeftFields((fields) => {
+      if (fields[index].name === '') {
+        return fields.filter((_, i) => i !== index)
+      }
+      const newFields = [...fields]
+      newFields[index] = omit(newFields[index], ['isEditing'])
+      return newFields
+    })
   }
 
   if (leftFields.length === 0 && rightFields.length === 0) {
@@ -406,10 +438,10 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
         <FlexBox tw="flex items-start transition-all duration-500">
           {leftFields.length ? (
             <div css={styles.wrapper}>
-              <div css={[styles.grid, styles.header]}>
+              <FieldRow isHeader>
                 <div>类型</div>
                 <div>来源表字段</div>
-              </div>
+              </FieldRow>
               {leftFields.map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
@@ -417,14 +449,31 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
                   key={item.name}
                   index={i}
                   hasConnection={!!mappings.find(([l]) => l === item.name)}
-                  css={[styles.grid, styles.row]}
                   anchor="Right"
                   moveItem={moveItem}
-                >
-                  <FieldRow field={item} />
-                </MappingItem>
+                  onOk={(info, index) => {
+                    keepEditingField(info, index)
+                  }}
+                  onCancel={cancelAddCustomField}
+                  deleteItem={(index) => {
+                    setLeftFields((fields) =>
+                      fields.filter((f, idx) => idx !== index)
+                    )
+                  }}
+                  getDeleteField={(name: string) => {
+                    const delItem = leftFieldsProp.find((f) => f.name === name)
+                    const existItem = leftFields.find((f) => f.name === name)
+                    if (delItem && !existItem) {
+                      return delItem
+                    }
+                    return undefined
+                  }}
+                />
               ))}
-              <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addField}>
+              <Center
+                tw="bg-neut-16 cursor-pointer h-8"
+                onClick={addCustomField}
+              >
                 <Icon name="add" type="light" />
                 添加字段
               </Center>
@@ -463,23 +512,19 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
           </Tippy>
           {rightFields.length ? (
             <div css={styles.wrapper}>
-              <div css={[styles.grid, styles.header]}>
-                <div>目标表字段</div>
+              <FieldRow isHeader isReverse>
                 <div>类型</div>
-              </div>
+                <div>目标表字段</div>
+              </FieldRow>
               {rightFields.map((item, i) => {
                 return (
                   <MappingItem
                     jsplumb={jsPlumbInstRef.current}
                     key={item.name}
-                    css={[styles.grid, styles.row]}
                     anchor="Left"
                     item={item}
                     index={i}
-                  >
-                    <div>{item.name}</div>
-                    <div>{item.type}</div>
-                  </MappingItem>
+                  />
                 )
               })}
             </div>
