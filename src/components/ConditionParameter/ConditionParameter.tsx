@@ -5,6 +5,7 @@ import React, {
   useRef,
 } from 'react'
 import {
+  Button,
   Form,
   Input,
   RadioButton,
@@ -42,10 +43,12 @@ interface IConditionParameterProps {
   className?: string
   width?: number
   columns: string[]
+  loading?: boolean
+  onRefresh?: () => void
 }
 
 const SimpleWrapper = styled.div`
-  ${tw`bg-neut-16 p-2`}
+  ${tw`bg-neut-16 p-2 max-w-[376px]`}
   ${css`
     & > div {
       ${tw`flex-auto!`}
@@ -91,6 +94,8 @@ export const ConditionParameter = React.forwardRef(
       className,
       width,
       columns,
+      loading = false,
+      onRefresh,
     } = props
 
     const [value, setValue] = useImmer(defaultValue || { type: 'visual' })
@@ -186,11 +191,29 @@ export const ConditionParameter = React.forwardRef(
                     draft.column = v
                   })
                 }}
+                isLoading={loading}
                 options={(columns || []).map((item) => ({
                   label: item,
                   value: item,
                 }))}
               />
+              <Button
+                tw="w-8 ml-3 p-0 dark:bg-neut-16!"
+                disabled={loading}
+                onClick={() => onRefresh && onRefresh()}
+              >
+                <Icon
+                  name="refresh"
+                  tw="text-white"
+                  css={css`
+                    svg {
+                      ${tw`fill-current`}
+                    }
+                  `}
+                  type="light"
+                  size={20}
+                />
+              </Button>
             </FlexBox>
             <FlexBox>
               <span tw="label-required">开始条件</span>

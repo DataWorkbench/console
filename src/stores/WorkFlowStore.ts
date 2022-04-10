@@ -6,7 +6,7 @@ import type RootStore from './RootStore'
 interface IJob {
   id: string
   name: string
-  type: number
+  type: 0 | 1 | 2 | 3
   desc: string
   version: string
   source_type?: number

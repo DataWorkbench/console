@@ -69,21 +69,21 @@ export type DataSourceType =
 export const dataSourceTypes: { [key in DataSourceType]?: number } = {
   MySQL: 1,
   // TIDB: 2,
-  Oracle: 10,
+  Kafka: 3,
+  // S3: 4,
+  ClickHouse: 5,
+  HBase: 6,
+  FTP: 7,
+  HDFS: 8,
   SQLServer: 9,
+  Oracle: 10,
   PostgreSQL: 2,
   DB2: 11,
   'SAP HANA': 12,
-  ClickHouse: 5,
   Hive: 13,
-  HBase: 6,
-  HDFS: 8,
-  FTP: 7,
   MongoDB: 15,
   Redis: 16,
   ElasticSearch: 14,
-  Kafka: 3,
-  // S3: 4
 }
 
 export const jobModeData = [

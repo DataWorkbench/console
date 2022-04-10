@@ -19,6 +19,7 @@ const { MenuItem } = Menu
 export type TMappingField = {
   type: string
   name: string
+  uuid: string
   is_primary_key?: boolean
   custom?: boolean
   isEditing?: boolean
@@ -46,7 +47,7 @@ export const FieldRow = styled('div')(
     isEditing?: boolean
     isReverse?: boolean
   }) => [
-    tw`flex flex-wrap border-b border-neut-13 p-1.5`,
+    tw`flex flex-wrap border-b border-neut-13 last:border-b-0 p-1.5`,
     isReverse && tw`flex-row-reverse`,
     isHeader ? tw`bg-neut-16` : tw`hover:bg-[#1E2F41] `,
     isDragging && tw`bg-green-4/10!`,
@@ -96,12 +97,13 @@ interface MappingItemProps {
   index: number
   className?: string
   jsplumb?: jsPlumbInstance
-  hasConnection?: boolean
+  // hasConnection?: boolean
   moveItem?: (dragId: string, hoverId: string, isTop: boolean) => void
-  deleteItem?: (index: number) => void
+  deleteItem?: (item: TMappingField) => void
   onCancel?: (item: TMappingField, index: number) => void
   onOk?: (v: TMappingField, index?: number) => void
   getDeleteField?: (name: string) => TMappingField | undefined
+  exist?: (name: string) => boolean
 }
 
 const MappingItem = (props: MappingItemProps) => {
@@ -113,12 +115,12 @@ const MappingItem = (props: MappingItemProps) => {
     index,
     item: itemProps,
     className,
-    hasConnection,
     moveItem = noop,
     deleteItem = noop,
     onOk = noop,
     onCancel = noop,
     getDeleteField,
+    exist,
   } = props
   const [isTop, setIsTop] = useState(false)
   const [item, setItem] = useImmer(itemProps)
@@ -136,13 +138,13 @@ const MappingItem = (props: MappingItemProps) => {
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: dndType,
-      item: { ...item, id: item.name, index },
+      item: { ...item, index },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
-      canDrag: () => !hasConnection,
+      canDrag: () => !item.isEditing,
     }),
-    [item.name, index, hasConnection]
+    [item.name, index, item.isEditing]
   )
 
   const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
@@ -176,63 +178,75 @@ const MappingItem = (props: MappingItemProps) => {
         setIsTop(false)
       }
     },
-    drop({ id: draggedId }: DragItem) {
+    drop({ uuid: draggedId }: DragItem) {
       if (!ref.current) {
         return
       }
-      if (draggedId !== item.name) {
-        moveItem(draggedId, item.name, isTop)
+      if (draggedId !== item.uuid) {
+        moveItem(draggedId, item.uuid, isTop)
+        jsplumb?.repaintEverything()
       }
     },
   })
 
   useEffect(() => {
     if (ref.current && jsplumb) {
-      const endPoint = endPointRef.current
-      if (endPoint) {
-        jsplumb.deleteEndpoint(endPoint)
+      let endPoint = endPointRef.current
+      const parameters = { [String(anchor)]: itemProps }
+      if (!endPoint) {
+        // jsplumb.deleteEndpoint(endPoint)
+        endPoint = jsplumb.addEndpoint(ref.current, {
+          anchor,
+          parameters,
+          isSource: anchor !== 'Left',
+          isTarget: anchor === 'Left',
+          connectorStyle: {
+            gradient: {
+              stops: [
+                [0, '#229CE9'],
+                [1, '#15A675'],
+              ],
+            },
+            strokeWidth: 2,
+            stroke: '#fff',
+          },
+          connectorHoverStyle: {
+            strokeWidth: 4,
+          },
+          endpoint: [
+            'Dot',
+            {
+              cssClass: `point-${anchor}`,
+              radius: 6,
+            },
+          ],
+          paintStyle: {
+            fill: anchor === 'Left' ? '#9DDFC9' : '#BAE6FD',
+            stroke: '#fff',
+            strokeWidth: 2,
+          },
+          'connector-pointer-events': 'visible',
+          uuid: itemProps.uuid,
+        } as any) as Endpoint
+        endPointRef.current = endPoint
       }
-      endPointRef.current = jsplumb.addEndpoint(ref.current, {
-        anchor,
-        parameters: { [String(anchor)]: item },
-        isSource: anchor !== 'Left',
-        isTarget: anchor === 'Left',
-        connectorStyle: {
-          gradient: {
-            stops: [
-              [0, '#229CE9'],
-              [1, '#15A675'],
-            ],
-          },
-          strokeWidth: 2,
-          stroke: '#fff',
-        },
-        connectorHoverStyle: {
-          strokeWidth: 4,
-        },
-        endpoint: [
-          'Dot',
-          {
-            cssClass: `point-${anchor}`,
-            radius: 6,
-          },
-        ],
-        paintStyle: {
-          fill: anchor === 'Left' ? '#9DDFC9' : '#BAE6FD',
-          stroke: '#fff',
-          strokeWidth: 2,
-        },
-        'connector-pointer-events': 'visible',
-        uuid: `${anchor}-${item.name}`,
-      } as any) as Endpoint
+      endPoint.setParameters(parameters)
     }
-  }, [item, jsplumb, anchor])
+  }, [itemProps, jsplumb, anchor])
+
+  useEffect(() => {
+    if (isEmpty(itemProps.name)) {
+      endPointRef.current?.setVisible(!item.isEditing)
+    }
+    jsplumb?.repaintEverything()
+  }, [item.isEditing, itemProps.name, jsplumb])
 
   useUnmount(() => {
     const endPoint = endPointRef.current
     if (jsplumb && endPoint) {
       jsplumb.deleteEndpoint(endPoint)
     }
+    endPointRef.current = null
   })
 
   const handleMoreClick = (key: string) => {
@@ -348,7 +362,7 @@ const MappingItem = (props: MappingItemProps) => {
             tw="h-6"
             onClick={() => {
               if (popuState === 'delete') {
-                deleteItem(index)
+                deleteItem(item)
                 setPopuState(null)
               } else if (popuState === 'parse') {
                 onOk(item, index)
@@ -370,8 +384,6 @@ const MappingItem = (props: MappingItemProps) => {
 
   const renderEditContent = () => {
     return (
-      // <Form ref={formRef} tw="pl-0!">
-      //   <FieldRow isEditing>
       <Form ref={formRef} tw="pl-0!">
         <FieldRow isEditing tw="p-0 ">
           <div>
@@ -407,6 +419,15 @@ const MappingItem = (props: MappingItemProps) => {
                   rule: {
                     required: true,
                     matchRegex: nameMatchRegex,
+                  },
+                  status: 'error',
+                },
+                {
+                  rule: (v: string) => {
+                    if (exist) {
+                      return !exist(v)
+                    }
+                    return true
                   },
                   status: 'error',
                 },
@@ -531,10 +552,7 @@ const MappingItem = (props: MappingItemProps) => {
       </FieldRow>
     )
   }
-  if (!item.isEditing) {
-    drag(drop(ref))
-  }
-  // const Row = item.isEditing ? Form : FieldRow
+  drag(drop(ref))
   return (
     <Tippy
       content={renderConfirmContent()}

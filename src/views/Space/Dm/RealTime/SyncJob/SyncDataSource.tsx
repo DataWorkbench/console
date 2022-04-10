@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { findKey, get, pick, isEmpty } from 'lodash-es'
-import { Form, Icon, Button } from '@QCFE/lego-ui'
+import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
   FlexBox,
@@ -12,6 +12,8 @@ import {
   SelectWithRefresh,
   ConditionParameterField,
   ButtonWithClearField,
+  HelpCenterLink,
+  SqlGroupField,
 } from 'components'
 import {
   useStore,
@@ -21,7 +23,7 @@ import {
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
 import { dataSourceTypes } from '../JobUtils'
 
-const { TextField } = Form
+const { TextField, SelectField, TextAreaField } = Form
 
 const styles = {
   arrowBox: tw`space-x-2 bg-neut-17 w-[70%] z-10`,
@@ -33,7 +35,17 @@ const styles = {
       > .field {
         ${tw`mb-0`}
         > .label {
-          ${tw`w-28`}
+          ${tw`w-28 pr-0`}
+        }
+        .select,
+        .input {
+          ${tw`w-full`}
+        }
+        .select-with-refresh {
+          ${tw`w-2/3 flex max-w-[376px]`}
+          .select {
+            ${tw`flex-1`}
+          }
         }
       }
       .help {
@@ -41,7 +53,15 @@ const styles = {
       }
     }
   `,
-  tableSelect: [tw`w-full flex-1`],
+  tableSelect: [
+    tw`w-full flex-1`,
+    css`
+      .help {
+        ${tw`w-full`}
+      }
+    `,
+  ],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
 }
 
 const Label = styled('div')(() => [
@@ -50,6 +70,19 @@ const Label = styled('div')(() => [
 
 const DashedLine = styled('div')(() => [
   tw`border-neut-13 border-l border-dashed my-1`,
+])
+
+const StyledSqlGroupField = styled(SqlGroupField)(() => [
+  css`
+    &.field {
+      .label {
+        ${tw`self-start pt-2`}
+      }
+      .textarea {
+        ${tw`w-[378px]!`}
+      }
+    }
+  `,
 ])
 
 type OpType = 'source' | 'target'
@@ -71,6 +104,8 @@ interface SyncDataSourceProps {
 const SyncDataSource = observer((props: SyncDataSourceProps) => {
   const { onFetchedFields } = props
   const [visible, setVisible] = useState<boolean | null>(null)
+  const [showSourceAdvance, setShowSourceAdvance] = useState(false)
+  const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
   const sourceForm = useRef(null)
   const op = useRef<OpType>('source')
   const [db, setDB] = useImmer<IDB>({
@@ -85,7 +120,7 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
     { enabled: sourceId !== '' }
   )
 
-  useQuerySourceTableSchema(
+  const schemaRet = useQuerySourceTableSchema(
     {
       sourceId,
       tableName,
@@ -106,8 +141,8 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
     workFlowStore: { curJob },
   } = useStore()
 
-  const handleClick = (v: OpType) => {
-    op.current = v
+  const handleClick = (from: OpType) => {
+    op.current = from
     setVisible(true)
   }
 
@@ -121,87 +156,96 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
     })
   }
 
-  const handleTableChange = (tp: OpType, v: string) => {
-    op.current = tp
+  const handleTableChange = (from: OpType, v: string) => {
+    op.current = from
     setDB((draft) => {
-      draft[tp].tableName = v
+      draft[from].tableName = v
     })
   }
 
-  const handleClear = (tp: OpType) => {
+  const handleClear = (from: OpType) => {
     setDB((draft) => {
-      if (tp === 'source') {
+      if (from === 'source') {
         draft.source = {}
       } else {
         draft.target = {}
       }
     })
-    onFetchedFields(tp, [])
+    onFetchedFields(from, [])
   }
 
-  const getSourceName = (type: OpType) =>
+  const getSourceTypeName = (type: OpType) =>
     findKey(dataSourceTypes, (v) => v === get(curJob, `${type}_type`))
 
-  const renderCommon = (tp: OpType) => {
-    const dbInfo = get(db, tp)
-    const hasDbInfo = !isEmpty(dbInfo)
+  const getJobTypeName = (type: 0 | 1 | 2 | 3) => {
+    const typeNameMap = new Map([
+      [0, '离线 - 全量'],
+      [1, '离线 - 增量'],
+      [2, '实时 - 全量'],
+      [3, '实时 - 增量'],
+    ])
+    return typeNameMap.get(type)
+  }
+
+  const renderCommon = (from: OpType) => {
+    const dbInfo = db[from]
+    const isSelected = !isEmpty(dbInfo)
     const tables = (get(tablesRet, 'data.items', []) || []) as string[]
     return (
       <>
         <ButtonWithClearField
           name="source"
-          placeholder={
-            <>
-              <Icon
-                name="blockchain"
-                size={16}
-                color={{ secondary: 'rgba(255,255,255,0.4)' }}
-              />
-              <span>选择数据来源</span>
-            </>
-          }
+          placeholder="选择数据来源"
           css={css`
             .help {
               width: 100%;
             }
           `}
           label={<AffixLabel>数据源</AffixLabel>}
-          help={hasDbInfo && <div>网络配置名称（ID：{dbInfo.networkId}）</div>}
+          help={isSelected && <div>网络配置名称（ID：{dbInfo.networkId}）</div>}
+          icon={
+            <Icon
+              name="blockchain"
+              size={16}
+              color={{ secondary: 'rgba(255,255,255,0.4)' }}
+            />
+          }
           value={dbInfo.id}
-          onClick={() => handleClick(tp)}
-          onClear={() => handleClear(tp)}
+          clearable={isSelected}
+          onClick={() => handleClick(from)}
+          onClear={() => handleClear(from)}
         >
-          {hasDbInfo && (
-            <FlexBox tw="items-center space-x-1">
-              <Icon
-                name="blockchain"
-                size={16}
-                color={{ secondary: 'rgba(255,255,255,0.4)' }}
-              />
-              <span tw="ml-1">{dbInfo.name}</span>
-              <span tw="text-neut-8">(ID:{dbInfo.id})</span>
-            </FlexBox>
-          )}
+          <Center tw="space-x-1">
+            <span tw="ml-1">{dbInfo.name}</span>
+            <span tw="text-neut-8">(ID:{dbInfo.id})</span>
+          </Center>
         </ButtonWithClearField>
-        {hasDbInfo && (
+        {isSelected && (
           <SelectWithRefresh
             css={styles.tableSelect}
             name="table"
             label={<AffixLabel>数据源表</AffixLabel>}
-            options={tables.map((f) => ({
-              label: f,
-              value: f,
+            options={tables.map((tabName) => ({
+              label: tabName,
+              value: tabName,
             }))}
-            isLoading={tablesRet.isFetching && op.current === tp}
+            isLoading={tablesRet.isFetching && op.current === from}
             clearable={false}
             onRefresh={() => {
-              // setOp(tp)
-              op.current = tp
+              op.current = from
               tablesRet.refetch()
             }}
             onChange={(v: string) => {
-              handleTableChange(tp, v)
+              handleTableChange(from, v)
             }}
+            help={
+              <HelpCenterLink href="xxx" hasIcon>
+                {`${getSourceTypeName(from)} ${
+                  from === 'source' ? 'Source' : 'Sink'
+                }
+                  配置文档`}
+              </HelpCenterLink>
+            }
           />
         )}
       </>
@@ -209,12 +253,14 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
   }
 
   const renderSource = () => {
-    const tp: OpType = 'source'
-    const hasFields = get(db, 'source.fields', []).length > 0
+    const from: OpType = 'source'
+    const hasTable = !isEmpty(db.source.tableName)
+    const isOffLineFull = get(curJob, 'type') === 0
+    const isOfflineIncrement = get(curJob, 'type') === 1
     return (
       <Form css={styles.form} ref={sourceForm}>
-        {renderCommon(tp)}
-        {hasFields && (
+        {renderCommon(from)}
+        {hasTable && isOfflineIncrement && (
           <>
             <ConditionParameterField
               name="condition"
@@ -222,6 +268,10 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
                 (c: { name: string; [k: string]: any }) => c.name
               )}
               label={<AffixLabel>条件参数配置</AffixLabel>}
+              loading={op.current === from && schemaRet.isFetching}
+              onRefresh={() => {
+                schemaRet.refetch()
+              }}
             />
             <TextField
               name="divide"
@@ -231,7 +281,7 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
             />
           </>
         )}
-        <div>
+        {/* <div>
           <Button
             onClick={() => {
               if (sourceForm.current) {
@@ -241,25 +291,106 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
           >
             验证
           </Button>
-        </div>
+        </div> */}
+        {hasTable && isOffLineFull && (
+          <>
+            <FlexBox>
+              <div css={styles.line} />
+              <Center
+                tw="px-1 cursor-pointer"
+                onClick={() => setShowSourceAdvance((prev) => !prev)}
+              >
+                <Icon
+                  name={`chevron-${showSourceAdvance ? 'up' : 'down'}`}
+                  type="light"
+                />
+                高级配置
+              </Center>
+              <div css={styles.line} />
+            </FlexBox>
+            {showSourceAdvance && (
+              <TextAreaField
+                label="过滤条件"
+                placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"
+              />
+            )}
+          </>
+        )}
       </Form>
     )
   }
 
   const renderTarget = () => {
-    const tp: OpType = 'target'
-    return <Form css={styles.form}>{renderCommon(tp)}</Form>
+    const from: OpType = 'target'
+    const hasTable = !isEmpty(db.target.tableName)
+    return (
+      <Form css={styles.form}>
+        {renderCommon(from)}
+        {hasTable && (
+          <>
+            <SelectField
+              label={<AffixLabel>写入模式</AffixLabel>}
+              name="mode"
+              options={[]}
+              help="当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现"
+            />
+            <SelectField
+              label={<AffixLabel>写入一致性语义</AffixLabel>}
+              name="semantic"
+              options={[]}
+            />
+            <TextField
+              label={<AffixLabel>批量写入条数</AffixLabel>}
+              name="batch"
+              help="范围：1~65535，该值可减少网络交互次数，过大会造成 OOM"
+            />
+            <FlexBox>
+              <div css={styles.line} />
+              <Center
+                tw="px-1 cursor-pointer"
+                onClick={() => setShowTargetAdvanced((prev) => !prev)}
+              >
+                <Icon
+                  name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`}
+                  type="light"
+                />
+                高级配置
+              </Center>
+              <div css={styles.line} />
+            </FlexBox>
+            {showTargetAdvanced && (
+              <>
+                <StyledSqlGroupField
+                  className="sql-group-field"
+                  name="sql"
+                  label="写入前SQL语句组"
+                  size={2}
+                  placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                />
+                <StyledSqlGroupField
+                  className="sql-group-field"
+                  name="sql"
+                  label="写入后SQL语句组"
+                  size={1}
+                  placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                />
+              </>
+            )}
+          </>
+        )}
+      </Form>
+    )
   }
 
   return (
     <FlexBox tw="flex-col">
       <Center tw="mb-[-15px]">
         <Center css={styles.arrowBox}>
-          <Label>来源: {getSourceName('source')}</Label>
+          <Label>来源: {getSourceTypeName('source')}</Label>
           <ArrowLine />
-          <Label>离线-增量</Label>
+          <Label>{curJob && getJobTypeName(curJob.type)}</Label>
           <ArrowLine />
-          <Label>目的: {getSourceName('target')}</Label>
+          <Label>目的: {getSourceTypeName('target')}</Label>
         </Center>
       </Center>
       <FlexBox css={styles.dashedBox}>
@@ -275,6 +406,7 @@ const SyncDataSource = observer((props: SyncDataSourceProps) => {
           (v) => v === get(curJob, `${op.current}_type`)
         )})`}
         visible={visible}
+        sourceType={get(curJob, `${op.current}_type`)!}
         onCancel={() => setVisible(false)}
         onOk={(v: any) => {
           setVisible(false)
