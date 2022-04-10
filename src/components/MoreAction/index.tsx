@@ -1,6 +1,6 @@
-import { Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import { Menu } from '@QCFE/lego-ui'
-import React, { SyntheticEvent } from 'react'
+import React, { ReactElement, SyntheticEvent } from 'react'
 import tw, { css } from 'twin.macro'
 import { FlexBox } from 'components/Box'
 import { Center } from '../Center'
@@ -16,6 +16,8 @@ export interface IMoreActionProps {
   theme?: 'darker' | 'light'
   onMenuClick?: (selectedData: any, menuKey: string) => void
   items: IMoreActionItem[]
+  type?: 'icon' | 'button'
+  buttonText?: string
 }
 
 const { MenuItem } = Menu as any
@@ -37,8 +39,26 @@ export const moreActionStyle = {
   },
 }
 
+const getStyles = (theme: 'darker') => {
+  switch (theme) {
+    case 'darker':
+      return {
+        button: tw`border border-line-dark! text-white hover:bg-line-dark! hover:text-white`,
+        icon: tw`flex items-center p-0.5 cursor-pointer dark:hover:bg-line-dark rounded-sm`,
+      }
+    default:
+      return {}
+  }
+}
+
 export const MoreAction = (props: IMoreActionProps) => {
-  const { theme = 'darker', onMenuClick, items } = props
+  const {
+    theme = 'darker',
+    onMenuClick,
+    items,
+    type = 'icon',
+    buttonText,
+  } = props
 
   const handleMenuClick = (
     e: SyntheticEvent,
@@ -49,6 +69,41 @@ export const MoreAction = (props: IMoreActionProps) => {
     if (onMenuClick) {
       onMenuClick(value, key)
     }
+  }
+
+  // todo light style
+  const styles = getStyles(theme as 'darker')
+  let children: ReactElement
+
+  switch (type) {
+    case 'button':
+      children = (
+        <Button css={styles.button} type="outlined">
+          <Icon
+            name="more"
+            clickable
+            changeable
+            type={theme !== 'light' ? 'light' : 'dark'}
+            size={20}
+            tw="bg-transparent! hover:bg-transparent!"
+          />
+          <span>{buttonText}</span>
+        </Button>
+      )
+      break
+    default:
+      children = (
+        <div css={styles.icon}>
+          <Icon
+            name="more"
+            clickable
+            changeable
+            type={theme !== 'light' ? 'light' : 'dark'}
+            size={20}
+          />
+        </div>
+      )
+      break
   }
 
   return (
@@ -70,22 +125,14 @@ export const MoreAction = (props: IMoreActionProps) => {
                       type={theme !== 'light' ? 'light' : 'dark'}
                     />
                   ) : null}
-                  {text}
+                  <span>{text}</span>
                 </FlexBox>
               </MenuItem>
             ))}
           </Menu>
         }
       >
-        <div tw="flex items-center p-0.5 cursor-pointer dark:hover:bg-line-dark rounded-sm">
-          <Icon
-            name="more"
-            clickable
-            changeable
-            type={theme !== 'light' ? 'light' : 'dark'}
-            size={20}
-          />
-        </div>
+        {children}
       </Tooltip>
     </Center>
   )
