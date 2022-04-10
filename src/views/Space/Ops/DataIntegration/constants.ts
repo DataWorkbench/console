@@ -1,12 +1,9 @@
-import { IColumn } from 'hooks/utils'
+/* eslint-disable no-bitwise */
+import { IColumn } from 'hooks/useHooks/useColumns'
 import { getHelpCenterLink } from 'utils/index'
+import { ISuggestion, ITab } from './interfaces'
+import {tuple} from "utils/functions";
 
-interface ITab {
-  title: string
-  description: string
-  icon: string
-  helpLink: string
-}
 export const dataJobReleaseTab: ITab[] = [
   {
     title: 'Release',
@@ -16,33 +13,89 @@ export const dataJobReleaseTab: ITab[] = [
   },
 ]
 
+
+
 export const dataJobInstanceTab: ITab[] = [
   {
     title: '数据集成-作业实例',
     description: 'Instance data job',
-    icon: 'instance',
+    icon: 'q-mergeFillDuotone',
     helpLink: getHelpCenterLink('data-job-instance'),
   },
 ]
 
-export enum JobStatusType {
-  FAILED_AND_RETRY,
-  RUNNING,
-  PREPARING,
-  FAILED,
-  TIMEOUT,
-  FINISHED,
-  SUCCEEDED,
+export enum JobInstanceStatusType {
+  FAILED_AND_RETRY = 2 << 0,
+  RUNNING = 2 << 1,
+  PREPARING = 2 << 2,
+  FAILED = 2 << 3,
+  SUCCEEDED = 2 << 4,
+  TIMEOUT = 2 << 5,
+  FINISHED = 2 << 6,
 }
-export const jobStatus = {
-  '0': { label: '失败重试', value: '0', type: JobStatusType.FAILED_AND_RETRY },
-  '1': { label: '运行中', value: '1', type: JobStatusType.RUNNING },
-  '2': { label: '准备资源', value: '2', type: JobStatusType.PREPARING },
-  '3': { label: '运行失败', value: '3', type: JobStatusType.FAILED },
-  '4': { label: '运行成功', value: '4', type: JobStatusType.SUCCEEDED },
-  '5': { label: '运行超时', value: '5', type: JobStatusType.TIMEOUT },
-  '6': { label: '已终止', value: '6', type: JobStatusType.FINISHED },
+
+export const jobInstanceStatus = {
+  '0': {
+    label: '失败重试',
+    value: '0',
+    type: JobInstanceStatusType.FAILED_AND_RETRY,
+  },
+  '1': { label: '运行中', value: '1', type: JobInstanceStatusType.RUNNING },
+  '2': { label: '准备资源', value: '2', type: JobInstanceStatusType.PREPARING },
+  '3': { label: '运行失败', value: '3', type: JobInstanceStatusType.FAILED },
+  '4': { label: '运行成功', value: '4', type: JobInstanceStatusType.SUCCEEDED },
+  '5': { label: '运行超时', value: '5', type: JobInstanceStatusType.TIMEOUT },
+  '6': { label: '已终止', value: '6', type: JobInstanceStatusType.FINISHED },
 } as const
+
+export enum AlarmStatus {
+  NORMAL = 'NORMAL',
+  WARNING = 'WARNING',
+}
+
+export const alarmStatus = {
+  '0': { label: '正常', value: '0', type: AlarmStatus.NORMAL },
+  '1': { label: '警告', value: '1', type: AlarmStatus.WARNING },
+} as const
+
+export enum JobType {
+  REALTIME_UPDATE = 2 << 0,
+  FULL_UPDATE = 2 << 1,
+  INCREMENT_UPDATE = 2 << 2,
+}
+
+export const jobType = {
+  '0': { label: '全量更新', value: '0', type: JobType.FULL_UPDATE },
+  '1': { label: '增量更新', value: '1', type: JobType.INCREMENT_UPDATE },
+  '2': { label: '实时更新', value: '2', type: JobType.REALTIME_UPDATE },
+} as const
+
+export const dataJobInstanceSuggestions: ISuggestion[] = [
+  {
+    label: '状态',
+    key: 'status',
+    options: Object.values(jobInstanceStatus).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
+    label: '告警状态',
+    key: 'alarm_status',
+    options: Object.values(alarmStatus).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
+    label: '作业名称',
+    key: 'job_name',
+  },
+  {
+    label: '实例 ID',
+    key: 'instance_id',
+  },
+]
 
 export const dataJobInstanceColumns: IColumn[] = [
   {

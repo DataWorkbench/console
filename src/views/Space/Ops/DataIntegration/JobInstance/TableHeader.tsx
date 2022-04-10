@@ -1,11 +1,16 @@
 import { Icon, Button, ToolBar } from '@QCFE/qingcloud-portal-ui'
 
 import { FlexBox } from 'components/Box'
-import { IColumn } from 'hooks/utils'
+import { IColumn } from 'hooks/useHooks/useColumns'
 import { Table } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { styled } from 'twin.macro'
-import { dataJobInstanceColumns } from '../constants'
+import {useMemo, useState} from 'react'
+import { ISuggestionTag } from 'views/Space/Ops/DataIntegration/interfaces'
+import {
+  dataJobInstanceColumns,
+  dataJobInstanceSuggestions,
+} from '../constants'
 
 const { FilterInput } = Table as any
 const FilterInputWrapper = styled.div`
@@ -21,8 +26,8 @@ const FilterInputWrapper = styled.div`
 const { ColumnsSetting } = ToolBar as any
 
 interface ITableHeaderProps {
+  columns: IColumn[]
   columnsSetting: {
-    defaultColumns: IColumn[]
     storageKey: string
     onSave: (s: Record<string, any>[]) => void
   }
@@ -30,14 +35,53 @@ interface ITableHeaderProps {
 
 const TableHeader = observer((props: ITableHeaderProps) => {
   const {
+    columns,
     columnsSetting: { storageKey, onSave },
   } = props
+  const [tags, setTags] = useState<ISuggestionTag[]>([])
+
+  // const suggestions = useMemo(
+  //   () => {
+  //     return columns.reduce(
+  //       (acc, cur) => {
+  //         if (cur) {
+  //
+  //         }
+  //       }, []
+  //     )
+  //   }, [columns]
+  // )
+
+  const handleChange = (tag1: ISuggestionTag[]) => {
+    const jobName = tag1.findIndex(
+      (t: ISuggestionTag) => t && t?.filter === 'job_name'
+    )
+    const keyword = tag1.findIndex(
+      (t: ISuggestionTag) => t && t?.filter === 'keyword'
+    )
+    if (keyword !== -1) {
+      delete tag1[jobName]
+      tag1.push({
+        filter: 'job_name',
+        value: tag1[keyword].value,
+        valueLabel: tag1[keyword].value,
+        filterLabel: '作业名称',
+      })
+      delete tag1[keyword]
+    }
+    setTags(tag1.filter(Boolean))
+  }
   return (
     <FlexBox tw=" gap-2">
       <FilterInputWrapper>
         <FilterInput
+          suggestions={dataJobInstanceSuggestions}
+          tags={tags}
+          onChange={handleChange}
           tw="border-line-dark!"
           placeholder="搜索关键字或输入过滤条件"
+          // isMultiKeyword
+          defaultKeywordLabel="作业名称或 ID"
         />
       </FilterInputWrapper>
 
