@@ -131,3 +131,135 @@ export const dataJobInstanceColumns: IColumn[] = [
     key: 'update_time',
   },
 ]
+
+export enum DataReleaseSchedule {
+  RUNNING = 2 << 0,
+  FINISHED = 2 << 1,
+  DOWNED = 2 << 2,
+}
+
+export const dataReleaseScheduleType = {
+  '0': { label: '运行中', value: '0', type: DataReleaseSchedule.RUNNING },
+  '1': { label: '已完成', value: '1', type: DataReleaseSchedule.FINISHED },
+  '2': { label: '已下线', value: '2', type: DataReleaseSchedule.DOWNED },
+} as const
+
+export enum DataReleaseDevMode {
+  UI = 2 << 0,
+  SCRIPT = 2 << 1,
+}
+
+export const dataReleaseDevModeType = {
+  '0': { label: '向导模式', value: '0', type: DataReleaseDevMode.UI },
+  '1': { label: '脚本模式', value: '1', type: DataReleaseDevMode.SCRIPT },
+} as const
+
+export const sourceTypes = {
+  MySQL: 'MySQL',
+  PostgreSQL: 'PostgreSQL',
+  TiDB: 'TiDB',
+  Oracle: 'Oracle',
+  SqlServer: 'SqlServer',
+  DB2: 'DB2',
+  SapHana: 'SPA HANA',
+  ClickHouse: 'ClickHouse',
+  Hive: 'Hive',
+  Ftp: 'FTP',
+  HDFS: 'HDFS',
+  HBase: 'HBase',
+  ElasticSearch: 'ElasticSearch',
+  Redis: 'Redis',
+  MongoDb: 'MongoDB',
+  Kafka: 'Kafka',
+}
+
+export const dataReleaseSuggestions: ISuggestion[] = [
+  {
+    label: '调度状态',
+    key: 'schedule_status',
+    options: Object.values(dataReleaseScheduleType).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
+    label: '开发模式',
+    key: 'dev_mode',
+    options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
+    label: '来源',
+    key: 'source',
+    options: Object.entries(sourceTypes).map(([key, value]) => ({
+      label: value,
+      key,
+    })),
+  },
+  {
+    label: '目的',
+    key: 'target',
+    options: Object.entries(sourceTypes).map(([key, value]) => ({
+      label: value,
+      key,
+    })),
+  },
+]
+export const dataReleaseTabs: ITab[] = [
+  {
+    title: '数据集成-已发布作业',
+    description: 'Release data job',
+    icon: 'equalizer',
+    helpLink: getHelpCenterLink('data-job-release'),
+  },
+]
+
+export const dataReleaseColumns: IColumn[] = [
+  {
+    title: '作业名称/ID',
+    dataIndex: 'job_name',
+    key: 'job_name',
+  },
+  {
+    title: '调度状态',
+    dataIndex: 'schedule_status',
+    key: 'schedule_status',
+  },
+  {
+    title: '告警状态',
+    dataIndex: 'alarm_status',
+    key: 'alarm_status',
+  },
+  {
+    title: '版本 ID',
+    dataIndex: 'version_id',
+    key: 'version_id',
+  },
+  {
+    title: '开发模式',
+    dataIndex: 'dev_mode',
+    key: 'dev_mode',
+  },
+  {
+    title: '作业类型',
+    dataIndex: 'job_type',
+    key: 'job_type',
+  },
+  {
+    title: '来源',
+    dataIndex: 'source',
+    key: 'source',
+  },
+  {
+    title: '目的',
+    dataIndex: 'target',
+    key: 'target',
+  },
+  {
+    title: '最近发布时间',
+    dataIndex: `created_at`,
+    key: 'created_at',
+  },
+]

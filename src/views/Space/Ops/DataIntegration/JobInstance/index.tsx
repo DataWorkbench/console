@@ -19,6 +19,8 @@ import dayjs from 'dayjs'
 import useIcon from 'hooks/useHooks/useIcon'
 import { tuple } from 'utils/functions'
 import { useHistory } from 'react-router-dom'
+import { useQueryClient } from 'react-query'
+import { get, omitBy } from 'lodash-es'
 import {
   alarmStatus,
   dataJobInstanceColumns,
@@ -26,9 +28,15 @@ import {
   jobInstanceStatus,
   JobInstanceStatusType,
   jobType,
+  sourceTypes,
 } from '../constants'
 import TableHeader from './TableHeader'
 import icons from '../icons'
+import {
+  getJobInstanceKey,
+  useMutationInstance,
+  useQueryJobInstances,
+} from '../../../../../hooks'
 
 const settingKey = 'DATA_JOB_INSTANCE_TABLE_SETTING'
 
@@ -48,6 +56,20 @@ const DataJobInstance = () => {
     status: string
     offset: number
   }>({ alarm_status: '', offset: 0, status: '' })
+
+  const queryClient = useQueryClient()
+  const mutation = useMutationInstance()
+
+  const { isFetching, isRefetching, data } = useQueryJobInstances(
+    omitBy(filter, Boolean)
+  )
+
+  const infos = get(data, 'infos', []) || []
+
+  const refetchData = () => {
+    queryClient.invalidateQueries(getJobInstanceKey())
+  }
+
   const columnsRender = {
     instance_id: {
       render: (text: string) => (
@@ -102,14 +124,14 @@ const DataJobInstance = () => {
     job_id: {
       render: (v: string, record: Record<string, any>) => {
         return (
-          <div>
-            <FlexBox>
+          <div tw="truncate">
+            <TextEllipsis theme="light">
               <span tw="text-white">{record.job_name}</span>
               <span tw="text-neut-8"> {record.job_id}</span>
-            </FlexBox>
-            <div>
-              <span tw="text-neut-8">{`版本 ID： ${record.version_id}`}</span>
-            </div>
+            </TextEllipsis>
+            <TextEllipsis theme="light">
+              <span tw="text-neut-8">{`版本 ID： ${record.version}`}</span>
+            </TextEllipsis>
           </div>
         )
       },
@@ -137,6 +159,7 @@ const DataJobInstance = () => {
           : '',
       render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
+
     update_time: {
       sortable: true,
       sortOrder:
@@ -227,39 +250,7 @@ const DataJobInstance = () => {
       <PageTab tabs={dataJobInstanceTab} />
       <FlexBox orient="column" tw="gap-3">
         <TableHeader columnsSetting={columnsSetting} columns={columns} />
-        <Table
-          columns={columns}
-          dataSource={[
-            {
-              instance_id: '122222222222222222222333333',
-              status: '1',
-              alarm_status: '1',
-              job_id: '1',
-              job_type: '1',
-              create_time: '1',
-              update_time: '1',
-            },
-
-            {
-              instance_id: '888888888888888888888888888',
-              status: '2',
-              alarm_status: '1',
-              job_id: '1',
-              job_type: '2',
-              create_time: '1',
-              update_time: '1',
-            },
-            {
-              instance_id: '999999999999999999999999999',
-              status: '4',
-              alarm_status: '1',
-              job_id: '1',
-              job_type: '0',
-              create_time: '1',
-              update_time: '1',
-            },
-          ]}
-        />
+        <Table columns={columns} dataSource={infos} loading={!!isFetching} />
       </FlexBox>
     </FlexBox>
   )
