@@ -187,7 +187,6 @@ export const Divider = styled.div`
   ${tw`inline-block h-4 w-[1px] bg-[#475569]`}
 `
 
-
 export const Circle = styled.div`
   ${tw`inline-flex items-center justify-center w-6 h-6 rounded-full text-white bg-line-dark mr-2 flex-none`}
 `

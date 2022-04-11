@@ -1,11 +1,11 @@
-import { Icon, Button, ToolBar } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, ToolBar } from '@QCFE/qingcloud-portal-ui'
 
 import { FlexBox } from 'components/Box'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { Table } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { styled } from 'twin.macro'
-import {useMemo, useState} from 'react'
+import { useState } from 'react'
 import { ISuggestionTag } from 'views/Space/Ops/DataIntegration/interfaces'
 import {
   dataJobInstanceColumns,
@@ -18,6 +18,7 @@ const FilterInputWrapper = styled.div`
   & .table-filter-bar {
     ${tw`border-none! text-xs!`}
   }
+
   & .table-filter-bar .autosuggest .autosuggest-input > input {
     ${tw`bg-transparent! border-none! text-white! text-xs!`}
   }
@@ -35,7 +36,6 @@ interface ITableHeaderProps {
 
 const TableHeader = observer((props: ITableHeaderProps) => {
   const {
-    columns,
     columnsSetting: { storageKey, onSave },
   } = props
   const [tags, setTags] = useState<ISuggestionTag[]>([])

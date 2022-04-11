@@ -35,7 +35,7 @@ const Strategies = () => {
   const [activeKeys, setActiveKeys] = useState(defaultKeys)
 
   return (
-    <div>
+    <div tw="w-full">
       <Collapse
         css={collapseStyle.wrapper}
         defaultActiveKey={defaultKeys}

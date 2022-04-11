@@ -2,7 +2,6 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { getHelpCenterLink } from 'utils/index'
 import { ISuggestion, ITab } from './interfaces'
-import {tuple} from "utils/functions";
 
 export const dataJobReleaseTab: ITab[] = [
   {
@@ -12,8 +11,6 @@ export const dataJobReleaseTab: ITab[] = [
     helpLink: getHelpCenterLink('data-job-release'),
   },
 ]
-
-
 
 export const dataJobInstanceTab: ITab[] = [
   {

@@ -88,9 +88,10 @@ const Routes = () => {
               component={Dm}
             />
             <Route
-              path="/:regionId/workspace/:spaceId/ops/:mod?"
+              path="/:regionId/workspace/:spaceId/ops/:mod?/:detail?"
               component={Ops}
             />
+
             <Route
               path="/:regionId/workspace/:spaceId/manage/:mod?"
               component={Manage}

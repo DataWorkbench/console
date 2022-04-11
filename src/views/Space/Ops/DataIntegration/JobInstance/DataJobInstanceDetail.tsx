@@ -12,13 +12,13 @@ import { HorizonTabs } from 'views/Space/Dm/styled'
 import Cluster from 'views/Space/Ops/DataIntegration/components/Cluster'
 import useIcon from 'hooks/useHooks/useIcon'
 import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
+import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
 import {
   AlarmStatusCmp,
   Circle,
   JobInstanceStatusCmp,
   JobTypeCmp,
 } from '../styledComponents'
-import Monitor from "views/Space/Ops/DataIntegration/components/Monitor";
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -81,7 +81,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
   const history = useHistory()
 
   const [isOpen, setOpen] = useState(true)
-  const [activeName, setActiveName] = useState('job-instance-detail')
+  const [activeName, setActiveName] = useState('Message')
   const toList = () => {
     history.push('../data-job')
   }

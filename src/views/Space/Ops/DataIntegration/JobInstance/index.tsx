@@ -6,9 +6,10 @@ import { Table } from 'views/Space/styled'
 import { IMoreActionItem, MoreAction, TextEllipsis, TextLink } from 'components'
 import React, { useMemo } from 'react'
 import { Center } from 'components/Center'
-import tw, { css, styled } from 'twin.macro'
+import tw, { css } from 'twin.macro'
 import {
-  AlarmStatusCmp, Circle,
+  AlarmStatusCmp,
+  Circle,
   Divider,
   JobInstanceStatusCmp,
   JobTypeCmp,
@@ -17,6 +18,7 @@ import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import useIcon from 'hooks/useHooks/useIcon'
 import { tuple } from 'utils/functions'
+import { useHistory } from 'react-router-dom'
 import {
   alarmStatus,
   dataJobInstanceColumns,
@@ -27,13 +29,11 @@ import {
 } from '../constants'
 import TableHeader from './TableHeader'
 import icons from '../icons'
-import {useHistory} from "react-router-dom";
 
 const settingKey = 'DATA_JOB_INSTANCE_TABLE_SETTING'
 
 const actionsType = tuple('info', 'stop')
 type ActionsType = typeof actionsType[number]
-
 
 const DataJobInstance = () => {
   useIcon(icons)
