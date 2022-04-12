@@ -1,11 +1,11 @@
 import { Icon, InputSearch, Button } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components'
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
-import { useImmer } from 'use-immer'
 import { Circle } from 'views/Space/Ops/DataIntegration/styledComponents'
 import { Table } from 'views/Space/styled'
 import dayjs from 'dayjs'
 import tw, { css } from 'twin.macro'
+import useFilter from 'hooks/useHooks/useFilter'
 
 const defaultColumns: IColumn[] = [
   {
@@ -23,17 +23,17 @@ const defaultColumns: IColumn[] = [
 const itemSettingKey = 'ITEM_MONITOR_HISTORY'
 
 const MonitorHistory = () => {
-  const [filter, setFilter] = useImmer<{
-    reverse?: 'asc' | 'desc'
-    sort_by?: string
-    search?: string
-    offset: number
-    limit: number
-  }>({
-    search: '',
-    limit: 10,
-    offset: 0,
-  })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { filter, setFilter, pagination } = useFilter<
+    {
+      reverse?: 'asc' | 'desc'
+      sort_by?: string
+      search?: string
+      offset: number
+      limit: number
+    },
+    { pagination: true }
+  >({})
 
   const renderColumns = {
     id: {
@@ -61,7 +61,7 @@ const MonitorHistory = () => {
 
   const { columns } = useColumns(itemSettingKey, defaultColumns, renderColumns)
   const data = {
-    total: 10,
+    total: 9,
     infos: [
       {
         id: '1',
@@ -119,19 +119,7 @@ const MonitorHistory = () => {
         rowKey="id"
         pagination={{
           total: data?.total || 0,
-          current: filter.offset / filter.limit + 1,
-          pageSize: filter.limit,
-          onPageChange: (current: number) => {
-            setFilter((draft) => {
-              draft.offset = (current - 1) * filter.limit
-            })
-          },
-          onShowSizeChange: (size: number) => {
-            setFilter((draft) => {
-              draft.offset = 0
-              draft.limit = size
-            })
-          },
+          ...pagination,
         }}
       />
     </div>

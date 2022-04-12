@@ -37,6 +37,7 @@ import {
   useMutationInstance,
   useQueryJobInstances,
 } from '../../../../../hooks'
+import useFilter from '../../../../../hooks/useHooks/useFilter'
 
 const settingKey = 'DATA_JOB_INSTANCE_TABLE_SETTING'
 
@@ -48,14 +49,17 @@ const DataJobInstance = () => {
 
   const history = useHistory()
 
-  const [filter, setFilter] = useImmer<{
-    reverse?: 'asc' | 'desc'
-    sort_by?: string
-    job_type?: any
-    alarm_status: string
-    status: string
-    offset: number
-  }>({ alarm_status: '', offset: 0, status: '' })
+  const { filter, setFilter, pagination, sort } = useFilter<
+    {
+      reverse?: 'asc' | 'desc'
+      sort_by?: string
+      job_type?: any
+      alarm_status: string
+      status: string
+      offset: number
+    },
+    { pagination: true; sort: true }
+  >({ alarm_status: '', offset: 0, status: '' })
 
   const queryClient = useQueryClient()
   const mutation = useMutationInstance()
@@ -250,7 +254,16 @@ const DataJobInstance = () => {
       <PageTab tabs={dataJobInstanceTab} />
       <FlexBox orient="column" tw="gap-3">
         <TableHeader columnsSetting={columnsSetting} columns={columns} />
-        <Table columns={columns} dataSource={infos} loading={!!isFetching} />
+        <Table
+          columns={columns}
+          dataSource={new Array(10).fill({})}
+          loading={!!isFetching}
+          sort={sort}
+          pagination={{
+            total: get(data, 'total', 0),
+            ...pagination,
+          }}
+        />
       </FlexBox>
     </FlexBox>
   )

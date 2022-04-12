@@ -14,16 +14,21 @@ import React, { useMemo } from 'react'
 import { TextLink } from 'components/Link'
 import {
   AlarmStatusCmp,
+  Circle,
   Divider,
   JobTypeCmp,
 } from 'views/Space/Ops/DataIntegration/styledComponents'
 import { MoreAction } from 'components/MoreAction'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
-import { styled } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
+import { Center } from 'components/Center'
+import { Icon } from '@QCFE/lego-ui'
 import TableHeader from './TableHeader'
+import { TextEllipsis } from '../../../../../components'
+import useFilter from '../../../../../hooks/useHooks/useFilter'
 // import { IColumn } from 'hooks/utils'
 
 // interface IDataReleaseProps {}
@@ -38,19 +43,47 @@ const TabsWrapper = styled.div`
 const dataReleaseSettingKey = 'DATA_RELEASE_SETTING'
 // const columns: IColumn[] = []
 const DataRelease = () => {
-  const [filter, setFilter] = useImmer<{
-    source?: string
-    target?: string
-    reverse?: 'asc' | 'desc'
-    sort_by?: string
-    job_type?: any
-    alarm_status?: string
-    schedule_status?: number
-    offset: number
-    limit: number
-  }>({ offset: 0, limit: 10 })
+  const { filter, setFilter, pagination, sort } = useFilter<
+    {
+      source?: string
+      target?: string
+      reverse?: 'asc' | 'desc'
+      sort_by?: string
+      job_type?: any
+      alarm_status?: string
+      schedule_status?: number
+      offset: number
+      limit: number
+    },
+    { pagination: true; sort: true }
+  >({})
 
   const columnsRender = {
+    job_name: {
+      render: (text: string, record: Record<string, any>) => (
+        <Center tw="truncate">
+          {/* // TODO merge fill icon */}
+          <Circle>
+            <Icon
+              name="q-mergeFillDuotone"
+              type="light"
+              css={css`
+                & .qicon {
+                  ${tw`text-white! fill-[#fff]!`}
+                }
+              `}
+            />
+          </Circle>
+
+          <div tw="flex-1 truncate">
+            <TextEllipsis theme="light">{text}</TextEllipsis>
+            <TextEllipsis theme="light">
+              <span tw="text-neut-8">{record.id}</span>
+            </TextEllipsis>
+          </div>
+        </Center>
+      ),
+    },
     schedule_status: {
       filter: filter.schedule_status,
       onFilter: (v: number) => {
@@ -158,7 +191,38 @@ const DataRelease = () => {
   }
 
   const getActions = (record: Record<string, any>) => {
-    return []
+    return [
+      {
+        icon: '',
+        text: '关联实例',
+        key: 'link',
+      },
+      {
+        icon: '',
+        text: '开发内容',
+        key: 'dev',
+      },
+      {
+        icon: '',
+        text: '计算集群',
+        key: 'cluster',
+      },
+      {
+        icon: '',
+        text: '监控告警',
+        key: 'alarm',
+      },
+      {
+        icon: '',
+        text: '调度信息',
+        key: 'schedule',
+      },
+      {
+        icon: '',
+        text: '下线',
+        key: 'offline',
+      },
+    ]
   }
 
   const handleMenuClick = () => {
@@ -198,8 +262,11 @@ const DataRelease = () => {
     [setColumnSettings]
   )
 
-  const { data, isFetching } = {}
-
+  const { data, isFetching } = {
+    data: { infos: [{ id: 1, job_name: 'aaaa' }] },
+    isFetching: false,
+  }
+  // local.testing.com/dataomnis/testing/workspace/wks-yrl0o4ex205vkr9y/ops/data-release
   const infos = get(data, 'infos', [])
 
   return (
@@ -209,7 +276,16 @@ const DataRelease = () => {
       </TabsWrapper>
       <FlexBox orient="column" tw="gap-3">
         <TableHeader columnsSetting={columnsSetting} columns={columns} />
-        <Table columns={columns} dataSource={infos} loading={!!isFetching} />
+        <Table
+          columns={columns}
+          dataSource={infos}
+          loading={!!isFetching}
+          sort={sort}
+          pagination={{
+            total: get(data, 'total', 0),
+            ...pagination,
+          }}
+        />
       </FlexBox>
     </FlexBox>
   )
