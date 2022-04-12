@@ -7,11 +7,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { styled } from 'twin.macro'
 import { useState } from 'react'
 import { ISuggestionTag } from 'views/Space/Ops/DataIntegration/interfaces'
-import {
-  dataJobInstanceColumns,
-  dataJobInstanceSuggestions, dataReleaseColumns,
-  dataReleaseSuggestions,
-} from '../constants'
+import { dataReleaseSuggestions } from '../constants'
 
 const { FilterInput } = Table as any
 const FilterInputWrapper = styled.div`
@@ -28,8 +24,8 @@ const FilterInputWrapper = styled.div`
 const { ColumnsSetting } = ToolBar as any
 
 interface ITableHeaderProps {
-  columns: IColumn[]
   columnsSetting: {
+    columns: IColumn[]
     storageKey: string
     onSave: (s: Record<string, any>[]) => void
   }
@@ -37,7 +33,7 @@ interface ITableHeaderProps {
 
 const TableHeader = observer((props: ITableHeaderProps) => {
   const {
-    columnsSetting: { storageKey, onSave },
+    columnsSetting: { storageKey, onSave, columns },
   } = props
   const [tags, setTags] = useState<ISuggestionTag[]>([])
 
@@ -90,7 +86,7 @@ const TableHeader = observer((props: ITableHeaderProps) => {
         <Icon name="if-refresh" tw="text-xl text-white" type="light" />
       </Button>
       <ColumnsSetting
-        defaultColumns={dataReleaseColumns}
+        defaultColumns={columns}
         storageKey={storageKey}
         onSave={onSave}
       />

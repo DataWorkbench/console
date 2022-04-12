@@ -217,6 +217,8 @@ const DataSourceModal = observer(
                   return (
                     curkind && (
                       <DataSourceForm
+                        op={op}
+                        opSourceList={opSourceList}
                         getFormData={getFormData as any}
                         resInfo={curkind}
                         onFieldValueChange={handleFieldValueChange}

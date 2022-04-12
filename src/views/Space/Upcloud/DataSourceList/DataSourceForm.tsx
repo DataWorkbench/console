@@ -13,7 +13,6 @@ import { get, omit, toLower } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
-import { useStore } from 'hooks'
 import { AffixLabel, Center, Divider } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
@@ -149,10 +148,18 @@ interface IFormProps {
   }
   getFormData?: MutableRefObject<() => any>
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
+  op: string
+  opSourceList: Record<string, any>[]
 }
 
 const DataSourceForm = observer(
-  ({ resInfo, getFormData, onFieldValueChange }: IFormProps) => {
+  ({
+    resInfo,
+    getFormData,
+    onFieldValueChange,
+    op,
+    opSourceList,
+  }: IFormProps) => {
     const [network, setNetWork] = useImmer<{
       type: 'vpc' | 'eip'
       id: string
@@ -166,9 +173,9 @@ const DataSourceForm = observer(
     })
     const ref = useRef<Form>(null)
 
-    const {
-      dataSourceStore: { op, opSourceList },
-    } = useStore()
+    // const {
+    //   dataSourceStore: { op, opSourceList },
+    // } = useStore()
 
     const urlType = resInfo.name.toLowerCase()
     const sourceInfo =

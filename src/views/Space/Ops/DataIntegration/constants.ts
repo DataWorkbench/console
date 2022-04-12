@@ -263,3 +263,15 @@ export const dataReleaseColumns: IColumn[] = [
     key: 'created_at',
   },
 ]
+
+const versionSet = new Set([
+  'job_name',
+  'schedule_status',
+  'alarm_status',
+  'version_id',
+  'created_at',
+])
+
+export const versionColumns = dataReleaseColumns.filter(
+  (column) => column.key && versionSet.has(column!.key)
+)
