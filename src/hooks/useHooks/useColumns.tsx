@@ -2,6 +2,7 @@ import React, { ReactElement, useMemo, useState } from 'react'
 import { FlexBox } from 'components/Box'
 import { Tooltip } from 'components/Tooltip'
 import { Icon, Menu } from '@QCFE/lego-ui'
+import tw, { css } from 'twin.macro'
 
 const { MenuItem } = Menu as any
 
@@ -90,7 +91,19 @@ export const useColumns = (
                     </Menu>
                   }
                 >
-                  <Icon name="filter" type="light" clickable tw="ml-1 block" />
+                  <Icon
+                    name="filter"
+                    type="light"
+                    clickable
+                    tw="ml-1 block"
+                    css={css`
+                      &.icon .qicon {
+                        ${item.filter
+                          ? tw`dark:text-white!`
+                          : tw`dark:text-[#fff6]!`}
+                      }
+                    `}
+                  />
                 </Tooltip>
               </FlexBox>
             )
@@ -102,7 +115,6 @@ export const useColumns = (
     [columnsRender, defaultColumns]
   )
 
-  console.log('columnsWithRender', columnsWithRender, columnSettings)
   const filterColumn =
     Array.isArray(columnSettings) && columnSettings.length
       ? columnSettings
