@@ -21,7 +21,7 @@ import {
   useQuerySourceTableSchema,
 } from 'hooks'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { dataSourceTypes } from '../JobUtils'
+import { dataSourceTypes } from '../job/JobUtils'
 
 const { TextField, SelectField, TextAreaField } = Form
 

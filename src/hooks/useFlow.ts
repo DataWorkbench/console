@@ -26,7 +26,6 @@ import {
   streamJobCodeSyntax,
   streamJobCodeRun,
 } from 'stores/api'
-import { JobMode } from 'views/Space/Dm/RealTime/JobUtils'
 
 interface IRouteParams {
   regionId: string
@@ -70,12 +69,12 @@ export const useMutationStreamJob = () => {
       op,
       jobMode,
       ...rest
-    }: IWorkFlowParams & { jobMode: JobMode }) => {
+    }: IWorkFlowParams & { jobMode: 'RT' | 'DI' }) => {
       const params = { ...rest, regionId, spaceId }
-      if (jobMode === JobMode.RT) {
+      if (jobMode === 'RT') {
         params.tp = 'stream'
       }
-      if (jobMode === JobMode.DI) {
+      if (jobMode === 'DI') {
         params.tp = 'sync'
       }
       if (params.tp) {

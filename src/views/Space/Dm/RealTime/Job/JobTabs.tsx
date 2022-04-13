@@ -11,10 +11,10 @@ import tw, { theme, css, styled } from 'twin.macro'
 import { useStore } from 'stores'
 import { RouterLink, Icons } from 'components'
 
-import StreamOperator from './stream/StreamOperator'
-import StreamCode from './stream/StreamCode'
-import StreamJAR from './stream/StreamJAR'
-import SyncJob from './sync/SyncJob'
+import StreamOperator from '../stream/StreamOperator'
+import StreamCode from '../stream/StreamCode'
+import StreamJAR from '../stream/StreamJAR'
+import SyncJob from '../sync/SyncJob'
 import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
 
 const { TabPanel } = Tabs

@@ -29,7 +29,7 @@ import {
   getNewTreeData,
   filterFolderOfTreeData,
   getDiJobType,
-} from '../JobUtils'
+} from '../job/JobUtils'
 import {
   SyncTypeRadioGroupField,
   SyncTypeVal,

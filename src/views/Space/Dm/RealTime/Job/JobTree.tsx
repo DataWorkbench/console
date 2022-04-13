@@ -28,6 +28,7 @@ import { get, cloneDeep } from 'lodash-es'
 import { useStore } from 'stores'
 import { nameMatchRegex, strlen } from 'utils'
 import { TreeNodeProps } from 'rc-tree'
+import { useParams } from 'react-router-dom'
 import {
   JobType,
   RootKey,
@@ -41,7 +42,7 @@ import {
   renderSwitcherIcon,
   JobMode,
 } from './JobUtils'
-import { JobModal, JobModalData } from './modal/JobModal'
+import { JobModal, JobModalData } from '../modal/JobModal'
 
 const { MenuItem } = Menu
 const { TextField } = Form
@@ -72,7 +73,10 @@ interface JobTreeProps {
 export const JobTree = observer(
   (props: JobTreeProps, ref) => {
     const { expandedKeys: expandedKeysProp } = props
+    const { spaceId } = useParams<{ spaceId: string }>()
     const fetchJob = useFetchJob()
+
+    console.log('spaceId', spaceId)
     const {
       workFlowStore,
       workFlowStore: { treeData, loadedKeys, showJobModal },
@@ -82,6 +86,7 @@ export const JobTree = observer(
       expandedKeysProp || []
     )
     const [curOpNode, setCurOpNode] = useState(treeData[1])
+    const [autoExpandParent, setAutoExpandParent] = useState(false)
     const [targetNodeKey, setTargetNodeKey] = useState<string>('')
     const [selectedKeys, setSelectedKeys] = useState<string[]>([])
     const [curOp, setCurOp] = useState<'create' | 'edit' | 'move'>('create')
@@ -333,6 +338,11 @@ export const JobTree = observer(
           throw e
         })
     }
+
+    useEffect(() => {
+      workFlowStore.resetTreeData()
+    }, [spaceId, workFlowStore])
+
     const handleMutate = (op: 'create' | 'edit' | 'move' | 'delete') => {
       const { key } = curOpNode
       let data: any = { op, jobMode: curOpNode.jobMode }
@@ -405,7 +415,9 @@ export const JobTree = observer(
             ? findTreeNode(workFlowStore.treeData, curOpNode.pid)
             : curOpNode)
 
-        fetchJobTreeData(node)
+        fetchJobTreeData(node).then(() => {
+          setAutoExpandParent(true)
+        })
       }
     }
 
@@ -431,6 +443,7 @@ export const JobTree = observer(
         >
           <TreeWrapper ref={treeEl}>
             <Tree
+              autoExpandParent={autoExpandParent}
               treeData={treeData}
               loadedKeys={loadedKeys}
               expandedKeys={expandedKeys}
@@ -453,9 +466,17 @@ export const JobTree = observer(
               )}
               loadData={fetchJobTreeData}
               onExpand={(keys) => setExpandedKeys(keys as string[])}
-              onLoad={(keys) => workFlowStore.set({ loadedKeys: keys })}
+              onLoad={(keys) => {
+                workFlowStore.set({ loadedKeys: keys })
+                if (autoExpandParent) {
+                  setAutoExpandParent(false)
+                }
+              }}
               onSelect={(keys: (string | number)[], { selected, node }) => {
                 const job = get(node, 'job')
+                if (autoExpandParent) {
+                  setAutoExpandParent(false)
+                }
                 if (
                   workFlowStore.curJob?.id !== job?.id &&
                   workFlowStore.isDirty
