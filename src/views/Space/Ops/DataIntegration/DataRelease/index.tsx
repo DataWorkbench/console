@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { DataReleaseContext, DataReleaseStore } from './store'
 import DataReleaseTable from './DataReleaseTable'
 
-const DataRelase = () => {
+const DataRelease = () => {
   const store = useRef(new DataReleaseStore())
   return (
     <DataReleaseContext.Provider value={store.current}>
@@ -11,6 +11,4 @@ const DataRelase = () => {
   )
 }
 
-var a = '221'
-
-export default DataRelase
+export default DataRelease

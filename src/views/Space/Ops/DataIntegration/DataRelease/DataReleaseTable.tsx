@@ -11,11 +11,11 @@ import { get } from 'lodash-es'
 import { styled } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
 import { observer } from 'mobx-react-lite'
-import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelase/store'
+import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import {
   getColumnsRender,
   getOperations,
-} from 'views/Space/Ops/DataIntegration/DataRelase/utils'
+} from 'views/Space/Ops/DataIntegration/DataRelease/utils'
 import VersionsModal from './VersionsModal'
 import TableHeader from './TableHeader'
 

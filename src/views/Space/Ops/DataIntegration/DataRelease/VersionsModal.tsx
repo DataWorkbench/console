@@ -5,7 +5,7 @@ import { versionColumns } from 'views/Space/Ops/DataIntegration/constants'
 import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { Table } from 'views/Space/styled'
-import TableHeader from 'views/Space/Ops/DataIntegration/DataRelase/TableHeader'
+import TableHeader from 'views/Space/Ops/DataIntegration/DataRelease/TableHeader'
 import { getColumnsRender, getOperations } from './utils'
 
 interface IProps {
