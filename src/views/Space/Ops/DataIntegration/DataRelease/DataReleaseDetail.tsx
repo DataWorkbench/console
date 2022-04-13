@@ -1,25 +1,24 @@
 // @ts-ignore
-import { Breadcrumb, Button, Icon, CopyText } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Card, MoreAction, Center, Tooltip } from 'components'
+import { Breadcrumb, Button, CopyText, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Card, Center, FlexBox, MoreAction } from 'components'
 import { useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
 import icons from 'views/Space/Ops/DataIntegration/icons'
 import { Collapse, Tabs } from '@QCFE/lego-ui'
-import { HelpCenterLink } from 'components/Link'
 import dayjs from 'dayjs'
 import { HorizonTabs } from 'views/Space/Dm/styled'
 import Cluster from 'views/Space/Ops/DataIntegration/components/Cluster'
 import useIcon from 'hooks/useHooks/useIcon'
 import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
 import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
+import LinkInstance from 'views/Space/Ops/DataIntegration/components/LinkInstance'
 import {
   AlarmStatusCmp,
   Circle,
   JobInstanceStatusCmp,
   JobTypeCmp,
 } from '../styledComponents'
-import LinkInstance from "views/Space/Ops/DataIntegration/components/LinkInstance";
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -35,9 +34,11 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
     & {
       ${tw`grid place-content-start gap-y-1`}
       grid-template-columns: ${labelWidth}px 1fr;
+
       & > span:nth-of-type(2n + 1) {
         ${tw`text-neut-8!`}
       }
+
       & > span:nth-of-type(2n) {
         ${tw`text-white!`}
       }
@@ -48,10 +49,12 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
 const Root = styled.div`
   ${tw`grid gap-3 h-full px-4 py-3 leading-[20px]`}
   grid-template-rows: auto auto 1fr;
+
   & {
     & .tabs {
       ${tw`flex-none`}
     }
+
     & .tab-content {
       ${tw`overflow-y-auto px-0 py-4`}
     }
@@ -67,6 +70,7 @@ const BreadcrumbWrapper = styled.div`
         ${tw`text-neut-8!`}
       }
     }
+
     & .breadcrumb-last-item .copy-text {
       &:hover .text-field {
         ${tw`text-white!`}
