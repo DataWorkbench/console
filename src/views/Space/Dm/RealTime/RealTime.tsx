@@ -13,8 +13,8 @@ import emitter from 'utils/emitter'
 import { useParams } from 'react-router-dom'
 import JobMenu from './JobMenu'
 import JobTabs from './JobTabs'
-import StreamRightMenu from './StreamRightMenu'
-import VersionDisplay from './VersionDisplay'
+import StreamRightMenu from './stream/StreamRightMenu'
+import VersionDisplay from './version/VersionDisplay'
 
 const RealTime = observer(() => {
   const { spaceId } = useParams<{ regionId: string; spaceId: string }>()

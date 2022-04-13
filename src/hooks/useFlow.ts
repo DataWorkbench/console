@@ -46,7 +46,7 @@ export const useFetchJob = () => {
         search: '',
         limit: 100,
         offset: 0,
-        reverse: false,
+        reverse: true,
         sort_by: 'created',
         ...filter,
       }

@@ -11,10 +11,10 @@ import tw, { theme, css, styled } from 'twin.macro'
 import { useStore } from 'stores'
 import { RouterLink, Icons } from 'components'
 
-import StreamOperator from './StreamOperator'
-import StreamCode from './StreamCode'
-import StreamJAR from './StreamJAR'
-import SyncJob from './SyncJob/SyncJob'
+import StreamOperator from './stream/StreamOperator'
+import StreamCode from './stream/StreamCode'
+import StreamJAR from './stream/StreamJAR'
+import SyncJob from './sync/SyncJob'
 import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
 
 const { TabPanel } = Tabs
@@ -22,17 +22,17 @@ const { TabPanel } = Tabs
 const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full flex flex-col`,
   css`
-    .tabs {
+    &.tabs-container .tabs.is-boxed {
       ${tw`bg-neut-17 h-8 flex-none`};
       ul {
         border: 0;
-        li {
-          ${tw`(border-none rounded-b-none mx-0.5)!`}
+        > li {
+          ${tw`border-l-0 border-r-0 border-t-0 border-b-2 border-b-transparent (rounded-b-none mx-0.5)!`}
           .tag {
             ${tw`border border-neut-13 text-neut-8  bg-transparent`}
           }
           &.is-active {
-            ${tw`text-white bg-green-11! hover:(bg-green-11)!`}
+            ${tw`text-white border-b-green-11!`}
             .tag {
               ${tw`text-neut-13 bg-white border-0`}
             }
@@ -106,17 +106,6 @@ const JobTabs = observer(() => {
     workFlowStore.set({ panels: [], curJob: null, curViewJobId: null })
   })
 
-  // const showNames: any = useMemo(
-  //   () => ({
-  //     1: '算子',
-  //     2: 'Sql',
-  //     3: 'Jar',
-  //     4: 'Python',
-  //     5: 'Scala',
-  //   }),
-  //   []
-  // )
-
   const getTag = (job) => {
     const { jobMode } = job
     if (jobMode === JobMode.RT) {
@@ -132,15 +121,6 @@ const JobTabs = observer(() => {
       )
     }
     if (jobMode === JobMode.DI) {
-      // return get(
-      //   {
-      //     0: '离线全量',
-      //     1: '离线增量',
-      //     2: '实时全量',
-      //     3: '实时增量',
-      //   },
-      //   job.type
-      // )
       const tp = getDiJobType(job.type)
       return (
         <IconWrapper theme="grey">

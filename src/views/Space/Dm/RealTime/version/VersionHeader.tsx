@@ -4,7 +4,7 @@ import { Level, LevelLeft, Select } from '@QCFE/lego-ui'
 import { Icon, Divider } from '@QCFE/qingcloud-portal-ui'
 import { flatten } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
-import { AlertWrapper, Tag } from './styled'
+import { AlertWrapper, Tag } from '../styled'
 
 const SelectWrapper = styled(Select)(() => [
   css`

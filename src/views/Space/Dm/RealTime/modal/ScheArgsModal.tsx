@@ -28,7 +28,7 @@ import {
 } from 'hooks'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import tw, { css } from 'twin.macro'
-import { ScheForm } from './styled'
+import { ScheForm } from '../styled'
 
 const { CollapseItem } = Collapse
 const { NumberField, SelectField } = Form

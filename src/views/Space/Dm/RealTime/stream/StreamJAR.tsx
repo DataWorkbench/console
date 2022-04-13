@@ -24,10 +24,10 @@ import {
 import { strlen } from 'utils/convert'
 import { get, flatten } from 'lodash-es'
 import { css } from 'twin.macro'
-import ReleaseModal from './ReleaseModal'
-import { JobToolBar } from './styled'
-import UploadModal from '../Resource/UploadModal'
-import VersionHeader from './VersionHeader'
+import ReleaseModal from '../modal/ReleaseModal'
+import { JobToolBar } from '../styled'
+import UploadModal from '../../Resource/UploadModal'
+import VersionHeader from '../version/VersionHeader'
 
 const { TextField } = Form
 

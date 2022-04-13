@@ -11,6 +11,7 @@ interface IJob {
   version: string
   source_type?: number
   target_type?: number
+  jobMode?: 'DI' | 'RT' | 'OLE'
 }
 
 const initTreeData = [
@@ -39,6 +40,8 @@ class WorkFlowStore {
   curJob: null | IJob = null
 
   curVersion: null | IJob = null
+
+  showJobModal = false
 
   panels: IJob[] = []
 
@@ -137,6 +140,14 @@ class WorkFlowStore {
   resetTreeData = () => {
     this.treeData = initTreeData
     this.loadedKeys = []
+  }
+
+  toggleJobModal = (v?: boolean) => {
+    if (typeof v === 'boolean') {
+      this.showJobModal = v
+    } else {
+      this.showJobModal = !this.showJobModal
+    }
   }
 }
 
