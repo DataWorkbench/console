@@ -124,7 +124,7 @@ let config = {
   },
   optimization: {},
   devServer: {
-    host: 'localhost',
+    host: '0.0.0.0',
     allowedHosts: ['local.testing.com'],
     compress: true,
     hot: true,
