@@ -11,4 +11,6 @@ const DataRelase = () => {
   )
 }
 
+var a = '221'
+
 export default DataRelase
