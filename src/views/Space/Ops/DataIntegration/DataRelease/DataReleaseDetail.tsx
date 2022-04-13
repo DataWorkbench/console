@@ -13,6 +13,7 @@ import useIcon from 'hooks/useHooks/useIcon'
 import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
 import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
 import LinkInstance from 'views/Space/Ops/DataIntegration/components/LinkInstance'
+import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent/DevContentUI'
 import {
   AlarmStatusCmp,
   Circle,
@@ -56,7 +57,11 @@ const Root = styled.div`
     }
 
     & .tab-content {
-      ${tw`overflow-y-auto px-0 py-4`}
+      ${tw`overflow-y-auto px-0 py-4 flex-auto`}
+    }
+
+    & .tab-panel.is-active {
+      ${tw`h-full`}
     }
   }
 `
@@ -209,9 +214,10 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
           </div>
         </CollapsePanel>
       </Card>
+
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent"
+        tw="overflow-hidden bg-transparent flex-auto"
         activeName={activeName}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
@@ -224,7 +230,7 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
           <Monitor />
         </TabPanel>
         <TabPanel label="开发内容" name="Develop">
-          <div>3</div>
+          <DevContent data={{}} />
         </TabPanel>
         <TabPanel label="计算集群" name="Cluster">
           <Cluster data={{}} />

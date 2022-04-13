@@ -172,7 +172,7 @@ let config = {
       profile: !isDev,
     }),
     new MonacoWebpackPlugin({
-      languages: ['sql', 'python', 'scala'],
+      languages: ['sql', 'python', 'scala', 'json'],
       filename: 'static/js/[name].worker.js',
     }),
   ].filter(Boolean),

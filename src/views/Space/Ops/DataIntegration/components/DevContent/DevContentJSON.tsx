@@ -2,7 +2,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import Editor from 'react-monaco-editor'
 import { isUndefined } from 'lodash-es'
 import { useRef, useState } from 'react'
-import { Center, FlexBox } from 'components'
+import { Center, FlexBox, ArrowLine } from 'components'
 
 const defaultCode = `
 {
@@ -72,16 +72,17 @@ const Item = styled.div`
   ${tw`rounded-[3px] border border-white py-1 px-2 text-white`}
 `
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Line = () => {
   return (
     <FlexBox tw="w-[20%]">
+      <div tw="h-[1px] flex-auto border-none mt-[3px] border-white border-t border-dashed" />
       <div
-        tw="h-[1px] flex-auto border-none border-t border-dashed"
+        tw="w-0 h-0 border-4 border-transparent border-l-white "
         css={css`
-          transform: translateY(50%);
+          transform: translateX(2px);
         `}
       />
-      <div tw="w-0 h-0 border-4 border-transparent border-l-white " />
     </FlexBox>
   )
 }
@@ -113,32 +114,35 @@ const DevContentJSON = (props: { data?: { code?: string } }) => {
   }
 
   return (
-    <div tw="flex-1 relative overflow-hidden h-auto ">
-      <div
-        css={[!showPlaceholder && tw`hidden`]}
-        tw="absolute inset-0 z-50 bg-neut-18 bg-opacity-40 cursor-text"
-      />
-      <Center tw="bg-neut-18 h-10">
+    <div tw="h-full w-full grid">
+      <Center tw="bg-neut-18 h-14">
         <Item>来源: mysql</Item>
-        <Line />
+        <ArrowLine tw="w-[20%] flex-none" />
         <Item>离线-增量</Item>
-        <Line />
+        <ArrowLine tw="w-[20%] flex-none" />
         <Item>目的: kafka</Item>
       </Center>
-      <Editor
-        language={codeName}
-        defaultValue={codeStr}
-        theme="my-theme"
-        tw="overflow-hidden"
-        options={{
-          minimap: { enabled: false },
-          scrollBeyondLastLine: false,
-          automaticLayout: true,
-          readOnly: true,
-        }}
-        editorWillMount={handleEditorWillMount}
-        editorDidMount={handleEditorDidMount}
-      />
+      <div tw="flex-1 relative overflow-hidden h-auto ">
+        <div
+          css={[!showPlaceholder && tw`hidden`]}
+          tw="absolute inset-0 z-50 bg-neut-18 bg-opacity-40 cursor-text"
+        />
+
+        <Editor
+          language={codeName}
+          defaultValue={codeStr}
+          theme="my-theme"
+          tw="overflow-hidden"
+          options={{
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            readOnly: true,
+          }}
+          editorWillMount={handleEditorWillMount}
+          editorDidMount={handleEditorDidMount}
+        />
+      </div>
     </div>
   )
 }
