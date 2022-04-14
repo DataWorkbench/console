@@ -26,6 +26,7 @@ export const getColumnsRender = (
 ): Record<string, Partial<IColumn>> => {
   const columnsRender = {
     job_name: {
+      width: 250,
       render: (text: string, record: Record<string, any>) => (
         <Center tw="truncate">
           {/* // TODO merge fill icon */}
@@ -155,7 +156,7 @@ export const getColumnsRender = (
       render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
   }
-  return pickByKeys ? pick(columnsRender, pickByKeys) : columnsRender
+  return (pickByKeys ? pick(columnsRender, pickByKeys) : columnsRender) as any
 }
 
 export const getOperations = (
