@@ -15,7 +15,7 @@ import {
   getColumnsRender,
   getOperations,
 } from 'views/Space/Ops/DataIntegration/DataRelease/utils'
-import SelectTreeTable from 'components/SelectTreeTable'
+import { SelectTreeTable } from 'components'
 import VersionsModal from './VersionsModal'
 import TableHeader from './TableHeader'
 
