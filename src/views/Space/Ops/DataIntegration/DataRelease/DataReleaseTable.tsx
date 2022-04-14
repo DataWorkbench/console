@@ -1,21 +1,14 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox } from 'components/Box'
-import {
-  dataReleaseColumns,
-  dataReleaseTabs,
-} from 'views/Space/Ops/DataIntegration/constants'
 import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
 import { styled } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
 import { observer } from 'mobx-react-lite'
-import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
-import {
-  getColumnsRender,
-  getOperations,
-} from 'views/Space/Ops/DataIntegration/DataRelease/utils'
-import { SelectTreeTable } from 'components'
+import { SelectTreeTable, FlexBox } from 'components'
+import { dataReleaseColumns, dataReleaseTabs } from '../constants'
+import { getColumnsRender, getOperations } from './utils'
+import { useDataReleaseStore } from './store'
 import VersionsModal from './VersionsModal'
 import TableHeader from './TableHeader'
 
