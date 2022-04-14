@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions,no-nested-ternary */
+import { omit } from 'lodash-es'
+
 interface TreeNode {
   value: any
   key: string | Symbol
@@ -26,18 +28,25 @@ export function isRoot(tree: TreeNode): boolean {
 function renderTreeNode(tree: TreeNode) {
   const map: TreeKeyChildrenMap = new Map()
   const getItem = (t: TreeNode) => {
-    return {
-      value: t.value,
-      key: t.key, // isOpen: s.openedAll.has(t.key as string),
-      // isSelected: s.selectedAll.has(t.key as string)
-    }
+    return omit(t, 'children')
+    // {
+    //   t
+    // value: t.value,
+    // key: t.key, // isOpen: s.openedAll.has(t.key as string),
+    // isSelected: s.selectedAll.has(t.key as string)
+    // }
   }
+
   map.set(tree.key, {
     pid: outSy,
     children: new Set(tree?.children?.map((t) => t.key) || []),
   })
   const list = [getItem(tree)]
-  let children = (tree.children || []).map((n) => ({ ...n, pid: tree.key }))
+  let children = (tree.children || []).map((n) => ({
+    ...n,
+    pid: tree.key,
+    level: 1,
+  }))
   while (Array.isArray(children) && children.length > 0) {
     const child = children[0]
     map.set(child.key, {
@@ -48,14 +57,14 @@ function renderTreeNode(tree: TreeNode) {
     children = children.slice(1)
     if (Array.isArray(child.children) && child.children.length > 0) {
       children = (child.children || [])
-        .map((n) => ({ ...n, pid: child.key }))
+        .map((n) => ({ ...n, pid: child.key, level: (child.level ?? 0) + 1 }))
         .concat(children)
     }
   }
   return { list, map }
 }
 
-class SelectTree {
+class SelectTreeData {
   static rootKey = rootSy
 
   state: State
@@ -89,6 +98,7 @@ class SelectTree {
 
   // 选中节点
   onAdd(key: string | Symbol, withChildren = true, type: 1 | 2 = 1) {
+    console.log(9999, key)
     if (!this.keyChildrenMap.has(key)) {
       return
     }
@@ -138,8 +148,7 @@ class SelectTree {
     }
     const { pid } = this.keyChildrenMap.get(key) || {}
 
-    console.log(key, pid, this.keyChildrenMap.has(key))
-    if (!pid || pid === rootSy) {
+    if (!pid || pid === outSy) {
       return
     }
     this.state.selectedAll?.delete(key)
@@ -174,7 +183,10 @@ class SelectTree {
         const index = this.list.findIndex((n) => n.key === nodeKey)
         this.list = [
           ...this.list.slice(0, index + 1),
-          ...children,
+          ...children.map((i) => ({
+            ...i,
+            level: (this.list[index].level ?? 0) + 1,
+          })),
           ...this.list.slice(index + 1),
         ]
 
@@ -194,22 +206,23 @@ class SelectTree {
         list = list.slice(1)
       }
     }
-    // this.init()
   }
 
   // 获取节点列表
   getList(cb: (node: Record<string, any>) => any = (d) => d) {
-    return this.list.map((item) =>
-      cb({
-        ...item,
-        isOpened: this.state.openedAll?.has(item.key),
-        isSelected: this.state.selectedAll?.has(item.key)
-          ? 1
-          : this.state.map.get(item.key)?.size
-          ? 2
-          : 0,
-      })
-    )
+    return this.list
+      .filter((i) => i.key !== rootSy)
+      .map((item) =>
+        cb({
+          ...item,
+          isOpened: this.state.openedAll?.has(item.key),
+          isSelected: this.state.selectedAll?.has(item.key)
+            ? 1
+            : this.state.map.get(item.key)?.size
+            ? 2
+            : 0,
+        })
+      )
   }
 
   getSelectedKeys() {
@@ -221,17 +234,34 @@ class SelectTree {
     keys.forEach((key) => {
       this.onAdd(key)
     })
-    // this.onAdd(keys[0])
-    // this.onAdd(keys[1])
-    // this.onAdd(keys[2])
-    // while (keys.length > 0) {
-    //     this.onAdd(keys[0] )
-    //     keys = keys.filter(k => k !== keys[0] && !this.keyChildrenMap.get(keys[0])?.children?.has(k))
-    // }
-    // keys.forEach(key => {
-    //     this.onAdd(key )
-    // })
+  }
+
+  onOpen(key: string) {
+    // 关闭
+    // 后续子节点全关
+    if (this.state.openedAll?.has(key)) {
+      this.state.openedAll?.delete(key)
+      let node: Record<string, any> | undefined
+      let flag = false
+      for (let i = 0; i < this.list.length; i += 1) {
+        if (node && node.level >= this.list[i].level) {
+          break
+        }
+        if (this.list[i].key === key) {
+          node = this.list[i]
+          flag = true
+        }
+        if (flag) {
+          this.state.openedAll?.delete(this.list[i].key)
+        }
+      }
+    } else {
+      // 开启
+      ;[key, ...(this.keyChildrenMap?.get(key)?.children || [])].map((i) =>
+        this.state.openedAll?.add(i)
+      )
+    }
   }
 }
 
-export default SelectTree
+export default SelectTreeData

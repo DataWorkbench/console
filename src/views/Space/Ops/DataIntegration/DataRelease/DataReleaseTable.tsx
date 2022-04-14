@@ -4,7 +4,6 @@ import {
   dataReleaseColumns,
   dataReleaseTabs,
 } from 'views/Space/Ops/DataIntegration/constants'
-import { Table } from 'views/Space/styled'
 import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
@@ -16,6 +15,7 @@ import {
   getColumnsRender,
   getOperations,
 } from 'views/Space/Ops/DataIntegration/DataRelease/utils'
+import SelectTreeTable from 'components/SelectTreeTable'
 import VersionsModal from './VersionsModal'
 import TableHeader from './TableHeader'
 
@@ -89,7 +89,13 @@ const DataRelease = observer(() => {
         </TabsWrapper>
         <FlexBox orient="column" tw="gap-3">
           <TableHeader columnsSetting={columnsSetting} />
-          <Table
+          <SelectTreeTable
+            getChildren={async (key) => [
+              {
+                id: `${key}as`,
+                name: `${key}asdf`,
+              },
+            ]}
             columns={columns}
             dataSource={infos}
             loading={!!isFetching}
