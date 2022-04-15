@@ -1,11 +1,14 @@
+/* eslint-disable */
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
-import { styled } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
 import { observer } from 'mobx-react-lite'
-import { SelectTreeTable, FlexBox } from 'components'
+import { SelectTreeTable, FlexBox, TextEllipsis, Center } from 'components'
+import { Circle } from 'views/Space/Ops/DataIntegration/styledComponents'
+import { Icon } from '@QCFE/lego-ui'
 import { dataReleaseColumns, dataReleaseTabs } from '../constants'
 import { getColumnsRender, getOperations } from './utils'
 import { useDataReleaseStore } from './store'
@@ -51,9 +54,62 @@ const DataRelease = observer(() => {
 
   const operations = getOperations(handleMenuClick)
 
+  const jobNameColumn = {
+    ...dataReleaseColumns[0],
+    width: 250,
+    render: (text: string, record: Record<string, any>) => {
+      if (record.hasMore) {
+        return (
+          <span
+            tw="text-green-11 cursor-pointer"
+            onClick={() => {
+              set({
+                showVersion: true,
+                selectedData: record,
+              })
+            }}
+          >
+            查看全部 →
+          </span>
+        )
+      }
+
+      if (record.hasNone) {
+        return <span tw="text-neut-8">暂无历史版本</span>
+      }
+
+      if (record.__level > 1) {
+        return <TextEllipsis>{text}</TextEllipsis>
+      }
+      return (
+        <Center tw="truncate">
+          {/* // TODO merge fill icon */}
+          <Circle>
+            <Icon
+              name="q-mergeFillDuotone"
+              type="light"
+              css={css`
+                & .qicon {
+                  ${tw`text-white! fill-[#fff]!`}
+                }
+              `}
+            />
+          </Circle>
+
+          <div tw="flex-1 truncate">
+            <TextEllipsis theme="light">{text}</TextEllipsis>
+            <TextEllipsis theme="light">
+              <span tw="text-neut-8">{record.id}</span>
+            </TextEllipsis>
+          </div>
+        </Center>
+      )
+    },
+  }
+
   const { columns, setColumnSettings } = useColumns(
     dataReleaseSettingKey,
-    dataReleaseColumns,
+    [jobNameColumn, ...dataReleaseColumns.slice(1)],
     columnsRender,
     operations
   )
@@ -83,10 +139,15 @@ const DataRelease = observer(() => {
         <FlexBox orient="column" tw="gap-3">
           <TableHeader columnsSetting={columnsSetting} />
           <SelectTreeTable
+            openLevel={1}
+            indentSpace={44}
+            selectedLevel={-1}
             getChildren={async (key) => [
               {
                 id: `${key}as`,
-                name: `${key}asdf`,
+                job_name: `${key}asdf`,
+                // hasNone: true,
+                hasMore: true,
               },
             ]}
             columns={columns}

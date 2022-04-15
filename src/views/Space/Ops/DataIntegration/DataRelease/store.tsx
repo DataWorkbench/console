@@ -6,6 +6,8 @@ export class DataReleaseStore {
 
   showDataSource: boolean = true
 
+  selectedData?: Record<string, any> = undefined
+
   constructor() {
     makeAutoObservable(this)
   }

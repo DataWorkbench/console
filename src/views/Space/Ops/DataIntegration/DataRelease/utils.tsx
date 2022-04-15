@@ -1,6 +1,6 @@
-import { Icon } from '@QCFE/lego-ui'
-import tw, { css } from 'twin.macro'
-import { Center, FlexBox, MoreAction, TextEllipsis, TextLink } from 'components'
+/* eslint-disable no-underscore-dangle */
+
+import { MoreAction } from 'components'
 import dayjs from 'dayjs'
 import React from 'react'
 import { pick } from 'lodash-es'
@@ -12,12 +12,7 @@ import {
   jobType,
   sourceTypes,
 } from '../constants'
-import {
-  AlarmStatusCmp,
-  Circle,
-  Divider,
-  JobTypeCmp,
-} from '../styledComponents'
+import { AlarmStatusCmp, JobTypeCmp } from '../styledComponents'
 
 export const getColumnsRender = (
   filter: Record<string, any>,
@@ -25,32 +20,6 @@ export const getColumnsRender = (
   pickByKeys?: string[]
 ): Record<string, Partial<IColumn>> => {
   const columnsRender = {
-    job_name: {
-      width: 250,
-      render: (text: string, record: Record<string, any>) => (
-        <Center tw="truncate">
-          {/* // TODO merge fill icon */}
-          <Circle>
-            <Icon
-              name="q-mergeFillDuotone"
-              type="light"
-              css={css`
-                & .qicon {
-                  ${tw`text-white! fill-[#fff]!`}
-                }
-              `}
-            />
-          </Circle>
-
-          <div tw="flex-1 truncate">
-            <TextEllipsis theme="light">{text}</TextEllipsis>
-            <TextEllipsis theme="light">
-              <span tw="text-neut-8">{record.id}</span>
-            </TextEllipsis>
-          </div>
-        </Center>
-      ),
-    },
     schedule_status: {
       filter: filter.schedule_status,
       onFilter: (v: number) => {
@@ -101,9 +70,13 @@ export const getColumnsRender = (
       },
       filterAble: true,
       filtersNew: Object.values(jobType) as any,
-      render: (text: keyof typeof jobType) => <JobTypeCmp type={text} />,
+      render: (text: keyof typeof jobType, record: Record<string, any>) => {
+        if (record.__level > 1) {
+          return null
+        }
+        return <JobTypeCmp type={text} />
+      },
     },
-
     source: {
       filter: filter.source,
       onFilter: (v: string) => {
@@ -117,8 +90,8 @@ export const getColumnsRender = (
         label,
         value,
       })),
-      render: (text: keyof typeof sourceTypes) =>
-        sourceTypes[text] ? (
+      render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
+        record.__level === 1 && sourceTypes[text] ? (
           <span tw="h-3 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2">
             {sourceTypes[text]}
           </span>
@@ -137,8 +110,8 @@ export const getColumnsRender = (
         label,
         value,
       })),
-      render: (text: keyof typeof sourceTypes) =>
-        sourceTypes[text] ? (
+      render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
+        record.__level === 1 && sourceTypes[text] ? (
           <span tw="h-3 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2">
             {sourceTypes[text]}
           </span>
@@ -153,7 +126,10 @@ export const getColumnsRender = (
             ? 'asc'
             : 'desc'
           : '',
-      render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (v: number, record: Record<string, any>) =>
+        record.__level === 1
+          ? dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')
+          : null,
     },
   }
   return (pickByKeys ? pick(columnsRender, pickByKeys) : columnsRender) as any
@@ -203,15 +179,11 @@ export const getOperations = (
     key: 'operation',
     render: (_: never, record: Record<string, any>) => {
       return (
-        <FlexBox tw="gap-4">
-          <TextLink>Flink UI</TextLink>
-          <Divider />
-          <MoreAction
-            theme="darker"
-            items={getActions(record)}
-            onMenuClick={handleMenuClick}
-          />
-        </FlexBox>
+        <MoreAction
+          theme="darker"
+          items={getActions(record)}
+          onMenuClick={handleMenuClick}
+        />
       )
     },
   }
