@@ -12,7 +12,9 @@ export interface ISelectTreeTableProps {
   columns: IColumn[]
   dataSource: Record<string, any>[]
   getChildren: (key: string) => PromiseLike<Record<string, any>[]>
-
+  openLevel?: number
+  selectedLevel?: number
+  indentSpace?: number
   [propName: string]: any
 }
 
@@ -21,6 +23,9 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     columns: columnsProp,
     dataSource,
     rowKey = 'id',
+    openLevel = 1000,
+    selectedLevel = 1000,
+    indentSpace = 20,
     getChildren = async () => [],
   } = props
 
@@ -72,39 +77,43 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
         <FlexBox
           tw="flex-auto gap-2"
           css={css`
-            padding-left: ${(record.__level - 1) * 20}px;
+            padding-left: ${(record.__level - 1) * indentSpace}px;
           `}
         >
           <FlexBox tw="flex-none gap-2 items-center">
-            <Icon
-              name={
-                tableTreeRef.current.state.openedAll?.has(record[rowKey])
-                  ? 'chevron-up'
-                  : 'chevron-down'
-              }
-              type="light"
-              clickable
-              size={16}
-              onClick={() => handleOpen(record[rowKey])}
-            />
-            <Checkbox
-              indeterminate={record.__isSelected === 2}
-              checked={record.__isSelected === 1 || record.isSelected === 2}
-              onChange={(e, checked: boolean) => {
-                if (!checked) {
-                  tableTreeRef.current.onRemove(record[rowKey])
-                } else {
-                  tableTreeRef.current.onAdd(record[rowKey])
+            {record.__level <= openLevel && (
+              <Icon
+                name={
+                  tableTreeRef.current.state.openedAll?.has(record[rowKey])
+                    ? 'chevron-up'
+                    : 'chevron-down'
                 }
-                fourUpdate()
-              }}
-            />
+                type="light"
+                clickable
+                size={16}
+                onClick={() => handleOpen(record[rowKey])}
+              />
+            )}
+            {record._level <= selectedLevel && (
+              <Checkbox
+                indeterminate={record.__isSelected === 2}
+                checked={record.__isSelected === 1 || record.isSelected === 2}
+                onChange={(e, checked: boolean) => {
+                  if (!checked) {
+                    tableTreeRef.current.onRemove(record[rowKey])
+                  } else {
+                    tableTreeRef.current.onAdd(record[rowKey])
+                  }
+                  fourUpdate()
+                }}
+              />
+            )}
           </FlexBox>
           {renderTd(column)(text as never, record)}
         </FlexBox>
       )
     },
-    [handleOpen, rowKey]
+    [handleOpen, indentSpace, openLevel, rowKey, selectedLevel]
   )
 
   const columns = useMemo(() => {
