@@ -113,6 +113,19 @@ export const getStreamJobArgs = ({
     uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/args`,
   })
 
+export const SetSyncJobConf = ({
+  regionId,
+  spaceId,
+  jobId,
+  ...rest
+}: IWorkFlowParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/args`,
+    body: rest,
+    method: 'PUT',
+  })
+
 export const setStreamJobCode = ({
   regionId,
   spaceId,

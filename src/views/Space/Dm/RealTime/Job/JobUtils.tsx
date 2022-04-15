@@ -29,6 +29,15 @@ export enum JobType {
   /** scala模式 */
   SCALA = 5,
 }
+/** 数据集成作业类型 */
+export enum SyncJobType {
+  /** 1 => "OfflineFull"(离线全量) */
+  OFFLINEFULL = 1,
+  /**  2 => "OfflineIncrement"(离线增量)  */
+  OFFLINEINCREMENT = 2,
+  /** 3 => "RealTime"(实时)  */
+  REALTIME = 3,
+}
 
 /** 作业树icon主题 */
 export enum TreeIconTheme {

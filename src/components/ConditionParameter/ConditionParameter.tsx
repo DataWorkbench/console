@@ -16,7 +16,7 @@ import {
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
-import { isEqual, pick } from 'lodash-es'
+import { isEqual } from 'lodash-es'
 
 import { FlexBox } from '../Box'
 import { Tooltip } from '../Tooltip'
@@ -27,17 +27,25 @@ const tuple = <T extends string[]>(...args: T) => args
 const symbols = tuple('<=', '>=', '=', '!=', '>', '<')
 type SymbolType = typeof symbols[number]
 
+enum ConditionType {
+  // Unset = 0,
+  Visualization = 1,
+  Express = 2,
+}
+
+export type TConditionParameterVal = {
+  type: ConditionType
+  column?: string
+  startValue?: string
+  endValue?: string
+  startCondition?: SymbolType
+  endCondition?: SymbolType
+  expression?: string
+}
+
 interface IConditionParameterProps {
-  value?: {
-    type: 'visual' | 'expression'
-    startValue?: string
-    endValue?: string
-    startSymbol?: SymbolType
-    endSymbol?: SymbolType
-    column?: string
-    expression?: string
-  }
-  onChange?: (value: { type: 'visual' | 'expression'; config: any }) => void
+  value?: TConditionParameterVal
+  onChange?: (value: TConditionParameterVal) => void
   help?: React.ReactElement
   helpLink?: string
   className?: string
@@ -77,17 +85,17 @@ const SimpleWrapper = styled.div`
 const types = [
   {
     label: '可视化',
-    value: 'visual',
+    value: ConditionType.Visualization,
   },
   {
     label: '表达式',
-    value: 'expression',
+    value: ConditionType.Express,
   },
 ]
 export const ConditionParameter = React.forwardRef(
   (props: IConditionParameterProps, ref: React.ForwardedRef<any>) => {
     const {
-      value: defaultValue = { type: 'visual' },
+      value: defaultValue = { type: ConditionType.Visualization },
       onChange,
       help,
       helpLink,
@@ -98,11 +106,13 @@ export const ConditionParameter = React.forwardRef(
       onRefresh,
     } = props
 
-    const [value, setValue] = useImmer(defaultValue || { type: 'visual' })
+    const [value, setValue] = useImmer(
+      defaultValue || { type: ConditionType.Visualization }
+    )
     const prevValue = useRef(value)
 
     useEffect(() => {
-      const v = defaultValue || { type: 'visual' }
+      const v = defaultValue || { type: ConditionType.Visualization }
       if (!isEqual(v, prevValue.current)) {
         setValue(() => v)
         prevValue.current = v
@@ -113,35 +123,35 @@ export const ConditionParameter = React.forwardRef(
 
     useEffect(() => {
       if (value && onChange) {
-        const tempValue =
-          value?.type === 'visual'
-            ? pick(value, [
-                'type',
-                'column',
-                'startValue',
-                'endValue',
-                'startSymbol',
-                'endSymbol',
-              ])
-            : (pick(value, ['type', 'column', 'expression']) as any)
-        onChange(tempValue)
-        prevValue.current = tempValue
+        // const tempValue =
+        //   value?.type === ConditionType.Visualization
+        //     ? pick(value, [
+        //         'type',
+        //         'column',
+        //         'startValue',
+        //         'endValue',
+        //         'startCondition',
+        //         'endCondition',
+        //       ])
+        //     : (pick(value, ['type', 'column', 'expression']) as any)
+        onChange(value)
+        prevValue.current = value
       }
     }, [onChange, value])
 
-    const handleTypeChange = (v: 'visual' | 'expression') => {
+    const handleTypeChange = (v: ConditionType) => {
       setValue((draft) => {
         draft.type = v
-        if (v !== 'visual' && draft.column) {
-          const hasStart = draft.startValue && draft.startSymbol
-          const hasEnd = draft.endValue && draft.endSymbol
+        if (v !== ConditionType.Visualization && draft.column) {
+          const hasStart = draft.startValue && draft.startCondition
+          const hasEnd = draft.endValue && draft.endCondition
           const start = hasStart
-            ? `${draft?.startValue ?? ''} ${draft?.startSymbol ?? ''} {${
+            ? `${draft?.startValue ?? ''} ${draft?.startCondition ?? ''} {${
                 draft?.column
               }}`
             : ''
           const end = hasEnd
-            ? `${draft?.endValue ?? ''} ${draft?.endSymbol ?? ''} {${
+            ? `${draft?.endValue ?? ''} ${draft?.endCondition ?? ''} {${
                 draft?.column
               }}`
             : ''
@@ -179,7 +189,7 @@ export const ConditionParameter = React.forwardRef(
             {helpLink && <HelpCenterLink href={helpLink} />}
           </div>
         </FlexBox>
-        {value?.type !== 'expression' && (
+        {value?.type !== ConditionType.Express && (
           <SimpleWrapper>
             <FlexBox>
               <span tw="label-required">列名</span>
@@ -220,10 +230,10 @@ export const ConditionParameter = React.forwardRef(
               <FlexBox tw="gap-2">
                 <Select
                   placeholder="关系符号"
-                  value={value?.startSymbol}
+                  value={value?.startCondition}
                   onChange={(v: SymbolType) => {
                     setValue((draft) => {
-                      draft.startSymbol = v
+                      draft.startCondition = v
                     })
                   }}
                   options={symbols.map((item) => ({
@@ -247,10 +257,10 @@ export const ConditionParameter = React.forwardRef(
               <FlexBox tw="gap-2">
                 <Select
                   placeholder="关系符号"
-                  value={value?.endSymbol}
+                  value={value?.endCondition}
                   onChange={(v: SymbolType) => {
                     setValue((draft) => {
-                      draft.endSymbol = v
+                      draft.endCondition = v
                     })
                   }}
                   options={symbols.map((item) => ({
@@ -273,14 +283,14 @@ export const ConditionParameter = React.forwardRef(
               <span>生成条件参数</span>
               <div tw="text-neut-8">
                 [{value?.startValue || '开始条件'}] [
-                {value?.startSymbol ?? '关系符号'}] [{value?.column ?? '列名'}]
-                [{value?.endSymbol ?? '关系符号'}] [
-                {value?.endValue || '结束条件'}]
+                {value?.startCondition ?? '关系符号'}] [
+                {value?.column ?? '列名'}] [{value?.endCondition ?? '关系符号'}]
+                [{value?.endValue || '结束条件'}]
               </div>
             </FlexBox>
           </SimpleWrapper>
         )}
-        {value?.type === 'expression' && (
+        {value?.type === ConditionType.Express && (
           <TextArea
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               setValue((draft) => {

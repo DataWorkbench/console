@@ -76,7 +76,6 @@ export const JobTree = observer(
     const { spaceId } = useParams<{ spaceId: string }>()
     const fetchJob = useFetchJob()
 
-    console.log('spaceId', spaceId)
     const {
       workFlowStore,
       workFlowStore: { treeData, loadedKeys, showJobModal },

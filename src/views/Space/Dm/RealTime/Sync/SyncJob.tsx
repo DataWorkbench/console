@@ -1,12 +1,14 @@
-import { Collapse } from '@QCFE/lego-ui'
+import { Collapse, Notification as Notify } from '@QCFE/lego-ui'
 import { Button, Icon } from '@QCFE/qingcloud-portal-ui'
 import { HelpCenterLink, FieldMappings, PopConfirm } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
+import { isObject, isUndefined, set } from 'lodash-es'
+import { useMutationSyncJobConf } from 'hooks'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -70,7 +72,20 @@ const stepsData = [
   },
 ]
 
+const removeUndefined = (obj: any) => {
+  const newObj: any = {}
+  Object.entries(obj).forEach(([key, value]) => {
+    if (isObject(value)) {
+      newObj[key] = removeUndefined(value)
+    } else if (!isUndefined(value)) {
+      newObj[key] = value
+    }
+  })
+  return newObj
+}
+
 const SyncJob = () => {
+  const mutation = useMutationSyncJobConf()
   const [fields, setFields] = useImmer<{
     source: TMappingField[]
     target: TMappingField[]
@@ -79,6 +94,17 @@ const SyncJob = () => {
     target: [],
   })
   const [mode, setMode] = useState<1 | 2>(1)
+  const dbRef =
+    useRef<{
+      getResource: () => Record<string, string>
+      getTypeNames: () => string[]
+    }>(null)
+  const mappingRef =
+    useRef<{
+      rowMapping: () => [Record<string, string>, Record<string, string>]
+    }>(null)
+  const clusterRef = useRef<{ getCluster: () => Record<string, string> }>(null)
+  const channelRef = useRef<{ getChannel: () => Record<string, string> }>(null)
   // console.log('fields', fields)
 
   const handleEditorWillMount = (monaco: any) => {
@@ -94,6 +120,49 @@ const SyncJob = () => {
 
   const handleEditorDidMount = (editor) => {
     editor.focus()
+  }
+
+  const save = () => {
+    if (
+      !dbRef.current ||
+      !mappingRef.current ||
+      !clusterRef.current ||
+      !channelRef.current
+    ) {
+      return
+    }
+    const resource = dbRef.current.getResource()
+    const sourceTypeNames = dbRef.current.getTypeNames()
+    const mapping = mappingRef.current.rowMapping()
+    const cluster = clusterRef.current.getCluster()
+    const channel = channelRef.current.getChannel()
+    if (resource && mapping && cluster && channel) {
+      set(
+        resource,
+        `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
+        mapping[0]
+      )
+      set(
+        resource,
+        `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+        mapping[1]
+      )
+      set(resource, 'cluster_id', cluster.id)
+      set(resource, 'job_mode', 0)
+      set(resource, 'channel_control', channel)
+      const filterResouce = removeUndefined(resource)
+      // console.log('filterResouce', filterResouce)
+      mutation.mutate(filterResouce, {
+        onSuccess: () => {
+          // console.log(data)
+          Notify.success({
+            title: '操作提示',
+            content: '配置保存成功',
+            placement: 'bottomRight',
+          })
+        },
+      })
+    }
   }
 
   const renderGuideMode = () => {
@@ -115,7 +184,8 @@ const SyncJob = () => {
             >
               {index === 0 && (
                 <SyncDataSource
-                  onFetchedFields={(
+                  ref={dbRef}
+                  onSelectTable={(
                     tp: 'source' | 'target',
                     data: Record<string, any>[]
                   ) => {
@@ -135,6 +205,7 @@ const SyncJob = () => {
               )}
               {index === 1 && (
                 <FieldMappings
+                  ref={mappingRef}
                   leftFields={fields.source}
                   rightFields={fields.target}
                   topHelp={
@@ -144,8 +215,8 @@ const SyncJob = () => {
                   }
                 />
               )}
-              {index === 2 && <SyncCluster />}
-              {index === 3 && <SyncChannel />}
+              {index === 2 && <SyncCluster ref={clusterRef} />}
+              {index === 3 && <SyncChannel ref={channelRef} />}
             </CollapseItem>
           ))}
         </Collapse>
@@ -224,7 +295,7 @@ const SyncJob = () => {
             语法检查
           </Button>
         )}
-        <Button>
+        <Button onClick={save} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存
         </Button>

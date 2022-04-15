@@ -29,6 +29,7 @@ import {
   getNewTreeData,
   filterFolderOfTreeData,
   getDiJobType,
+  SyncJobType,
 } from '../job/JobUtils'
 import {
   SyncTypeRadioGroupField,
@@ -185,10 +186,16 @@ export const JobModal = observer((props: JobModalProps) => {
           data.type = params.jobType
         } else if (params.jobMode === JobMode.DI) {
           if (params.jobType === JobType.OFFLINE) {
-            data.type = syncTypeInfo.type === 'full' ? 0 : 1
+            data.type =
+              syncTypeInfo.type === 'full'
+                ? SyncJobType.OFFLINEFULL
+                : SyncJobType.OFFLINEINCREMENT
           }
           if (params.jobType === JobType.REALTIME) {
-            data.type = syncTypeInfo.type === 'full' ? 2 : 3
+            data.type =
+              syncTypeInfo.type === 'full'
+                ? SyncJobType.REALTIME
+                : SyncJobType.REALTIME
           }
           if (syncTypeInfo.type === 'full') {
             data.source_type = syncTypeInfo.fullSource

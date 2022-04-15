@@ -1,4 +1,12 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  forwardRef,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
 import { useMount, useUnmount, useMeasure } from 'react-use'
 import tw, { styled } from 'twin.macro'
@@ -89,7 +97,7 @@ export interface IFieldMappingsRecord {
   clear: () => void
 }
 
-export const FieldMappings = (props: IFieldMappingsProps) => {
+export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const {
     leftFields: leftFieldsProp,
     rightFields: rightFieldsProp,
@@ -119,6 +127,37 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
   useEffect(() => {
     jsPlumbInstRef.current?.repaintEverything()
   }, [rect.width])
+
+  useImperativeHandle(ref, () => ({
+    rowMapping: () => {
+      const leftColumns: Record<string, any>[] = []
+      const rightColumns: Record<string, any>[] = []
+      mappings.forEach(([left, right], index) => {
+        const leftField = leftFields.find(({ name }) => name === left)!
+        const rightField = rightFields.find(({ name }) => name === right)!
+        leftColumns.push({
+          format: leftField.formatter,
+          index,
+          is_part: false,
+          name: leftField.name,
+          type: leftField.type,
+          value: leftField.default,
+        })
+        rightColumns.push({
+          format: rightField.formatter,
+          index,
+          is_part: false,
+          name: rightField.name,
+          type: rightField.type,
+          value: rightField.default,
+        })
+      })
+      if (leftColumns.length === 0 && rightColumns.length === 0) {
+        return null
+      }
+      return [leftColumns, rightColumns]
+    },
+  }))
 
   // console.log(mappings)
 
@@ -548,4 +587,4 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
       </Container>
     </Root>
   )
-}
+})

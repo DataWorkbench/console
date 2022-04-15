@@ -18,6 +18,7 @@ import {
   setStreamJobSchedule,
   getStreamJobSchedule,
   setStreamJobArgs,
+  SetSyncJobConf,
   getStreamJobArgs,
   setStreamJobCode,
   getStreamJobCode,
@@ -194,6 +195,22 @@ export const useMutationStreamJobArgs = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async (params: IWorkFlowParams) => {
     const ret = await setStreamJobArgs({
+      ...params,
+      regionId,
+      spaceId,
+      jobId: curJob?.id,
+    })
+    return ret
+  })
+}
+
+export const useMutationSyncJobConf = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  return useMutation(async (params: Record<string, any>) => {
+    const ret = await SetSyncJobConf({
       ...params,
       regionId,
       spaceId,

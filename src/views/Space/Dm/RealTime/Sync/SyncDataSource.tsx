@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useImperativeHandle, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { findKey, get, pick, isEmpty } from 'lodash-es'
+import { findKey, get, pick, isEmpty, isEqual } from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
@@ -14,6 +14,7 @@ import {
   ButtonWithClearField,
   HelpCenterLink,
   SqlGroupField,
+  TConditionParameterVal,
 } from 'components'
 import {
   useStore,
@@ -21,7 +22,7 @@ import {
   useQuerySourceTableSchema,
 } from 'hooks'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { dataSourceTypes } from '../job/JobUtils'
+import { dataSourceTypes, SyncJobType } from '../job/JobUtils'
 
 const { TextField, SelectField, TextAreaField } = Form
 
@@ -49,7 +50,7 @@ const styles = {
         }
       }
       .help {
-        ${tw`ml-28`}
+        ${tw`ml-28 w-full`}
       }
     }
   `,
@@ -94,332 +95,532 @@ type IDB = {
     networkId?: string
     tableName?: string
     fields?: string[]
+    splitPk?: string
+    condition?: TConditionParameterVal
+    writeMode?: string
+    batchSize?: number
+    semantic?: string
+    preSql?: string[] | Record<'value' | 'key', string>[]
+    postSql?: string[] | Record<'value' | 'key', string>[]
   }
 }
 
 interface SyncDataSourceProps {
-  onFetchedFields: (tp: OpType, data: Record<string, any>[]) => void
+  onSelectTable: (tp: OpType, data: Record<string, any>[]) => void
 }
 
-const SyncDataSource = observer((props: SyncDataSourceProps) => {
-  const { onFetchedFields } = props
-  const [visible, setVisible] = useState<boolean | null>(null)
-  const [showSourceAdvance, setShowSourceAdvance] = useState(false)
-  const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
-  const sourceForm = useRef(null)
-  const op = useRef<OpType>('source')
-  const [db, setDB] = useImmer<IDB>({
-    source: {},
-    target: {},
-  })
+const SyncDataSource = observer(
+  (props: SyncDataSourceProps, ref) => {
+    const { onSelectTable } = props
+    const {
+      workFlowStore: { curJob },
+    } = useStore()
+    const [visible, setVisible] = useState<boolean | null>(null)
+    const [showSourceAdvance, setShowSourceAdvance] = useState(false)
+    const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
+    const sourceForm = useRef(null)
+    const targetForm = useRef(null)
+    const op = useRef<OpType>('source')
+    const [db, setDB] = useImmer<IDB>({
+      source: {},
+      target: {},
+    })
 
-  const { id: sourceId = '', tableName = '' } = db[op.current]
+    const [sourceTypeName, targetTypeName] = useMemo(() => {
+      const sourceType = curJob?.source_type
+      const targetType = curJob?.target_type
+      return [
+        findKey(dataSourceTypes, (v) => v === sourceType),
+        findKey(dataSourceTypes, (v) => v === targetType),
+      ]
+    }, [curJob])
 
-  const tablesRet = useQuerySourceTables(
-    { sourceId },
-    { enabled: sourceId !== '' }
-  )
+    const { id: sourceId = '', tableName = '' } = db[op.current]
 
-  const schemaRet = useQuerySourceTableSchema(
-    {
-      sourceId,
-      tableName,
-    },
-    {
-      enabled: sourceId !== '' && tableName !== '',
-      onSuccess: (data: any) => {
-        const columns = get(data, 'schema.columns') || []
-        setDB((draft) => {
-          draft[op.current].fields = columns
-        })
-        onFetchedFields(op.current, columns)
+    const tablesRet = useQuerySourceTables(
+      { sourceId },
+      { enabled: sourceId !== '' }
+    )
+
+    const schemaRet = useQuerySourceTableSchema(
+      {
+        sourceId,
+        tableName,
       },
-    }
-  )
-
-  const {
-    workFlowStore: { curJob },
-  } = useStore()
-
-  const handleClick = (from: OpType) => {
-    op.current = from
-    setVisible(true)
-  }
-
-  const handleSelectDb = (v: {
-    id: string
-    name: string
-    networkId: string
-  }) => {
-    setDB((draft) => {
-      draft[op.current] = v
-    })
-  }
-
-  const handleTableChange = (from: OpType, v: string) => {
-    op.current = from
-    setDB((draft) => {
-      draft[from].tableName = v
-    })
-  }
-
-  const handleClear = (from: OpType) => {
-    setDB((draft) => {
-      if (from === 'source') {
-        draft.source = {}
-      } else {
-        draft.target = {}
+      {
+        enabled: sourceId !== '' && tableName !== '',
+        onSuccess: (data: any) => {
+          const columns = get(data, 'schema.columns') || []
+          setDB((draft) => {
+            draft[op.current].fields = columns
+          })
+          onSelectTable(op.current, columns)
+        },
       }
-    })
-    onFetchedFields(from, [])
-  }
-
-  const getSourceTypeName = (type: OpType) =>
-    findKey(dataSourceTypes, (v) => v === get(curJob, `${type}_type`))
-
-  const getJobTypeName = (type: 0 | 1 | 2 | 3) => {
-    const typeNameMap = new Map([
-      [0, '离线 - 全量'],
-      [1, '离线 - 增量'],
-      [2, '实时 - 全量'],
-      [3, '实时 - 增量'],
-    ])
-    return typeNameMap.get(type)
-  }
-
-  const renderCommon = (from: OpType) => {
-    const dbInfo = db[from]
-    const isSelected = !isEmpty(dbInfo)
-    const tables = (get(tablesRet, 'data.items', []) || []) as string[]
-    return (
-      <>
-        <ButtonWithClearField
-          name="source"
-          placeholder="选择数据来源"
-          css={css`
-            .help {
-              width: 100%;
-            }
-          `}
-          label={<AffixLabel>数据源</AffixLabel>}
-          help={isSelected && <div>网络配置名称（ID：{dbInfo.networkId}）</div>}
-          icon={
-            <Icon
-              name="blockchain"
-              size={16}
-              color={{ secondary: 'rgba(255,255,255,0.4)' }}
-            />
-          }
-          value={dbInfo.id}
-          clearable={isSelected}
-          onClick={() => handleClick(from)}
-          onClear={() => handleClear(from)}
-        >
-          <Center tw="space-x-1">
-            <span tw="ml-1">{dbInfo.name}</span>
-            <span tw="text-neut-8">(ID:{dbInfo.id})</span>
-          </Center>
-        </ButtonWithClearField>
-        {isSelected && (
-          <SelectWithRefresh
-            css={styles.tableSelect}
-            name="table"
-            label={<AffixLabel>数据源表</AffixLabel>}
-            options={tables.map((tabName) => ({
-              label: tabName,
-              value: tabName,
-            }))}
-            isLoading={tablesRet.isFetching && op.current === from}
-            clearable={false}
-            onRefresh={() => {
-              op.current = from
-              tablesRet.refetch()
-            }}
-            onChange={(v: string) => {
-              handleTableChange(from, v)
-            }}
-            help={
-              <HelpCenterLink href="xxx" hasIcon>
-                {`${getSourceTypeName(from)} ${
-                  from === 'source' ? 'Source' : 'Sink'
-                }
-                  配置文档`}
-              </HelpCenterLink>
-            }
-          />
-        )}
-      </>
     )
-  }
 
-  const renderSource = () => {
-    const from: OpType = 'source'
-    const hasTable = !isEmpty(db.source.tableName)
-    const isOffLineFull = get(curJob, 'type') === 0
-    const isOfflineIncrement = get(curJob, 'type') === 1
-    return (
-      <Form css={styles.form} ref={sourceForm}>
-        {renderCommon(from)}
-        {hasTable && isOfflineIncrement && (
-          <>
-            <ConditionParameterField
-              name="condition"
-              columns={(get(db, 'source.fields') || []).map(
-                (c: { name: string; [k: string]: any }) => c.name
-              )}
-              label={<AffixLabel>条件参数配置</AffixLabel>}
-              loading={op.current === from && schemaRet.isFetching}
-              onRefresh={() => {
-                schemaRet.refetch()
-              }}
-            />
-            <TextField
-              name="divide"
-              label="切分键"
-              placeholder="推荐使用表主键，仅支持整型数据切分"
-              help="如果通道设置中作业期望最大并发数大于 1 时必须配置此参数"
-            />
-          </>
-        )}
-        {/* <div>
-          <Button
-            onClick={() => {
-              if (sourceForm.current) {
-                // console.logschemaRet((sourceForm.current as Form)?.getFieldsValue())
+    useImperativeHandle(ref, () => ({
+      getResource: () => {
+        const srcform = sourceForm.current as any
+        const tgtform = targetForm.current as any
+
+        if (srcform?.validateForm() && tgtform?.validateForm()) {
+          const sourceKey = `${sourceTypeName!.toLowerCase()}_source`
+          const targetKey = `${targetTypeName!.toLowerCase()}_target`
+          const condition = db.source.condition!
+          const config = {
+            source_id: db.source.id,
+            target_id: db.target.id,
+            sync_resource: {
+              [sourceKey]: {
+                table: [db.source.tableName],
+                schema: '',
+                where: '',
+                split_pk: db.source.splitPk,
+                condition_type: condition.type,
+                visualization: {
+                  column: condition.column,
+                  start_condition: condition.startCondition,
+                  start_value: condition.startValue,
+                  end_condition: condition.endCondition,
+                  end_value: condition.endValue,
+                },
+                express: condition.expression,
+              },
+              [targetKey]: {
+                table: [db.target.tableName],
+                write_mode: db.target.writeMode,
+                semantic: db.target.semantic,
+                batch_size: db.target.batchSize,
+                pre_sql: db.target.preSql
+                  ?.map((v) => {
+                    if (typeof v === 'string') {
+                      return v
+                    }
+                    return v.value
+                  })
+                  .filter((v) => v !== ''),
+                post_sql: db.target.postSql
+                  ?.map((v) => {
+                    if (typeof v === 'string') {
+                      return v
+                    }
+                    return v.value
+                  })
+                  .filter((v) => v !== ''),
+              },
+            },
+          }
+
+          return config
+        }
+
+        return null
+      },
+      getTypeNames: () => [sourceTypeName, targetTypeName],
+    }))
+
+    const handleClick = (from: OpType) => {
+      op.current = from
+      setVisible(true)
+    }
+
+    const handleSelectDb = (v: {
+      id: string
+      name: string
+      networkId: string
+    }) => {
+      setDB((draft) => {
+        draft[op.current] = v
+      })
+    }
+
+    const handleTableChange = (from: OpType, v: string) => {
+      op.current = from
+      setDB((draft) => {
+        draft[from].tableName = v
+      })
+    }
+
+    const handleClear = (from: OpType) => {
+      setDB((draft) => {
+        if (from === 'source') {
+          draft.source = {}
+        } else {
+          draft.target = {}
+        }
+      })
+      onSelectTable(from, [])
+    }
+
+    const getJobTypeName = (type: 1 | 2 | 3) => {
+      const typeNameMap = new Map([
+        [1, '离线 - 全量'],
+        [2, '离线 - 增量'],
+        [3, '实时'],
+      ])
+      return typeNameMap.get(type)
+    }
+
+    const renderCommon = (from: OpType) => {
+      const dbInfo = db[from]
+      const isSelected = !isEmpty(dbInfo)
+      const tables = (get(tablesRet, 'data.items', []) || []) as string[]
+      return (
+        <>
+          <ButtonWithClearField
+            name="source"
+            placeholder="选择数据来源"
+            css={css`
+              .help {
+                width: 100%;
               }
-            }}
-          >
-            验证
-          </Button>
-        </div> */}
-        {hasTable && isOffLineFull && (
-          <>
-            <FlexBox>
-              <div css={styles.line} />
-              <Center
-                tw="px-1 cursor-pointer"
-                onClick={() => setShowSourceAdvance((prev) => !prev)}
-              >
-                <Icon
-                  name={`chevron-${showSourceAdvance ? 'up' : 'down'}`}
-                  type="light"
-                />
-                高级配置
-              </Center>
-              <div css={styles.line} />
-            </FlexBox>
-            {showSourceAdvance && (
-              <TextAreaField
-                label="过滤条件"
-                placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"
+            `}
+            label={<AffixLabel>数据源</AffixLabel>}
+            help={
+              isSelected && <div>网络配置名称（ID：{dbInfo.networkId}）</div>
+            }
+            icon={
+              <Icon
+                name="blockchain"
+                size={16}
+                color={{ secondary: 'rgba(255,255,255,0.4)' }}
               />
-            )}
-          </>
-        )}
-      </Form>
-    )
-  }
+            }
+            value={dbInfo.id}
+            validateOnChange
+            clearable={isSelected}
+            onClick={() => handleClick(from)}
+            onClear={() => handleClear(from)}
+            schemas={[
+              {
+                help: '请选择数据来源',
+                status: 'error',
+                rule: (v?: string) => !!v,
+              },
+            ]}
+          >
+            <Center tw="space-x-1">
+              <span tw="ml-1">{dbInfo.name}</span>
+              <span tw="text-neut-8">(ID:{dbInfo.id})</span>
+            </Center>
+          </ButtonWithClearField>
+          {isSelected && (
+            <SelectWithRefresh
+              css={styles.tableSelect}
+              name="table"
+              label={<AffixLabel>数据源表</AffixLabel>}
+              options={tables.map((tabName) => ({
+                label: tabName,
+                value: tabName,
+              }))}
+              isLoading={tablesRet.isFetching && op.current === from}
+              clearable={false}
+              onRefresh={() => {
+                op.current = from
+                tablesRet.refetch()
+              }}
+              onChange={(v: string) => {
+                handleTableChange(from, v)
+              }}
+              validateOnChange
+              value={dbInfo.tableName}
+              schemas={[
+                {
+                  help: '请选择数据源表',
+                  status: 'error',
+                  rule: (v?: string) => !!v,
+                },
+              ]}
+              help={
+                <HelpCenterLink href="xxx" hasIcon>
+                  {from === 'source'
+                    ? `${sourceTypeName} Source`
+                    : `${targetTypeName} Sink`}
+                  配置文档
+                </HelpCenterLink>
+              }
+            />
+          )}
+        </>
+      )
+    }
 
-  const renderTarget = () => {
-    const from: OpType = 'target'
-    const hasTable = !isEmpty(db.target.tableName)
+    const renderSource = () => {
+      const from: OpType = 'source'
+      const dbInfo = db[from]
+      const hasTable = !isEmpty(db.source.tableName)
+      const isOffLineFull = get(curJob, 'type') === SyncJobType.OFFLINEFULL
+      const isOfflineIncrement =
+        get(curJob, 'type') === SyncJobType.OFFLINEINCREMENT
+      return (
+        <Form css={styles.form} ref={sourceForm}>
+          {renderCommon(from)}
+          {hasTable && isOfflineIncrement && (
+            <>
+              <ConditionParameterField
+                name="condition"
+                columns={(get(db, 'source.fields') || []).map(
+                  (c: { name: string; [k: string]: any }) => c.name
+                )}
+                label={<AffixLabel>条件参数配置</AffixLabel>}
+                loading={op.current === from && schemaRet.isFetching}
+                onRefresh={() => {
+                  schemaRet.refetch()
+                }}
+                value={dbInfo.condition}
+                onChange={(v: any) => {
+                  setDB((draft) => {
+                    draft.source.condition = v
+                  })
+                }}
+                css={css`
+                  .help {
+                    ${tw`w-full`}
+                  }
+                `}
+                validateOnChange={
+                  dbInfo.condition &&
+                  !isEqual(dbInfo.condition, { type: 1 }) &&
+                  !isEqual(dbInfo.condition, { type: 2 })
+                }
+                schemas={[
+                  {
+                    help: '条件参数未配置',
+                    status: 'error',
+                    rule: (v: TConditionParameterVal) => {
+                      let valid = false
+                      if (v.type === 2) {
+                        valid = !isEmpty(v.expression)
+                      } else {
+                        valid =
+                          !isEmpty(v.startValue) &&
+                          !isEmpty(v.endValue) &&
+                          !isEmpty(v.startCondition) &&
+                          !isEmpty(v.endCondition) &&
+                          !isEmpty(v.column)
+                      }
+
+                      return valid
+                    },
+                  },
+                ]}
+              />
+              <TextField
+                name="split_pk"
+                label="切分键"
+                placeholder="推荐使用表主键，仅支持整型数据切分"
+                help="如果通道设置中作业期望最大并发数大于 1 时必须配置此参数"
+                value={dbInfo.splitPk || ''}
+                onChange={(v: string) => {
+                  setDB((draft) => {
+                    draft[from].splitPk = v
+                  })
+                }}
+              />
+            </>
+          )}
+          {hasTable && isOffLineFull && (
+            <>
+              <FlexBox>
+                <div css={styles.line} />
+                <Center
+                  tw="px-1 cursor-pointer"
+                  onClick={() => setShowSourceAdvance((prev) => !prev)}
+                >
+                  <Icon
+                    name={`chevron-${showSourceAdvance ? 'up' : 'down'}`}
+                    type="light"
+                  />
+                  高级配置
+                </Center>
+                <div css={styles.line} />
+              </FlexBox>
+              {showSourceAdvance && (
+                <TextAreaField
+                  name="where"
+                  label="过滤条件"
+                  placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"
+                />
+              )}
+            </>
+          )}
+        </Form>
+      )
+    }
+
+    const renderTarget = () => {
+      const from: OpType = 'target'
+      const dbInfo = db[from]
+      const hasTable = !isEmpty(db.target.tableName)
+      return (
+        <Form css={styles.form} ref={targetForm}>
+          {renderCommon(from)}
+          {hasTable && (
+            <>
+              <SelectField
+                label={<AffixLabel>写入模式</AffixLabel>}
+                name="write_mode"
+                options={[
+                  { label: 'insert: insert into', value: 'insert' },
+                  { label: 'replace: replace into', value: 'replace' },
+                  { label: 'update: on duplicate key update', value: 'update' },
+                ]}
+                value={dbInfo.writeMode}
+                schemas={[
+                  {
+                    help: '请选择写入模式',
+                    status: 'error',
+                    rule: { required: true },
+                  },
+                ]}
+                validateOnChange
+                onChange={(v: string) => {
+                  setDB((draft) => {
+                    draft[from].writeMode = v
+                  })
+                }}
+                help="当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现"
+              />
+              <SelectField
+                label={<AffixLabel>写入一致性语义</AffixLabel>}
+                name="semantic"
+                value={dbInfo.semantic}
+                options={[
+                  { label: 'exactly-once', value: 'exactly-once' },
+                  { label: 'at-least-once', value: 'at-least-once' },
+                ]}
+                onChange={(v: string) => {
+                  setDB((draft) => {
+                    draft[from].semantic = v
+                  })
+                }}
+                validateOnChange
+                schemas={[
+                  {
+                    help: '请选择写入模式',
+                    status: 'error',
+                    rule: { required: true },
+                  },
+                ]}
+              />
+              <TextField
+                label={<AffixLabel>批量写入条数</AffixLabel>}
+                name="batchSize"
+                help="范围: 1~65535, 该值可减少网络交互次数, 过大会造成 OOM"
+                validateOnChange
+                css={css`
+                  input.input {
+                    ${tw`w-28!`}
+                  }
+                `}
+                schemas={[
+                  {
+                    help: '批量写入条数不能为空',
+                    status: 'error',
+                    rule: { required: true },
+                  },
+                  {
+                    help: '范围: 1~65535, 批量写入条数不能小于 1',
+                    status: 'error',
+                    rule: (v) => v > 0 && v <= 65535,
+                  },
+                ]}
+              />
+              <FlexBox>
+                <div css={styles.line} />
+                <Center
+                  tw="px-1 cursor-pointer"
+                  onClick={() => setShowTargetAdvanced((prev) => !prev)}
+                >
+                  <Icon
+                    name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`}
+                    type="light"
+                  />
+                  高级配置
+                </Center>
+                <div css={styles.line} />
+              </FlexBox>
+              {showTargetAdvanced && (
+                <>
+                  <StyledSqlGroupField
+                    className="sql-group-field"
+                    name="pre_sql"
+                    label="写入前SQL语句组"
+                    size={2}
+                    onChange={(
+                      v: string[] | Record<'value' | 'key', string>[]
+                    ) => {
+                      setDB((draft) => {
+                        draft[from].preSql = v
+                      })
+                    }}
+                    value={dbInfo.preSql}
+                    placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                  />
+                  <StyledSqlGroupField
+                    className="sql-group-field"
+                    name="post_sql"
+                    value={dbInfo.postSql}
+                    label="写入后SQL语句组"
+                    size={1}
+                    onChange={(
+                      v: string[] | Record<'value' | 'key', string>[]
+                    ) => {
+                      setDB((draft) => {
+                        draft[from].postSql = v
+                      })
+                    }}
+                    placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                  />
+                </>
+              )}
+            </>
+          )}
+        </Form>
+      )
+    }
+
     return (
-      <Form css={styles.form}>
-        {renderCommon(from)}
-        {hasTable && (
-          <>
-            <SelectField
-              label={<AffixLabel>写入模式</AffixLabel>}
-              name="mode"
-              options={[]}
-              help="当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现"
-            />
-            <SelectField
-              label={<AffixLabel>写入一致性语义</AffixLabel>}
-              name="semantic"
-              options={[]}
-            />
-            <TextField
-              label={<AffixLabel>批量写入条数</AffixLabel>}
-              name="batch"
-              help="范围：1~65535，该值可减少网络交互次数，过大会造成 OOM"
-            />
-            <FlexBox>
-              <div css={styles.line} />
-              <Center
-                tw="px-1 cursor-pointer"
-                onClick={() => setShowTargetAdvanced((prev) => !prev)}
-              >
-                <Icon
-                  name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`}
-                  type="light"
-                />
-                高级配置
-              </Center>
-              <div css={styles.line} />
-            </FlexBox>
-            {showTargetAdvanced && (
-              <>
-                <StyledSqlGroupField
-                  className="sql-group-field"
-                  name="sql"
-                  label="写入前SQL语句组"
-                  size={2}
-                  placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
-                />
-                <StyledSqlGroupField
-                  className="sql-group-field"
-                  name="sql"
-                  label="写入后SQL语句组"
-                  size={1}
-                  placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
-                />
-              </>
-            )}
-          </>
-        )}
-      </Form>
-    )
-  }
-
-  return (
-    <FlexBox tw="flex-col">
-      <Center tw="mb-[-15px]">
-        <Center css={styles.arrowBox}>
-          <Label>来源: {getSourceTypeName('source')}</Label>
-          <ArrowLine />
-          <Label>{curJob && getJobTypeName(curJob.type)}</Label>
-          <ArrowLine />
-          <Label>目的: {getSourceTypeName('target')}</Label>
+      <FlexBox tw="flex-col">
+        <Center tw="mb-[-15px]">
+          <Center css={styles.arrowBox}>
+            <Label>来源: {sourceTypeName}</Label>
+            <ArrowLine />
+            <Label>{curJob && getJobTypeName(curJob.type)}</Label>
+            <ArrowLine />
+            <Label>目的: {targetTypeName}</Label>
+          </Center>
         </Center>
-      </Center>
-      <FlexBox css={styles.dashedBox}>
-        {renderSource()}
-        <DashedLine />
-        {renderTarget()}
+        <FlexBox css={styles.dashedBox}>
+          {renderSource()}
+          <DashedLine />
+          {renderTarget()}
+        </FlexBox>
+        <DataSourceSelectModal
+          title={`选择${
+            op.current === 'source' ? '来源' : '目的'
+          }数据源（已选类型为 ${findKey(
+            dataSourceTypes,
+            (v) => v === get(curJob, `${op.current}_type`)
+          )})`}
+          visible={visible}
+          sourceType={get(curJob, `${op.current}_type`)!}
+          onCancel={() => setVisible(false)}
+          onOk={(v: any) => {
+            setVisible(false)
+            if (v) {
+              handleSelectDb({
+                ...pick(v, ['id', 'name']),
+                networkId: get(v, 'last_connection.network_id', ''),
+              })
+            }
+          }}
+        />
       </FlexBox>
-      <DataSourceSelectModal
-        title={`选择${
-          op.current === 'source' ? '来源' : '目的'
-        }数据源（已选类型为 ${findKey(
-          dataSourceTypes,
-          (v) => v === get(curJob, `${op.current}_type`)
-        )})`}
-        visible={visible}
-        sourceType={get(curJob, `${op.current}_type`)!}
-        onCancel={() => setVisible(false)}
-        onOk={(v: any) => {
-          setVisible(false)
-          if (v) {
-            handleSelectDb({
-              ...pick(v, ['id', 'name']),
-              networkId: get(v, 'last_connection.network_id', ''),
-            })
-          }
-        }}
-      />
-    </FlexBox>
-  )
-})
+    )
+  },
+  { forwardRef: true }
+)
 
 export default SyncDataSource
