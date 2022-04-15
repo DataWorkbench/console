@@ -1,8 +1,24 @@
 import tw, { css, styled } from 'twin.macro'
 import { Collapse } from '@QCFE/lego-ui'
 import DevContentDataSource from 'views/Space/Ops/DataIntegration/components/DevContent/DevContentDataSource'
+import { AffixLabel, FieldMappings } from 'components'
+import { pick } from 'lodash-es'
 
 const { CollapseItem } = Collapse
+
+const Grid = styled('div')(() => [
+  tw`grid gap-2 leading-[20px] place-content-start`,
+  css`
+    grid-template-columns: 140px 1fr;
+
+    & > div:nth-of-type(2n + 1) {
+      ${tw`text-neut-8`}
+    }
+
+    & > div:nth-of-type(2n) {
+      ${tw`text-white`}
+  `,
+])
 const CollapseWrapper = styled('div')(() => [
   tw`flex-1 px-2 py-2 bg-neut-18`,
   css`
@@ -87,23 +103,54 @@ const DevContentUI = (props: IProps) => {
               // />
             )}
             {index === 1 && (
-              <div>2</div>
-              // <FieldMappings
-              //   leftFields={fields.source.map((field) =>
-              //     pick(field, ['name', 'type', 'is_primary_key'])
-              //   )}
-              //   rightFields={fields.target.map((field) =>
-              //     pick(field, ['name', 'type', 'is_primary_key'])
-              //   )}
-              //   topHelp={
-              //     <HelpCenterLink href="/xxx" isIframe={false}>
-              //       字段映射说明文档
-              //     </HelpCenterLink>
-              //   }
-              // />
+              <div tw="relative">
+                <div tw="absolute inset-0 z-50" />
+                <FieldMappings
+                  leftFields={
+                    [{ key: 'aa', name: 'aaa' }].map((field) =>
+                      pick(field, ['name', 'type', 'is_primary_key'])
+                    ) as any
+                  }
+                  rightFields={[].map((field) =>
+                    pick(field, ['name', 'type', 'is_primary_key'])
+                  )}
+                  readonly
+                  hasHeader={false}
+                />
+              </div>
             )}
-            {index === 2 && <>3</>}
-            {index === 3 && <>4</>}
+            {index === 2 && (
+              <div>
+                <Grid>
+                  <div>
+                    <AffixLabel
+                      theme="light"
+                      required={false}
+                      help="作业期望最大并行数"
+                    >
+                      作业期望最大并行数
+                    </AffixLabel>
+                  </div>
+                  <div>200</div>
+                  <div>
+                    <AffixLabel
+                      theme="light"
+                      required={false}
+                      help="作业期望最大并行数"
+                    >
+                      同步速率
+                    </AffixLabel>
+                  </div>
+                  <div>不限流</div>
+                  <div>
+                    <AffixLabel theme="light" required={false} help="同步速率">
+                      错误记录数超过
+                    </AffixLabel>
+                  </div>
+                  <div> 190% 比例，达到任一条件时，任务自动结束</div>
+                </Grid>
+              </div>
+            )}
           </CollapseItem>
         ))}
       </Collapse>
