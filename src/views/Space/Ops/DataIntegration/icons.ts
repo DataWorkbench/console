@@ -39,7 +39,9 @@ const icons = `
  
  <symbol id="lego-ui-icon-q-loadingCircleFill" viewBox="0 0 48 48" fill="none"><path d="M36 24C36 25.1 35.1 26 34 26C32.9 26 32 25.1 32 24C32 18.5 27.5 14 22 14C16.5 14 12 18.5 12 24C12 22.9 12.9 22 14 22C15.1 22 16 22.9 16 24C16 29.5 20.5 34 26 34C31.5 34 36 29.5 36 24Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24ZM24 12C17.4 12 12 17.4 12 24C12 30.6 17.4 36 24 36C30.6 36 36 30.6 36 24C36 17.4 30.6 12 24 12Z" fill="currentColor"></path></symbol>
  
-<symbol id="lego-ui-icon-q-bellLightningFill" viewBox="0 0 48 48" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 2C22.3431 2 21 3.34315 21 5V7.29778C14.0915 8.68929 8.88889 14.7926 8.88889 22.1111V32.3529L7 38H41L39.1111 32.3529V22.1111C39.1111 14.7926 33.9085 8.68929 27 7.29778V5C27 3.34315 25.6569 2 24 2ZM25.5 14V22.25H30L22.5 32V23.75H18L25.5 14Z" fill="currentColor"></path><path d="M17.2898 41C18.1503 43.8915 20.8289 46 23.9999 46C27.1709 46 29.8495 43.8915 30.71 41H17.2898Z" fill="currentColor"></path></symbol> 
+ <symbol id="lego-ui-icon-q-bellLightningFill" viewBox="0 0 48 48" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M24 2C22.3431 2 21 3.34315 21 5V7.29778C14.0915 8.68929 8.88889 14.7926 8.88889 22.1111V32.3529L7 38H41L39.1111 32.3529V22.1111C39.1111 14.7926 33.9085 8.68929 27 7.29778V5C27 3.34315 25.6569 2 24 2ZM25.5 14V22.25H30L22.5 32V23.75H18L25.5 14Z" fill="currentColor"></path><path d="M17.2898 41C18.1503 43.8915 20.8289 46 23.9999 46C27.1709 46 29.8495 43.8915 30.71 41H17.2898Z" fill="currentColor"></path></symbol> 
+
+<symbol id="lego-ui-icon-q-downloadBoxFill" viewBox="0 0 48 48" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.1085 6C11.4189 6 10.778 6.35524 10.4125 6.94L6 14V40C6 41.1046 6.89543 42 8 42H40C41.1046 42 42 41.1046 42 40V14L37.5875 6.94C37.222 6.35524 36.5811 6 35.8915 6H12.1085ZM37.5 14H10.5L13 10H35L37.5 14ZM22 20H26V28H31L24 36L17 28H22V20Z" fill="currentColor"></path></symbol>
 </svg>
 `
 

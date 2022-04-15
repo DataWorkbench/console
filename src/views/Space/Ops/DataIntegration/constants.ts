@@ -52,7 +52,7 @@ export enum AlarmStatus {
 
 export const alarmStatus = {
   '0': { label: '正常', value: '0', type: AlarmStatus.NORMAL },
-  '1': { label: '警告', value: '1', type: AlarmStatus.WARNING },
+  '1': { label: '告警', value: '1', type: AlarmStatus.WARNING },
 } as const
 
 export enum JobType {

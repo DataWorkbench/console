@@ -6,16 +6,31 @@ import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
 import { observer } from 'mobx-react-lite'
-import { SelectTreeTable, FlexBox, TextEllipsis, Center } from 'components'
+import {
+  SelectTreeTable,
+  FlexBox,
+  TextEllipsis,
+  Center,
+  InstanceName,
+  Tooltip,
+} from 'components'
 import { Circle } from 'views/Space/Ops/DataIntegration/styledComponents'
 import { Icon } from '@QCFE/lego-ui'
-import { dataReleaseColumns, dataReleaseTabs } from '../constants'
+import {
+  dataReleaseColumns,
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
+  dataReleaseTabs,
+  JobType,
+  jobType,
+} from '../constants'
 import { getColumnsRender, getOperations } from './utils'
 import { useDataReleaseStore } from './store'
 import VersionsModal from './VersionsModal'
 import TableHeader from './TableHeader'
 
 import DataSourceModal from './DataSourceModal'
+import { useHistory } from 'react-router-dom'
 // import { IColumn } from 'hooks/utils'
 
 // interface IDataReleaseProps {}
@@ -27,6 +42,19 @@ const TabsWrapper = styled.div`
   }
 `
 
+const jobNameStyle = css`
+  &:hover {
+    .instance-name-title {
+      ${tw`text-green-11`}
+    }
+    .instance-name-icon {
+      ${tw`bg-[#13966a80] border-[#9ddfc966]`}
+      .icon svg.qicon {
+        ${tw`text-green-11`}
+      }
+    }
+  }
+`
 const dataReleaseSettingKey = 'DATA_RELEASE_SETTING'
 // const columns: IColumn[] = []
 const DataRelease = observer(() => {
@@ -46,7 +74,28 @@ const DataRelease = observer(() => {
     { pagination: true; sort: true }
   >({})
 
-  const columnsRender = getColumnsRender(filter, setFilter)
+  const history = useHistory()
+  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    window.open(`./${record.id}${tab ? `?tab=${tab}` : ''}`, 'target')
+  }
+
+  const handleDatasource = (record: Record<string, any>) => {
+    if (
+      dataReleaseDevModeType[record.dev_mode as 1]?.type ===
+      DataReleaseDevMode.UI
+    ) {
+      set({
+        showDataSource: true,
+        selectedData: record,
+      })
+    }
+  }
+
+  const columnsRender = getColumnsRender(filter, setFilter, undefined, {
+    alarm_status: jumpDetail('alarm'),
+    source: handleDatasource,
+    target: handleDatasource,
+  })
 
   const handleMenuClick = () => {
     console.log('handleMenuClick')
@@ -81,29 +130,25 @@ const DataRelease = observer(() => {
       if (record.__level > 1) {
         return <TextEllipsis>{text}</TextEllipsis>
       }
-      return (
-        <Center tw="truncate">
-          {/* // TODO merge fill icon */}
-          <Circle>
-            <Icon
-              name="q-mergeFillDuotone"
-              type="light"
-              css={css`
-                & .qicon {
-                  ${tw`text-white! fill-[#fff]!`}
-                }
-              `}
-            />
-          </Circle>
-
-          <div tw="flex-1 truncate">
-            <TextEllipsis theme="light">{text}</TextEllipsis>
-            <TextEllipsis theme="light">
-              <span tw="text-neut-8">{record.id}</span>
-            </TextEllipsis>
-          </div>
+      const child = (
+        <Center tw="truncate" css={jobNameStyle}>
+          <InstanceName
+            theme={'dark'}
+            icon={'q-downloadBoxFill'}
+            name={'asfda'}
+            desc={'asfdasdf'}
+          />
         </Center>
       )
+      if (record.desc) {
+        // TODO: 描述字段未确认
+        return (
+          <Tooltip theme={'light'} hasPadding content={record.desc}>
+            {child}
+          </Tooltip>
+        )
+      }
+      return child
     },
   }
 
@@ -124,7 +169,17 @@ const DataRelease = observer(() => {
   )
 
   const { data, isFetching } = {
-    data: { infos: [{ id: 1, job_name: 'aaaa' }] },
+    data: {
+      infos: [
+        {
+          id: 1,
+          job_name: 'aaaa',
+          desc: 'asdasdfas',
+          source: 'MySQL',
+          alarm_status: '1',
+        },
+      ],
+    },
     isFetching: false,
   }
   // local.testing.com/dataomnis/testing/workspace/wks-yrl0o4ex205vkr9y/ops/data-release

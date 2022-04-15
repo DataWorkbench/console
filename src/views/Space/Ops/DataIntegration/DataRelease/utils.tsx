@@ -12,12 +12,13 @@ import {
   jobType,
   sourceTypes,
 } from '../constants'
-import { AlarmStatusCmp, JobTypeCmp } from '../styledComponents'
+import { AlarmStatusCmp, DbTypeCmp, JobTypeCmp } from '../styledComponents'
 
 export const getColumnsRender = (
   filter: Record<string, any>,
   setFilter: (f: (t: Record<string, any>) => void) => void,
-  pickByKeys?: string[]
+  pickByKeys?: string[],
+  actions?: Record<string, any>
 ): Record<string, Partial<IColumn>> => {
   const columnsRender = {
     schedule_status: {
@@ -41,8 +42,15 @@ export const getColumnsRender = (
       filter: filter.alarm_status,
       filterAble: true,
       filtersNew: Object.values(alarmStatus) as any,
-      render: (text: keyof typeof alarmStatus) => (
-        <AlarmStatusCmp type={text} />
+      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
+        <AlarmStatusCmp
+          type={text}
+          onClick={
+            actions?.alarm_status
+              ? () => actions.alarm_status(record)
+              : undefined
+          }
+        />
       ),
     },
     dev_mode: {
@@ -91,10 +99,8 @@ export const getColumnsRender = (
         value,
       })),
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
-        record.__level === 1 && sourceTypes[text] ? (
-          <span tw="h-3 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2">
-            {sourceTypes[text]}
-          </span>
+        record.__level === 1 ? (
+          <DbTypeCmp type={text} onClick={() => actions?.source(record)} />
         ) : null,
     },
     target: {
@@ -111,10 +117,8 @@ export const getColumnsRender = (
         value,
       })),
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
-        record.__level === 1 && sourceTypes[text] ? (
-          <span tw="h-3 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2">
-            {sourceTypes[text]}
-          </span>
+        record.__level === 1 ? (
+          <DbTypeCmp type={text} onClick={() => actions?.target(record)} />
         ) : null,
     },
     created_at: {
@@ -127,9 +131,11 @@ export const getColumnsRender = (
             : 'desc'
           : '',
       render: (v: number, record: Record<string, any>) =>
-        record.__level === 1
-          ? dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')
-          : null,
+        record.__level === 1 ? (
+          <span tw="text-neut-8">
+            {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+          </span>
+        ) : null,
     },
   }
   return (pickByKeys ? pick(columnsRender, pickByKeys) : columnsRender) as any

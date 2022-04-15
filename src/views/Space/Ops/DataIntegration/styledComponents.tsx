@@ -2,8 +2,9 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components/Box'
 import tw, { css, styled, theme } from 'twin.macro'
-import { ReactElement } from 'react'
+import React, { ReactElement } from 'react'
 import { Center } from 'components/Center'
+import { isFunction } from 'lodash-es'
 import {
   AlarmStatus,
   alarmStatus,
@@ -11,6 +12,7 @@ import {
   JobInstanceStatusType,
   JobType,
   jobType,
+  sourceTypes,
 } from './constants'
 
 export const statusStyle = (type: JobInstanceStatusType) => {
@@ -90,8 +92,11 @@ export const JobInstanceStatusCmp = (props: {
   )
 }
 
-export const AlarmStatusCmp = (props: { type: keyof typeof alarmStatus }) => {
-  const { type } = props
+export const AlarmStatusCmp = (props: {
+  type: keyof typeof alarmStatus
+  onClick?: Function
+}) => {
+  const { type, onClick } = props
   if (alarmStatus[type] === undefined) {
     return null
   }
@@ -104,13 +109,24 @@ export const AlarmStatusCmp = (props: { type: keyof typeof alarmStatus }) => {
             : 'if-exclamation'
         }
         size={14}
-        css={
+        css={[
           alarmStatus[type].type === AlarmStatus.NORMAL
             ? tw`text-blue-10`
-            : tw`text-[#FFD127]`
-        }
+            : tw`text-[#FFD127]`,
+
+          tw`text-[14px]`,
+        ]}
       />
-      <span>{alarmStatus[type].label}</span>
+      {isFunction(onClick) ? (
+        <span
+          tw="hover:text-green-11 cursor-pointer hover:underline "
+          onClick={onClick}
+        >
+          {alarmStatus[type].label}
+        </span>
+      ) : (
+        <span>{alarmStatus[type].label}</span>
+      )}
     </FlexBox>
   )
 }
@@ -149,7 +165,6 @@ const jobTypeConfig = new Map([
 
 export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
   const { type } = props
-  console.log(1111, jobType[type])
   if (jobType[type] === undefined) {
     return null
   }
@@ -190,3 +205,29 @@ export const Divider = styled.div`
 export const Circle = styled.div`
   ${tw`inline-flex items-center justify-center w-6 h-6 rounded-full text-white bg-line-dark mr-2 flex-none`}
 `
+
+export const DbTypeCmp = ({
+  type,
+  onClick,
+  className,
+}: {
+  type: keyof typeof sourceTypes
+  onClick: Function
+  className?: string
+}) => {
+  if (!sourceTypes[type]) {
+    return null
+  }
+  return (
+    <div
+      onClick={onClick as any}
+      className={className}
+      css={[
+        onClick ? tw`hover:text-green-11` : tw`hover:text-neut-19`,
+        tw`inline-block h-4 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2 leading-[16px]`,
+      ]}
+    >
+      {sourceTypes[type]}
+    </div>
+  )
+}
