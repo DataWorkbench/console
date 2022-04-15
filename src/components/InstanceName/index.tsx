@@ -1,6 +1,7 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { FC, ReactElement } from 'react'
-import tw, { css, styled } from 'twin.macro'
+import tw, { styled } from 'twin.macro'
+import { FlexBox } from 'components/Box'
 import { Center } from '../Center'
 import { TextEllipsis } from '../TextEllipsis'
 
@@ -14,41 +15,46 @@ export interface IInstanceNameProps {
   iconHasBorder?: boolean
 }
 
-const Circle = styled.div(({ theme = 'dark' }: { theme: 'dark' | 'light' }) => {
-  return [
-    tw`border-2 box-content rounded-full w-6 h-6 mr-1.5`,
-    theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
-    theme === 'light' && tw`bg-[#E2E8F0] border-white`,
-  ]
-})
-
-const InstanceNameWrapper = styled(Center)(
+const Circle = styled(Center)(
   ({ theme = 'dark' }: { theme: 'dark' | 'light' }) => {
-    return [tw`truncate`, css``]
+    return [
+      tw`border-2 box-content rounded-full w-6 h-6`,
+      theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
+      theme === 'light' && tw`bg-neut-2 border-white`,
+    ]
   }
 )
 
-export const darkInstanceNameStyle = css``
-
-const InstanceName: FC<IInstanceNameProps> = (props) => {
-  const { theme, name, desc, icon, className, iconClassName, iconHasBorder } = props
+export const InstanceName: FC<IInstanceNameProps> = (props) => {
+  const { theme, name, desc, icon, className, iconClassName } = props
   return (
-    <Center tw="truncate" className={className}>
+    <FlexBox tw="items-center truncate flex-auto gap-2" className={className}>
       {typeof icon === 'string' ? (
-        <Icon name={icon} type={theme} className={iconClassName} />
+        <Circle theme={theme} className="instance-name-icon">
+          <Icon
+            name={icon}
+            type={theme === 'dark' ? 'light' : 'dark'}
+            className={iconClassName}
+          />
+        </Circle>
       ) : (
         icon
       )}
       <div tw="truncate">
         <TextEllipsis theme={theme === 'dark' ? 'light' : 'darker'}>
-          {name}
+          <span
+            className="instance-name-title"
+            tw="dark:text-white light:text-neut-15"
+          >
+            {name}
+          </span>
         </TextEllipsis>
         {desc && (
           <TextEllipsis theme={theme === 'dark' ? 'light' : 'darker'}>
-            <span>{desc}</span>
+            <span tw="text-neut-8">{desc}</span>
           </TextEllipsis>
         )}
       </div>
-    </Center>
+    </FlexBox>
   )
 }
