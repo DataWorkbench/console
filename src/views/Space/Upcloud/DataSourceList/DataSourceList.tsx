@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, lowerCase, pick } from 'lodash-es'
+import { get, lowerCase, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
@@ -155,11 +155,12 @@ const getUrl = (
 
 export interface DataSourceListProps {
   selectMode?: boolean
+  sourceType?: number
   onCheck?: (source: any) => void
 }
 
 const DataSourceList = observer((props: DataSourceListProps) => {
-  const { selectMode = false, onCheck = () => {} } = props
+  const { selectMode = false, sourceType, onCheck = () => {} } = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
@@ -201,7 +202,9 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     limit: 10,
     verbose: 2,
   })
-  const { isLoading, refetch, data } = useQuerySource(filter)
+  const { isLoading, refetch, data } = useQuerySource(
+    merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})
+  )
   const mutation = useMutationSource()
 
   const shouldRefetch = useRef<string>()

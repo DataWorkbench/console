@@ -7,12 +7,13 @@ import DataSourceList from './DataSourceList'
 interface DataSourceSelectModalProps {
   visible?: boolean | null
   title: string
+  sourceType: number
   onCancel?: () => void
   onOk?: (source: any) => void
 }
 
 const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
-  const { title, onCancel, onOk = noop, visible: show } = props
+  const { title, onCancel, onOk = noop, visible: show, sourceType } = props
   const [visible, setVisible] = useState(show)
   const [source, setSource] = useState(null)
 
@@ -33,7 +34,7 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
         onOk(source)
       }}
     >
-      <DataSourceList selectMode onCheck={setSource} />
+      <DataSourceList selectMode sourceType={sourceType} onCheck={setSource} />
     </Modal>
   )
 }

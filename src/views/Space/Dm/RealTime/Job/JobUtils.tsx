@@ -29,6 +29,15 @@ export enum JobType {
   /** scala模式 */
   SCALA = 5,
 }
+/** 数据集成作业类型 */
+export enum SyncJobType {
+  /** 1 => "OfflineFull"(离线全量) */
+  OFFLINEFULL = 1,
+  /**  2 => "OfflineIncrement"(离线增量)  */
+  OFFLINEINCREMENT = 2,
+  /** 3 => "RealTime"(实时)  */
+  REALTIME = 3,
+}
 
 /** 作业树icon主题 */
 export enum TreeIconTheme {
@@ -50,40 +59,40 @@ export enum RootKey {
 export type DataSourceType =
   | 'MySQL'
   | 'TIDB'
-  | 'Oracle'
+  | 'Kafka'
+  | 'S3'
+  | 'ClickHouse'
+  | 'HBase'
+  | 'FTP'
+  | 'HDFS'
   | 'SQLServer'
+  | 'Oracle'
   | 'PostgreSQL'
   | 'DB2'
   | 'SAP HANA'
-  | 'ClickHouse'
   | 'Hive'
-  | 'HBase'
-  | 'HDFS'
-  | 'FTP'
   | 'MongoDB'
   | 'Redis'
   | 'ElasticSearch'
-  | 'Kafka'
-  | 'S3'
 
 export const dataSourceTypes: { [key in DataSourceType]?: number } = {
   MySQL: 1,
   // TIDB: 2,
-  Oracle: 10,
+  // Kafka: 3,
+  // S3: 4,
+  // ClickHouse: 5,
+  // HBase: 6,
+  // FTP: 7,
+  // HDFS: 8,
   SQLServer: 9,
+  // Oracle: 10,
   PostgreSQL: 2,
-  DB2: 11,
-  'SAP HANA': 12,
-  ClickHouse: 5,
-  Hive: 13,
-  HBase: 6,
-  HDFS: 8,
-  FTP: 7,
-  MongoDB: 15,
-  Redis: 16,
-  ElasticSearch: 14,
-  Kafka: 3,
-  // S3: 4
+  // DB2: 11,
+  // 'SAP HANA': 12,
+  // Hive: 13,
+  // MongoDB: 15,
+  // Redis: 16,
+  // ElasticSearch: 14,
 }
 
 export const jobModeData = [
@@ -105,6 +114,7 @@ export const jobModeData = [
         title: '实时-流式同步作业',
         desc: '实时-流式的描述文案，尽量简短，一句话内',
         value: JobType.REALTIME,
+        disabled: true,
       },
     ],
   },

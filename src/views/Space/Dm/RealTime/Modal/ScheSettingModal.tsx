@@ -33,7 +33,7 @@ import {
   SmallDatePicker,
   SmallDatePickerField,
   HorizonFiledsWrapper,
-} from './styled'
+} from '../styled'
 
 const {
   TextField,

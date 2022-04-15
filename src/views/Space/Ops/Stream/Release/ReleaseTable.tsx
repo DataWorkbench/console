@@ -23,8 +23,8 @@ import dayjs from 'dayjs'
 import { omitBy, get } from 'lodash-es'
 import { useHistory, useParams } from 'react-router-dom'
 import { AssoiateModal } from './AssoiateModal'
-import ScheSettingModal from '../../../Dm/RealTime/ScheSettingModal'
-import ReleaseModal from '../../../Dm/RealTime/ReleaseModal'
+import ScheSettingModal from '../../../Dm/RealTime/modal/ScheSettingModal'
+import ReleaseModal from '../../../Dm/RealTime/modal/ReleaseModal'
 
 const { MenuItem } = Menu
 

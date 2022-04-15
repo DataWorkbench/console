@@ -29,11 +29,12 @@ import {
   getNewTreeData,
   filterFolderOfTreeData,
   getDiJobType,
-} from './JobUtils'
+  SyncJobType,
+} from '../job/JobUtils'
 import {
   SyncTypeRadioGroupField,
   SyncTypeVal,
-} from './SyncJob/SyncTypeRadioGroup'
+} from '../sync/SyncTypeRadioGroup'
 
 const { TextField, TextAreaField } = Form
 
@@ -63,190 +64,207 @@ const FormWrapper = styled('div')(() => [
   `,
 ])
 
-interface JobModalProps {
-  op: 'create' | 'edit'
-  jobType?: JobType
-  jobNode?: TreeNodeProps
-  onClose?: (created: boolean, op: 'create' | 'edit') => void
+export interface JobModalData {
+  id: string
+  pid: string
+  jobMode: JobMode
+  type: number
+  isEdit: boolean
+  pNode?: Record<string, any>
 }
 
-export const JobModal = observer(
-  ({
-    op = 'create',
-    jobType = JobType.SQL,
-    jobNode,
-    onClose,
-  }: JobModalProps) => {
-    const fetchJob = useFetchJob()
-    const {
-      workFlowStore,
-      workFlowStore: { treeData, loadedKeys },
-    } = useStore()
-    const isEdit = op === 'edit'
-    const form = useRef<Form>(null)
-    const [showCluster, setShowCluster] = useState(false)
-    const [cluster, setCluster] = useState(null)
-    const { width: winWidth } = useWindowSize()
-    const [params, setParams] = useImmer(() => {
-      const jobMode = isEdit ? get(jobNode, 'jobMode') : getJobMode(jobType)
-      let type = jobType
-      if (isEdit && jobMode === JobMode.DI) {
-        type = getDiJobType(get(jobNode, 'job.type'))
-      }
-      return {
-        step: !isEdit && !jobNode ? 0 : 1,
-        jobMode,
-        jobType: type,
-        pid: jobNode ? get(jobNode, isEdit ? 'pid' : 'key') : '',
-        job: isEdit ? get(jobNode, 'job') : null,
-        syncTypeInfo: {
-          type: 'full',
-          fullSource: '',
-          fullSink: '',
-          incrSource: '',
-          incrSink: '',
-        } as SyncTypeVal,
-      }
+interface JobModalProps {
+  isEdit?: boolean
+  jobType?: JobType
+  jobNode?: TreeNodeProps
+  onClose?: (data?: JobModalData) => void
+}
+
+export const JobModal = observer((props: JobModalProps) => {
+  const { isEdit = false, jobType = JobType.OFFLINE, jobNode, onClose } = props
+  const fetchJob = useFetchJob()
+  const {
+    workFlowStore,
+    workFlowStore: { treeData, loadedKeys },
+  } = useStore()
+  const form = useRef<Form>(null)
+  const [showCluster, setShowCluster] = useState(false)
+  const [cluster, setCluster] = useState(null)
+  const [pNode, setPNode] = useState<Record<string, any>>()
+  const { width: winWidth } = useWindowSize()
+  const [params, setParams] = useImmer(() => {
+    const jobMode = isEdit ? get(jobNode, 'jobMode') : getJobMode(jobType)
+    let type = jobType
+    if (isEdit && jobMode === JobMode.DI) {
+      type = getDiJobType(get(jobNode, 'job.type'))
+    }
+    return {
+      step: !isEdit && !jobNode ? 0 : 1,
+      jobMode,
+      jobType: type,
+      pid: jobNode ? get(jobNode, isEdit ? 'pid' : 'key') : '',
+      job: isEdit ? get(jobNode, 'job') : null,
+      syncTypeInfo: {
+        type: 'full',
+        fullSource: '',
+        fullSink: '',
+        incrSource: '',
+        incrSink: '',
+      } as SyncTypeVal,
+    }
+  })
+
+  // useEffect(() => {
+  //   if (!isEdit && !jobNode) {
+  //     setParams((draft) => {
+  //       draft.step = 0
+  //     })
+  //   }
+  // }, [isEdit, jobNode, setParams])
+
+  const { job } = params
+  const mutation = useMutationStreamJob()
+
+  // useEffect(() => {
+  //   if (jobType) {
+  //     setParams((draft) => {
+  //       draft.jobMode = getJobMode(jobType)
+  //     })
+  //   }
+  // }, [jobType, setParams])
+
+  const fetchJobTreeData = (node: any) => {
+    const tp = params.jobMode === JobMode.DI ? 'sync' : 'stream'
+    return fetchJob(tp, {
+      pid: isRootNode(node.key) ? '' : node.key,
+    }).then((data) => {
+      const jobs = get(data, 'infos') || []
+      const newTreeData = getNewTreeData(treeData, node, jobs)
+      workFlowStore.set({
+        treeData: newTreeData,
+        loadedKeys: [...loadedKeys, node.key],
+      })
     })
+  }
 
-    const { job } = params
-    const mutation = useMutationStreamJob()
+  const handleItemClick = ({ mode }, type) => {
+    setParams((draft) => {
+      draft.jobMode = mode
+      draft.jobType = type
+    })
+  }
 
-    // useEffect(() => {
-    //   if (jobType) {
-    //     setParams((draft) => {
-    //       draft.jobMode = getJobMode(jobType)
-    //     })
-    //   }
-    // }, [jobType, setParams])
+  const handleTypeItemChange = (type: any) => {
+    setParams((draft) => {
+      draft.jobType = type
+    })
+  }
 
-    const fetchJobTreeData = (node: any) => {
-      const tp = params.jobMode === JobMode.DI ? 'sync' : 'stream'
-      return fetchJob(tp, {
-        pid: isRootNode(node.key) ? '' : node.key,
-      }).then((data) => {
-        const jobs = get(data, 'infos') || []
-        const newTreeData = getNewTreeData(treeData, node, jobs)
-        workFlowStore.set({
-          treeData: newTreeData,
-          loadedKeys: [...loadedKeys, node.key],
-        })
-      })
-    }
-
-    const handleClose = (created = false) => {
+  const handleNext = () => {
+    if (params.step === 0) {
       setParams((draft) => {
-        draft.step = 0
+        draft.step = 1
       })
-      if (onClose) {
-        onClose(created, op)
+    } else if (form.current?.validateForm()) {
+      const fields = form.current.getFieldsValue()
+      const { syncTypeInfo, ...rest }: { syncTypeInfo: SyncTypeVal } = fields
+      const data: any = {
+        op: isEdit ? 'edit' : 'create',
+        jobMode: params.jobMode,
+        ...rest,
       }
-    }
-
-    const handleItemClick = ({ mode }, type) => {
-      setParams((draft) => {
-        draft.jobMode = mode
-        draft.jobType = type
-      })
-    }
-
-    const handleTypeItemChange = (type: any) => {
-      setParams((draft) => {
-        draft.jobType = type
-      })
-    }
-
-    const handleNext = () => {
-      if (params.step === 0) {
-        setParams((draft) => {
-          draft.step = 1
-        })
-      } else if (form.current?.validateForm()) {
-        const fields = form.current.getFieldsValue()
-        const { syncTypeInfo, ...rest }: { syncTypeInfo: SyncTypeVal } = fields
-        const data: any = {
-          op,
-          jobMode: params.jobMode,
-          ...rest,
+      if (isEdit) {
+        data.jobId = job.id
+      } else {
+        data.type = params.jobType
+        data.is_directory = false
+        data.pid = isRootNode(fields.pid) ? '' : fields.pid
+        if (cluster) {
+          data.cluster_id = get(cluster, 'id')
         }
-        if (isEdit) {
-          data.jobId = job.id
-        } else {
+        if (params.jobMode === JobMode.RT) {
           data.type = params.jobType
-          data.is_directory = false
-          data.pid = isRootNode(fields.pid) ? '' : fields.pid
-          if (cluster) {
-            data.cluster_id = cluster.id
+        } else if (params.jobMode === JobMode.DI) {
+          if (params.jobType === JobType.OFFLINE) {
+            data.type =
+              syncTypeInfo.type === 'full'
+                ? SyncJobType.OFFLINEFULL
+                : SyncJobType.OFFLINEINCREMENT
           }
-          if (params.jobMode === JobMode.RT) {
-            data.type = params.jobType
-          } else if (params.jobMode === JobMode.DI) {
-            if (params.jobType === JobType.OFFLINE) {
-              data.type = syncTypeInfo.type === 'full' ? 0 : 1
-            }
-            if (params.jobType === JobType.REALTIME) {
-              data.type = syncTypeInfo.type === 'full' ? 2 : 3
-            }
-            if (syncTypeInfo.type === 'full') {
-              data.source_type = syncTypeInfo.fullSource
-              data.target_type = syncTypeInfo.fullSink
-            } else {
-              data.source_type = syncTypeInfo.incrSource
-              data.target_type = syncTypeInfo.incrSink
-            }
+          if (params.jobType === JobType.REALTIME) {
+            data.type =
+              syncTypeInfo.type === 'full'
+                ? SyncJobType.REALTIME
+                : SyncJobType.REALTIME
+          }
+          if (syncTypeInfo.type === 'full') {
+            data.source_type = syncTypeInfo.fullSource
+            data.target_type = syncTypeInfo.fullSink
+          } else {
+            data.source_type = syncTypeInfo.incrSource
+            data.target_type = syncTypeInfo.incrSink
           }
         }
-        mutation.mutate(data, {
-          onSuccess: () => {
-            handleClose(true)
-          },
-        })
       }
+      mutation.mutate(data, {
+        onSuccess: (ret) => {
+          onClose?.({
+            id: ret.id as string,
+            pid: String(data.pid),
+            pNode,
+            jobMode: params.jobMode,
+            type: data.type,
+            isEdit,
+          })
+        },
+      })
     }
+  }
 
-    const isXl = winWidth >= 1280
-    const modalWidth = useMemo(() => {
-      if (job && params.jobMode === JobMode.RT) {
-        return 700
-      }
-      return isXl ? 1200 : 900
-    }, [isXl, job, params.jobMode])
-    return (
-      <>
-        <Modal
-          visible
-          title={`${job ? '修改' : '创建'}作业`}
-          width={modalWidth}
-          maskClosable={false}
-          appendToBody
-          draggable
-          onCancel={() => handleClose(false)}
-          footer={
-            <div tw="flex justify-end space-x-2">
-              {params.step === 0 || job ? (
-                <Button onClick={() => handleClose(false)}>取消</Button>
-              ) : (
-                <Button
-                  onClick={() =>
-                    setParams((draft) => {
-                      draft.step = 0
-                    })
-                  }
-                >
-                  上一步
-                </Button>
-              )}
+  const isXl = winWidth >= 1280
+  const modalWidth = useMemo(() => {
+    if (job && params.jobMode === JobMode.RT) {
+      return 700
+    }
+    return isXl ? 1200 : 900
+  }, [isXl, job, params.jobMode])
+  return (
+    <>
+      <Modal
+        visible
+        title={`${job ? '修改' : '创建'}作业`}
+        width={modalWidth}
+        maskClosable={false}
+        appendToBody
+        draggable
+        onCancel={onClose}
+        footer={
+          <div tw="flex justify-end space-x-2">
+            {params.step === 0 || job ? (
+              <Button onClick={() => onClose?.()}>取消</Button>
+            ) : (
               <Button
-                type="primary"
-                loading={mutation.isLoading}
-                onClick={handleNext}
-                // disabled={params.jobType === JobType.REALTIME}
+                onClick={() =>
+                  setParams((draft) => {
+                    draft.step = 0
+                  })
+                }
               >
-                {params.step === 0 ? '下一步' : '确定'}
+                上一步
               </Button>
-            </div>
-          }
-        >
+            )}
+            <Button
+              type="primary"
+              loading={mutation.isLoading}
+              onClick={handleNext}
+              // disabled={params.jobType === JobType.REALTIME}
+            >
+              {params.step === 0 ? '下一步' : '确定'}
+            </Button>
+          </div>
+        }
+      >
+        <>
           {!job && (
             <ModalStep
               step={params.step}
@@ -331,7 +349,7 @@ export const JobModal = observer(
                                   }
                                   return true
                                 },
-                                help: '请选择同步数据源',
+                                help: '请选择同步数据源信息',
                                 status: 'error',
                               },
                             ]}
@@ -395,10 +413,11 @@ export const JobModal = observer(
                         workFlowStore.set({ loadedKeys: keys })
                       }
                       value={params.pid}
-                      onChange={(v: string) => {
+                      onChange={(v: string, node: Record<string, any>) => {
                         setParams((draft) => {
                           draft.pid = v
                         })
+                        setPNode(node)
                       }}
                     />
                     {params.jobMode === JobMode.RT && !job && (
@@ -458,22 +477,22 @@ export const JobModal = observer(
               </div>
             )}
           </ModalContent>
-        </Modal>
+        </>
+      </Modal>
 
-        <ClusterTableModal
-          visible={showCluster}
-          onCancel={() => setShowCluster(false)}
-          onOk={(clusterItem) => {
-            if (clusterItem) {
-              setCluster(clusterItem)
-            }
-            setShowCluster(false)
-          }}
-          selectedIds={cluster ? [cluster.id] : []}
-        />
-      </>
-    )
-  }
-)
+      <ClusterTableModal
+        visible={showCluster}
+        onCancel={() => setShowCluster(false)}
+        onOk={(clusterItem) => {
+          if (clusterItem) {
+            setCluster(clusterItem)
+          }
+          setShowCluster(false)
+        }}
+        selectedIds={cluster ? [cluster.id] : []}
+      />
+    </>
+  )
+})
 
 export default JobModal

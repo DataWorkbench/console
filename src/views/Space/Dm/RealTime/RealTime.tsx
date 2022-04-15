@@ -11,10 +11,10 @@ import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
 import emitter from 'utils/emitter'
 import { useParams } from 'react-router-dom'
-import JobMenu from './JobMenu'
-import JobTabs from './JobTabs'
-import StreamRightMenu from './StreamRightMenu'
-import VersionDisplay from './VersionDisplay'
+import JobMenu from './job/JobMenu'
+import JobTabs from './job/JobTabs'
+import StreamRightMenu from './stream/StreamRightMenu'
+import VersionDisplay from './version/VersionDisplay'
 
 const RealTime = observer(() => {
   const { spaceId } = useParams<{ regionId: string; spaceId: string }>()

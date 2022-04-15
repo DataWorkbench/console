@@ -1,45 +1,48 @@
-import React, { useEffect, useState } from 'react'
+import React, { FC, useEffect } from 'react'
 import { Form, Icon, Button } from '@QCFE/lego-ui'
 import { noop } from 'lodash-es'
 
 interface ButtonWithClearProps {
-  name: string
   value?: string
   placeholder?: React.ReactNode
-  showClear?: boolean
+  icon?: React.ReactNode
+  clearable?: boolean
   children?: React.ReactNode
   onClick?: () => void
   onClear?: () => void
+  onChange?: (value: string) => void
 }
 
 export const ButtonWithClear = React.forwardRef(
   (props: ButtonWithClearProps, ref: any) => {
     const {
-      name,
-      value: val = '',
+      value,
       placeholder = '请选择',
-      showClear = true,
+      clearable = true,
       onClick = noop,
       onClear = noop,
+      icon,
       children,
+      onChange = noop,
     } = props
-    const [value, setValue] = useState(val)
 
     useEffect(() => {
-      setValue(val)
-    }, [val])
+      if (value !== undefined) {
+        onChange(value)
+      }
+    }, [value, onChange])
 
     return (
       <div>
-        <Button tw="h-7" name={name} ref={ref} type="black" onClick={onClick}>
-          {value === '' ? placeholder : children}
+        <Button tw="h-8" ref={ref} type="black" onClick={onClick}>
+          {icon}
+          {!value ? placeholder : children}
         </Button>
-        {showClear && (
+        {clearable && (
           <Button
             type="black"
-            tw="ml-2 h-7"
+            tw="ml-2 h-8 px-[7px]"
             onClick={() => {
-              setValue('')
               onClear()
             }}
           >
@@ -51,4 +54,6 @@ export const ButtonWithClear = React.forwardRef(
   }
 )
 
-export const ButtonWithClearField = Form.getFormField(ButtonWithClear)
+export const ButtonWithClearField: FC<
+  ButtonWithClearProps & { label: React.ReactNode; name: string }
+> = Form.getFormField(ButtonWithClear)

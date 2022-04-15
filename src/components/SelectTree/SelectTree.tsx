@@ -6,12 +6,15 @@ import { Tree } from 'components/Tree'
 
 export interface SelectTreeProps {
   name: string
+  label?: React.ReactNode
   value?: string | null
   placeholder?: string
   disabled?: boolean
-  onChange?: (value: any) => void
+  onChange?: (value: any, treeNode: any) => void
   onOpened?: (value: boolean) => void
+  validateOnChange?: boolean
   treeHeight?: number
+  schemas: Record<string, any>[]
 }
 
 const SelectInputWrapper = styled('div')(
@@ -98,7 +101,7 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
         setVal(node.key)
 
         if (onChange) {
-          onChange(node.key)
+          onChange(node.key, node)
         }
       },
       [onChange]
@@ -162,6 +165,6 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
 
 export default SelectTree
 
-export const SelectTreeField: (props: SelectTreeProps) => any = (
-  Form as any
-).getFormField(SelectTree)
+export const SelectTreeField: (props: any) => any = (Form as any).getFormField(
+  SelectTree
+)

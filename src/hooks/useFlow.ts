@@ -18,6 +18,7 @@ import {
   setStreamJobSchedule,
   getStreamJobSchedule,
   setStreamJobArgs,
+  SetSyncJobConf,
   getStreamJobArgs,
   setStreamJobCode,
   getStreamJobCode,
@@ -26,7 +27,6 @@ import {
   streamJobCodeSyntax,
   streamJobCodeRun,
 } from 'stores/api'
-import { JobMode } from 'views/Space/Dm/RealTime/JobUtils'
 
 interface IRouteParams {
   regionId: string
@@ -46,7 +46,7 @@ export const useFetchJob = () => {
         search: '',
         limit: 100,
         offset: 0,
-        reverse: false,
+        reverse: true,
         sort_by: 'created',
         ...filter,
       }
@@ -70,12 +70,12 @@ export const useMutationStreamJob = () => {
       op,
       jobMode,
       ...rest
-    }: IWorkFlowParams & { jobMode: JobMode }) => {
+    }: IWorkFlowParams & { jobMode: 'RT' | 'DI' }) => {
       const params = { ...rest, regionId, spaceId }
-      if (jobMode === JobMode.RT) {
+      if (jobMode === 'RT') {
         params.tp = 'stream'
       }
-      if (jobMode === JobMode.DI) {
+      if (jobMode === 'DI') {
         params.tp = 'sync'
       }
       if (params.tp) {
@@ -195,6 +195,22 @@ export const useMutationStreamJobArgs = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async (params: IWorkFlowParams) => {
     const ret = await setStreamJobArgs({
+      ...params,
+      regionId,
+      spaceId,
+      jobId: curJob?.id,
+    })
+    return ret
+  })
+}
+
+export const useMutationSyncJobConf = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  return useMutation(async (params: Record<string, any>) => {
+    const ret = await SetSyncJobConf({
       ...params,
       regionId,
       spaceId,
