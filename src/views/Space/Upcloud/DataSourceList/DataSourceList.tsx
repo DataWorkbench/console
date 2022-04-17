@@ -17,6 +17,7 @@ import {
   ToolBar,
   ToolBarLeft,
   ToolBarRight,
+  // @ts-ignore
   utils,
 } from '@QCFE/qingcloud-portal-ui'
 import { useMutationSource, useQuerySource, useStore } from 'hooks'
@@ -42,7 +43,12 @@ import {
   getPingConnection,
 } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
-import { CONNECTION_STATUS, DATASOURCE_STATUS, ftpProtocol } from './constant'
+import {
+  CONNECTION_STATUS,
+  DATASOURCE_STATUS,
+  ftpProtocol,
+  sourceKinds,
+} from './constant'
 import { SourceKindImg } from './styled'
 
 const { MenuItem } = Menu as any
@@ -127,8 +133,53 @@ const getUrl = (
     | 'mysql'
     | 'clickhouse'
     | 'postgresql'
+    | 'sap_hana'
+    | 'tidb'
+    | 'oracle'
+    | 'mssql'
+    | 'sqlserver'
+    | 'mongo_db'
+    | 'elastic_search'
+    | 'redis'
+    | 'db2'
+    | 'hive'
 ) => {
   switch (type) {
+    // mysql default
+    case 'tidb':
+      return `jdbc:mysql://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+    case 'oracle':
+      return `jdbc:oracle:thin:@${urlObj.host}:${urlObj.port}:${urlObj.database}`
+    case 'sqlserver':
+      return `jdbc:jtds:sqlserver://${urlObj.host}:${urlObj.port};DatabaseName=${urlObj.database}`
+    // PostgreSQL default
+    case 'db2':
+      return `jdbc:db2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+    // ClickHouse default
+    case 'mongo_db':
+      return `mongodb://${urlObj.mongodb_brokers
+        .map(
+          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
+        )
+        .join(',')}`
+    case 'sap_hana':
+      return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
+    case 'elastic_search':
+      return `elasticsearch://${urlObj.host}:${urlObj.port}`
+    case 'ftp':
+      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
+        urlObj?.host
+      }:${urlObj?.port}`
+    case 'hdfs':
+      return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
+    case 'redis':
+      return `redis://${urlObj.redis_brokers
+        .map(
+          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
+        )
+        .join(',')}`
+    case 'hive':
+      return `jdbc:hive2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
     case 'hbase': {
       try {
         return `${JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']}`
@@ -142,14 +193,9 @@ const getUrl = (
           ({ host, port }: { host: string; port: number }) => `${host}:${port}`
         )
         .join(',')
-    case 'ftp':
-      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
-        urlObj?.host
-      }:${urlObj?.port}`
-    case 'hdfs':
-      return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
+
     default:
-      return `jdbc:${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      return `jdbc:${type}://${urlObj?.host}:${urlObj?.port}/${urlObj?.database}`
   }
 }
 
@@ -172,7 +218,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       op,
       opSourceList,
       mutateOperation,
-      sourceKinds,
+      // sourceKinds,
       showPingHistories,
       addEmptyHistories,
       addItemHistories,
@@ -325,12 +371,11 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       dataIndex: 'url',
       width: 250,
       render: (v: any, row: any) => {
-        const kindName = sourceKinds.find(
-          (kind) => kind.source_type === row.type
-        )?.name
+        const item = sourceKinds.find((kind) => kind.source_type === row.type)
+        const kindName = item?.urlType ?? item?.name
 
         if (kindName) {
-          const key = kindName.toLowerCase()
+          const key = kindName
           const urlObj = get(v, key)
           // const networkId = get(urlObj, 'network.vpc_network.network_id')
           return (
