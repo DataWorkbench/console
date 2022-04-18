@@ -54,6 +54,13 @@ const inputStyles = css`
         }
       }
     }
+
+    .input-password > input.input[type='text'],
+    .input-password input.input[type='password'],
+    .input-search > input.input[type='text'],
+    .input-search input.input[type='password'] {
+      ${tw`border-none`}
+    }
     .label-required {
       ${tw`label-required`}
     }
