@@ -1,12 +1,13 @@
 // @ts-ignore
 import { Breadcrumb, Button, CopyText, Icon } from '@QCFE/qingcloud-portal-ui'
 import { Card, Center, FlexBox, MoreAction } from 'components'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
 import icons from 'views/Space/Ops/DataIntegration/icons'
 import { Collapse, Tabs } from '@QCFE/lego-ui'
 import dayjs from 'dayjs'
+import qs from 'qs'
 import { HorizonTabs } from 'views/Space/Dm/styled'
 import Cluster from 'views/Space/Ops/DataIntegration/components/Cluster'
 import useIcon from 'hooks/useHooks/useIcon'
@@ -89,9 +90,12 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
   const { id } = props
 
   const history = useHistory()
+  const { search } = useLocation()
+  const { tab = 'link' } = qs.parse(search.slice(1))
+  console.log(history, tab)
 
   const [isOpen, setOpen] = useState(true)
-  const [activeName, setActiveName] = useState('Message')
+  const [activeName, setActiveName] = useState(tab)
   const toList = () => {
     history.push('../data-release')
   }
@@ -226,16 +230,16 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
         <TabPanel label="关联实例" name="link">
           <LinkInstance />
         </TabPanel>
-        <TabPanel label="监控告警" name="Monitor">
+        <TabPanel label="监控告警" name="alarm">
           <Monitor />
         </TabPanel>
-        <TabPanel label="开发内容" name="Develop">
+        <TabPanel label="开发内容" name="dev">
           <DevContent data={{}} />
         </TabPanel>
-        <TabPanel label="计算集群" name="Cluster">
+        <TabPanel label="计算集群" name="cluster">
           <Cluster data={{}} />
         </TabPanel>
-        <TabPanel label="调度信息" name="Schedule">
+        <TabPanel label="调度信息" name="schedule">
           <Schedule data={{}} />
         </TabPanel>
       </HorizonTabs>

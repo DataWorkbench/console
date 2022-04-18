@@ -7,6 +7,8 @@ import { pick } from 'lodash-es'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import {
   alarmStatus,
+  dataReleaseActions,
+  DataReleaseActionType,
   dataReleaseDevModeType,
   dataReleaseScheduleType,
   jobType,
@@ -142,42 +144,20 @@ export const getColumnsRender = (
 }
 
 export const getOperations = (
-  handleMenuClick: (selectedData: any, menuKey: string) => void
+  handleMenuClick: (selectedData: any, menuKey: DataReleaseActionType) => void
 ) => {
   const getActions = (record: Record<string, any>) => {
-    console.log(record)
-    return [
-      {
-        icon: '',
-        text: '关联实例',
-        key: 'link',
-      },
-      {
-        icon: '',
-        text: '开发内容',
-        key: 'dev',
-      },
-      {
-        icon: '',
-        text: '计算集群',
-        key: 'cluster',
-      },
-      {
-        icon: '',
-        text: '监控告警',
-        key: 'alarm',
-      },
-      {
-        icon: '',
-        text: '调度信息',
-        key: 'schedule',
-      },
-      {
-        icon: '',
-        text: '下线',
-        key: 'offline',
-      },
-    ]
+    let key = ''
+    if (record.status === '1') {
+      // TODO: 待定
+      key = 'offline'
+    } else {
+      key = 're-publish'
+    }
+
+    return dataReleaseActions
+      .filter((i) => i.key !== key)
+      .map((i) => ({ ...i, value: record }))
   }
 
   return {
@@ -185,7 +165,7 @@ export const getOperations = (
     key: 'operation',
     render: (_: never, record: Record<string, any>) => {
       return (
-        <MoreAction
+        <MoreAction<DataReleaseActionType>
           theme="darker"
           items={getActions(record)}
           onMenuClick={handleMenuClick}

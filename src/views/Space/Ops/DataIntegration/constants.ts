@@ -175,6 +175,14 @@ export const sourceTypes = {
 
 export const dataReleaseSuggestions: ISuggestion[] = [
   {
+    label: '作业名称',
+    key: 'job_name',
+  },
+  {
+    label: 'ID',
+    key: 'ID',
+  },
+  {
     label: '调度状态',
     key: 'schedule_status',
     options: Object.values(dataReleaseScheduleType).map(({ label, value }) => ({
@@ -275,3 +283,43 @@ const versionSet = new Set([
 export const versionColumns = dataReleaseColumns.filter(
   (column) => column.key && versionSet.has(column!.key)
 )
+
+export const dataReleaseActions = [
+  {
+    icon: 'q-listViewFill',
+    text: '关联实例',
+    key: 'link',
+  },
+  {
+    icon: 'q-terminalBoxFill',
+    text: '开发内容',
+    key: 'dev',
+  },
+  {
+    icon: 'q-clusterFill',
+    text: '计算集群',
+    key: 'cluster',
+  },
+  {
+    icon: 'q-bellGearFill',
+    text: '监控告警',
+    key: 'alarm',
+  },
+  {
+    icon: 'q-topology2Fill',
+    text: '调度信息',
+    key: 'schedule',
+  },
+  {
+    icon: 'q-subtractBoxFill',
+    text: '下线',
+    key: 'offline',
+  },
+  {
+    icon: '',
+    text: '重新发布',
+    key: 're-publish',
+  },
+] as const
+
+export type DataReleaseActionType = typeof dataReleaseActions[number]['key']

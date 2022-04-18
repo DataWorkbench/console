@@ -150,6 +150,8 @@ interface IFormProps {
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
   op: string
   opSourceList: Record<string, any>[]
+  theme: 'dark' | 'light'
+  className?: string
 }
 
 const DataSourceForm = observer(
@@ -159,6 +161,8 @@ const DataSourceForm = observer(
     onFieldValueChange,
     op,
     opSourceList,
+    theme = 'light',
+    className,
   }: IFormProps) => {
     const [network, setNetWork] = useImmer<{
       type: 'vpc' | 'eip'
@@ -295,7 +299,7 @@ const DataSourceForm = observer(
     }, [getFormData, parseFormData])
 
     return (
-      <Root>
+      <Root className={className}>
         <Form
           tw="max-w-full!"
           layout="vertical"
@@ -324,6 +328,7 @@ const DataSourceForm = observer(
                   <AffixLabel
                     help="数据源是大数据工作台用于数据处理的出入口,数据源采用连接串和云实例两种模式, 目前暂时只支持连接串模式。"
                     required={false}
+                    theme={theme === 'light' ? 'darker' : 'light'}
                   >
                     数据源连接方式
                   </AffixLabel>
@@ -507,7 +512,10 @@ const DataSourceForm = observer(
                     tw="cursor-pointer"
                     onClick={() => setShowPing((_) => !_)}
                   >
-                    <Icon name={showPing ? 'chevron-up' : 'chevron-down'} />
+                    <Icon
+                      name={showPing ? 'chevron-up' : 'chevron-down'}
+                      type={theme === 'light' ? 'dark' : 'light'}
+                    />
                     <span tw="ml-2">数据源可用性测试</span>
                   </Center>
                 </Divider>
@@ -515,7 +523,11 @@ const DataSourceForm = observer(
 
               <Field css={showPing ? visibleStyle : hiddenStyle}>
                 <Label>
-                  <AffixLabel help="检查数据源参数是否正确" required={false}>
+                  <AffixLabel
+                    theme={theme === 'light' ? 'darker' : 'light'}
+                    help="检查数据源参数是否正确"
+                    required={false}
+                  >
                     数据源可用性测试
                   </AffixLabel>
                 </Label>

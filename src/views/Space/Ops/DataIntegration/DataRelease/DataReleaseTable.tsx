@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { PageTab } from '@QCFE/qingcloud-portal-ui'
+import { PageTab, Icon } from '@QCFE/qingcloud-portal-ui'
 import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
@@ -7,22 +7,20 @@ import tw, { css, styled } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
 import { observer } from 'mobx-react-lite'
 import {
-  SelectTreeTable,
-  FlexBox,
-  TextEllipsis,
   Center,
+  FlexBox,
   InstanceName,
+  Modal,
+  SelectTreeTable,
+  TextEllipsis,
   Tooltip,
 } from 'components'
-import { Circle } from 'views/Space/Ops/DataIntegration/styledComponents'
-import { Icon } from '@QCFE/lego-ui'
 import {
+  DataReleaseActionType,
   dataReleaseColumns,
   DataReleaseDevMode,
   dataReleaseDevModeType,
   dataReleaseTabs,
-  JobType,
-  jobType,
 } from '../constants'
 import { getColumnsRender, getOperations } from './utils'
 import { useDataReleaseStore } from './store'
@@ -31,6 +29,7 @@ import TableHeader from './TableHeader'
 
 import DataSourceModal from './DataSourceModal'
 import { useHistory } from 'react-router-dom'
+import { Checkbox } from '@QCFE/lego-ui'
 // import { IColumn } from 'hooks/utils'
 
 // interface IDataReleaseProps {}
@@ -55,10 +54,30 @@ const jobNameStyle = css`
     }
   }
 `
+
+const ModalWrapper = styled(Modal)(() => [
+  css`
+    .modal-card-head {
+      border-bottom: 0;
+    }
+
+    .modal-card-body {
+      padding-top: 0;
+    }
+
+    .modal-card-foot {
+      border-top: 0;
+      ${tw`pb-4!`}
+    }
+  `,
+])
+
 const dataReleaseSettingKey = 'DATA_RELEASE_SETTING'
+
 // const columns: IColumn[] = []
 const DataRelease = observer(() => {
-  const { showDataSource, showVersion, set } = useDataReleaseStore()
+  const { showDataSource, showVersion, showOffline, selectedData, set } =
+    useDataReleaseStore()
   const { filter, setFilter, pagination, sort } = useFilter<
     {
       source?: string
@@ -72,11 +91,14 @@ const DataRelease = observer(() => {
       limit: number
     },
     { pagination: true; sort: true }
-  >({})
+  >({}, { pagination: true, sort: true }, dataReleaseSettingKey)
 
   const history = useHistory()
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
-    window.open(`./${record.id}${tab ? `?tab=${tab}` : ''}`, 'target')
+    window.open(
+      `./data-release/${record.id}${tab ? `?tab=${tab}` : ''}`,
+      'target'
+    )
   }
 
   const handleDatasource = (record: Record<string, any>) => {
@@ -97,8 +119,28 @@ const DataRelease = observer(() => {
     target: handleDatasource,
   })
 
-  const handleMenuClick = () => {
-    console.log('handleMenuClick')
+  const handleMenuClick = (
+    record: Record<string, any>,
+    key: DataReleaseActionType
+  ) => {
+    console.log(record)
+    switch (key) {
+      case 'link':
+      case 'dev':
+      case 'cluster':
+      case 'alarm':
+      case 'schedule':
+        jumpDetail(key)(record)
+        break
+      case 'offline':
+        set({
+          showOffline: true,
+          selectedData: record,
+        })
+        break
+      case 're-publish':
+        break
+    }
   }
 
   const operations = getOperations(handleMenuClick)
@@ -177,6 +219,7 @@ const DataRelease = observer(() => {
           desc: 'asdasdfas',
           source: 'MySQL',
           alarm_status: '1',
+          dev_mode: '0',
         },
       ],
     },
@@ -233,6 +276,47 @@ const DataRelease = observer(() => {
             })
           }}
         />
+      )}
+      {showOffline && (
+        <ModalWrapper
+          visible
+          width={400}
+          onCancel={() => {
+            set({
+              showOffline: false,
+            })
+          }}
+          okText="下线"
+          okType={'danger'}
+          onOk={() => {
+            set({
+              showOffline: false,
+            })
+          }}
+        >
+          <div>
+            <FlexBox tw={'gap-3'}>
+              <Icon
+                name={'if-exclamation'}
+                size={24}
+                tw={'text-[24px] text-[#FFD127] leading-6'}
+              />
+              <div tw={'grid gap-2'}>
+                <div tw={'text-white text-[16px] leading-6'}>
+                  下线作业 {selectedData?.name}{' '}
+                </div>
+                <div tw={'text-neut-8 leading-5'}>
+                  作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?
+                </div>
+                <div tw={'leading-5'}>
+                  <Checkbox>
+                    <span tw={'text-white ml-1'}>同时停止运行中的实例</span>
+                  </Checkbox>
+                </div>
+              </div>
+            </FlexBox>
+          </div>
+        </ModalWrapper>
       )}
     </>
   )

@@ -1,11 +1,16 @@
-import { FlexBox, Modal, ModalContent } from 'components'
+import { FlexBox, Modal, ModalContent, TextEllipsis, Tooltip } from 'components'
 import { observer } from 'mobx-react-lite'
 import useFilter from 'hooks/useHooks/useFilter'
-import { versionColumns } from 'views/Space/Ops/DataIntegration/constants'
+import {
+  DataReleaseActionType,
+  dataReleaseColumns,
+  versionColumns,
+} from 'views/Space/Ops/DataIntegration/constants'
 import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { Table } from 'views/Space/styled'
 import TableHeader from 'views/Space/Ops/DataIntegration/DataRelease/TableHeader'
+import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import { getColumnsRender, getOperations } from './utils'
 
 interface IProps {
@@ -15,6 +20,7 @@ interface IProps {
 const dataReleaseVersionSettingKey = 'DATA_RELEASE_VERSION_SETTING'
 
 const VersionsModal = observer((props: IProps) => {
+  const { set } = useDataReleaseStore()
   const { onCancel } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
@@ -28,6 +34,10 @@ const VersionsModal = observer((props: IProps) => {
     { pagination: true; sort: true }
   >({})
 
+  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    window.open(`./${record.id}${tab ? `?tab=${tab}` : ''}`, 'target')
+  }
+
   const columnsRender = getColumnsRender(filter, setFilter, [
     'alarm_status',
     'schedule_status',
@@ -35,15 +45,57 @@ const VersionsModal = observer((props: IProps) => {
     'created_at',
   ])
 
-  const handleMenuClick = () => {
-    console.log('handleMenuClick')
+  const handleMenuClick = (
+    record: Record<string, any>,
+    key: DataReleaseActionType
+  ) => {
+    switch (key) {
+      case 'link':
+      case 'dev':
+      case 'cluster':
+      case 'alarm':
+      case 'schedule':
+        jumpDetail(key)(record)
+        break
+      case 'offline':
+        set({
+          showOffline: true,
+          selectedData: record,
+        })
+        break
+      case 're-publish':
+        break
+      default:
+        break
+    }
   }
 
   const operations = getOperations(handleMenuClick)
-
+  const jobNameColumn = {
+    ...dataReleaseColumns[0],
+    width: 250,
+    render: (text: string, record: Record<string, any>) => {
+      const child = (
+        <TextEllipsis>
+          <span tw="hover:text-green-11" onClick={() => jumpDetail()(record)}>
+            {text}
+          </span>
+        </TextEllipsis>
+      )
+      if (record.desc) {
+        // TODO: 描述字段未确认
+        return (
+          <Tooltip theme="light" hasPadding content={record.desc}>
+            {child}
+          </Tooltip>
+        )
+      }
+      return child
+    },
+  }
   const { columns, setColumnSettings } = useColumns(
     dataReleaseVersionSettingKey,
-    versionColumns,
+    [jobNameColumn, ...versionColumns.slice(1)],
     columnsRender,
     operations
   )

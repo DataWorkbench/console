@@ -4,7 +4,9 @@ import { makeAutoObservable, set } from 'mobx'
 export class DataReleaseStore {
   showVersion: boolean = false
 
-  showDataSource: boolean = true
+  showDataSource: boolean = false
+
+  showOffline: boolean = false
 
   selectedData?: Record<string, any> = undefined
 

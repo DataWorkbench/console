@@ -1,13 +1,14 @@
 /* eslint-disable no-bitwise */
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox } from 'components/Box'
 import tw, { css, styled, theme } from 'twin.macro'
 import React, { ReactElement } from 'react'
-import { Center } from 'components/Center'
 import { isFunction } from 'lodash-es'
+import { Tooltip, FlexBox, Center } from 'components'
 import {
   AlarmStatus,
   alarmStatus,
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
   jobInstanceStatus,
   JobInstanceStatusType,
   JobType,
@@ -210,24 +211,40 @@ export const DbTypeCmp = ({
   type,
   onClick,
   className,
+  devMode,
 }: {
   type: keyof typeof sourceTypes
   onClick: Function
   className?: string
+  devMode?: keyof typeof dataReleaseDevModeType
 }) => {
   if (!sourceTypes[type]) {
     return null
   }
-  return (
+
+  const item = (
     <div
       onClick={onClick as any}
       className={className}
       css={[
-        onClick ? tw`hover:text-green-11` : tw`hover:text-neut-19`,
+        onClick
+          ? tw`hover:text-green-11 cursor-pointer`
+          : tw`hover:text-neut-19`,
         tw`inline-block h-4 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2 leading-[16px]`,
       ]}
     >
       {sourceTypes[type]}
     </div>
   )
+  if (
+    devMode &&
+    dataReleaseDevModeType[devMode!]?.type !== DataReleaseDevMode.UI
+  ) {
+    return (
+      <Tooltip hasPadding content="脚本模式请查看开发内容" theme="light">
+        {item}
+      </Tooltip>
+    )
+  }
+  return item
 }
