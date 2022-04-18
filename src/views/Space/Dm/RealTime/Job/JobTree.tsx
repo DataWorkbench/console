@@ -450,13 +450,13 @@ export const JobTree = observer(
               icon={renderIcon}
               switcherIcon={renderSwitcherIcon}
               onRightClick={onRightClick}
-              draggable={(dragNode) => {
-                const { key } = dragNode
-                if (isRootNode(String(key))) {
-                  return false
-                }
-                return true
-              }}
+              // draggable={(dragNode) => {
+              //   const { key } = dragNode
+              //   if (isRootNode(String(key))) {
+              //     return false
+              //   }
+              //   return true
+              // }}
               dropIndicatorRender={({ dropLevelOffset }) => (
                 <div
                   tw="absolute bg-red-10 h-0.5 bottom-0 right-0 pointer-events-none"
