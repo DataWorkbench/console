@@ -1,9 +1,9 @@
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-import ScheSettingModal from '../modal/ScheSettingModal'
-import ScheArgsModal from '../modal/ScheArgsModal'
-import VersionsModal from '../modal/VersionsModal'
+import ScheSettingModal from '../Modal/ScheSettingModal'
+import ScheArgsModal from '../Modal/ScheArgsModal'
+import VersionsModal from '../Modal/VersionsModal'
 
 const MenuRoot = styled('div')(() => [
   tw`pt-8 space-y-4 align-middle bg-neut-17 w-10`,

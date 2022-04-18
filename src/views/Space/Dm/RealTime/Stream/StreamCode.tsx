@@ -30,8 +30,8 @@ import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
 import { JobToolBar } from '../styled'
-import ReleaseModal from '../modal/ReleaseModal'
-import VersionHeader from '../version/VersionHeader'
+import ReleaseModal from '../Modal/ReleaseModal'
+import VersionHeader from '../Version/VersionHeader'
 
 const CODETYPE = {
   2: 'sql',
