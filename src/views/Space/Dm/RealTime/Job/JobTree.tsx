@@ -42,7 +42,7 @@ import {
   renderSwitcherIcon,
   JobMode,
 } from './JobUtils'
-import { JobModal, JobModalData } from '../modal/JobModal'
+import { JobModal, JobModalData } from '../Modal/JobModal'
 
 const { MenuItem } = Menu
 const { TextField } = Form
