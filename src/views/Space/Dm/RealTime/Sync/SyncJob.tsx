@@ -110,6 +110,7 @@ const SyncJob = () => {
   const clusterRef = useRef<{ getCluster: () => Record<string, string> }>(null)
   const channelRef = useRef<{ getChannel: () => Record<string, string> }>(null)
   // console.log('fields', fields)
+  const enableRelease = get(scheData, 'schedule_policy') !== 0
 
   const handleEditorWillMount = (monaco: any) => {
     monaco.editor.defineTheme('my-theme', {
@@ -126,6 +127,14 @@ const SyncJob = () => {
     editor.focus()
   }
 
+  const showConfWarn = (content: string) => {
+    Notify.warning({
+      title: '操作提示',
+      content,
+      placement: 'bottomRight',
+    })
+  }
+
   const save = () => {
     if (
       !dbRef.current ||
@@ -135,48 +144,59 @@ const SyncJob = () => {
     ) {
       return
     }
+
     const resource = dbRef.current.getResource()
-    const sourceTypeNames = dbRef.current.getTypeNames()
-    const mapping = mappingRef.current.rowMapping()
-    const cluster = clusterRef.current.getCluster()
-    const channel = channelRef.current.getChannel()
-    if (!mapping || !cluster) {
-      Notify.warning({
-        title: '操作提示',
-        content: !mapping ? '未配置字段映射' : '未配置计算集群',
-        placement: 'bottomRight',
-      })
+    if (!resource) {
+      showConfWarn('未配置数据源信息')
+      return
     }
 
-    if (resource && mapping && cluster && channel) {
-      set(
-        resource,
-        `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
-        mapping[0]
-      )
-      set(
-        resource,
-        `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-        mapping[1]
-      )
-      set(resource, 'cluster_id', cluster.id)
-      set(resource, 'job_mode', 0)
-      set(resource, 'channel_control', channel)
-      const filterResouce = removeUndefined(resource)
-      // console.log('filterResouce', filterResouce)
-      mutation.mutate(filterResouce, {
-        onSuccess: () => {
-          Notify.success({
-            title: '操作提示',
-            content: '配置保存成功',
-            placement: 'bottomRight',
-          })
-        },
-      })
+    const sourceTypeNames = dbRef.current.getTypeNames()
+
+    const mapping = mappingRef.current.rowMapping()
+    if (!mapping) {
+      showConfWarn('未配置字段映射信息')
+      return
     }
+
+    const cluster = clusterRef.current.getCluster()
+    if (!cluster) {
+      showConfWarn('未配置计算集群信息')
+      return
+    }
+    const channel = channelRef.current.getChannel()
+    if (!channel) {
+      showConfWarn('未配置通道控制信息')
+      return
+    }
+
+    set(
+      resource,
+      `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
+      mapping[0]
+    )
+    set(
+      resource,
+      `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+      mapping[1]
+    )
+    set(resource, 'cluster_id', cluster.id)
+    set(resource, 'job_mode', 0)
+    set(resource, 'channel_control', channel)
+    const filterResouce = removeUndefined(resource)
+    // console.log('filterResouce', filterResouce)
+    mutation.mutate(filterResouce, {
+      onSuccess: () => {
+        Notify.success({
+          title: '操作提示',
+          content: '配置保存成功',
+          placement: 'bottomRight',
+        })
+      },
+    })
   }
   const release = () => {
-    if (get(scheData, 'schedule_policy') === 0) {
+    if (!enableRelease) {
       workFlowStore.set({ showScheSetting: true })
     } else {
       setShowRelaseModal(true)
@@ -318,7 +338,7 @@ const SyncJob = () => {
           保存
         </Button>
         {/* loading={releaseMutation.isLoading} */}
-        <Button type="primary" onClick={release}>
+        <Button type="primary" onClick={release} disabled={!enableRelease}>
           <Icon name="export" />
           发布
         </Button>
