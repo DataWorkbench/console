@@ -1,5 +1,5 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { FC, ReactElement } from 'react'
+import { FC, MouseEventHandler, ReactElement } from 'react'
 import tw, { styled } from 'twin.macro'
 import { FlexBox } from 'components/Box'
 import { Center } from '../Center'
@@ -13,6 +13,7 @@ export interface IInstanceNameProps {
   className?: string
   iconClassName?: string
   iconHasBorder?: boolean
+  onClick?: MouseEventHandler<HTMLDivElement>
 }
 
 const Circle = styled(Center)(
@@ -26,9 +27,14 @@ const Circle = styled(Center)(
 )
 
 export const InstanceName: FC<IInstanceNameProps> = (props) => {
-  const { theme, name, desc, icon, className, iconClassName } = props
+  const { theme, name, desc, icon, className, iconClassName, onClick } = props
   return (
-    <FlexBox tw="items-center truncate flex-auto gap-2" className={className}>
+    <FlexBox
+      tw="items-center truncate flex-auto gap-2"
+      css={[onClick ? tw`cursor-pointer` : '']}
+      className={className}
+      onClick={onClick}
+    >
       {typeof icon === 'string' ? (
         <Circle theme={theme} className="instance-name-icon">
           <Icon

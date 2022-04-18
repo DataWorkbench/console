@@ -1,26 +1,34 @@
 /* eslint-disable no-bitwise */
-import { Icon, PageTab } from '@QCFE/qingcloud-portal-ui'
+import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components/Box'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { Table } from 'views/Space/styled'
-import { IMoreActionItem, MoreAction, TextEllipsis, TextLink } from 'components'
+import {
+  IMoreActionItem,
+  InstanceName,
+  MoreAction,
+  TextEllipsis,
+  TextLink,
+} from 'components'
 import React, { useMemo } from 'react'
-import { Center } from 'components/Center'
-import tw, { css } from 'twin.macro'
 import {
   AlarmStatusCmp,
-  Circle,
   Divider,
   JobInstanceStatusCmp,
   JobTypeCmp,
 } from 'views/Space/Ops/DataIntegration/styledComponents'
-import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import useIcon from 'hooks/useHooks/useIcon'
 import { tuple } from 'utils/functions'
 import { useHistory } from 'react-router-dom'
-import { useQueryClient } from 'react-query'
+// import { useQueryClient } from 'react-query'
 import { get, omitBy } from 'lodash-es'
+import {
+  // getJobInstanceKey,
+  // useMutationInstance,
+  useQueryJobInstances,
+} from 'hooks'
+import useFilter from 'hooks/useHooks/useFilter'
 import {
   alarmStatus,
   dataJobInstanceColumns,
@@ -28,16 +36,9 @@ import {
   jobInstanceStatus,
   JobInstanceStatusType,
   jobType,
-  sourceTypes,
 } from '../constants'
 import TableHeader from './TableHeader'
 import icons from '../icons'
-import {
-  getJobInstanceKey,
-  useMutationInstance,
-  useQueryJobInstances,
-} from '../../../../../hooks'
-import useFilter from '../../../../../hooks/useHooks/useFilter'
 
 const settingKey = 'DATA_JOB_INSTANCE_TABLE_SETTING'
 
@@ -61,39 +62,33 @@ const DataJobInstance = () => {
     { pagination: true; sort: true }
   >({ alarm_status: '', offset: 0, status: '' })
 
-  const queryClient = useQueryClient()
-  const mutation = useMutationInstance()
+  // const queryClient = useQueryClient()
+  // const mutation = useMutationInstance()
 
-  const { isFetching, isRefetching, data } = useQueryJobInstances(
-    omitBy(filter, Boolean)
-  )
+  const { isFetching } = useQueryJobInstances(omitBy(filter, Boolean))
 
-  const infos = get(data, 'infos', []) || []
+  const data = {}
 
-  const refetchData = () => {
-    queryClient.invalidateQueries(getJobInstanceKey())
-  }
+  const infos =
+    get(data, 'infos', [
+      {
+        instance_id: '11',
+        instance_name: 'xxxxx',
+      },
+    ]) || []
+
+  // const refetchData = () => {
+  //   queryClient.invalidateQueries(getJobInstanceKey())
+  // }
 
   const columnsRender = {
     instance_id: {
-      render: (text: string) => (
-        <Center tw="truncate">
-          {/* // TODO merge fill icon */}
-          <Circle>
-            <Icon
-              name="q-mergeFillDuotone"
-              type="light"
-              css={css`
-                & .qicon {
-                  ${tw`text-white! fill-[#fff]!`}
-                }
-              `}
-            />
-          </Circle>
-          <div tw="flex-1 truncate">
-            <TextEllipsis theme="light">{text}</TextEllipsis>
-          </div>
-        </Center>
+      render: (text: string, record: Record<string, any>) => (
+        <InstanceName
+          theme="dark"
+          name={record.instance_name}
+          icon="q-dotLine2Fill"
+        />
       ),
     },
 
@@ -256,7 +251,7 @@ const DataJobInstance = () => {
         <TableHeader columnsSetting={columnsSetting} columns={columns} />
         <Table
           columns={columns}
-          dataSource={new Array(10).fill({})}
+          dataSource={infos}
           loading={!!isFetching}
           sort={sort}
           pagination={{

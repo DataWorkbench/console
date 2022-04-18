@@ -1,11 +1,33 @@
+/* eslint-disable no-bitwise */
 import { Table } from 'views/Space/styled'
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
 import tw, { css } from 'twin.macro'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button, InputSearch, Select } from '@QCFE/lego-ui'
-import { Center, FlexBox } from 'components'
+import {
+  Center,
+  FlexBox,
+  IMoreActionItem,
+  InstanceName,
+  MoreAction,
+  TextLink,
+} from 'components'
 import { get } from 'lodash-es'
 import useFilter from 'hooks/useHooks/useFilter'
+import {
+  alarmStatus,
+  dataJobActions,
+  DataJobActionType,
+  jobInstanceStatus,
+  JobInstanceStatusType,
+} from 'views/Space/Ops/DataIntegration/constants'
+import {
+  AlarmStatusCmp,
+  Divider,
+  JobInstanceStatusCmp,
+} from 'views/Space/Ops/DataIntegration/styledComponents'
+import dayjs from 'dayjs'
+import React from 'react'
 
 const defaultColumns: IColumn[] = [
   {
@@ -35,6 +57,20 @@ const defaultColumns: IColumn[] = [
   },
 ]
 
+const instanceNameStyle = css`
+  &:hover {
+    .instance-name-title {
+      ${tw`text-green-11`}
+    }
+    .instance-name-icon {
+      ${tw`bg-[#13966a80] border-[#9ddfc966]`}
+      .icon svg.qicon {
+        ${tw`text-green-11`}
+      }
+    }
+  }
+`
+
 const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 
 const LinkInstance = () => {
@@ -56,27 +92,149 @@ const LinkInstance = () => {
     data: [],
   }
 
-  const columnsRender = {
+  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    window.open(`../data-job/${record.id}${tab ? `?tab=${tab}` : ''}`, 'target')
+  }
 
+  const columnsRender = {
+    instance_id: {
+      render: (text: string, record: Record<string, any>) => (
+        <InstanceName
+          theme="dark"
+          name={record.instance_name}
+          icon="q-dotLine2Fill"
+          css={instanceNameStyle}
+          onClick={() => {
+            jumpDetail()(record)
+          }}
+        />
+      ),
+    },
+
+    status: {
+      filter: filter.status,
+      onFilter: (v: number) => {
+        setFilter((draft) => {
+          draft.status = v
+          draft.offset = 0
+        })
+      },
+      filterAble: true,
+      filtersNew: Object.values(jobInstanceStatus) as any,
+      render: (text: keyof typeof jobInstanceStatus) => (
+        <JobInstanceStatusCmp type={text} />
+      ),
+    },
+    alarm_status: {
+      onFilter: (v: number) => {
+        setFilter((draft) => {
+          draft.alarm_status = v
+          draft.offset = 0
+        })
+      },
+      filter: filter.alarm_status,
+      filterAble: true,
+      filtersNew: Object.values(alarmStatus) as any,
+      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
+        <AlarmStatusCmp
+          type={text}
+          onClick={() => jumpDetail('alarm')(record)}
+        />
+      ),
+    },
+    create_time: {
+      sortable: true,
+      sortOrder:
+        // eslint-disable-next-line no-nested-ternary
+        filter.sort_by === 'updated_at'
+          ? filter.reverse
+            ? 'asc'
+            : 'desc'
+          : '',
+      render: (v: number) => (
+        <span tw="text-neut-8">
+          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+      ),
+    },
+
+    update_time: {
+      sortable: true,
+      sortOrder:
+        // eslint-disable-next-line no-nested-ternary
+        filter.sort_by === 'updated_at'
+          ? filter.reverse
+            ? 'asc'
+            : 'desc'
+          : '',
+      render: (v: number) => (
+        <span tw="text-neut-8">
+          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+      ),
+    },
+  }
+
+  const getActions = (
+    status: JobInstanceStatusType,
+    record: Record<string, any>
+  ): IMoreActionItem[] => {
+    const stopAble =
+      JobInstanceStatusType.RUNNING |
+      JobInstanceStatusType.FAILED_AND_RETRY |
+      JobInstanceStatusType.PREPARING
+    const filterKeys = new Set<string>()
+    if (status & stopAble) {
+      filterKeys.add('stop')
+    }
+
+    return dataJobActions.reduce(
+      (acc: IMoreActionItem[], cur: IMoreActionItem) => {
+        if (filterKeys.has(cur.key)) {
+          return acc
+        }
+        return [...acc, { ...cur, value: record }]
+      },
+      []
+    )
+  }
+
+  const handleMenuClick = (
+    record: Record<string, any>,
+    key: DataJobActionType
+  ) => {
+    switch (key) {
+      case 'stop':
+        console.log('stop', record)
+        break
+      case 'info':
+        jumpDetail()(record)
+        break
+      default:
+        break
+    }
   }
 
   const operations = {
     title: '操作',
+    width: 150,
     key: 'operation',
     render: (text: any, record: any) => (
-      <span>
-        <a href="javascript:;">查看</a>
-        <span className="ant-divider" />
-        <a href="javascript:;">编辑</a>
-        <span className="ant-divider" />
-        <a href="javascript:;">删除</a>
-      </span>
+      <FlexBox tw="gap-4">
+        <TextLink>Flink UI</TextLink>
+        <Divider />
+        <MoreAction<DataJobActionType>
+          theme="darker"
+          items={getActions(record.status, record)}
+          onMenuClick={handleMenuClick as any}
+        />
+      </FlexBox>
     ),
   }
   const { columns } = useColumns(
     linkInstanceSettingKey,
     defaultColumns,
-    columnsRender,
+    columnsRender as any,
     operations
   )
 
@@ -163,7 +321,14 @@ const LinkInstance = () => {
           }
         `}
         columns={columns}
-        dataSource={[]}
+        dataSource={[
+          {
+            instance_id: '111',
+            instance_name: 'xxxx',
+            status: '1',
+            alarm_status: '1',
+          },
+        ]}
         sort={sort}
         pagination={{
           total: get(data, 'total', 0),

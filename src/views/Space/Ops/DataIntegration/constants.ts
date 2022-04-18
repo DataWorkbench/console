@@ -323,3 +323,18 @@ export const dataReleaseActions = [
 ] as const
 
 export type DataReleaseActionType = typeof dataReleaseActions[number]['key']
+
+export const dataJobActions = [
+  {
+    text: '中止',
+    icon: 'q-closeCircleFill',
+    key: 'stop',
+  },
+  {
+    text: '查看详情',
+    icon: 'eye',
+    key: 'info',
+  },
+] as const
+
+export type DataJobActionType = typeof dataJobActions[number]['key']
