@@ -1,4 +1,4 @@
-import { Form, Icon } from '@QCFE/lego-ui'
+import { Button, Control, Field, Form, Icon, Label } from '@QCFE/lego-ui'
 import { AffixLabel, ButtonWithClearField } from 'components'
 import { get, isEmpty } from 'lodash-es'
 import { forwardRef, useImperativeHandle, useState } from 'react'
@@ -19,6 +19,8 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
   useImperativeHandle(ref, () => ({
     getCluster: () => cluster,
   }))
+
+  const handleConnection = () => {}
 
   return (
     <>
@@ -48,24 +50,22 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         >
           {clusterName}
         </ButtonWithClearField>
-
-        <ButtonWithClearField
-          clearable={false}
-          name="connection"
-          icon={
-            <Icon
-              name="pod"
-              size={16}
-              color={{ secondary: 'rgba(255,255,255,0.4)' }}
-            />
-          }
-          placeholder="连通性测试"
-          label={
+        <Field>
+          <Label>
             <AffixLabel help="more" theme="green">
               计算集群连通性
             </AffixLabel>
-          }
-        />
+          </Label>
+          <Control>
+            <Button
+              type="outlined"
+              tw="text-green-11!"
+              onClick={handleConnection}
+            >
+              连通性测试
+            </Button>
+          </Control>
+        </Field>
       </Form>
       <ClusterTableModal
         visible={visible}
