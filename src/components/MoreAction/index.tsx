@@ -12,9 +12,9 @@ export interface IMoreActionItem {
   icon?: string
   value?: any
 }
-export interface IMoreActionProps {
+export interface IMoreActionProps<T> {
   theme?: 'darker' | 'light'
-  onMenuClick?: (selectedData: any, menuKey: string) => void
+  onMenuClick?: (selectedData: any, menuKey: T) => void
   items: IMoreActionItem[]
   type?: 'icon' | 'button'
   buttonText?: string
@@ -51,7 +51,7 @@ const getStyles = (theme: 'darker') => {
   }
 }
 
-export const MoreAction = (props: IMoreActionProps) => {
+export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
   const {
     theme = 'darker',
     onMenuClick,
@@ -62,7 +62,7 @@ export const MoreAction = (props: IMoreActionProps) => {
 
   const handleMenuClick = (
     e: SyntheticEvent,
-    key: string,
+    key: T,
     value: string | number
   ) => {
     // e.stopPropagation()
