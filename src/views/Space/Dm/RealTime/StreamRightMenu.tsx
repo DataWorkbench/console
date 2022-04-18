@@ -1,13 +1,11 @@
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-import MonitorModal from 'views/Space/Dm/RealTime/Monitor/MonitorModal'
-import MonitorAddModal from 'views/Space/Dm/RealTime/Monitor/MonitorAddModal'
-import MonitorAddFormModal from 'views/Space/Dm/RealTime/Monitor/MonitorAddFormModal'
+import AlarmsModal from 'views/Space/Ops/Alarms/Modal'
+import { useAlarmsStore } from 'views/Space/Ops/Alarms/AlarmsStore'
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
 import VersionsModal from './VersionsModal'
-import MonitorAddFormDetail from './Monitor/MonitorAddFormDetail'
 
 const MenuRoot = styled('div')(() => [
   tw`pt-8 space-y-4 align-middle bg-neut-17 w-10`,
@@ -22,16 +20,9 @@ const MenuRoot = styled('div')(() => [
 const StreamRightMenu = observer(() => {
   const {
     workFlowStore,
-    workFlowStore: {
-      showScheSetting,
-      showArgsSetting,
-      showVersions,
-      showMonitor,
-      showAddMonitor,
-      showAddMonitorDetail,
-      showAddMonitorForm,
-    },
+    workFlowStore: { showScheSetting, showArgsSetting, showVersions },
   } = useStore()
+  const { set: setAlarms } = useAlarmsStore()
   return (
     <>
       <MenuRoot>
@@ -42,7 +33,7 @@ const StreamRightMenu = observer(() => {
         <span onClick={() => workFlowStore.set({ showScheSetting: true })}>
           调 度 设 置
         </span>
-        <span onClick={() => workFlowStore.set({ showMonitor: true })}>
+        <span onClick={() => setAlarms({ showMonitor: true })}>
           告 警 策 略
         </span>
         <span onClick={() => workFlowStore.set({ showVersions: true })}>
@@ -72,35 +63,7 @@ const StreamRightMenu = observer(() => {
           }}
         />
       )}
-      {showMonitor && (
-        <MonitorModal
-          onCancel={() => {
-            workFlowStore.set({ showMonitor: false })
-          }}
-        />
-      )}
-      {showAddMonitor && (
-        <MonitorAddModal
-          onCancel={() => {
-            workFlowStore.set({ showAddMonitor: false })
-          }}
-        />
-      )}
-      {showAddMonitorForm && (
-        <MonitorAddFormModal
-          onCancel={() => {
-            workFlowStore.set({ showAddMonitorForm: false })
-          }}
-        />
-      )}
-      {showAddMonitorDetail && (
-        <MonitorAddFormDetail
-          onCancel={() => {
-            workFlowStore.set({ showAddMonitorDetail: false })
-          }}
-          data={{}}
-        />
-      )}
+      <AlarmsModal />
     </>
   )
 })

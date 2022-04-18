@@ -1,6 +1,6 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 
-import { FlexBox, Tooltip } from 'components'
+import { FlexBox, Tooltip } from 'components/index'
 import tw, { styled } from 'twin.macro'
 
 interface IMonitorItemProps {}
