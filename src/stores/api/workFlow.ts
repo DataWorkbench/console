@@ -6,6 +6,7 @@ export interface IWorkFlowParams {
   jobId?: string
   version?: string
   tp?: 'sync' | 'stream'
+  parameters?: Record<string, string>
   [k: string]: unknown
 }
 
@@ -77,6 +78,19 @@ export const setStreamJobSchedule = ({
     method: 'PUT',
   })
 
+export const setSyncJobSchedule = ({
+  regionId,
+  spaceId,
+  jobId,
+  ...rest
+}: IWorkFlowParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/schedule`,
+    body: rest,
+    method: 'PUT',
+  })
+
 export const getStreamJobSchedule = (
   origin: String,
   { regionId, spaceId, jobId, version }: IWorkFlowParams
@@ -84,6 +98,19 @@ export const getStreamJobSchedule = (
   const uri = version
     ? `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${version}/schedule`
     : `/v1/workspace/${spaceId}/stream/job/${jobId}/schedule`
+  return request({
+    region: regionId,
+    uri,
+  })
+}
+
+export const getSyncJobSchedule = (
+  origin: String,
+  { regionId, spaceId, jobId, version }: IWorkFlowParams
+) => {
+  const uri = version
+    ? `/v1/workspace/${spaceId}/sync/job/${jobId}/version/${version}/schedule`
+    : `/v1/workspace/${spaceId}/sync/job/${jobId}/schedule`
   return request({
     region: regionId,
     uri,
@@ -121,7 +148,7 @@ export const SetSyncJobConf = ({
 }: IWorkFlowParams) =>
   request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/args`,
+    uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/conf`,
     body: rest,
     method: 'PUT',
   })
@@ -190,6 +217,22 @@ export const releaseStreamJob = ({
     {
       region: regionId,
       uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/release`,
+      body: rest,
+      method: 'POST',
+    },
+    { timeout: 60000 }
+  )
+
+export const releaseSyncJob = ({
+  regionId,
+  spaceId,
+  jobId,
+  ...rest
+}: IWorkFlowParams) =>
+  request(
+    {
+      region: regionId,
+      uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/release`,
       body: rest,
       method: 'POST',
     },

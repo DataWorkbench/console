@@ -1,5 +1,5 @@
-import { Collapse, Notification as Notify } from '@QCFE/lego-ui'
-import { Button, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Collapse } from '@QCFE/lego-ui'
+import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { HelpCenterLink, FieldMappings, PopConfirm } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
@@ -7,12 +7,13 @@ import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
 import { useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
-import { isObject, isUndefined, set } from 'lodash-es'
-import { useMutationSyncJobConf } from 'hooks'
+import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
+import { useMutationSyncJobConf, useQueryJobSchedule, useStore } from 'hooks'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
+import ReleaseModal from '../modal/ReleaseModal'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -73,7 +74,7 @@ const stepsData = [
 ]
 
 const removeUndefined = (obj: any) => {
-  const newObj: any = {}
+  const newObj: any = isArray(obj) ? [] : {}
   Object.entries(obj).forEach(([key, value]) => {
     if (isObject(value)) {
       newObj[key] = removeUndefined(value)
@@ -86,6 +87,8 @@ const removeUndefined = (obj: any) => {
 
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
+  const { data: scheData } = useQueryJobSchedule()
+  const { workFlowStore } = useStore()
   const [fields, setFields] = useImmer<{
     source: TMappingField[]
     target: TMappingField[]
@@ -94,6 +97,7 @@ const SyncJob = () => {
     target: [],
   })
   const [mode, setMode] = useState<1 | 2>(1)
+  const [showRelaseModal, setShowRelaseModal] = useState(false)
   const dbRef =
     useRef<{
       getResource: () => Record<string, string>
@@ -136,6 +140,14 @@ const SyncJob = () => {
     const mapping = mappingRef.current.rowMapping()
     const cluster = clusterRef.current.getCluster()
     const channel = channelRef.current.getChannel()
+    if (!mapping || !cluster) {
+      Notify.warning({
+        title: '操作提示',
+        content: !mapping ? '未配置字段映射' : '未配置计算集群',
+        placement: 'bottomRight',
+      })
+    }
+
     if (resource && mapping && cluster && channel) {
       set(
         resource,
@@ -154,7 +166,6 @@ const SyncJob = () => {
       // console.log('filterResouce', filterResouce)
       mutation.mutate(filterResouce, {
         onSuccess: () => {
-          // console.log(data)
           Notify.success({
             title: '操作提示',
             content: '配置保存成功',
@@ -162,6 +173,13 @@ const SyncJob = () => {
           })
         },
       })
+    }
+  }
+  const release = () => {
+    if (get(scheData, 'schedule_policy') === 0) {
+      workFlowStore.set({ showScheSetting: true })
+    } else {
+      setShowRelaseModal(true)
     }
   }
 
@@ -284,7 +302,7 @@ const SyncJob = () => {
               setMode(2)
             }}
           >
-            <Button type="black">
+            <Button type="black" disabled>
               <Icon name="coding" type="light" />
               脚本模式
             </Button>
@@ -299,12 +317,19 @@ const SyncJob = () => {
           <Icon name="data" type="dark" />
           保存
         </Button>
-        <Button type="primary">
+        {/* loading={releaseMutation.isLoading} */}
+        <Button type="primary" onClick={release}>
           <Icon name="export" />
           发布
         </Button>
       </JobToolBar>
       {mode === 1 ? renderGuideMode() : renderScriptMode()}
+      {showRelaseModal && (
+        <ReleaseModal
+          // onSuccess={handleReleaseSuccess}
+          onCancel={() => setShowRelaseModal(false)}
+        />
+      )}
     </div>
   )
 }

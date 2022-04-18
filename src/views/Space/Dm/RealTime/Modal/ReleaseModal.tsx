@@ -5,7 +5,13 @@ import tw, { styled, css } from 'twin.macro'
 import { Modal } from 'components'
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
-import { useMutationReleaseStreamJob, useQueryStreamJobSchedule } from 'hooks'
+import {
+  useMutationReleaseStreamJob,
+  useMutationReleaseSyncJob,
+  useQueryStreamJobSchedule,
+  useQuerySyncJobSchedule,
+  useStore,
+} from 'hooks'
 import { strlen } from 'utils'
 
 const { TextAreaField } = Form
@@ -25,9 +31,21 @@ const ReleaseModal = ({
   onCancel?: () => void
   onSuccess?: () => void
 }) => {
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
   const form = useRef<Form>(null)
-  const releaseMutation = useMutationReleaseStreamJob()
-  const { data: scheData } = useQueryStreamJobSchedule()
+  const useMutationReleaseJob =
+    curJob?.jobMode === 'RT'
+      ? useMutationReleaseStreamJob
+      : useMutationReleaseSyncJob
+  const releaseMutation = useMutationReleaseJob()
+  const useQueryJobSchedule =
+    curJob?.jobMode === 'RT'
+      ? useQueryStreamJobSchedule
+      : useQuerySyncJobSchedule
+  const { data: scheData } = useQueryJobSchedule()
+
   const [params, setParams] = useImmer({
     desc: '',
     stopRunning: false,
