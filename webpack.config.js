@@ -125,6 +125,7 @@ let config = {
   optimization: {},
   devServer: {
     host: 'localhost',
+    allowedHosts: ['local.testing.com', 'local.qacloud.com'],
     compress: true,
     hot: true,
     historyApiFallback: {

@@ -165,10 +165,10 @@ export const jobModeData = [
     items: [],
   },
 ]
-// 0 => "OfflineFull" 1 => "OfflineIncrement" 2 => "RealTimeFull" 3 => "RealTimeIncrement"
-type DiType = 0 | 1 | 2 | 3
+// 1 => "OfflineFull" 2 => "OfflineIncrement" 3 => "RealTimeFull" 3 => "RealTimeIncrement"
+type DiType = 1 | 2 | 3
 export const getDiJobType = (type: DiType) => {
-  if (type === 0 || type === 1) {
+  if (type === 1 || type === 2) {
     return JobType.OFFLINE
   }
   return JobType.REALTIME

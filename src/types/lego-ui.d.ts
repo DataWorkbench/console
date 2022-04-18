@@ -305,6 +305,7 @@ declare module '@QCFE/lego-ui' {
     error: (message?: string) => void
     open: (o: Record<string, unknown>) => void
     success: (o: Record<string, unknown>) => void
+    warning: (o: Record<string, unknown>) => void
   }
 
   export interface Locale {

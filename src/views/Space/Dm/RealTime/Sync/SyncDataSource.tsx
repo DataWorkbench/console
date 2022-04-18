@@ -2,7 +2,7 @@ import { useRef, useState, useImperativeHandle, useMemo } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { findKey, get, pick, isEmpty, isEqual } from 'lodash-es'
+import { findKey, get, pick, isEmpty, isEqual, trim } from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
@@ -100,6 +100,7 @@ type IDB = {
     writeMode?: string
     batchSize?: number
     semantic?: string
+    where?: string
     preSql?: string[] | Record<'value' | 'key', string>[]
     postSql?: string[] | Record<'value' | 'key', string>[]
   }
@@ -167,7 +168,7 @@ const SyncDataSource = observer(
         if (srcform?.validateForm() && tgtform?.validateForm()) {
           const sourceKey = `${sourceTypeName!.toLowerCase()}_source`
           const targetKey = `${targetTypeName!.toLowerCase()}_target`
-          const condition = db.source.condition!
+          const { condition } = db.source
           const config = {
             source_id: db.source.id,
             target_id: db.target.id,
@@ -175,17 +176,17 @@ const SyncDataSource = observer(
               [sourceKey]: {
                 table: [db.source.tableName],
                 schema: '',
-                where: '',
+                where: db.source.where,
                 split_pk: db.source.splitPk,
-                condition_type: condition.type,
+                condition_type: condition?.type,
                 visualization: {
-                  column: condition.column,
-                  start_condition: condition.startCondition,
-                  start_value: condition.startValue,
-                  end_condition: condition.endCondition,
-                  end_value: condition.endValue,
+                  column: condition?.column,
+                  start_condition: condition?.startCondition,
+                  start_value: condition?.startValue,
+                  end_condition: condition?.endCondition,
+                  end_value: condition?.endValue,
                 },
-                express: condition.expression,
+                express: condition?.expression,
               },
               [targetKey]: {
                 table: [db.target.tableName],
@@ -439,6 +440,12 @@ const SyncDataSource = observer(
               {showSourceAdvance && (
                 <TextAreaField
                   name="where"
+                  defaultValue={dbInfo.where || ''}
+                  onChange={(v: string) => {
+                    setDB((draft) => {
+                      draft.source.where = trim(v)
+                    })
+                  }}
                   label="过滤条件"
                   placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"
                 />
@@ -462,9 +469,9 @@ const SyncDataSource = observer(
                 label={<AffixLabel>写入模式</AffixLabel>}
                 name="write_mode"
                 options={[
-                  { label: 'insert: insert into', value: 'insert' },
-                  { label: 'replace: replace into', value: 'replace' },
-                  { label: 'update: on duplicate key update', value: 'update' },
+                  { label: 'insert: insert into', value: 1 },
+                  { label: 'replace: replace into', value: 2 },
+                  { label: 'update: on duplicate key update', value: 3 },
                 ]}
                 value={dbInfo.writeMode}
                 schemas={[
@@ -487,8 +494,8 @@ const SyncDataSource = observer(
                 name="semantic"
                 value={dbInfo.semantic}
                 options={[
-                  { label: 'exactly-once', value: 'exactly-once' },
-                  { label: 'at-least-once', value: 'at-least-once' },
+                  { label: 'exactly-once', value: 2 },
+                  { label: 'at-least-once', value: 1 },
                 ]}
                 onChange={(v: string) => {
                   setDB((draft) => {

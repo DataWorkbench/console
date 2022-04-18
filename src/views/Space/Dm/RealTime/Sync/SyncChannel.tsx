@@ -38,7 +38,7 @@ const Root = styled('div')(() => [
 const SyncChannel = forwardRef((props, ref) => {
   const [channel, setChannel] = useImmer<{
     parallelism?: number
-    record_num?: number
+    record_num?: string
     percentage?: number
     bytes?: number
     rate?: 2 | 1
@@ -153,7 +153,7 @@ const SyncChannel = forwardRef((props, ref) => {
                 const num = +v
                 if (!isNAN(num)) {
                   setChannel((draft) => {
-                    draft.record_num = num
+                    draft.record_num = String(num)
                   })
                 }
               }}
