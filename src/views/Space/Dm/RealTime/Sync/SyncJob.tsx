@@ -13,7 +13,7 @@ import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
-import ReleaseModal from '../modal/ReleaseModal'
+import ReleaseModal from '../Modal/ReleaseModal'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [

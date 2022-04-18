@@ -30,11 +30,11 @@ import {
   filterFolderOfTreeData,
   getDiJobType,
   SyncJobType,
-} from '../job/JobUtils'
+} from '../Job/JobUtils'
 import {
   SyncTypeRadioGroupField,
   SyncTypeVal,
-} from '../sync/SyncTypeRadioGroup'
+} from '../Sync/SyncTypeRadioGroup'
 
 const { TextField, TextAreaField } = Form
 

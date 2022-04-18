@@ -37,7 +37,7 @@ import {
   SmallDatePickerField,
   HorizonFiledsWrapper,
 } from '../styled'
-import { JobMode } from '../job/JobUtils'
+import { JobMode } from '../Job/JobUtils'
 
 const {
   // TextField,

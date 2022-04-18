@@ -4,7 +4,7 @@ import tw, { styled } from 'twin.macro'
 import { isFunction, keys } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { ArrowLine } from 'components'
-import { dataSourceTypes } from '../job/JobUtils'
+import { dataSourceTypes } from '../Job/JobUtils'
 
 type SyncType = 'full' | 'incr'
 type SyncSourceType = 'fullSource' | 'fullSink' | 'incrSource' | 'incrSink'
