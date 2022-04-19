@@ -11,7 +11,7 @@ import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
 import emitter from 'utils/emitter'
 import { useParams } from 'react-router-dom'
-import { AlarmsStore, AlarmsContext } from 'views/Space/Ops/Alert/AlarmsStore'
+import { AlertStore, AlertContext } from 'views/Space/Ops/Alert/AlertStore'
 import JobMenu from './JobMenu'
 import JobTabs from './JobTabs'
 import StreamRightMenu from './StreamRightMenu'
@@ -102,7 +102,7 @@ const RealTime = observer(() => {
   }
 
   return (
-    <AlarmsContext.Provider value={new AlarmsStore()}>
+    <AlertContext.Provider value={new AlertStore()}>
       <div tw="flex min-h-[600px] w-full h-full overflow-auto p-2 pr-0 ">
         <div tw="flex w-full">
           <JobMenu tw="mr-2" />
@@ -149,7 +149,7 @@ const RealTime = observer(() => {
           )}
         </div>
       </div>
-    </AlarmsContext.Provider>
+    </AlertContext.Provider>
   )
 })
 

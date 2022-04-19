@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react'
 import { makeAutoObservable, set } from 'mobx'
 
-export class AlarmsStore {
+export class AlertStore {
   showMonitor = false
 
   showAddMonitor = false
@@ -19,11 +19,12 @@ export class AlarmsStore {
   }
 
   set = (params: { [key: string]: any }) => {
+    console.log(params)
     set(this, { ...params })
   }
 }
 
-export const AlarmsContext = createContext<AlarmsStore>({} as AlarmsStore)
-export const useAlarmsStore = () => useContext(AlarmsContext)
+export const AlertContext = createContext<AlertStore>({} as AlertStore)
+export const useAlertStore = () => useContext(AlertContext)
 
-export default AlarmsStore
+export default AlertStore

@@ -5,7 +5,7 @@ import { Table } from 'views/Space/styled'
 import { InputSearch } from '@QCFE/lego-ui'
 import React, { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
-import { useAlarmsStore } from 'views/Space/Ops/Alert/AlarmsStore'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
 import tw, { css } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
@@ -57,7 +57,7 @@ const instanceNameStyle = css`
 `
 
 const MonitorAddModal = observer((props: IMonitorAddProps) => {
-  const { set } = useAlarmsStore()
+  const { set } = useAlertStore()
   const { onCancel } = props
   const { filter, setFilter, sort, pagination } = useFilter<
     { search: string },

@@ -1,8 +1,8 @@
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-import AlarmsModal from 'views/Space/Ops/Alert/Modal'
-import { useAlarmsStore } from 'views/Space/Ops/Alert/AlarmsStore'
+import AlertModal from 'views/Space/Ops/Alert/Modal'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import ScheSettingModal from './ScheSettingModal'
 import ScheArgsModal from './ScheArgsModal'
 import VersionsModal from './VersionsModal'
@@ -22,7 +22,7 @@ const StreamRightMenu = observer(() => {
     workFlowStore,
     workFlowStore: { showScheSetting, showArgsSetting, showVersions },
   } = useStore()
-  const { set: setAlarms } = useAlarmsStore()
+  const { set: setAlarms } = useAlertStore()
   return (
     <>
       <MenuRoot>
@@ -63,7 +63,7 @@ const StreamRightMenu = observer(() => {
           }}
         />
       )}
-      <AlarmsModal />
+      <AlertModal />
     </>
   )
 })

@@ -5,7 +5,7 @@ import { Alert, Button, Icon } from '@QCFE/qingcloud-portal-ui'
 import { Collapse } from '@QCFE/lego-ui'
 import tw, { css } from 'twin.macro'
 import MonitorItem from 'views/Space/Ops/Alert/Monitor/MonitorItem'
-import { useAlarmsStore } from 'views/Space/Ops/Alert/AlarmsStore'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 
 const { CollapseItem } = Collapse
 
@@ -36,7 +36,7 @@ interface IMonitorModalProps {
 }
 
 const MonitorModal = observer((props: IMonitorModalProps) => {
-  const { set } = useAlarmsStore()
+  const { set } = useAlertStore()
   console.log(props)
   const { onCancel } = props
   const arr = [{ name: '1 xxxx' }, { name: '2 asdfasdf' }]

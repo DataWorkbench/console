@@ -10,6 +10,8 @@ import { useColumns } from 'hooks/useHooks/useColumns'
 import { Table } from 'views/Space/styled'
 import { get } from 'lodash-es'
 import useFilter from 'hooks/useHooks/useFilter'
+import useIcon from 'hooks/useHooks/useIcon'
+import icons from './common/icons'
 
 interface IAlertPolicy {}
 
@@ -17,6 +19,7 @@ const { ColumnsSetting } = ToolBar as any
 
 const alertPolicySettingKey = 'ALERT_POLICY_SETTING_KEY'
 const AlertPolicy = (props: IAlertPolicy) => {
+  useIcon(icons)
   const { filter, setFilter, pagination, sort } = useFilter<
     {
       search?: string

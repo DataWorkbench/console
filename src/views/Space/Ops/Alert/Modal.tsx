@@ -2,21 +2,21 @@ import MonitorModal from 'views/Space/Ops/Alert/Monitor/MonitorModal'
 import MonitorAddModal from 'views/Space/Ops/Alert/Monitor/MonitorAddModal'
 import MonitorAddFormModal from 'views/Space/Ops/Alert/Monitor/MonitorAddFormModal'
 import MonitorAddFormDetail from 'views/Space/Ops/Alert/Monitor/MonitorAddFormDetail'
-import { useAlarmsStore } from 'views/Space/Ops/Alert/AlarmsStore'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import { observer } from 'mobx-react-lite'
 import useIcon from 'hooks/useHooks/useIcon'
 import icons from './common/icons'
 
-const AlarmsModal = observer(() => {
+const AlertModal = observer(() => {
   const {
     set,
     showAddMonitor,
     showAddMonitorDetail,
     showAddMonitorForm,
     showMonitor,
-  } = useAlarmsStore()
+  } = useAlertStore()
   useIcon(icons)
-  console.log(2222, showMonitor)
+  console.log(222233333, showMonitor)
   return (
     <>
       {showMonitor && (
@@ -51,4 +51,4 @@ const AlarmsModal = observer(() => {
     </>
   )
 })
-export default AlarmsModal
+export default AlertModal
