@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { Alert, Button, Icon } from '@QCFE/qingcloud-portal-ui'
 import { Collapse } from '@QCFE/lego-ui'
 import tw, { css } from 'twin.macro'
-import MonitorItem from 'views/Space/Ops/Alarms/Monitor/MonitorItem'
-import { useAlarmsStore } from 'views/Space/Ops/Alarms/AlarmsStore'
+import MonitorItem from 'views/Space/Ops/Alert/Monitor/MonitorItem'
+import { useAlarmsStore } from 'views/Space/Ops/Alert/AlarmsStore'
 
 const { CollapseItem } = Collapse
 

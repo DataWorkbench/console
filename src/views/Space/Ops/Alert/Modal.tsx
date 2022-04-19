@@ -1,11 +1,11 @@
-import MonitorModal from 'views/Space/Ops/Alarms/Monitor/MonitorModal'
-import MonitorAddModal from 'views/Space/Ops/Alarms/Monitor/MonitorAddModal'
-import MonitorAddFormModal from 'views/Space/Ops/Alarms/Monitor/MonitorAddFormModal'
-import MonitorAddFormDetail from 'views/Space/Ops/Alarms/Monitor/MonitorAddFormDetail'
-import { useAlarmsStore } from 'views/Space/Ops/Alarms/AlarmsStore'
+import MonitorModal from 'views/Space/Ops/Alert/Monitor/MonitorModal'
+import MonitorAddModal from 'views/Space/Ops/Alert/Monitor/MonitorAddModal'
+import MonitorAddFormModal from 'views/Space/Ops/Alert/Monitor/MonitorAddFormModal'
+import MonitorAddFormDetail from 'views/Space/Ops/Alert/Monitor/MonitorAddFormDetail'
+import { useAlarmsStore } from 'views/Space/Ops/Alert/AlarmsStore'
 import { observer } from 'mobx-react-lite'
 import useIcon from 'hooks/useHooks/useIcon'
-import icons from './icons'
+import icons from './common/icons'
 
 const AlarmsModal = observer(() => {
   const {

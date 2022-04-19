@@ -4,6 +4,8 @@ import DataJobInstance from 'views/Space/Ops/DataIntegration/JobInstance'
 import DataRelease from 'views/Space/Ops/DataIntegration/DataRelease'
 import DataJobInstanceDetail from 'views/Space/Ops/DataIntegration/JobInstance/DataJobInstanceDetail'
 import DataReleaseDetail from 'views/Space/Ops/DataIntegration/DataRelease/DataReleaseDetail'
+import AlertHistory from 'views/Space/Ops/Alert/AlertHistory'
+import AlertPolicy from 'views/Space/Ops/Alert/AlertPolicy'
 import { Sider } from '../Sider'
 import Release from './Stream/Release'
 import Job from './Stream/Job'
@@ -22,6 +24,8 @@ export const Ops = () => {
         {mod === 'data-release' && !detail && <DataRelease />}
         {mod === 'data-job' && detail && <DataJobInstanceDetail id={detail!} />}
         {mod === 'data-job' && !detail && <DataJobInstance />}
+        {mod === 'alert-policy' && <AlertPolicy />}
+        {mod === 'alert-history' && <AlertHistory />}
       </div>
     </div>
   )

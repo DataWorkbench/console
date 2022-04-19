@@ -3,7 +3,7 @@ import { FlexBox, Modal, ModalContent } from 'components/index'
 import { Checkbox, Field, Label } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css } from 'twin.macro'
-import AdduserField from 'views/Space/Ops/Alarms/Monitor/AdduserField'
+import AdduserField from 'views/Space/Ops/Alert/Monitor/AdduserField'
 
 const { TextField, TextAreaField } = Form
 
