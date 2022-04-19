@@ -93,7 +93,7 @@ const LinkInstance = () => {
   }
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
-    window.open(`../data-job/${record.id}${tab ? `?tab=${tab}` : ''}`, 'target')
+    window.open(`../data-job/${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
   }
 
   const columnsRender = {

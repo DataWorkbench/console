@@ -316,11 +316,24 @@ export const dataReleaseActions = [
     key: 'offline',
   },
   {
-    icon: '',
+    icon: 'q-upload2Fill',
     text: '重新发布',
     key: 're-publish',
   },
 ] as const
+
+export const dataReleaseDetailActions = [
+  {
+    icon: 'q-subtractBoxFill',
+    text: '下线',
+    key: 'offline',
+  },
+  {
+    icon: 'q-upload2Fill',
+    text: '重新发布',
+    key: 're-publish',
+  },
+]
 
 export type DataReleaseActionType = typeof dataReleaseActions[number]['key']
 

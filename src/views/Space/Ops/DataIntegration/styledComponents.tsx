@@ -77,19 +77,20 @@ export const statusStyle = (type: JobInstanceStatusType) => {
 
 export const JobInstanceStatusCmp = (props: {
   type: keyof typeof jobInstanceStatus
+  className?: string
 }) => {
-  const { type } = props
+  const { type, className } = props
   if (jobInstanceStatus[type] === undefined) {
     return null
   }
   const { wrapper, item } = statusStyle(jobInstanceStatus[type]?.type)
   return (
-    <FlexBox tw="items-center gap-2">
+    <div tw="flex items-center gap-2" className={className}>
       <div css={wrapper}>
         <div css={item} />
       </div>
       <span>{jobInstanceStatus[type].label}</span>
-    </FlexBox>
+    </div>
   )
 }
 
@@ -102,7 +103,7 @@ export const AlarmStatusCmp = (props: {
     return null
   }
   return (
-    <FlexBox tw="items-center gap-2">
+    <div tw="items-center gap-2 inline-flex">
       <Icon
         name={
           alarmStatus[type].type === AlarmStatus.NORMAL
@@ -128,7 +129,7 @@ export const AlarmStatusCmp = (props: {
       ) : (
         <span>{alarmStatus[type].label}</span>
       )}
-    </FlexBox>
+    </div>
   )
 }
 
@@ -214,7 +215,7 @@ export const DbTypeCmp = ({
   devMode,
 }: {
   type: keyof typeof sourceTypes
-  onClick: Function
+  onClick?: Function
   className?: string
   devMode?: keyof typeof dataReleaseDevModeType
 }) => {
@@ -225,13 +226,13 @@ export const DbTypeCmp = ({
   const item = (
     <div
       onClick={onClick as any}
-      className={className}
       css={[
         onClick
           ? tw`hover:text-green-11 cursor-pointer`
           : tw`hover:text-neut-19`,
         tw`inline-block h-4 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2 leading-[16px]`,
       ]}
+      className={className}
     >
       {sourceTypes[type]}
     </div>

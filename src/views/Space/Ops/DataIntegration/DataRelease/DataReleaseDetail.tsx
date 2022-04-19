@@ -1,6 +1,6 @@
 // @ts-ignore
-import { Breadcrumb, Button, CopyText, Icon } from '@QCFE/qingcloud-portal-ui'
-import { Card, Center, FlexBox, MoreAction } from 'components'
+import { Button, CopyText, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Card, Center, FlexBox, MoreAction, Tooltip } from 'components'
 import { useHistory, useLocation } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
@@ -15,12 +15,18 @@ import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
 import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
 import LinkInstance from 'views/Space/Ops/DataIntegration/components/LinkInstance'
 import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent/DevContentUI'
+import { observer } from 'mobx-react-lite'
+import AlertModal from 'views/Space/Ops/Alert/Modal'
+import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSourceModal'
+import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import {
   AlarmStatusCmp,
   Circle,
+  DbTypeCmp,
   JobInstanceStatusCmp,
   JobTypeCmp,
 } from '../styledComponents'
+import { dataReleaseDetailActions } from '../constants'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -28,8 +34,6 @@ interface IDataJobInstanceDetailProps {
 
 const { TabPanel } = Tabs as any
 const { CollapsePanel } = Collapse
-
-const { BreadcrumbItem } = Breadcrumb as any
 
 const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
   css`
@@ -67,27 +71,34 @@ const Root = styled.div`
   }
 `
 
-const BreadcrumbWrapper = styled.div`
+const CopyTextWrapper = styled(CopyText)`
   & {
-    ${tw`pt-3 px-4 mb-0!`}
-    & .breadcrumb-item {
-      &,
-      & .breadcrumb-separator {
-        ${tw`text-neut-8!`}
+    & .text-field {
+      ${tw`text-neut-8!`}
+    }
+    .popper.tooltip {
+      ${tw`bg-white`}
+      .tooltip-content {
+        ${tw`text-neut-15`}
+      }
+      .tooltip-arrow {
+        ${tw`border-b-white`}
       }
     }
-
-    & .breadcrumb-last-item .copy-text {
-      &:hover .text-field {
-        ${tw`text-white!`}
-      }
+  }
+  &:hover {
+    & .text-field {
+      ${tw`text-white!`}
     }
   }
 `
 
-const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
+const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
   useIcon(icons)
   const { id } = props
+
+  const { showDataSource, set } = useDataReleaseStore()
+  const data = { name: 'work' }
 
   const history = useHistory()
   const { search } = useLocation()
@@ -101,24 +112,41 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
   }
   return (
     <Root tw="">
-      <BreadcrumbWrapper>
-        <Breadcrumb>
-          <BreadcrumbItem>
-            <span
-              onClick={toList}
-              tw="hover:text-link active:text-link cursor-pointer text-neut-8"
-            >
-              数据集成-已发布作业
-            </span>
-          </BreadcrumbItem>
-          <BreadcrumbItem>
-            <CopyText text={id} />
-          </BreadcrumbItem>
-        </Breadcrumb>
-      </BreadcrumbWrapper>
+      <FlexBox tw="items-center gap-2">
+        <Tooltip theme="light" content="返回" hasPadding placement="bottom">
+          <Icon
+            name="previous"
+            size={20}
+            clickable
+            type="light"
+            onClick={() => toList()}
+            css={css`
+              svg.qicon {
+                ${tw`text-[#939EA9]! fill-[#939EA9]!`}
+              }
+            `}
+          />
+        </Tooltip>
+        <CopyTextWrapper text={`${data.name}(ID: ${id})`} theme="light" />
+      </FlexBox>
+      {/* <BreadcrumbWrapper> */}
+      {/*   <Breadcrumb> */}
+      {/*     <BreadcrumbItem> */}
+      {/*       <span */}
+      {/*         onClick={toList} */}
+      {/*         tw="hover:text-link active:text-link cursor-pointer text-neut-8" */}
+      {/*       > */}
+      {/*         数据集成-已发布作业 */}
+      {/*       </span> */}
+      {/*     </BreadcrumbItem> */}
+      {/*     <BreadcrumbItem> */}
+      {/*       <CopyText text={id} /> */}
+      {/*     </BreadcrumbItem> */}
+      {/*   </Breadcrumb> */}
+      {/* </BreadcrumbWrapper> */}
       <Card hasBoxShadow tw="bg-neut-16">
         <div tw="flex justify-between items-center px-4 h-[72px]">
-          <Center>
+          <Center tw="flex-auto">
             <Circle>
               <Icon
                 name="q-mergeFillDuotone"
@@ -130,19 +158,23 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
                 `}
               />
             </Circle>
-            <div tw="flex-1">
-              <div tw="text-white">qwerqwerqw</div>
+            <div tw="flex-auto">
+              <div tw="text-white">
+                <span tw="mr-3">qwerqwerqw</span>
+                <JobInstanceStatusCmp type="1" tw="inline-flex" />
+              </div>
               <div tw="text-neut-8">fresa</div>
             </div>
           </Center>
           <FlexBox tw="gap-4">
             <MoreAction
-              items={[
-                { text: '下线', key: 'aaa' },
-                { text: '重新发布', key: 'bbb' },
-              ]}
+              items={dataReleaseDetailActions.map((i) => ({
+                ...i,
+                value: data,
+              }))}
               type="button"
               buttonText="更多操作"
+              placement="bottom-start"
             />
 
             <Button
@@ -165,10 +197,6 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>调度状态:</span>
-              <span>
-                <JobInstanceStatusCmp type="1" />
-              </span>
               <span>告警状态:</span>
               <span>
                 <AlarmStatusCmp type="1" />
@@ -187,23 +215,21 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
             <GridItem>
               <span>数据来源:</span>
               <span tw="inline-block">
-                <div tw="align-middle">
-                  <span tw="h-3 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2">
-                    mysql
-                  </span>
-                  <span>mysql11212</span>
+                <div
+                  tw="align-middle hover:text-green-11"
+                  css={[tw`cursor-pointer`]}
+                  onClick={() => set({ showDataSource: true })}
+                >
+                  <DbTypeCmp type="MySQL" onClick={() => {}} />
+                  <span tw="ml-1">mysql11212</span>
                 </div>
                 <div tw="text-neut-8">id_dfafda</div>
               </span>
               <span>数据目的:</span>
               <span tw="inline-block">
                 <div tw="align-middle">
-                  <span tw="h-3 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2">
-                    mysql
-                  </span>
-                  <span>mysql11212</span>
+                  <DbTypeCmp devMode="1" type="MySQL" onClick={undefined} />
                 </div>
-                <div tw="text-neut-8">id_dfafda</div>
               </span>
             </GridItem>
 
@@ -222,6 +248,7 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
       <HorizonTabs
         defaultActiveName=""
         tw="overflow-hidden bg-transparent flex-auto"
+        // @ts-ignore
         activeName={activeName}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
@@ -243,8 +270,17 @@ const DataReleaseDetail = (props: IDataJobInstanceDetailProps) => {
           <Schedule data={{}} />
         </TabPanel>
       </HorizonTabs>
+      <AlertModal />
+      {showDataSource && (
+        <DataSourceModal
+          onCancel={() => {
+            set({
+              showDataSource: false,
+            })
+          }}
+        />
+      )}
     </Root>
   )
-}
-
+})
 export default DataReleaseDetail

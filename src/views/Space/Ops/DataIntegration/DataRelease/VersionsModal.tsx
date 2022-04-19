@@ -32,10 +32,10 @@ const VersionsModal = observer((props: IProps) => {
       limit: number
     },
     { pagination: true; sort: true }
-  >({})
+  >({}, { pagination: true, sort: true }, dataReleaseVersionSettingKey)
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
-    window.open(`./${record.id}${tab ? `?tab=${tab}` : ''}`, 'target')
+    window.open(`./${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
   }
 
   const columnsRender = getColumnsRender(filter, setFilter, [
@@ -108,7 +108,17 @@ const VersionsModal = observer((props: IProps) => {
     [setColumnSettings]
   )
 
-  const data: Record<string, any> = {}
+  const data: Record<string, any> = {
+    infos: [
+      {
+        id: 1,
+        desc: 'adfasdfa',
+        job_name: ';asdas',
+        instance_id: 1,
+        instance_name: 'adfasdfas',
+      },
+    ],
+  }
   return (
     <Modal
       width={800}

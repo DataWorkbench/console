@@ -9,6 +9,7 @@ import {
   MoreAction,
   TextEllipsis,
   TextLink,
+  Tooltip,
 } from 'components'
 import React, { useMemo } from 'react'
 import {
@@ -29,6 +30,7 @@ import {
   useQueryJobInstances,
 } from 'hooks'
 import useFilter from 'hooks/useHooks/useFilter'
+import tw, { css } from 'twin.macro'
 import {
   alarmStatus,
   dataJobInstanceColumns,
@@ -39,6 +41,20 @@ import {
 } from '../constants'
 import TableHeader from './TableHeader'
 import icons from '../icons'
+
+const instanceNameStyle = css`
+  &:hover {
+    .instance-name-title {
+      ${tw`text-green-11`}
+    }
+    .instance-name-icon {
+      ${tw`bg-[#13966a80] border-[#9ddfc966]`}
+      .icon svg.qicon {
+        ${tw`text-green-11`}
+      }
+    }
+  }
+`
 
 const settingKey = 'DATA_JOB_INSTANCE_TABLE_SETTING'
 
@@ -74,6 +90,9 @@ const DataJobInstance = () => {
       {
         instance_id: '11',
         instance_name: 'xxxxx',
+        alarm_status: '1',
+        job_name: 'adfa',
+        job_id: '123123',
       },
     ]) || []
 
@@ -81,13 +100,22 @@ const DataJobInstance = () => {
   //   queryClient.invalidateQueries(getJobInstanceKey())
   // }
 
+  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    window.open(
+      `./data-instance/${record.id}${tab ? `?tab=${tab}` : ''}`,
+      '_blank'
+    )
+  }
+
   const columnsRender = {
     instance_id: {
       render: (text: string, record: Record<string, any>) => (
         <InstanceName
+          css={instanceNameStyle}
           theme="dark"
           name={record.instance_name}
           icon="q-dotLine2Fill"
+          onClick={() => jumpDetail()(record)}
         />
       ),
     },
@@ -116,16 +144,30 @@ const DataJobInstance = () => {
       filter: filter.alarm_status,
       filterAble: true,
       filtersNew: Object.values(alarmStatus) as any,
-      render: (text: keyof typeof alarmStatus) => (
-        <AlarmStatusCmp type={text} />
+      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
+        <AlarmStatusCmp
+          type={text}
+          onClick={() => jumpDetail('alarm')(record)}
+        />
       ),
     },
     job_id: {
       render: (v: string, record: Record<string, any>) => {
-        return (
-          <div tw="truncate">
+        const child = (
+          <div
+            tw="truncate"
+            css={css`
+              &:hover {
+                .pit-job-name-text {
+                  ${tw`text-green-11`}
+                }
+              }
+            `}
+          >
             <TextEllipsis theme="light">
-              <span tw="text-white">{record.job_name}</span>
+              <span tw="text-white" className="pit-job-name-text">
+                {record.job_name}
+              </span>
               <span tw="text-neut-8"> {record.job_id}</span>
             </TextEllipsis>
             <TextEllipsis theme="light">
@@ -133,6 +175,15 @@ const DataJobInstance = () => {
             </TextEllipsis>
           </div>
         )
+        // TODO: desc 字段未定
+        if (record.desc) {
+          return (
+            <Tooltip theme="light" hasPadding content={record.desc}>
+              {child}
+            </Tooltip>
+          )
+        }
+        return child
       },
     },
     job_type: {

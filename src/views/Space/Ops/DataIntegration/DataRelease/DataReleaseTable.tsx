@@ -1,5 +1,5 @@
-/* eslint-disable */
-import { PageTab, Icon } from '@QCFE/qingcloud-portal-ui'
+/* eslint-disable no-underscore-dangle */
+import { Icon, PageTab } from '@QCFE/qingcloud-portal-ui'
 import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
@@ -15,6 +15,7 @@ import {
   TextEllipsis,
   Tooltip,
 } from 'components'
+import { Checkbox } from '@QCFE/lego-ui'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
@@ -28,8 +29,6 @@ import VersionsModal from './VersionsModal'
 import TableHeader from './TableHeader'
 
 import DataSourceModal from './DataSourceModal'
-import { useHistory } from 'react-router-dom'
-import { Checkbox } from '@QCFE/lego-ui'
 // import { IColumn } from 'hooks/utils'
 
 // interface IDataReleaseProps {}
@@ -93,11 +92,10 @@ const DataRelease = observer(() => {
     { pagination: true; sort: true }
   >({}, { pagination: true, sort: true }, dataReleaseSettingKey)
 
-  const history = useHistory()
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     window.open(
       `./data-release/${record.id}${tab ? `?tab=${tab}` : ''}`,
-      'target'
+      '_blank'
     )
   }
 
@@ -140,6 +138,8 @@ const DataRelease = observer(() => {
         break
       case 're-publish':
         break
+      default:
+        break
     }
   }
 
@@ -175,17 +175,18 @@ const DataRelease = observer(() => {
       const child = (
         <Center tw="truncate" css={jobNameStyle}>
           <InstanceName
-            theme={'dark'}
-            icon={'q-downloadBoxFill'}
-            name={'asfda'}
-            desc={'asfdasdf'}
+            theme="dark"
+            icon="q-downloadBoxFill"
+            name="asfda"
+            desc="asfdasdf"
+            onClick={() => jumpDetail()(record)}
           />
         </Center>
       )
       if (record.desc) {
         // TODO: 描述字段未确认
         return (
-          <Tooltip theme={'light'} hasPadding content={record.desc}>
+          <Tooltip theme="light" hasPadding content={record.desc}>
             {child}
           </Tooltip>
         )
@@ -281,13 +282,14 @@ const DataRelease = observer(() => {
         <ModalWrapper
           visible
           width={400}
+          appendToBody
           onCancel={() => {
             set({
               showOffline: false,
             })
           }}
           okText="下线"
-          okType={'danger'}
+          okType="danger"
           onOk={() => {
             set({
               showOffline: false,
@@ -295,22 +297,22 @@ const DataRelease = observer(() => {
           }}
         >
           <div>
-            <FlexBox tw={'gap-3'}>
+            <FlexBox tw="gap-3">
               <Icon
-                name={'if-exclamation'}
+                name="if-exclamation"
                 size={24}
-                tw={'text-[24px] text-[#FFD127] leading-6'}
+                tw="text-[24px] text-[#FFD127] leading-6"
               />
-              <div tw={'grid gap-2'}>
-                <div tw={'text-white text-[16px] leading-6'}>
-                  下线作业 {selectedData?.name}{' '}
+              <div tw="grid gap-2">
+                <div tw="text-white text-[16px] leading-6">
+                  下线作业 {selectedData?.name}
                 </div>
-                <div tw={'text-neut-8 leading-5'}>
+                <div tw="text-neut-8 leading-5">
                   作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?
                 </div>
-                <div tw={'leading-5'}>
+                <div tw="leading-5">
                   <Checkbox>
-                    <span tw={'text-white ml-1'}>同时停止运行中的实例</span>
+                    <span tw="text-white ml-1">同时停止运行中的实例</span>
                   </Checkbox>
                 </div>
               </div>
