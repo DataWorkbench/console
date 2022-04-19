@@ -18,6 +18,22 @@ export interface IMoreActionProps<T> {
   items: IMoreActionItem[]
   type?: 'icon' | 'button'
   buttonText?: string
+  placement?:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'auto'
+    | 'auto-start'
+    | 'auto-end'
 }
 
 const { MenuItem } = Menu as any
@@ -58,6 +74,7 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
     items,
     type = 'icon',
     buttonText,
+    placement = 'bottom-end',
   } = props
 
   const handleMenuClick = (
@@ -111,7 +128,7 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
       <Tooltip
         arrow={false}
         trigger="click"
-        placement="bottom-end"
+        placement={placement}
         twChild={moreActionStyle.child({ theme }) as any}
         content={
           <Menu onClick={handleMenuClick}>
