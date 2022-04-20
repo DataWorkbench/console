@@ -6,7 +6,7 @@ import tw, { css, theme } from 'twin.macro'
 const dataSourceStyle = css`
   & {
     .collapse .collapse-item-label > span.icon {
-      transform: translateY(-125%);
+      transform: translateY(0);
     }
     .collapse-item > .collapse-item-label {
       ${tw`shadow-none!`}
