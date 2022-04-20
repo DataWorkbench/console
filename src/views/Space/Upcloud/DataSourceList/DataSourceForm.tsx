@@ -192,6 +192,15 @@ const DataSourceForm = ({
       }
       return hivePwdFilters
     }
+    if (urlType === 'elastic_search') {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return esAnonymousFilters
+      }
+      return esPwdFilters
+    }
     return undefined
   })
 

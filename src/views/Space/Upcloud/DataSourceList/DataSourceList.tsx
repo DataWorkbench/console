@@ -173,7 +173,7 @@ const getUrl = (
     case 'hdfs':
       return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
     case 'redis':
-      return `redis://${urlObj.redis_brokers
+      return `redis://${urlObj.port
         .map(
           ({ host, port }: { host: string; port: number }) => `${host}:${port}`
         )
