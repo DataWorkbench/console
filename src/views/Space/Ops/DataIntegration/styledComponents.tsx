@@ -10,6 +10,7 @@ import {
   DataReleaseDevMode,
   dataReleaseDevModeType,
   DataReleaseSchedule,
+  dataReleaseScheduleType,
   jobInstanceStatus,
   JobInstanceStatusType,
   JobType,
@@ -94,22 +95,54 @@ export const statusStyle = (
   }
 }
 
-export const JobInstanceStatusCmp = (props: {
-  type: keyof typeof jobInstanceStatus
+export const StatusCmp = ({
+  label,
+  type,
+  className,
+}: {
+  label: string
+  type?: JobInstanceStatusType | DataReleaseSchedule
   className?: string
 }) => {
-  const { type, className } = props
-  if (jobInstanceStatus[type] === undefined) {
+  if (type === undefined) {
     return null
   }
-  const { wrapper, item } = statusStyle(jobInstanceStatus[type]?.type)
+  const { wrapper, item } = statusStyle(type)
   return (
     <div tw="flex items-center gap-2" className={className}>
       <div css={wrapper}>
         <div css={item} />
       </div>
-      <span>{jobInstanceStatus[type].label}</span>
+      <span>{label}</span>
     </div>
+  )
+}
+
+export const JobInstanceStatusCmp = (props: {
+  type: keyof typeof jobInstanceStatus
+  className?: string
+}) => {
+  const { type, className } = props
+  return (
+    <StatusCmp
+      label={jobInstanceStatus[type].label}
+      type={jobInstanceStatus[type]?.type}
+      className={className}
+    />
+  )
+}
+
+export const DataReleaseStatusCmp = (props: {
+  type: keyof typeof dataReleaseScheduleType
+  className?: string
+}) => {
+  const { type, className } = props
+  return (
+    <StatusCmp
+      label={dataReleaseScheduleType[type].label}
+      type={dataReleaseScheduleType[type]?.type}
+      className={className}
+    />
   )
 }
 

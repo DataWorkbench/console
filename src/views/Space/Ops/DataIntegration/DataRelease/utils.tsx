@@ -14,7 +14,12 @@ import {
   jobType,
   sourceTypes,
 } from '../constants'
-import { AlarmStatusCmp, DbTypeCmp, JobTypeCmp } from '../styledComponents'
+import {
+  AlarmStatusCmp,
+  DataReleaseStatusCmp,
+  DbTypeCmp,
+  JobTypeCmp,
+} from '../styledComponents'
 
 export const getColumnsRender = (
   filter: Record<string, any>,
@@ -33,8 +38,8 @@ export const getColumnsRender = (
       },
       filterAble: true,
       filtersNew: Object.values(dataReleaseScheduleType) as any,
-      render: (status: number) => {
-        return status
+      render: (status: keyof typeof dataReleaseScheduleType) => {
+        return <DataReleaseStatusCmp type={status} />
       },
     },
     alarm_status: {
@@ -147,8 +152,7 @@ export const getOperations = (
 ) => {
   const getActions = (record: Record<string, any>) => {
     let key = ''
-    if (record.status === '1') {
-      // TODO: 待定
+    if (record.status === 2) {
       key = 'offline'
     } else {
       key = 're-publish'
