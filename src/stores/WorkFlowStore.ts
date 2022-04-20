@@ -6,11 +6,15 @@ import type RootStore from './RootStore'
 interface IJob {
   id: string
   name: string
-  type: number
+  /**
+   * 1 => "OfflineFull" 2 => "OfflineIncrement" 3 => "RealTime"
+   *  */
+  type: 1 | 2 | 3
   desc: string
   version: string
   source_type?: number
   target_type?: number
+  jobMode?: 'DI' | 'RT' | 'OLE'
 }
 
 const initTreeData = [
@@ -39,6 +43,8 @@ class WorkFlowStore {
   curJob: null | IJob = null
 
   curVersion: null | IJob = null
+
+  showJobModal = false
 
   panels: IJob[] = []
 
@@ -145,6 +151,14 @@ class WorkFlowStore {
   resetTreeData = () => {
     this.treeData = initTreeData
     this.loadedKeys = []
+  }
+
+  toggleJobModal = (v?: boolean) => {
+    if (typeof v === 'boolean') {
+      this.showJobModal = v
+    } else {
+      this.showJobModal = !this.showJobModal
+    }
   }
 }
 

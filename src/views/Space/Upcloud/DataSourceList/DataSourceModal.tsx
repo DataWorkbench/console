@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { Modal, ModalStep, ModalContent, HelpCenterLink } from 'components'
@@ -20,9 +20,16 @@ import { toJS } from 'mobx'
 import sourceListBg from 'assets/source-list.svg'
 import DataSourceForm from './DataSourceForm'
 import DbList from './DbList'
+import { DbType, sourceKinds } from './constant'
 
 interface DataSourceModalProp {
   onHide?: () => void
+}
+
+const dbLabelStyles = {
+  wrapper: tw`flex items-center mb-2`,
+  icon: tw`bg-green-11 w-1 h-4 mr-2`,
+  label: tw`text-neut-15`,
 }
 
 const DataSourceModal = observer(
@@ -33,7 +40,7 @@ const DataSourceModal = observer(
       dataSourceStore: {
         op,
         opSourceList,
-        sourceKinds,
+        // sourceKinds,
         emptyHistories,
         clearEmptyHistories,
       },
@@ -188,11 +195,26 @@ const DataSourceModal = observer(
                 case 'idle':
                 case 'success':
                   if (state.step === 0) {
-                    const items = kinds
-                      .map(({ name }: { name: string }) =>
-                        sourceKinds.find((info) => info.name === name)
+                    const map = new Map(sourceKinds.map((k) => [k.name, k]))
+                    const items: Record<DbType, Record<string, any>[]>[] =
+                      kinds.reduce(
+                        (
+                          acc: Record<string, any>,
+                          cur: Record<string, any>
+                        ) => {
+                          if (map.has(cur.name)) {
+                            acc[map.get(cur.name)!.type].push(map.get(cur.name))
+                          }
+                          return acc
+                        },
+                        {
+                          [DbType.Sql]: [],
+                          [DbType.DW]: [],
+                          [DbType.Storage]: [],
+                          [DbType.Nosql]: [],
+                          [DbType.Mq]: [],
+                        }
                       )
-                      .filter((n: any) => n)
                     return (
                       <>
                         <p tw="pt-2 pb-3 font-medium">
@@ -205,11 +227,19 @@ const DataSourceModal = observer(
                           </HelpCenterLink>
                           进行查看配置
                         </p>
-                        <DbList
-                          current={curkind}
-                          items={items}
-                          onChange={handleDbSelect}
-                        />
+                        {Object.entries(items).map(([k, v]) => (
+                          <Fragment key={k}>
+                            <div css={dbLabelStyles.wrapper}>
+                              <div css={dbLabelStyles.icon} />
+                              <div css={dbLabelStyles.label}>{k}:</div>
+                            </div>
+                            <DbList
+                              current={curkind}
+                              items={v as any}
+                              onChange={handleDbSelect}
+                            />
+                          </Fragment>
+                        ))}
                       </>
                     )
                   }

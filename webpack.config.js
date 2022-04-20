@@ -125,7 +125,7 @@ let config = {
   optimization: {},
   devServer: {
     host: '0.0.0.0',
-    allowedHosts: ['local.testing.com'],
+    allowedHosts: ['local.testing.com', 'local.qacloud.com'],
     compress: true,
     hot: true,
     historyApiFallback: {
@@ -172,7 +172,7 @@ let config = {
       profile: !isDev,
     }),
     new MonacoWebpackPlugin({
-      languages: ['sql', 'python', 'scala', 'json'],
+      languages: ['json', 'sql', 'python', 'scala'],
       filename: 'static/js/[name].worker.js',
     }),
   ].filter(Boolean),

@@ -29,9 +29,9 @@ import {
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
-import { JobToolBar } from './styled'
-import ReleaseModal from './ReleaseModal'
-import VersionHeader from './VersionHeader'
+import { JobToolBar } from '../styled'
+import ReleaseModal from '../Modal/ReleaseModal'
+import VersionHeader from '../Version/VersionHeader'
 
 const CODETYPE = {
   2: 'sql',

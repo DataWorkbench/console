@@ -12,10 +12,10 @@ import { Center, FlexBox } from 'components'
 import emitter from 'utils/emitter'
 import { useParams } from 'react-router-dom'
 import { AlertStore, AlertContext } from 'views/Space/Ops/Alert/AlertStore'
-import JobMenu from './JobMenu'
-import JobTabs from './JobTabs'
-import StreamRightMenu from './StreamRightMenu'
-import VersionDisplay from './VersionDisplay'
+import JobMenu from './Job/JobMenu'
+import JobTabs from './Job/JobTabs'
+import StreamRightMenu from './Stream/StreamRightMenu'
+import VersionDisplay from './Version/VersionDisplay'
 
 const RealTime = observer(() => {
   const { spaceId } = useParams<{ regionId: string; spaceId: string }>()

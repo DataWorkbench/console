@@ -22,9 +22,9 @@ import { useQueryClient } from 'react-query'
 import dayjs from 'dayjs'
 import { omitBy, get } from 'lodash-es'
 import { useHistory, useParams } from 'react-router-dom'
+import ScheSettingModal from 'views/Space/Dm/RealTime/Modal/ScheSettingModal'
+import ReleaseModal from 'views/Space/Dm/RealTime/Modal/ReleaseModal'
 import { AssoiateModal } from './AssoiateModal'
-import ScheSettingModal from '../../../Dm/RealTime/ScheSettingModal'
-import ReleaseModal from '../../../Dm/RealTime/ReleaseModal'
 
 const { MenuItem } = Menu
 

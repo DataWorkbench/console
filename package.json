@@ -11,6 +11,7 @@
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
     "deploy:testing": "bash bin/deploy.sh testing",
     "deploy:console-testing": "bash bin/deploy.sh console_testing",
+    "deploy:qa": "bash bin/deploy.sh qa",
     "test": "jest",
     "start:console": "./docker/start.sh start",
     "stop:console": "./docker/start.sh stop"

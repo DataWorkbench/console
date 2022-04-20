@@ -1,4 +1,1 @@
-export {
-  ConditionParameter,
-  ConditionParameterField,
-} from './ConditionParameter'
+export * from './ConditionParameter'

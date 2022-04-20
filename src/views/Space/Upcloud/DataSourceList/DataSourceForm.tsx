@@ -19,10 +19,17 @@ import { nameMatchRegex, strlen } from 'utils'
 import { toJS } from 'mobx'
 import { DataSourcePingButton } from './DataSourcePing'
 import {
+  esAnonymousFilters,
+  esPwdFilters,
   ftpFilters,
   ftpProtocol,
   ftpProtocolValue,
+  hiveAnonymousFilters,
+  hivePwdFilters,
   sftpFilters,
+  sFtpProtocolValue,
+  SourceType,
+  // urlType2Api,
 } from './constant'
 import getFieldsInfo from './getDatasourceFormConfig'
 
@@ -82,22 +89,7 @@ const MultiFieldWrapper = styled.div(() => [
   `,
 ])
 
-const parseRemoteData = (
-  data: Record<'url' & string, any>
-  // urlType: string
-) => {
-  // const { url } = data
-  // if (urlType === 'hdfs') {
-  //   const pushArr = ['name_node', 'port']
-  //   return omit(
-  //     merge(data, {
-  //       url: {
-  //         hdfs: pick(get(url, 'hdfs.nodes'), pushArr),
-  //       },
-  //     }),
-  //     'url.hdfs.nodes'
-  //   )
-  // }
+const parseRemoteData = (data: Record<'url' & string, any>) => {
   return data
 }
 
@@ -134,6 +126,10 @@ const getInitValue = (path: string) => {
    "zookeeper.znode.parent": "/hbase"
 }`,
       },
+      hive: {
+        auth01: 1,
+        auth02: 2,
+      },
     },
   }
   return get(initValues, path, '')
@@ -142,409 +138,440 @@ const getInitValue = (path: string) => {
 interface IFormProps {
   resInfo: {
     name: string
+    urlType?: string
     desc?: string
     img?: React.ReactNode
-    source_type?: number
+    source_type?: SourceType
   }
   getFormData?: MutableRefObject<() => any>
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
   op: string
   opSourceList: Record<string, any>[]
-  theme: 'dark' | 'light'
-  className?: string
 }
 
-const DataSourceForm = observer(
-  ({
-    resInfo,
-    getFormData,
-    onFieldValueChange,
-    op,
-    opSourceList,
-    theme = 'light',
-    className,
-  }: IFormProps) => {
-    const [network, setNetWork] = useImmer<{
-      type: 'vpc' | 'eip'
-      id: string
-      name: string
-      network_info: Record<string, any>
-    }>({
-      type: 'vpc',
-      id: '',
-      name: '',
-      network_info: {},
-    })
-    const ref = useRef<Form>(null)
+const DataSourceForm = ({
+  resInfo,
+  getFormData,
+  onFieldValueChange,
+  op,
+  opSourceList,
+}: IFormProps) => {
+  const [network, setNetWork] = useImmer<{
+    type: 'vpc' | 'eip'
+    id: string
+    name: string
+    network_info: Record<string, any>
+  }>({
+    type: 'vpc',
+    id: '',
+    name: '',
+    network_info: {},
+  })
+  const ref = useRef<Form>(null)
 
-    // const {
-    //   dataSourceStore: { op, opSourceList },
-    // } = useStore()
+  // const {
+  //   dataSourceStore: { op, opSourceList },
+  // } = useStore()
 
-    const urlType = resInfo.name.toLowerCase()
-    const sourceInfo =
-      ['update', 'view'].includes(op) &&
-      opSourceList.length > 0 &&
-      parseRemoteData(opSourceList[0])
+  const urlType = resInfo?.urlType ?? resInfo.name.toLowerCase()
+  const sourceInfo =
+    ['update', 'view'].includes(op) &&
+    opSourceList.length > 0 &&
+    parseRemoteData(opSourceList[0])
 
-    const [filters, setFilters] = useState<Set<string> | undefined>(() => {
-      if (urlType !== 'ftp') {
-        return undefined
-      }
-      if (get(sourceInfo, 'url.ftp.protocol') === 2) {
+  const [filters, setFilters] = useState<Set<string> | undefined>(() => {
+    if (urlType === 'ftp') {
+      if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
         return sftpFilters
       }
       return ftpFilters
-    })
-
-    const fields = getFieldsInfo(urlType, filters)
-
-    const isViewMode = op === 'view'
-
-    const defaultStatus = useMemo<
-      { status: boolean; message?: string } | undefined
-    >(() => {
-      if (
-        op === 'create' ||
-        !get(opSourceList, '[0].last_connection.network_id')
-      ) {
-        return undefined
+    }
+    if (urlType === 'hive') {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+        return hiveAnonymousFilters
       }
-      return get(opSourceList, '[0].last_connection.result') === 1
-        ? {
-            status: true,
-          }
-        : {
-            status: false,
-            message: toJS(get(opSourceList, '[0].last_connection.message')),
-          }
-    }, [op, opSourceList])
+      return hivePwdFilters
+    }
+    if (urlType === 'elastic_search') {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return esAnonymousFilters
+      }
+      return esPwdFilters
+    }
+    return undefined
+  })
 
-    const [showPing, setShowPing] = useState(false)
-    const [ftpProtocolType, setFtpProtocol] = useState(() => {
-      return get(opSourceList, 'url.ftp.protocol', ftpProtocolValue)
-    })
-    const [ftpPortConfig, setFtpPortConfig] = useImmer({
-      key: ftpProtocolType,
-      changed: false,
-    })
+  const fields = getFieldsInfo(resInfo.source_type!, filters)
 
-    const handleChange = {
-      ftp_protocol: (onChange?: Function) => (type: number) => {
-        setFilters(type === ftpProtocolValue ? ftpFilters : sftpFilters)
-        setFtpProtocol(type)
-        if (!ftpPortConfig.changed) {
-          setFtpPortConfig((_) => {
-            _.key = type
+  const isViewMode = op === 'view'
+
+  const defaultStatus = useMemo<
+    { status: boolean; message?: string } | undefined
+  >(() => {
+    if (
+      op === 'create' ||
+      !get(opSourceList, '[0].last_connection.network_id')
+    ) {
+      return undefined
+    }
+    return get(opSourceList, '[0].last_connection.result') === 1
+      ? {
+          status: true,
+        }
+      : {
+          status: false,
+          message: toJS(get(opSourceList, '[0].last_connection.message')),
+        }
+  }, [op, opSourceList])
+
+  const [showPing, setShowPing] = useState(false)
+  const [ftpProtocolType, setFtpProtocol] = useState(() => {
+    return get(opSourceList, 'url.ftp.protocol', ftpProtocolValue)
+  })
+  const [ftpPortConfig, setFtpPortConfig] = useImmer({
+    key: ftpProtocolType,
+    changed: false,
+  })
+
+  const handleChange = {
+    ftp_protocol: (onChange?: Function) => (type: number) => {
+      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFilters)
+      setFtpProtocol(type)
+      if (!ftpPortConfig.changed) {
+        setFtpPortConfig((_) => {
+          _.key = type
+        })
+      }
+      onChange?.(type)
+    },
+    ftp_port: (onChange?: Function) => (v: number) => {
+      setFtpPortConfig((_) => {
+        _.changed = true
+      })
+      onChange?.(v)
+    },
+    hive_hiveAuth: (onChange?: Function) => (v: number) => {
+      if (v === 2) {
+        setFilters(hiveAnonymousFilters)
+      } else {
+        setFilters(hivePwdFilters)
+      }
+      onChange?.(v)
+    },
+    elastic_search_esAuth: (onChange?: Function) => (v: number) => {
+      if (v === 2) {
+        setFilters(esAnonymousFilters)
+      } else {
+        setFilters(esPwdFilters)
+      }
+      onChange?.(v)
+    },
+  }
+
+  useMount(() => {
+    if (sourceInfo) {
+      setNetWork((draft) => {
+        draft.id = get(sourceInfo, `last_connection.network_id`)
+        draft.name = get(sourceInfo, 'last_connection.network_info.name')
+        draft.type = 'vpc'
+      })
+    }
+  })
+
+  const parseFormData = useCallback(
+    (needValid = true) => {
+      const formElem = ref?.current
+      if (!needValid) {
+        return formElem?.getFieldsValue()
+      }
+      if (formElem?.validateForm()) {
+        const {
+          name,
+          desc,
+          network_id: netWorkId,
+          ...others
+        } = formElem.getFieldsValue()
+        const rest = omit(others, 'utype')
+        if (urlType === 'hdfs') {
+          Object.assign(rest, {
+            default_fs: `hdfs://${rest.name_node}:${rest.port}`,
           })
         }
-        onChange?.(type)
-      },
-      ftp_port: (onChange?: Function) => (v: number) => {
-        setFtpPortConfig((_) => {
-          _.changed = true
-        })
-        onChange?.(v)
-      },
+        // if (urlType === 'hdfs') {
+        //   const shiftArr = ['name_node', 'port']
+        //   rest.nodes = pick(rest, shiftArr)
+        //   rest = omit(rest, shiftArr)
+        // }
+        return {
+          name,
+          desc,
+          type: resInfo.source_type,
+          url: {
+            [urlType]: rest,
+          },
+        }
+      }
+      return null
+    },
+    [ref, urlType, resInfo]
+  )
+
+  useEffect(() => {
+    if (getFormData) {
+      getFormData.current = parseFormData
+    }
+  }, [getFormData, parseFormData])
+
+  function getDefaultValue(name: string) {
+    // 如果 hive ，有 hadoop config auth 取 2， 后端未存储值。 默认为 1
+    if (urlType === 'hive' && name === 'hiveAuth') {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+        return 2
+      }
+      return 1
+    }
+    if (urlType === 'elastic_search' && name === 'esAuth') {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return 2
+      }
+      return 1
     }
 
-    useMount(() => {
-      if (sourceInfo) {
-        setNetWork((draft) => {
-          draft.id = get(sourceInfo, `last_connection.network_id`)
-          draft.name = get(sourceInfo, 'last_connection.network_info.name')
-          draft.type = 'vpc'
-        })
-      }
-    })
-
-    const parseFormData = useCallback(
-      (needValid = true) => {
-        const formElem = ref?.current
-        if (!needValid) {
-          return formElem?.getFieldsValue()
-        }
-        if (formElem?.validateForm()) {
-          const {
-            name,
-            desc,
-            network_id: netWorkId,
-            ...others
-          } = formElem.getFieldsValue()
-          const rest = omit(others, 'utype')
-
-          // if (urlType === 'hdfs') {
-          //   const shiftArr = ['name_node', 'port']
-          //   rest.nodes = pick(rest, shiftArr)
-          //   rest = omit(rest, shiftArr)
-          // }
-          return {
-            name,
-            desc,
-            type: resInfo.source_type,
-            url: {
-              [urlType]: rest,
-            },
-          }
-        }
-        return null
-      },
-      [ref, urlType, resInfo]
-    )
-
-    useEffect(() => {
-      if (getFormData) {
-        getFormData.current = parseFormData
-      }
-    }, [getFormData, parseFormData])
-
-    return (
-      <Root className={className}>
-        <Form
-          tw="max-w-full!"
-          layout="vertical"
-          ref={ref}
-          onFieldValueChange={onFieldValueChange}
-        >
-          <CollapseWrapper defaultActiveKey={['p0', 'p1']}>
-            <CollapseItem
-              key="p0"
-              label={
-                <div
-                  tw="flex items-center"
-                  css={css`
-                    & > span.icon {
-                      ${tw`relative top-0 right-0 mr-2`}
-                    }
-                  `}
-                >
-                  <Icon name="file" />
-                  基本信息
-                </div>
-              }
-            >
-              <Field>
-                <Label>
-                  <AffixLabel
-                    help="数据源是大数据工作台用于数据处理的出入口,数据源采用连接串和云实例两种模式, 目前暂时只支持连接串模式。"
-                    required={false}
-                    theme={theme === 'light' ? 'darker' : 'light'}
-                  >
-                    数据源连接方式
-                  </AffixLabel>
-                </Label>
-                <Control tw="w-60">
-                  <div
-                    tw="rounded-sm border border-green-11 p-3 pb-5 bg-no-repeat bg-right-bottom"
-                    className="source-item-bg"
-                  >
-                    <div tw="font-medium flex items-center">
-                      <Icon name="container" tw="mr-2" size={20} />
-                      <span tw="text-green-11 text-sm leading-[22px]">
-                        连接串模式
-                      </span>
-                    </div>
-                    <div tw="text-neut-8">
-                      连接串模式是通过IP端口用户名密码进行连接的方式。
-                    </div>
-                  </div>
-                </Control>
-              </Field>
-              <TextField
-                name="name"
-                tw="w-80"
-                autoComplete="off"
-                defaultValue={get(sourceInfo, 'name', '')}
-                label={<AffixLabel>数据源名称</AffixLabel>}
-                placeholder="请输入数据源名称（自定义）"
-                help={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
-                validateOnChange
-                disabled={isViewMode}
-                schemas={[
-                  {
-                    rule: { matchRegex: nameMatchRegex },
-                    help: '允许包含字母、数字 及 "_"，不能以（_）开始结尾，长度 2-64',
-                    status: 'error',
-                  },
-                  {
-                    rule: (value: string) => {
-                      const l = strlen(value)
-                      return l >= 2 && l <= 64
-                    },
-                    help: '最小长度2,最大长度64',
-                    status: 'error',
-                  },
-                ]}
-              />
-              <TextAreaField
-                name="desc"
-                tw="w-8/12"
-                defaultValue={get(sourceInfo, 'desc', '')}
-                rows={4}
-                label="数据源描述"
-                disabled={isViewMode}
-                resize
-                placeholder="请填写数据库的描述信息"
-                validateOnChange
-                schemas={[
-                  {
-                    rule: (value: string) => {
-                      const l = strlen(value)
-                      return l <= 256
-                    },
-                    help: '数据库的长度在0-256字节之间',
-                    status: 'error',
-                  },
-                ]}
-              />
-            </CollapseItem>
-            <CollapseItem
-              key="p1"
-              label={
-                <div
-                  tw="flex items-center"
-                  css={css`
-                    & > span.icon {
-                      ${tw`relative top-0 right-0 mr-2`}
-                    }
-                  `}
-                >
-                  <Icon name="changing-over" />
-                  连接信息
-                </div>
-              }
-            >
-              {fields.map((field) => {
-                const getField = (fieldData: Record<string, any>) => {
-                  const {
-                    name,
-                    label,
-                    placeholder,
-                    component,
-                    onChange,
-                    schemas = [],
-                    ...rest
-                  } = fieldData
-                  const FieldComponent = component || TextField
-                  return (
-                    <FieldComponent
-                      key={
-                        // eslint-disable-next-line no-nested-ternary
-                        urlType === 'ftp' && name === 'port'
-                          ? ftpPortConfig.changed
-                            ? ftpPortConfig.key
-                            : ftpProtocolType
-                          : name
-                      }
-                      name={name}
-                      disabled={isViewMode}
-                      defaultValue={get(
-                        sourceInfo,
-                        `url.${urlType}.${name}`,
-                        getInitValue(
-                          urlType === 'ftp' && name === 'port'
-                            ? `url.${toLower(
-                                get(ftpProtocol, `${ftpProtocolType}.label`)
-                              )}.${name}`
-                            : `url.${urlType}.${name}`
-                        )
-                      )}
-                      validateOnChange
-                      schemas={schemas}
-                      css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
-                      {...rest}
-                      onChange={
-                        get(handleChange, `${urlType}_${name}`)
-                          ? get(handleChange, `${urlType}_${name}`)(onChange)
-                          : onChange
-                      }
-                      label={
-                        label ? (
-                          <AffixLabel required={rest.required !== false}>
-                            {label}
-                          </AffixLabel>
-                        ) : undefined
-                      }
-                      placeholder={placeholder}
-                    />
-                  )
-                }
-                if (field.fieldType === 'dbUrl') {
-                  return (
-                    <Field key={field.name} tw="mb-0!">
-                      <label htmlFor="__" className="label">
-                        <AffixLabel required>{field.label}</AffixLabel>
-                      </label>
-                      <MultiFieldWrapper>
-                        {field.items.reduce(
-                          (
-                            acc: Record<string, any>[],
-                            cur: Record<string, any>,
-                            curIndex: number
-                          ) => {
-                            acc.push(getField(cur))
-                            if (field.space && field.space[curIndex]) {
-                              acc.push(
-                                <span
-                                  key={
-                                    // eslint-disable-next-line react/no-array-index-key
-                                    field.space[curIndex] + curIndex
-                                  }
-                                  tw="leading-10"
-                                >
-                                  {field.space[curIndex]}
-                                </span>
-                              )
-                            }
-                            return acc
-                          },
-                          []
-                        )}
-                      </MultiFieldWrapper>
-                    </Field>
-                  )
-                }
-                return getField(field)
-              })}
-              <Field>
-                <Divider>
-                  <Center
-                    tw="cursor-pointer"
-                    onClick={() => setShowPing((_) => !_)}
-                  >
-                    <Icon
-                      name={showPing ? 'chevron-up' : 'chevron-down'}
-                      type={theme === 'light' ? 'dark' : 'light'}
-                    />
-                    <span tw="ml-2">数据源可用性测试</span>
-                  </Center>
-                </Divider>
-              </Field>
-
-              <Field css={showPing ? visibleStyle : hiddenStyle}>
-                <Label>
-                  <AffixLabel
-                    theme={theme === 'light' ? 'darker' : 'light'}
-                    help="检查数据源参数是否正确"
-                    required={false}
-                  >
-                    数据源可用性测试
-                  </AffixLabel>
-                </Label>
-                <DataSourcePingButton
-                  getValue={parseFormData}
-                  defaultStatus={defaultStatus}
-                  network={network}
-                  hasPing={!!get(sourceInfo, 'last_connection')}
-                  withNetwork
-                />
-              </Field>
-            </CollapseItem>
-          </CollapseWrapper>
-        </Form>
-      </Root>
-    )
+    const defaultPath =
+      urlType === 'ftp' && name === 'port'
+        ? `url.${toLower(get(ftpProtocol, `${ftpProtocolType}.label`))}.${name}`
+        : `url.${urlType}.${name}`
+    return get(sourceInfo, `url.${urlType}.${name}`, getInitValue(defaultPath))
   }
-)
 
-export default DataSourceForm
+  return (
+    <Root>
+      <Form
+        tw="max-w-full!"
+        layout="vertical"
+        ref={ref}
+        onFieldValueChange={onFieldValueChange}
+      >
+        <CollapseWrapper defaultActiveKey={['p0', 'p1']}>
+          <CollapseItem
+            key="p0"
+            label={
+              <div
+                tw="flex items-center"
+                css={css`
+                  & > span.icon {
+                    ${tw`relative top-0 right-0 mr-2`}
+                  }
+                `}
+              >
+                <Icon name="file" />
+                基本信息
+              </div>
+            }
+          >
+            <Field>
+              <Label>
+                <AffixLabel
+                  help="数据源是大数据工作台用于数据处理的出入口,数据源采用连接串和云实例两种模式, 目前暂时只支持连接串模式。"
+                  required={false}
+                >
+                  数据源连接方式
+                </AffixLabel>
+              </Label>
+              <Control tw="w-60">
+                <div
+                  tw="rounded-sm border border-green-11 p-3 pb-5 bg-no-repeat bg-right-bottom"
+                  className="source-item-bg"
+                >
+                  <div tw="font-medium flex items-center">
+                    <Icon name="container" tw="mr-2" size={20} />
+                    <span tw="text-green-11 text-sm leading-[22px]">
+                      连接串模式
+                    </span>
+                  </div>
+                  <div tw="text-neut-8">
+                    连接串模式是通过IP端口用户名密码进行连接的方式。
+                  </div>
+                </div>
+              </Control>
+            </Field>
+            <TextField
+              name="name"
+              tw="w-80"
+              autoComplete="off"
+              defaultValue={get(sourceInfo, 'name', '')}
+              label={<AffixLabel>数据源名称</AffixLabel>}
+              placeholder="请输入数据源名称（自定义）"
+              help={`输入名称，允许包含字母、数字 及 "_"，长度 2-64`}
+              validateOnChange
+              disabled={isViewMode}
+              schemas={[
+                {
+                  rule: { matchRegex: nameMatchRegex },
+                  help: '允许包含字母、数字 及 "_"，不能以（_）开始结尾，长度 2-64',
+                  status: 'error',
+                },
+                {
+                  rule: (value: string) => {
+                    const l = strlen(value)
+                    return l >= 2 && l <= 64
+                  },
+                  help: '最小长度2,最大长度64',
+                  status: 'error',
+                },
+              ]}
+            />
+            <TextAreaField
+              name="desc"
+              tw="w-8/12"
+              defaultValue={get(sourceInfo, 'desc', '')}
+              rows={4}
+              label="数据源描述"
+              disabled={isViewMode}
+              resize
+              placeholder="请填写数据库的描述信息"
+              validateOnChange
+              schemas={[
+                {
+                  rule: (value: string) => {
+                    const l = strlen(value)
+                    return l <= 256
+                  },
+                  help: '数据库的长度在0-256字节之间',
+                  status: 'error',
+                },
+              ]}
+            />
+          </CollapseItem>
+          <CollapseItem
+            key="p1"
+            label={
+              <div
+                tw="flex items-center"
+                css={css`
+                  & > span.icon {
+                    ${tw`relative top-0 right-0 mr-2`}
+                  }
+                `}
+              >
+                <Icon name="changing-over" />
+                连接信息
+              </div>
+            }
+          >
+            {fields.map((field) => {
+              const getField = (fieldData: Record<string, any>) => {
+                const {
+                  name,
+                  label,
+                  placeholder,
+                  component,
+                  onChange,
+                  schemas = [],
+                  ...rest
+                } = fieldData
+                const FieldComponent = component || TextField
+                return (
+                  <FieldComponent
+                    key={
+                      // eslint-disable-next-line no-nested-ternary
+                      urlType === 'ftp' && name === 'port'
+                        ? ftpPortConfig.changed
+                          ? ftpPortConfig.key
+                          : ftpProtocolType
+                        : name
+                    }
+                    name={name}
+                    disabled={isViewMode}
+                    defaultValue={getDefaultValue(name)}
+                    validateOnChange
+                    schemas={schemas}
+                    css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
+                    {...rest}
+                    onChange={
+                      get(handleChange, `${urlType}_${name}`)
+                        ? get(handleChange, `${urlType}_${name}`)(onChange)
+                        : onChange
+                    }
+                    label={
+                      label ? (
+                        <AffixLabel required={rest.required !== false}>
+                          {label}
+                        </AffixLabel>
+                      ) : undefined
+                    }
+                    placeholder={placeholder}
+                  />
+                )
+              }
+              if (field.fieldType === 'dbUrl') {
+                return (
+                  <Field key={field.name} tw="mb-0!">
+                    <label htmlFor="__" className="label">
+                      <AffixLabel required>{field.label}</AffixLabel>
+                    </label>
+                    <MultiFieldWrapper>
+                      {field.items.reduce(
+                        (
+                          acc: Record<string, any>[],
+                          cur: Record<string, any>,
+                          curIndex: number
+                        ) => {
+                          acc.push(getField(cur))
+                          if (field.space && field.space[curIndex]) {
+                            acc.push(
+                              <span
+                                key={
+                                  // eslint-disable-next-line react/no-array-index-key
+                                  field.space[curIndex] + curIndex
+                                }
+                                tw="leading-10"
+                              >
+                                {field.space[curIndex]}
+                              </span>
+                            )
+                          }
+                          return acc
+                        },
+                        []
+                      )}
+                    </MultiFieldWrapper>
+                  </Field>
+                )
+              }
+              return getField(field)
+            })}
+            <Field>
+              <Divider>
+                <Center
+                  tw="cursor-pointer"
+                  onClick={() => setShowPing((_) => !_)}
+                >
+                  <Icon name={showPing ? 'chevron-up' : 'chevron-down'} />
+                  <span tw="ml-2">网络连通及数据源可用性测试</span>
+                </Center>
+              </Divider>
+            </Field>
+            <Field css={showPing ? visibleStyle : hiddenStyle}>
+              <DataSourcePingButton
+                getValue={parseFormData}
+                defaultStatus={defaultStatus}
+                network={network}
+                hasPing={!!get(sourceInfo, 'last_connection')}
+                withNetwork
+              />
+            </Field>
+          </CollapseItem>
+        </CollapseWrapper>
+      </Form>
+    </Root>
+  )
+}
+
+export default observer(DataSourceForm)

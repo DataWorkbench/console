@@ -18,4 +18,14 @@ export const getHelpCenterLinkWithHost = (path: string) =>
 export const getIsFormalEnv = () =>
   /console\d*\.qingcloud\.com$/.test(window.location.hostname)
 
+export const getApiJobMode = (jobId: string) => {
+  if (/^syj-/.test(jobId)) {
+    return 'sync'
+  }
+  if (/^wks-/.test(jobId)) {
+    return 'stream'
+  }
+  return null
+}
+
 export { request, customRequest, emitter }
