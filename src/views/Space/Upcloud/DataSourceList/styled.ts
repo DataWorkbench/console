@@ -11,9 +11,9 @@ import MongoDbImg from 'assets/MongoDB.png'
 import RedisImg from 'assets/Redis.png'
 import OracleImg from 'assets/Oracle.png'
 import ElasticSearchImg from 'assets/ElasticSearch.png'
-import SqlServerImg from 'assets/Sql-Server.png'
+import SqlServerImg from 'assets/SQL-Server.png'
 import DB2Img from 'assets/DB2.png'
-import SapHanaImg from 'assets/Sap-Hana.png'
+import SapHanaImg from 'assets/SAP-HANA.png'
 import HiveImg from 'assets/Hive.png'
 
 type SourceType =
