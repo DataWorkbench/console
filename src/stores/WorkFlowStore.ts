@@ -56,6 +56,14 @@ class WorkFlowStore {
 
   showVersions = false
 
+  showMonitor = false
+
+  showAddMonitor = false
+
+  showAddMonitorDetail = false
+
+  showAddMonitorForm = false
+
   isDirty = false
 
   tabOp: '' | 'switch' | 'close' | 'leave' = ''
