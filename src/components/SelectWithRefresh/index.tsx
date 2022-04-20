@@ -36,7 +36,7 @@ const SelectWithRefreshCmp = forwardRef<
     getControlRef: () => selectRef?.current!,
   }))
   return (
-    <SelectWithRefreshBox>
+    <SelectWithRefreshBox className="select-with-refresh">
       <>
         <Select
           clearable

@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from 'react'
+import React, { useState, forwardRef, useEffect } from 'react'
 import {
   TextArea,
   Input,
@@ -13,7 +13,7 @@ import { FlexBox } from 'components/Box'
 import { Tooltip } from '../Tooltip'
 
 const Root = styled('div')(() => [
-  tw`flex-1`,
+  tw`flex-1 min-w-full`,
   css`
     .input {
       ${tw`w-1/2!`}
@@ -49,11 +49,17 @@ interface IKVTextArea {
   title?: string
   className?: string
   kvs?: string[]
+  lables: string[]
   value?: string
   placeholder?: string
+  placeholders?: string[]
   division?: string
   disabled?: boolean
+  type?: 'single' | 'batch'
+  reverse?: boolean
+  addText?: string
   theme?: 'light' | 'dark'
+  min?: number
   onChange?: (v: string) => void
   onBlur?: (v: string) => void
 }
@@ -117,160 +123,178 @@ export const formatKvStr = (str: string, division = ' ') => {
   return arr.join('\r\n')
 }
 
-const KVTextArea = forwardRef(
-  (
-    {
-      title = '参数信息',
-      className = '',
-      kvs = ['键', '值'],
-      value = '',
-      placeholder = '',
-      division = ' ',
-      theme = 'dark',
-      onBlur,
-      onChange,
-      disabled = false,
-    }: IKVTextArea,
-    ref
-  ) => {
-    const [type, setType] = useState<TKV>('batch')
-    const [kvArr, setKvArr] = useState(parseToKV(value))
-    const [kvValue, setKvValue] = useState(formatKvStr(value, division))
+const KVTextArea = forwardRef((props: IKVTextArea, ref) => {
+  const {
+    title = '参数信息',
+    className = '',
+    kvs = ['键', '值'],
+    value = '',
+    placeholder = '',
+    lables = ['批量输入', '单条输入'],
+    placeholders = ['键', '值'],
+    division = ' ',
+    theme = 'dark',
+    type: typeProp = 'batch',
+    addText = '添加参数',
+    onBlur,
+    onChange,
+    min = 0,
+    reverse = false,
+    disabled = false,
+  } = props
+  const [type, setType] = useState<TKV>(typeProp)
+  const [kvArr, setKvArr] = useState(parseToKV(value))
+  const [kvValue, setKvValue] = useState(formatKvStr(value, division))
 
-    const [curIptIndex, setCurIptIdx] = useState(-1)
+  useEffect(() => {
+    setKvArr(parseToKV(value))
+    setKvValue(formatKvStr(value, division))
+  }, [value, division])
 
-    const handleTypeChange = (tp: TKV) => {
-      setType(tp)
-      if (tp === 'single') {
-        setKvArr(parseToKV(kvValue))
-      } else {
-        setKvValue(parseFromKv(kvArr, division))
-      }
+  const handleTypeChange = (tp: TKV) => {
+    setType(tp)
+    if (tp === 'single') {
+      setKvArr(parseToKV(kvValue))
+    } else {
+      setKvValue(parseFromKv(kvArr, division))
     }
+  }
 
-    const addRow = () => {
-      setKvArr([...kvArr, ['', '']])
+  const addRow = () => {
+    setKvArr([...kvArr, ['', '']])
+  }
+  const handleTextAreaChange = (v: string) => {
+    setKvValue(v)
+    if (onChange) {
+      onChange(v)
     }
-    const handleTextAreaChange = (v: string) => {
-      setKvValue(v)
-      if (onChange) {
-        onChange(v)
-      }
-    }
+  }
 
-    const handleTextAreaBlur = (v: string) => {
-      const str = formatKvStr(v, division)
-      setKvValue(str)
-      if (onBlur) {
-        onBlur(str)
-      }
+  const handleTextAreaBlur = (v: string) => {
+    const str = formatKvStr(v, division)
+    setKvValue(str)
+    if (onBlur) {
+      onBlur(str)
     }
+  }
 
-    const handleInputBlur = () => {
-      if (onBlur) {
-        onBlur(kvArr)
-      }
+  const handleInputBlur = () => {
+    if (onBlur) {
+      onBlur(kvArr)
     }
+  }
 
-    const handleInputChange = (tp: 'k' | 'v', v: string, i: number) => {
-      const arr = [...kvArr]
-      const row = arr[i]
-      if (row) {
-        row[tp === 'k' ? 0 : 1] = v
-        setKvArr(arr)
-        if (onChange) {
-          onChange(parseFromKv(arr, division))
-        }
-      }
-    }
-
-    const handleInputsDel = (i: number) => {
-      const arr = filter(kvArr, (v, index) => i !== index)
+  const handleInputChange = (tp: 'k' | 'v', v: string, i: number) => {
+    const arr = [...kvArr]
+    const row = arr[i]
+    if (row) {
+      row[tp === 'k' ? 0 : 1] = v
       setKvArr(arr)
       if (onChange) {
         onChange(parseFromKv(arr, division))
       }
     }
+  }
 
-    return (
-      <Root className={className}>
-        <RadioGroup label="Host别名" value={type} onChange={handleTypeChange}>
-          <RadioButton value="batch">批量输入</RadioButton>
-          <RadioButton value="single">单条输入</RadioButton>
-        </RadioGroup>
-        {type === 'batch' ? (
-          <div>
+  const handleInputsDel = (i: number) => {
+    const arr = filter(kvArr, (v, index) => i !== index)
+    setKvArr(arr)
+    if (onChange) {
+      onChange(parseFromKv(arr, division))
+    }
+  }
+
+  return (
+    <Root className={className}>
+      <RadioGroup label="Host别名" value={type} onChange={handleTypeChange}>
+        <RadioButton value={reverse ? 'single' : 'batch'}>
+          {lables[0]}
+        </RadioButton>
+        <RadioButton value={reverse ? 'batch' : 'single'}>
+          {lables[1]}
+        </RadioButton>
+      </RadioGroup>
+      {type === 'batch' ? (
+        <div>
+          {title && (
             <div tw="flex pl-4 h-8  items-center border border-neut-2 bg-neut-1 dark:bg-neut-17 dark:border-none">
               <span>{title}</span>
             </div>
-            <TextArea
-              disabled={disabled}
-              tw="my-3 w-full!"
-              resize
-              placeholder={placeholder}
-              ref={ref}
-              // defaultValue={kvValue}
-              value={kvValue}
-              onBlur={(e: React.SyntheticEvent) =>
-                handleTextAreaBlur((e.target as HTMLTextAreaElement).value)
-              }
-              onChange={(e: React.SyntheticEvent, v: string) => {
-                handleTextAreaChange(v)
-              }}
-            />
-          </div>
-        ) : (
-          <SignleRoot>
-            <FlexBox tw="bg-neut-1 dark:bg-neut-17 h-8 items-center space-x-1 px-3 py-1.5">
-              <span tw="w-1/2">{kvs[0]}</span>
-              <span tw="w-1/2">{kvs[1]}</span>
-            </FlexBox>
-            {kvArr.map((kv, i) => (
-              <InputRow
-                hasDivision={division !== ''}
-                key={String(i)}
-                onMouseEnter={() => setCurIptIdx(i)}
-                onMouseLeave={() => setCurIptIdx(-1)}
+          )}
+          <TextArea
+            disabled={disabled}
+            tw="my-3 w-full!"
+            resize
+            placeholder={placeholder}
+            ref={ref}
+            // defaultValue={kvValue}
+            value={kvValue}
+            onBlur={(e: React.SyntheticEvent) =>
+              handleTextAreaBlur((e.target as HTMLTextAreaElement).value)
+            }
+            onChange={(e: React.SyntheticEvent, v: string) => {
+              handleTextAreaChange(v)
+            }}
+          />
+        </div>
+      ) : (
+        <SignleRoot>
+          <FlexBox tw="bg-neut-1 dark:bg-neut-17 h-8 items-center space-x-1 px-3 py-1.5">
+            <span tw="w-1/2">{kvs[0]}</span>
+            <span tw="w-1/2">{kvs[1]}</span>
+          </FlexBox>
+          {kvArr.map((kv, i) => (
+            <InputRow
+              hasDivision={division !== ''}
+              key={String(i)}
+              className="group"
+            >
+              <Input
+                autoComplete="off"
+                disabled={disabled}
+                value={kv[0] || ''}
+                onChange={(e, v) => handleInputChange('k', String(v), i)}
+                onBlur={(e, v) => handleInputBlur(v)}
+                placeholder={placeholders[0]}
+              />
+              <div>{division}</div>
+              <Input
+                autoComplete="off"
+                disabled={disabled}
+                value={kv[1] || ''}
+                onChange={(e, v) => handleInputChange('v', String(v), i)}
+                onBlur={(e, v) => handleInputBlur(v)}
+                placeholder={placeholders[1]}
+              />
+
+              <div
+                css={[
+                  tw`px-2 opacity-0`,
+                  i >= min && tw`group-hover:opacity-100`,
+                ]}
               >
-                <Input
-                  autoComplete="off"
-                  disabled={disabled}
-                  defaultValue={kv[0] || ''}
-                  onChange={(e, v) => handleInputChange('k', String(v), i)}
-                  onBlur={(e, v) => handleInputBlur(v)}
-                />
-                <div>{division}</div>
-                <Input
-                  autoComplete="off"
-                  disabled={disabled}
-                  defaultValue={kv[1] || ''}
-                  onChange={(e, v) => handleInputChange('v', String(v), i)}
-                  onBlur={(e, v) => handleInputBlur(v)}
-                />
-                <div tw="px-2" css={[curIptIndex !== i && tw`invisible`]}>
-                  <Tooltip content="删除" theme="light" hasPadding>
-                    <Icon
-                      disabled={disabled}
-                      name="trash"
-                      clickable
-                      type="dark"
-                      onClick={() => handleInputsDel(i)}
-                    />
-                  </Tooltip>
-                </div>
-              </InputRow>
-            ))}
-            <FlexBox tw="h-8 items-center">
-              <Button type="text" onClick={() => addRow()} disabled={disabled}>
-                <Icon name="add" type={theme === 'dark' ? 'light' : 'dark'} />
-                添加参数
-              </Button>
-            </FlexBox>
-          </SignleRoot>
-        )}
-      </Root>
-    )
-  }
-)
+                <Tooltip content="删除" theme="light" hasPadding>
+                  <Icon
+                    disabled={disabled}
+                    name="trash"
+                    clickable
+                    type="dark"
+                    onClick={() => handleInputsDel(i)}
+                  />
+                </Tooltip>
+              </div>
+            </InputRow>
+          ))}
+          <FlexBox tw="h-8 items-center">
+            <Button type="text" onClick={() => addRow()} disabled={disabled}>
+              <Icon name="add" type={theme === 'dark' ? 'light' : 'dark'} />
+              {addText}
+            </Button>
+          </FlexBox>
+        </SignleRoot>
+      )}
+    </Root>
+  )
+})
 
 export default KVTextArea

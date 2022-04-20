@@ -4,7 +4,7 @@ import tw, { styled } from 'twin.macro'
 import { isFunction, keys } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { ArrowLine } from 'components'
-import { dataSourceTypes } from '../JobUtils'
+import { dataSourceTypes } from '../Job/JobUtils'
 
 type SyncType = 'full' | 'incr'
 type SyncSourceType = 'fullSource' | 'fullSink' | 'incrSource' | 'incrSink'
@@ -130,14 +130,6 @@ const SyncTypeRadioGroup = forwardRef<
               tw="flex-1"
               onChange={(v: SyncSourceType) => handleChange(v, 'fullSource')}
             />
-            {/* <div tw="relative">
-              <div tw="w-9 border-b border-dashed border-white" />
-              <Icon
-                name="caret-right"
-                type="light"
-                tw="absolute -top-2 -right-2"
-              />
-            </div> */}
             <ArrowLine tw="w-9 flex-none" />
             <Select
               tw="flex-1"
@@ -182,5 +174,6 @@ const SyncTypeRadioGroup = forwardRef<
 
 export default SyncTypeRadioGroup
 
-export const SyncTypeRadioGroupField: (props: SyncTypeRadioGroupProps) => any =
-  (Form as any).getFormField(SyncTypeRadioGroup)
+export const SyncTypeRadioGroupField: (props: any) => any = (
+  Form as any
+).getFormField(SyncTypeRadioGroup)

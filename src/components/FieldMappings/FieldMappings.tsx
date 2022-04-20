@@ -1,9 +1,18 @@
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  forwardRef,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
 import { useMount, useUnmount, useMeasure } from 'react-use'
 import tw, { styled } from 'twin.macro'
 import { intersectionBy, isEmpty, get, omit } from 'lodash-es'
 import { Button, Icon, Alert } from '@QCFE/lego-ui'
+import { nanoid } from 'nanoid'
 import Tippy from '@tippyjs/react'
 import { followCursor } from 'tippy.js'
 import { Center } from 'components/Center'
@@ -11,6 +20,7 @@ import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
 import MappingItem, { TMappingField, FieldRow } from './MappingItem'
 import { PopConfirm } from '../PopConfirm'
+
 /* @refresh reset */
 const styles = {
   wrapper: tw`border flex-1 border-neut-13`,
@@ -87,7 +97,7 @@ export interface IFieldMappingsRecord {
   clear: () => void
 }
 
-export const FieldMappings = (props: IFieldMappingsProps) => {
+export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const {
     leftFields: leftFieldsProp,
     rightFields: rightFieldsProp,
@@ -97,7 +107,6 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
 
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
-  // const [extralFields, setExtralFields] = useState<TMappingField[]>([])
   const jsPlumbInstRef = useRef<jsPlumbInstance>()
   const [mappings, setMappings] = useState<[string, string][]>(mappingsProp)
   const [visible, setVisible] = useState<boolean>(false)
@@ -116,10 +125,39 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
   }, [rightFieldsProp])
 
   useEffect(() => {
-    if (jsPlumbInstRef.current) {
-      jsPlumbInstRef.current.repaintEverything()
-    }
+    jsPlumbInstRef.current?.repaintEverything()
   }, [rect.width])
+
+  useImperativeHandle(ref, () => ({
+    rowMapping: () => {
+      const leftColumns: Record<string, any>[] = []
+      const rightColumns: Record<string, any>[] = []
+      mappings.forEach(([left, right], index) => {
+        const leftField = leftFields.find(({ name }) => name === left)!
+        const rightField = rightFields.find(({ name }) => name === right)!
+        leftColumns.push({
+          format: leftField.formatter,
+          index,
+          is_part: false,
+          name: leftField.name,
+          type: leftField.type,
+          value: leftField.default,
+        })
+        rightColumns.push({
+          format: rightField.formatter,
+          index,
+          is_part: false,
+          name: rightField.name,
+          type: rightField.type,
+          value: rightField.default,
+        })
+      })
+      if (leftColumns.length === 0 && rightColumns.length === 0) {
+        return null
+      }
+      return [leftColumns, rightColumns]
+    },
+  }))
 
   // console.log(mappings)
 
@@ -159,9 +197,8 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
         const leftField = leftFields.find((f) => f.name === left)
         const rightField = rightFields.find((f) => f.name === right)
         if (leftField && rightField) {
-          // console.log('in 3', leftUUID, rightUUID)
           jsPlumbInst.connect({
-            uuids: [`Right-${leftField.name}`, `Left-${rightField.name}`],
+            uuids: [leftField.uuid, rightField.uuid],
           })
         }
       })
@@ -315,14 +352,14 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
     (dragId: string, hoverId: string, isTop = false) => {
       setLeftFields((fields) => {
         const dragFieldIndex = fields.findIndex(
-          (field) => field.name === dragId
+          (field) => field.uuid === dragId
         )!
         const dragField = fields[dragFieldIndex]
         const newFields = [...fields]
 
         newFields.splice(dragFieldIndex, 1)
         const hoverFieldIndex = newFields.findIndex(
-          (field) => field.name === hoverId
+          (field) => field.uuid === hoverId
         )!
         newFields.splice(isTop ? 0 : hoverFieldIndex + 1, 0, dragField)
         return newFields
@@ -338,7 +375,14 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
     if (!hasUnFinish) {
       setLeftFields((fields) => [
         ...fields,
-        { name: '', type: '', custom: true, default: '', isEditing: true },
+        {
+          name: '',
+          type: '',
+          custom: true,
+          default: '',
+          isEditing: true,
+          uuid: nanoid(),
+        },
       ])
     }
   }
@@ -455,11 +499,17 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
                     keepEditingField(info, index)
                   }}
                   onCancel={cancelAddCustomField}
-                  deleteItem={(index) => {
+                  deleteItem={(field) => {
                     setLeftFields((fields) =>
-                      fields.filter((f, idx) => idx !== index)
+                      fields.filter((f) => f.uuid !== field.uuid)
+                    )
+                    setMappings((prevMappings) =>
+                      prevMappings.filter(([l]) => l !== field.name)
                     )
                   }}
+                  exist={(name: string) =>
+                    !!leftFields.find((f) => f.name === name)
+                  }
                   getDeleteField={(name: string) => {
                     const delItem = leftFieldsProp.find((f) => f.name === name)
                     const existItem = leftFields.find((f) => f.name === name)
@@ -537,4 +587,4 @@ export const FieldMappings = (props: IFieldMappingsProps) => {
       </Container>
     </Root>
   )
-}
+})

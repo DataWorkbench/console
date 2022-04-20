@@ -1,6 +1,6 @@
 import { useStore } from 'stores'
-import StreamCode from './StreamCode'
-import StreamJAR from './StreamJAR'
+import StreamCode from '../Stream/StreamCode'
+import StreamJAR from '../Stream/StreamJAR'
 
 const VersionDisplay = () => {
   const {
