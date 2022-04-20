@@ -9,6 +9,7 @@ import {
   alarmStatus,
   DataReleaseDevMode,
   dataReleaseDevModeType,
+  DataReleaseSchedule,
   jobInstanceStatus,
   JobInstanceStatusType,
   JobType,
@@ -16,7 +17,9 @@ import {
   sourceTypes,
 } from './constants'
 
-export const statusStyle = (type: JobInstanceStatusType) => {
+export const statusStyle = (
+  type: JobInstanceStatusType | DataReleaseSchedule
+) => {
   let wrapperBg
   let centerBorder
   let bg
@@ -55,6 +58,22 @@ export const statusStyle = (type: JobInstanceStatusType) => {
       wrapperBg = tw`bg-[#C6F4E4]`
       centerBorder = tw`border-[#47CB9F]`
       bg = tw`bg-green-11`
+      break
+
+    case DataReleaseSchedule.RUNNING:
+      wrapperBg = tw`bg-[#DEE7F1]`
+      centerBorder = tw`border-[#B7C8D8]`
+      bg = tw`bg-neut-8`
+      break
+    case DataReleaseSchedule.FINISHED:
+      wrapperBg = tw`bg-[#DEE7F1]`
+      centerBorder = tw`border-[#B7C8D8]`
+      bg = tw`bg-neut-8`
+      break
+    case DataReleaseSchedule.DOWNED:
+      wrapperBg = tw`bg-[#DEE7F1]`
+      centerBorder = tw`border-[#B7C8D8]`
+      bg = tw`bg-neut-8`
       break
     default:
       break

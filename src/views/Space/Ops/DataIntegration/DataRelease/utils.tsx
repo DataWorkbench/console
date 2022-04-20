@@ -23,16 +23,19 @@ export const getColumnsRender = (
   actions?: Record<string, any>
 ): Record<string, Partial<IColumn>> => {
   const columnsRender = {
-    schedule_status: {
-      filter: filter.schedule_status,
+    status: {
+      filter: filter.status,
       onFilter: (v: number) => {
         setFilter((draft) => {
-          draft.schedule_status = v
+          draft.status = v
           draft.offset = 0
         })
       },
       filterAble: true,
       filtersNew: Object.values(dataReleaseScheduleType) as any,
+      render: (status: number) => {
+        return status
+      },
     },
     alarm_status: {
       onFilter: (v: string) => {
@@ -123,15 +126,11 @@ export const getColumnsRender = (
           <DbTypeCmp type={text} onClick={() => actions?.target(record)} />
         ) : null,
     },
-    created_at: {
+    updated: {
       sortable: true,
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
-        filter.sort_by === 'created_at'
-          ? filter.reverse
-            ? 'asc'
-            : 'desc'
-          : '',
+        filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
       render: (v: number, record: Record<string, any>) =>
         record.__level === 1 ? (
           <span tw="text-neut-8">

@@ -27,7 +27,7 @@ const VersionsModal = observer((props: IProps) => {
       reverse?: 'asc' | 'desc'
       sort_by?: string
       alarm_status?: string
-      schedule_status?: number
+      status?: number
       offset: number
       limit: number
     },
@@ -40,7 +40,7 @@ const VersionsModal = observer((props: IProps) => {
 
   const columnsRender = getColumnsRender(filter, setFilter, [
     'alarm_status',
-    'schedule_status',
+    'status',
     'version_id',
     'created_at',
   ])

@@ -16,6 +16,7 @@ import {
   Tooltip,
 } from 'components'
 import { Checkbox } from '@QCFE/lego-ui'
+import { useQuerySyncJobRelease } from 'hooks/useJobRelease'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
@@ -85,7 +86,7 @@ const DataRelease = observer(() => {
       sort_by?: string
       job_type?: any
       alarm_status?: string
-      schedule_status?: number
+      status?: number
       offset: number
       limit: number
     },
@@ -177,14 +178,13 @@ const DataRelease = observer(() => {
           <InstanceName
             theme="dark"
             icon="q-downloadBoxFill"
-            name="asfda"
-            desc="asfdasdf"
+            name={record.name}
+            desc={record.id}
             onClick={() => jumpDetail()(record)}
           />
         </Center>
       )
       if (record.desc) {
-        // TODO: 描述字段未确认
         return (
           <Tooltip theme="light" hasPadding content={record.desc}>
             {child}
@@ -211,23 +211,32 @@ const DataRelease = observer(() => {
     [setColumnSettings]
   )
 
-  const { data, isFetching } = {
-    data: {
-      infos: [
-        {
-          id: 1,
-          job_name: 'aaaa',
-          desc: 'asdasdfas',
-          source: 'MySQL',
-          alarm_status: '1',
-          dev_mode: '0',
-        },
-      ],
-    },
-    isFetching: false,
-  }
-  // local.testing.com/dataomnis/testing/workspace/wks-yrl0o4ex205vkr9y/ops/data-release
-  const infos = get(data, 'infos', [])
+  const { data, isFetching } = useQuerySyncJobRelease(filter)
+
+  // const infos =  [
+  //   {
+  //     id: 'fadsf-asdf-asdf-asdf',
+  //     name: 'work-adf',
+  //     created_by: new Date().getTime(),
+  //     status: 2,
+  //     type: 1,
+  //     updated: new Date().getTime(),
+  //     version: 'asdfasfd',
+  //   },
+  // ]
+  const infos =
+    get(data, 'infos', [
+      {
+        id: 'fadsf-asdf-asdf-asdf',
+        name: 'work-adf',
+        created_by: new Date().getTime(),
+        status: 2,
+        type: 1,
+        updated: new Date().getTime() / 1000,
+        version: 'asdfasfd',
+      },
+    ]) || []
+  console.log(infos)
 
   return (
     <>

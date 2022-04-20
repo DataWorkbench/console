@@ -139,9 +139,9 @@ export enum DataReleaseSchedule {
 }
 
 export const dataReleaseScheduleType = {
-  '0': { label: '运行中', value: '0', type: DataReleaseSchedule.RUNNING },
-  '1': { label: '已完成', value: '1', type: DataReleaseSchedule.FINISHED },
-  '2': { label: '已下线', value: '2', type: DataReleaseSchedule.DOWNED },
+  3: { label: '运行中', value: 3, type: DataReleaseSchedule.RUNNING },
+  4: { label: '已完成', value: 4, type: DataReleaseSchedule.FINISHED },
+  2: { label: '已下线', value: 2, type: DataReleaseSchedule.DOWNED },
 } as const
 
 export enum DataReleaseDevMode {
@@ -184,7 +184,7 @@ export const dataReleaseSuggestions: ISuggestion[] = [
   },
   {
     label: '调度状态',
-    key: 'schedule_status',
+    key: 'status',
     options: Object.values(dataReleaseScheduleType).map(({ label, value }) => ({
       label,
       key: value,
@@ -227,13 +227,13 @@ export const dataReleaseTabs: ITab[] = [
 export const dataReleaseColumns: IColumn[] = [
   {
     title: '作业名称/ID',
-    dataIndex: 'job_name',
-    key: 'job_name',
+    dataIndex: 'id',
+    key: 'id',
   },
   {
     title: '调度状态',
-    dataIndex: 'schedule_status',
-    key: 'schedule_status',
+    dataIndex: 'status',
+    key: 'status',
   },
   {
     title: '告警状态',
@@ -267,14 +267,14 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '最近发布时间',
-    dataIndex: `created_at`,
-    key: 'created_at',
+    dataIndex: `updated`,
+    key: 'updated',
   },
 ]
 
 const versionSet = new Set([
-  'job_name',
-  'schedule_status',
+  'id',
+  'status',
   'alarm_status',
   'version_id',
   'created_at',
