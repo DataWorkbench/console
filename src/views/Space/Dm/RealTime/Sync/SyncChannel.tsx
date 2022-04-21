@@ -11,7 +11,7 @@ import {
 import { AffixLabel } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { isNaN as isNAN, isNumber } from 'lodash-es'
+import { isNaN as isNAN, isNumber, pickBy } from 'lodash-es'
 
 const { NumberField } = Form
 const Root = styled('div')(() => [
@@ -36,10 +36,10 @@ const Root = styled('div')(() => [
 ])
 
 interface ChannelControl {
-  parallelism?: number
-  record_num?: number
-  percentage?: number
-  bytes?: number
+  parallelism?: number | string
+  record_num?: number | string
+  percentage?: number | string
+  bytes?: number | string
   rate?: 2 | 1
 }
 interface SyncChannelProps {
@@ -48,15 +48,18 @@ interface SyncChannelProps {
 
 const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
   const { channelControl } = props
-  const [channel, setChannel] = useImmer<ChannelControl>(
-    channelControl || { rate: 2 }
-  )
+  const [channel, setChannel] = useImmer<ChannelControl>(() => {
+    if (channelControl) {
+      return pickBy(channelControl, (v) => v !== -1)
+    }
+    return { rate: 2 }
+  })
 
   useLayoutEffect(() => {
     if (channelControl) {
-      setChannel(channelControl)
+      setChannel(pickBy(channelControl, (v) => v !== -1))
     }
-  })
+  }, [channelControl, setChannel])
 
   const formRef = useRef<Form>(null)
   useImperativeHandle(ref, () => ({
@@ -71,6 +74,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
       return null
     },
   }))
+
   return (
     <Root>
       <Form ref={formRef}>
@@ -118,7 +122,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
             ]}
           >
             <RadioGroup
-              value={channel.rate}
+              value={channel.rate || 2}
               onChange={(v) => {
                 setChannel((draft) => {
                   draft.rate = v
