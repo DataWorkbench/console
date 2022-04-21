@@ -193,8 +193,11 @@ const MappingItem = (props: MappingItemProps) => {
     if (ref.current && jsplumb) {
       let endPoint = endPointRef.current
       const parameters = { [String(anchor)]: itemProps }
+      if (endPoint) {
+        jsplumb.deleteEndpoint(endPoint)
+        endPoint = null
+      }
       if (!endPoint) {
-        // jsplumb.deleteEndpoint(endPoint)
         endPoint = jsplumb.addEndpoint(ref.current, {
           anchor,
           parameters,

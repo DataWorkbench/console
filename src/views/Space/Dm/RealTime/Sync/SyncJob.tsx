@@ -5,7 +5,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
 import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
@@ -91,6 +91,12 @@ const removeUndefined = (obj: any) => {
   return newObj
 }
 
+interface DbInfo {
+  id?: string
+  tableName?: string
+  fields?: TMappingField[]
+}
+
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
@@ -101,30 +107,17 @@ const SyncJob = () => {
     workFlowStore: { curJob },
   } = useStore()
 
-  // console.log('confData', confData)
   const [db, setDb] = useImmer<{
-    source?: Record<string, any>
-    target?: Record<string, any>
-  }>({})
-  const [fields, setFields] = useImmer<{
-    source: TMappingField[]
-    target: TMappingField[]
+    source: DbInfo
+    target: DbInfo
   }>({
-    source: [],
-    target: [],
+    source: { id: get(confData, 'source_id') },
+    target: { id: get(confData, 'target_id') },
   })
+
   const [mode, setMode] = useState<1 | 2>(1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
-  const [mappings, setMappings] = useState([])
-
-  const [sourceTypeName, targetTypeName] = useMemo(() => {
-    const sourceType = curJob?.source_type
-    const targetType = curJob?.target_type
-    return [
-      findKey(dataSourceTypes, (v) => v === sourceType),
-      findKey(dataSourceTypes, (v) => v === targetType),
-    ]
-  }, [curJob])
+  // const [mappings, setMappings] = useState([])
 
   const dbRef =
     useRef<{
@@ -146,25 +139,80 @@ const SyncJob = () => {
     }>(null)
   const enableRelease = get(scheData, 'schedule_policy') !== 0
 
-  useEffect(() => {
-    if (confData && sourceTypeName && targetTypeName) {
-      const sourceColumn =
-        get(
-          confData,
-          `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
-        ) || []
-      const targetColumn =
-        get(
-          confData,
-          `sync_resource.${targetTypeName.toLowerCase()}_target.column`
-        ) || []
-      setMappings(sourceColumn.map((v, i) => [v.name, targetColumn[i].name]))
-      setDb({
-        source: { id: get(confData, 'source_id') },
-        target: { id: get(confData, 'target_id') },
-      })
+  const [sourceTypeName, targetTypeName] = useMemo(() => {
+    const sourceType = curJob?.source_type
+    const targetType = curJob?.target_type
+    return [
+      findKey(dataSourceTypes, (v) => v === sourceType),
+      findKey(dataSourceTypes, (v) => v === targetType),
+    ]
+  }, [curJob])
+
+  const sourceColumn = useMemo(() => {
+    if (confData && db.source.tableName && sourceTypeName) {
+      const source = get(
+        confData,
+        `sync_resource.${sourceTypeName?.toLowerCase()}_source`
+      )
+      const table = get(source, 'table[0]')
+      if (source && table === db.source.tableName) {
+        return get(source, 'column')
+      }
     }
-  }, [confData, sourceTypeName, targetTypeName, setDb])
+    return []
+  }, [confData, sourceTypeName, db.source.tableName])
+
+  const targetColumn = useMemo(() => {
+    if (confData && db.target.tableName && targetTypeName) {
+      const source = get(
+        confData,
+        `sync_resource.${targetTypeName?.toLowerCase()}_target`
+      )
+      const table = get(source, 'table[0]')
+      if (source && table === db.target.tableName) {
+        return get(source, 'column')
+      }
+    }
+    return []
+  }, [confData, targetTypeName, db.target.tableName])
+
+  // console.log(db)
+
+  // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
+
+  // useEffect(() => {
+  //   if (confData && sourceTypeName && targetTypeName) {
+  //     // const sourceColumn =
+  //     //   get(
+  //     //     confData,
+  //     //     `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
+  //     //   ) || []
+  //     // const targetColumn =
+  //     //   get(
+  //     //     confData,
+  //     //     `sync_resource.${targetTypeName.toLowerCase()}_target.column`
+  //     //   ) || []
+  //     // setMappings(sourceColumn.map((v, i) => [v.name, targetColumn[i].name]))
+  //     setDb({
+  //       source: {
+  //         id: get(confData, 'source_id'),
+  //         tableName: get(
+  //           confData,
+  //           `sync_resource.${sourceTypeName.toLowerCase()}_source.table[0]`
+  //         ),
+  //       },
+  //       target: {
+  //         id: get(confData, 'target_id'),
+  //         tableName: get(
+  //           confData,
+  //           `sync_resource.${targetTypeName.toLowerCase()}_target.table[0]`
+  //         ),
+  //       },
+  //     })
+  //   }
+  // }, [confData, sourceTypeName, targetTypeName, setDb])
+
+  // console.log(db, fields)
   const handleEditorWillMount = (monaco: any) => {
     monaco.editor.defineTheme('my-theme', {
       base: 'vs-dark',
@@ -176,7 +224,7 @@ const SyncJob = () => {
     })
   }
 
-  const handleEditorDidMount = (editor) => {
+  const handleEditorDidMount = (editor: any) => {
     editor.focus()
   }
 
@@ -285,20 +333,15 @@ const SyncJob = () => {
               {index === 0 && (
                 <SyncDataSource
                   ref={dbRef}
-                  onSelectTable={(
-                    tp: 'source' | 'target',
-                    data: Record<string, any>[]
-                  ) => {
-                    const fieldData = (data || []).map((field) => ({
+                  onSelectTable={(tp, tableName, data) => {
+                    const fieldData = data.map((field) => ({
                       ...field,
                       uuid: nanoid(),
                     })) as TMappingField[]
-                    setFields((draft) => {
-                      if (tp === 'source') {
-                        draft.source = fieldData
-                      } else {
-                        draft.target = fieldData
-                      }
+                    setDb((draft) => {
+                      const soruceInfo = draft[tp]
+                      soruceInfo.tableName = tableName
+                      soruceInfo.fields = fieldData
                     })
                   }}
                   onDbChange={(tp: 'source' | 'target', data) => {
@@ -312,9 +355,10 @@ const SyncJob = () => {
               {index === 1 && (
                 <FieldMappings
                   ref={mappingRef}
-                  mappings={mappings}
-                  leftFields={fields.source}
-                  rightFields={fields.target}
+                  // mappings={mappings}
+                  leftFields={db.source.fields || []}
+                  rightFields={db.target.fields || []}
+                  columns={[sourceColumn, targetColumn]}
                   topHelp={
                     <HelpCenterLink href="/xxx" isIframe={false}>
                       字段映射说明文档
