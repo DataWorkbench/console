@@ -39,6 +39,7 @@ export const getColumnsRender = (
       filterAble: true,
       filtersNew: Object.values(dataReleaseScheduleType) as any,
       render: (status: keyof typeof dataReleaseScheduleType) => {
+        console.log(1111, status)
         return <DataReleaseStatusCmp type={status} />
       },
     },

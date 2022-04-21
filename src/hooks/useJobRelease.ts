@@ -7,14 +7,13 @@ import {
   resumeReleaseSyncJobs,
   suspendReleaseSyncJob,
 } from 'stores/api'
-import { omit } from 'lodash-es'
 
 interface IRouteParams {
   regionId: string
   spaceId: string
 }
 
-const queryKey: any = ''
+let queryKey: any = ''
 
 export const getJobReleaseKey = () => queryKey
 
@@ -30,9 +29,9 @@ export const useQuerySyncJobRelease = (
     offset: 0,
     ...filter,
   }
-  const qryKey = ['syncJobInstances', omit(params, 'offset')]
+  queryKey = ['jobRelease', params]
   return useInfiniteQuery(
-    qryKey,
+    queryKey,
     async ({ pageParam = params }) => listReleaseSyncJobs(pageParam),
     {
       enabled,
@@ -68,7 +67,6 @@ export const useMutationJobRelease = (options?: {}) => {
       } else if (op === 'resume') {
         ret = await resumeReleaseSyncJobs({
           ...rest,
-          udf_id: rest.id,
           regionId,
           spaceId,
         })

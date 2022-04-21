@@ -2,7 +2,9 @@ import { Button, Icon, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { FilterInput, FlexBox } from 'components'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { observer } from 'mobx-react-lite'
+import { useIsFetching, useQueryClient } from 'react-query'
 import { dataReleaseSuggestions } from '../constants'
+import { getJobReleaseKey } from '../../../../../hooks/useJobRelease'
 
 // const { FilterInput } = Table as any
 
@@ -21,6 +23,13 @@ const TableHeader = observer((props: ITableHeaderProps) => {
     columnsSetting: { storageKey, onSave, columns },
   } = props
 
+  const queryClient = useQueryClient()
+  const isFetching = useIsFetching()
+
+  const refetchData = () => {
+    queryClient.invalidateQueries(getJobReleaseKey())
+  }
+
   return (
     <FlexBox tw=" gap-2">
       <FilterInput
@@ -33,7 +42,15 @@ const TableHeader = observer((props: ITableHeaderProps) => {
         defaultKeywordLabel="作业名称"
       />
 
-      <Button type="black" loading={false} tw="px-[5px] border-line-dark!">
+      <Button
+        type="black"
+        onClick={() => {
+          console.log(11111)
+          refetchData()
+        }}
+        loading={!!isFetching}
+        tw="px-[5px] border-line-dark!"
+      >
         <Icon name="if-refresh" tw="text-xl text-white" type="light" />
       </Button>
       <ColumnsSetting

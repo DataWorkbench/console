@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Icon, PageTab } from '@QCFE/qingcloud-portal-ui'
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
@@ -16,7 +16,12 @@ import {
   Tooltip,
 } from 'components'
 import { Checkbox } from '@QCFE/lego-ui'
-import { useQuerySyncJobRelease } from 'hooks/useJobRelease'
+import {
+  getJobReleaseKey,
+  useMutationJobRelease,
+  useQuerySyncJobRelease,
+} from 'hooks/useJobRelease'
+import { useQueryClient } from 'react-query'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
@@ -93,12 +98,16 @@ const DataRelease = observer(() => {
     { pagination: true; sort: true }
   >({}, { pagination: true, sort: true }, dataReleaseSettingKey)
 
+  const mutation = useMutationJobRelease()
+
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     window.open(
       `./data-release/${record.id}${tab ? `?tab=${tab}` : ''}`,
       '_blank'
     )
   }
+
+  const checkRef = useRef(false)
 
   const handleDatasource = (record: Record<string, any>) => {
     if (
@@ -117,6 +126,11 @@ const DataRelease = observer(() => {
     source: handleDatasource,
     target: handleDatasource,
   })
+
+  const queryClient = useQueryClient()
+  const refetchData = () => {
+    queryClient.invalidateQueries(getJobReleaseKey())
+  }
 
   const handleMenuClick = (
     record: Record<string, any>,
@@ -138,6 +152,16 @@ const DataRelease = observer(() => {
         })
         break
       case 're-publish':
+        mutation
+          .mutateAsync({
+            op: 'resume',
+            jobId: record.id,
+          })
+          .then(() => {
+            console.log(3333)
+            refetchData()
+          })
+
         break
       default:
         break
@@ -230,7 +254,7 @@ const DataRelease = observer(() => {
         id: 'fadsf-asdf-asdf-asdf',
         name: 'work-adf',
         created_by: new Date().getTime(),
-        status: 2,
+        status: 3,
         type: 1,
         updated: new Date().getTime() / 1000,
         version: 'asdfasfd',
@@ -296,12 +320,26 @@ const DataRelease = observer(() => {
             set({
               showOffline: false,
             })
+            checkRef.current = false
           }}
           okText="下线"
           okType="danger"
           onOk={() => {
-            set({
-              showOffline: false,
+            Promise.all([
+              mutation.mutateAsync({
+                op: 'resume',
+                jobId: selectedData?.id,
+              }),
+              mutation.mutateAsync({
+                op: checkRef.current ? 'suspend' : '',
+                jobId: selectedData?.id,
+              }),
+            ]).then(() => {
+              set({
+                showOffline: false,
+              })
+              checkRef.current = false
+              refetchData()
             })
           }}
         >
@@ -320,7 +358,11 @@ const DataRelease = observer(() => {
                   作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?
                 </div>
                 <div tw="leading-5">
-                  <Checkbox>
+                  <Checkbox
+                    onChange={(e, checked) => {
+                      checkRef.current = checked
+                    }}
+                  >
                     <span tw="text-white ml-1">同时停止运行中的实例</span>
                   </Checkbox>
                 </div>
