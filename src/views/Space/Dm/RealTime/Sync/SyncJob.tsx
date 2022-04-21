@@ -5,15 +5,21 @@ import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
-import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
-import { useMutationSyncJobConf, useQueryJobSchedule, useStore } from 'hooks'
+import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
+import {
+  useMutationSyncJobConf,
+  useQueryJobSchedule,
+  useQuerySyncJobConf,
+  useStore,
+} from 'hooks'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
 import ReleaseModal from '../Modal/ReleaseModal'
+import { dataSourceTypes } from '../Job/JobUtils'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -89,6 +95,17 @@ const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
   const { workFlowStore } = useStore()
+  const { data: confData } = useQuerySyncJobConf()
+
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+
+  // console.log('confData', confData)
+  const [db, setDb] = useImmer<{
+    source?: Record<string, any>
+    target?: Record<string, any>
+  }>({})
   const [fields, setFields] = useImmer<{
     source: TMappingField[]
     target: TMappingField[]
@@ -98,6 +115,17 @@ const SyncJob = () => {
   })
   const [mode, setMode] = useState<1 | 2>(1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
+  const [mappings, setMappings] = useState([])
+
+  const [sourceTypeName, targetTypeName] = useMemo(() => {
+    const sourceType = curJob?.source_type
+    const targetType = curJob?.target_type
+    return [
+      findKey(dataSourceTypes, (v) => v === sourceType),
+      findKey(dataSourceTypes, (v) => v === targetType),
+    ]
+  }, [curJob])
+
   const dbRef =
     useRef<{
       getResource: () => Record<string, string>
@@ -107,11 +135,36 @@ const SyncJob = () => {
     useRef<{
       rowMapping: () => [Record<string, string>, Record<string, string>]
     }>(null)
-  const clusterRef = useRef<{ getCluster: () => Record<string, string> }>(null)
-  const channelRef = useRef<{ getChannel: () => Record<string, string> }>(null)
-  // console.log('fields', fields)
+  const clusterRef =
+    useRef<{
+      getCluster: () => Record<string, string>
+      checkPingSuccess: () => boolean
+    }>(null)
+  const channelRef =
+    useRef<{
+      getChannel: () => Record<string, string>
+    }>(null)
   const enableRelease = get(scheData, 'schedule_policy') !== 0
 
+  useEffect(() => {
+    if (confData && sourceTypeName && targetTypeName) {
+      const sourceColumn =
+        get(
+          confData,
+          `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
+        ) || []
+      const targetColumn =
+        get(
+          confData,
+          `sync_resource.${targetTypeName.toLowerCase()}_target.column`
+        ) || []
+      setMappings(sourceColumn.map((v, i) => [v.name, targetColumn[i].name]))
+      setDb({
+        source: { id: get(confData, 'source_id') },
+        target: { id: get(confData, 'target_id') },
+      })
+    }
+  }, [confData, sourceTypeName, targetTypeName, setDb])
   const handleEditorWillMount = (monaco: any) => {
     monaco.editor.defineTheme('my-theme', {
       base: 'vs-dark',
@@ -164,6 +217,10 @@ const SyncJob = () => {
       showConfWarn('未配置计算集群信息')
       return
     }
+    if (!clusterRef.current.checkPingSuccess()) {
+      showConfWarn('计算集群连通性未测试或者未通过测试')
+      return
+    }
     const channel = channelRef.current.getChannel()
     if (!channel) {
       showConfWarn('未配置通道控制信息')
@@ -181,7 +238,12 @@ const SyncJob = () => {
       mapping[1]
     )
     set(resource, 'cluster_id', cluster.id)
-    set(resource, 'job_mode', 0)
+    set(resource, 'job_mode', 1)
+    set(
+      resource,
+      'job_content',
+      'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    )
     set(resource, 'channel_control', channel)
     const filterResouce = removeUndefined(resource)
     // console.log('filterResouce', filterResouce)
@@ -239,11 +301,18 @@ const SyncJob = () => {
                       }
                     })
                   }}
+                  onDbChange={(tp: 'source' | 'target', data) => {
+                    setDb((draft) => {
+                      draft[tp] = data
+                    })
+                  }}
+                  conf={confData}
                 />
               )}
               {index === 1 && (
                 <FieldMappings
                   ref={mappingRef}
+                  mappings={mappings}
                   leftFields={fields.source}
                   rightFields={fields.target}
                   topHelp={
@@ -253,8 +322,20 @@ const SyncJob = () => {
                   }
                 />
               )}
-              {index === 2 && <SyncCluster ref={clusterRef} />}
-              {index === 3 && <SyncChannel ref={channelRef} />}
+              {index === 2 && (
+                <SyncCluster
+                  sourceId={db.source?.id}
+                  targetId={db.target?.id}
+                  ref={clusterRef}
+                  clusterId={get(confData, 'cluster_id')}
+                />
+              )}
+              {index === 3 && (
+                <SyncChannel
+                  ref={channelRef}
+                  channelControl={get(confData, 'channel_control')}
+                />
+              )}
             </CollapseItem>
           ))}
         </Collapse>
@@ -337,8 +418,12 @@ const SyncJob = () => {
           <Icon name="data" type="dark" />
           保存
         </Button>
-        {/* loading={releaseMutation.isLoading} */}
-        <Button type="primary" onClick={release} disabled={!enableRelease}>
+        {/* loading={releaseMutation.isLoading} disabled={!enableRelease} */}
+        <Button
+          type="primary"
+          onClick={release}
+          disabled={get(confData, 'source_id') === ''}
+        >
           <Icon name="export" />
           发布
         </Button>
