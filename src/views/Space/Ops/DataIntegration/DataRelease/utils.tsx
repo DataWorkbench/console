@@ -10,6 +10,7 @@ import {
   dataReleaseActions,
   DataReleaseActionType,
   dataReleaseDevModeType,
+  DataReleaseSchedule,
   dataReleaseScheduleType,
   jobType,
   sourceTypes,
@@ -77,13 +78,13 @@ export const getColumnsRender = (
       render: (text: keyof typeof dataReleaseDevModeType) =>
         dataReleaseDevModeType[text]?.label,
     },
-    version_id: {
+    version: {
       render: (text: string) => <span tw="text-neut-8">{text}</span>,
     },
-    job_type: {
+    type: {
       onFilter: (v: string) => {
         setFilter((draft) => {
-          draft.job_type = v
+          draft.type = v
           draft.offset = 0
         })
       },
@@ -153,7 +154,10 @@ export const getOperations = (
 ) => {
   const getActions = (record: Record<string, any>) => {
     let key = ''
-    if (record.status === 2) {
+    if (
+      dataReleaseScheduleType[record.status as 2]?.type ===
+      DataReleaseSchedule.DOWNED
+    ) {
       key = 'offline'
     } else {
       key = 're-publish'

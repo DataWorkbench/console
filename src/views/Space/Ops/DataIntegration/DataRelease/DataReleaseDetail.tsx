@@ -160,7 +160,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           <Center tw="flex-auto">
             <Circle>
               <Icon
-                name="q-mergeFillDuotone"
+                name="q-downloadBoxFill"
                 type="light"
                 css={css`
                   & .qicon {
@@ -171,10 +171,13 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             </Circle>
             <div tw="flex-auto">
               <div tw="text-white">
-                <span tw="mr-3">qwerqwerqw</span>
-                <JobInstanceStatusCmp type="1" tw="inline-flex" />
+                <span tw="mr-3">{data?.name}</span>
+                <JobInstanceStatusCmp
+                  type={data?.status as 1}
+                  tw="inline-flex"
+                />
               </div>
-              <div tw="text-neut-8">fresa</div>
+              <div tw="text-neut-8">{data?.id}</div>
             </div>
           </Center>
           <FlexBox tw="gap-4">
@@ -231,9 +234,14 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <span>数据来源:</span>
               <span tw="inline-block">
                 <div
-                  tw="align-middle hover:text-green-11"
-                  css={[tw`cursor-pointer`]}
-                  onClick={() => set({ showDataSource: true })}
+                  tw="align-middle"
+                  css={
+                    [
+                      // tw`cursor-pointer  hover:text-green-11`
+                    ]
+                  }
+
+                  // onClick={() => set({ showDataSource: true })}
                 >
                   <DbTypeCmp type={data?.source_type} onClick={() => {}} />
                   <span tw="ml-1">{data?.source_name}</span>
@@ -243,16 +251,20 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <span>数据目的:</span>
               <span tw="inline-block">
                 <div tw="align-middle">
-                  <DbTypeCmp devMode="1" type="MySQL" onClick={undefined} />
+                  <DbTypeCmp type={data?.target_type} onClick={undefined} />
                 </div>
               </span>
             </GridItem>
 
             <GridItem labelWidth={84}>
               <span>生效时间:</span>
-              <span>{dayjs(data?.created).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>
+                {dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
+              </span>
               <span>最近发布时间:</span>
-              <span>{dayjs(data?.updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>
+                {dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
+              </span>
               <span>发布描述:</span>
               <span>{data?.desc}</span>
             </GridItem>
@@ -270,7 +282,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         }}
       >
         <TabPanel label="关联实例" name="link">
-          <LinkInstance />
+          <LinkInstance jobId={id} version={version} />
         </TabPanel>
         <TabPanel label="监控告警" name="alarm">
           <Monitor />

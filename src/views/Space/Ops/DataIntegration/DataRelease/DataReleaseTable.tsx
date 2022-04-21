@@ -156,7 +156,7 @@ const DataRelease = observer(() => {
       case 're-publish':
         mutation
           .mutateAsync({
-            op: 'resume',
+            op: 'release',
             jobId: record.id,
           })
           .then(() => {
@@ -252,17 +252,16 @@ const DataRelease = observer(() => {
   // ]
   const infos =
     get(data, 'infos', [
-      {
-        id: 'fadsf-asdf-asdf-asdf',
-        name: 'work-adf',
-        created_by: new Date().getTime(),
-        status: 3,
-        type: 1,
-        updated: new Date().getTime() / 1000,
-        version: 'asdfasfd',
-      },
+      // {
+      //   id: 'fadsf-asdf-asdf-asdf',
+      //   name: 'work-adf',
+      //   created_by: new Date().getTime(),
+      //   status: 3,
+      //   type: 1,
+      //   updated: new Date().getTime() / 1000,
+      //   version: 'asdfasfd',
+      // },
     ]) || []
-  console.log(infos)
 
   return (
     <>
@@ -329,7 +328,7 @@ const DataRelease = observer(() => {
           onOk={() => {
             Promise.all([
               mutation.mutateAsync({
-                op: 'resume',
+                op: 'offline',
                 jobId: selectedData?.id,
               }),
               mutation.mutateAsync({

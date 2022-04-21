@@ -104,12 +104,12 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
                 </div>
               </>
             )}
-            {data?.schedule_policy === 1 && (
-              <>
-                <div>cron 表达式：</div>
-                <div>{data?.express}</div>
-              </>
-            )}
+            {/* {data?.schedule_policy === 1 && ( */}
+            <>
+              <div>cron 表达式：</div>
+              <div>{data?.express}</div>
+            </>
+            {/* )} */}
             <div>并发策略：</div>
             <div>
               {data?.concurrency_policy &&

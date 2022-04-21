@@ -62,9 +62,9 @@ export enum JobType {
 }
 
 export const jobType = {
-  '0': { label: '全量更新', value: '0', type: JobType.FULL_UPDATE },
-  '1': { label: '增量更新', value: '1', type: JobType.INCREMENT_UPDATE },
-  '2': { label: '实时更新', value: '2', type: JobType.REALTIME_UPDATE },
+  1: { label: '全量更新', value: 1, type: JobType.FULL_UPDATE },
+  2: { label: '增量更新', value: 2, type: JobType.INCREMENT_UPDATE },
+  3: { label: '实时更新', value: 3, type: JobType.REALTIME_UPDATE },
 } as const
 
 export const dataJobInstanceSuggestions: ISuggestion[] = [
@@ -139,9 +139,9 @@ export enum DataReleaseSchedule {
 }
 
 export const dataReleaseScheduleType = {
-  3: { label: '运行中', value: 3, type: DataReleaseSchedule.RUNNING },
+  2: { label: '运行中', value: 2, type: DataReleaseSchedule.RUNNING },
   4: { label: '已完成', value: 4, type: DataReleaseSchedule.FINISHED },
-  2: { label: '已下线', value: 2, type: DataReleaseSchedule.DOWNED },
+  3: { label: '已下线', value: 3, type: DataReleaseSchedule.DOWNED },
 } as const
 
 export enum DataReleaseDevMode {
@@ -242,8 +242,8 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '版本 ID',
-    dataIndex: 'version_id',
-    key: 'version_id',
+    dataIndex: 'version',
+    key: 'version',
   },
   {
     title: '开发模式',
@@ -252,8 +252,9 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '作业类型',
-    dataIndex: 'job_type',
-    key: 'job_type',
+    dataIndex: 'type',
+    key: 'type',
+    width: 130,
   },
   {
     title: '来源',

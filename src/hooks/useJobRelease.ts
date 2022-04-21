@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import {
   jobReleaseSyncJob,
@@ -30,7 +30,7 @@ export const useQuerySyncJobRelease = (
     ...filter,
   }
   queryKey = ['jobRelease', params]
-  return useInfiniteQuery(
+  return useQuery(
     queryKey,
     async ({ pageParam = params }) => listReleaseSyncJobs(pageParam),
     {

@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { css } from 'twin.macro'
 import { Table } from 'views/Space/styled'
-import { useCallback, useMemo, useReducer, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import SelectTreeData from 'utils/selectTree'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Checkbox } from '@QCFE/lego-ui'
@@ -40,6 +40,18 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
       })),
     })
   )
+
+  useEffect(() => {
+    tableTreeRef.current = new SelectTreeData({
+      key: SelectTreeData.rootKey,
+      value: {},
+      children: dataSource.map((d) => ({
+        key: d[rowKey],
+        value: d,
+      })),
+    })
+    fourUpdate()
+  }, [dataSource, rowKey])
 
   const handleOpen = useCallback(
     (key: string) => {

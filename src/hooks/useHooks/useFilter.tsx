@@ -16,7 +16,7 @@ const useFilter = <T extends Object, P extends ITableConfig>(
   const [filter, setFilter] = useImmer<WithConfig<T, P>>(() => {
     let v = { ...(defaultFilter ?? {}) }
     if (config.pagination) {
-      v = { limit: 10, offset: 1, ...v }
+      v = { limit: 10, offset: 0, ...v }
     }
     return v as WithConfig<T, P>
   })

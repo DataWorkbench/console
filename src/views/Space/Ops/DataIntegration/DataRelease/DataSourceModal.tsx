@@ -22,7 +22,6 @@ interface IProps {
   onCancel: () => void
 }
 
-// todo 数据源 dark 模式
 const DataSourceModal = (props: IProps) => {
   const { onCancel } = props
   const op = 'view'

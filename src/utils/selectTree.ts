@@ -92,6 +92,18 @@ class SelectTreeData {
   // 设置节点列表
   init() {
     const { list, map } = renderTreeNode(this.root)
+    new Set([
+      ...Array.from(this.state?.map?.keys()),
+      ...Array.from(this.state?.openedAll ?? []),
+      ...Array.from(this.state?.selectedAll ?? []),
+    ]).forEach((key) => {
+      if (!map.has(key)) {
+        this.state.map.delete(key)
+        this.state?.openedAll?.delete(key)
+        this.state?.selectedAll?.delete(key)
+      }
+    })
+
     this.keyChildrenMap = map
     this.list = list
   }

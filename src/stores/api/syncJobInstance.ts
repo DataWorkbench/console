@@ -13,7 +13,7 @@ export const listSyncInstances = ({
 }: ISyncInstanceParams) => {
   return request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/instance`,
+    uri: `/v1/workspace/${spaceId}/sync/job/instance`,
     query: rest,
   })
 }

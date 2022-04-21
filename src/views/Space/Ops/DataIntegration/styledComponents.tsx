@@ -3,7 +3,11 @@ import { Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled, theme } from 'twin.macro'
 import React, { ReactElement } from 'react'
 import { isFunction } from 'lodash-es'
-import { Tooltip, FlexBox, Center } from 'components'
+import { Center, FlexBox, Tooltip } from 'components'
+import {
+  sourceKinds,
+  SourceType,
+} from 'views/Space/Upcloud/DataSourceList/constant'
 import {
   AlarmStatus,
   alarmStatus,
@@ -15,7 +19,6 @@ import {
   JobInstanceStatusType,
   JobType,
   jobType,
-  sourceTypes,
 } from './constants'
 
 export const statusStyle = (
@@ -125,7 +128,7 @@ export const JobInstanceStatusCmp = (props: {
   const { type, className } = props
   return (
     <StatusCmp
-      label={jobInstanceStatus[type].label}
+      label={jobInstanceStatus[type]?.label}
       type={jobInstanceStatus[type]?.type}
       className={className}
     />
@@ -269,12 +272,13 @@ export const DbTypeCmp = ({
   className,
   devMode,
 }: {
-  type: keyof typeof sourceTypes
+  type: SourceType
   onClick?: Function
   className?: string
   devMode?: keyof typeof dataReleaseDevModeType
 }) => {
-  if (!sourceTypes[type]) {
+  const kind = sourceKinds.find((i) => i.source_type === type)
+  if (!kind) {
     return null
   }
 
@@ -289,7 +293,7 @@ export const DbTypeCmp = ({
       ]}
       className={className}
     >
-      {sourceTypes[type]}
+      {kind.showname ?? kind.name}
     </div>
   )
   if (
