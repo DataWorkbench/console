@@ -32,17 +32,17 @@ export enum JobInstanceStatusType {
 }
 
 export const jobInstanceStatus = {
-  '0': {
+  3: {
     label: '失败重试',
-    value: '0',
+    value: 3,
     type: JobInstanceStatusType.FAILED_AND_RETRY,
   },
-  '1': { label: '运行中', value: '1', type: JobInstanceStatusType.RUNNING },
-  '2': { label: '准备资源', value: '2', type: JobInstanceStatusType.PREPARING },
-  '3': { label: '运行失败', value: '3', type: JobInstanceStatusType.FAILED },
-  '4': { label: '运行成功', value: '4', type: JobInstanceStatusType.SUCCEEDED },
-  '5': { label: '运行超时', value: '5', type: JobInstanceStatusType.TIMEOUT },
-  '6': { label: '已终止', value: '6', type: JobInstanceStatusType.FINISHED },
+  2: { label: '运行中', value: 2, type: JobInstanceStatusType.RUNNING },
+  1: { label: '准备资源', value: 1, type: JobInstanceStatusType.PREPARING },
+  8: { label: '运行失败', value: 8, type: JobInstanceStatusType.FAILED },
+  6: { label: '运行成功', value: 6, type: JobInstanceStatusType.SUCCEEDED },
+  7: { label: '运行超时', value: 7, type: JobInstanceStatusType.TIMEOUT },
+  5: { label: '已终止', value: 5, type: JobInstanceStatusType.FINISHED },
 } as const
 
 export enum AlarmStatus {
@@ -70,7 +70,7 @@ export const jobType = {
 export const dataJobInstanceSuggestions: ISuggestion[] = [
   {
     label: '状态',
-    key: 'status',
+    key: 'state',
     options: Object.values(jobInstanceStatus).map(({ label, value }) => ({
       label,
       key: value,
@@ -89,8 +89,8 @@ export const dataJobInstanceSuggestions: ISuggestion[] = [
     key: 'job_name',
   },
   {
-    label: '实例 ID',
-    key: 'instance_id',
+    label: '作业 ID',
+    key: 'job_id',
   },
 ]
 
@@ -102,8 +102,8 @@ export const dataJobInstanceColumns: IColumn[] = [
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    key: 'status',
+    dataIndex: 'state',
+    key: 'state',
   },
   {
     title: '告警状态',

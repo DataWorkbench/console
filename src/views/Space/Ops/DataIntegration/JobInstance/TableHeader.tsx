@@ -1,18 +1,17 @@
 import { Button, Icon, ToolBar } from '@QCFE/qingcloud-portal-ui'
 
-import { FlexBox } from 'components/Box'
+import { FilterInput, FlexBox } from 'components'
 import { IColumn } from 'hooks/useHooks/useColumns'
-import { Table } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { styled } from 'twin.macro'
-import { useState } from 'react'
-import { ISuggestionTag } from 'views/Space/Ops/DataIntegration/interfaces'
+import { useIsFetching, useQueryClient } from 'react-query'
+import { getSyncJobInstanceKey } from 'hooks/useJobInstance'
 import {
   dataJobInstanceColumns,
   dataJobInstanceSuggestions,
 } from '../constants'
 
-const { FilterInput } = Table as any
+// const { FilterInput } = Table as any
 const FilterInputWrapper = styled.div`
   ${tw`flex-auto border-line-dark border`}
   & .table-filter-bar {
@@ -38,54 +37,36 @@ const TableHeader = observer((props: ITableHeaderProps) => {
   const {
     columnsSetting: { storageKey, onSave },
   } = props
-  const [tags, setTags] = useState<ISuggestionTag[]>([])
 
-  // const suggestions = useMemo(
-  //   () => {
-  //     return columns.reduce(
-  //       (acc, cur) => {
-  //         if (cur) {
-  //
-  //         }
-  //       }, []
-  //     )
-  //   }, [columns]
-  // )
+  const queryClient = useQueryClient()
+  const isFetching = useIsFetching()
 
-  const handleChange = (tag1: ISuggestionTag[]) => {
-    const jobName = tag1.findIndex(
-      (t: ISuggestionTag) => t && t?.filter === 'job_name'
-    )
-    const keyword = tag1.findIndex(
-      (t: ISuggestionTag) => t && t?.filter === 'keyword'
-    )
-    if (keyword !== -1) {
-      delete tag1[jobName]
-      tag1.push({
-        filter: 'job_name',
-        value: tag1[keyword].value,
-        valueLabel: tag1[keyword].value,
-        filterLabel: '作业名称',
-      })
-      delete tag1[keyword]
-    }
-    setTags(tag1.filter(Boolean))
+  const refetchData = () => {
+    queryClient.invalidateQueries(getSyncJobInstanceKey())
   }
+
   return (
     <FlexBox tw=" gap-2">
       <FilterInputWrapper>
         <FilterInput
           suggestions={dataJobInstanceSuggestions}
-          tags={tags}
-          onChange={handleChange}
           tw="border-line-dark!"
           placeholder="搜索关键字或输入过滤条件"
           // isMultiKeyword
-          defaultKeywordLabel="作业名称或 ID"
+          defaultKeywordLabel="作业 ID"
+          searchKey="job_id"
+          filterLinkKey={storageKey}
         />
       </FilterInputWrapper>
 
-      <Button type="black" loading={false} tw="px-[5px] border-line-dark!">
+      <Button
+        type="black"
+        onClick={() => {
+          refetchData()
+        }}
+        loading={!!isFetching}
+        tw="px-[5px] border-line-dark!"
+      >
         <Icon name="if-refresh" tw="text-xl text-white" type="light" />
       </Button>
       <ColumnsSetting

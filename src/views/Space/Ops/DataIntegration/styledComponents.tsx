@@ -256,7 +256,7 @@ export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
 }
 
 export const Divider = styled.div`
-  ${tw`inline-block h-4 w-[1px] bg-[#475569]`}
+  ${tw`inline-block my-0.5 w-[1px] bg-[#475569]`}
 `
 
 export const Circle = styled.div`

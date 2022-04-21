@@ -45,7 +45,6 @@ const TableHeader = observer((props: ITableHeaderProps) => {
       <Button
         type="black"
         onClick={() => {
-          console.log(11111)
           refetchData()
         }}
         loading={!!isFetching}

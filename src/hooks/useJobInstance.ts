@@ -5,6 +5,7 @@ import {
   listSyncInstances,
   terminateSyncInstances,
 } from 'stores/api'
+import { isNull, omitBy } from 'lodash-es'
 
 interface IRouteParams {
   regionId: string
@@ -17,20 +18,24 @@ const queryKey = {
   flinkUi: '' as any,
 }
 
-export const getFlinkClusterKey = (key: keyof typeof queryKey) => queryKey[key]
+export const getSyncJobInstanceKey = (key: keyof typeof queryKey = 'list') =>
+  queryKey[key]
 
 export const useQuerySyncJobInstances = (
   filter: any,
   { enabled = true }: Record<string, any> = { enabled: true }
 ) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  const params = {
-    regionId,
-    spaceId,
-    limit: 10,
-    offset: 0,
-    ...filter,
-  }
+  const params = omitBy(
+    {
+      regionId,
+      spaceId,
+      limit: 10,
+      offset: 0,
+      ...filter,
+    },
+    isNull
+  )
   queryKey.list = ['syncJobInstances', params]
   return useInfiniteQuery(
     queryKey.list,

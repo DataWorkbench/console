@@ -21,12 +21,16 @@ import {
 import dayjs from 'dayjs'
 import useIcon from 'hooks/useHooks/useIcon'
 import { tuple } from 'utils/functions'
-import { useHistory } from 'react-router-dom'
-// import { useQueryClient } from 'react-query'
-import { get, omitBy } from 'lodash-es'
+import { get } from 'lodash-es'
 import useFilter from 'hooks/useHooks/useFilter'
 import tw, { css } from 'twin.macro'
-import { useQuerySyncJobInstances } from 'hooks/useJobInstance'
+import {
+  getSyncJobInstanceKey,
+  useMutationJobInstance,
+  useQuerySyncJobInstances,
+} from 'hooks/useJobInstance'
+import { describeFlinkUiByInstanceId } from 'stores/api'
+import { useQueryClient } from 'react-query'
 import {
   alarmStatus,
   dataJobInstanceColumns,
@@ -43,6 +47,7 @@ const instanceNameStyle = css`
     .instance-name-title {
       ${tw`text-green-11`}
     }
+
     .instance-name-icon {
       ${tw`bg-[#13966a80] border-[#9ddfc966]`}
       .icon svg.qicon {
@@ -60,31 +65,30 @@ type ActionsType = typeof actionsType[number]
 const DataJobInstance = () => {
   useIcon(icons)
 
-  const history = useHistory()
-
   const { filter, setFilter, pagination, sort } = useFilter<
     {
       reverse?: 'asc' | 'desc'
       sort_by?: string
       job_type?: any
-      alarm_status: string
-      status: string
-      offset: number
+      alarm_status?: string
+      state?: number
     },
     { pagination: true; sort: true }
-  >({ alarm_status: '', offset: 0, status: '' })
+  >({}, { pagination: true, sort: true }, settingKey)
 
   // const queryClient = useQueryClient()
   // const mutation = useMutationInstance()
 
-  const { data, isFetching } = useQuerySyncJobInstances(omitBy(filter, Boolean))
+  const { data, isFetching } = useQuerySyncJobInstances(filter)
 
   const infos =
     get(data, 'infos', [
       {
         id: '111',
+        job_id: 'aaf',
         name: 'asdfasdf',
-        type: 1,
+        message: 'sdfaf',
+        state: 1,
         status: 1,
         alarm_status: 1,
         created: new Date().getTime(),
@@ -117,11 +121,11 @@ const DataJobInstance = () => {
       ),
     },
 
-    status: {
-      filter: filter.status,
-      onFilter: (v: string) => {
+    state: {
+      filter: filter.state,
+      onFilter: (v: number) => {
         setFilter((draft) => {
-          draft.status = v
+          draft.state = v
           draft.offset = 0
         })
       },
@@ -220,6 +224,13 @@ const DataJobInstance = () => {
     },
   }
 
+  const queryClient = useQueryClient()
+  const refetchData = () => {
+    queryClient.invalidateQueries(getSyncJobInstanceKey('list'))
+  }
+
+  const mutation = useMutationJobInstance()
+
   const getActions = (
     status: JobInstanceStatusType,
     record: Record<string, any>
@@ -249,10 +260,17 @@ const DataJobInstance = () => {
   const handleMenuClick = (record: Record<string, any>, key: ActionsType) => {
     switch (key) {
       case 'stop':
-        console.log('stop')
+        mutation
+          .mutateAsync({
+            op: 'terminate',
+            ids: [record.id],
+          })
+          .then(() => {
+            refetchData()
+          })
         break
       case 'info':
-        history.push(`./data-job/${record.instance_id}`)
+        jumpDetail()(record)
         break
       default:
         break
@@ -264,11 +282,29 @@ const DataJobInstance = () => {
     render: (_: never, record: Record<string, any>) => {
       return (
         <FlexBox tw="gap-4">
-          <TextLink>Flink UI</TextLink>
+          <TextLink
+            disabled={
+              // todo: 字段和值未定
+              jobInstanceStatus[record.state as 1]?.type ===
+              JobInstanceStatusType.RUNNING
+            }
+            onClick={() => {
+              describeFlinkUiByInstanceId(record.id).then((web_ui: string) => {
+                if (web_ui) {
+                  window.open(web_ui, '_blank')
+                }
+              })
+            }}
+          >
+            Flink UI
+          </TextLink>
           <Divider />
           <MoreAction
             theme="darker"
-            items={getActions(record.status, record)}
+            items={getActions(
+              jobInstanceStatus[record.state as 1]?.type,
+              record
+            )}
             onMenuClick={handleMenuClick as any}
           />
         </FlexBox>
@@ -279,11 +315,10 @@ const DataJobInstance = () => {
   const { columns, setColumnSettings } = useColumns(
     settingKey,
     dataJobInstanceColumns,
-    columnsRender,
+    columnsRender as any,
     operations
   )
   const columnsSetting = useMemo(() => {
-    console.log(11111111111111)
     return {
       defaultColumns: dataJobInstanceColumns,
       storageKey: settingKey,
@@ -291,7 +326,6 @@ const DataJobInstance = () => {
     }
   }, [setColumnSettings])
 
-  console.log(columnsSetting)
   return (
     <FlexBox orient="column" tw="p-5 h-full">
       <PageTab tabs={dataJobInstanceTab} />
