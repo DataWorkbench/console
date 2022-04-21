@@ -133,10 +133,13 @@ export const JobInstanceStatusCmp = (props: {
 }
 
 export const DataReleaseStatusCmp = (props: {
-  type: keyof typeof dataReleaseScheduleType
+  type?: keyof typeof dataReleaseScheduleType
   className?: string
 }) => {
   const { type, className } = props
+  if (type === undefined || dataReleaseScheduleType[type] === undefined) {
+    return null
+  }
   return (
     <StatusCmp
       label={dataReleaseScheduleType[type].label}
@@ -147,11 +150,11 @@ export const DataReleaseStatusCmp = (props: {
 }
 
 export const AlarmStatusCmp = (props: {
-  type: keyof typeof alarmStatus
+  type?: keyof typeof alarmStatus
   onClick?: Function
 }) => {
   const { type, onClick } = props
-  if (alarmStatus[type] === undefined) {
+  if (type === undefined || alarmStatus[type] === undefined) {
     return null
   }
   return (

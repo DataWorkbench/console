@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Button, CopyText, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Button, CopyText, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { Card, Center, FlexBox, MoreAction, Tooltip } from 'components'
 import { useHistory, useLocation } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
@@ -20,6 +20,10 @@ import AlertModal from 'views/Space/Ops/Alert/Modal'
 import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSourceModal'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import {
+  useQuerySyncJobVersionDetail,
+  useQuerySyncJobVersionSchedule,
+} from 'hooks/useJobVersion'
+import {
   AlarmStatusCmp,
   Circle,
   DbTypeCmp,
@@ -30,6 +34,7 @@ import { dataReleaseDetailActions } from '../constants'
 
 interface IDataJobInstanceDetailProps {
   id: string
+  version: string
 }
 
 const { TabPanel } = Tabs as any
@@ -95,23 +100,35 @@ const CopyTextWrapper = styled(CopyText)`
 
 const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
   useIcon(icons)
-  const { id } = props
+  const { id, version } = props
 
+  console.log(version)
   const { showDataSource, set } = useDataReleaseStore()
-  const data = { name: 'work' }
 
   const history = useHistory()
   const { search } = useLocation()
   const { tab = 'link' } = qs.parse(search.slice(1))
-  console.log(history, tab)
 
   const [isOpen, setOpen] = useState(true)
   const [activeName, setActiveName] = useState(tab)
   const toList = () => {
     history.push('../data-release')
   }
+
+  const { data, isFetching } = useQuerySyncJobVersionDetail<
+    Record<string, any>
+  >({
+    jobId: id,
+    versionId: version,
+  })
+
+  const { data: scheduleData } = useQuerySyncJobVersionSchedule({
+    jobId: id,
+    versionId: version,
+  })
+
   return (
-    <Root tw="">
+    <Root tw="relative">
       <FlexBox tw="items-center gap-2">
         <Tooltip theme="light" content="返回" hasPadding placement="bottom">
           <Icon
@@ -127,24 +144,18 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             `}
           />
         </Tooltip>
-        <CopyTextWrapper text={`${data.name}(ID: ${id})`} theme="light" />
+        <CopyTextWrapper
+          text={`${data?.name ?? ''}(ID: ${id})`}
+          theme="light"
+        />
       </FlexBox>
-      {/* <BreadcrumbWrapper> */}
-      {/*   <Breadcrumb> */}
-      {/*     <BreadcrumbItem> */}
-      {/*       <span */}
-      {/*         onClick={toList} */}
-      {/*         tw="hover:text-link active:text-link cursor-pointer text-neut-8" */}
-      {/*       > */}
-      {/*         数据集成-已发布作业 */}
-      {/*       </span> */}
-      {/*     </BreadcrumbItem> */}
-      {/*     <BreadcrumbItem> */}
-      {/*       <CopyText text={id} /> */}
-      {/*     </BreadcrumbItem> */}
-      {/*   </Breadcrumb> */}
-      {/* </BreadcrumbWrapper> */}
-      <Card hasBoxShadow tw="bg-neut-16">
+
+      <Card hasBoxShadow tw="bg-neut-16 relative">
+        {isFetching && (
+          <div tw="absolute inset-0 z-50">
+            <Loading size="large" />
+          </div>
+        )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
             <Circle>
@@ -199,16 +210,20 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             <GridItem>
               <span>告警状态:</span>
               <span>
-                <AlarmStatusCmp type="1" />
+                <AlarmStatusCmp type={data?.alert_status} />
               </span>
               <span>版本 ID:</span>
-              <span>asdfasdfa</span>
+              <span>{data?.version}</span>
               <span>作业模式:</span>
-              <span>脚本</span>
-
+              <span>
+                {
+                  // TODO: 作业模式字段
+                  ''
+                }
+              </span>
               <span>作业类型:</span>
               <span>
-                <JobTypeCmp type="1" />
+                <JobTypeCmp type={data?.type} />
               </span>
             </GridItem>
 
@@ -220,10 +235,10 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
                   css={[tw`cursor-pointer`]}
                   onClick={() => set({ showDataSource: true })}
                 >
-                  <DbTypeCmp type="MySQL" onClick={() => {}} />
-                  <span tw="ml-1">mysql11212</span>
+                  <DbTypeCmp type={data?.source_type} onClick={() => {}} />
+                  <span tw="ml-1">{data?.source_name}</span>
                 </div>
-                <div tw="text-neut-8">id_dfafda</div>
+                <div tw="text-neut-8">{data?.source_id}</div>
               </span>
               <span>数据目的:</span>
               <span tw="inline-block">
@@ -235,11 +250,11 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
             <GridItem labelWidth={84}>
               <span>生效时间:</span>
-              <span>{dayjs().format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>{dayjs(data?.created).format('YYYY-MM-DD HH:mm:ss')}</span>
               <span>最近发布时间:</span>
-              <span>{dayjs().format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>{dayjs(data?.updated).format('YYYY-MM-DD HH:mm:ss')}</span>
               <span>发布描述:</span>
-              <span>发布内容发布内容</span>
+              <span>{data?.desc}</span>
             </GridItem>
           </div>
         </CollapsePanel>
@@ -264,10 +279,10 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           <DevContent data={{}} />
         </TabPanel>
         <TabPanel label="计算集群" name="cluster">
-          <Cluster data={{}} />
+          <Cluster clusterId="" />
         </TabPanel>
         <TabPanel label="调度信息" name="schedule">
-          <Schedule data={{}} />
+          <Schedule data={scheduleData} />
         </TabPanel>
       </HorizonTabs>
       <AlertModal />

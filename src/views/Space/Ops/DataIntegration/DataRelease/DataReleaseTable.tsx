@@ -102,7 +102,9 @@ const DataRelease = observer(() => {
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     window.open(
-      `./data-release/${record.id}${tab ? `?tab=${tab}` : ''}`,
+      `./data-release/${record.id}?version=${record.version}${
+        tab ? `&tab=${tab}` : ''
+      }`,
       '_blank'
     )
   }
