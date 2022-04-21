@@ -1,6 +1,6 @@
 import { Icon } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
-import { get, cloneDeep } from 'lodash-es'
+import { get, cloneDeep, findKey } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
 import { Icons, Center } from 'components'
 
@@ -94,6 +94,9 @@ export const dataSourceTypes: { [key in DataSourceType]?: number } = {
   // Redis: 16,
   // ElasticSearch: 14,
 }
+
+export const getSourceNameByType = (type: DataSourceType) =>
+  findKey(dataSourceTypes, (v) => v === dataSourceTypes[type])
 
 export const jobModeData = [
   {

@@ -1,5 +1,5 @@
 import { Button, Form, Icon, TextArea } from '@QCFE/lego-ui'
-import { forwardRef, useEffect, useImperativeHandle } from 'react'
+import { forwardRef, useLayoutEffect, useImperativeHandle } from 'react'
 import { useImmer } from 'use-immer'
 import { FlexBox } from 'components/Box'
 import { nanoid } from 'nanoid'
@@ -7,11 +7,11 @@ import { nanoid } from 'nanoid'
 export interface SqlGroupProps {
   name: string
   label?: string
-  value?: string[] | Record<'value' | 'key', string>[]
+  value?: string[]
   className?: string
   size?: number
   placeholder?: React.ReactNode
-  onChange?: (value: { value: string; key: string }[]) => void
+  onChange?: (value: string[]) => void
 }
 
 const addKey = (items: string[] | Record<'value' | 'key', string>[]) =>
@@ -33,11 +33,21 @@ export const SqlGroup = forwardRef((props: SqlGroupProps, ref) => {
 
   useImperativeHandle(ref, () => ({}))
 
-  useEffect((): void => {
-    if (onChange) {
-      onChange(value)
+  useLayoutEffect(() => {
+    if (!valueProps) {
+      return
     }
-  }, [value, onChange])
+    setValue((prevValue) => {
+      const newValue = valueProps.map((v, i) => {
+        const item = prevValue.find((o, j) => o.value === v && i === j)
+        if (item) {
+          return item
+        }
+        return { key: nanoid(), value: v }
+      })
+      return newValue
+    })
+  }, [valueProps, setValue])
 
   const statements = value
   return (
@@ -48,11 +58,21 @@ export const SqlGroup = forwardRef((props: SqlGroupProps, ref) => {
             placeholder={placeholder}
             value={s.value}
             rows={2}
-            onChange={(e: any, v: string) =>
+            onChange={(e: any, v: string) => {
+              if (onChange) {
+                onChange(
+                  statements.map((st, i) => {
+                    if (i === index) {
+                      return v
+                    }
+                    return st.value
+                  })
+                )
+              }
               setValue((draft) => {
                 draft[index].value = v
               })
-            }
+            }}
           />
           {index !== 0 && (
             <Icon

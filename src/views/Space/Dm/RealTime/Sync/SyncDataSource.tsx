@@ -1,8 +1,23 @@
-import { useRef, useState, useImperativeHandle, useMemo } from 'react'
+import {
+  useRef,
+  useState,
+  useImperativeHandle,
+  useMemo,
+  useEffect,
+} from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { findKey, get, pick, isEmpty, isEqual, trim } from 'lodash-es'
+import {
+  findKey,
+  get,
+  pick,
+  isEmpty,
+  isEqual,
+  trim,
+  camelCase,
+  keys,
+} from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
@@ -22,7 +37,7 @@ import {
   useQuerySourceTableSchema,
 } from 'hooks'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { dataSourceTypes, SyncJobType } from '../Job/JobUtils'
+import { dataSourceTypes, DataSourceType, SyncJobType } from '../Job/JobUtils'
 
 const { TextField, SelectField, TextAreaField } = Form
 
@@ -88,31 +103,65 @@ const StyledSqlGroupField = styled(SqlGroupField)(() => [
 
 type OpType = 'source' | 'target'
 
-type IDB = {
-  [k in OpType]: {
+type JobType = 1 | 2 | 3
+
+enum WriteMode {
+  Insert = 1,
+  Replace = 2,
+  Update = 3,
+}
+
+enum Semantic {
+  'AtLeastOnce' = 1,
+  'ExactlyOnce' = 2,
+}
+
+interface Column {
+  type: string
+  name: string
+  is_primary_key?: boolean
+}
+
+interface ResInfo {
+  source: {
     id?: string
     name?: string
     networkId?: string
+    columns?: Column[]
     tableName?: string
-    fields?: string[]
-    splitPk?: string
     condition?: TConditionParameterVal
-    writeMode?: string
-    batchSize?: number
-    semantic?: string
+    splitPk?: string
     where?: string
-    preSql?: string[] | Record<'value' | 'key', string>[]
-    postSql?: string[] | Record<'value' | 'key', string>[]
+  }
+  target: {
+    id?: string
+    name?: string
+    networkId?: string
+    columns?: Column[]
+    tableName?: string
+    writeMode?: WriteMode
+    semantic?: Semantic
+    batchSize?: number
+    postSql?: string[] | null
+    preSql?: string[] | null
   }
 }
 
+type SyncResKey = `${Lowercase<DataSourceType>}_${OpType}`
+
 interface SyncDataSourceProps {
-  onSelectTable: (tp: OpType, data: Record<string, any>[]) => void
+  onDbChange?: (tp: OpType, data: ResInfo[keyof ResInfo]) => void
+  onSelectTable?: (tp: OpType, data: Record<string, any>[]) => void
+  conf?: {
+    source_id?: string
+    target_id?: string
+    sync_resource?: Record<SyncResKey, any>
+  }
 }
 
 const SyncDataSource = observer(
   (props: SyncDataSourceProps, ref) => {
-    const { onSelectTable } = props
+    const { onSelectTable, onDbChange, conf } = props
     const {
       workFlowStore: { curJob },
     } = useStore()
@@ -122,7 +171,7 @@ const SyncDataSource = observer(
     const sourceForm = useRef(null)
     const targetForm = useRef(null)
     const op = useRef<OpType>('source')
-    const [db, setDB] = useImmer<IDB>({
+    const [db, setDB] = useImmer<ResInfo>({
       source: {},
       target: {},
     })
@@ -136,26 +185,50 @@ const SyncDataSource = observer(
       ]
     }, [curJob])
 
-    const { id: sourceId = '', tableName = '' } = db[op.current]
-
-    const tablesRet = useQuerySourceTables(
-      { sourceId },
-      { enabled: sourceId !== '' }
+    const sourceTablesRet = useQuerySourceTables(
+      { sourceId: db.source.id! },
+      { enabled: !!db.source.id }
     )
 
-    const schemaRet = useQuerySourceTableSchema(
+    const targetTablesRet = useQuerySourceTables(
+      { sourceId: db.target.id! },
+      { enabled: !!db.target.id }
+    )
+
+    const sourceColumnRet = useQuerySourceTableSchema(
       {
-        sourceId,
-        tableName,
+        sourceId: db.source.id!,
+        tableName: db.source.tableName!,
       },
       {
-        enabled: sourceId !== '' && tableName !== '',
+        enabled: !!(db.source.id && db.source.tableName),
         onSuccess: (data: any) => {
           const columns = get(data, 'schema.columns') || []
           setDB((draft) => {
-            draft[op.current].fields = columns
+            draft.source.columns = columns
           })
-          onSelectTable(op.current, columns)
+          if (onSelectTable) {
+            onSelectTable('source', columns)
+          }
+        },
+      }
+    )
+
+    useQuerySourceTableSchema(
+      {
+        sourceId: db.target.id!,
+        tableName: db.target.tableName!,
+      },
+      {
+        enabled: !!(db.target.id && db.target.tableName),
+        onSuccess: (data: any) => {
+          const columns = get(data, 'schema.columns') || []
+          setDB((draft) => {
+            draft.target.columns = columns
+          })
+          if (onSelectTable) {
+            onSelectTable('target', columns)
+          }
         },
       }
     )
@@ -193,22 +266,8 @@ const SyncDataSource = observer(
                 write_mode: db.target.writeMode,
                 semantic: db.target.semantic,
                 batch_size: db.target.batchSize,
-                pre_sql: db.target.preSql
-                  ?.map((v) => {
-                    if (typeof v === 'string') {
-                      return v
-                    }
-                    return v.value
-                  })
-                  .filter((v) => v !== ''),
-                post_sql: db.target.postSql
-                  ?.map((v) => {
-                    if (typeof v === 'string') {
-                      return v
-                    }
-                    return v.value
-                  })
-                  .filter((v) => v !== ''),
+                pre_sql: db.target.preSql?.filter((v) => v !== ''),
+                post_sql: db.target.postSql?.filter((v) => v !== ''),
               },
             },
           }
@@ -221,19 +280,67 @@ const SyncDataSource = observer(
       getTypeNames: () => [sourceTypeName, targetTypeName],
     }))
 
+    useEffect(() => {
+      if (conf && conf.source_id) {
+        const dbSource = get(
+          conf,
+          `sync_resource.${sourceTypeName!.toLowerCase()}_source`
+        )
+        const dbTarget = get(
+          conf,
+          `sync_resource.${targetTypeName!.toLowerCase()}_target`
+        )
+        const visualization = get<Record<string, string>>(
+          dbSource,
+          'visualization',
+          {}
+        )
+        const condition: any = {}
+        keys(visualization).forEach((v) => {
+          condition[camelCase(v)] = visualization[v]
+        })
+        const newDB = {
+          source: {
+            id: conf.source_id,
+            tableName: get(dbSource, 'table[0]', ''),
+            condition,
+            where: get(dbSource, 'where', ''),
+            splitPk: get(dbSource, 'split_pk', ''),
+          },
+          target: {
+            id: conf.target_id,
+            tableName: get(dbTarget, 'table[0]', ''),
+            writeMode: get(dbTarget, 'write_mode', ''),
+            semantic: get(dbTarget, 'semantic', ''),
+            batchSize: get(dbTarget, 'batch_size', ''),
+            postSql: get(dbTarget, 'post_sql', []),
+            preSql: get(dbTarget, 'pre_sql', []),
+          },
+        }
+        setDB(newDB)
+        if (
+          newDB.target.postSql?.length > 0 ||
+          newDB.target.preSql?.length > 0
+        ) {
+          setShowTargetAdvanced(true)
+        }
+      }
+    }, [conf, setDB, sourceTypeName, targetTypeName])
+
+    // console.log(db)
+
     const handleClick = (from: OpType) => {
       op.current = from
       setVisible(true)
     }
 
-    const handleSelectDb = (v: {
-      id: string
-      name: string
-      networkId: string
-    }) => {
+    const handleSelectDb = (v: Partial<ResInfo[OpType]>) => {
       setDB((draft) => {
         draft[op.current] = v
       })
+      if (onDbChange) {
+        onDbChange(op.current, v)
+      }
     }
 
     const handleTableChange = (from: OpType, v: string) => {
@@ -251,10 +358,15 @@ const SyncDataSource = observer(
           draft.target = {}
         }
       })
-      onSelectTable(from, [])
+      if (onSelectTable) {
+        onSelectTable(from, [])
+      }
+      if (onDbChange) {
+        onDbChange(from, {})
+      }
     }
 
-    const getJobTypeName = (type: 1 | 2 | 3) => {
+    const getJobTypeName = (type: JobType) => {
       const typeNameMap = new Map([
         [1, '离线 - 全量'],
         [2, '离线 - 增量'],
@@ -266,6 +378,7 @@ const SyncDataSource = observer(
     const renderCommon = (from: OpType) => {
       const dbInfo = db[from]
       const isSelected = !isEmpty(dbInfo)
+      const tablesRet = from === 'source' ? sourceTablesRet : targetTablesRet
       const tables = (get(tablesRet, 'data.items', []) || []) as string[]
       return (
         <>
@@ -279,7 +392,10 @@ const SyncDataSource = observer(
             `}
             label={<AffixLabel>数据源</AffixLabel>}
             help={
-              isSelected && <div>网络配置名称（ID：{dbInfo.networkId}）</div>
+              isSelected &&
+              dbInfo.networkId && (
+                <div>网络配置名称（ID：{dbInfo.networkId}）</div>
+              )
             }
             icon={
               <Icon
@@ -354,6 +470,7 @@ const SyncDataSource = observer(
       const isOffLineFull = get(curJob, 'type') === SyncJobType.OFFLINEFULL
       const isOfflineIncrement =
         get(curJob, 'type') === SyncJobType.OFFLINEINCREMENT
+      const schemaRet = sourceColumnRet
       return (
         <Form css={styles.form} ref={sourceForm}>
           {renderCommon(from)}
@@ -361,9 +478,7 @@ const SyncDataSource = observer(
             <>
               <ConditionParameterField
                 name="condition"
-                columns={(get(db, 'source.fields') || []).map(
-                  (c: { name: string; [k: string]: any }) => c.name
-                )}
+                columns={(db.source.columns || []).map((c) => c.name)}
                 label={<AffixLabel>条件参数配置</AffixLabel>}
                 loading={op.current === from && schemaRet.isFetching}
                 onRefresh={() => {
@@ -469,9 +584,12 @@ const SyncDataSource = observer(
                 label={<AffixLabel>写入模式</AffixLabel>}
                 name="write_mode"
                 options={[
-                  { label: 'insert: insert into', value: 1 },
-                  { label: 'replace: replace into', value: 2 },
-                  { label: 'update: on duplicate key update', value: 3 },
+                  { label: 'insert: insert into', value: WriteMode.Insert },
+                  { label: 'replace: replace into', value: WriteMode.Replace },
+                  {
+                    label: 'update: on duplicate key update',
+                    value: WriteMode.Update,
+                  },
                 ]}
                 value={dbInfo.writeMode}
                 schemas={[
@@ -482,9 +600,9 @@ const SyncDataSource = observer(
                   },
                 ]}
                 validateOnChange
-                onChange={(v: string) => {
+                onChange={(v: WriteMode) => {
                   setDB((draft) => {
-                    draft[from].writeMode = v
+                    draft[from].writeMode = +v
                   })
                 }}
                 help="当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现"
@@ -494,12 +612,12 @@ const SyncDataSource = observer(
                 name="semantic"
                 value={dbInfo.semantic}
                 options={[
-                  { label: 'exactly-once', value: 2 },
-                  { label: 'at-least-once', value: 1 },
+                  { label: 'exactly-once', value: Semantic.ExactlyOnce },
+                  { label: 'at-least-once', value: Semantic.AtLeastOnce },
                 ]}
-                onChange={(v: string) => {
+                onChange={(v: Semantic) => {
                   setDB((draft) => {
-                    draft[from].semantic = v
+                    draft[from].semantic = +v
                   })
                 }}
                 validateOnChange
@@ -521,6 +639,12 @@ const SyncDataSource = observer(
                     ${tw`w-28!`}
                   }
                 `}
+                defaultValue={dbInfo.batchSize}
+                onChange={(v: string) => {
+                  setDB((draft) => {
+                    draft[from].batchSize = +v
+                  })
+                }}
                 schemas={[
                   {
                     help: '批量写入条数不能为空',
@@ -530,7 +654,8 @@ const SyncDataSource = observer(
                   {
                     help: '范围: 1~65535, 批量写入条数不能小于 1',
                     status: 'error',
-                    rule: (v) => v > 0 && v <= 65535,
+                    rule: (v) =>
+                      /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535,
                   },
                 ]}
               />
@@ -555,9 +680,7 @@ const SyncDataSource = observer(
                     name="pre_sql"
                     label="写入前SQL语句组"
                     size={2}
-                    onChange={(
-                      v: string[] | Record<'value' | 'key', string>[]
-                    ) => {
+                    onChange={(v: string[]) => {
                       setDB((draft) => {
                         draft[from].preSql = v
                       })
@@ -571,9 +694,7 @@ const SyncDataSource = observer(
                     value={dbInfo.postSql}
                     label="写入后SQL语句组"
                     size={1}
-                    onChange={(
-                      v: string[] | Record<'value' | 'key', string>[]
-                    ) => {
+                    onChange={(v: string[]) => {
                       setDB((draft) => {
                         draft[from].postSql = v
                       })

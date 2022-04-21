@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react'
 import {
   Control,
   Field,
@@ -35,18 +35,30 @@ const Root = styled('div')(() => [
   `,
 ])
 
-const SyncChannel = forwardRef((props, ref) => {
-  const [channel, setChannel] = useImmer<{
-    parallelism?: number
-    record_num?: string
-    percentage?: number
-    bytes?: number
-    rate?: 2 | 1
-  }>({
-    rate: 2,
+interface ChannelControl {
+  parallelism?: number
+  record_num?: number
+  percentage?: number
+  bytes?: number
+  rate?: 2 | 1
+}
+interface SyncChannelProps {
+  channelControl?: ChannelControl
+}
+
+const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
+  const { channelControl } = props
+  const [channel, setChannel] = useImmer<ChannelControl>(
+    channelControl || { rate: 2 }
+  )
+
+  useLayoutEffect(() => {
+    if (channelControl) {
+      setChannel(channelControl)
+    }
   })
-  // const [rate, setRate] = useState()
-  const formRef = useRef(null)
+
+  const formRef = useRef<Form>(null)
   useImperativeHandle(ref, () => ({
     getChannel: () => {
       if (formRef.current?.validateForm()) {
@@ -153,7 +165,7 @@ const SyncChannel = forwardRef((props, ref) => {
                 const num = +v
                 if (!isNAN(num)) {
                   setChannel((draft) => {
-                    draft.record_num = String(num)
+                    draft.record_num = num
                   })
                 }
               }}

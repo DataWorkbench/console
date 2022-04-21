@@ -116,13 +116,23 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   useEffect(() => {
     setLeftFields(leftFieldsProp)
-    setMappings([])
-  }, [leftFieldsProp])
+    if (mappingsProp.length === 0) {
+      setMappings([])
+    }
+  }, [leftFieldsProp, mappingsProp])
 
   useEffect(() => {
     setRightFields(rightFieldsProp)
-    setMappings([])
-  }, [rightFieldsProp])
+    if (mappingsProp.length === 0) {
+      setMappings([])
+    }
+  }, [rightFieldsProp, mappingsProp])
+
+  useEffect(() => {
+    setMappings(mappingsProp)
+  }, [mappingsProp])
+
+  // console.log('mappingsProp', mappingsProp, mappings)
 
   useEffect(() => {
     jsPlumbInstRef.current?.repaintEverything()

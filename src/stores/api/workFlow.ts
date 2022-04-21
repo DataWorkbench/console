@@ -140,7 +140,7 @@ export const getStreamJobArgs = ({
     uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/args`,
   })
 
-export const SetSyncJobConf = ({
+export const setSyncJobConf = ({
   regionId,
   spaceId,
   jobId,
@@ -151,6 +151,26 @@ export const SetSyncJobConf = ({
     uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/conf`,
     body: rest,
     method: 'PUT',
+  })
+
+export const getSyncJobConf = ({ regionId, spaceId, jobId }: IWorkFlowParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/conf`,
+    method: 'GET',
+  })
+
+export const pingSyncJobConnection = ({
+  regionId,
+  spaceId,
+  jobId,
+  ...rest
+}: IWorkFlowParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/sync/job/${jobId}/conn`,
+    body: rest,
+    method: 'POST',
   })
 
 export const setStreamJobCode = ({

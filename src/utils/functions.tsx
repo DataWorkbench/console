@@ -16,3 +16,5 @@ export const compose = (...fn: ((v: any) => any)[]) =>
         // @ts-ignore
         a(b(...args))
   )
+
+export const tuple = <T extends string[]>(...args: T) => args

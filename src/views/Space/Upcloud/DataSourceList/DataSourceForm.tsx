@@ -1,9 +1,8 @@
 import React, {
   MutableRefObject,
   useCallback,
-  // useContext,
-  useMemo,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -14,13 +13,11 @@ import { get, omit, toLower } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
-import { useStore } from 'hooks'
 import { AffixLabel, Center, Divider } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { toJS } from 'mobx'
 import { DataSourcePingButton } from './DataSourcePing'
-// import { NetworkContext } from './NetworkProvider'
 import {
   esAnonymousFilters,
   esPwdFilters,
@@ -148,12 +145,16 @@ interface IFormProps {
   }
   getFormData?: MutableRefObject<() => any>
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
+  op: string
+  opSourceList: Record<string, any>[]
 }
 
 const DataSourceForm = ({
   resInfo,
   getFormData,
   onFieldValueChange,
+  op,
+  opSourceList,
 }: IFormProps) => {
   const [network, setNetWork] = useImmer<{
     type: 'vpc' | 'eip'
@@ -168,9 +169,9 @@ const DataSourceForm = ({
   })
   const ref = useRef<Form>(null)
 
-  const {
-    dataSourceStore: { op, opSourceList },
-  } = useStore()
+  // const {
+  //   dataSourceStore: { op, opSourceList },
+  // } = useStore()
 
   const urlType = resInfo?.urlType ?? resInfo.name.toLowerCase()
   const sourceInfo =
@@ -190,6 +191,15 @@ const DataSourceForm = ({
         return hiveAnonymousFilters
       }
       return hivePwdFilters
+    }
+    if (urlType === 'elastic_search') {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return esAnonymousFilters
+      }
+      return esPwdFilters
     }
     return undefined
   })
@@ -456,31 +466,6 @@ const DataSourceForm = ({
             }
           >
             {fields.map((field) => {
-              // if (name === 'nodes') {
-              //   return (
-              //     <HdfsNodeField
-              //       key={name}
-              //       name={name}
-              //       validateOnBlur
-              //       label={<AffixLabel required>{label}</AffixLabel>}
-              //       defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
-              //       schemas={[
-              //         {
-              //           rule: (o: Record<string, any>) => {
-              //             if (trim(o.name_node) === '') {
-              //               return false
-              //             }
-              //             return /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
-              //               o.port
-              //             )
-              //           },
-              //           help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
-              //           status: 'error',
-              //         },
-              //       ]}
-              //     />
-              //   )
-              // }
               const getField = (fieldData: Record<string, any>) => {
                 const {
                   name,
@@ -574,11 +559,6 @@ const DataSourceForm = ({
               </Divider>
             </Field>
             <Field css={showPing ? visibleStyle : hiddenStyle}>
-              {/* <Label> */}
-              {/*  <AffixLabel help="检查数据源参数是否正确" required={false}> */}
-              {/*    数据源可用性测试 */}
-              {/*  </AffixLabel> */}
-              {/* </Label> */}
               <DataSourcePingButton
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}

@@ -41,6 +41,21 @@ class WorkSpaceStore {
             { name: 'job', title: '作业实例' },
           ],
         },
+        {
+          name: 'data-integration',
+          title: '数据集成运维',
+          icon: 'slider',
+          items: [
+            {
+              name: 'data-release',
+              title: '已发布作业',
+            },
+            {
+              name: 'data-job',
+              title: '作业实例',
+            },
+          ],
+        },
         // { name: 'offline', title: '离线任务运维', icon: 'blockchain' },
         // { name: 'monitor', title: '智能监控', icon: 'blockchain' },
         // { name: 'logs', title: '操作日志', icon: 'blockchain' },

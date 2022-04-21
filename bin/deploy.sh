@@ -55,10 +55,10 @@ function sync_qa() {
   echo "done"
 
   echo "start deploy"
-  ssh root@"$PROXY" ssh "$WEBSERVICE0" sh $PROXY_PATH/deploy.sh
+  ssh root@"$PROXY" ssh "$WEBSERVICE0" sh $PROXY_PATH/refresh.sh
 
   echo "start deploy"
-  ssh root@"$PROXY" ssh "$WEBSERVICE1" sh $PROXY_PATH/deploy.sh
+  ssh root@"$PROXY" ssh "$WEBSERVICE1" sh $PROXY_PATH/refresh.sh
 
   echo "clear dist"
   rm -r dist/configs

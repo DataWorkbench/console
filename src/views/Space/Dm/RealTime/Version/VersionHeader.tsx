@@ -122,8 +122,8 @@ export default function VersionHeader() {
           onClick={() => workFlowStore.set({ curVersion: null })}
         >
           <Icon
-            name="close"
-            color={{ primary: '#fff', secondary: '#fff' }}
+            name="if-close"
+            // color={{ primary: '#fff', secondary: '#fff' }}
             tw="mr-1"
           />
           退出

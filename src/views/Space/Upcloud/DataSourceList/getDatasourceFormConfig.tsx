@@ -797,7 +797,7 @@ localhost:6379
       fieldsInfo = [
         {
           component: KVTextAreaFieldWrapper,
-          name: 'hostPort',
+          name: 'port',
           title: 'IP:Port',
           label: '访问地址（Host：Port）',
           placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
