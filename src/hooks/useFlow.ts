@@ -20,7 +20,9 @@ import {
   getStreamJobSchedule,
   getSyncJobSchedule,
   setStreamJobArgs,
-  SetSyncJobConf,
+  setSyncJobConf,
+  getSyncJobConf,
+  pingSyncJobConnection,
   getStreamJobArgs,
   setStreamJobCode,
   getStreamJobCode,
@@ -270,7 +272,7 @@ export const useMutationSyncJobConf = () => {
     workFlowStore: { curJob },
   } = useStore()
   return useMutation(async (params: Record<string, any>) => {
-    const ret = await SetSyncJobConf({
+    const ret = await setSyncJobConf({
       ...params,
       regionId,
       spaceId,
@@ -278,6 +280,28 @@ export const useMutationSyncJobConf = () => {
     })
     return ret
   })
+}
+
+export const useQuerySyncJobConf = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  const key = [
+    'JobConf',
+    {
+      regionId,
+      spaceId,
+      jobId: curJob?.id,
+    },
+  ]
+  return useQuery(key, async () =>
+    getSyncJobConf({
+      regionId,
+      spaceId,
+      jobId: curJob?.id,
+    })
+  )
 }
 
 export const useQueryStreamJobArgs = (options?: UseQueryOptions) => {
@@ -296,6 +320,24 @@ export const useQueryStreamJobArgs = (options?: UseQueryOptions) => {
     async () =>
       getStreamJobArgs({ ...params, regionId, spaceId, jobId: curJob?.id }),
     options
+  )
+}
+
+export const useMutationPingSyncJobConnection = () => {
+  const {
+    workFlowStore: { curJob },
+  } = useStore()
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  return useMutation(
+    async (params: { clusterId: string; sourceId: string; targetId: string }) =>
+      pingSyncJobConnection({
+        cluster_id: params.clusterId,
+        source_id: params.sourceId,
+        target_id: params.targetId,
+        regionId,
+        spaceId,
+        jobId: curJob?.id,
+      })
   )
 }
 

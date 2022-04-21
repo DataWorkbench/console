@@ -1,26 +1,47 @@
 import { Button, Control, Field, Form, Icon, Label } from '@QCFE/lego-ui'
-import { AffixLabel, ButtonWithClearField } from 'components'
+import { AffixLabel, ButtonWithClearField, FlexBox, Tooltip } from 'components'
 import { get, isEmpty } from 'lodash-es'
-import { forwardRef, useImperativeHandle, useState } from 'react'
-import tw, { css } from 'twin.macro'
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
+import tw, { css, theme } from 'twin.macro'
+import { useMutationPingSyncJobConnection } from 'hooks'
 import ClusterTableModal from '../../Cluster/ClusterTableModal'
 
 interface SyncClusterProps {
   onChange?: (clusterId: string) => void
+  sourceId?: string
+  targetId?: string
+  clusterId?: string
 }
 
 const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
-  const { onChange } = props
+  const { onChange, sourceId, targetId, clusterId: clusterIdProps } = props
   const [visible, setVisible] = useState(false)
-  const [cluster, setCluster] = useState(null)
+  const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
   const clusterName = get(cluster, 'name', '')
+  const enablePing = !!(sourceId && targetId && clusterId)
+  const mutation = useMutationPingSyncJobConnection()
+  useEffect(() => {
+    if (clusterIdProps) {
+      setCluster({ id: clusterIdProps })
+    }
+  }, [clusterIdProps])
 
   useImperativeHandle(ref, () => ({
     getCluster: () => cluster,
+    checkPingSuccess: () => mutation.isSuccess,
   }))
 
-  const handleConnection = () => {}
+  const handlePingConnection = () => {
+    if (!enablePing) {
+      return
+    }
+    mutation.mutate({
+      clusterId,
+      sourceId,
+      targetId,
+    })
+  }
 
   return (
     <>
@@ -45,26 +66,63 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
           value={clusterId}
           placeholder="选择集群"
           onClick={() => setVisible(true)}
-          onClear={() => setCluster(null)}
+          onClear={() => {
+            setCluster(null)
+            mutation.reset()
+          }}
           label={<AffixLabel>计算集群</AffixLabel>}
         >
-          {clusterName}
+          {clusterName || clusterId}
         </ButtonWithClearField>
         <Field>
           <Label>
-            <AffixLabel help="more" theme="green">
+            <AffixLabel
+              help="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
+              theme="light"
+            >
               计算集群连通性
             </AffixLabel>
           </Label>
-          <Control>
-            <Button
-              type="outlined"
-              tw="text-green-11!"
-              onClick={handleConnection}
+          <Control tw="flex-wrap">
+            <Tooltip
+              disabled={enablePing}
+              theme="light"
+              content="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
+              hasPadding
             >
-              连通性测试
-            </Button>
+              <Button
+                type="outlined"
+                loading={mutation.isLoading}
+                css={[
+                  tw`text-green-11!`,
+                  !enablePing && tw`cursor-not-allowed opacity-50`,
+                ]}
+                onClick={() => {
+                  if (enablePing) {
+                    handlePingConnection()
+                  }
+                }}
+              >
+                连通性测试
+              </Button>
+            </Tooltip>
           </Control>
+          {clusterId && mutation.isSuccess && (
+            <FlexBox
+              className="help"
+              tw="w-full ml-[132px]! items-center text-green-11! space-x-0.5"
+            >
+              <Icon
+                name="clock"
+                size={16}
+                color={{
+                  primary: theme('colors.transparent'),
+                  secondary: theme('colors.green.11'),
+                }}
+              />
+              <span>测试通过</span>
+            </FlexBox>
+          )}
         </Field>
       </Form>
       <ClusterTableModal
@@ -72,6 +130,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         onOk={(v) => {
           setCluster(v)
           setVisible(false)
+          mutation.reset()
           if (onChange) {
             onChange(v)
           }
