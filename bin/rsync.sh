@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # webservice机器上用，负责备份原代码，同步最新代码
+# 位置：/data/webapp/refresh.sh
 #bak
 echo "[0] start bak current file"
 
