@@ -5,7 +5,7 @@ import {
   getSyncJobVersionConf,
   getSyncJobVersionSchedule,
   listSyncJobVersions,
-} from 'stores/api/jobVersion'
+} from 'stores/api/syncJobVersion'
 
 interface IRouteParams {
   regionId: string

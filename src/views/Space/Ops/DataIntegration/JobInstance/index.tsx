@@ -24,13 +24,9 @@ import { tuple } from 'utils/functions'
 import { useHistory } from 'react-router-dom'
 // import { useQueryClient } from 'react-query'
 import { get, omitBy } from 'lodash-es'
-import {
-  // getJobInstanceKey,
-  // useMutationInstance,
-  useQueryJobInstances,
-} from 'hooks'
 import useFilter from 'hooks/useHooks/useFilter'
 import tw, { css } from 'twin.macro'
+import { useQuerySyncJobInstances } from 'hooks/useJobInstance'
 import {
   alarmStatus,
   dataJobInstanceColumns,
@@ -81,18 +77,19 @@ const DataJobInstance = () => {
   // const queryClient = useQueryClient()
   // const mutation = useMutationInstance()
 
-  const { isFetching } = useQueryJobInstances(omitBy(filter, Boolean))
-
-  const data = {}
+  const { data, isFetching } = useQuerySyncJobInstances(omitBy(filter, Boolean))
 
   const infos =
     get(data, 'infos', [
       {
-        instance_id: '11',
-        instance_name: 'xxxxx',
-        alarm_status: '1',
-        job_name: 'adfa',
-        job_id: '123123',
+        id: '111',
+        name: 'asdfasdf',
+        type: 1,
+        status: 1,
+        alarm_status: 1,
+        created: new Date().getTime(),
+        updated: new Date().getTime(),
+        version: 'asdfasdfasf',
       },
     ]) || []
 
@@ -108,7 +105,7 @@ const DataJobInstance = () => {
   }
 
   const columnsRender = {
-    instance_id: {
+    id: {
       render: (text: string, record: Record<string, any>) => (
         <InstanceName
           css={instanceNameStyle}
@@ -164,21 +161,29 @@ const DataJobInstance = () => {
               }
             `}
           >
-            <TextEllipsis theme="light">
-              <span tw="text-white" className="pit-job-name-text">
-                {record.job_name}
-              </span>
-              <span tw="text-neut-8"> {record.job_id}</span>
-            </TextEllipsis>
-            <TextEllipsis theme="light">
-              <span tw="text-neut-8">{`版本 ID： ${record.version}`}</span>
-            </TextEllipsis>
+            <div tw="truncate">
+              <TextEllipsis theme="light">
+                <span tw="text-white" className="pit-job-name-text">
+                  {record.job_name}
+                </span>
+                <span tw="text-neut-8"> {`(${record.job_id})`}</span>
+              </TextEllipsis>
+            </div>
+            <div tw="truncate">
+              <TextEllipsis theme="light">
+                <span tw="text-neut-8">{`版本 ID： ${record.version}`}</span>
+              </TextEllipsis>
+            </div>
           </div>
         )
         // TODO: desc 字段未定
         if (record.desc) {
           return (
-            <Tooltip theme="light" hasPadding content={record.desc}>
+            <Tooltip
+              theme="light"
+              hasPadding
+              content={`发布描述: ${record.desc}`}
+            >
               {child}
             </Tooltip>
           )
@@ -186,7 +191,7 @@ const DataJobInstance = () => {
         return child
       },
     },
-    job_type: {
+    type: {
       filter: filter.job_type,
       onFilter: (v: string) => {
         setFilter((draft) => {
@@ -198,27 +203,19 @@ const DataJobInstance = () => {
       filtersNew: Object.values(jobType) as any,
       render: (text: keyof typeof jobType) => <JobTypeCmp type={text} />,
     },
-    create_time: {
+    created: {
       sortable: true,
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
-        filter.sort_by === 'updated_at'
-          ? filter.reverse
-            ? 'asc'
-            : 'desc'
-          : '',
+        filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
       render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
 
-    update_time: {
+    updated: {
       sortable: true,
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
-        filter.sort_by === 'updated_at'
-          ? filter.reverse
-            ? 'asc'
-            : 'desc'
-          : '',
+        filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
       render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
     },
   }

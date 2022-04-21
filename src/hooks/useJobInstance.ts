@@ -1,28 +1,27 @@
-import {
-  useMutation,
-  useQuery,
-  UseQueryOptions,
-  useQueryClient,
-  useInfiniteQuery,
-} from 'react-query'
-import { useCallback } from 'react'
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
-import { useStore } from 'stores'
-import { listFlinkClusters, listSyncInstances } from 'stores/api'
-import { omit } from 'lodash-es'
+import {
+  describeFlinkUiByInstanceId,
+  listSyncInstances,
+  terminateSyncInstances,
+} from 'stores/api'
 
 interface IRouteParams {
   regionId: string
   spaceId: string
 }
 
-const queryKey: any = ''
+const queryKey = {
+  list: '' as any,
+  detail: '' as any,
+  flinkUi: '' as any,
+}
 
-export const getFlinkClusterKey = () => queryKey
+export const getFlinkClusterKey = (key: keyof typeof queryKey) => queryKey[key]
 
 export const useQuerySyncJobInstances = (
   filter: any,
-  { enabled = true }: Record<string, any>
+  { enabled = true }: Record<string, any> = { enabled: true }
 ) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
@@ -32,9 +31,9 @@ export const useQuerySyncJobInstances = (
     offset: 0,
     ...filter,
   }
-  const qryKey = ['syncJobInstances', omit(params, 'offset')]
+  queryKey.list = ['syncJobInstances', params]
   return useInfiniteQuery(
-    qryKey,
+    queryKey.list,
     async ({ pageParam = params }) => listSyncInstances(pageParam),
     {
       enabled,
@@ -58,4 +57,35 @@ export const useQuerySyncJobInstances = (
       },
     }
   )
+}
+
+export const useQueryDescribeFlinkUIByInstanceId = (
+  id: string,
+  { enabled = true }: Record<string, any>
+) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const qryKey = ['syncJobInstance', { regionId, spaceId, id }]
+  return useQuery(
+    qryKey,
+    async () => describeFlinkUiByInstanceId({ regionId, spaceId, id }),
+    {
+      enabled,
+    }
+  )
+}
+
+export const useMutationJobInstance = (options?: {}) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  return useMutation(async ({ op, ...rest }: Record<string, any>) => {
+    if (['terminate'].includes(op)) {
+      let ret
+      if (op === 'terminate') {
+        ret = await terminateSyncInstances({ ...rest, regionId, spaceId })
+      } else {
+        ret = undefined
+      }
+      return ret
+    }
+    return undefined
+  }, options)
 }

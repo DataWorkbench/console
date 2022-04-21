@@ -97,8 +97,8 @@ export const dataJobInstanceSuggestions: ISuggestion[] = [
 export const dataJobInstanceColumns: IColumn[] = [
   {
     title: '实例 ID',
-    dataIndex: 'instance_id',
-    key: 'instance_id',
+    dataIndex: 'id',
+    key: 'id',
   },
   {
     title: '状态',
@@ -117,18 +117,18 @@ export const dataJobInstanceColumns: IColumn[] = [
   },
   {
     title: '作业类型',
-    dataIndex: 'job_type',
-    key: 'job_type',
+    dataIndex: 'type',
+    key: 'type',
   },
   {
     title: '创建时间',
-    dataIndex: 'create_time',
-    key: 'create_time',
+    dataIndex: 'created',
+    key: 'created',
   },
   {
     title: '更新时间',
-    dataIndex: 'update_time',
-    key: 'update_time',
+    dataIndex: 'updated',
+    key: 'updated',
   },
 ]
 
@@ -176,7 +176,7 @@ export const sourceTypes = {
 export const dataReleaseSuggestions: ISuggestion[] = [
   {
     label: '作业名称',
-    key: 'job_name',
+    key: 'name',
   },
   {
     label: 'ID',
