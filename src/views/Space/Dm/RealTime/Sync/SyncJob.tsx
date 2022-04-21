@@ -418,8 +418,12 @@ const SyncJob = () => {
           <Icon name="data" type="dark" />
           保存
         </Button>
-        {/* loading={releaseMutation.isLoading} */}
-        <Button type="primary" onClick={release} disabled={!enableRelease}>
+        {/* loading={releaseMutation.isLoading} disabled={!enableRelease} */}
+        <Button
+          type="primary"
+          onClick={release}
+          disabled={get(confData, 'source_id') === ''}
+        >
           <Icon name="export" />
           发布
         </Button>
