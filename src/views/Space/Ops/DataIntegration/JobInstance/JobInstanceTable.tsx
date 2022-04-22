@@ -210,7 +210,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
-      render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (v: number) => (
+        <span tw="text-neut-8">
+          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+      ),
     },
 
     updated: {
@@ -218,7 +222,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
-      render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (v: number) => (
+        <span tw="text-neut-8">
+          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+      ),
     },
   }
 
