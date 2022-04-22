@@ -13,7 +13,33 @@ export const listSyncInstances = ({
 }: ISyncInstanceParams) => {
   return request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/release`,
+    uri: `/v1/workspace/${spaceId}/sync/job/instance`,
     query: rest,
+  })
+}
+
+export const terminateSyncInstances = ({
+  regionId,
+  spaceId,
+  ids,
+}: ISyncInstanceParams) => {
+  return request({
+    region: regionId,
+    method: 'POST',
+    uri: `/v1/workspace/${spaceId}/sync/job/instance/terminates`,
+    body: {
+      instance_ids: ids,
+    },
+  })
+}
+
+export const describeFlinkUiByInstanceId = ({
+  regionId,
+  spaceId,
+  instanceId,
+}: ISyncInstanceParams) => {
+  return request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/sync/job/instance/${instanceId}/flink-ui`,
   })
 }

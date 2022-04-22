@@ -9,6 +9,7 @@ import {
   startFlinkClusters,
   stopFlinkClusters,
   describeResourceBinding,
+  getDescribeFlinkCluster,
 } from 'stores/api'
 import { get, omit } from 'lodash-es'
 
@@ -125,4 +126,17 @@ export const useMutationCluster = () => {
   )
 }
 
-export default {}
+export const useQueryDescribeFlinkCluster = (
+  filter: Record<string, any>,
+  option: Record<string, any> = { enabled: true }
+) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const params = {
+    regionId,
+    spaceId,
+    ...filter,
+  }
+
+  const qky = ['describeFlinkCluster', params]
+  return useQuery(qky, async () => getDescribeFlinkCluster(params), option)
+}

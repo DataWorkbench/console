@@ -32,17 +32,17 @@ export enum JobInstanceStatusType {
 }
 
 export const jobInstanceStatus = {
-  '0': {
+  3: {
     label: '失败重试',
-    value: '0',
+    value: 3,
     type: JobInstanceStatusType.FAILED_AND_RETRY,
   },
-  '1': { label: '运行中', value: '1', type: JobInstanceStatusType.RUNNING },
-  '2': { label: '准备资源', value: '2', type: JobInstanceStatusType.PREPARING },
-  '3': { label: '运行失败', value: '3', type: JobInstanceStatusType.FAILED },
-  '4': { label: '运行成功', value: '4', type: JobInstanceStatusType.SUCCEEDED },
-  '5': { label: '运行超时', value: '5', type: JobInstanceStatusType.TIMEOUT },
-  '6': { label: '已终止', value: '6', type: JobInstanceStatusType.FINISHED },
+  2: { label: '运行中', value: 2, type: JobInstanceStatusType.RUNNING },
+  1: { label: '准备资源', value: 1, type: JobInstanceStatusType.PREPARING },
+  8: { label: '运行失败', value: 8, type: JobInstanceStatusType.FAILED },
+  6: { label: '运行成功', value: 6, type: JobInstanceStatusType.SUCCEEDED },
+  7: { label: '运行超时', value: 7, type: JobInstanceStatusType.TIMEOUT },
+  5: { label: '已终止', value: 5, type: JobInstanceStatusType.FINISHED },
 } as const
 
 export enum AlarmStatus {
@@ -52,7 +52,7 @@ export enum AlarmStatus {
 
 export const alarmStatus = {
   '0': { label: '正常', value: '0', type: AlarmStatus.NORMAL },
-  '1': { label: '警告', value: '1', type: AlarmStatus.WARNING },
+  '1': { label: '告警', value: '1', type: AlarmStatus.WARNING },
 } as const
 
 export enum JobType {
@@ -62,15 +62,15 @@ export enum JobType {
 }
 
 export const jobType = {
-  '0': { label: '全量更新', value: '0', type: JobType.FULL_UPDATE },
-  '1': { label: '增量更新', value: '1', type: JobType.INCREMENT_UPDATE },
-  '2': { label: '实时更新', value: '2', type: JobType.REALTIME_UPDATE },
+  1: { label: '全量更新', value: 1, type: JobType.FULL_UPDATE },
+  2: { label: '增量更新', value: 2, type: JobType.INCREMENT_UPDATE },
+  3: { label: '实时更新', value: 3, type: JobType.REALTIME_UPDATE },
 } as const
 
 export const dataJobInstanceSuggestions: ISuggestion[] = [
   {
     label: '状态',
-    key: 'status',
+    key: 'state',
     options: Object.values(jobInstanceStatus).map(({ label, value }) => ({
       label,
       key: value,
@@ -89,21 +89,21 @@ export const dataJobInstanceSuggestions: ISuggestion[] = [
     key: 'job_name',
   },
   {
-    label: '实例 ID',
-    key: 'instance_id',
+    label: '作业 ID',
+    key: 'job_id',
   },
 ]
 
 export const dataJobInstanceColumns: IColumn[] = [
   {
     title: '实例 ID',
-    dataIndex: 'instance_id',
-    key: 'instance_id',
+    dataIndex: 'id',
+    key: 'id',
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    key: 'status',
+    dataIndex: 'state',
+    key: 'state',
   },
   {
     title: '告警状态',
@@ -117,18 +117,18 @@ export const dataJobInstanceColumns: IColumn[] = [
   },
   {
     title: '作业类型',
-    dataIndex: 'job_type',
-    key: 'job_type',
+    dataIndex: 'type',
+    key: 'type',
   },
   {
     title: '创建时间',
-    dataIndex: 'create_time',
-    key: 'create_time',
+    dataIndex: 'created',
+    key: 'created',
   },
   {
     title: '更新时间',
-    dataIndex: 'update_time',
-    key: 'update_time',
+    dataIndex: 'updated',
+    key: 'updated',
   },
 ]
 
@@ -139,9 +139,9 @@ export enum DataReleaseSchedule {
 }
 
 export const dataReleaseScheduleType = {
-  '0': { label: '运行中', value: '0', type: DataReleaseSchedule.RUNNING },
-  '1': { label: '已完成', value: '1', type: DataReleaseSchedule.FINISHED },
-  '2': { label: '已下线', value: '2', type: DataReleaseSchedule.DOWNED },
+  2: { label: '运行中', value: 2, type: DataReleaseSchedule.RUNNING },
+  4: { label: '已完成', value: 4, type: DataReleaseSchedule.FINISHED },
+  3: { label: '已下线', value: 3, type: DataReleaseSchedule.DOWNED },
 } as const
 
 export enum DataReleaseDevMode {
@@ -175,8 +175,16 @@ export const sourceTypes = {
 
 export const dataReleaseSuggestions: ISuggestion[] = [
   {
+    label: '作业名称',
+    key: 'name',
+  },
+  {
+    label: 'ID',
+    key: 'ID',
+  },
+  {
     label: '调度状态',
-    key: 'schedule_status',
+    key: 'status',
     options: Object.values(dataReleaseScheduleType).map(({ label, value }) => ({
       label,
       key: value,
@@ -219,13 +227,13 @@ export const dataReleaseTabs: ITab[] = [
 export const dataReleaseColumns: IColumn[] = [
   {
     title: '作业名称/ID',
-    dataIndex: 'job_name',
-    key: 'job_name',
+    dataIndex: 'id',
+    key: 'id',
   },
   {
     title: '调度状态',
-    dataIndex: 'schedule_status',
-    key: 'schedule_status',
+    dataIndex: 'status',
+    key: 'status',
   },
   {
     title: '告警状态',
@@ -234,8 +242,8 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '版本 ID',
-    dataIndex: 'version_id',
-    key: 'version_id',
+    dataIndex: 'version',
+    key: 'version',
   },
   {
     title: '开发模式',
@@ -244,8 +252,9 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '作业类型',
-    dataIndex: 'job_type',
-    key: 'job_type',
+    dataIndex: 'type',
+    key: 'type',
+    width: 130,
   },
   {
     title: '来源',
@@ -259,19 +268,87 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '最近发布时间',
-    dataIndex: `created_at`,
-    key: 'created_at',
+    dataIndex: `updated`,
+    key: 'updated',
   },
 ]
 
 const versionSet = new Set([
-  'job_name',
-  'schedule_status',
+  'id',
+  'status',
   'alarm_status',
-  'version_id',
-  'created_at',
+  'version',
+  'updated',
 ])
 
 export const versionColumns = dataReleaseColumns.filter(
   (column) => column.key && versionSet.has(column!.key)
 )
+
+export const dataReleaseActions = [
+  {
+    icon: 'q-listViewFill',
+    text: '关联实例',
+    key: 'link',
+  },
+  {
+    icon: 'q-terminalBoxFill',
+    text: '开发内容',
+    key: 'dev',
+  },
+  {
+    icon: 'q-clusterFill',
+    text: '计算集群',
+    key: 'cluster',
+  },
+  {
+    icon: 'q-bellGearFill',
+    text: '监控告警',
+    key: 'alarm',
+  },
+  {
+    icon: 'q-topology2Fill',
+    text: '调度信息',
+    key: 'schedule',
+  },
+  {
+    icon: 'q-subtractBoxFill',
+    text: '下线',
+    key: 'offline',
+  },
+  {
+    icon: 'q-upload2Fill',
+    text: '重新发布',
+    key: 're-publish',
+  },
+] as const
+
+export const dataReleaseDetailActions = [
+  {
+    icon: 'q-subtractBoxFill',
+    text: '下线',
+    key: 'offline',
+  },
+  {
+    icon: 'q-upload2Fill',
+    text: '重新发布',
+    key: 're-publish',
+  },
+]
+
+export type DataReleaseActionType = typeof dataReleaseActions[number]['key']
+
+export const dataJobActions = [
+  {
+    text: '中止',
+    icon: 'q-closeCircleFill',
+    key: 'stop',
+  },
+  {
+    text: '查看详情',
+    icon: 'eye',
+    key: 'info',
+  },
+] as const
+
+export type DataJobActionType = typeof dataJobActions[number]['key']

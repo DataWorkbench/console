@@ -12,12 +12,28 @@ export interface IMoreActionItem {
   icon?: string
   value?: any
 }
-export interface IMoreActionProps {
+export interface IMoreActionProps<T> {
   theme?: 'darker' | 'light'
-  onMenuClick?: (selectedData: any, menuKey: string) => void
+  onMenuClick?: (selectedData: any, menuKey: T) => void
   items: IMoreActionItem[]
   type?: 'icon' | 'button'
   buttonText?: string
+  placement?:
+    | 'top'
+    | 'top-start'
+    | 'top-end'
+    | 'right'
+    | 'right-start'
+    | 'right-end'
+    | 'bottom'
+    | 'bottom-start'
+    | 'bottom-end'
+    | 'left'
+    | 'left-start'
+    | 'left-end'
+    | 'auto'
+    | 'auto-start'
+    | 'auto-end'
 }
 
 const { MenuItem } = Menu as any
@@ -51,18 +67,19 @@ const getStyles = (theme: 'darker') => {
   }
 }
 
-export const MoreAction = (props: IMoreActionProps) => {
+export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
   const {
     theme = 'darker',
     onMenuClick,
     items,
     type = 'icon',
     buttonText,
+    placement = 'bottom-end',
   } = props
 
   const handleMenuClick = (
     e: SyntheticEvent,
-    key: string,
+    key: T,
     value: string | number
   ) => {
     // e.stopPropagation()
@@ -111,7 +128,7 @@ export const MoreAction = (props: IMoreActionProps) => {
       <Tooltip
         arrow={false}
         trigger="click"
-        placement="bottom-end"
+        placement={placement}
         twChild={moreActionStyle.child({ theme }) as any}
         content={
           <Menu onClick={handleMenuClick}>

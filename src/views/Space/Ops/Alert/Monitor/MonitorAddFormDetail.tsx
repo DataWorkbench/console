@@ -1,6 +1,6 @@
-import { FlexBox, Icons, Modal, ModalContent } from 'components'
+import { FlexBox, Icons, Modal, ModalContent } from 'components/index'
 import tw, { styled } from 'twin.macro'
-import { UserItem } from 'views/Space/Dm/RealTime/Monitor/components'
+import { UserItem } from 'views/Space/Ops/Alert/Monitor/components'
 import { JobItem, Tag } from './styles'
 
 interface IMonitorAddProps {

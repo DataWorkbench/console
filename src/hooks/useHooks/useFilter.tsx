@@ -1,6 +1,7 @@
 import { useImmer } from 'use-immer'
 import { WithConfig, WithPagination, WithSort } from 'utils/types'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
+import { emitter } from 'utils/index'
 
 interface ITableConfig {
   pagination?: boolean
@@ -9,12 +10,13 @@ interface ITableConfig {
 
 const useFilter = <T extends Object, P extends ITableConfig>(
   defaultFilter: Partial<WithConfig<T, P>>,
-  config: ITableConfig = { pagination: true }
+  config: ITableConfig = { pagination: true },
+  tableLinkKey?: string
 ) => {
   const [filter, setFilter] = useImmer<WithConfig<T, P>>(() => {
     let v = { ...(defaultFilter ?? {}) }
     if (config.pagination) {
-      v = { limit: 10, offset: 1, ...v }
+      v = { limit: 10, offset: 0, ...v }
     }
     return v as WithConfig<T, P>
   })
@@ -69,6 +71,21 @@ const useFilter = <T extends Object, P extends ITableConfig>(
     }
     return undefined
   }, [config.sort, handleSort])
+
+  useEffect(() => {
+    if (tableLinkKey) {
+      emitter.emit(`${tableLinkKey}-set`, filter)
+    }
+  }, [filter, tableLinkKey])
+
+  useEffect(() => {
+    emitter.on(`${tableLinkKey}-get`, (d) => {
+      setFilter((draft: any) => {
+        return { ...draft, ...d }
+      })
+    })
+  }, [tableLinkKey, setFilter])
+
   return {
     filter,
     setFilter,

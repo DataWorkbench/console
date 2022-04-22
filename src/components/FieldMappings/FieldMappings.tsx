@@ -90,6 +90,8 @@ interface Column {
   name: string
   type: string
   value: string
+  readonly?: boolean
+  hasHeader?: boolean
 }
 
 export interface IFieldMappingsProps {
@@ -101,6 +103,8 @@ export interface IFieldMappingsProps {
   topHelp?: ReactNode
   mappings?: [string, string][]
   columns?: [Column[], Column[]]
+  readonly?: boolean
+  hasHeader?: boolean
 }
 
 export interface IFieldMappingsRecord {
@@ -117,6 +121,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     topHelp,
     mappings: mappingsProp,
     columns,
+    readonly = false,
+    hasHeader = true,
   } = props
 
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
@@ -514,50 +520,57 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       </Root>
     )
   }
+
   return (
     <Root>
       <div tw="relative">
         {topHelp && <Center tw="absolute left-0 bottom-0">{topHelp}</Center>}
-        <Center tw="gap-4">
-          <OutlinedGreenButton type="outlined" onClick={handleParallel}>
-            全部平行
-          </OutlinedGreenButton>
-          <PopConfirm
-            type="warning"
-            okType="danger"
-            okText="确认"
-            content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
-            onOk={handleNameMapping}
-          >
-            <OutlinedGreenButton type="outlined">同名映射</OutlinedGreenButton>
-          </PopConfirm>
-          <PopConfirm
-            type="warning"
-            okText="确认"
-            content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
-            onOk={handleRowMapping}
-          >
-            <OutlinedGreenButton type="outlined">同行映射</OutlinedGreenButton>
-          </PopConfirm>
-          <PopConfirm
-            content="取消映射会去除所有现有映射，确定取消映射么？"
-            type="warning"
-            okText="解除全部映射"
-            okType="danger"
-            onOk={handleClearMapping}
-          >
-            <Button type="black">解除全部映射</Button>
-          </PopConfirm>
-          <PopConfirm
-            content="置为初始状态会重新将表结构恢复到获取时的状态且去掉已有的映射和新增字段，确认置为初始状态么？"
-            type="warning"
-            okText="置为初始状态"
-            okType="danger"
-            onOk={handleReset}
-          >
-            <Button type="black">置为初始状态</Button>
-          </PopConfirm>
-        </Center>
+        {hasHeader && (
+          <Center tw="gap-4">
+            <OutlinedGreenButton type="outlined" onClick={handleParallel}>
+              全部平行
+            </OutlinedGreenButton>
+            <PopConfirm
+              type="warning"
+              okType="danger"
+              okText="确认"
+              content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
+              onOk={handleNameMapping}
+            >
+              <OutlinedGreenButton type="outlined">
+                同名映射
+              </OutlinedGreenButton>
+            </PopConfirm>
+            <PopConfirm
+              type="warning"
+              okText="确认"
+              content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
+              onOk={handleRowMapping}
+            >
+              <OutlinedGreenButton type="outlined">
+                同行映射
+              </OutlinedGreenButton>
+            </PopConfirm>
+            <PopConfirm
+              content="取消映射会去除所有现有映射，确定取消映射么？"
+              type="warning"
+              okText="解除全部映射"
+              okType="danger"
+              onOk={handleClearMapping}
+            >
+              <Button type="black">解除全部映射</Button>
+            </PopConfirm>
+            <PopConfirm
+              content="置为初始状态会重新将表结构恢复到获取时的状态且去掉已有的映射和新增字段，确认置为初始状态么？"
+              type="warning"
+              okText="置为初始状态"
+              okType="danger"
+              onOk={handleReset}
+            >
+              <Button type="black">置为初始状态</Button>
+            </PopConfirm>
+          </Center>
+        )}
       </div>
       <Container ref={containerRef}>
         <FlexBox tw="flex items-start transition-all duration-500">
@@ -602,13 +615,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                 />
               ))}
-              <Center
-                tw="bg-neut-16 cursor-pointer h-8"
-                onClick={addCustomField}
-              >
-                <Icon name="add" type="light" />
-                添加字段
-              </Center>
+              {!readonly && (
+                <Center
+                  tw="bg-neut-16 cursor-pointer h-8"
+                  onClick={addCustomField}
+                >
+                  <Icon name="add" type="light" />
+                  添加字段
+                </Center>
+              )}
             </div>
           ) : (
             <EmptyFieldWrapper>

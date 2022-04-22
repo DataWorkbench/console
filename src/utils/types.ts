@@ -1,6 +1,13 @@
 export type ValueOf<T> = T[keyof T]
 export const tuple = <T extends string[]>(...args: T) => args
 
+export interface ITab {
+  title: string
+  description: string
+  icon: string
+  helpLink: string
+}
+
 export type RequireField<T, K extends keyof T> = T & Required<Pick<T, K>>
 
 export interface IPagination {

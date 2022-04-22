@@ -1,9 +1,9 @@
 import { Form, InputNumber, Select } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Modal, ModalContent } from 'components'
+import { FlexBox, Modal, ModalContent } from 'components/index'
 import { Checkbox, Field, Label } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css } from 'twin.macro'
-import AdduserField from 'views/Space/Dm/RealTime/Monitor/AdduserField'
+import AdduserField from 'views/Space/Ops/Alert/Monitor/AdduserField'
 
 const { TextField, TextAreaField } = Form
 

@@ -161,14 +161,16 @@ interface SyncDataSourceProps {
     target_id?: string
     sync_resource?: Record<SyncResKey, any>
   }
+  curJob?: Record<string, any>
 }
 
 const SyncDataSource = observer(
   (props: SyncDataSourceProps, ref) => {
-    const { onSelectTable, onDbChange, conf } = props
+    const { onSelectTable, onDbChange, conf, curJob: curJobProp } = props
     const {
-      workFlowStore: { curJob },
+      workFlowStore: { curJob: curJobStore },
     } = useStore()
+    const curJob = curJobProp ?? curJobStore
     const [visible, setVisible] = useState<boolean | null>(null)
     const [showSourceAdvance, setShowSourceAdvance] = useState(false)
     const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
