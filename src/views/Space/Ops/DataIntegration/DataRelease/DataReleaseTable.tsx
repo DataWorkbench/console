@@ -203,7 +203,16 @@ const DataRelease = observer(() => {
       }
 
       if (record.__level > 1) {
-        return <TextEllipsis>{text}</TextEllipsis>
+        return (
+          <TextEllipsis>
+            <span
+              tw="hover:text-green-11 hover:cursor-pointer"
+              onClick={() => jumpDetail()(record)}
+            >
+              {text}
+            </span>
+          </TextEllipsis>
+        )
       }
       const child = (
         <Center tw="truncate" css={jobNameStyle}>
