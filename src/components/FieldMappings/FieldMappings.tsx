@@ -96,6 +96,8 @@ export interface IFieldMappingsProps {
   onChange?: (value: Record<string, any>) => void
   leftFields: TMappingField[]
   rightFields: TMappingField[]
+  leftTypeName?: string
+  rightTypeName?: string
   topHelp?: ReactNode
   mappings?: [string, string][]
   columns?: [Column[], Column[]]
@@ -111,6 +113,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const {
     leftFields: leftFieldsProp,
     rightFields: rightFieldsProp,
+    leftTypeName,
     topHelp,
     mappings: mappingsProp,
     columns,
@@ -511,7 +514,6 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       </Root>
     )
   }
-
   return (
     <Root>
       <div tw="relative">
@@ -573,6 +575,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   index={i}
                   hasConnection={!!mappings.find(([l]) => l === item.name)}
                   anchor="Right"
+                  typeName={leftTypeName}
                   moveItem={moveItem}
                   onOk={(info, index) => {
                     keepEditingField(info, index)
