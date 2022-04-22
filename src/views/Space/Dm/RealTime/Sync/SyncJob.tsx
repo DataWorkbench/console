@@ -359,6 +359,8 @@ const SyncJob = () => {
                   // mappings={mappings}
                   leftFields={db.source.fields || []}
                   rightFields={db.target.fields || []}
+                  leftTypeName={sourceTypeName}
+                  // rightTypeName={targetTypeName}
                   columns={[sourceColumn, targetColumn]}
                   topHelp={
                     <HelpCenterLink href="/xxx" isIframe={false}>
