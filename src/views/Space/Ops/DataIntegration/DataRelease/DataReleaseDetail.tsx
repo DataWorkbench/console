@@ -188,19 +188,36 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
   return (
     <Root tw="relative">
       <FlexBox tw="items-center gap-2">
-        <Tooltip theme="light" content="返回" hasPadding placement="bottom">
-          <Icon
-            name="previous"
-            size={20}
-            clickable
-            type="light"
+        <Tooltip
+          theme="light"
+          content="返回"
+          hasPadding
+          placement="bottom"
+          twChild={tw`inline-flex`}
+        >
+          <div
+            tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
             onClick={() => toList()}
             css={css`
-              svg.qicon {
-                ${tw`text-[#939EA9]! fill-[#939EA9]!`}
-              }
-            `}
-          />
+            &:hover {
+              ${tw`bg-white cursor-pointer`}
+            .icon svg.qicon {
+              ${tw`text-neut-15!`}
+            }
+          `}
+          >
+            <Icon
+              name="previous"
+              size={20}
+              // clickable
+              type="light"
+              css={css`
+                svg.qicon {
+                  ${tw`text-[#939EA9]! fill-[#939EA9]!`}
+                }
+              `}
+            />
+          </div>
         </Tooltip>
         <CopyTextWrapper
           text={`${data?.name ?? ''}(ID: ${id})`}
