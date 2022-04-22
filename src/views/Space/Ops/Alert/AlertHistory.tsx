@@ -105,7 +105,7 @@ const AlertHistory = (props: IAlertHistory) => {
           columns={columns}
           dataSource={infos}
           loading={!!isFetching}
-          sort={sort}
+          onSort={sort}
           pagination={{
             total: get(data, 'total', 0),
             ...pagination,

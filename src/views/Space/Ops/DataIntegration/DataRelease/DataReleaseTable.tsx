@@ -283,7 +283,7 @@ const DataRelease = observer(() => {
       return arr
     })
   }
-
+  console.log(11111111111, sort)
   return (
     <>
       <FlexBox orient="column" tw="p-5 h-full">
@@ -305,7 +305,7 @@ const DataRelease = observer(() => {
               }
             })}
             loading={!!isFetching}
-            sort={sort}
+            onSort={sort}
             rowKey="uuid"
             pagination={{
               total: get(data, 'total', 0),
