@@ -152,7 +152,11 @@ type SyncResKey = `${Lowercase<DataSourceType>}_${OpType}`
 interface SyncDataSourceProps {
   onDbChange?: (tp: OpType, data: ResInfo[keyof ResInfo]) => void
   onChangeDb?: (data: ResInfo) => void
-  onSelectTable?: (tp: OpType, data: Record<string, any>[]) => void
+  onSelectTable?: (
+    tp: OpType,
+    tableName: string,
+    data: Record<string, any>[]
+  ) => void
   conf?: {
     source_id?: string
     target_id?: string
@@ -166,9 +170,9 @@ const SyncDataSource = observer(
     const {
       onSelectTable,
       onDbChange,
-      onChangeDb,
       conf,
       curJob: curJobProp,
+      onChangeDb,
     } = props
     const {
       workFlowStore: { curJob: curJobStore },
@@ -221,7 +225,7 @@ const SyncDataSource = observer(
             draft.source.columns = columns
           })
           if (onSelectTable) {
-            onSelectTable('source', columns)
+            onSelectTable('source', db.source.tableName!, columns)
           }
         },
       }
@@ -240,7 +244,7 @@ const SyncDataSource = observer(
             draft.target.columns = columns
           })
           if (onSelectTable) {
-            onSelectTable('target', columns)
+            onSelectTable('target', db.target.tableName!, columns)
           }
         },
       }
@@ -317,7 +321,7 @@ const SyncDataSource = observer(
             id: conf.source_id,
             tableName: get(dbSource, 'table[0]', ''),
             condition,
-            where: get(dbSource, 'where', ''),
+            where: trim(get(dbSource, 'where', '')),
             splitPk: get(dbSource, 'split_pk', ''),
           },
           target: {
@@ -337,6 +341,9 @@ const SyncDataSource = observer(
         ) {
           setShowTargetAdvanced(true)
         }
+        if (newDB.source.where) {
+          setShowSourceAdvance(true)
+        }
       }
     }, [conf, setDB, sourceTypeName, targetTypeName])
 
@@ -351,6 +358,7 @@ const SyncDataSource = observer(
       setDB((draft) => {
         draft[op.current] = v
       })
+
       if (onDbChange) {
         onDbChange(op.current, v)
       }
@@ -371,9 +379,6 @@ const SyncDataSource = observer(
           draft.target = {}
         }
       })
-      if (onSelectTable) {
-        onSelectTable(from, [])
-      }
       if (onDbChange) {
         onDbChange(from, {})
       }
@@ -479,7 +484,7 @@ const SyncDataSource = observer(
     const renderSource = () => {
       const from: OpType = 'source'
       const dbInfo = db[from]
-      const hasTable = !isEmpty(db.source.tableName)
+      const hasTable = !isEmpty(dbInfo.tableName)
       const isOffLineFull = get(curJob, 'type') === SyncJobType.OFFLINEFULL
       const isOfflineIncrement =
         get(curJob, 'type') === SyncJobType.OFFLINEINCREMENT
@@ -568,10 +573,10 @@ const SyncDataSource = observer(
               {showSourceAdvance && (
                 <TextAreaField
                   name="where"
-                  defaultValue={dbInfo.where || ''}
+                  value={dbInfo.where || ''}
                   onChange={(v: string) => {
                     setDB((draft) => {
-                      draft.source.where = trim(v)
+                      draft.source.where = v
                     })
                   }}
                   label="过滤条件"
@@ -652,7 +657,7 @@ const SyncDataSource = observer(
                     ${tw`w-28!`}
                   }
                 `}
-                defaultValue={dbInfo.batchSize}
+                value={dbInfo.batchSize || ''}
                 onChange={(v: string) => {
                   setDB((draft) => {
                     draft[from].batchSize = +v
@@ -667,7 +672,7 @@ const SyncDataSource = observer(
                   {
                     help: '范围: 1~65535, 批量写入条数不能小于 1',
                     status: 'error',
-                    rule: (v) =>
+                    rule: (v: any) =>
                       /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535,
                   },
                 ]}

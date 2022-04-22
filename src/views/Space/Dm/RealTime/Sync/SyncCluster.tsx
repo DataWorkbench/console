@@ -20,6 +20,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
   const clusterId = get(cluster, 'id', '')
   const clusterName = get(cluster, 'name', '')
   const enablePing = !!(sourceId && targetId && clusterId)
+  console.log(sourceId, targetId, clusterId)
   const mutation = useMutationPingSyncJobConnection()
   useEffect(() => {
     if (clusterIdProps) {
