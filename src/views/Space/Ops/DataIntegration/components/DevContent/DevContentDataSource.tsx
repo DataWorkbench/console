@@ -74,10 +74,26 @@ const DevContentDataSource = (props: Record<string, any>) => {
         </div>
         <div>数据源表</div>
         <div>{sourceTypeName}</div>
-        <div>条件参数配置</div>
-        <div>{source?.where ?? ''}</div>
-        <div>切分键</div>
-        <div>{source.splitPk ?? ''}</div>
+        {source?.condition && (
+          <>
+            <div>条件参数配置</div>
+            <div>
+              [{source?.condition?.startValue || '开始条件'}] [
+              {source?.condition?.startCondition ?? '关系符号'}] [
+              {source?.condition?.column ?? '列名'}] [
+              {source?.condition?.endCondition ?? '关系符号'}] [
+              {source?.condition?.endValue || '结束条件'}]
+            </div>
+            <div>切分键</div>
+            <div>{source.splitPk ?? ''}</div>
+          </>
+        )}
+        {source?.where && (
+          <>
+            <div>过滤条件</div>
+            <div>{source?.where}</div>
+          </>
+        )}
       </Grid>
     )
   }

@@ -151,7 +151,6 @@ type SyncResKey = `${Lowercase<DataSourceType>}_${OpType}`
 
 interface SyncDataSourceProps {
   onDbChange?: (tp: OpType, data: ResInfo[keyof ResInfo]) => void
-  onChangeDb?: (data: ResInfo) => void
   onSelectTable?: (
     tp: OpType,
     tableName: string,
@@ -167,13 +166,7 @@ interface SyncDataSourceProps {
 
 const SyncDataSource = observer(
   (props: SyncDataSourceProps, ref) => {
-    const {
-      onSelectTable,
-      onDbChange,
-      conf,
-      curJob: curJobProp,
-      onChangeDb,
-    } = props
+    const { onSelectTable, onDbChange, conf, curJob: curJobProp } = props
     const {
       workFlowStore: { curJob: curJobStore },
     } = useStore()
@@ -188,10 +181,6 @@ const SyncDataSource = observer(
       source: {},
       target: {},
     })
-
-    useEffect(() => {
-      if (onChangeDb) onChangeDb(db)
-    }, [onChangeDb, db])
 
     const [sourceTypeName, targetTypeName] = useMemo(() => {
       const sourceType = curJob?.source_type

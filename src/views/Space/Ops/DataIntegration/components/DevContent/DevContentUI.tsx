@@ -5,7 +5,7 @@ import { AffixLabel, FieldMappings } from 'components'
 import { findKey, get } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef } from 'react'
 import { dataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import SyncDataSource from 'views/Space/Dm/RealTime/Sync/SyncDataSource'
 import { nanoid } from 'nanoid'
@@ -77,6 +77,19 @@ const DevContentUI = (props: IProps) => {
   const { data: confData = {}, curJob = {} } = props
   const { channel_control: channel } = confData
 
+  const dbDataRef = useRef({
+    source: {},
+    target: {},
+  })
+
+  const [db, setDb] = useImmer<{
+    source: Record<string, any>
+    target: Record<string, any>
+  }>({
+    source: { id: get(confData, 'source_id') },
+    target: { id: get(confData, 'target_id') },
+  })
+
   const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
@@ -86,47 +99,33 @@ const DevContentUI = (props: IProps) => {
     ]
   }, [curJob])
 
-  console.log(222222, sourceTypeName, targetTypeName)
-  const [fields, setFields] = useImmer<{
-    source: TMappingField[]
-    target: TMappingField[]
-  }>({
-    source: [],
-    target: [],
-  })
-
-  // const [db, setDb] = useImmer<{
-  //   source: Record<string, any>
-  //   target: Record<string, any>
-  // }>({
-  //   source: {},
-  //   target: {},
-  // })
-
-  const dbDataRef = useRef({
-    source: {},
-    target: {},
-  })
-  console.log(2222, dbDataRef.current)
-  const [mappings, setMappings] = useState([])
-
-  useEffect(() => {
-    if (confData && sourceTypeName && targetTypeName) {
-      const sourceColumn =
-        get(
-          confData,
-          `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
-        ) || []
-      const targetColumn =
-        get(
-          confData,
-          `sync_resource.${targetTypeName.toLowerCase()}_target.column`
-        ) || []
-      setMappings(
-        sourceColumn.map((v: any, i: any) => [v.name, targetColumn[i].name])
+  const sourceColumn = useMemo(() => {
+    if (confData && db.source.tableName && sourceTypeName) {
+      const source = get(
+        confData,
+        `sync_resource.${sourceTypeName?.toLowerCase()}_source`
       )
+      const table = get(source, 'table[0]')
+      if (source && table === db.source.tableName) {
+        return get(source, 'column')
+      }
     }
-  }, [confData, sourceTypeName, targetTypeName])
+    return []
+  }, [confData, sourceTypeName, db.source.tableName])
+
+  const targetColumn = useMemo(() => {
+    if (confData && db.target.tableName && targetTypeName) {
+      const source = get(
+        confData,
+        `sync_resource.${targetTypeName?.toLowerCase()}_target`
+      )
+      const table = get(source, 'table[0]')
+      if (source && table === db.target.tableName) {
+        return get(source, 'column')
+      }
+    }
+    return []
+  }, [confData, targetTypeName, db.target.tableName])
   return (
     <CollapseWrapper>
       <Collapse defaultActiveKey={stepsData.map((step) => step.key)}>
@@ -145,7 +144,7 @@ const DevContentUI = (props: IProps) => {
           >
             {index === 0 && (
               <DevContentDataSource
-                dbData={dbDataRef.current}
+                dbData={db}
                 sourceTypeName={sourceTypeName}
                 targetTypeName={targetTypeName}
               />
@@ -155,23 +154,23 @@ const DevContentUI = (props: IProps) => {
                 <div tw="absolute invisible">
                   <SyncDataSource
                     curJob={curJob}
-                    onSelectTable={(
-                      tp: 'source' | 'target',
-                      data: Record<string, any>[]
-                    ) => {
-                      const fieldData = (data || []).map((field) => ({
+                    onSelectTable={(tp, tableName, data) => {
+                      const fieldData = data.map((field) => ({
                         ...field,
                         uuid: nanoid(),
                       })) as TMappingField[]
-                      setFields((draft) => {
-                        if (tp === 'source') {
-                          draft.source = fieldData
-                        } else {
-                          draft.target = fieldData
-                        }
+                      setDb((draft) => {
+                        const soruceInfo = draft[tp]
+                        soruceInfo.tableName = tableName
+                        soruceInfo.fields = fieldData
                       })
                     }}
-                    conf={{ ...confData }}
+                    onDbChange={(tp: 'source' | 'target', data) => {
+                      setDb((draft) => {
+                        draft[tp] = data
+                      })
+                    }}
+                    conf={confData}
                     onChangeDb={(dbData) => {
                       dbDataRef.current = dbData
                     }}
@@ -179,10 +178,12 @@ const DevContentUI = (props: IProps) => {
                 </div>
                 <div tw="absolute inset-0 z-50" />
                 <FieldMappings
-                  leftFields={fields.source}
-                  rightFields={fields.target}
+                  leftFields={db.source.fields || []}
+                  rightFields={db.target.fields || []}
+                  leftTypeName={sourceTypeName}
+                  // rightTypeName={targetTypeName}
+                  columns={[sourceColumn, targetColumn]}
                   readonly
-                  mappings={mappings}
                   hasHeader={false}
                 />
               </div>
