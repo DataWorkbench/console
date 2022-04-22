@@ -138,7 +138,7 @@ const VersionsModal = observer((props: IProps) => {
           <Table
             columns={columns}
             dataSource={data?.infos || []}
-            sort={sort}
+            onSort={sort}
             rowKey="version"
             pagination={{
               total: data?.total ?? 0,

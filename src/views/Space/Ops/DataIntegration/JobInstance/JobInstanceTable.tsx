@@ -353,7 +353,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         dataSource={infos}
         loading={!!isFetching}
         rowKey="id"
-        sort={sort}
+        onSort={sort}
         pagination={{
           total: get(data, 'total', 0),
           ...pagination,

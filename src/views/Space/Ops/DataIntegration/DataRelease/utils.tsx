@@ -64,7 +64,7 @@ export const getColumnsRender = (
         />
       ),
     },
-    dev_mode: {
+    job_mode: {
       onFilter: (v: string) => {
         setFilter((draft) => {
           draft.job_type = v
@@ -87,6 +87,7 @@ export const getColumnsRender = (
           draft.offset = 0
         })
       },
+      filter: filter.type,
       filterAble: true,
       filtersNew: Object.values(jobType) as any,
       render: (text: keyof typeof jobType, record: Record<string, any>) => {
@@ -140,6 +141,7 @@ export const getColumnsRender = (
     },
     updated: {
       sortable: true,
+      sortKey: filter.sort_by,
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',

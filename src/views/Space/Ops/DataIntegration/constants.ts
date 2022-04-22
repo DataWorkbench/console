@@ -179,7 +179,7 @@ export const dataReleaseSuggestions: ISuggestion[] = [
     key: 'name',
   },
   {
-    label: 'ID',
+    label: '作业 ID',
     key: 'ID',
   },
   {
@@ -192,8 +192,16 @@ export const dataReleaseSuggestions: ISuggestion[] = [
   },
   {
     label: '开发模式',
-    key: 'dev_mode',
+    key: 'job_mode',
     options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
+    label: '作业类型',
+    key: 'type',
+    options: Object.values(jobType).map(({ label, value }) => ({
       label,
       key: value,
     })),
@@ -247,8 +255,8 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '开发模式',
-    dataIndex: 'dev_mode',
-    key: 'dev_mode',
+    dataIndex: 'job_mode',
+    key: 'job_mode',
   },
   {
     title: '作业类型',
