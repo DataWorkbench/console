@@ -26,7 +26,7 @@ export const terminateSyncInstances = ({
   return request({
     region: regionId,
     method: 'POST',
-    uri: `/v1/workspace/${spaceId}/stream/job/instance/terminates`,
+    uri: `/v1/workspace/${spaceId}/sync/job/instance/terminates`,
     body: {
       instance_ids: ids,
     },
@@ -40,6 +40,6 @@ export const describeFlinkUiByInstanceId = ({
 }: ISyncInstanceParams) => {
   return request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/instance/${instanceId}/flink-ui`,
+    uri: `/v1/workspace/${spaceId}/sync/job/instance/${instanceId}/flink-ui`,
   })
 }

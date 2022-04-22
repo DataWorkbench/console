@@ -37,6 +37,7 @@ import {
   useQuerySyncJobInstances,
 } from 'hooks/useJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
+import { useParams } from 'react-router-dom'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -63,6 +64,11 @@ const instanceNameStyle = css`
 
 const actionsType = tuple('info', 'stop')
 type ActionsType = typeof actionsType[number]
+
+interface IRouteParams {
+  regionId: string
+  spaceId: string
+}
 
 const JobInstanceTable = (props: IJobInstanceTable) => {
   const {
@@ -98,21 +104,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
 
   const { data, isFetching } = useQuerySyncJobInstances(filter)
 
-  const infos =
-    get(data, 'infos', [
-      {
-        id: '111',
-        job_id: 'aaf',
-        name: 'asdfasdf',
-        message: 'sdfaf',
-        state: 1,
-        status: 1,
-        alarm_status: 1,
-        created: new Date().getTime() * 1000,
-        updated: new Date().getTime() * 1000,
-        version: 'asdfasdfasf',
-      },
-    ]) || []
+  const infos = get(data, 'infos', []) || []
 
   const columnsRender = {
     id: {
@@ -262,6 +254,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     })
     return result
   }
+  const { regionId, spaceId } = useParams<IRouteParams>()
 
   const handleMenuClick = (record: Record<string, any>, key: ActionsType) => {
     switch (key) {
@@ -291,10 +284,20 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           <TextLink
             disabled={
               jobInstanceStatus[record.state as 1]?.type ===
-              JobInstanceStatusType.RUNNING
+              JobInstanceStatusType.PREPARING
             }
             onClick={() => {
-              describeFlinkUiByInstanceId(record.id).then((web_ui: string) => {
+              if (
+                jobInstanceStatus[record.state as 1]?.type ===
+                JobInstanceStatusType.PREPARING
+              ) {
+                return
+              }
+              describeFlinkUiByInstanceId({
+                instanceId: record.id,
+                regionId,
+                spaceId,
+              }).then((web_ui: string) => {
                 if (web_ui) {
                   window.open(web_ui, '_blank')
                 }

@@ -1,9 +1,11 @@
+/* eslint-disable no-bitwise */
 // @ts-ignore
 import { Button, CopyText, Icon } from '@QCFE/qingcloud-portal-ui'
 import {
   Card,
   Center,
   FlexBox,
+  IMoreActionItem,
   MoreAction,
   TextLink,
   Tooltip,
@@ -24,6 +26,7 @@ import {
   JobInstanceStatusType,
 } from 'views/Space/Ops/DataIntegration/constants'
 import { describeFlinkUiByInstanceId } from 'stores/api'
+import { useQueryClient } from 'react-query'
 import {
   AlarmStatusCmp,
   Circle,
@@ -32,7 +35,11 @@ import {
   JobTypeCmp,
 } from '../styledComponents'
 import AlertModal from '../../Alert/Modal'
-import { useQuerySyncJobInstances } from '../../../../../hooks/useJobInstance'
+import {
+  getSyncJobInstanceKey,
+  useMutationJobInstance,
+  useQuerySyncJobInstances,
+} from '../../../../../hooks/useJobInstance'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -119,10 +126,53 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
   const { data: list, isFetching } = useQuerySyncJobInstances({
     instance_id: id,
   })
-  const data = get(list, 'infos[0]', {
-    id: '111111',
-    state: 1,
-  })
+  const data = get(list, 'infos[0]', {})
+
+  const stopAble =
+    JobInstanceStatusType.RUNNING |
+    JobInstanceStatusType.FAILED_AND_RETRY |
+    JobInstanceStatusType.PREPARING
+
+  const getActions = (
+    status: JobInstanceStatusType,
+    record: Record<string, any>
+  ): IMoreActionItem[] => {
+    const result = []
+    if (status & stopAble) {
+      result.push({
+        text: '中止',
+        icon: 'q-closeCircleFill',
+        key: 'stop',
+        value: record,
+      })
+    }
+    return result
+  }
+
+  const queryClient = useQueryClient()
+  const refetchData = () => {
+    queryClient.invalidateQueries(getSyncJobInstanceKey('list'))
+  }
+
+  const mutation = useMutationJobInstance()
+
+  const handleMenuClick = (record: Record<string, any>, key: any) => {
+    switch (key) {
+      case 'stop':
+        mutation
+          .mutateAsync({
+            op: 'terminate',
+            ids: [record.id],
+          })
+          .then(() => {
+            refetchData()
+          })
+        break
+      default:
+        break
+    }
+  }
+
   return (
     <Root tw="">
       <FlexBox tw="items-center gap-2">
@@ -175,15 +225,18 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            <MoreAction
-              items={[
-                { text: '暂停', key: 'aaa' },
-                { text: '重启', key: 'bbb' },
-              ]}
-              type="button"
-              buttonText="更多操作"
-            />
-
+            {data.state & stopAble && (
+              <MoreAction
+                items={getActions(
+                  jobInstanceStatus[data.state as 1]?.type,
+                  data
+                )}
+                onMenuClick={handleMenuClick as any}
+                type="button"
+                placement="bottom-start"
+                buttonText="更多操作"
+              />
+            )}
             <Button
               onClick={() => {
                 setOpen(!isOpen)

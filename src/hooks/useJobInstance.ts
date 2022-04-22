@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQuery } from 'react-query'
+import { useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import {
   describeFlinkUiByInstanceId,
@@ -37,7 +37,7 @@ export const useQuerySyncJobInstances = (
     isNull
   )
   queryKey.list = ['syncJobInstances', params]
-  return useInfiniteQuery(
+  return useQuery(
     queryKey.list,
     async ({ pageParam = params }) => listSyncInstances(pageParam),
     {

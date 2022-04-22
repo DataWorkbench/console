@@ -36,7 +36,7 @@ export const InstanceName: FC<IInstanceNameProps> = (props) => {
       onClick={onClick}
     >
       {typeof icon === 'string' ? (
-        <Circle theme={theme} className="instance-name-icon">
+        <Circle tw="flex-none" theme={theme} className="instance-name-icon">
           <Icon
             name={icon}
             type={theme === 'dark' ? 'light' : 'dark'}
@@ -46,14 +46,9 @@ export const InstanceName: FC<IInstanceNameProps> = (props) => {
       ) : (
         icon
       )}
-      <div tw="truncate">
+      <div tw="truncate dark:text-white light:text-neut-15">
         <TextEllipsis theme={theme === 'dark' ? 'light' : 'darker'}>
-          <span
-            className="instance-name-title"
-            tw="dark:text-white light:text-neut-15"
-          >
-            {name}
-          </span>
+          <span className="instance-name-title">{name}</span>
         </TextEllipsis>
         {desc && (
           <TextEllipsis theme={theme === 'dark' ? 'light' : 'darker'}>
