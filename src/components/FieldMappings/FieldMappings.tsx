@@ -83,12 +83,22 @@ const Container = styled.div`
 //   is_primary_key?: boolean
 // }
 
+interface Column {
+  format: string
+  index: number
+  is_part: boolean
+  name: string
+  type: string
+  value: string
+}
+
 export interface IFieldMappingsProps {
   onChange?: (value: Record<string, any>) => void
   leftFields: TMappingField[]
   rightFields: TMappingField[]
   topHelp?: ReactNode
   mappings?: [string, string][]
+  columns?: [Column[], Column[]]
 }
 
 export interface IFieldMappingsRecord {
@@ -102,13 +112,16 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     leftFields: leftFieldsProp,
     rightFields: rightFieldsProp,
     topHelp,
-    mappings: mappingsProp = [],
+    mappings: mappingsProp,
+    columns,
   } = props
 
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
   const jsPlumbInstRef = useRef<jsPlumbInstance>()
-  const [mappings, setMappings] = useState<[string, string][]>(mappingsProp)
+  const [mappings, setMappings] = useState<[string, string][]>(
+    mappingsProp || []
+  )
   const [visible, setVisible] = useState<boolean>(false)
   const selectedConnection = useRef<Connection>()
 
@@ -116,23 +129,79 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   useEffect(() => {
     setLeftFields(leftFieldsProp)
-    if (mappingsProp.length === 0) {
-      setMappings([])
-    }
-  }, [leftFieldsProp, mappingsProp])
+  }, [leftFieldsProp])
 
   useEffect(() => {
     setRightFields(rightFieldsProp)
-    if (mappingsProp.length === 0) {
-      setMappings([])
-    }
-  }, [rightFieldsProp, mappingsProp])
+  }, [rightFieldsProp])
 
   useEffect(() => {
-    setMappings(mappingsProp)
+    if (mappingsProp) {
+      setMappings(mappingsProp)
+    }
   }, [mappingsProp])
 
-  // console.log('mappingsProp', mappingsProp, mappings)
+  // console.log(columns)
+
+  useEffect(() => {
+    const [leftColumns, rightColumns] = columns || [[], []]
+    if (leftColumns.length > 0 && rightColumns.length > 0) {
+      const mappingArr = leftColumns.map<[string, string]>((column, i) => [
+        column.name,
+        rightColumns[i].name,
+      ])
+      setMappings(mappingArr)
+      setLeftFields((fields) => {
+        // const leftMappings = mappingArr.map(([left]) => left)
+        const filedNames: string[] = []
+        const mappingFields = leftColumns.map((c) => {
+          filedNames.push(c.name)
+          const field = fields.find((f) => f.name === c.name)
+          const uuid = nanoid()
+          if (field) {
+            return { ...field, uuid }
+          }
+          return {
+            type: c.type,
+            name: c.name,
+            default: c.value,
+            formatter: c.format,
+            uuid,
+          }
+        })
+        const filterFields = fields.filter(
+          (field) => !filedNames.includes(field.name)
+        )
+        return [...mappingFields, ...filterFields]
+      })
+      setRightFields((fields) => {
+        const filedNames: string[] = []
+        const mappingFields = rightColumns.map((c) => {
+          filedNames.push(c.name)
+          const field = fields.find((f) => f.name === c.name)
+          const uuid = nanoid()
+          if (field) {
+            return { ...field, uuid }
+          }
+          return {
+            type: c.type,
+            name: c.name,
+            default: c.value,
+            formatter: c.format,
+            uuid,
+          }
+        })
+        const filterFields = fields.filter(
+          (field) => !filedNames.includes(field.name)
+        )
+        return [...mappingFields, ...filterFields]
+      })
+    } else {
+      setMappings([])
+    }
+  }, [columns])
+
+  // console.log('mappings', mappings)
 
   useEffect(() => {
     jsPlumbInstRef.current?.repaintEverything()
