@@ -267,7 +267,11 @@ export const JobTree = observer(
             )}
             {isDi && (
               <>
-                <MenuItem value={JobType.REALTIME} onClick={onRightMenuClick}>
+                <MenuItem
+                  value={JobType.REALTIME}
+                  onClick={onRightMenuClick}
+                  disabled
+                >
                   <Icons name="LayerFill" size={14} tw="mr-2" />
                   <span>创建实时同步作业</span>
                 </MenuItem>
