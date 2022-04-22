@@ -97,6 +97,7 @@ interface MappingItemProps {
   index: number
   className?: string
   jsplumb?: jsPlumbInstance
+  typeName?: string
   // hasConnection?: boolean
   moveItem?: (dragId: string, hoverId: string, isTop: boolean) => void
   deleteItem?: (item: TMappingField) => void
@@ -115,6 +116,7 @@ const MappingItem = (props: MappingItemProps) => {
     index,
     item: itemProps,
     className,
+    typeName,
     moveItem = noop,
     deleteItem = noop,
     onOk = noop,
@@ -193,8 +195,11 @@ const MappingItem = (props: MappingItemProps) => {
     if (ref.current && jsplumb) {
       let endPoint = endPointRef.current
       const parameters = { [String(anchor)]: itemProps }
+      if (endPoint) {
+        jsplumb.deleteEndpoint(endPoint)
+        endPoint = null
+      }
       if (!endPoint) {
-        // jsplumb.deleteEndpoint(endPoint)
         endPoint = jsplumb.addEndpoint(ref.current, {
           anchor,
           parameters,
@@ -381,7 +386,6 @@ const MappingItem = (props: MappingItemProps) => {
       </div>
     )
   }
-
   const renderEditContent = () => {
     return (
       <Form ref={formRef} tw="pl-0!">
@@ -398,9 +402,13 @@ const MappingItem = (props: MappingItemProps) => {
                   status: 'error',
                 },
               ]}
-              options={fieldTypeMapper
-                .get('MySQL')
-                ?.map((v) => ({ label: v, value: v }))}
+              options={
+                typeName
+                  ? fieldTypeMapper
+                      .get(typeName)
+                      ?.map((v) => ({ label: v, value: v }))
+                  : []
+              }
               onChange={(v: string) =>
                 setItem((draft) => {
                   draft.type = v
