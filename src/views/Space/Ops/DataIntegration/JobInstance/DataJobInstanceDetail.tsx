@@ -10,7 +10,7 @@ import {
   TextLink,
   Tooltip,
 } from 'components'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
 import icons from 'views/Space/Ops/DataIntegration/icons'
@@ -107,11 +107,18 @@ const CopyTextWrapper = styled(CopyText)`
   }
 `
 
+interface IRouteParams {
+  regionId: string
+  spaceId: string
+}
+
 const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
   useIcon(icons)
   const { id } = props
 
   const history = useHistory()
+
+  const { regionId, spaceId } = useParams<IRouteParams>()
 
   const [{ showDataSource }, setDataSource] = useImmer({
     showDataSource: false,
@@ -319,16 +326,18 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 <TextLink
                   disabled={
                     jobInstanceStatus[data.state as 1]?.type ===
-                    JobInstanceStatusType.RUNNING
+                    JobInstanceStatusType.PREPARING
                   }
                   onClick={() => {
-                    describeFlinkUiByInstanceId(data.id).then(
-                      (web_ui: string) => {
-                        if (web_ui) {
-                          window.open(web_ui, '_blank')
-                        }
+                    describeFlinkUiByInstanceId({
+                      regionId,
+                      spaceId,
+                      instanceId: id,
+                    }).then((web_ui: string) => {
+                      if (web_ui) {
+                        window.open(web_ui, '_blank')
                       }
-                    )
+                    })
                   }}
                 >
                   Flink UI
