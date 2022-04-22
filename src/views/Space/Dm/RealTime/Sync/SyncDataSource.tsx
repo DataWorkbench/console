@@ -151,20 +151,29 @@ type SyncResKey = `${Lowercase<DataSourceType>}_${OpType}`
 
 interface SyncDataSourceProps {
   onDbChange?: (tp: OpType, data: ResInfo[keyof ResInfo]) => void
+  onChangeDb?: (data: ResInfo) => void
   onSelectTable?: (tp: OpType, data: Record<string, any>[]) => void
   conf?: {
     source_id?: string
     target_id?: string
     sync_resource?: Record<SyncResKey, any>
   }
+  curJob?: Record<string, any>
 }
 
 const SyncDataSource = observer(
   (props: SyncDataSourceProps, ref) => {
-    const { onSelectTable, onDbChange, conf } = props
     const {
-      workFlowStore: { curJob },
+      onSelectTable,
+      onDbChange,
+      onChangeDb,
+      conf,
+      curJob: curJobProp,
+    } = props
+    const {
+      workFlowStore: { curJob: curJobStore },
     } = useStore()
+    const curJob = curJobProp ?? curJobStore
     const [visible, setVisible] = useState<boolean | null>(null)
     const [showSourceAdvance, setShowSourceAdvance] = useState(false)
     const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
@@ -175,6 +184,10 @@ const SyncDataSource = observer(
       source: {},
       target: {},
     })
+
+    useEffect(() => {
+      if (onChangeDb) onChangeDb(db)
+    }, [onChangeDb, db])
 
     const [sourceTypeName, targetTypeName] = useMemo(() => {
       const sourceType = curJob?.source_type

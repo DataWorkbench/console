@@ -40,7 +40,24 @@ const Grid = styled('div')(() => [
       ${tw`text-white`}
   `,
 ])
-const DevContentDataSource = () => {
+
+enum WriteMode {
+  Insert = 1,
+  Replace = 2,
+  Update = 3,
+}
+
+enum Semantic {
+  'AtLeastOnce' = 1,
+  'ExactlyOnce' = 2,
+}
+
+const DevContentDataSource = (props: Record<string, any>) => {
+  const {
+    dbData: { source, target },
+    sourceTypeName,
+    targetTypeName,
+  } = props
   const [visible, setVisible] = useState(true)
 
   const renderSource = () => {
@@ -50,17 +67,17 @@ const DevContentDataSource = () => {
         <div>
           <FlexBox tw="items-center">
             <Icon name="blockchain" type="light" />
-            <span>Mysql</span>
-            <span tw="text-neut-8">(ID: 1231)</span>
+            <span>{source?.tableName}</span>
+            <span tw="text-neut-8">(ID: {source?.id})</span>
           </FlexBox>
-          <div tw="text-neut-8">网络配置名称(ID: 12112)</div>
+          {/* <div tw="text-neut-8">网络配置名称(ID: 12112)</div> */}
         </div>
         <div>数据源表</div>
-        <div>Mysql</div>
+        <div>{sourceTypeName}</div>
         <div>条件参数配置</div>
-        <div>{'var1 < update < var2'}</div>
+        <div>{source?.where ?? ''}</div>
         <div>切分键</div>
-        <div>what ?</div>
+        <div>{source.splitPk ?? ''}</div>
       </Grid>
     )
   }
@@ -73,19 +90,37 @@ const DevContentDataSource = () => {
           <div>
             <FlexBox tw="items-center">
               <Icon name="blockchain" type="light" />
-              <span>Mysql</span>
-              <span tw="text-neut-8">(ID: 1231)</span>
+              <span>{target.tableName}</span>
+              <span tw="text-neut-8">(ID: {target.id})</span>
             </FlexBox>
-            <div tw="text-neut-8">网络配置名称(ID: 12112)</div>
+            {/* <div tw="text-neut-8">网络配置名称(ID: 12112)</div> */}
           </div>
           <div>数据源表</div>
-          <div>Mysql</div>
+          <div>{targetTypeName}</div>
           <div>写入模式</div>
-          <div>insert</div>
+          <div>
+            {
+              [
+                { label: 'insert: insert into', value: WriteMode.Insert },
+                { label: 'replace: replace into', value: WriteMode.Replace },
+                {
+                  label: 'update: on duplicate key update',
+                  value: WriteMode.Update,
+                },
+              ].find((i) => i.value === target.writeMode)?.label
+            }
+          </div>
           <div>写入一致性语义</div>
-          <div>at-least-once</div>
+          <div>
+            {
+              [
+                { label: 'exactly-once', value: Semantic.ExactlyOnce },
+                { label: 'at-least-once', value: Semantic.AtLeastOnce },
+              ].find((i) => i.value === target.semantic)?.label
+            }
+          </div>
           <div>批量写入条数</div>
-          <div>1024</div>
+          <div>{target.batchSize}</div>
         </Grid>
         <Divider tw="my-3 border-line-dark text-white">
           <Center tw="cursor-pointer" onClick={() => setVisible(!visible)}>
@@ -102,11 +137,16 @@ const DevContentDataSource = () => {
           <Grid>
             <div>写入前SQL语句组</div>
             <div>
-              <div>what’s up? (一组语句填充示意，根据实际内容显示）</div>
-              <div>what’s up? (一组语句填充示意，根据实际内容显示）</div>
+              {target?.preSql
+                ? target?.preSql.map((i: string) => <div key={i}>{i}</div>)
+                : '无'}
             </div>
             <div>写入后SQL语句组</div>
-            <div>what’s up? (一组语句填充示意，根据实际内容显示）</div>
+            <div>
+              {target?.postSql
+                ? target?.postSql.map((i: string) => <div key={i}>{i}</div>)
+                : '无'}
+            </div>
           </Grid>
         </CollapsePanel>
       </div>

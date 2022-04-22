@@ -2,7 +2,13 @@ import tw, { css, styled } from 'twin.macro'
 import { Collapse } from '@QCFE/lego-ui'
 import DevContentDataSource from 'views/Space/Ops/DataIntegration/components/DevContent/DevContentDataSource'
 import { AffixLabel, FieldMappings } from 'components'
-import { pick } from 'lodash-es'
+import { findKey, get } from 'lodash-es'
+import { useImmer } from 'use-immer'
+import { TMappingField } from 'components/FieldMappings/MappingItem'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { dataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import SyncDataSource from 'views/Space/Dm/RealTime/Sync/SyncDataSource'
+import { nanoid } from 'nanoid'
 
 const { CollapseItem } = Collapse
 
@@ -63,12 +69,64 @@ const styles = {
 }
 
 interface IProps {
-  data: Record<string, any>
+  data?: Record<string, any>
+  curJob?: Record<string, any>
 }
 
 const DevContentUI = (props: IProps) => {
-  const { data } = props
-  console.log(data)
+  const { data: confData = {}, curJob = {} } = props
+  const { channel_control: channel } = confData
+
+  const [sourceTypeName, targetTypeName] = useMemo(() => {
+    const sourceType = curJob?.source_type
+    const targetType = curJob?.target_type
+    return [
+      findKey(dataSourceTypes, (v) => v === sourceType),
+      findKey(dataSourceTypes, (v) => v === targetType),
+    ]
+  }, [curJob])
+
+  console.log(222222, sourceTypeName, targetTypeName)
+  const [fields, setFields] = useImmer<{
+    source: TMappingField[]
+    target: TMappingField[]
+  }>({
+    source: [],
+    target: [],
+  })
+
+  // const [db, setDb] = useImmer<{
+  //   source: Record<string, any>
+  //   target: Record<string, any>
+  // }>({
+  //   source: {},
+  //   target: {},
+  // })
+
+  const dbDataRef = useRef({
+    source: {},
+    target: {},
+  })
+  console.log(2222, dbDataRef.current)
+  const [mappings, setMappings] = useState([])
+
+  useEffect(() => {
+    if (confData && sourceTypeName && targetTypeName) {
+      const sourceColumn =
+        get(
+          confData,
+          `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
+        ) || []
+      const targetColumn =
+        get(
+          confData,
+          `sync_resource.${targetTypeName.toLowerCase()}_target.column`
+        ) || []
+      setMappings(
+        sourceColumn.map((v: any, i: any) => [v.name, targetColumn[i].name])
+      )
+    }
+  }, [confData, sourceTypeName, targetTypeName])
   return (
     <CollapseWrapper>
       <Collapse defaultActiveKey={stepsData.map((step) => step.key)}>
@@ -86,35 +144,45 @@ const DevContentUI = (props: IProps) => {
             }
           >
             {index === 0 && (
-              <DevContentDataSource />
-              // <SyncDataSource
-              //   onFetchedFields={(
-              //     tp: 'source' | 'target',
-              //     data: Record<string, any>[]
-              //   ) => {
-              //     setFields((draft) => {
-              //       if (tp === 'source') {
-              //         draft.source = data || []
-              //       } else {
-              //         draft.target = data || []
-              //       }
-              //     })
-              //   }}
-              // />
+              <DevContentDataSource
+                dbData={dbDataRef.current}
+                sourceTypeName={sourceTypeName}
+                targetTypeName={targetTypeName}
+              />
             )}
             {index === 1 && (
               <div tw="relative">
+                <div tw="absolute invisible">
+                  <SyncDataSource
+                    curJob={curJob}
+                    onSelectTable={(
+                      tp: 'source' | 'target',
+                      data: Record<string, any>[]
+                    ) => {
+                      const fieldData = (data || []).map((field) => ({
+                        ...field,
+                        uuid: nanoid(),
+                      })) as TMappingField[]
+                      setFields((draft) => {
+                        if (tp === 'source') {
+                          draft.source = fieldData
+                        } else {
+                          draft.target = fieldData
+                        }
+                      })
+                    }}
+                    conf={{ ...confData }}
+                    onChangeDb={(dbData) => {
+                      dbDataRef.current = dbData
+                    }}
+                  />
+                </div>
                 <div tw="absolute inset-0 z-50" />
                 <FieldMappings
-                  leftFields={
-                    [{ key: 'aa', name: 'aaa' }].map((field) =>
-                      pick(field, ['name', 'type', 'is_primary_key'])
-                    ) as any
-                  }
-                  rightFields={[].map((field) =>
-                    pick(field, ['name', 'type', 'is_primary_key'])
-                  )}
+                  leftFields={fields.source}
+                  rightFields={fields.target}
                   readonly
+                  mappings={mappings}
                   hasHeader={false}
                 />
               </div>
@@ -131,7 +199,7 @@ const DevContentUI = (props: IProps) => {
                       作业期望最大并行数
                     </AffixLabel>
                   </div>
-                  <div>200</div>
+                  <div>{channel.parallelism || ''}</div>
                   <div>
                     <AffixLabel
                       theme="light"
@@ -141,13 +209,16 @@ const DevContentUI = (props: IProps) => {
                       同步速率
                     </AffixLabel>
                   </div>
-                  <div>不限流</div>
+                  <div>{{ 1: '限流', 2: '不限流' }[channel.rate as 1]}</div>
                   <div>
                     <AffixLabel theme="light" required={false} help="同步速率">
                       错误记录数超过
                     </AffixLabel>
                   </div>
-                  <div> 190% 比例，达到任一条件时，任务自动结束</div>
+                  <div>
+                    {channel.record_num ?? ''} 条或 {channel.percentage ?? ''}
+                    比例，达到任一条件时，任务自动结束
+                  </div>
                 </Grid>
               </div>
             )}

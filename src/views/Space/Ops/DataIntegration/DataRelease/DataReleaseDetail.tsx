@@ -14,12 +14,13 @@ import useIcon from 'hooks/useHooks/useIcon'
 import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
 import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
 import LinkInstance from 'views/Space/Ops/DataIntegration/components/LinkInstance'
-import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent/DevContentUI'
+import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
 import { observer } from 'mobx-react-lite'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
 import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSourceModal'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import {
+  useQuerySyncJobVersionConf,
   useQuerySyncJobVersionDetail,
   useQuerySyncJobVersionSchedule,
 } from 'hooks/useJobVersion'
@@ -127,6 +128,12 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
     versionId: version,
   })
 
+  const { data: config } = useQuerySyncJobVersionConf({
+    jobId: id,
+    versionId: version,
+  })
+
+  console.log(config)
   return (
     <Root tw="relative">
       <FlexBox tw="items-center gap-2">
@@ -288,10 +295,10 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           <Monitor />
         </TabPanel>
         <TabPanel label="开发内容" name="dev">
-          <DevContent data={{}} />
+          <DevContent data={config} curJob={data} />
         </TabPanel>
         <TabPanel label="计算集群" name="cluster">
-          <Cluster clusterId="" />
+          <Cluster clusterId={config?.cluster_id} />
         </TabPanel>
         <TabPanel label="调度信息" name="schedule">
           <Schedule data={scheduleData} />
