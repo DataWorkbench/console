@@ -7,7 +7,7 @@ export interface ITab {
 
 export interface ISuggestionItem {
   label: string
-  key: string
+  key: string | number
 }
 
 export interface ISuggestion extends ISuggestionItem {

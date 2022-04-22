@@ -1,3 +1,4 @@
+import { Global } from '@emotion/react'
 import { PropsWithChildren } from 'react'
 import tw, { styled, css } from 'twin.macro'
 
@@ -22,7 +23,7 @@ const DividerWarp = styled.div(
     orientation?: keyof typeof orientationMap
   }) => [
     css`
-      ${tw`flex text-neut-15 whitespace-nowrap leading-5 border-neut-3`}
+      ${tw`flex whitespace-nowrap leading-5`}
       &::after,
       &::before {
         ${tw`relative top-0 w-2/4 border-b-0 translate-y-1/2`}
@@ -43,14 +44,39 @@ const DividerWarp = styled.div(
 type DividerPropsType = {
   orientation?: keyof typeof orientationMap
   className?: string
+  theme?: 'light' | 'dark'
 }
 
 export const Divider = styled((props: PropsWithChildren<DividerPropsType>) => {
-  const { className, orientation } = props
+  const { className, orientation, theme = 'light' } = props
   return (
-    <DividerWarp className={className} orientation={orientation}>
-      <span tw="inline-block py-0 px-3">{props.children}</span>
-    </DividerWarp>
+    <>
+      <Global
+        styles={css`
+      .light {
+        .pitrix-divider {
+          ${tw`border-neut-3 text-neut-15`}
+        }
+        
+      }
+      .dark {
+        .pitrix-divider {
+          ${tw`border-line-dark text-white`}}
+        }
+        
+        .icon .qicon {
+          ${tw`text-white`}
+          }
+        }`}
+      />
+      <DividerWarp
+        theme={theme}
+        className={`pitrix-divider ${className}`}
+        orientation={orientation}
+      >
+        <span tw="inline-block py-0 px-3">{props.children}</span>
+      </DividerWarp>
+    </>
   )
 })``
 

@@ -124,7 +124,7 @@ let config = {
   },
   optimization: {},
   devServer: {
-    host: 'localhost',
+    host: '0.0.0.0',
     allowedHosts: ['local.testing.com', 'local.qacloud.com'],
     compress: true,
     hot: true,
@@ -140,18 +140,23 @@ let config = {
     proxy: {
       '/*_api': {
         target: apiUrl,
+        changeOrigin: true,
       },
       '/api': {
         target: apiUrl,
+        changeOrigin: true,
       },
       '/login': {
         target: apiUrl,
+        changeOrigin: true,
       },
       '/static': {
         target: apiUrl,
+        changeOrigin: true,
       },
       '/captcha': {
         target: apiUrl,
+        changeOrigin: true,
       },
     },
   },

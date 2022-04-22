@@ -1,106 +1,71 @@
-import { Table } from 'views/Space/styled'
-import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
-import tw, { css } from 'twin.macro'
+/* eslint-disable no-bitwise */
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button, InputSearch, Select } from '@QCFE/lego-ui'
 import { Center, FlexBox } from 'components'
-import { get } from 'lodash-es'
 import useFilter from 'hooks/useHooks/useFilter'
-
-const defaultColumns: IColumn[] = [
-  {
-    title: '实例 ID',
-    dataIndex: 'instance_id',
-    key: 'instance_id',
-  },
-  {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-  },
-  {
-    title: '告警状态',
-    dataIndex: 'alarm_status',
-    key: 'alarm_status',
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'create_time',
-    key: 'create_time',
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'update_time',
-    key: 'update_time',
-  },
-]
+import {
+  dataJobInstanceColumns,
+  dataReleaseScheduleType,
+} from 'views/Space/Ops/DataIntegration/constants'
+import React from 'react'
+import { useIsFetching, useQueryClient } from 'react-query'
+import JobInstanceTable from 'views/Space/Ops/DataIntegration/JobInstance/JobInstanceTable'
+import { getSyncJobInstanceKey } from 'hooks/useJobInstance'
 
 const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 
-const LinkInstance = () => {
-  const { filter, setFilter, pagination, sort } = useFilter<
+const LinkInstance = ({
+  jobId,
+  version,
+}: {
+  jobId: string
+  version: string
+}) => {
+  const { filter, setFilter } = useFilter<
     {
+      job_id: string
+      version: string
       instance_id?: string
-      status?: number
+      state?: number
       alarm_status?: number
     },
     {
       pagination: true
       sort: true
     }
-  >({})
+  >({ job_id: jobId, version })
 
-  const { data, refetch, isFetching } = {
-    refetch: () => {},
-    isFetching: false,
-    data: [],
+  const queryClient = useQueryClient()
+  const isFetching = useIsFetching()
+
+  const refetchData = () => {
+    queryClient.invalidateQueries(getSyncJobInstanceKey())
   }
 
-  const columnsRender = {
-
+  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    window.open(`../data-job/${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
   }
-
-  const operations = {
-    title: '操作',
-    key: 'operation',
-    render: (text: any, record: any) => (
-      <span>
-        <a href="javascript:;">查看</a>
-        <span className="ant-divider" />
-        <a href="javascript:;">编辑</a>
-        <span className="ant-divider" />
-        <a href="javascript:;">删除</a>
-      </span>
-    ),
-  }
-  const { columns } = useColumns(
-    linkInstanceSettingKey,
-    defaultColumns,
-    columnsRender,
-    operations
-  )
-
-  console.log(pagination)
   return (
     <div tw="w-full">
       <FlexBox tw="gap-9 whitespace-nowrap">
         <Center tw="gap-1 ">
-          <div tw="text-white w-auto">调度状态</div>
+          <div tw="text-white w-auto">实例状态</div>
           <Select
             tw="w-[200px]"
             placeholder="请选择"
             options={[
               { value: 0, label: '全部' },
-              { value: 1, label: '调度中' },
-              { value: 2, label: '已暂停' },
-              { value: 4, label: '已完成' },
+              ...Object.values(dataReleaseScheduleType).map((v) => ({
+                value: v.value,
+                label: v.label,
+              })),
             ]}
             onChange={(value: number) => {
               setFilter((draft) => {
-                draft.status = value
+                draft.state = value
               })
             }}
-            value={filter.status}
+            value={filter.state}
           />
         </Center>
         <Center tw="gap-1">
@@ -149,26 +114,24 @@ const LinkInstance = () => {
               tw="text-xl text-white"
               type="light"
               onClick={() => {
-                refetch()
+                refetchData()
               }}
             />
           </Button>
         </div>
       </FlexBox>
-      <Table
-        tw="mt-2"
-        css={css`
-          .grid-table-header {
-            ${tw`bg-[#1e2f41]!`}
-          }
-        `}
-        columns={columns}
-        dataSource={[]}
-        sort={sort}
-        pagination={{
-          total: get(data, 'total', 0),
-          ...pagination,
+      <JobInstanceTable
+        settingKey={linkInstanceSettingKey}
+        defaultColumns={dataJobInstanceColumns.filter(
+          (i) => !['job_id', 'type'].includes(i.key as any)
+        )}
+        filter={{
+          ...filter,
+          job_id: jobId,
+          version,
         }}
+        showHeader={false}
+        jumpDetail={jumpDetail}
       />
     </div>
   )

@@ -1,11 +1,11 @@
-import { Center, HelpCenterLink, Modal, ModalContent } from 'components'
+import { Center, HelpCenterLink, Modal, ModalContent } from 'components/index'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Alert, Button, Icon } from '@QCFE/qingcloud-portal-ui'
 import { Collapse } from '@QCFE/lego-ui'
 import tw, { css } from 'twin.macro'
-import MonitorItem from 'views/Space/Dm/RealTime/Monitor/MonitorItem'
-import { useStore } from 'stores/index'
+import MonitorItem from 'views/Space/Ops/Alert/Monitor/MonitorItem'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 
 const { CollapseItem } = Collapse
 
@@ -36,7 +36,7 @@ interface IMonitorModalProps {
 }
 
 const MonitorModal = observer((props: IMonitorModalProps) => {
-  const { workFlowStore } = useStore()
+  const { set } = useAlertStore()
   console.log(props)
   const { onCancel } = props
   const arr = [{ name: '1 xxxx' }, { name: '2 asdfasdf' }]
@@ -64,7 +64,7 @@ const MonitorModal = observer((props: IMonitorModalProps) => {
         <Button
           size="large"
           tw="w-full mt-3 mb-4"
-          onClick={() => workFlowStore.set({ showAddMonitor: true })}
+          onClick={() => set({ showAddMonitor: true })}
         >
           <Icon name="add" size={14} type="light" />
           <span tw="text-xs">添加告警策略</span>

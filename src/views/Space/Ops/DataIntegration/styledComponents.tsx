@@ -1,19 +1,29 @@
 /* eslint-disable no-bitwise */
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox } from 'components/Box'
 import tw, { css, styled, theme } from 'twin.macro'
-import { ReactElement } from 'react'
-import { Center } from 'components/Center'
+import React, { ReactElement } from 'react'
+import { isFunction } from 'lodash-es'
+import { Center, FlexBox, Tooltip } from 'components'
+import {
+  sourceKinds,
+  SourceType,
+} from 'views/Space/Upcloud/DataSourceList/constant'
 import {
   AlarmStatus,
   alarmStatus,
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
+  DataReleaseSchedule,
+  dataReleaseScheduleType,
   jobInstanceStatus,
   JobInstanceStatusType,
   JobType,
   jobType,
 } from './constants'
 
-export const statusStyle = (type: JobInstanceStatusType) => {
+export const statusStyle = (
+  type: JobInstanceStatusType | DataReleaseSchedule
+) => {
   let wrapperBg
   let centerBorder
   let bg
@@ -53,6 +63,22 @@ export const statusStyle = (type: JobInstanceStatusType) => {
       centerBorder = tw`border-[#47CB9F]`
       bg = tw`bg-green-11`
       break
+
+    case DataReleaseSchedule.RUNNING:
+      wrapperBg = tw`bg-[#DEE7F1]`
+      centerBorder = tw`border-[#B7C8D8]`
+      bg = tw`bg-neut-8`
+      break
+    case DataReleaseSchedule.FINISHED:
+      wrapperBg = tw`bg-[#DEE7F1]`
+      centerBorder = tw`border-[#B7C8D8]`
+      bg = tw`bg-neut-8`
+      break
+    case DataReleaseSchedule.DOWNED:
+      wrapperBg = tw`bg-[#DEE7F1]`
+      centerBorder = tw`border-[#B7C8D8]`
+      bg = tw`bg-neut-8`
+      break
     default:
       break
   }
@@ -72,31 +98,70 @@ export const statusStyle = (type: JobInstanceStatusType) => {
   }
 }
 
-export const JobInstanceStatusCmp = (props: {
-  type: keyof typeof jobInstanceStatus
+export const StatusCmp = ({
+  label,
+  type,
+  className,
+}: {
+  label: string
+  type?: JobInstanceStatusType | DataReleaseSchedule
+  className?: string
 }) => {
-  const { type } = props
-  if (jobInstanceStatus[type] === undefined) {
+  if (type === undefined) {
     return null
   }
-  const { wrapper, item } = statusStyle(jobInstanceStatus[type]?.type)
+  const { wrapper, item } = statusStyle(type)
   return (
-    <FlexBox tw="items-center gap-2">
+    <div tw="flex items-center gap-2" className={className}>
       <div css={wrapper}>
         <div css={item} />
       </div>
-      <span>{jobInstanceStatus[type].label}</span>
-    </FlexBox>
+      <span>{label}</span>
+    </div>
   )
 }
 
-export const AlarmStatusCmp = (props: { type: keyof typeof alarmStatus }) => {
-  const { type } = props
-  if (alarmStatus[type] === undefined) {
+export const JobInstanceStatusCmp = (props: {
+  type: keyof typeof jobInstanceStatus
+  className?: string
+}) => {
+  const { type, className } = props
+  return (
+    <StatusCmp
+      label={jobInstanceStatus[type]?.label}
+      type={jobInstanceStatus[type]?.type}
+      className={className}
+    />
+  )
+}
+
+export const DataReleaseStatusCmp = (props: {
+  type?: keyof typeof dataReleaseScheduleType
+  className?: string
+}) => {
+  const { type, className } = props
+  if (type === undefined || dataReleaseScheduleType[type] === undefined) {
     return null
   }
   return (
-    <FlexBox tw="items-center gap-2">
+    <StatusCmp
+      label={dataReleaseScheduleType[type].label}
+      type={dataReleaseScheduleType[type]?.type}
+      className={className}
+    />
+  )
+}
+
+export const AlarmStatusCmp = (props: {
+  type?: keyof typeof alarmStatus
+  onClick?: Function
+}) => {
+  const { type, onClick } = props
+  if (type === undefined || alarmStatus[type] === undefined) {
+    return null
+  }
+  return (
+    <div tw="items-center gap-2 inline-flex">
       <Icon
         name={
           alarmStatus[type].type === AlarmStatus.NORMAL
@@ -104,14 +169,25 @@ export const AlarmStatusCmp = (props: { type: keyof typeof alarmStatus }) => {
             : 'if-exclamation'
         }
         size={14}
-        css={
+        css={[
           alarmStatus[type].type === AlarmStatus.NORMAL
             ? tw`text-blue-10`
-            : tw`text-[#FFD127]`
-        }
+            : tw`text-[#FFD127]`,
+
+          tw`text-[14px]`,
+        ]}
       />
-      <span>{alarmStatus[type].label}</span>
-    </FlexBox>
+      {isFunction(onClick) ? (
+        <span
+          tw="hover:text-green-11 cursor-pointer hover:underline "
+          onClick={onClick}
+        >
+          {alarmStatus[type].label}
+        </span>
+      ) : (
+        <span>{alarmStatus[type].label}</span>
+      )}
+    </div>
   )
 }
 
@@ -149,7 +225,6 @@ const jobTypeConfig = new Map([
 
 export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
   const { type } = props
-  console.log(1111, jobType[type])
   if (jobType[type] === undefined) {
     return null
   }
@@ -158,7 +233,7 @@ export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
     if (jobType[type].type & Number(i)) {
       btns.push(
         <Center
-          key={i.toString()}
+          key={item.label}
           tw="rounded-[2px] px-2 text-xs h-4 border leading-4"
           css={css`
             color: ${item.css};
@@ -174,7 +249,11 @@ export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
           </span>
         </Center>
       )
-      btns.push(<span tw="text-line-dark">-</span>)
+      btns.push(
+        <span key="-" tw="text-line-dark">
+          -
+        </span>
+      )
     }
   })
   if (btns.length) {
@@ -184,9 +263,52 @@ export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
 }
 
 export const Divider = styled.div`
-  ${tw`inline-block h-4 w-[1px] bg-[#475569]`}
+  ${tw`inline-block my-0.5 w-[1px] bg-[#475569]`}
 `
 
 export const Circle = styled.div`
   ${tw`inline-flex items-center justify-center w-6 h-6 rounded-full text-white bg-line-dark mr-2 flex-none`}
 `
+
+export const DbTypeCmp = ({
+  type,
+  onClick,
+  className,
+  devMode,
+}: {
+  type: SourceType
+  onClick?: Function
+  className?: string
+  devMode?: keyof typeof dataReleaseDevModeType
+}) => {
+  const kind = sourceKinds.find((i) => i.source_type === type)
+  if (!kind) {
+    return null
+  }
+
+  const item = (
+    <div
+      onClick={onClick as any}
+      css={[
+        onClick
+          ? tw`hover:text-green-11 cursor-pointer`
+          : tw`hover:text-neut-19`,
+        tw`inline-block h-4 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2 leading-[16px]`,
+      ]}
+      className={className}
+    >
+      {kind.showname ?? kind.name}
+    </div>
+  )
+  if (
+    devMode &&
+    dataReleaseDevModeType[devMode!]?.type !== DataReleaseDevMode.UI
+  ) {
+    return (
+      <Tooltip hasPadding content="脚本模式请查看开发内容" theme="light">
+        {item}
+      </Tooltip>
+    )
+  }
+  return item
+}

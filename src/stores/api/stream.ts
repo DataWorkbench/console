@@ -25,7 +25,7 @@ export const listReleaseJobVersions = ({
   ...rest
 }: IStreamParams) => {
   const jobMode = getApiJobMode(jobId as string)
-  request({
+  return request({
     region,
     uri: `/v1/workspace/${spaceId}/${jobMode}/job/${jobId}/version`,
     query: rest,
