@@ -5,7 +5,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
 import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
@@ -179,7 +179,12 @@ const SyncJob = () => {
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
-
+  useEffect(() => {
+    setDb((draft) => {
+      draft.source.id = get(confData, 'source_id')
+      draft.target.id = get(confData, 'target_id')
+    })
+  }, [confData, setDb])
   // useEffect(() => {
   //   if (confData && sourceTypeName && targetTypeName) {
   //     // const sourceColumn =
@@ -287,11 +292,7 @@ const SyncJob = () => {
     )
     set(resource, 'cluster_id', cluster.id)
     set(resource, 'job_mode', 1)
-    set(
-      resource,
-      'job_content',
-      'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    )
+    set(resource, 'job_content', '')
     set(resource, 'channel_control', channel)
     const filterResouce = removeUndefined(resource)
     // console.log('filterResouce', filterResouce)
