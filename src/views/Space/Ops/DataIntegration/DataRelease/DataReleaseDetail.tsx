@@ -24,6 +24,7 @@ import {
   useQuerySyncJobVersionDetail,
   useQuerySyncJobVersionSchedule,
 } from 'hooks/useJobVersion'
+import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
 import {
   AlarmStatusCmp,
   Circle,
@@ -31,7 +32,12 @@ import {
   JobInstanceStatusCmp,
   JobTypeCmp,
 } from '../styledComponents'
-import { dataReleaseDetailActions } from '../constants'
+import {
+  dataReleaseDetailActions,
+  DataReleaseSchedule,
+  dataReleaseScheduleType,
+} from '../constants'
+import { useMutationJobRelease } from '../../../../../hooks/useJobRelease'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -103,7 +109,8 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
   useIcon(icons)
   const { id, version } = props
 
-  console.log(version)
+  // const { regionId, spaceId } = useParams<IRouteParams>()
+
   const { showDataSource, set } = useDataReleaseStore()
 
   const history = useHistory()
@@ -116,7 +123,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
     history.push('../data-release')
   }
 
-  const { data, isFetching } = useQuerySyncJobVersionDetail<
+  const { data, isFetching, refetch } = useQuerySyncJobVersionDetail<
     Record<string, any>
   >({
     jobId: id,
@@ -133,7 +140,52 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
     versionId: version,
   })
 
-  console.log(config)
+  const handleClickDb = (datasourceId: string) => {
+    // loadDataSource()
+    console.log(datasourceId)
+  }
+
+  const mutation = useMutationJobRelease()
+
+  const handleAction = (d: Record<string, any>, type: string) => {
+    console.log(type)
+    switch (type) {
+      case 'offline':
+        set({
+          showOffline: true,
+          selectedData: data,
+        })
+        break
+      case 're-publish':
+        mutation
+          .mutateAsync({
+            op: 'release',
+            jobId: id,
+          })
+          .then(() => {
+            refetch()
+          })
+
+        break
+      default:
+        break
+    }
+  }
+
+  const filterActionFn = (item: { key: string }) => {
+    let filterActionKey = ''
+
+    if (
+      dataReleaseScheduleType[data?.status as 2]?.type ===
+      DataReleaseSchedule.DOWNED
+    ) {
+      filterActionKey = 'offline'
+    } else {
+      filterActionKey = 're-publish'
+    }
+    return item.key !== filterActionKey
+  }
+
   return (
     <Root tw="relative">
       <FlexBox tw="items-center gap-2">
@@ -189,13 +241,16 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           </Center>
           <FlexBox tw="gap-4">
             <MoreAction
-              items={dataReleaseDetailActions.map((i) => ({
-                ...i,
-                value: data,
-              }))}
+              items={dataReleaseDetailActions
+                .filter(filterActionFn)
+                .map((i) => ({
+                  ...i,
+                  value: data,
+                }))}
               type="button"
               buttonText="更多操作"
               placement="bottom-start"
+              onMenuClick={handleAction}
             />
 
             <Button
@@ -250,7 +305,11 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
                   // onClick={() => set({ showDataSource: true })}
                 >
-                  <DbTypeCmp type={data?.source_type} onClick={() => {}} />
+                  <DbTypeCmp
+                    devMode={config?.job_type}
+                    type={data?.source_type}
+                    onClick={() => handleClickDb(data?.source_id)}
+                  />
                   <span tw="ml-1">{data?.source_name}</span>
                 </div>
                 <div tw="text-neut-8">{data?.source_id}</div>
@@ -258,7 +317,11 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <span>数据目的:</span>
               <span tw="inline-block">
                 <div tw="align-middle">
-                  <DbTypeCmp type={data?.target_type} onClick={undefined} />
+                  <DbTypeCmp
+                    devMode={config?.job_type}
+                    type={data?.target_type}
+                    onClick={() => handleClickDb(data?.target_id)}
+                  />
                 </div>
               </span>
             </GridItem>
@@ -314,6 +377,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           }}
         />
       )}
+      <OfflineModal refetch={refetch} />
     </Root>
   )
 })

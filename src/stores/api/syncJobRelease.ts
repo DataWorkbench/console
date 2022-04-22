@@ -22,11 +22,13 @@ export const offlineReleaseSyncJob = ({
   regionId,
   spaceId,
   jobId,
+  ...rest
 }: IJobReleaseParams) => {
   return request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/sync/job/release/${jobId}/offline`,
     method: 'POST',
+    body: rest,
   })
 }
 

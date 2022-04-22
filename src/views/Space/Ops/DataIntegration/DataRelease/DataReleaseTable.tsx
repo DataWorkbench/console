@@ -330,11 +330,12 @@ const DataRelease = observer(() => {
               mutation.mutateAsync({
                 op: 'offline',
                 jobId: selectedData?.id,
+                stop_running: checkRef.current,
               }),
-              mutation.mutateAsync({
-                op: checkRef.current ? 'suspend' : '',
-                jobId: selectedData?.id,
-              }),
+              // mutation.mutateAsync({
+              //   op: checkRef.current ? 'suspend' : '',
+              //   jobId: selectedData?.id,
+              // }),
             ]).then(() => {
               set({
                 showOffline: false,
