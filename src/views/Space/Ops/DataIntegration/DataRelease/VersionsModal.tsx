@@ -136,10 +136,10 @@ const VersionsModal = observer((props: IProps) => {
         <FlexBox orient="column" tw="gap-3">
           <TableHeader columnsSetting={columnsSetting} />
           <Table
-            rowKey="id"
             columns={columns}
             dataSource={data?.infos || []}
             sort={sort}
+            rowKey="version"
             pagination={{
               total: data?.total ?? 0,
               ...pagination,

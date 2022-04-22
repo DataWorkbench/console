@@ -8,7 +8,7 @@ export const JobItem = styled.div`
   ${tw`inline-flex gap-2 items-center bg-neut-13 rounded-[2px] px-2 h-6`}
   & > div {
     ${tw`inline-block`}
-    & > span:first-child {
+    & > span:first-of-type {
       ${tw`text-white mr-0.5`}
     }
     & > span:last-child {

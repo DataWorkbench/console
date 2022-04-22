@@ -166,7 +166,6 @@ const DataRelease = observer(() => {
             jobId: record.id,
           })
           .then(() => {
-            console.log(3333)
             refetchData()
           })
 
@@ -272,11 +271,10 @@ const DataRelease = observer(() => {
         uuid: `${i.id}=-=${i.version}`,
       }))
       if (arr.length === 11) {
-        const value = res.infos.slice(0, 10).concat({
-          key: res.infos[10].id,
+        const value = arr.slice(0, 10).concat({
+          key: arr[10].id,
           hasMore: true,
         })
-        console.log(value)
         return value
       }
       if (arr.length === 0) {

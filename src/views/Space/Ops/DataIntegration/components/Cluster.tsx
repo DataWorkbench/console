@@ -1,12 +1,10 @@
-import { Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import tw, { styled } from 'twin.macro'
-import { FlexBox } from 'components/Box'
-import { AffixLabel, TextLink } from 'components'
+import { AffixLabel, TextLink, FlexBox } from 'components'
 import React from 'react'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
-import { Loading } from '@QCFE/lego-ui'
-import { useQueryDescribeFlinkCluster } from '../../../../../hooks'
+import { useQueryDescribeFlinkCluster } from 'hooks'
 
 const Header = styled(FlexBox)`
   ${tw`rounded-[2px] bg-neut-16 px-6 py-3`}

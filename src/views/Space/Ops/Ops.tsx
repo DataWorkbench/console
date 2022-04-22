@@ -12,7 +12,6 @@ import Job from './Stream/Job'
 
 export const Ops = () => {
   const { mod, detail } = useParams<{ mod: string; detail?: string }>()
-  console.log(mod, detail)
   return (
     <div tw="flex-1 flex h-full">
       <Sider funcMod="ops" />

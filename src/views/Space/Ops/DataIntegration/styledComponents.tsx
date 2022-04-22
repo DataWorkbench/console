@@ -233,7 +233,7 @@ export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
     if (jobType[type].type & Number(i)) {
       btns.push(
         <Center
-          key={i.toString()}
+          key={item.label}
           tw="rounded-[2px] px-2 text-xs h-4 border leading-4"
           css={css`
             color: ${item.css};
@@ -249,7 +249,11 @@ export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
           </span>
         </Center>
       )
-      btns.push(<span tw="text-line-dark">-</span>)
+      btns.push(
+        <span key="-" tw="text-line-dark">
+          -
+        </span>
+      )
     }
   })
   if (btns.length) {

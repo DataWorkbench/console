@@ -12,7 +12,7 @@ import { HorizonTabs } from 'views/Space/Dm/styled'
 import Cluster from 'views/Space/Ops/DataIntegration/components/Cluster'
 import useIcon from 'hooks/useHooks/useIcon'
 import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
-import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
+// import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
 import LinkInstance from 'views/Space/Ops/DataIntegration/components/LinkInstance'
 import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
 import { observer } from 'mobx-react-lite'
@@ -148,7 +148,6 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
   const mutation = useMutationJobRelease()
 
   const handleAction = (d: Record<string, any>, type: string) => {
-    console.log(type)
     switch (type) {
       case 'offline':
         set({
@@ -355,7 +354,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           <LinkInstance jobId={id} version={version} />
         </TabPanel>
         <TabPanel label="监控告警" name="alarm">
-          <Monitor />
+          {/* <Monitor /> */}
         </TabPanel>
         <TabPanel label="开发内容" name="dev">
           <DevContent data={config} curJob={data} />
