@@ -22,6 +22,8 @@ import {
   useQuerySyncJobRelease,
 } from 'hooks/useJobRelease'
 import { useQueryClient } from 'react-query'
+import { listSyncJobVersions } from 'stores/api/syncJobVersion'
+import { useParams } from 'react-router-dom'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
@@ -38,6 +40,11 @@ import DataSourceModal from './DataSourceModal'
 // import { IColumn } from 'hooks/utils'
 
 // interface IDataReleaseProps {}
+
+interface IRouteParams {
+  regionId: string
+  spaceId: string
+}
 
 const TabsWrapper = styled.div`
   & .panel-right .icon svg.qicon {
@@ -138,7 +145,6 @@ const DataRelease = observer(() => {
     record: Record<string, any>,
     key: DataReleaseActionType
   ) => {
-    console.log(record)
     switch (key) {
       case 'link':
       case 'dev':
@@ -239,29 +245,37 @@ const DataRelease = observer(() => {
 
   const { data, isFetching } = useQuerySyncJobRelease(filter)
 
-  // const infos =  [
-  //   {
-  //     id: 'fadsf-asdf-asdf-asdf',
-  //     name: 'work-adf',
-  //     created_by: new Date().getTime(),
-  //     status: 2,
-  //     type: 1,
-  //     updated: new Date().getTime(),
-  //     version: 'asdfasfd',
-  //   },
-  // ]
-  const infos =
-    get(data, 'infos', [
-      // {
-      //   id: 'fadsf-asdf-asdf-asdf',
-      //   name: 'work-adf',
-      //   created_by: new Date().getTime(),
-      //   status: 3,
-      //   type: 1,
-      //   updated: new Date().getTime() / 1000,
-      //   version: 'asdfasfd',
-      // },
-    ]) || []
+  const infos = get(data, 'infos', []) || []
+
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  const getChildren = async (uuid: string) => {
+    const [key] = uuid.split('=-=')
+    return listSyncJobVersions({
+      regionId,
+      spaceId,
+      jobId: key,
+      limit: 11,
+      offset: 0,
+    }).then((res) => {
+      const arr = res.infos?.map((i: any) => ({
+        ...i,
+        uuid: `${i.id}=-=${i.version}`,
+      }))
+      if (arr.length === 11) {
+        const value = res.infos.slice(0, 10).concat({
+          key: res.infos[10].id,
+          hasMore: true,
+        })
+        console.log(value)
+        return value
+      }
+      if (arr.length === 0) {
+        return [{ key: Math.random().toString(32), hasNone: true }]
+      }
+      return arr
+    })
+  }
 
   return (
     <>
@@ -275,18 +289,17 @@ const DataRelease = observer(() => {
             openLevel={1}
             indentSpace={44}
             selectedLevel={-1}
-            getChildren={async (key) => [
-              {
-                id: `${key}as`,
-                job_name: `${key}asdf`,
-                // hasNone: true,
-                hasMore: true,
-              },
-            ]}
+            getChildren={getChildren}
             columns={columns}
-            dataSource={infos}
+            dataSource={infos.map((i: any) => {
+              return {
+                ...i,
+                uuid: `${i.id}=-=${i.version}`,
+              }
+            })}
             loading={!!isFetching}
             sort={sort}
+            rowKey="uuid"
             pagination={{
               total: get(data, 'total', 0),
               ...pagination,

@@ -40,7 +40,6 @@ export const getColumnsRender = (
       filterAble: true,
       filtersNew: Object.values(dataReleaseScheduleType) as any,
       render: (status: keyof typeof dataReleaseScheduleType) => {
-        console.log(1111, status)
         return <DataReleaseStatusCmp type={status} />
       },
     },
@@ -112,7 +111,10 @@ export const getColumnsRender = (
       })),
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
         record.__level === 1 ? (
-          <DbTypeCmp type={text} onClick={() => actions?.source(record)} />
+          <DbTypeCmp
+            type={text as any}
+            onClick={() => actions?.source(record)}
+          />
         ) : null,
     },
     target: {
@@ -130,7 +132,10 @@ export const getColumnsRender = (
       })),
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
         record.__level === 1 ? (
-          <DbTypeCmp type={text} onClick={() => actions?.target(record)} />
+          <DbTypeCmp
+            type={text as any}
+            onClick={() => actions?.target(record)}
+          />
         ) : null,
     },
     updated: {
@@ -139,7 +144,7 @@ export const getColumnsRender = (
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
       render: (v: number, record: Record<string, any>) =>
-        record.__level === 1 ? (
+        record.__level === undefined || record.__level === 1 ? (
           <span tw="text-neut-8">
             {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
           </span>

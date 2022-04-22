@@ -11,6 +11,7 @@ import { useColumns } from 'hooks/useHooks/useColumns'
 import { Table } from 'views/Space/styled'
 import TableHeader from 'views/Space/Ops/DataIntegration/DataRelease/TableHeader'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
+import { useQuerySyncJobVersions } from 'hooks/useJobVersion'
 import { getColumnsRender, getOperations } from './utils'
 
 interface IProps {
@@ -20,7 +21,7 @@ interface IProps {
 const dataReleaseVersionSettingKey = 'DATA_RELEASE_VERSION_SETTING'
 
 const VersionsModal = observer((props: IProps) => {
-  const { set } = useDataReleaseStore()
+  const { set, selectedData } = useDataReleaseStore()
   const { onCancel } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
@@ -30,19 +31,30 @@ const VersionsModal = observer((props: IProps) => {
       status?: number
       offset: number
       limit: number
+      jobId: string
     },
-    { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, dataReleaseVersionSettingKey)
+    { pagination: true; sort: true },
+    dataReleaseVersionSettingKey
+  >(
+    { limit: 15, jobId: selectedData?.key },
+    { pagination: true, sort: true },
+    dataReleaseVersionSettingKey
+  )
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
-    window.open(`./${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
+    window.open(
+      `./data-release/${record.id}?version=${record.version}${
+        tab ? `&tab=${tab}` : ''
+      }`,
+      '_blank'
+    )
   }
 
   const columnsRender = getColumnsRender(filter, setFilter, [
     'alarm_status',
     'status',
-    'version_id',
-    'created_at',
+    'version',
+    'updated',
   ])
 
   const handleMenuClick = (
@@ -73,17 +85,19 @@ const VersionsModal = observer((props: IProps) => {
   const operations = getOperations(handleMenuClick)
   const jobNameColumn = {
     ...dataReleaseColumns[0],
-    width: 250,
+    // width: 250,
     render: (text: string, record: Record<string, any>) => {
       const child = (
         <TextEllipsis>
-          <span tw="hover:text-green-11" onClick={() => jumpDetail()(record)}>
+          <span
+            tw="hover:text-green-11 hover:cursor-pointer"
+            onClick={() => jumpDetail()(record)}
+          >
             {text}
           </span>
         </TextEllipsis>
       )
       if (record.desc) {
-        // TODO: 描述字段未确认
         return (
           <Tooltip theme="light" hasPadding content={record.desc}>
             {child}
@@ -107,18 +121,7 @@ const VersionsModal = observer((props: IProps) => {
     }),
     [setColumnSettings]
   )
-
-  const data: Record<string, any> = {
-    infos: [
-      {
-        id: 1,
-        desc: 'adfasdfa',
-        job_name: ';asdas',
-        instance_id: 1,
-        instance_name: 'adfasdfas',
-      },
-    ],
-  }
+  const { data } = useQuerySyncJobVersions(filter)
   return (
     <Modal
       width={800}
@@ -138,7 +141,7 @@ const VersionsModal = observer((props: IProps) => {
             dataSource={data?.infos || []}
             sort={sort}
             pagination={{
-              total: data.total ?? 0,
+              total: data?.total ?? 0,
               ...pagination,
             }}
           />

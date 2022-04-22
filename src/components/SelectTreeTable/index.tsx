@@ -57,6 +57,14 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     (key: string) => {
       if (!tableTreeRef.current.keyChildrenMap?.get(key)?.children?.size) {
         getChildren(key).then((data: Record<string, any>[]) => {
+          console.log(
+            333333333,
+            key,
+            data.map((i) => ({
+              key: i[rowKey],
+              value: i,
+            }))
+          )
           tableTreeRef.current.setChildren(
             key,
             data.map((i) => ({

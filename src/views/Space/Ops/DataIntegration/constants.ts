@@ -277,8 +277,8 @@ const versionSet = new Set([
   'id',
   'status',
   'alarm_status',
-  'version_id',
-  'created_at',
+  'version',
+  'updated',
 ])
 
 export const versionColumns = dataReleaseColumns.filter(
