@@ -6,17 +6,13 @@ import { useDarkMode } from 'hooks'
 // describeDataOmnis
 const DescribeDataOmnis = lazy(
   () =>
-    import(
-      /* webpackChunkName: "describeDataOmnis" */ 'views/DataOmnis/DescribeDataOmnis'
-    )
+    import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
 )
 
 // activateDataOmnis
 const ActivateDataOmnis = lazy(
   () =>
-    import(
-      /* webpackChunkName: "activateDataOmnis" */ 'views/DataOmnis/ActivateDataOmnis'
-    )
+    import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
 )
 
 // home
