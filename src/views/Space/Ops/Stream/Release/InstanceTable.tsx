@@ -151,7 +151,7 @@ export const InstanceTable = observer(
       {
         title: '实例ID',
         dataIndex: 'id',
-        width: 185,
+        width: 200,
         render: (value: string) => {
           return (
             <FlexBox tw="items-center space-x-1">
