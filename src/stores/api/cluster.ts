@@ -84,3 +84,14 @@ export const deleteFlinkClusters = ({
     body: { cluster_ids: clusterIds },
     method: 'POST',
   })
+
+export const getDescribeFlinkCluster = ({
+  regionId,
+  spaceId,
+  clusterId,
+}: IParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink/${clusterId}`,
+    method: 'GET',
+  })

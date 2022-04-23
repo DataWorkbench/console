@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, lowerCase, pick } from 'lodash-es'
+import { get, lowerCase, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
@@ -17,6 +17,7 @@ import {
   ToolBar,
   ToolBarLeft,
   ToolBarRight,
+  // @ts-ignore
   utils,
 } from '@QCFE/qingcloud-portal-ui'
 import { useMutationSource, useQuerySource, useStore } from 'hooks'
@@ -28,6 +29,7 @@ import {
   Icons,
   TextEllipsis,
   TextLink,
+  RouterLink,
   Tooltip,
 } from 'components'
 import { getHelpCenterLink } from 'utils'
@@ -41,7 +43,12 @@ import {
   getPingConnection,
 } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
-import { CONNECTION_STATUS, DATASOURCE_STATUS, ftpProtocol } from './constant'
+import {
+  CONNECTION_STATUS,
+  DATASOURCE_STATUS,
+  ftpProtocol,
+  sourceKinds,
+} from './constant'
 import { SourceKindImg } from './styled'
 
 const { MenuItem } = Menu as any
@@ -126,43 +133,101 @@ const getUrl = (
     | 'mysql'
     | 'clickhouse'
     | 'postgresql'
+    | 'sap_hana'
+    | 'tidb'
+    | 'oracle'
+    | 'mssql'
+    | 'sqlserver'
+    | 'mongo_db'
+    | 'elastic_search'
+    | 'redis'
+    | 'db2'
+    | 'hive'
 ) => {
-  switch (type) {
-    case 'hbase': {
-      try {
-        return `${JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']}`
-      } catch (e) {
-        return ''
+  try {
+    switch (type) {
+      // mysql default
+      case 'tidb':
+        return `jdbc:mysql://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      case 'oracle':
+        return `jdbc:oracle:thin:@${urlObj.host}:${urlObj.port}:${urlObj.database}`
+      case 'sqlserver':
+        return `jdbc:jtds:sqlserver://${urlObj.host}:${urlObj.port};DatabaseName=${urlObj.database}`
+      // PostgreSQL default
+      case 'db2':
+        return `jdbc:db2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      // ClickHouse default
+      case 'mongo_db':
+        return `mongodb://${urlObj.mongodb_brokers
+          .map(
+            ({ host, port }: { host: string; port: number }) =>
+              `${host}:${port}`
+          )
+          .join(',')}`
+      case 'sap_hana':
+        return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
+      case 'elastic_search':
+        return `elasticsearch://${urlObj.host}:${urlObj.port}`
+      case 'ftp':
+        return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
+          urlObj?.host
+        }:${urlObj?.port}`
+      case 'hdfs':
+        return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
+      case 'redis':
+        return `redis://${urlObj.port
+          .map(
+            ({ host, port }: { host: string; port: number }) =>
+              `${host}:${port}`
+          )
+          .join(',')}`
+      case 'hive':
+        return `jdbc:hive2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      case 'hbase': {
+        try {
+          return `${
+            JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']
+          }`
+        } catch (e) {
+          return ''
+        }
       }
+      case 'kafka':
+        return urlObj.kafka_brokers
+          .map(
+            ({ host, port }: { host: string; port: number }) =>
+              `${host}:${port}`
+          )
+          .join(',')
+
+      default:
+        return `jdbc:${type}://${urlObj?.host}:${urlObj?.port}/${urlObj?.database}`
     }
-    case 'kafka':
-      return urlObj.kafka_brokers
-        .map(
-          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
-        )
-        .join(',')
-    case 'ftp':
-      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
-        urlObj?.host
-      }:${urlObj?.port}`
-    case 'hdfs':
-      return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
-    default:
-      return `jdbc:${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+  } catch (e) {
+    return ''
   }
 }
-const DataSourceList = observer(() => {
+
+export interface DataSourceListProps {
+  selectMode?: boolean
+  sourceType?: number
+  onCheck?: (source: any) => void
+}
+
+const DataSourceList = observer((props: DataSourceListProps) => {
+  const { selectMode = false, sourceType, onCheck = () => {} } = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
   const [isReFetching, setIsReFetching] = useState(false)
   const [delText, setDelText] = useState('')
+  const history = useHistory()
   const {
     dataSourceStore: {
       op,
       opSourceList,
       mutateOperation,
-      sourceKinds,
+      // sourceKinds,
       showPingHistories,
       addEmptyHistories,
       addItemHistories,
@@ -174,7 +239,6 @@ const DataSourceList = observer(() => {
   } = useStore()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
-
   const [filter, setFilter] = useImmer<{
     regionId: string
     spaceId: string
@@ -193,7 +257,9 @@ const DataSourceList = observer(() => {
     limit: 10,
     verbose: 2,
   })
-  const { isLoading, refetch, data } = useQuerySource(filter)
+  const { isLoading, refetch, data } = useQuerySource(
+    merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})
+  )
   const mutation = useMutationSource()
 
   const shouldRefetch = useRef<string>()
@@ -314,12 +380,11 @@ const DataSourceList = observer(() => {
       dataIndex: 'url',
       width: 250,
       render: (v: any, row: any) => {
-        const kindName = sourceKinds.find(
-          (kind) => kind.source_type === row.type
-        )?.name
+        const item = sourceKinds.find((kind) => kind.source_type === row.type)
+        const kindName = item?.urlType ?? item?.name
 
         if (kindName) {
-          const key = kindName.toLowerCase()
+          const key = kindName
           const urlObj = get(v, key)
           // const networkId = get(urlObj, 'network.vpc_network.network_id')
           return (
@@ -448,74 +513,88 @@ const DataSourceList = observer(() => {
       title: '操作',
       key: 'table_actions',
       width: 150,
-      render: (v: string, info: any) => (
-        <>
-          <Button
-            type="text"
-            tw="text-green-11! font-semibold"
-            onClick={() => {
-              mutateOperation('view', [info])
-            }}
-          >
-            查看详情
-          </Button>
-          <Tooltip
-            theme="light"
-            trigger="click"
-            arrow={false}
-            twChild={
-              css`
-                &[aria-expanded='true'],
-                &:hover {
-                  ${tw`bg-neut-2 rounded-sm`}
-                }
+      render: (v: string, info: any) => {
+        if (selectMode) {
+          return (
+            <span
+              tw="cursor-pointer"
+              onClick={() => {
+                mutateOperation('ping', [info])
+              }}
+            >
+              可用性测试
+            </span>
+          )
+        }
+        return (
+          <>
+            <Button
+              type="text"
+              tw="text-green-11! font-semibold"
+              onClick={() => {
+                mutateOperation('view', [info])
+              }}
+            >
+              查看详情
+            </Button>
+            <Tooltip
+              theme="light"
+              trigger="click"
+              arrow={false}
+              twChild={
+                css`
+                  &[aria-expanded='true'],
+                  &:hover {
+                    ${tw`bg-neut-2 rounded-sm`}
+                  }
 
-                svg {
-                  ${tw`text-black! bg-transparent! fill-[transparent]!`}
-                }
-              ` as any
-            }
-            content={
-              <Menu
-                onClick={(e: React.SyntheticEvent, key: any) => {
-                  mutateOperation(key, [info])
-                }}
-              >
-                <MenuItem key="ping">
-                  <Icon name="if-doublecheck" tw="mr-2" />
-                  可用性测试
-                </MenuItem>
-                <MenuItem
-                  key="update"
-                  disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                  svg {
+                    ${tw`text-black! bg-transparent! fill-[transparent]!`}
+                  }
+                ` as any
+              }
+              content={
+                <Menu
+                  onClick={(e: React.SyntheticEvent, key: any) => {
+                    mutateOperation(key, [info])
+                  }}
                 >
-                  <Icon name="pen" tw="mr-2" />
-                  编辑
-                </MenuItem>
-                {info.status === DATASOURCE_STATUS.DISABLED ? (
-                  <MenuItem key="enable">
-                    <Icon name="start" tw="mr-2" />
-                    启用
+                  <MenuItem key="ping">
+                    <Icon name="if-doublecheck" tw="mr-2" />
+                    可用性测试
                   </MenuItem>
-                ) : (
-                  <MenuItem key="disable">
-                    <Icon name="stop" tw="mr-2" />
-                    停用
+                  <MenuItem
+                    key="update"
+                    disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                  >
+                    <Icon name="pen" tw="mr-2" />
+                    编辑
                   </MenuItem>
-                )}
-                <MenuItem key="delete">
-                  <Icon name="trash" tw="mr-2" />
-                  删除
-                </MenuItem>
-              </Menu>
-            }
-          >
-            <Center tw="w-6 h-6">
-              <Icon name="more" size={20} clickable />
-            </Center>
-          </Tooltip>
-        </>
-      ),
+                  {info.status === DATASOURCE_STATUS.DISABLED ? (
+                    <MenuItem key="enable">
+                      <Icon name="start" tw="mr-2" />
+                      启用
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key="disable">
+                      <Icon name="stop" tw="mr-2" />
+                      停用
+                    </MenuItem>
+                  )}
+                  <MenuItem key="delete">
+                    <Icon name="trash" tw="mr-2" />
+                    删除
+                  </MenuItem>
+                </Menu>
+              }
+            >
+              <Center tw="w-6 h-6">
+                <Icon name="more" size={20} clickable />
+              </Center>
+            </Tooltip>
+          </>
+        )
+      },
     },
   ]
 
@@ -536,8 +615,8 @@ const DataSourceList = observer(() => {
   if (isLoading) {
     return (
       <Root>
-        <PageTab tabs={tabs} />
-        <ContentBox tw="bg-white h-80">
+        {!selectMode && <PageTab tabs={tabs} />}
+        <ContentBox tw="bg-white dark:bg-neut-16 h-80">
           <Loading />
         </ContentBox>
       </Root>
@@ -550,39 +629,55 @@ const DataSourceList = observer(() => {
     <>
       {sourceList?.length || filter.search !== '' ? (
         <Root>
-          <PageTab tabs={tabs} />
-          <ToolBar tw="bg-white">
+          {!selectMode && <PageTab tabs={tabs} />}
+          <ToolBar tw="bg-white dark:bg-neut-16">
             <ToolBarLeft>
-              <Button type="primary" onClick={() => mutateOperation('create')}>
-                <Icon name="add" />
-                新增数据源
-              </Button>
-              <Button
-                type="default"
-                disabled={
-                  // .filter(
-                  // ({
-                  // source_id,
-                  // status,
-                  // }: {
-                  // source_id: string
-                  // status: number
-                  // }) => selectedRowKeys.includes(source_id) && status !== 2
-                  // ).
-                  selectedRowKeys.length === 0
-                }
-                onClick={() =>
-                  mutateOperation(
-                    'delete',
-                    sourceList.filter(({ id }: Record<string, any>) =>
-                      selectedRowKeys.includes(id)
-                    )
-                  )
-                }
-              >
-                <Icon name="trash" />
-                删除
-              </Button>
+              {!selectMode ? (
+                <>
+                  <Button
+                    type="primary"
+                    onClick={() => mutateOperation('create')}
+                  >
+                    <Icon name="add" />
+                    新增数据源
+                  </Button>
+                  <Button
+                    type="default"
+                    disabled={
+                      // .filter(
+                      // ({
+                      // source_id,
+                      // status,
+                      // }: {
+                      // source_id: string
+                      // status: number
+                      // }) => selectedRowKeys.includes(source_id) && status !== 2
+                      // ).
+                      selectedRowKeys.length === 0
+                    }
+                    onClick={() =>
+                      mutateOperation(
+                        'delete',
+                        sourceList.filter(({ id }: Record<string, any>) =>
+                          selectedRowKeys.includes(id)
+                        )
+                      )
+                    }
+                  >
+                    <Icon name="trash" />
+                    删除
+                  </Button>
+                </>
+              ) : (
+                <div tw="text-neut-8">
+                  如需选择新的数据源，您可以前往
+                  <RouterLink
+                    to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                  >
+                    新建 MySQL 数据源
+                  </RouterLink>
+                </div>
+              )}
             </ToolBarLeft>
             <ToolBarRight>
               <InputSearch
@@ -619,15 +714,20 @@ const DataSourceList = observer(() => {
               />
             </ToolBarRight>
           </ToolBar>
-          <Card tw="flex-1 pb-5 px-5">
+          <Card tw="flex-1 pb-5 px-5 dark:bg-neut-16">
             <Table
-              selectType="checkbox"
+              selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
               columns={columns}
               rowKey="id"
               tw="pb-4 "
               selectedRowKeys={selectedRowKeys}
-              onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
+              onSelect={(rowKeys: string[]) => {
+                if (selectMode && rowKeys.length) {
+                  onCheck(sourceList.find((v: any) => v.id === rowKeys[0]))
+                }
+                setSelectedRowKeys(rowKeys)
+              }}
               onSort={(sortKey: string, sortOrder: string) => {
                 setFilter((draft) => {
                   draft.order_by = sortKey
@@ -654,7 +754,15 @@ const DataSourceList = observer(() => {
           </Card>
         </Root>
       ) : (
-        <DataEmpty onAddClick={() => mutateOperation('create')} />
+        <DataEmpty
+          onAddClick={() => {
+            if (selectMode) {
+              history.push(`/${regionId}/workspace/${spaceId}/upload/dsl`)
+            } else {
+              mutateOperation('create')
+            }
+          }}
+        />
       )}
       {(() => {
         if (['create', 'update', 'view'].includes(op)) {

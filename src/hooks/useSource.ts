@@ -11,6 +11,8 @@ import {
   pingDataSource,
   pingDataSourceList,
   updateDataSource,
+  describeDataSourceTables,
+  describeDataSourceTableSchema,
 } from 'stores/api'
 import { get } from 'lodash-es'
 import { getIsFormalEnv } from 'utils/index'
@@ -115,6 +117,41 @@ export const useQuerySourceHistories = (
       // enabled: !!sourceId,
       initialData: { infos: [] },
     }
+  )
+}
+
+export const useQuerySourceTables = (
+  { sourceId }: { sourceId: string },
+  options = {}
+) => {
+  const { regionId, spaceId } = useParams<IUseParams>()
+  const params = {
+    regionId,
+    spaceId,
+    sourceId,
+  }
+  return useQuery(
+    ['tables', params],
+    async () => describeDataSourceTables(params),
+    options
+  )
+}
+
+export const useQuerySourceTableSchema = (
+  { sourceId, tableName }: { sourceId: string; tableName: string },
+  options = {}
+) => {
+  const { regionId, spaceId } = useParams<IUseParams>()
+  const params = {
+    regionId,
+    spaceId,
+    sourceId,
+    tableName,
+  }
+  return useQuery(
+    ['tableSchema', params],
+    async () => describeDataSourceTableSchema(params),
+    options
   )
 }
 

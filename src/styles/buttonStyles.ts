@@ -41,7 +41,7 @@ const buttonStyles = css`
         ${tw`bg-transparent`}
       }
       &.is-black {
-        ${tw`bg-transparent border-neut-15`}
+        ${tw`bg-transparent border-neut-13`}
         &:hover {
           ${tw`bg-neut-13`}
         }

@@ -29,9 +29,9 @@ import {
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
-import { StreamToolBar } from './styled'
-import StreamRightMenu from './StreamRightMenu'
-import ReleaseModal from './ReleaseModal'
+import { JobToolBar } from '../styled'
+import ReleaseModal from '../Modal/ReleaseModal'
+import VersionHeader from '../Version/VersionHeader'
 
 const CODETYPE = {
   2: 'sql',
@@ -62,8 +62,10 @@ interface IProp {
 const StreamCode = observer(({ tp }: IProp) => {
   const {
     workFlowStore,
-    workFlowStore: { curJob, showSaveJobConfirm },
+    workFlowStore: { curJob, curVersion, showSaveJobConfirm },
   } = useStore()
+  const readOnly = !!curVersion
+
   const [nextLocation, setNextLocation] = useState(null)
   const [shouldNav, setShouldNav] = useState(false)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
@@ -74,13 +76,13 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [enableRelease, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showRunLog, setShowRunLog] = useState(false)
-  const [showScheSettingModal, setShowScheSettingModal] = useState(false)
+  // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef<any>(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
   const runMutation = useMutationStreamJobCodeRun()
-  const { data, isLoading } = useQueryStreamJobCode()
+  const { data, isFetching } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
   const codeStr = get(data, `${codeName}.code`)
@@ -331,7 +333,10 @@ def main(args: Array[String]): Unit = {
         setEnableRelease(true)
       }
     }
-  }, [codeStr, defaultCode])
+    if (curVersion?.version) {
+      editorRef.current?.setValue(isFetching ? loadingWord : codeStr)
+    }
+  }, [codeStr, defaultCode, curVersion?.version, isFetching])
 
   useUnmount(() => {
     workFlowStore.set({
@@ -352,51 +357,51 @@ def main(args: Array[String]): Unit = {
   return (
     <FlexBox tw="relative h-full w-full flex-1" ref={boxRef}>
       <FlexBox tw="flex flex-col flex-1 overflow-hidden">
-        <StreamToolBar tw="pb-4">
-          {/* <Button type="black">
-            <Icon name="listview" type="light" />
-            插入表
-          </Button> */}
-          <Button
-            type="black"
-            tw="w-[84px] px-0"
-            disabled={tp !== 2}
-            onClick={() => mutateCodeData('codeSyntax')}
-            loading={syntaxMutation.isLoading}
-          >
-            <Icon name="remark" type="light" />
-            语法检查
-          </Button>
-          {false && (
+        {readOnly ? (
+          <VersionHeader />
+        ) : (
+          <JobToolBar tw="pb-4">
+            {/* <Button type="black">
+                <Icon name="listview" type="light" />
+                插入表
+              </Button> */}
             <Button
               type="black"
-              tw="w-[60px] px-0 "
-              onClick={handleRun}
-              loading={runMutation.isLoading}
+              disabled={tp !== 2}
+              onClick={() => mutateCodeData('codeSyntax')}
+              loading={syntaxMutation.isLoading}
             >
-              <Icon name="triangle-right" type="light" />
-              运行
+              <Icon name="remark" type="light" />
+              语法检查
             </Button>
-          )}
-          <Button
-            tw="w-[68px] px-0"
-            onClick={() => mutateCodeData('codeSave')}
-            loading={mutation.isLoading}
-          >
-            <Icon name="data" />
-            保存
-          </Button>
-          <Button
-            type="primary"
-            tw="w-[68px] px-0"
-            onClick={onRelease}
-            loading={releaseMutation.isLoading}
-            disabled={!enableRelease}
-          >
-            <Icon name="export" />
-            发布
-          </Button>
-        </StreamToolBar>
+            {false && (
+              <Button
+                type="black"
+                onClick={handleRun}
+                loading={runMutation.isLoading}
+              >
+                <Icon name="triangle-right" type="light" />
+                运行
+              </Button>
+            )}
+            <Button
+              onClick={() => mutateCodeData('codeSave')}
+              loading={mutation.isLoading}
+            >
+              <Icon name="data" />
+              保存
+            </Button>
+            <Button
+              type="primary"
+              onClick={onRelease}
+              loading={releaseMutation.isLoading}
+              disabled={!enableRelease}
+            >
+              <Icon name="export" />
+              发布
+            </Button>
+          </JobToolBar>
+        )}
         <div tw="flex-1 relative overflow-hidden flex flex-col">
           <div
             css={[!showPlaceholder && tw`hidden`]}
@@ -405,13 +410,14 @@ def main(args: Array[String]): Unit = {
           />
           <Editor
             language={codeName}
-            defaultValue={isLoading ? loadingWord : codeStr}
+            defaultValue={isFetching ? loadingWord : codeStr}
             theme="my-theme"
             tw="overflow-hidden"
             options={{
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               automaticLayout: true,
+              readOnly,
             }}
             editorWillMount={handleEditorWillMount}
             editorDidMount={handleEditorDidMount}
@@ -419,12 +425,12 @@ def main(args: Array[String]): Unit = {
           />
         </div>
       </FlexBox>
-      <StreamRightMenu
+      {/* <StreamRightMenu
         showScheSetting={showScheSettingModal}
         onScheSettingClose={() => {
           setShowScheSettingModal(false)
         }}
-      />
+      /> */}
       {showScheModal && (
         <Modal
           visible
@@ -433,7 +439,10 @@ def main(args: Array[String]): Unit = {
           onCancel={() => toggleScheModal(false)}
           okText="调度配置"
           onOk={() => {
-            setShowScheSettingModal(true)
+            workFlowStore.set({
+              showScheSetting: true,
+            })
+            // setShowScheSettingModal(true)
             toggleScheModal(false)
           }}
         >

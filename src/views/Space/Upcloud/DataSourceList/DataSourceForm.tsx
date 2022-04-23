@@ -1,8 +1,8 @@
 import React, {
   MutableRefObject,
   useCallback,
-  useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react'
@@ -13,25 +13,23 @@ import { get, omit, toLower } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
-import { useStore } from 'hooks'
-import {
-  AffixLabel,
-  Center,
-  Divider,
-  HelpCenterLink,
-  SelectWithRefresh,
-} from 'components'
+import { AffixLabel, Center, Divider } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { toJS } from 'mobx'
 import { DataSourcePingButton } from './DataSourcePing'
-import { NetworkContext } from './NetworkProvider'
 import {
+  esAnonymousFilters,
+  esPwdFilters,
   ftpFilters,
   ftpProtocol,
   ftpProtocolValue,
-  networkLink,
+  hiveAnonymousFilters,
+  hivePwdFilters,
   sftpFilters,
+  sFtpProtocolValue,
+  SourceType,
+  // urlType2Api,
 } from './constant'
 import getFieldsInfo from './getDatasourceFormConfig'
 
@@ -91,22 +89,7 @@ const MultiFieldWrapper = styled.div(() => [
   `,
 ])
 
-const parseRemoteData = (
-  data: Record<'url' & string, any>
-  // urlType: string
-) => {
-  // const { url } = data
-  // if (urlType === 'hdfs') {
-  //   const pushArr = ['name_node', 'port']
-  //   return omit(
-  //     merge(data, {
-  //       url: {
-  //         hdfs: pick(get(url, 'hdfs.nodes'), pushArr),
-  //       },
-  //     }),
-  //     'url.hdfs.nodes'
-  //   )
-  // }
+const parseRemoteData = (data: Record<'url' & string, any>) => {
   return data
 }
 
@@ -143,6 +126,10 @@ const getInitValue = (path: string) => {
    "zookeeper.znode.parent": "/hbase"
 }`,
       },
+      hive: {
+        auth01: 1,
+        auth02: 2,
+      },
     },
   }
   return get(initValues, path, '')
@@ -151,18 +138,27 @@ const getInitValue = (path: string) => {
 interface IFormProps {
   resInfo: {
     name: string
+    urlType?: string
     desc?: string
     img?: React.ReactNode
-    source_type?: number
+    source_type?: SourceType
   }
   getFormData?: MutableRefObject<() => any>
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
+  op: string
+  opSourceList: Record<string, any>[]
+  theme: 'dark' | 'light'
+  className?: string
 }
 
 const DataSourceForm = ({
   resInfo,
   getFormData,
   onFieldValueChange,
+  op,
+  opSourceList,
+  theme = 'light',
+  className,
 }: IFormProps) => {
   const [network, setNetWork] = useImmer<{
     type: 'vpc' | 'eip'
@@ -177,38 +173,46 @@ const DataSourceForm = ({
   })
   const ref = useRef<Form>(null)
 
-  const {
-    dataSourceStore: { op, opSourceList },
-    dmStore,
-  } = useStore()
+  // const {
+  //   dataSourceStore: { op, opSourceList },
+  // } = useStore()
 
-  const {
-    networks,
-    refreshNetworks,
-    isFetching: networksIsFetching,
-  } = useContext(NetworkContext)
-
-  const urlType = resInfo.name.toLowerCase()
+  const urlType = resInfo?.urlType ?? resInfo.name.toLowerCase()
   const sourceInfo =
     ['update', 'view'].includes(op) &&
     opSourceList.length > 0 &&
     parseRemoteData(opSourceList[0])
 
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
-    if (urlType !== 'ftp') {
-      return undefined
+    if (urlType === 'ftp') {
+      if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
+        return sftpFilters
+      }
+      return ftpFilters
     }
-    if (get(sourceInfo, 'url.ftp.protocol') === 2) {
-      return sftpFilters
+    if (urlType === 'hive') {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+        return hiveAnonymousFilters
+      }
+      return hivePwdFilters
     }
-    return ftpFilters
+    if (urlType === 'elastic_search') {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return esAnonymousFilters
+      }
+      return esPwdFilters
+    }
+    return undefined
   })
 
-  const fields = getFieldsInfo(urlType, filters)
+  const fields = getFieldsInfo(resInfo.source_type!, filters)
 
   const isViewMode = op === 'view'
 
-  const [defaultStatus, setDefaultStatus] = useState<
+  const defaultStatus = useMemo<
     { status: boolean; message?: string } | undefined
   >(() => {
     if (
@@ -225,7 +229,7 @@ const DataSourceForm = ({
           status: false,
           message: toJS(get(opSourceList, '[0].last_connection.message')),
         }
-  })
+  }, [op, opSourceList])
 
   const [showPing, setShowPing] = useState(false)
   const [ftpProtocolType, setFtpProtocol] = useState(() => {
@@ -251,6 +255,22 @@ const DataSourceForm = ({
       setFtpPortConfig((_) => {
         _.changed = true
       })
+      onChange?.(v)
+    },
+    hive_hiveAuth: (onChange?: Function) => (v: number) => {
+      if (v === 2) {
+        setFilters(hiveAnonymousFilters)
+      } else {
+        setFilters(hivePwdFilters)
+      }
+      onChange?.(v)
+    },
+    elastic_search_esAuth: (onChange?: Function) => (v: number) => {
+      if (v === 2) {
+        setFilters(esAnonymousFilters)
+      } else {
+        setFilters(esPwdFilters)
+      }
       onChange?.(v)
     },
   }
@@ -279,7 +299,11 @@ const DataSourceForm = ({
           ...others
         } = formElem.getFieldsValue()
         const rest = omit(others, 'utype')
-
+        if (urlType === 'hdfs') {
+          Object.assign(rest, {
+            default_fs: `hdfs://${rest.name_node}:${rest.port}`,
+          })
+        }
         // if (urlType === 'hdfs') {
         //   const shiftArr = ['name_node', 'port']
         //   rest.nodes = pick(rest, shiftArr)
@@ -305,8 +329,33 @@ const DataSourceForm = ({
     }
   }, [getFormData, parseFormData])
 
+  function getDefaultValue(name: string) {
+    // 如果 hive ，有 hadoop config auth 取 2， 后端未存储值。 默认为 1
+    if (urlType === 'hive' && name === 'hiveAuth') {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+        return 2
+      }
+      return 1
+    }
+    if (urlType === 'elastic_search' && name === 'esAuth') {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return 2
+      }
+      return 1
+    }
+
+    const defaultPath =
+      urlType === 'ftp' && name === 'port'
+        ? `url.${toLower(get(ftpProtocol, `${ftpProtocolType}.label`))}.${name}`
+        : `url.${urlType}.${name}`
+    return get(sourceInfo, `url.${urlType}.${name}`, getInitValue(defaultPath))
+  }
+
   return (
-    <Root>
+    <Root className={className}>
       <Form
         tw="max-w-full!"
         layout="vertical"
@@ -335,6 +384,7 @@ const DataSourceForm = ({
                 <AffixLabel
                   help="数据源是大数据工作台用于数据处理的出入口,数据源采用连接串和云实例两种模式, 目前暂时只支持连接串模式。"
                   required={false}
+                  theme={theme === 'light' ? 'darker' : 'light'}
                 >
                   数据源连接方式
                 </AffixLabel>
@@ -421,31 +471,6 @@ const DataSourceForm = ({
             }
           >
             {fields.map((field) => {
-              // if (name === 'nodes') {
-              //   return (
-              //     <HdfsNodeField
-              //       key={name}
-              //       name={name}
-              //       validateOnBlur
-              //       label={<AffixLabel required>{label}</AffixLabel>}
-              //       defaultValue={get(sourceInfo, `url.${urlType}.${name}`)}
-              //       schemas={[
-              //         {
-              //           rule: (o: Record<string, any>) => {
-              //             if (trim(o.name_node) === '') {
-              //               return false
-              //             }
-              //             return /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/.test(
-              //               o.port
-              //             )
-              //           },
-              //           help: '格式不正确,请输入 Name_node Port，多条配置之间换行输入',
-              //           status: 'error',
-              //         },
-              //       ]}
-              //     />
-              //   )
-              // }
               const getField = (fieldData: Record<string, any>) => {
                 const {
                   name,
@@ -469,17 +494,7 @@ const DataSourceForm = ({
                     }
                     name={name}
                     disabled={isViewMode}
-                    defaultValue={get(
-                      sourceInfo,
-                      `url.${urlType}.${name}`,
-                      getInitValue(
-                        urlType === 'ftp' && name === 'port'
-                          ? `url.${toLower(
-                              get(ftpProtocol, `${ftpProtocolType}.label`)
-                            )}.${name}`
-                          : `url.${urlType}.${name}`
-                      )
-                    )}
+                    defaultValue={getDefaultValue(name)}
                     validateOnChange
                     schemas={schemas}
                     css={['port'].includes(name) ? tw`w-28` : tw`w-96`}
@@ -543,71 +558,21 @@ const DataSourceForm = ({
                   tw="cursor-pointer"
                   onClick={() => setShowPing((_) => !_)}
                 >
-                  <Icon name={showPing ? 'chevron-up' : 'chevron-down'} />
+                  <Icon
+                    name={showPing ? 'chevron-up' : 'chevron-down'}
+                    type={theme === 'light' ? 'dark' : 'light'}
+                  />
                   <span tw="ml-2">网络连通及数据源可用性测试</span>
                 </Center>
               </Divider>
             </Field>
-            <SelectWithRefresh
-              name="network_id"
-              css={showPing ? visibleStyle : hiddenStyle}
-              value={network.id}
-              placeholder="请选择网络配置"
-              validateOnChange
-              disabled={isViewMode}
-              label={
-                <AffixLabel help="测试连通性时使用的网络配置" required={false}>
-                  网络配置
-                </AffixLabel>
-              }
-              onChange={(v: string, option: Record<string, any>) => {
-                setNetWork((draft) => {
-                  draft.id = v
-                  draft.name = option.label
-                  draft.network_info = option
-                })
-                setDefaultStatus(undefined)
-              }}
-              onRefresh={refreshNetworks}
-              help={
-                <>
-                  <div>
-                    <span tw="mr-0.5">详情请见</span>
-                    <HelpCenterLink href={networkLink} isIframe={false}>
-                      网络配置选择说明文档
-                    </HelpCenterLink>
-                  </div>
-                  <div>
-                    <span tw="mr-0.5">
-                      选择网络后可测试对应此网络的数据源可用性，如需选择新的网络配置，您可
-                    </span>
-                    <span
-                      tw="text-green-11 cursor-pointer"
-                      onClick={() => dmStore.setNetWorkOp('create')}
-                    >
-                      绑定VPC
-                    </span>
-                  </div>
-                </>
-              }
-              options={(networks || []).map(({ name, id }) => ({
-                label: name,
-                value: id,
-              }))}
-              isLoading={networksIsFetching}
-              searchable={false}
-            />
             <Field css={showPing ? visibleStyle : hiddenStyle}>
-              {/* <Label> */}
-              {/*  <AffixLabel help="检查数据源参数是否正确" required={false}> */}
-              {/*    数据源可用性测试 */}
-              {/*  </AffixLabel> */}
-              {/* </Label> */}
               <DataSourcePingButton
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
                 network={network}
                 hasPing={!!get(sourceInfo, 'last_connection')}
+                withNetwork
               />
             </Field>
           </CollapseItem>

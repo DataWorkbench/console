@@ -1,35 +1,38 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useUpdateEffect, useUnmount } from 'react-use'
 import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { findIndex } from 'lodash-es'
+import { findIndex, get } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
 import tw, { theme, css, styled } from 'twin.macro'
-import { useStore } from 'stores'
-import { RouterLink } from 'components'
 
-import StreamOperator from './StreamOperator'
-import StreamCode from './StreamCode'
-import StreamJAR from './StreamJAR'
+import { useStore } from 'stores'
+import { RouterLink, Icons } from 'components'
+
+import StreamOperator from '../Stream/StreamOperator'
+import StreamCode from '../Stream/StreamCode'
+import StreamJAR from '../Stream/StreamJAR'
+import SyncJob from '../Sync/SyncJob'
+import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
 
 const { TabPanel } = Tabs
 
 const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full flex flex-col`,
   css`
-    .tabs {
+    &.tabs-container .tabs.is-boxed {
       ${tw`bg-neut-17 h-8 flex-none`};
       ul {
         border: 0;
-        li {
-          ${tw`(border-none rounded-b-none mx-0.5)!`}
+        > li {
+          ${tw`border-l-0 border-r-0 border-t-0 border-b-2 border-b-transparent (rounded-b-none mx-0.5)!`}
           .tag {
-            ${tw`border border-neut-13 text-neut-8 scale-75 bg-transparent`}
+            ${tw`border border-neut-13 text-neut-8  bg-transparent`}
           }
           &.is-active {
-            ${tw`text-white bg-green-11! hover:(bg-green-11)!`}
+            ${tw`text-white border-b-green-11!`}
             .tag {
               ${tw`text-neut-13 bg-white border-0`}
             }
@@ -103,16 +106,33 @@ const JobTabs = observer(() => {
     workFlowStore.set({ panels: [], curJob: null, curViewJobId: null })
   })
 
-  const showNames: any = useMemo(
-    () => ({
-      1: '算子',
-      2: 'Sql',
-      3: 'Jar',
-      4: 'Python',
-      5: 'Scala',
-    }),
-    []
-  )
+  const getTag = (job) => {
+    const { jobMode } = job
+    if (jobMode === JobMode.RT) {
+      return get(
+        {
+          1: '算子',
+          2: 'Sql',
+          3: 'Jar',
+          4: 'Python',
+          5: 'Scala',
+        },
+        job.type
+      )
+    }
+    if (jobMode === JobMode.DI) {
+      const tp = getDiJobType(job.type)
+      return (
+        <IconWrapper theme="grey">
+          <Icons
+            name={tp === JobType.OFFLINE ? 'DownloadBoxFill' : 'LayerFill'}
+            size={16}
+          />
+        </IconWrapper>
+      )
+    }
+    return null
+  }
 
   return (
     <div tw="flex-1 w-full overflow-x-hidden ">
@@ -165,32 +185,43 @@ const JobTabs = observer(() => {
           }
         }}
       >
-        {panels.map((flow) => (
+        {panels.map((job) => (
           <TabPanel
-            key={flow.id}
-            name={flow.id}
+            key={job.id}
+            name={job.id}
             closable
             label={
               <div tw="inline-flex items-center justify-center">
-                <div className="tag">{showNames[flow.type]}</div>
-                <div>{flow.name}</div>
+                <div
+                  tw="scale-75"
+                  className={job.jobMode === JobMode.RT ? 'tag' : ''}
+                >
+                  {getTag(job)}
+                </div>
+                <div>{job.name}</div>
               </div>
             }
           >
             {(() => {
-              if (flow.type === 1) {
-                return (
-                  <DndProvider backend={HTML5Backend}>
-                    <StreamOperator tw="flex-1 h-full" />
-                  </DndProvider>
-                )
+              const jobMode = get(job, 'jobMode') as JobMode
+              if (jobMode === JobMode.RT) {
+                if (job.type === 1) {
+                  return (
+                    <DndProvider backend={HTML5Backend}>
+                      <StreamOperator tw="flex-1 h-full" />
+                    </DndProvider>
+                  )
+                }
+                if ([2, 4, 5].includes(job.type)) {
+                  return <StreamCode tw="flex-1 h-full" tp={job.type as any} />
+                }
+                if (job.type === 3) {
+                  return <StreamJAR tw="flex-1 h-full" />
+                }
+              } else if (jobMode === JobMode.DI) {
+                return <SyncJob />
               }
-              if ([2, 4, 5].includes(flow.type)) {
-                return <StreamCode tw="flex-1 h-full" tp={flow.type as any} />
-              }
-              if (flow.type === 3) {
-                return <StreamJAR tw="flex-1 h-full" />
-              }
+
               return null
             })()}
           </TabPanel>

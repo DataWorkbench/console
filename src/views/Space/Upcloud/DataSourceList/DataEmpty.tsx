@@ -24,7 +24,7 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => {
   )
 
   return (
-    <ContentBox tw="py-20 rounded-sm bg-white">
+    <ContentBox tw="py-20 rounded-sm bg-white dark:bg-neut-16">
       <FlexBox tw="flex-col items-center">
         <div tw="mb-5 relative w-[72px] ">
           <SexangleImg />
@@ -32,7 +32,7 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => {
             <Icon name="blockchain" size={60} tw="mb-3 inline-block" />
           </div>
         </div>
-        <div tw="mb-5 font-medium text-xl text-[#19121A] leading-5">
+        <div tw="mb-5 font-medium text-xl text-[#19121A] dark:text-white leading-5">
           暂无数据源
         </div>
         <p tw="mx-auto mb-6 text-neut-8 text-center max-w-[700px]">

@@ -1,4 +1,5 @@
-import tw, { styled } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
+import { Tooltip } from 'components'
 import { SourceKindImg } from './styled'
 
 const ItemWrapper = styled('div')(({ selected }: { selected: boolean }) => [
@@ -31,7 +32,22 @@ const DbList = ({ items, current, onChange }: IDbList) => (
             <div tw="font-medium group-hover:text-green-11">
               {showname || name}
             </div>
-            <div tw="text-neut-8 h-10 overflow-hidden">{desc}</div>
+            <Tooltip
+              content={<div onClick={(e) => e.stopPropagation()}>{desc}</div>}
+              theme="darker"
+              hasPadding
+            >
+              <div
+                tw="text-neut-8 h-10 overflow-hidden overflow-ellipsis"
+                css={css`
+                  display: -webkit-box;
+                  -webkit-box-orient: vertical;
+                  -webkit-line-clamp: 2;
+                `}
+              >
+                {desc}
+              </div>
+            </Tooltip>
           </div>
         </ItemWrapper>
       </div>

@@ -70,6 +70,7 @@ const SideMenuWrapper = styled('div')(() => [
       }
       .side-menu-pickup {
         box-shadow: none;
+        height: calc(100vh - 60px);
         ${tw`border-r border-neut-3 bg-neut-2 dark:(bg-neut-17 border-neut-15) shadow-none`}
         .side-title,
         .divider-horizon {

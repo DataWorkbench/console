@@ -1,19 +1,4 @@
-// import 'assets/icons/circle_check.svg'
-// import 'assets/icons/circle_close.svg'
-// import 'assets/icons/circle_enable.svg'
-// import 'assets/icons/circle_disable.svg'
-// import 'assets/icons/icon_service_0.svg'
-// import 'assets/icons/icon_service_1.svg'
-// import 'assets/icons/icon_service_2.svg'
-// import 'assets/icons/icon_service_3.svg'
-// import 'assets/icons/icon_service_4.svg'
-// import 'assets/icons/icon_service_5.svg'
-// import 'assets/icons/screen_failed.svg'
-// import 'assets/icons/screen_running.svg'
-// import 'assets/icons/screen_stoped.svg'
-// import 'assets/icons/screen_success.svg'
-// import 'assets/icons/screen_waiting.svg'
-// import 'assets/icons/direct.svg'
+import tw from 'twin.macro'
 
 function requireAll(r: any) {
   r.keys().forEach(r)
@@ -26,18 +11,39 @@ interface IconProps {
   size?: number
   width?: number
   height?: number
+  isLegoIcon?: boolean
+  type?: 'light' | 'dark'
 }
 
 const Icons = (props: IconProps) => {
-  const { name, className = '', size = 24, height, width, ...others } = props
+  const {
+    name,
+    isLegoIcon = false,
+    className = '',
+    size = 24,
+    height,
+    width,
+    type,
+    ...others
+  } = props
   const wh = {
     width: width || size,
     height: height || size,
   }
+  const id = isLegoIcon ? `#lego-ui-icon-${name}` : `#bdicon-${name}`
 
   return (
-    <svg {...wh} {...others} className={className} tw="inline-block">
-      <use xlinkHref={`#bdicon-${name}`} />
+    <svg
+      {...wh}
+      {...others}
+      className={className}
+      css={[
+        tw`inline-block`,
+        type === 'light' && tw`text-white`,
+        type === 'dark' && tw`text-neut-8`,
+      ]}
+    >
+      <use xlinkHref={id} />
     </svg>
   )
 }

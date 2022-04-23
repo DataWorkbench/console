@@ -1,4 +1,4 @@
-import { request } from 'utils'
+import { request, getApiJobMode } from 'utils'
 
 export interface IStreamParams {
   regionId: string
@@ -14,6 +14,20 @@ export const listReleaseStreamJobs = ({
   return request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/stream/job/release`,
+    query: rest,
+  })
+}
+
+export const listReleaseJobVersions = ({
+  region,
+  spaceId,
+  jobId,
+  ...rest
+}: IStreamParams) => {
+  const jobMode = getApiJobMode(jobId as string)
+  return request({
+    region,
+    uri: `/v1/workspace/${spaceId}/${jobMode}/job/${jobId}/version`,
     query: rest,
   })
 }

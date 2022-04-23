@@ -1,4 +1,4 @@
-import { makeAutoObservable, set } from 'mobx'
+import { makeAutoObservable, observable, set } from 'mobx'
 import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
 import type RootStore from './RootStore'
@@ -6,10 +6,35 @@ import type RootStore from './RootStore'
 interface IJob {
   id: string
   name: string
-  type: number
+  /**
+   * 1 => "OfflineFull" 2 => "OfflineIncrement" 3 => "RealTime"
+   *  */
+  type: 1 | 2 | 3
   desc: string
   version: string
+  source_type?: number
+  target_type?: number
+  jobMode?: 'DI' | 'RT' | 'OLE'
 }
+
+const initTreeData = [
+  {
+    key: 'di-root',
+    pid: 'di-root',
+    jobMode: 'DI',
+    title: '数据集成',
+    isLeaf: false,
+    children: [],
+  },
+  {
+    key: 'rt-root',
+    pid: 'rt-root',
+    jobMode: 'RT',
+    title: '实时-流式开发',
+    isLeaf: false,
+    children: [],
+  },
+]
 class WorkFlowStore {
   rootStore
 
@@ -17,9 +42,27 @@ class WorkFlowStore {
 
   curJob: null | IJob = null
 
+  curVersion: null | IJob = null
+
+  showJobModal = false
+
   panels: IJob[] = []
 
   showNotify = false
+
+  showScheSetting = false
+
+  showArgsSetting = false
+
+  showVersions = false
+
+  showMonitor = false
+
+  showAddMonitor = false
+
+  showAddMonitorDetail = false
+
+  showAddMonitorForm = false
 
   isDirty = false
 
@@ -31,9 +74,15 @@ class WorkFlowStore {
 
   showSaveJobConfirm = false
 
+  treeData = initTreeData
+
+  loadedKeys: (string | number)[] = []
+
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       rootStore: false,
+      treeData: observable.ref,
+      loadedKeys: observable.ref,
     })
     this.rootStore = rootStore
   }
@@ -97,6 +146,19 @@ class WorkFlowStore {
 
   set(params: { [key: string]: any }) {
     set(this, { ...params })
+  }
+
+  resetTreeData = () => {
+    this.treeData = initTreeData
+    this.loadedKeys = []
+  }
+
+  toggleJobModal = (v?: boolean) => {
+    if (typeof v === 'boolean') {
+      this.showJobModal = v
+    } else {
+      this.showJobModal = !this.showJobModal
+    }
   }
 }
 
