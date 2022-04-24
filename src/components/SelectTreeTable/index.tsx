@@ -11,14 +11,13 @@ import { FlexBox } from '../Box'
 export interface ISelectTreeTableProps {
   columns: IColumn[]
   dataSource: Record<string, any>[]
-  getChildren: (
-    key: string
-  ) => PromiseLike<Record<string, any>[]> | Record<string, any>[]
+  getChildren: (key: string) => PromiseLike<Record<string, any>[]>
   openLevel?: number
   selectedLevel?: number
   indentSpace?: number
   [propName: string]: any
   rowKey?: string
+  showItemCheckboxFn?: (item: Record<string, any>) => boolean
 }
 
 export const SelectTreeTable = (props: ISelectTreeTableProps) => {
@@ -28,8 +27,9 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     rowKey = 'id',
     openLevel = 1000,
     selectedLevel = 1000,
-    indentSpace = 20,
+    indentSpace = 24,
     getChildren = async () => [],
+    showItemCheckboxFn,
   } = props
 
   const [, fourUpdate] = useReducer((x) => x + 1, 0)
@@ -88,6 +88,11 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
 
   const renderFirstTd = useCallback(
     (column) => (text: string, record: Record<string, any>) => {
+      console.log(record)
+      let show = true
+      if (showItemCheckboxFn) {
+        show = showItemCheckboxFn(record)
+      }
       return (
         <FlexBox
           tw="flex-auto gap-2"
@@ -96,7 +101,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
           `}
         >
           <FlexBox tw="flex-none gap-2 items-center">
-            {record.__level <= openLevel && (
+            {record.__level <= openLevel && show && (
               <Icon
                 name={
                   tableTreeRef.current.state.openedAll?.has(record[rowKey])
@@ -109,7 +114,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
                 onClick={() => handleOpen(record[rowKey])}
               />
             )}
-            {record._level <= selectedLevel && (
+            {record.__level <= selectedLevel && (
               <Checkbox
                 indeterminate={record.__isSelected === 2}
                 checked={record.__isSelected === 1 || record.isSelected === 2}
@@ -128,7 +133,14 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
         </FlexBox>
       )
     },
-    [handleOpen, indentSpace, openLevel, rowKey, selectedLevel]
+    [
+      handleOpen,
+      indentSpace,
+      openLevel,
+      rowKey,
+      selectedLevel,
+      showItemCheckboxFn,
+    ]
   )
 
   const columns = useMemo(() => {

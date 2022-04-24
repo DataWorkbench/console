@@ -12,6 +12,7 @@ import tw, { css } from 'twin.macro'
 import AdduserField from 'views/Space/Ops/Alert/Monitor/AdduserField'
 import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import { useState } from 'react'
+import JobSelectModal from './JobSelectModal'
 
 const { TextField, TextAreaField, RadioGroupField } = Form
 
@@ -152,7 +153,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
             ]}
           />
         </Form>
-        {visible && <div>1111</div>}
+        {visible && <JobSelectModal onCancel={() => setVisible(false)} />}
       </ModalContent>
     </Modal>
   )
