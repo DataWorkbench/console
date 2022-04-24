@@ -11,7 +11,9 @@ import { FlexBox } from '../Box'
 export interface ISelectTreeTableProps {
   columns: IColumn[]
   dataSource: Record<string, any>[]
-  getChildren: (key: string) => PromiseLike<Record<string, any>[]>
+  getChildren: (
+    key: string
+  ) => PromiseLike<Record<string, any>[]> | Record<string, any>[]
   openLevel?: number
   selectedLevel?: number
   indentSpace?: number
