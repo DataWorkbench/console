@@ -1,5 +1,11 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { ITab } from 'utils/types'
+import {
+  historyFiledMapping,
+  policyFieldMapping,
+  Mapping,
+  jobFieldMapping,
+} from 'views/Space/Ops/Alert/common/mapping'
 
 export const alertHistoryTabs: ITab[] = [
   {
@@ -20,43 +26,18 @@ export const alertPolicyTabs: ITab[] = [
   },
 ]
 
-export const alertHistoryColumns: IColumn[] = [
-  {
-    title: '告警内容',
-    dataIndex: 'alert-content',
-    key: 'alert-content',
-  },
-  {
-    title: '告警实例 ID',
-    dataIndex: 'instance_id',
-    key: 'instance_id',
-  },
-  {
-    title: '告警时间',
-    dataIndex: 'created_at',
-    key: 'created_at',
-  },
-]
+function getField(mapping: Mapping<T>): IColumn[] {
+  return Array.from(mapping.values()).map((i) => {
+    return {
+      title: i.label,
+      dataIndex: i.apiField,
+      key: i.apiField,
+    }
+  })
+}
 
-export const alertPolicyColumns: IColumn[] = [
-  {
-    title: '名称/ID',
-    dataIndex: 'id',
-    key: 'id',
-  },
-  {
-    title: '监控对象',
-    dataIndex: 'alert_obj',
-    key: 'alert_obj',
-  },
-  {
-    title: '描述',
-    dataIndex: 'desc',
-    key: 'desc',
-  },
-  {
-    title: '最近更新时间',
-    dataIndex: 'updated_at',
-    key: 'updated_at',
-  },
-]
+export const alertHistoryColumns: IColumn[] = getField(historyFiledMapping)
+
+export const alertPolicyColumns: IColumn[] = getField(policyFieldMapping)
+
+export const jobColumns: IColumn[] = getField(jobFieldMapping)

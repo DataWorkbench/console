@@ -10,6 +10,12 @@ export class AlertStore {
 
   showAddMonitorForm = false
 
+  // 监控对象 有值的时候, 表单显示字符串
+  monitorObject?: number
+
+  // 绑定作业 有值的时候,表单字段不显示
+  jobs?: string[]
+
   selectedData?: Record<string, any> = undefined
 
   selectedList?: Record<string, any>[] = []
@@ -19,7 +25,6 @@ export class AlertStore {
   }
 
   set = (params: { [key: string]: any }) => {
-    console.log(params)
     set(this, { ...params })
   }
 }
