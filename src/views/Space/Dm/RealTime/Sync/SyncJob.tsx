@@ -469,7 +469,8 @@ const SyncJob = () => {
         <Button
           type="primary"
           onClick={release}
-          disabled={get(confData, 'source_id') === ''}
+          disabled={!enableRelease}
+          // disabled={get(confData, 'source_id') === '' && enableRelease}
         >
           <Icon name="export" />
           发布

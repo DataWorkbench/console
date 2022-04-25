@@ -34,6 +34,7 @@ specifiers:
   babel-jest: ^27.0.6
   babel-loader: ^8.2.2
   babel-plugin-macros: ^3.1.0
+  babel-plugin-transform-remove-console: ^6.9.4
   babel-plugin-twin: ^1.0.2
   core-js: ^3.13.1
   css-loader: ^5.2.6
@@ -170,6 +171,7 @@ devDependencies:
   babel-jest: 27.0.6_@babel+core@7.14.3
   babel-loader: 8.2.2_4a57c995696a86095e4baa34992d4aa2
   babel-plugin-macros: 3.1.0
+  babel-plugin-transform-remove-console: 6.9.4
   babel-plugin-twin: 1.0.2
   css-loader: 5.2.6_webpack@5.52.0
   css-minimizer-webpack-plugin: 3.0.1_webpack@5.52.0
@@ -3233,6 +3235,10 @@ packages:
       '@babel/helper-define-polyfill-provider': 0.2.3_@babel+core@7.14.3
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /babel-plugin-transform-remove-console/6.9.4:
+    resolution: {integrity: sha512-88blrUrMX3SPiGkT1GnvVY8E/7A+k6oj3MNvUtTIxJflFzXTw1bHkuJ/y039ouhFMp2prRn5cQGzokViYi1dsg==}
     dev: true
 
   /babel-plugin-twin/1.0.2:
