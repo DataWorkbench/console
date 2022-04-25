@@ -139,7 +139,7 @@ export enum DataReleaseSchedule {
 }
 
 export const dataReleaseScheduleType = {
-  2: { label: '运行中', value: 2, type: DataReleaseSchedule.RUNNING },
+  2: { label: '调度中', value: 2, type: DataReleaseSchedule.RUNNING },
   4: { label: '已完成', value: 4, type: DataReleaseSchedule.FINISHED },
   3: { label: '已下线', value: 3, type: DataReleaseSchedule.DOWNED },
 } as const

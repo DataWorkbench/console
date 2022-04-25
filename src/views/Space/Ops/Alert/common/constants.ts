@@ -26,7 +26,7 @@ export const alertPolicyTabs: ITab[] = [
   },
 ]
 
-function getField(mapping: Mapping<T>): IColumn[] {
+function getField<T>(mapping: Mapping<T>): IColumn[] {
   return Array.from(mapping.values()).map((i) => {
     return {
       title: i.label,

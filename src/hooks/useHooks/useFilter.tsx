@@ -86,11 +86,41 @@ const useFilter = <T extends Object, P extends ITableConfig>(
     })
   }, [tableLinkKey, setFilter])
 
+  const getFilter = (key: string, types: Record<string, any>) => {
+    return {
+      filter: (filter as any)[key],
+      onFilter: (v: string | number) => {
+        setFilter((draft) => {
+          ;(draft as any)[key] = v
+          if (config.pagination) {
+            ;(draft as any).offset = 0
+          }
+        })
+      },
+      filterAble: true,
+      filtersNew: Object.values(types) as any,
+    }
+  }
+
+  const getSort = (key: string) => ({
+    sortable: true,
+    sortKey: (filter as any).sort_by,
+    sortOrder:
+      // eslint-disable-next-line no-nested-ternary
+      (filter as any).sort_by === key
+        ? (filter as any).reverse
+          ? 'asc'
+          : 'desc'
+        : '',
+  })
+
   return {
     filter,
     setFilter,
     pagination,
     sort,
+    getColumnFilter: getFilter,
+    getColumnSort: getSort,
   }
 }
 
