@@ -27,7 +27,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     rowKey = 'id',
     openLevel = 1000,
     selectedLevel = 1000,
-    indentSpace = 24,
+    indentSpace = 32,
     getChildren = async () => [],
     showItemCheckboxFn,
   } = props
