@@ -73,19 +73,15 @@ export const FilterInput = (props: IFilterInput) => {
     if (filterLinkKey) {
       emitter.on(`${filterLinkKey}-set`, (data) => {
         if (
+          Object.keys(tempRef.current).length &&
           isEqual(pick(data, Object.keys(tempRef.current)), tempRef.current)
         ) {
           return
         }
-        console.log(
-          111111111,
-          pick(data, Object.keys(tempRef.current)),
-          tempRef.current,
-          data,
-          tempRef.current
-        )
+
         const newTags: ISuggestionTag[] = []
 
+        console.log(1111, rest, data)
         rest.suggestions.forEach((i: ISuggestion) => {
           if (data[i.key]) {
             newTags.push({
@@ -107,6 +103,7 @@ export const FilterInput = (props: IFilterInput) => {
     }
     return () => {}
   }, [
+    rest,
     filterLinkKey,
     rest.defaultKeywordLabel,
     rest.suggestions,

@@ -74,16 +74,22 @@ const useFilter = <T extends Object, P extends ITableConfig>(
 
   useEffect(() => {
     if (tableLinkKey) {
+      console.log(2222222222, filter)
       emitter.emit(`${tableLinkKey}-set`, filter)
     }
   }, [filter, tableLinkKey])
 
   useEffect(() => {
-    emitter.on(`${tableLinkKey}-get`, (d) => {
+    const handler = (d: Record<string, any>) => {
+      console.log(111111111, d)
       setFilter((draft: any) => {
         return { ...draft, ...d }
       })
-    })
+    }
+    emitter.on(`${tableLinkKey}-get`, handler)
+    return () => {
+      emitter.off(`${tableLinkKey}-get`, handler)
+    }
   }, [tableLinkKey, setFilter])
 
   const getFilter = (key: string, types: Record<string, any>) => {
