@@ -2,66 +2,81 @@ import { useColumns } from 'hooks/useHooks/useColumns'
 import {
   dataReleaseScheduleType,
   streamDevModeType,
+  streamInstanceColumns,
+  streamInstanceSuggestions,
+  streamInstanceTabs,
   streamReleaseColumns,
-  streamReleaseSuggestions,
-  streamReleaseTabs,
-} from 'views/Space/Ops/Sream1/common/constants'
+} from 'views/Space/Ops/Stream1/common/constants'
 import { FlexBox } from 'components/Box'
-import { PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { Button, Icon } from '@QCFE/lego-ui'
+import { PageTab, ToolBar, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Button } from '@QCFE/lego-ui'
 import { alarmStatus } from 'views/Space/Ops/DataIntegration/constants'
 import { Table } from 'views/Space/styled'
 import { get } from 'lodash-es'
 import React from 'react'
 import { useIsFetching } from 'react-query'
 import { MappingKey } from 'utils/types'
-import { streamReleaseFieldMapping } from 'views/Space/Ops/Sream1/common/mappings'
+import { streamInstanceFieldMapping } from 'views/Space/Ops/Stream1/common/mappings'
 import dayjs from 'dayjs'
 import useFilter from 'hooks/useHooks/useFilter'
 import { FilterInput } from 'components'
 
 const { ColumnsSetting } = ToolBar as any
 
-const getName = (name: MappingKey<typeof streamReleaseFieldMapping>) =>
-  streamReleaseFieldMapping.get(name)!.apiField
+const getName = (name: MappingKey<typeof streamInstanceFieldMapping>) =>
+  streamInstanceFieldMapping.get(name)!.apiField
 
-const streamReleaseSettingKey = 'STREAM_RELEASE_SETTING'
+const streamInstanceSettingKey = 'STREAM_INSTANCE_SETTING'
 
-const StreamRelease = () => {
+const StreamInstance = () => {
   const {
-    filter,
-    setFilter,
+    // filter,
+    // setFilter,
     pagination,
     sort,
     getColumnFilter: getFilter,
-    getColumnSort: getSort,
   } = useFilter<
-    Record<ReturnType<typeof getName>, number>,
+    Record<ReturnType<typeof getName>, number | string>,
     { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, streamReleaseSettingKey)
-  console.log(filter, setFilter)
+  >({}, { pagination: true, sort: true }, streamInstanceSettingKey)
 
   const columnsRender = {
-    [getName('versionId')]: {
-      // TODO: render
+    [getName('instanceId')]: {
       render: (text: string) => {
         return <span tw="text-neut-8">{text}</span>
       },
     },
     [getName('status')]: {
       ...getFilter(getName('status'), dataReleaseScheduleType),
-      // TODO: render
+      render: (text: string) => {
+        return <span tw="text-neut-8">{text}</span>
+      },
     },
     [getName('alarmStatus')]: {
       ...getFilter(getName('alarmStatus'), alarmStatus),
+      render: (text: string) => {
+        return <span tw="text-neut-8">{text}</span>
+      },
+    },
+    [getName('job')]: {
       // TODO: render
     },
     [getName('devMode')]: {
       ...getFilter(getName('devMode'), streamDevModeType),
       // TODO: render
     },
-    [getName('lastPublishTime')]: {
-      ...getSort(getName('lastPublishTime')),
+    [getName('createTime')]: {
+      render: (d: number) => {
+        return (
+          d && (
+            <span tw="text-neut-8">
+              {dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}
+            </span>
+          )
+        )
+      },
+    },
+    [getName('updateTime')]: {
       render: (d: number) => {
         return (
           d && (
@@ -76,8 +91,8 @@ const StreamRelease = () => {
   const operations = {}
 
   const { columns, setColumnSettings } = useColumns(
-    streamReleaseSettingKey,
-    streamReleaseColumns,
+    streamInstanceSettingKey,
+    streamInstanceColumns,
     columnsRender as any,
     operations
   )
@@ -94,17 +109,17 @@ const StreamRelease = () => {
 
   return (
     <FlexBox orient="column" tw="p-5 h-full">
-      <PageTab tabs={streamReleaseTabs} />
+      <PageTab tabs={streamInstanceTabs} />
       <FlexBox orient="column" tw="gap-3 p-5 bg-neut-16">
         <FlexBox tw=" gap-2">
           <FilterInput
-            filterLinkKey={streamReleaseSettingKey}
-            suggestions={streamReleaseSuggestions}
+            filterLinkKey={streamInstanceSettingKey}
+            suggestions={streamInstanceSuggestions}
             tw="border-line-dark!"
             searchKey="job_name"
             placeholder="搜索关键字或输入过滤条件"
             // isMultiKeyword
-            defaultKeywordLabel="作业名称"
+            defaultKeywordLabel="实例名称"
           />
 
           <Button
@@ -119,7 +134,7 @@ const StreamRelease = () => {
           </Button>
           <ColumnsSetting
             defaultColumns={streamReleaseColumns}
-            storageKey={streamReleaseSettingKey}
+            storageKey={streamInstanceSettingKey}
             onSave={setColumnSettings}
           />
         </FlexBox>
@@ -138,4 +153,4 @@ const StreamRelease = () => {
   )
 }
 
-export default StreamRelease
+export default StreamInstance

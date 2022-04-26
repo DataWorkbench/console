@@ -13,7 +13,7 @@ import {
   Divider,
   JobInstanceStatusCmp,
   JobTypeCmp,
-} from 'views/Space/Ops/DataIntegration/styledComponents'
+} from 'views/Space/Ops/styledComponents'
 import tw, { css } from 'twin.macro'
 import dayjs from 'dayjs'
 import { useQueryClient } from 'react-query'
@@ -45,6 +45,7 @@ interface IJobInstanceTable {
   defaultColumns: IColumn[]
   settingKey: string
   jumpDetail: (tab?: string) => (record: Record<string, any>) => void
+  type?: 'stream' | 'sync'
 }
 
 const instanceNameStyle = css`
@@ -77,6 +78,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     defaultColumns,
     filter: filterProp,
     jumpDetail,
+    type = 'sync',
   } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
@@ -88,9 +90,10 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       job_id?: string
       version?: string
       instance_id?: string
+      apiType?: string
     },
     { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, settingKey)
+  >({ apiType: type }, { pagination: true, sort: true }, settingKey)
 
   useEffect(() => {
     if (filterProp) {

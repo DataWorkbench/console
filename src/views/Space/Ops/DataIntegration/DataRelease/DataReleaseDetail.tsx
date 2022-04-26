@@ -4,7 +4,7 @@ import { Card, Center, FlexBox, MoreAction, Tooltip } from 'components'
 import { useHistory, useLocation } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
-import icons from 'views/Space/Ops/DataIntegration/icons'
+import icons from 'views/Space/Ops/icons'
 import { Collapse, Tabs } from '@QCFE/lego-ui'
 import dayjs from 'dayjs'
 import qs from 'qs'
@@ -31,7 +31,7 @@ import {
   DbTypeCmp,
   JobInstanceStatusCmp,
   JobTypeCmp,
-} from '../styledComponents'
+} from '../../styledComponents'
 import {
   dataReleaseDetailActions,
   DataReleaseSchedule,

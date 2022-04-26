@@ -104,7 +104,7 @@ const useFilter = <T extends Object, P extends ITableConfig>(
         })
       },
       filterAble: true,
-      filtersNew: Object.values(types) as any,
+      filtersNew: Object.values(types).filter((i) => !i.hidden) as any,
     }
   }
 

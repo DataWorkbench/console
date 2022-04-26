@@ -1,7 +1,7 @@
 import { Table } from '@QCFE/lego-ui'
 import { useEffect, useRef, useState } from 'react'
 import { emitter } from 'utils'
-import { isEqual, pick } from 'lodash-es'
+import { isEqual, isNil, pick } from 'lodash-es'
 
 const { FilterInput: FilterInputCmp } = Table as any
 
@@ -81,9 +81,8 @@ export const FilterInput = (props: IFilterInput) => {
 
         const newTags: ISuggestionTag[] = []
 
-        console.log(1111, rest, data)
         rest.suggestions.forEach((i: ISuggestion) => {
-          if (data[i.key]) {
+          if (!isNil(data[i.key])) {
             newTags.push({
               filter: i.key,
               filterLabel: i.label,

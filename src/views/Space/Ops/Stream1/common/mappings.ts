@@ -11,11 +11,11 @@ export const streamReleaseFieldMapping: Mapping<
   .set('name', { label: '作业名称/ID', apiField: 'name' })
   .set('status', { label: '调度状态', apiField: 'status' })
   .set('alarmStatus', { label: '告警状态', apiField: 'alarmStatus' })
-  .set('devMode', { label: '开发模式', apiField: 'devMode' })
-  .set('versionId', { label: '版本 ID', apiField: 'versionId' })
+  .set('devMode', { label: '开发模式', apiField: 'type' })
+  .set('versionId', { label: '版本 ID', apiField: 'version' })
   .set('lastPublishTime', {
     label: '最近发布时间',
-    apiField: 'lastPublishTime',
+    apiField: 'updated',
   })
 
 export const streamInstanceFieldMapping: Mapping<

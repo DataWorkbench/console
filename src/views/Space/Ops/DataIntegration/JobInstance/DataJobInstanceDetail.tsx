@@ -13,7 +13,7 @@ import {
 import { useHistory, useParams } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
-import icons from 'views/Space/Ops/DataIntegration/icons'
+import icons from 'views/Space/Ops/icons'
 import { Collapse, Loading, Tabs } from '@QCFE/lego-ui'
 import dayjs from 'dayjs'
 import { HorizonTabs } from 'views/Space/Dm/styled'
@@ -33,7 +33,7 @@ import {
   DbTypeCmp,
   JobInstanceStatusCmp,
   JobTypeCmp,
-} from '../styledComponents'
+} from '../../styledComponents'
 import AlertModal from '../../Alert/Modal'
 import {
   getSyncJobInstanceKey,

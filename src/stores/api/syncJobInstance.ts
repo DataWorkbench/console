@@ -9,11 +9,12 @@ export interface ISyncInstanceParams {
 export const listSyncInstances = ({
   regionId,
   spaceId,
+  apiType,
   ...rest
 }: ISyncInstanceParams) => {
   return request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/sync/job/instance`,
+    uri: `/v1/workspace/${spaceId}/${apiType}/job/instance`,
     query: rest,
   })
 }

@@ -11,5 +11,6 @@ export * from './useCluster'
 export * from './useNetwork'
 export * from './useResource'
 export * from './useStream'
+export * from './useStreamVersion'
 
 export { useDarkMode, useScrollBlock, useStore }

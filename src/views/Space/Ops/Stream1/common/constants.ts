@@ -4,13 +4,13 @@ import { ITab, Mapping } from 'utils/types'
 import {
   streamInstanceFieldMapping,
   streamReleaseFieldMapping,
-} from 'views/Space/Ops/Sream1/common/mappings'
+} from 'views/Space/Ops/Stream1/common/mappings'
 import { ISuggestion } from 'views/Space/Ops/DataIntegration/interfaces'
 import {
   alarmStatus,
-  dataReleaseScheduleType,
   jobInstanceStatus,
 } from 'views/Space/Ops/DataIntegration/constants'
+import { autoIncrementKey } from 'utils'
 
 export {
   DataReleaseSchedule,
@@ -51,10 +51,12 @@ export const streamInstanceTabs: ITab[] = [
 ]
 
 function getSuggestionOptions(types: Record<string | number, any>) {
-  return Object.values(types).map(({ label, value }) => ({
-    label,
-    key: value,
-  }))
+  return Object.values(types)
+    .filter((i) => !i.hidden)
+    .map(({ label, value }) => ({
+      label,
+      key: value,
+    }))
 }
 
 export enum StreamDevMode {
@@ -70,14 +72,45 @@ export const streamDevModeType = {
     type: StreamDevMode.SQL,
   },
   2: {
-    label: 'Jar 模式',
+    label: '代码开发-Jar 模式',
     value: 2,
     type: StreamDevMode.JAR,
   },
   3: {
-    label: 'python 模式',
+    label: '代码开发-python 模式',
     value: 3,
     type: StreamDevMode.PYTHON,
+  },
+}
+
+export enum StreamReleaseScheduleType {
+  ACTIVE = 2 << autoIncrementKey.statusKey,
+  SUSPENDED = 2 << autoIncrementKey.statusKey,
+  DELETED = 2 << autoIncrementKey.statusKey,
+  FINISHED = 2 << autoIncrementKey.statusKey,
+}
+
+export const streamReleaseScheduleTypes = {
+  1: {
+    label: '调度中',
+    value: 1,
+    type: StreamReleaseScheduleType.ACTIVE,
+  },
+  2: {
+    label: '已暂停',
+    value: 2,
+    type: StreamReleaseScheduleType.SUSPENDED,
+  },
+  3: {
+    label: '已删除',
+    value: 3,
+    type: StreamReleaseScheduleType.DELETED,
+    hidden: true,
+  },
+  4: {
+    label: '已完成',
+    value: 4,
+    type: StreamReleaseScheduleType.FINISHED,
   },
 }
 
@@ -93,7 +126,7 @@ export const streamReleaseSuggestions: ISuggestion[] = [
   {
     label: streamReleaseFieldMapping.get('status')!.label,
     key: streamReleaseFieldMapping.get('status')!.apiField,
-    options: getSuggestionOptions(dataReleaseScheduleType),
+    options: getSuggestionOptions(streamReleaseScheduleTypes),
   },
   {
     label: streamReleaseFieldMapping.get('alarmStatus')!.label,
