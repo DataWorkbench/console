@@ -206,6 +206,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         return [...mappingFields, ...filterFields]
       })
     } else {
+      // console.log('in this.....')
       setMappings([])
     }
   }, [columns])

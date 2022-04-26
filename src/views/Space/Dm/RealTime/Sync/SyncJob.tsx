@@ -101,7 +101,7 @@ const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
   const { workFlowStore } = useStore()
-  const { data: confData } = useQuerySyncJobConf()
+  const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
 
   const {
     workFlowStore: { curJob },
@@ -298,6 +298,7 @@ const SyncJob = () => {
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
+        confRefetch()
         Notify.success({
           title: '操作提示',
           content: '配置保存成功',
@@ -313,6 +314,10 @@ const SyncJob = () => {
       setShowRelaseModal(true)
     }
   }
+
+  const columns = useMemo<[any, any]>(() => {
+    return [sourceColumn, targetColumn]
+  }, [sourceColumn, targetColumn])
 
   const renderGuideMode = () => {
     return (
@@ -361,7 +366,7 @@ const SyncJob = () => {
                   rightFields={db.target.fields || []}
                   leftTypeName={sourceTypeName}
                   // rightTypeName={targetTypeName}
-                  columns={[sourceColumn, targetColumn]}
+                  columns={columns}
                   topHelp={
                     <HelpCenterLink href="/xxx" isIframe={false}>
                       字段映射说明文档
