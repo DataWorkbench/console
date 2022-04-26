@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '@QCFE/qingcloud-portal-ui'
-import tw from 'twin.macro'
 import { noop } from 'lodash-es'
 import DataSourceList from './DataSourceList'
 
@@ -20,22 +19,28 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
   useEffect(() => {
     setVisible(show)
   }, [show])
-
   return (
-    <Modal
-      title={title}
-      visible={visible !== null}
-      draggable
-      width={1200}
-      appendToBody
-      css={!visible && tw`hidden!`}
-      onCancel={onCancel}
-      onOk={() => {
-        onOk(source)
-      }}
-    >
-      <DataSourceList selectMode sourceType={sourceType} onCheck={setSource} />
-    </Modal>
+    <>
+      {visible && (
+        <Modal
+          title={title}
+          visible
+          draggable
+          width={1200}
+          appendToBody
+          onCancel={onCancel}
+          onOk={() => {
+            onOk(source)
+          }}
+        >
+          <DataSourceList
+            selectMode
+            sourceType={sourceType}
+            onCheck={setSource}
+          />
+        </Modal>
+      )}
+    </>
   )
 }
 
