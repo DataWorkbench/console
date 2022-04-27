@@ -10,7 +10,6 @@ import tw, { theme, css, styled } from 'twin.macro'
 
 import { useStore } from 'stores'
 import { RouterLink, Icons } from 'components'
-import SimpleBar from 'simplebar-react'
 
 import StreamOperator from '../Stream/StreamOperator'
 import StreamCode from '../Stream/StreamCode'
@@ -61,7 +60,7 @@ const TabWrapper = styled(Tabs)(() => [
       }
     }
     .tab-content {
-      ${tw`flex-1 py-0!`}
+      ${tw`flex-1 py-0! overflow-hidden`}
       .tab-panel {
         ${tw`flex h-full`}
       }
@@ -137,101 +136,97 @@ const JobTabs = observer(() => {
 
   return (
     <div tw="flex-1 w-full overflow-x-hidden">
-      <SimpleBar tw="h-full">
-        {showNotify && (
-          <div tw="relative">
-            <div tw="absolute left-0 top-9 w-full pointer-events-none z-10">
-              <div tw="flex justify-center">
-                <div tw="flex items-center bg-white text-neut-15 px-3 py-2 rounded-sm">
-                  <Icon
-                    name="success"
-                    type="light"
-                    size={20}
-                    tw="mr-2"
-                    color={{
-                      secondary: theme('colors.green.11'),
-                    }}
-                  />
-                  <div tw="pointer-events-auto">
-                    调度作业发布成功，您可前往
-                    <RouterLink
-                      color="blue"
-                      to={`/${regionId}/workspace/${spaceId}/ops/release`}
-                    >
-                      运维中心-已发布作业
-                    </RouterLink>{' '}
-                    查看作业详情
-                  </div>
+      {showNotify && (
+        <div tw="relative">
+          <div tw="absolute left-0 top-9 w-full pointer-events-none z-10">
+            <div tw="flex justify-center">
+              <div tw="flex items-center bg-white text-neut-15 px-3 py-2 rounded-sm">
+                <Icon
+                  name="success"
+                  type="light"
+                  size={20}
+                  tw="mr-2"
+                  color={{
+                    secondary: theme('colors.green.11'),
+                  }}
+                />
+                <div tw="pointer-events-auto">
+                  调度作业发布成功，您可前往
+                  <RouterLink
+                    color="blue"
+                    to={`/${regionId}/workspace/${spaceId}/ops/release`}
+                  >
+                    运维中心-已发布作业
+                  </RouterLink>{' '}
+                  查看作业详情
                 </div>
               </div>
             </div>
           </div>
-        )}
-        <TabWrapper
-          type="card"
-          activeName={curJob?.id}
-          onChange={(name) => {
-            if (workFlowStore.isDirty) {
-              workFlowStore.showSaveConfirm(name, 'switch')
-            } else {
-              workFlowStore.set({
-                curJob: panels.find((p) => p.id === name),
-              })
-            }
-          }}
-          onClose={(name: string) => {
-            if (workFlowStore.isDirty) {
-              workFlowStore.showSaveConfirm(name, 'close')
-            } else {
-              removePanel(name)
-            }
-          }}
-        >
-          {panels.map((job) => (
-            <TabPanel
-              key={job.id}
-              name={job.id}
-              closable
-              label={
-                <div tw="inline-flex items-center justify-center">
-                  <div
-                    tw="scale-75"
-                    className={job.jobMode === JobMode.RT ? 'tag' : ''}
-                  >
-                    {getTag(job)}
-                  </div>
-                  <div>{job.name}</div>
+        </div>
+      )}
+      <TabWrapper
+        type="card"
+        activeName={curJob?.id}
+        onChange={(name) => {
+          if (workFlowStore.isDirty) {
+            workFlowStore.showSaveConfirm(name, 'switch')
+          } else {
+            workFlowStore.set({
+              curJob: panels.find((p) => p.id === name),
+            })
+          }
+        }}
+        onClose={(name: string) => {
+          if (workFlowStore.isDirty) {
+            workFlowStore.showSaveConfirm(name, 'close')
+          } else {
+            removePanel(name)
+          }
+        }}
+      >
+        {panels.map((job) => (
+          <TabPanel
+            key={job.id}
+            name={job.id}
+            closable
+            label={
+              <div tw="inline-flex items-center justify-center">
+                <div
+                  tw="scale-75"
+                  className={job.jobMode === JobMode.RT ? 'tag' : ''}
+                >
+                  {getTag(job)}
                 </div>
-              }
-            >
-              {(() => {
-                const jobMode = get(job, 'jobMode') as JobMode
-                if (jobMode === JobMode.RT) {
-                  if (job.type === 1) {
-                    return (
-                      <DndProvider backend={HTML5Backend}>
-                        <StreamOperator tw="flex-1 h-full" />
-                      </DndProvider>
-                    )
-                  }
-                  if ([2, 4, 5].includes(job.type)) {
-                    return (
-                      <StreamCode tw="flex-1 h-full" tp={job.type as any} />
-                    )
-                  }
-                  if (job.type === 3) {
-                    return <StreamJAR tw="flex-1 h-full" />
-                  }
-                } else if (jobMode === JobMode.DI) {
-                  return <SyncJob />
+                <div>{job.name}</div>
+              </div>
+            }
+          >
+            {(() => {
+              const jobMode = get(job, 'jobMode') as JobMode
+              if (jobMode === JobMode.RT) {
+                if (job.type === 1) {
+                  return (
+                    <DndProvider backend={HTML5Backend}>
+                      <StreamOperator tw="flex-1 h-full" />
+                    </DndProvider>
+                  )
                 }
+                if ([2, 4, 5].includes(job.type)) {
+                  return <StreamCode tw="flex-1 h-full" tp={job.type as any} />
+                }
+                if (job.type === 3) {
+                  return <StreamJAR tw="flex-1 h-full" />
+                }
+              } else if (jobMode === JobMode.DI) {
+                return <SyncJob />
+              }
 
-                return null
-              })()}
-            </TabPanel>
-          ))}
-        </TabWrapper>
-      </SimpleBar>
+              return null
+            })()}
+          </TabPanel>
+        ))}
+      </TabWrapper>
     </div>
   )
 })

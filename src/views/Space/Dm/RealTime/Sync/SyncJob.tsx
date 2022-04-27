@@ -14,6 +14,7 @@ import {
   useQuerySyncJobConf,
   useStore,
 } from 'hooks'
+import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -33,6 +34,9 @@ const CollapseWrapper = styled('div')(() => [
       .collapse-item-content {
         ${tw`bg-neut-17`}
       }
+    }
+    li:last-child {
+      ${tw`mb-1`}
     }
   `,
 ])
@@ -481,7 +485,11 @@ const SyncJob = () => {
           发布
         </Button>
       </JobToolBar>
-      {mode === 1 ? renderGuideMode() : renderScriptMode()}
+      <div tw="flex-1 overflow-hidden">
+        <SimpleBar tw="h-full">
+          {mode === 1 ? renderGuideMode() : renderScriptMode()}
+        </SimpleBar>
+      </div>
       {showRelaseModal && (
         <ReleaseModal
           // onSuccess={handleReleaseSuccess}
