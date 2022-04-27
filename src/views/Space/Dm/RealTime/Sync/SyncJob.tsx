@@ -492,7 +492,12 @@ const SyncJob = () => {
       </div>
       {showRelaseModal && (
         <ReleaseModal
-          // onSuccess={handleReleaseSuccess}
+          onSuccess={() => {
+            setShowRelaseModal(false)
+            workFlowStore.set({
+              showNotify: true,
+            })
+          }}
           onCancel={() => setShowRelaseModal(false)}
         />
       )}
