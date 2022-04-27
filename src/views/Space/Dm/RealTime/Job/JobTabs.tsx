@@ -154,7 +154,9 @@ const JobTabs = observer(() => {
                   调度作业发布成功，您可前往
                   <RouterLink
                     color="blue"
-                    to={`/${regionId}/workspace/${spaceId}/ops/release`}
+                    to={`/${regionId}/workspace/${spaceId}/ops/${
+                      curJob?.jobMode === 'DI' ? 'data-' : ''
+                    }release`}
                   >
                     运维中心-已发布作业
                   </RouterLink>{' '}
