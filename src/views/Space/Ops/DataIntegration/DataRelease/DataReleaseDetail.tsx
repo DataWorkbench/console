@@ -79,7 +79,7 @@ const Root = styled.div`
     }
 
     & .tab-panel.is-active {
-      ${tw`h-full`}
+      ${tw`min-h-full`}
     }
   }
 `
