@@ -39,7 +39,13 @@ export const getColumnsRender = (
       },
       filterAble: true,
       filtersNew: Object.values(dataReleaseScheduleType) as any,
-      render: (status: keyof typeof dataReleaseScheduleType) => {
+      render: (
+        status: keyof typeof dataReleaseScheduleType,
+        record: Record<string, any>
+      ) => {
+        if (record.__level !== 1) {
+          return null
+        }
         return <DataReleaseStatusCmp type={status} />
       },
     },
@@ -53,16 +59,18 @@ export const getColumnsRender = (
       filter: filter.alarm_status,
       filterAble: true,
       filtersNew: Object.values(alarmStatus) as any,
-      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
-        <AlarmStatusCmp
-          type={text}
-          onClick={
-            actions?.alarm_status
-              ? () => actions.alarm_status(record)
-              : undefined
-          }
-        />
-      ),
+      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => {
+        return (
+          <AlarmStatusCmp
+            type={text}
+            onClick={
+              actions?.alarm_status
+                ? () => actions.alarm_status(record)
+                : undefined
+            }
+          />
+        )
+      },
     },
     job_mode: {
       onFilter: (v: string) => {
