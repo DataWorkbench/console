@@ -150,8 +150,8 @@ export enum DataReleaseDevMode {
 }
 
 export const dataReleaseDevModeType = {
-  '0': { label: '向导模式', value: '0', type: DataReleaseDevMode.UI },
-  '1': { label: '脚本模式', value: '1', type: DataReleaseDevMode.SCRIPT },
+  1: { label: '向导模式', value: 1, type: DataReleaseDevMode.UI },
+  2: { label: '脚本模式', value: 2, type: DataReleaseDevMode.SCRIPT },
 } as const
 
 export const sourceTypes = {

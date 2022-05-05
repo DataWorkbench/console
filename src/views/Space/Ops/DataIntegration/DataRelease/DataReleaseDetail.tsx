@@ -29,11 +29,12 @@ import {
   AlarmStatusCmp,
   Circle,
   DbTypeCmp,
-  JobInstanceStatusCmp,
   JobTypeCmp,
 } from '../styledComponents'
 import {
   dataReleaseDetailActions,
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
   DataReleaseSchedule,
   dataReleaseScheduleType,
 } from '../constants'
@@ -199,12 +200,12 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
             onClick={() => toList()}
             css={css`
-            &:hover {
-              ${tw`bg-white cursor-pointer`}
-            .icon svg.qicon {
-              ${tw`text-neut-15!`}
-            }
-          `}
+              &:hover {
+                ${tw`bg-white cursor-pointer`}
+                .icon svg.qicon {
+                  ${tw`text-neut-15!`}
+                }
+            `}
           >
             <Icon
               name="previous"
@@ -247,10 +248,11 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             <div tw="flex-auto">
               <div tw="text-white">
                 <span tw="mr-3">{data?.name}</span>
-                <JobInstanceStatusCmp
-                  type={data?.status as 1}
-                  tw="inline-flex"
-                />
+                {/* // NOTE: 历史版本没有调度信息 */}
+                {/* <JobInstanceStatusCmp */}
+                {/*   type={data?.status as 1} */}
+                {/*   tw="inline-flex" */}
+                {/* /> */}
               </div>
               <div tw="text-neut-8">{data?.id}</div>
             </div>
@@ -297,10 +299,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <span>{data?.version}</span>
               <span>作业模式:</span>
               <span>
-                {
-                  // TODO: 作业模式字段
-                  ''
-                }
+                {dataReleaseDevModeType[config?.job_mode as 1]?.label}
               </span>
               <span>作业类型:</span>
               <span>
@@ -311,34 +310,56 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             <GridItem>
               <span>数据来源:</span>
               <span tw="inline-block">
-                <div
-                  tw="align-middle"
-                  css={
-                    [
-                      // tw`cursor-pointer  hover:text-green-11`
-                    ]
-                  }
-
-                  // onClick={() => set({ showDataSource: true })}
-                >
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
+                  DataReleaseDevMode.UI && (
+                  <div
+                    tw="align-middle"
+                    css={[tw`cursor-pointer  hover:text-green-11`]}
+                    onClick={() => set({ showDataSource: true })}
+                  >
+                    <DbTypeCmp
+                      devMode={config?.job_type}
+                      type={data?.source_type}
+                      onClick={() => handleClickDb(config?.source_id)}
+                    />
+                    <span tw="ml-1">{config?.source_name}</span>
+                  </div>
+                )}
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
+                  DataReleaseDevMode.SCRIPT && (
                   <DbTypeCmp
                     devMode={config?.job_type}
                     type={data?.source_type}
-                    onClick={() => handleClickDb(data?.source_id)}
                   />
-                  <span tw="ml-1">{data?.source_name}</span>
-                </div>
-                <div tw="text-neut-8">{data?.source_id}</div>
+                )}
+                <div tw="text-neut-8">{config?.source_id}</div>
               </span>
               <span>数据目的:</span>
+
               <span tw="inline-block">
-                <div tw="align-middle">
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
+                  DataReleaseDevMode.UI && (
+                  <div
+                    tw="align-middle"
+                    css={[tw`cursor-pointer  hover:text-green-11`]}
+                    onClick={() => set({ showDataSource: true })}
+                  >
+                    <DbTypeCmp
+                      devMode={config?.job_type}
+                      type={data?.target_type}
+                      onClick={() => handleClickDb(config?.target_id)}
+                    />
+                    <span tw="ml-1">{config?.target_name}</span>
+                  </div>
+                )}
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
+                  DataReleaseDevMode.SCRIPT && (
                   <DbTypeCmp
                     devMode={config?.job_type}
                     type={data?.target_type}
-                    onClick={() => handleClickDb(data?.target_id)}
                   />
-                </div>
+                )}
+                <div tw="text-neut-8">{config?.target_id}</div>
               </span>
             </GridItem>
 
