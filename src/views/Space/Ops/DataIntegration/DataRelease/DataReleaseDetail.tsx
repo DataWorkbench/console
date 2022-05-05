@@ -25,6 +25,7 @@ import {
   useQuerySyncJobVersionSchedule,
 } from 'hooks/useJobVersion'
 import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
+import { useMutationJobRelease } from 'hooks'
 import {
   AlarmStatusCmp,
   Circle,
@@ -38,7 +39,6 @@ import {
   DataReleaseSchedule,
   dataReleaseScheduleType,
 } from '../constants'
-import { useMutationJobRelease } from '../../../../../hooks/useJobRelease'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -112,7 +112,8 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
   // const { regionId, spaceId } = useParams<IRouteParams>()
 
-  const { showDataSource, set } = useDataReleaseStore()
+  const { showDataSource, set, datasourceId, datasourceType } =
+    useDataReleaseStore()
 
   const history = useHistory()
   const { search } = useLocation()
@@ -140,11 +141,6 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
     jobId: id,
     versionId: version,
   })
-
-  const handleClickDb = (datasourceId: string) => {
-    // loadDataSource()
-    console.log(datasourceId)
-  }
 
   const mutation = useMutationJobRelease()
 
@@ -311,20 +307,26 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <span>数据来源:</span>
               <span tw="inline-block">
                 {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
-                  DataReleaseDevMode.UI && (
-                  <div
-                    tw="align-middle"
-                    css={[tw`cursor-pointer  hover:text-green-11`]}
-                    onClick={() => set({ showDataSource: true })}
-                  >
-                    <DbTypeCmp
-                      devMode={config?.job_type}
-                      type={data?.source_type}
-                      onClick={() => handleClickDb(config?.source_id)}
-                    />
-                    <span tw="ml-1">{config?.source_name}</span>
-                  </div>
-                )}
+                  DataReleaseDevMode.UI &&
+                  config?.source_id && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                    >
+                      <DbTypeCmp
+                        devMode={config?.job_type}
+                        type={data?.source_type}
+                        onClick={() =>
+                          set({
+                            showDataSource: true,
+                            datasourceType: data?.source_type,
+                            datasourceId: config?.source_id,
+                          })
+                        }
+                      />
+                      <span tw="ml-1">{config?.source_name}</span>
+                    </div>
+                  )}
                 {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
                   DataReleaseDevMode.SCRIPT && (
                   <DbTypeCmp
@@ -338,20 +340,26 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
               <span tw="inline-block">
                 {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
-                  DataReleaseDevMode.UI && (
-                  <div
-                    tw="align-middle"
-                    css={[tw`cursor-pointer  hover:text-green-11`]}
-                    onClick={() => set({ showDataSource: true })}
-                  >
-                    <DbTypeCmp
-                      devMode={config?.job_type}
-                      type={data?.target_type}
-                      onClick={() => handleClickDb(config?.target_id)}
-                    />
-                    <span tw="ml-1">{config?.target_name}</span>
-                  </div>
-                )}
+                  DataReleaseDevMode.UI &&
+                  config?.target_id && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                    >
+                      <DbTypeCmp
+                        devMode={config?.job_type}
+                        type={data?.target_type}
+                        onClick={() =>
+                          set({
+                            showDataSource: true,
+                            datasourceType: data?.target_type,
+                            datasourceId: config?.target_id,
+                          })
+                        }
+                      />
+                      <span tw="ml-1">{config?.target_name}</span>
+                    </div>
+                  )}
                 {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
                   DataReleaseDevMode.SCRIPT && (
                   <DbTypeCmp
@@ -407,11 +415,9 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
       <AlertModal />
       {showDataSource && (
         <DataSourceModal
-          onCancel={() => {
-            set({
-              showDataSource: false,
-            })
-          }}
+          datasourceId={datasourceId}
+          datasourceType={datasourceType}
+          onCancel={() => set({ showDataSource: false })}
         />
       )}
       <OfflineModal refetch={refetch} />

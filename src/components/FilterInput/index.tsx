@@ -77,13 +77,7 @@ export const FilterInput = (props: IFilterInput) => {
         ) {
           return
         }
-        console.log(
-          111111111,
-          pick(data, Object.keys(tempRef.current)),
-          tempRef.current,
-          data,
-          tempRef.current
-        )
+
         const newTags: ISuggestionTag[] = []
 
         rest.suggestions.forEach((i: ISuggestion) => {

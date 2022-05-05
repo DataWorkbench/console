@@ -1,7 +1,11 @@
-import React from 'react'
 import DataSourceForm from 'views/Space/Upcloud/DataSourceList/DataSourceForm'
 import { Modal, ModalContent } from 'components'
 import tw, { css, theme } from 'twin.macro'
+
+import { sourceKinds } from 'views/Space/Upcloud/DataSourceList/constant'
+import { useDescribeDataSource } from 'hooks'
+import { Loading } from '@QCFE/qingcloud-portal-ui'
+import React from 'react'
 
 const dataSourceStyle = css`
   & {
@@ -18,17 +22,18 @@ const dataSourceStyle = css`
   }
 `
 
-interface IProps {
+interface IDataSourceModalProps {
+  datasourceId?: string
+  datasourceType?: number
   onCancel: () => void
 }
-
-const DataSourceModal = (props: IProps) => {
-  const { onCancel } = props
+const DataSourceModal = (props: IDataSourceModalProps) => {
+  const { datasourceId, datasourceType, onCancel } = props
   const op = 'view'
-  const opSourceList = [{}]
-  const curkind = {
-    name: 'Mysql',
-  }
+  const { data, isFetching } = useDescribeDataSource(datasourceId!)
+
+  const opSourceList = data ? [data] : []
+  const curkind = sourceKinds.find((i) => i.source_type === datasourceType)
 
   return (
     <Modal
@@ -41,16 +46,23 @@ const DataSourceModal = (props: IProps) => {
       title="历史版本"
     >
       <ModalContent>
-        <DataSourceForm
-          css={dataSourceStyle}
-          op={op}
-          opSourceList={opSourceList}
-          resInfo={curkind}
-          theme="dark"
-        />
+        <div tw="relative min-h-[400px]">
+          {isFetching ? (
+            <div tw="absolute inset-0 z-50">
+              <Loading size="large" />
+            </div>
+          ) : (
+            <DataSourceForm
+              css={dataSourceStyle}
+              op={op}
+              opSourceList={opSourceList}
+              resInfo={curkind as any}
+              theme="dark"
+            />
+          )}
+        </div>
       </ModalContent>
     </Modal>
   )
 }
-
 export default DataSourceModal
