@@ -9,6 +9,7 @@ import {
   updateResource,
   downloadFile,
   reuploadResource,
+  sourceManage,
 } from 'stores/api'
 
 interface IRouteParams {
@@ -20,12 +21,15 @@ interface IRouteParams {
 const keys: {
   infinite: any
   page: any
+  detail: any
 } = {
   infinite: '',
   page: '',
+  detail: '',
 }
 
-export const getResourceKey = (kind: 'infinite' | 'page' = 'page') => keys[kind]
+export const getResourceKey = (kind: 'infinite' | 'page' | 'detail' = 'page') =>
+  keys[kind]
 
 export const useQueryResource = (filter: Record<string, any>, options = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
@@ -169,6 +173,20 @@ export const useMutationResource = () => {
       }
       return ret
     }
+  )
+}
+
+export const useDescribeDataSource = (sourceId: string) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const params = {
+    space_id: spaceId,
+    regionId,
+    source_id: sourceId,
+  }
+
+  keys.detail = params
+  return useQuery(keys.detail, async () =>
+    sourceManage.describeDataSource(params)
   )
 }
 
