@@ -11,5 +11,8 @@ export * from './useCluster'
 export * from './useNetwork'
 export * from './useResource'
 export * from './useStream'
+export * from './useJobInstance'
+export * from './useJobVersion'
+export * from './useJobRelease'
 
 export { useDarkMode, useScrollBlock, useStore }

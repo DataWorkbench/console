@@ -9,7 +9,6 @@ import {
   updateResource,
   downloadFile,
   reuploadResource,
-  sourceManage,
 } from 'stores/api'
 
 interface IRouteParams {
@@ -173,20 +172,6 @@ export const useMutationResource = () => {
       }
       return ret
     }
-  )
-}
-
-export const useDescribeDataSource = (sourceId: string) => {
-  const { regionId, spaceId } = useParams<IRouteParams>()
-  const params = {
-    space_id: spaceId,
-    regionId,
-    source_id: sourceId,
-  }
-
-  keys.detail = params
-  return useQuery(keys.detail, async () =>
-    sourceManage.describeDataSource(params)
   )
 }
 
