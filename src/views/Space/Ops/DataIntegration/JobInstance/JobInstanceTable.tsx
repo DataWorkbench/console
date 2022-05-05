@@ -35,7 +35,7 @@ import {
   getSyncJobInstanceKey,
   useMutationJobInstance,
   useQuerySyncJobInstances,
-} from 'hooks/useJobInstance'
+} from 'hooks/useSyncJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
 import { useParams } from 'react-router-dom'
 

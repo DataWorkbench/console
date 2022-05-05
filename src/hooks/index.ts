@@ -11,7 +11,7 @@ export * from './useCluster'
 export * from './useNetwork'
 export * from './useResource'
 export * from './useStream'
-export * from './useJobInstance'
+export * from './useSyncJobInstance'
 export * from './useJobVersion'
 export * from './useJobRelease'
 

@@ -10,7 +10,7 @@ import {
 import React from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
 import JobInstanceTable from 'views/Space/Ops/DataIntegration/JobInstance/JobInstanceTable'
-import { getSyncJobInstanceKey } from 'hooks/useJobInstance'
+import { getSyncJobInstanceKey } from 'hooks/useSyncJobInstance'
 
 const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 

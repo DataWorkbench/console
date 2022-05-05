@@ -5,7 +5,7 @@ import { IColumn } from 'hooks/useHooks/useColumns'
 import { observer } from 'mobx-react-lite'
 import tw, { styled } from 'twin.macro'
 import { useIsFetching, useQueryClient } from 'react-query'
-import { getSyncJobInstanceKey } from 'hooks/useJobInstance'
+import { getSyncJobInstanceKey } from 'hooks/useSyncJobInstance'
 import {
   dataJobInstanceColumns,
   dataJobInstanceSuggestions,

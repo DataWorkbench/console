@@ -22,11 +22,18 @@ import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSou
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
 import {
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
   jobInstanceStatus,
   JobInstanceStatusType,
 } from 'views/Space/Ops/DataIntegration/constants'
 import { describeFlinkUiByInstanceId } from 'stores/api'
 import { useQueryClient } from 'react-query'
+import {
+  getSyncJobInstanceKey,
+  useDescribeFlinkUIByInstanceId,
+  useMutationJobInstance,
+} from 'hooks'
 import {
   AlarmStatusCmp,
   Circle,
@@ -35,11 +42,6 @@ import {
   JobTypeCmp,
 } from '../styledComponents'
 import AlertModal from '../../Alert/Modal'
-import {
-  getSyncJobInstanceKey,
-  useMutationJobInstance,
-  useQuerySyncJobInstances,
-} from '../../../../../hooks/useJobInstance'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -120,20 +122,19 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
 
   const { regionId, spaceId } = useParams<IRouteParams>()
 
-  const [{ showDataSource }, setDataSource] = useImmer({
-    showDataSource: false,
-    dataSourceData: undefined,
-  })
+  const [{ showDataSource, datasourceId, datasourceType }, setDataSource] =
+    useImmer({
+      showDataSource: false,
+      datasourceId: undefined as string | undefined,
+      datasourceType: undefined as number | undefined,
+    })
   const [isOpen, setOpen] = useState(true)
   const [activeName, setActiveName] = useState('Message')
   const toList = () => {
     history.push('../data-job')
   }
 
-  const { data: list, isFetching } = useQuerySyncJobInstances({
-    instance_id: id,
-  })
-  const data = get(list, 'infos[0]', {})
+  const { data, isFetching } = useDescribeFlinkUIByInstanceId(id)
 
   const stopAble =
     JobInstanceStatusType.RUNNING |
@@ -249,10 +250,10 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            {data.state & stopAble && (
+            {data?.state & stopAble && (
               <MoreAction
                 items={getActions(
-                  jobInstanceStatus[data.state as 1]?.type,
+                  jobInstanceStatus[data?.state as 1]?.type,
                   data
                 )}
                 onMenuClick={handleMenuClick as any}
@@ -304,35 +305,106 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 </Tooltip>
               </span>
               <span>作业模式:</span>
-              <span />
+              <span>
+                {
+                  dataReleaseDevModeType[
+                    get(data, 'sync_job_property.conf.job_mode') as 1
+                  ]?.label
+                }
+              </span>
             </GridItem>
 
             <GridItem>
               <span>作业类型:</span>
               <span>
-                <JobTypeCmp type={data?.type as 2} />
+                <JobTypeCmp type={get(data, 'sync_job.type') as 2} />
               </span>
               <span>数据来源:</span>
               <span tw="inline-block">
-                <div
-                  tw="align-middle"
-                  css={
-                    [
-                      // tw`cursor-pointer  hover:text-green-11`
-                    ]
-                  }
-
-                  // onClick={() => set({ showDataSource: true })}
-                >
-                  <DbTypeCmp type={data?.source_type} onClick={() => {}} />
-                  <span tw="ml-1">{data?.source_name}</span>
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.UI &&
+                  get(data, 'sync_job_property.conf.source_id') && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                    >
+                      <DbTypeCmp
+                        devMode={
+                          get(data, 'sync_job_property.conf.job_mode') as 1
+                        }
+                        type={data?.source_type}
+                        onClick={() =>
+                          setDataSource({
+                            showDataSource: true,
+                            datasourceType: get(data, 'sync_job.source_type'),
+                            datasourceId: get(
+                              data,
+                              'sync_job_property.conf.source_id'
+                            ),
+                          })
+                        }
+                      />
+                      <span tw="ml-1">
+                        {get(data, 'sync_job_property.conf.source_name')}
+                      </span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp
+                    devMode={get(data, 'sync_job_property.conf.job_mode')}
+                    type={data?.source_type}
+                  />
+                )}
+                <div tw="text-neut-8">
+                  {get(data, 'sync_job_property.conf.source_id')}
                 </div>
-                <div tw="text-neut-8">{data?.source_id}</div>
               </span>
               <span>数据目的:</span>
+
               <span tw="inline-block">
-                <div tw="align-middle">
-                  <DbTypeCmp type={data?.target_type} onClick={undefined} />
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.UI &&
+                  get(data, 'sync_job_property.conf.target_id') && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                    >
+                      <DbTypeCmp
+                        devMode={get(data, 'sync_job_property.conf.job_mode')}
+                        type={data?.target_type}
+                        onClick={() =>
+                          setDataSource({
+                            showDataSource: true,
+                            datasourceType: get(
+                              data,
+                              'sync_job.target_type'
+                            ) as number,
+                            datasourceId: get(
+                              data,
+                              'sync_job_property.conf.target_id'
+                            ) as string,
+                          })
+                        }
+                      />
+                      <span tw="ml-1">
+                        {get(data, 'sync_job_property.conf.target_name')}
+                      </span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp
+                    devMode={get(data, 'sync_job_property.conf.job_mode')}
+                    type={data?.target_type}
+                  />
+                )}
+                <div tw="text-neut-8">
+                  {get(data, 'sync_job_property.conf.target_id')}
                 </div>
               </span>
             </GridItem>
@@ -342,7 +414,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
               <span>
                 <TextLink
                   disabled={
-                    jobInstanceStatus[data.state as 1]?.type ===
+                    jobInstanceStatus[data?.state as 1]?.type ===
                     JobInstanceStatusType.PREPARING
                   }
                   onClick={() => {
@@ -402,11 +474,12 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
       {showDataSource && (
         <DataSourceModal
           onCancel={() => {
-            setDataSource({
-              showDataSource: false,
-              dataSourceData: undefined,
+            setDataSource((draft) => {
+              draft.showDataSource = false
             })
           }}
+          datasourceType={datasourceType}
+          datasourceId={datasourceId}
         />
       )}
       <AlertModal />
