@@ -178,6 +178,7 @@ export const getOperations = (
   return {
     title: '操作',
     key: 'operation',
+    width: 64,
     render: (_: never, record: Record<string, any>) => {
       return (
         <MoreAction<DataReleaseActionType>

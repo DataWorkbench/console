@@ -36,8 +36,8 @@ const TableHeader = observer((props: ITableHeaderProps) => {
         filterLinkKey={storageKey}
         suggestions={dataReleaseSuggestions}
         tw="border-line-dark!"
-        searchKey="job_name"
-        placeholder="通过指定属性的关键词进行搜索"
+        searchKey="search"
+        placeholder="搜索关键字或输入过滤条件"
         // isMultiKeyword
         defaultKeywordLabel="作业名称"
       />

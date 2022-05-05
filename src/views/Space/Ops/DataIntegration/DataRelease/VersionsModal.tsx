@@ -33,8 +33,7 @@ const VersionsModal = observer((props: IProps) => {
       limit: number
       jobId: string
     },
-    { pagination: true; sort: true },
-    dataReleaseVersionSettingKey
+    { pagination: true; sort: true }
   >(
     { limit: 15, jobId: selectedData?.key },
     { pagination: true, sort: true },

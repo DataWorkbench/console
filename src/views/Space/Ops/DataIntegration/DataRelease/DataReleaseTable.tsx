@@ -94,7 +94,7 @@ const DataRelease = observer(() => {
     {
       source?: string
       target?: string
-      reverse?: 'asc' | 'desc'
+      reverse?: boolean
       sort_by?: string
       job_type?: any
       alarm_status?: string
@@ -103,7 +103,14 @@ const DataRelease = observer(() => {
       limit: number
     },
     { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, dataReleaseSettingKey)
+  >(
+    {
+      sort_by: 'updated',
+      reverse: true,
+    },
+    { pagination: true, sort: true },
+    dataReleaseSettingKey
+  )
 
   const mutation = useMutationJobRelease()
 

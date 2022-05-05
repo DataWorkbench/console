@@ -176,7 +176,7 @@ export const sourceTypes = {
 export const dataReleaseSuggestions: ISuggestion[] = [
   {
     label: '作业名称',
-    key: 'name',
+    key: 'search',
   },
   {
     label: '作业 ID',
@@ -242,11 +242,13 @@ export const dataReleaseColumns: IColumn[] = [
     title: '调度状态',
     dataIndex: 'status',
     key: 'status',
+    width: 120,
   },
   {
     title: '告警状态',
     dataIndex: 'alarm_status',
     key: 'alarm_status',
+    width: 100,
   },
   {
     title: '版本 ID',
