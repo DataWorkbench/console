@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import {
   describeFlinkUiByInstanceId,
   listSyncInstances,
+  syncJobInstanceManage,
   terminateSyncInstances,
 } from 'stores/api'
 import { isNull, omitBy } from 'lodash-es'
@@ -93,4 +94,19 @@ export const useMutationJobInstance = (options?: {}) => {
     }
     return undefined
   }, options)
+}
+
+export const useDescribeFlinkUIByInstanceId = (id: string) => {
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const params = {
+    space_id: spaceId,
+    regionId,
+    instance_id: id,
+  }
+
+  const key: any = ['describeSyncInstance', params]
+  return useQuery(key, async () =>
+    syncJobInstanceManage.describeSyncInstance(params)
+  )
 }

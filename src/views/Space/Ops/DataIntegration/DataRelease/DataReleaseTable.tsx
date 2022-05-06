@@ -37,9 +37,6 @@ import VersionsModal from './VersionsModal'
 import TableHeader from './TableHeader'
 
 import DataSourceModal from './DataSourceModal'
-// import { IColumn } from 'hooks/utils'
-
-// interface IDataReleaseProps {}
 
 interface IRouteParams {
   regionId: string
@@ -86,7 +83,6 @@ const ModalWrapper = styled(Modal)(() => [
 
 const dataReleaseSettingKey = 'DATA_RELEASE_SETTING'
 
-// const columns: IColumn[] = []
 const DataRelease = observer(() => {
   const { showDataSource, showVersion, showOffline, selectedData, set } =
     useDataReleaseStore()
@@ -94,7 +90,7 @@ const DataRelease = observer(() => {
     {
       source?: string
       target?: string
-      reverse?: 'asc' | 'desc'
+      reverse?: boolean
       sort_by?: string
       job_type?: any
       alarm_status?: string
@@ -103,7 +99,14 @@ const DataRelease = observer(() => {
       limit: number
     },
     { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, dataReleaseSettingKey)
+  >(
+    {
+      sort_by: 'updated',
+      reverse: true,
+    },
+    { pagination: true, sort: true },
+    dataReleaseSettingKey
+  )
 
   const mutation = useMutationJobRelease()
 
@@ -257,19 +260,21 @@ const DataRelease = observer(() => {
 
   const { regionId, spaceId } = useParams<IRouteParams>()
 
-  const getChildren = async (uuid: string) => {
-    const [key] = uuid.split('=-=')
+  const getChildren = async (uuid: string, record: Record<string, any>) => {
+    const [key, version] = uuid.split('=-=')
     return listSyncJobVersions({
       regionId,
       spaceId,
       jobId: key,
-      limit: 11,
+      limit: 12,
       offset: 0,
     }).then((res) => {
-      const arr = res.infos?.map((i: any) => ({
-        ...i,
-        uuid: `${i.id}=-=${i.version}`,
-      }))
+      const arr = res.infos
+        ?.filter((item: Record<string, any>) => item.version !== version)
+        .map((i: any) => ({
+          ...i,
+          uuid: `${i.id}=-=${i.version}=-=${record.__level + 1}`,
+        }))
       if (arr.length === 11) {
         const value = arr.slice(0, 10).concat({
           key: arr[10].id,
@@ -283,7 +288,7 @@ const DataRelease = observer(() => {
       return arr
     })
   }
-  console.log(11111111111, sort)
+
   return (
     <>
       <FlexBox orient="column" tw="p-5 h-full">

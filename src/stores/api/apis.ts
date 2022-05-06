@@ -48,6 +48,11 @@ export const syncJobInstanceManage = apiConfig({
     '/v1/workspace/{space_id}/sync/job/instance/{instance_id}/flink-ui',
   ],
 
+  DescribeSyncInstance: [
+    'get',
+    '/v1/workspace/{space_id}/sync/job/instance/{instance_id}',
+  ],
+
   ListSyncInstances: ['get', '/v1/workspace/{space_id}/sync/job/instance'],
 
   TerminateSyncInstances: [
@@ -247,6 +252,11 @@ export const syncJobDevManage = apiConfig({
 
   DescribeSyncJob: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}'],
 
+  GenerateJobJson: [
+    'post',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/generate',
+  ],
+
   GetSyncJobSchedule: [
     'get',
     '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
@@ -271,13 +281,6 @@ export const syncJobDevManage = apiConfig({
   UpdateSyncJob: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}'],
 })
 
-export const sourceManage = apiConfig({
-  DescribeDataSource: [
-    'get',
-    '/v1/workspace/{space_id}/datasource/{source_id}',
-  ],
-})
-
 export const notifierManage = apiConfig({
   DescNotificationList: ['post', '/v1/notifier/{user_id}/desc'],
 })
@@ -299,7 +302,10 @@ export const syncJobDevManages = apiConfig({
 })
 
 export const uDFManage = apiConfig({
-  ERROR_UDF: ['get', '/v1/workspace/{space_id}/udf/{udf_id}'],
+  '/v1/workspace/{space_id}/udf/{udf_id}': [
+    'get',
+    '/v1/workspace/{space_id}/udf/{udf_id}',
+  ],
 
   CreateUDF: ['post', '/v1/workspace/{space_id}/udf'],
 
@@ -308,6 +314,17 @@ export const uDFManage = apiConfig({
   ListUDFs: ['get', '/v1/workspace/{space_id}/udf'],
 
   UpdateUDF: ['put', '/v1/workspace/{space_id}/udf/{udf_id}'],
+})
+
+export const platformManage = apiConfig({
+  DescribePlatformConfig: ['get', '/v1/platform/config'],
+})
+
+export const convertSyncJobMode = apiConfig({
+  GenerateJobJson: [
+    'post',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/convert',
+  ],
 })
 
 export const spaceManage = apiConfig({
@@ -390,6 +407,11 @@ export const dataSourceManage = apiConfig({
   DisableDataSources: ['post', '/v1/workspace/{space_id}/datasource/disables'],
 
   CreateDataSource: ['post', '/v1/workspace/{space_id}/datasource'],
+
+  DescribeDataSource: [
+    'get',
+    '/v1/workspace/{space_id}/datasource/{source_id}',
+  ],
 
   DescribeDataSourceKinds: ['get', '/v1/workspace/{space_id}/datasource/kinds'],
 

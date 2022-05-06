@@ -31,6 +31,15 @@ const Grid = styled.div`
   }
 `
 
+const periodType = [
+  { value: 'minute', label: '分钟' },
+  { value: 'hour', label: '小时' },
+  { value: 'day', label: '日' },
+  { value: 'week', label: '周' },
+  { value: 'month', label: '月' },
+  { value: 'year', label: '年' },
+]
+
 const concurrencys = {
   1: {
     value: 1,
@@ -95,7 +104,9 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
               {dayjs(data?.started * 1000).format('YYYY-MM-DD HH:mm:ss')}
             </div>
             <div>调度周期：</div>
-            <div>日</div>
+            <div>
+              {periodType.find((i) => i.value === data?.period_type)?.label}
+            </div>
             {data?.schedule_policy === 2 && (
               <>
                 <div>定时调度时间：</div>
@@ -116,7 +127,9 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
                 concurrencys[data?.concurrency_policy as 1].label}
             </div>
             <div>超时时间：</div>
-            <div>{data?.timeout ? '永不超时' : data?.timeout}</div>
+            <div>
+              {data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}
+            </div>
           </Grid>
         </div>
       </Context>

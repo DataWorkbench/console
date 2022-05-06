@@ -20,12 +20,15 @@ interface IRouteParams {
 const keys: {
   infinite: any
   page: any
+  detail: any
 } = {
   infinite: '',
   page: '',
+  detail: '',
 }
 
-export const getResourceKey = (kind: 'infinite' | 'page' = 'page') => keys[kind]
+export const getResourceKey = (kind: 'infinite' | 'page' | 'detail' = 'page') =>
+  keys[kind]
 
 export const useQueryResource = (filter: Record<string, any>, options = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()

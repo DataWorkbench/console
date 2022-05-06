@@ -11,7 +11,10 @@ import { FlexBox } from '../Box'
 export interface ISelectTreeTableProps {
   columns: IColumn[]
   dataSource: Record<string, any>[]
-  getChildren: (key: string) => PromiseLike<Record<string, any>[]>
+  getChildren: (
+    key: string,
+    record: Record<string, any>
+  ) => PromiseLike<Record<string, any>[]>
   openLevel?: number
   selectedLevel?: number
   indentSpace?: number
@@ -55,9 +58,9 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
   }, [dataSource, rowKey])
 
   const handleOpen = useCallback(
-    (key: string) => {
+    (key: string, record: Record<string, any>) => {
       if (!tableTreeRef.current.keyChildrenMap?.get(key)?.children?.size) {
-        getChildren(key).then((data: Record<string, any>[]) => {
+        getChildren(key, record).then((data: Record<string, any>[]) => {
           tableTreeRef.current.setChildren(
             key,
             data.map((i) => ({
@@ -104,7 +107,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
                 type="light"
                 clickable
                 size={16}
-                onClick={() => handleOpen(record[rowKey])}
+                onClick={() => handleOpen(record[rowKey], record)}
               />
             )}
             {record._level <= selectedLevel && (

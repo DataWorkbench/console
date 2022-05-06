@@ -20,12 +20,12 @@ function compilePath(
       continue
     }
     if (path[i] === '{') {
-      start = i
-      end = i
+      start = i + 1
+      end = i + 1
     } else if (path[i] === '}') {
       end = i
       const item = path.slice(start, end)
-
+      console.log(item)
       if (!isNil(get(params, item))) {
         re = re.replace(`{${item}}`, get(params, item))
         keys.push(item)

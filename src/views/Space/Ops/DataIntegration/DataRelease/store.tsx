@@ -10,6 +10,10 @@ export class DataReleaseStore {
 
   selectedData?: Record<string, any> = undefined
 
+  datasourceType?: number
+
+  datasourceId?: string
+
   constructor() {
     makeAutoObservable(this)
   }

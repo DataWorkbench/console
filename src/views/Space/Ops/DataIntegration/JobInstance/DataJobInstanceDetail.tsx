@@ -22,11 +22,19 @@ import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSou
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
 import {
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
   jobInstanceStatus,
   JobInstanceStatusType,
 } from 'views/Space/Ops/DataIntegration/constants'
 import { describeFlinkUiByInstanceId } from 'stores/api'
 import { useQueryClient } from 'react-query'
+import {
+  getSyncJobInstanceKey,
+  useDescribeFlinkUIByInstanceId,
+  useMutationJobInstance,
+} from 'hooks'
+import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
 import {
   AlarmStatusCmp,
   Circle,
@@ -35,11 +43,8 @@ import {
   JobTypeCmp,
 } from '../styledComponents'
 import AlertModal from '../../Alert/Modal'
-import {
-  getSyncJobInstanceKey,
-  useMutationJobInstance,
-  useQuerySyncJobInstances,
-} from '../../../../../hooks/useJobInstance'
+import Schedule from '../components/Schedule'
+import Cluster from '../components/Cluster'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -120,20 +125,19 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
 
   const { regionId, spaceId } = useParams<IRouteParams>()
 
-  const [{ showDataSource }, setDataSource] = useImmer({
-    showDataSource: false,
-    dataSourceData: undefined,
-  })
+  const [{ showDataSource, datasourceId, datasourceType }, setDataSource] =
+    useImmer({
+      showDataSource: false,
+      datasourceId: undefined as string | undefined,
+      datasourceType: undefined as number | undefined,
+    })
   const [isOpen, setOpen] = useState(true)
   const [activeName, setActiveName] = useState('Message')
   const toList = () => {
     history.push('../data-job')
   }
 
-  const { data: list, isFetching } = useQuerySyncJobInstances({
-    instance_id: id,
-  })
-  const data = get(list, 'infos[0]', {})
+  const { data, isFetching } = useDescribeFlinkUIByInstanceId(id)
 
   const stopAble =
     JobInstanceStatusType.RUNNING |
@@ -215,7 +219,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
           </div>
         </Tooltip>
         <CopyTextWrapper
-          text={`${data?.name ?? ''}(ID: ${id})`}
+          text={`${get(data, 'sync_job.name', '')}(ID: ${id})`}
           theme="light"
         />
       </FlexBox>
@@ -249,10 +253,10 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            {data.state & stopAble && (
+            {data?.state & stopAble && (
               <MoreAction
                 items={getActions(
-                  jobInstanceStatus[data.state as 1]?.type,
+                  jobInstanceStatus[data?.state as 1]?.type,
                   data
                 )}
                 onMenuClick={handleMenuClick as any}
@@ -290,12 +294,12 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 <Tooltip
                   theme="light"
                   hasPadding
-                  content={`发布描述：${data?.desc}`}
+                  content={`发布描述：${get(data, 'sync_job.desc', '')}`}
                 >
                   <div>
                     <div>
                       <span tw="text-white font-semibold mr-1">
-                        {data?.job_name}
+                        {get(data, 'sync_job.name')}
                       </span>
                       <span tw="text-neut-8">({data?.job_id})</span>
                     </div>
@@ -304,35 +308,108 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 </Tooltip>
               </span>
               <span>作业模式:</span>
-              <span />
+              <span>
+                {
+                  dataReleaseDevModeType[
+                    get(data, 'sync_job_property.conf.job_mode') as 1
+                  ]?.label
+                }
+              </span>
             </GridItem>
 
             <GridItem>
               <span>作业类型:</span>
               <span>
-                <JobTypeCmp type={data?.type as 2} />
+                <JobTypeCmp type={get(data, 'sync_job.type') as 2} />
               </span>
               <span>数据来源:</span>
               <span tw="inline-block">
-                <div
-                  tw="align-middle"
-                  css={
-                    [
-                      // tw`cursor-pointer  hover:text-green-11`
-                    ]
-                  }
-
-                  // onClick={() => set({ showDataSource: true })}
-                >
-                  <DbTypeCmp type={data?.source_type} onClick={() => {}} />
-                  <span tw="ml-1">{data?.source_name}</span>
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.UI &&
+                  get(data, 'sync_job_property.conf.source_id') && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                      onClick={() =>
+                        setDataSource({
+                          showDataSource: true,
+                          datasourceType: get(data, 'sync_job.source_type'),
+                          datasourceId: get(
+                            data,
+                            'sync_job_property.conf.source_id'
+                          ),
+                        })
+                      }
+                    >
+                      <DbTypeCmp
+                        devMode={
+                          get(data, 'sync_job_property.conf.job_mode') as 1
+                        }
+                        type={get(data, 'sync_job.source_type') as 1}
+                        onClick={() => {}}
+                      />
+                      <span tw="ml-1">
+                        {get(data, 'sync_job_property.conf.source_name')}
+                      </span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp
+                    devMode={get(data, 'sync_job_property.conf.job_mode')}
+                    type={get(data, 'sync_job.source_type') as 1}
+                  />
+                )}
+                <div tw="text-neut-8">
+                  {get(data, 'sync_job_property.conf.source_id')}
                 </div>
-                <div tw="text-neut-8">{data?.source_id}</div>
               </span>
               <span>数据目的:</span>
+
               <span tw="inline-block">
-                <div tw="align-middle">
-                  <DbTypeCmp type={data?.target_type} onClick={undefined} />
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.UI &&
+                  get(data, 'sync_job_property.conf.target_id') && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                      onClick={() =>
+                        setDataSource({
+                          showDataSource: true,
+                          datasourceType: get(
+                            data,
+                            'sync_job.target_type'
+                          ) as number,
+                          datasourceId: get(
+                            data,
+                            'sync_job_property.conf.target_id'
+                          ) as string,
+                        })
+                      }
+                    >
+                      <DbTypeCmp
+                        devMode={get(data, 'sync_job_property.conf.job_mode')}
+                        type={get(data, 'sync_job.target_type') as 1}
+                        onClick={() => {}}
+                      />
+                      <span tw="ml-1">
+                        {get(data, 'sync_job_property.conf.target_name')}
+                      </span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[
+                  get(data, 'sync_job_property.conf.job_mode') as 1
+                ]?.type === DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp
+                    devMode={get(data, 'sync_job_property.conf.job_mode')}
+                    type={get(data, 'sync_job.target_type') as 1}
+                  />
+                )}
+                <div tw="text-neut-8">
+                  {get(data, 'sync_job_property.conf.target_id')}
                 </div>
               </span>
             </GridItem>
@@ -342,7 +419,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
               <span>
                 <TextLink
                   disabled={
-                    jobInstanceStatus[data.state as 1]?.type ===
+                    jobInstanceStatus[data?.state as 1]?.type ===
                     JobInstanceStatusType.PREPARING
                   }
                   onClick={() => {
@@ -361,9 +438,17 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 </TextLink>
               </span>
               <span>开始时间:</span>
-              <span>{dayjs(data?.created).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>
+                {dayjs(get(data, 'created') * 1000).format(
+                  'YYYY-MM-DD HH:mm:ss'
+                )}
+              </span>
               <span>更新时间:</span>
-              <span>{dayjs(data?.updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>
+                {dayjs(get(data, 'updated') * 1000).format(
+                  'YYYY-MM-DD HH:mm:ss'
+                )}
+              </span>
             </GridItem>
           </div>
         </CollapsePanel>
@@ -391,22 +476,28 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         </TabPanel>
         <TabPanel label="开发内容" name="Develop">
           {/* <div>3</div> */}
+
+          <DevContent
+            data={get(data, 'sync_job_property.conf')}
+            curJob={get(data, 'sync_job')}
+          />
         </TabPanel>
         <TabPanel label="计算集群" name="Cluster">
-          {/* <Cluster /> */}
+          <Cluster clusterId={get(data, 'sync_job_property.conf.cluster_id')} />
         </TabPanel>
         <TabPanel label="调度信息" name="Schedule">
-          {/* <Schedule data={{}} /> */}
+          <Schedule data={get(data, 'sync_job_property.schedule')} />
         </TabPanel>
       </HorizonTabs>
       {showDataSource && (
         <DataSourceModal
           onCancel={() => {
-            setDataSource({
-              showDataSource: false,
-              dataSourceData: undefined,
+            setDataSource((draft) => {
+              draft.showDataSource = false
             })
           }}
+          datasourceType={datasourceType}
+          datasourceId={datasourceId}
         />
       )}
       <AlertModal />

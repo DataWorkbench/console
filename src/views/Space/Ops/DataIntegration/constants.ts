@@ -150,8 +150,8 @@ export enum DataReleaseDevMode {
 }
 
 export const dataReleaseDevModeType = {
-  '0': { label: '向导模式', value: '0', type: DataReleaseDevMode.UI },
-  '1': { label: '脚本模式', value: '1', type: DataReleaseDevMode.SCRIPT },
+  1: { label: '向导模式', value: 1, type: DataReleaseDevMode.UI },
+  2: { label: '脚本模式', value: 2, type: DataReleaseDevMode.SCRIPT },
 } as const
 
 export const sourceTypes = {
@@ -176,7 +176,7 @@ export const sourceTypes = {
 export const dataReleaseSuggestions: ISuggestion[] = [
   {
     label: '作业名称',
-    key: 'name',
+    key: 'search',
   },
   {
     label: '作业 ID',
@@ -242,11 +242,13 @@ export const dataReleaseColumns: IColumn[] = [
     title: '调度状态',
     dataIndex: 'status',
     key: 'status',
+    width: 120,
   },
   {
     title: '告警状态',
     dataIndex: 'alarm_status',
     key: 'alarm_status',
+    width: 100,
   },
   {
     title: '版本 ID',
