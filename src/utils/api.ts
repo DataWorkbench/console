@@ -9,10 +9,10 @@ export const api = {
         Object.assign(params, { space_id: params.spaceId })
         delete params.spaceId
       }
-      const [uri, { regionId }] = compilePath(path, params)
+      const [uri, { regionId, ...rest }] = compilePath(path, params)
       return request({
         region: regionId,
-        uri,
+        uri: `${uri}?${new URLSearchParams(rest).toString()}`,
         method: 'GET',
       })
     },
