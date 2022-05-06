@@ -245,18 +245,20 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            {data?.state & stopAble && (
-              <MoreAction
-                items={getActions(
-                  jobInstanceStatus[data?.state as 1]?.type,
-                  data
-                )}
-                onMenuClick={handleMenuClick as any}
-                type="button"
-                placement="bottom-start"
-                buttonText="更多操作"
-              />
-            )}
+            {data?.state & stopAble &&
+              getActions(jobInstanceStatus[data?.state as 1]?.type, data)
+                .length && (
+                <MoreAction
+                  items={getActions(
+                    jobInstanceStatus[data?.state as 1]?.type,
+                    data
+                  )}
+                  onMenuClick={handleMenuClick as any}
+                  type="button"
+                  placement="bottom-start"
+                  buttonText="更多操作"
+                />
+              )}
             <Button
               onClick={() => {
                 setOpen(!isOpen)
