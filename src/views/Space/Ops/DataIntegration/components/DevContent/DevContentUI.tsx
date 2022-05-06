@@ -199,19 +199,25 @@ const DevContentUI = (props: IProps) => {
                     </AffixLabel>
                   </div>
                   <div>{{ 1: '限流', 2: '不限流' }[channel.rate as 1]}</div>
-                  <div>
-                    <AffixLabel
-                      theme="light"
-                      required={false}
-                      help="错误记录数超过"
-                    >
-                      错误记录数超过
-                    </AffixLabel>
-                  </div>
-                  <div>
-                    {channel.record_num ?? ''} 条或 {channel.percentage ?? ''}
-                    %比例，达到任一条件时，任务自动结束
-                  </div>
+                  {channel.rat === 1 && (
+                    <>
+                      <div>
+                        <AffixLabel
+                          theme="light"
+                          required={false}
+                          help="错误记录数超过"
+                        >
+                          错误记录数超过
+                        </AffixLabel>
+                      </div>
+
+                      <div>
+                        {channel.record_num ?? ''} 条或{' '}
+                        {channel.percentage ?? ''}
+                        %比例，达到任一条件时，任务自动结束
+                      </div>
+                    </>
+                  )}
                 </Grid>
               </div>
             )}
