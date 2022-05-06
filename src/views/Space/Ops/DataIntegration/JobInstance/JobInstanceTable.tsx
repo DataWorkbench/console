@@ -17,7 +17,6 @@ import {
 import tw, { css } from 'twin.macro'
 import dayjs from 'dayjs'
 import { useQueryClient } from 'react-query'
-import { describeFlinkUiByInstanceId } from 'stores/api'
 import React, { useEffect, useMemo } from 'react'
 import TableHeader from 'views/Space/Ops/DataIntegration/JobInstance/TableHeader'
 import { Table } from 'views/Space/styled'
@@ -37,7 +36,6 @@ import {
   useQuerySyncJobInstances,
 } from 'hooks/useSyncJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
-import { useParams } from 'react-router-dom'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -64,11 +62,6 @@ const instanceNameStyle = css`
 
 const actionsType = tuple('info', 'stop')
 type ActionsType = typeof actionsType[number]
-
-interface IRouteParams {
-  regionId: string
-  spaceId: string
-}
 
 const JobInstanceTable = (props: IJobInstanceTable) => {
   const {
@@ -151,7 +144,18 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       ),
     },
     job_id: {
+      // width: 180,
       render: (v: string, record: Record<string, any>) => {
+        const getContent = (children?: React.ReactElement) => {
+          return record?.sync_job?.desc ? (
+            <div>
+              <div>{`发布描述: ${record?.sync_job?.desc}`}</div>
+              <div>{children}</div>
+            </div>
+          ) : (
+            children
+          )
+        }
         const child = (
           <div
             tw="truncate"
@@ -164,27 +168,44 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
             `}
           >
             <div tw="truncate">
-              <TextEllipsis theme="light">
-                <span tw="text-white" className="pit-job-name-text">
-                  {record.job_name}
+              <TextEllipsis
+                theme="light"
+                content={getContent(
+                  <div>{`${record?.sync_job?.name}(${record.job_id})`}</div>
+                )}
+              >
+                <span
+                  tw="text-white cursor-pointer"
+                  className="pit-job-name-text"
+                  onClick={() => {
+                    window.open(
+                      `./data-release/${record.job_id}?version=${record.version}`,
+                      '_blank'
+                    )
+                  }}
+                >
+                  {record?.sync_job?.name}
                 </span>
                 <span tw="text-neut-8"> {`(${record.job_id})`}</span>
               </TextEllipsis>
             </div>
             <div tw="truncate">
-              <TextEllipsis theme="light">
+              <TextEllipsis
+                theme="light"
+                content={getContent(<div>{`版本 ID： ${record.version}`}</div>)}
+              >
                 <span tw="text-neut-8">{`版本 ID： ${record.version}`}</span>
               </TextEllipsis>
             </div>
           </div>
         )
-        // TODO: desc 字段未定
-        if (record.desc) {
+        if (record?.sync_job?.desc) {
           return (
             <Tooltip
               theme="light"
               hasPadding
-              content={`发布描述: ${record.desc}`}
+              content={`发布描述: ${record?.sync_job?.desc}`}
+              twChild={tw`truncate text-neut-13!`}
             >
               {child}
             </Tooltip>
@@ -262,7 +283,6 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     })
     return result
   }
-  const { regionId, spaceId } = useParams<IRouteParams>()
 
   const handleMenuClick = (record: Record<string, any>, key: ActionsType) => {
     switch (key) {
@@ -301,15 +321,15 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
               ) {
                 return
               }
-              describeFlinkUiByInstanceId({
-                instanceId: record.id,
-                regionId,
-                spaceId,
-              }).then((web_ui: string) => {
-                if (web_ui) {
-                  window.open(web_ui, '_blank')
-                }
-              })
+              // describeFlinkUiByInstanceId({
+              //   instanceId: record.id,
+              //   regionId,
+              //   spaceId,
+              // }).then((web_ui: string) => {
+              if (data?.flink_ui) {
+                window.open(`//${data?.flink_ui}`, '_blank')
+              }
+              // })
             }}
           >
             Flink UI

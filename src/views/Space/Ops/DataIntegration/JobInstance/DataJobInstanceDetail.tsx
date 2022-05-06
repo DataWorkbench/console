@@ -10,7 +10,7 @@ import {
   TextLink,
   Tooltip,
 } from 'components'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
 import icons from 'views/Space/Ops/DataIntegration/icons'
@@ -27,7 +27,6 @@ import {
   jobInstanceStatus,
   JobInstanceStatusType,
 } from 'views/Space/Ops/DataIntegration/constants'
-import { describeFlinkUiByInstanceId } from 'stores/api'
 import { useQueryClient } from 'react-query'
 import {
   getSyncJobInstanceKey,
@@ -112,18 +111,11 @@ const CopyTextWrapper = styled(CopyText)`
   }
 `
 
-interface IRouteParams {
-  regionId: string
-  spaceId: string
-}
-
 const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
   useIcon(icons)
   const { id } = props
 
   const history = useHistory()
-
-  const { regionId, spaceId } = useParams<IRouteParams>()
 
   const [{ showDataSource, datasourceId, datasourceType }, setDataSource] =
     useImmer({
@@ -423,15 +415,15 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                     JobInstanceStatusType.PREPARING
                   }
                   onClick={() => {
-                    describeFlinkUiByInstanceId({
-                      regionId,
-                      spaceId,
-                      instanceId: id,
-                    }).then((web_ui: string) => {
-                      if (web_ui) {
-                        window.open(web_ui, '_blank')
-                      }
-                    })
+                    // describeFlinkUiByInstanceId({
+                    //   regionId,
+                    //   spaceId,
+                    //   instanceId: id,
+                    // }).then((web_ui: string) => {
+                    if (data?.flink_ui) {
+                      window.open(`//${data?.flink_ui}`, '_blank')
+                    }
+                    // })
                   }}
                 >
                   Flink UI
