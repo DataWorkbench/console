@@ -34,6 +34,7 @@ import {
   useDescribeFlinkUIByInstanceId,
   useMutationJobInstance,
 } from 'hooks'
+import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
 import {
   AlarmStatusCmp,
   Circle,
@@ -42,6 +43,8 @@ import {
   JobTypeCmp,
 } from '../styledComponents'
 import AlertModal from '../../Alert/Modal'
+import Schedule from '../components/Schedule'
+import Cluster from '../components/Cluster'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -216,7 +219,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
           </div>
         </Tooltip>
         <CopyTextWrapper
-          text={`${data?.name ?? ''}(ID: ${id})`}
+          text={`${get(data, 'sync_job.name', '')}(ID: ${id})`}
           theme="light"
         />
       </FlexBox>
@@ -291,12 +294,12 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 <Tooltip
                   theme="light"
                   hasPadding
-                  content={`发布描述：${data?.desc}`}
+                  content={`发布描述：${get(data, 'sync_job.desc', '')}`}
                 >
                   <div>
                     <div>
                       <span tw="text-white font-semibold mr-1">
-                        {data?.job_name}
+                        {get(data, 'sync_job.name')}
                       </span>
                       <span tw="text-neut-8">({data?.job_id})</span>
                     </div>
@@ -328,22 +331,23 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                     <div
                       tw="align-middle"
                       css={[tw`cursor-pointer  hover:text-green-11`]}
+                      onClick={() =>
+                        setDataSource({
+                          showDataSource: true,
+                          datasourceType: get(data, 'sync_job.source_type'),
+                          datasourceId: get(
+                            data,
+                            'sync_job_property.conf.source_id'
+                          ),
+                        })
+                      }
                     >
                       <DbTypeCmp
                         devMode={
                           get(data, 'sync_job_property.conf.job_mode') as 1
                         }
-                        type={data?.source_type}
-                        onClick={() =>
-                          setDataSource({
-                            showDataSource: true,
-                            datasourceType: get(data, 'sync_job.source_type'),
-                            datasourceId: get(
-                              data,
-                              'sync_job_property.conf.source_id'
-                            ),
-                          })
-                        }
+                        type={get(data, 'sync_job.source_type') as 1}
+                        onClick={() => {}}
                       />
                       <span tw="ml-1">
                         {get(data, 'sync_job_property.conf.source_name')}
@@ -355,7 +359,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 ]?.type === DataReleaseDevMode.SCRIPT && (
                   <DbTypeCmp
                     devMode={get(data, 'sync_job_property.conf.job_mode')}
-                    type={data?.source_type}
+                    type={get(data, 'sync_job.source_type') as 1}
                   />
                 )}
                 <div tw="text-neut-8">
@@ -372,23 +376,24 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                     <div
                       tw="align-middle"
                       css={[tw`cursor-pointer  hover:text-green-11`]}
+                      onClick={() =>
+                        setDataSource({
+                          showDataSource: true,
+                          datasourceType: get(
+                            data,
+                            'sync_job.target_type'
+                          ) as number,
+                          datasourceId: get(
+                            data,
+                            'sync_job_property.conf.target_id'
+                          ) as string,
+                        })
+                      }
                     >
                       <DbTypeCmp
                         devMode={get(data, 'sync_job_property.conf.job_mode')}
-                        type={data?.target_type}
-                        onClick={() =>
-                          setDataSource({
-                            showDataSource: true,
-                            datasourceType: get(
-                              data,
-                              'sync_job.target_type'
-                            ) as number,
-                            datasourceId: get(
-                              data,
-                              'sync_job_property.conf.target_id'
-                            ) as string,
-                          })
-                        }
+                        type={get(data, 'sync_job.target_type') as 1}
+                        onClick={() => {}}
                       />
                       <span tw="ml-1">
                         {get(data, 'sync_job_property.conf.target_name')}
@@ -400,7 +405,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 ]?.type === DataReleaseDevMode.SCRIPT && (
                   <DbTypeCmp
                     devMode={get(data, 'sync_job_property.conf.job_mode')}
-                    type={data?.target_type}
+                    type={get(data, 'sync_job.target_type') as 1}
                   />
                 )}
                 <div tw="text-neut-8">
@@ -433,9 +438,17 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 </TextLink>
               </span>
               <span>开始时间:</span>
-              <span>{dayjs(data?.created).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>
+                {dayjs(get(data, 'created') * 1000).format(
+                  'YYYY-MM-DD HH:mm:ss'
+                )}
+              </span>
               <span>更新时间:</span>
-              <span>{dayjs(data?.updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>
+                {dayjs(get(data, 'updated') * 1000).format(
+                  'YYYY-MM-DD HH:mm:ss'
+                )}
+              </span>
             </GridItem>
           </div>
         </CollapsePanel>
@@ -463,12 +476,17 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         </TabPanel>
         <TabPanel label="开发内容" name="Develop">
           {/* <div>3</div> */}
+
+          <DevContent
+            data={get(data, 'sync_job_property.conf')}
+            curJob={get(data, 'sync_job')}
+          />
         </TabPanel>
         <TabPanel label="计算集群" name="Cluster">
-          {/* <Cluster /> */}
+          <Cluster clusterId={get(data, 'sync_job_property.conf.cluster_id')} />
         </TabPanel>
         <TabPanel label="调度信息" name="Schedule">
-          {/* <Schedule data={{}} /> */}
+          <Schedule data={get(data, 'sync_job_property.schedule')} />
         </TabPanel>
       </HorizonTabs>
       {showDataSource && (
