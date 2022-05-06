@@ -246,7 +246,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
           </Center>
           <FlexBox tw="gap-4">
             {data?.state & stopAble &&
-              getActions(jobInstanceStatus[data?.state as 1]?.type, data)
+              !!getActions(jobInstanceStatus[data?.state as 1]?.type, data)
                 .length && (
                 <MoreAction
                   items={getActions(
