@@ -96,12 +96,13 @@ export const useMutationJobInstance = (options?: {}) => {
   }, options)
 }
 
-export const useDescribeFlinkUIByInstanceId = (id: string) => {
+export const useDescribeInstanceWithFlinkUIByInstanceId = (id: string) => {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
   const params = {
     space_id: spaceId,
     regionId,
+    verbose: 1,
     instance_id: id,
   }
 

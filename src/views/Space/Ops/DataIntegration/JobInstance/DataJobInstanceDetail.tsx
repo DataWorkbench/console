@@ -30,7 +30,7 @@ import {
 import { useQueryClient } from 'react-query'
 import {
   getSyncJobInstanceKey,
-  useDescribeFlinkUIByInstanceId,
+  useDescribeInstanceWithFlinkUIByInstanceId,
   useMutationJobInstance,
 } from 'hooks'
 import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
@@ -129,7 +129,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
     history.push('../data-job')
   }
 
-  const { data, isFetching } = useDescribeFlinkUIByInstanceId(id)
+  const { data, isFetching } = useDescribeInstanceWithFlinkUIByInstanceId(id)
 
   const stopAble =
     JobInstanceStatusType.RUNNING |
@@ -246,7 +246,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
           </Center>
           <FlexBox tw="gap-4">
             {data?.state & stopAble &&
-              getActions(jobInstanceStatus[data?.state as 1]?.type, data)
+              !!getActions(jobInstanceStatus[data?.state as 1]?.type, data)
                 .length && (
                 <MoreAction
                   items={getActions(

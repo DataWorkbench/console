@@ -81,9 +81,10 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       job_id?: string
       version?: string
       instance_id?: string
+      verbose: number
     },
     { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, settingKey)
+  >({ verbose: 1 }, { pagination: true, sort: true }, settingKey)
 
   useEffect(() => {
     if (filterProp) {
@@ -326,8 +327,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
               //   regionId,
               //   spaceId,
               // }).then((web_ui: string) => {
-              if (data?.flink_ui) {
-                window.open(`//${data?.flink_ui}`, '_blank')
+              if (record?.flink_ui) {
+                window.open(`//${record?.flink_ui}`, '_blank')
               }
               // })
             }}
