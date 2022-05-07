@@ -351,6 +351,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     {
       title: '状态',
       dataIndex: 'status',
+      width: 86,
       render: (v: number) => {
         if (v === DATASOURCE_STATUS.ENABLED) {
           return (
@@ -371,6 +372,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     {
       title: '数据源类型',
       dataIndex: 'type',
+      width: 92,
       render: (v: number) => {
         return sourceKinds.find((kind) => kind.source_type === v)?.name
       },
@@ -512,7 +514,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     {
       title: '操作',
       key: 'table_actions',
-      width: 150,
+      width: 124,
       render: (v: string, info: any) => {
         if (selectMode) {
           return (
@@ -714,7 +716,10 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               />
             </ToolBarRight>
           </ToolBar>
-          <Card tw="flex-1 pb-5 px-5 dark:bg-neut-16">
+          <Card
+            tw="flex-1 pb-5 dark:bg-neut-16"
+            css={[!selectMode && tw`px-5`]}
+          >
             <Table
               selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
