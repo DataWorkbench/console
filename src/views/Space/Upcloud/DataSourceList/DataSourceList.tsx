@@ -404,7 +404,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                       </TextEllipsis>
                     ) : (
                       <Tooltip
-                        theme="darker"
+                        theme="instead"
                         content={getUrl(urlObj, key as 'mysql')}
                         hasPadding
                       >
@@ -474,7 +474,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             {v && (
               <Tooltip
                 hasPadding
-                theme="darker"
+                theme="instead"
                 content={
                   <div>
                     <div>VPC: {networkInfo?.space_id}</div>
@@ -498,7 +498,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       dataIndex: 'desc',
       render: (v: string) => {
         return (
-          <Tooltip content={v} theme="darker" hasPadding>
+          <Tooltip content={v} theme="instead" hasPadding>
             <span>{getEllipsisText(v, 20)}</span>
           </Tooltip>
         )
@@ -540,7 +540,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               查看详情
             </Button>
             <Tooltip
-              theme="light"
+              theme="instead"
               trigger="click"
               arrow={false}
               twChild={
