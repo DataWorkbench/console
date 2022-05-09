@@ -30,6 +30,7 @@ import {
   HelpCenterLink,
   SqlGroupField,
   TConditionParameterVal,
+  PopConfirm,
 } from 'components'
 import {
   useStore,
@@ -171,6 +172,7 @@ const SyncDataSource = observer(
       workFlowStore: { curJob: curJobStore },
     } = useStore()
     const curJob = curJobProp ?? curJobStore
+    console.log(111, curJob)
     const [visible, setVisible] = useState<boolean | null>(null)
     const [showSourceAdvance, setShowSourceAdvance] = useState(false)
     const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
@@ -403,6 +405,12 @@ const SyncDataSource = observer(
               dbInfo.networkId && (
                 <div>网络配置名称（ID：{dbInfo.networkId}）</div>
               )
+            }
+            popConfirm={
+              <PopConfirm
+                type="warning"
+                content="移除数据源会清空所数据源表、条件参数配置、字段映射等所有信息，请确认是否移除？"
+              />
             }
             icon={
               <Icon
