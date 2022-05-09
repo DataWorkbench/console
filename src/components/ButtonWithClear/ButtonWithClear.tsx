@@ -11,6 +11,7 @@ interface ButtonWithClearProps {
   onClick?: () => void
   onClear?: () => void
   onChange?: (value: string) => void
+  popConfirm?: React.ReactNode
 }
 
 export const ButtonWithClear = React.forwardRef(
@@ -24,6 +25,7 @@ export const ButtonWithClear = React.forwardRef(
       icon,
       children,
       onChange = noop,
+      popConfirm,
     } = props
 
     useEffect(() => {
@@ -32,23 +34,33 @@ export const ButtonWithClear = React.forwardRef(
       }
     }, [value, onChange])
 
+    let clearButton: React.ReactNode | null = (
+      <Button type="black" tw="ml-2 h-8 px-[7px]">
+        <Icon name="close" type="light" size={16} />
+      </Button>
+    )
+    if (clearable) {
+      if (React.isValidElement(popConfirm)) {
+        clearButton = React.cloneElement(popConfirm, {
+          ...popConfirm.props,
+          children: clearButton,
+          onOk: onClear,
+        })
+      } else {
+        clearButton = React.cloneElement(clearButton as React.ReactElement, {
+          onClick: onClear,
+        })
+      }
+    } else {
+      clearButton = null
+    }
     return (
       <div>
         <Button tw="h-8" ref={ref} type="black" onClick={onClick}>
           {icon}
           {!value ? placeholder : children}
         </Button>
-        {clearable && (
-          <Button
-            type="black"
-            tw="ml-2 h-8 px-[7px]"
-            onClick={() => {
-              onClear()
-            }}
-          >
-            <Icon name="close" type="light" size={16} />
-          </Button>
-        )}
+        {clearable && clearButton}
       </div>
     )
   }

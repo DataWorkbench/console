@@ -16,8 +16,9 @@ import {
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
-import { isEqual } from 'lodash-es'
+import { isEqual, isNil, pick, values } from 'lodash-es'
 
+import { PopConfirm } from 'components/PopConfirm'
 import { FlexBox } from '../Box'
 import { Tooltip } from '../Tooltip'
 import { HelpCenterLink } from '../Link'
@@ -56,7 +57,7 @@ interface IConditionParameterProps {
 }
 
 const SimpleWrapper = styled.div`
-  ${tw`bg-neut-16 p-2 max-w-[376px]`}
+  ${tw`bg-neut-16 p-2 w-[376px]`}
   ${css`
     & > div {
       ${tw`flex-auto!`}
@@ -140,43 +141,63 @@ export const ConditionParameter = React.forwardRef(
     }, [onChange, value])
 
     const handleTypeChange = (v: ConditionType) => {
-      setValue((draft) => {
-        draft.type = v
-        if (v !== ConditionType.Visualization && draft.column) {
-          const hasStart = draft.startValue && draft.startCondition
-          const hasEnd = draft.endValue && draft.endCondition
-          const start = hasStart
-            ? `${draft?.startValue ?? ''} ${draft?.startCondition ?? ''} {${
-                draft?.column
-              }}`
-            : ''
-          const end = hasEnd
-            ? `${draft?.endValue ?? ''} ${draft?.endCondition ?? ''} {${
-                draft?.column
-              }}`
-            : ''
-          if (hasEnd || hasStart) {
-            draft.expression = `${start} ${
-              hasStart && hasEnd ? ' and ' : ''
-            } ${end}`
-          }
-        }
-      })
+      setValue({ type: v })
+      // setValue((draft) => {
+      //   draft.type = v
+      //   if (v !== ConditionType.Visualization && draft.column) {
+      //     const hasStart = draft.startValue && draft.startCondition
+      //     const hasEnd = draft.endValue && draft.endCondition
+      //     const start = hasStart
+      //       ? `${draft?.startValue ?? ''} ${draft?.startCondition ?? ''} {${
+      //           draft?.column
+      //         }}`
+      //       : ''
+      //     const end = hasEnd
+      //       ? `${draft?.endValue ?? ''} ${draft?.endCondition ?? ''} {${
+      //           draft?.column
+      //         }}`
+      //       : ''
+      //     if (hasEnd || hasStart) {
+      //       draft.expression = `${start} ${
+      //         hasStart && hasEnd ? ' and ' : ''
+      //       } ${end}`
+      //     }
+      //   }
+      // })
     }
-
+    const keys =
+      value.type === ConditionType.Visualization
+        ? ['endValue', 'startValue', 'startCondition', 'endCondition', 'column']
+        : ['expression']
+    const hasChange = !!values(pick(value, keys)).find((i) => !isNil(i))
     return (
       <div className={className} tw="flex-auto" style={{ width }}>
         <FlexBox>
           <RadioGroup
             value={value?.type}
-            onChange={handleTypeChange}
+            onChange={hasChange ? undefined : handleTypeChange}
             style={{ marginBottom: 4 }}
           >
-            {types.map((item) => (
-              <RadioButton key={item.value} value={item.value}>
-                {item.label}
-              </RadioButton>
-            ))}
+            {types.map((item) => {
+              if (!hasChange) {
+                return (
+                  <RadioButton key={item.value} value={item.value}>
+                    {item.label}
+                  </RadioButton>
+                )
+              }
+              return (
+                <PopConfirm
+                  content={<div>切换输入模式会清空已输入内容，确认切换？</div>}
+                  type="warning"
+                  onOk={() => handleTypeChange(item.value)}
+                >
+                  <RadioButton key={item.value} value={item.value}>
+                    {item.label}
+                  </RadioButton>
+                </PopConfirm>
+              )
+            })}
           </RadioGroup>
           <div>
             {help ? (
@@ -208,7 +229,7 @@ export const ConditionParameter = React.forwardRef(
                 }))}
               />
               <Button
-                tw="w-8 ml-3 p-0 dark:bg-neut-16!"
+                tw="w-8 ml-3 p-0 dark:bg-neut-16! flex-none"
                 disabled={loading}
                 onClick={() => onRefresh && onRefresh()}
               >
