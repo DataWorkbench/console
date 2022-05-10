@@ -12,8 +12,9 @@ export const api = {
       const [uri, { regionId, ...rest }] = compilePath(path, params)
       return request({
         region: regionId,
-        uri: `${uri}?${new URLSearchParams(rest).toString()}`,
+        uri,
         method: 'GET',
+        query: rest,
       })
     },
   post:
