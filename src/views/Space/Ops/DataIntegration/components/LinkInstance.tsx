@@ -17,9 +17,11 @@ const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 const LinkInstance = ({
   jobId,
   version,
+  type,
 }: {
   jobId: string
   version: string
+  type?: 'stream' | 'sync'
 }) => {
   const { filter, setFilter } = useFilter<
     {
@@ -132,6 +134,7 @@ const LinkInstance = ({
         }}
         showHeader={false}
         jumpDetail={jumpDetail}
+        type={type}
       />
     </div>
   )

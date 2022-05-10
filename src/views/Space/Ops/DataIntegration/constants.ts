@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { IColumn } from 'hooks/useHooks/useColumns'
-import { getHelpCenterLink } from 'utils/index'
+import { autoIncrementKey, getHelpCenterLink } from 'utils/index'
 import { ISuggestion, ITab } from './interfaces'
 
 export const dataJobReleaseTab: ITab[] = [
@@ -22,13 +22,13 @@ export const dataJobInstanceTab: ITab[] = [
 ]
 
 export enum JobInstanceStatusType {
-  FAILED_AND_RETRY = 2 << 0,
-  RUNNING = 2 << 1,
-  PREPARING = 2 << 2,
-  FAILED = 2 << 3,
-  SUCCEEDED = 2 << 4,
-  TIMEOUT = 2 << 5,
-  FINISHED = 2 << 6,
+  FAILED_AND_RETRY = 2 << autoIncrementKey.statusKey,
+  RUNNING = 2 << autoIncrementKey.statusKey,
+  PREPARING = 2 << autoIncrementKey.statusKey,
+  FAILED = 2 << autoIncrementKey.statusKey,
+  SUCCEEDED = 2 << autoIncrementKey.statusKey,
+  TIMEOUT = 2 << autoIncrementKey.statusKey,
+  FINISHED = 2 << autoIncrementKey.statusKey,
 }
 
 export const jobInstanceStatus = {
@@ -133,13 +133,13 @@ export const dataJobInstanceColumns: IColumn[] = [
 ]
 
 export enum DataReleaseSchedule {
-  RUNNING = 2 << 0,
-  FINISHED = 2 << 1,
-  DOWNED = 2 << 2,
+  RUNNING = 2 << autoIncrementKey.statusKey,
+  FINISHED = 2 << autoIncrementKey.statusKey,
+  DOWNED = 2 << autoIncrementKey.statusKey,
 }
 
 export const dataReleaseScheduleType = {
-  2: { label: '运行中', value: 2, type: DataReleaseSchedule.RUNNING },
+  2: { label: '调度中', value: 2, type: DataReleaseSchedule.RUNNING },
   4: { label: '已完成', value: 4, type: DataReleaseSchedule.FINISHED },
   3: { label: '已下线', value: 3, type: DataReleaseSchedule.DOWNED },
 } as const

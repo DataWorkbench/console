@@ -21,7 +21,7 @@ import {
   DataReleaseStatusCmp,
   DbTypeCmp,
   JobTypeCmp,
-} from '../styledComponents'
+} from '../../styledComponents'
 
 export const getColumnsRender = (
   filter: Record<string, any>,

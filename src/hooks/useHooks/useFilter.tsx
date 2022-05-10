@@ -74,23 +74,59 @@ const useFilter = <T extends Object, P extends ITableConfig>(
 
   useEffect(() => {
     if (tableLinkKey) {
+      console.log(2222222222, filter)
       emitter.emit(`${tableLinkKey}-set`, filter)
     }
   }, [filter, tableLinkKey])
 
   useEffect(() => {
-    emitter.on(`${tableLinkKey}-get`, (d) => {
+    const handler = (d: Record<string, any>) => {
+      console.log(111111111, d)
       setFilter((draft: any) => {
         return { ...draft, ...d }
       })
-    })
+    }
+    emitter.on(`${tableLinkKey}-get`, handler)
+    return () => {
+      emitter.off(`${tableLinkKey}-get`, handler)
+    }
   }, [tableLinkKey, setFilter])
+
+  const getFilter = (key: string, types: Record<string, any>) => {
+    return {
+      filter: (filter as any)[key],
+      onFilter: (v: string | number) => {
+        setFilter((draft) => {
+          ;(draft as any)[key] = v
+          if (config.pagination) {
+            ;(draft as any).offset = 0
+          }
+        })
+      },
+      filterAble: true,
+      filtersNew: Object.values(types).filter((i) => !i.hidden) as any,
+    }
+  }
+
+  const getSort = (key: string) => ({
+    sortable: true,
+    sortKey: (filter as any).sort_by,
+    sortOrder:
+      // eslint-disable-next-line no-nested-ternary
+      (filter as any).sort_by === key
+        ? (filter as any).reverse
+          ? 'asc'
+          : 'desc'
+        : '',
+  })
 
   return {
     filter,
     setFilter,
     pagination,
     sort,
+    getColumnFilter: getFilter,
+    getColumnSort: getSort,
   }
 }
 

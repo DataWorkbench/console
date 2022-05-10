@@ -3,7 +3,7 @@ import { Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled, theme } from 'twin.macro'
 import React, { ReactElement } from 'react'
 import { isFunction } from 'lodash-es'
-import { Center, FlexBox, Tooltip } from 'components'
+import { Center, FlexBox, Tooltip } from 'components/index'
 import {
   sourceKinds,
   SourceType,
@@ -19,10 +19,15 @@ import {
   JobInstanceStatusType,
   JobType,
   jobType,
-} from './constants'
+} from './DataIntegration/constants'
+
+import {
+  StreamReleaseScheduleType,
+  streamReleaseScheduleTypes,
+} from './Stream1/common/constants'
 
 export const statusStyle = (
-  type: JobInstanceStatusType | DataReleaseSchedule
+  type: JobInstanceStatusType | DataReleaseSchedule | StreamReleaseScheduleType
 ) => {
   let wrapperBg
   let centerBorder
@@ -33,6 +38,7 @@ export const statusStyle = (
       centerBorder = tw`border-[#F1E4FE]`
       bg = tw`bg-[#A855F7]`
       break
+    case StreamReleaseScheduleType.ACTIVE:
     case JobInstanceStatusType.RUNNING:
       wrapperBg = tw`bg-[#F0F9FF]`
       centerBorder = tw`border-[#E0EBFE]`
@@ -43,6 +49,7 @@ export const statusStyle = (
       centerBorder = tw`border-[#FFE278]`
       bg = tw`bg-[#FFD127]`
       break
+    case StreamReleaseScheduleType.SUSPENDED:
     case JobInstanceStatusType.FAILED:
       wrapperBg = tw`bg-[#F6DBDA]`
       centerBorder = tw`border-[#E0A9A8]`
@@ -53,27 +60,16 @@ export const statusStyle = (
       centerBorder = tw`border-[#FDEFD8]`
       bg = tw`bg-[#F97316]`
       break
-    case JobInstanceStatusType.FINISHED:
-      wrapperBg = tw`bg-[#DEE7F1]`
-      centerBorder = tw`border-[#B7C8D8]`
-      bg = tw`bg-neut-8`
-      break
+    case StreamReleaseScheduleType.FINISHED:
     case JobInstanceStatusType.SUCCEEDED:
       wrapperBg = tw`bg-[#C6F4E4]`
       centerBorder = tw`border-[#47CB9F]`
       bg = tw`bg-green-11`
       break
 
+    case JobInstanceStatusType.FINISHED:
     case DataReleaseSchedule.RUNNING:
-      wrapperBg = tw`bg-[#DEE7F1]`
-      centerBorder = tw`border-[#B7C8D8]`
-      bg = tw`bg-neut-8`
-      break
     case DataReleaseSchedule.FINISHED:
-      wrapperBg = tw`bg-[#DEE7F1]`
-      centerBorder = tw`border-[#B7C8D8]`
-      bg = tw`bg-neut-8`
-      break
     case DataReleaseSchedule.DOWNED:
       wrapperBg = tw`bg-[#DEE7F1]`
       centerBorder = tw`border-[#B7C8D8]`
@@ -121,36 +117,59 @@ export const StatusCmp = ({
   )
 }
 
-export const JobInstanceStatusCmp = (props: {
-  type: keyof typeof jobInstanceStatus
-  className?: string
-}) => {
-  const { type, className } = props
-  return (
-    <StatusCmp
-      label={jobInstanceStatus[type]?.label}
-      type={jobInstanceStatus[type]?.type}
-      className={className}
-    />
-  )
-}
-
-export const DataReleaseStatusCmp = (props: {
-  type?: keyof typeof dataReleaseScheduleType
-  className?: string
-}) => {
-  const { type, className } = props
-  if (type === undefined || dataReleaseScheduleType[type] === undefined) {
-    return null
+const getStatusCmp =
+  <T extends Record<string | number, any>>(types: T) =>
+  (props: { type: keyof T; className?: string }) => {
+    const { type, className } = props
+    if (type === undefined || types[type] === undefined) {
+      return null
+    }
+    return (
+      <StatusCmp
+        label={types[type].label}
+        type={types[type]?.type}
+        className={className}
+      />
+    )
   }
-  return (
-    <StatusCmp
-      label={dataReleaseScheduleType[type].label}
-      type={dataReleaseScheduleType[type]?.type}
-      className={className}
-    />
-  )
-}
+
+export const JobInstanceStatusCmp = getStatusCmp(jobInstanceStatus)
+export const DataReleaseStatusCmp = getStatusCmp(dataReleaseScheduleType)
+export const StreamReleaseStatusCmp = getStatusCmp(streamReleaseScheduleTypes)
+
+//
+// export const JobInstanceStatusCmp = (props: {
+//   type: keyof typeof jobInstanceStatus
+//   className?: string
+// }) => {
+//   const { type, className } = props
+//   return (
+//     <StatusCmp
+//       label={jobInstanceStatus[type]?.label}
+//       type={jobInstanceStatus[type]?.type}
+//       className={className}
+//     />
+//   )
+// }
+//
+//
+//
+// export const DataReleaseStatusCmp = (props: {
+//   type?: keyof typeof dataReleaseScheduleType
+//   className?: string
+// }) => {
+//   const { type, className } = props
+//   if (type === undefined || dataReleaseScheduleType[type] === undefined) {
+//     return null
+//   }
+//   return (
+//     <StatusCmp
+//       label={dataReleaseScheduleType[type].label}
+//       type={dataReleaseScheduleType[type]?.type}
+//       className={className}
+//     />
+//   )
+// }
 
 export const AlarmStatusCmp = (props: {
   type?: keyof typeof alarmStatus

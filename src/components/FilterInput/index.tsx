@@ -1,7 +1,7 @@
 import { Table } from '@QCFE/lego-ui'
 import { useEffect, useRef, useState } from 'react'
 import { emitter } from 'utils'
-import { isEqual, pick } from 'lodash-es'
+import { isEqual, isNil, pick } from 'lodash-es'
 
 const { FilterInput: FilterInputCmp } = Table as any
 
@@ -73,6 +73,7 @@ export const FilterInput = (props: IFilterInput) => {
     if (filterLinkKey) {
       emitter.on(`${filterLinkKey}-set`, (data) => {
         if (
+          Object.keys(tempRef.current).length &&
           isEqual(pick(data, Object.keys(tempRef.current)), tempRef.current)
         ) {
           return
@@ -81,7 +82,7 @@ export const FilterInput = (props: IFilterInput) => {
         const newTags: ISuggestionTag[] = []
 
         rest.suggestions.forEach((i: ISuggestion) => {
-          if (data[i.key]) {
+          if (!isNil(data[i.key])) {
             newTags.push({
               filter: i.key,
               filterLabel: i.label,
@@ -101,6 +102,7 @@ export const FilterInput = (props: IFilterInput) => {
     }
     return () => {}
   }, [
+    rest,
     filterLinkKey,
     rest.defaultKeywordLabel,
     rest.suggestions,
