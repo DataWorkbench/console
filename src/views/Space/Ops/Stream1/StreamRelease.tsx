@@ -7,7 +7,7 @@ import {
   streamReleaseTabs,
 } from 'views/Space/Ops/Stream1/common/constants'
 import { FlexBox } from 'components/Box'
-import { PageTab, ToolBar, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon, PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
 import {
   alarmStatus,
@@ -15,8 +15,8 @@ import {
 } from 'views/Space/Ops/DataIntegration/constants'
 import { Table } from 'views/Space/styled'
 import { get, isNil, omitBy } from 'lodash-es'
-import React from 'react'
-import { useIsFetching } from 'react-query'
+import React, { useCallback } from 'react'
+import { useIsFetching, useQueryClient } from 'react-query'
 import { MappingKey } from 'utils/types'
 import { streamReleaseFieldMapping } from 'views/Space/Ops/Stream1/common/mappings'
 import dayjs from 'dayjs'
@@ -27,7 +27,7 @@ import {
   AlarmStatusCmp,
   StreamReleaseStatusCmp,
 } from 'views/Space/Ops/styledComponents'
-import { useQueryReleaseJobs } from 'hooks'
+import { getReleaseJobsKey, useQueryReleaseJobs } from 'hooks'
 import { css } from 'twin.macro'
 
 const { ColumnsSetting } = ToolBar as any
@@ -51,7 +51,7 @@ const StreamRelease = () => {
   >({}, { pagination: true, sort: true }, streamReleaseSettingKey)
   console.log(filter, setFilter)
 
-  const jumpDetail = (tab: string) => (record: Record<string, any>) => {
+  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     window.open(
       `./release/${record.id}?version=${record[getName('versionId')]}${
         tab ? `&tab=${tab}` : ''
@@ -150,19 +150,18 @@ const StreamRelease = () => {
     operations
   )
 
-  // const queryClient = useQueryClient()
-  // const mutation = useMutationReleaseJobs()
+  // const mutation = useMutationUdfReleaseJobs()
 
   const isFetching = useIsFetching()
   const { data } = useQueryReleaseJobs(omitBy(filter, isNil))
 
   const infos = get(data, 'infos', []) || []
   //
-  // const refetchData = useCallback(() => {
-  //   queryClient.invalidateQueries(getReleaseJobsKey())
-  // }, [queryClient])
 
-  console.log(111, infos)
+  const queryClient = useQueryClient()
+  const refetchData = useCallback(() => {
+    queryClient.invalidateQueries(getReleaseJobsKey())
+  }, [queryClient])
 
   return (
     <FlexBox orient="column" tw="p-5 h-full">
@@ -182,7 +181,7 @@ const StreamRelease = () => {
           <Button
             type="black"
             onClick={() => {
-              // refetchData()
+              refetchData()
             }}
             loading={!!isFetching}
             tw="px-[5px] border-line-dark!"
