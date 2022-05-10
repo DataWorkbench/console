@@ -4,8 +4,10 @@ import {
   getDescribeSyncJobVersion,
   getSyncJobVersionConf,
   getSyncJobVersionSchedule,
-  listSyncJobVersions,
-} from 'stores/api/syncJobVersion'
+  streamJobVersionManage,
+  syncJobVersionManage,
+} from 'stores/api'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 interface IRouteParams {
   regionId: string
@@ -24,7 +26,8 @@ export const getJobVersionKey = (key: keyof typeof queryKey = 'list') =>
 
 export const useQuerySyncJobVersions = (
   filter: Record<string, any>,
-  { enabled = true }: Record<string, any> = { enable: true }
+  { enabled = true }: Record<string, any> = { enable: true },
+  type: JobMode = JobMode.DI
 ) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
@@ -32,10 +35,22 @@ export const useQuerySyncJobVersions = (
     spaceId,
     ...filter,
   }
-  queryKey.list = ['jobVersion', params]
+  queryKey.list = [`jobVersion`, { ...params, type }]
+  let action: any = async () => ({})
+  switch (type) {
+    case JobMode.DI:
+      action = syncJobVersionManage.listSyncJobVersions
+      break
+    case JobMode.RT:
+      action = streamJobVersionManage.listStreamJobVersions
+      break
+    case JobMode.OLE:
+    default:
+      break
+  }
   return useQuery(
     queryKey.list,
-    async ({ pageParam = params }) => listSyncJobVersions(pageParam),
+    async ({ pageParam = params }) => action(pageParam),
     {
       enabled,
       getNextPageParam: (lastPage, allPages) => {

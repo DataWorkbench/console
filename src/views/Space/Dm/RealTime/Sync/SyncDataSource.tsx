@@ -172,7 +172,6 @@ const SyncDataSource = observer(
       workFlowStore: { curJob: curJobStore },
     } = useStore()
     const curJob = curJobProp ?? curJobStore
-    console.log(111, curJob)
     const [visible, setVisible] = useState<boolean | null>(null)
     const [showSourceAdvance, setShowSourceAdvance] = useState(false)
     const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)

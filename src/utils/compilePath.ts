@@ -1,7 +1,15 @@
 import { get, isNil, omit } from 'lodash-es'
 
 /**
- * compilePath('abc/{x}/1', {x: '123', y: true }) // ['abc/123/1', { y: true }]
+ * 下划线转驼峰
+ * @param name
+ */
+export function toHump(name: string): string {
+  return name.replace(/-(\w)/g, (all, letter) => letter.toUpperCase())
+}
+
+/**
+ * compilePath('abc/{x_abc_d}/1', {x_abc_d: '123', y: true }) // ['abc/123/1', { y: true }]
  *
  * @param path
  * @param params
@@ -25,7 +33,6 @@ function compilePath(
     } else if (path[i] === '}') {
       end = i
       const item = path.slice(start, end)
-      console.log(item)
       if (!isNil(get(params, item))) {
         re = re.replace(`{${item}}`, get(params, item))
         keys.push(item)

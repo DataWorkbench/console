@@ -1,6 +1,8 @@
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
+import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import ScheSettingModal from '../Modal/ScheSettingModal'
 import ScheArgsModal from '../Modal/ScheArgsModal'
 import VersionsModal from '../Modal/VersionsModal'
@@ -18,8 +20,9 @@ const MenuRoot = styled('div')(() => [
 const StreamRightMenu = observer(() => {
   const {
     workFlowStore,
-    workFlowStore: { curJob, showScheSetting, showArgsSetting, showVersions },
+    workFlowStore: { curJob, showScheSetting, showArgsSetting },
   } = useStore()
+  const drStore = useDataReleaseStore()
   return (
     <>
       <MenuRoot>
@@ -32,7 +35,13 @@ const StreamRightMenu = observer(() => {
         <span onClick={() => workFlowStore.set({ showScheSetting: true })}>
           调 度 设 置
         </span>
-        <span onClick={() => workFlowStore.set({ showVersions: true })}>
+        <span
+          onClick={() =>
+            drStore.set({
+              showVersion: true,
+            })
+          }
+        >
           历 史 版 本
         </span>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">历 史 版 本</span> */}
@@ -52,13 +61,7 @@ const StreamRightMenu = observer(() => {
           }}
         />
       )}
-      {showVersions && (
-        <VersionsModal
-          onCancel={() => {
-            workFlowStore.set({ showVersions: false })
-          }}
-        />
-      )}
+      <VersionsModal jobId={curJob?.id!} type={JobMode[curJob?.jobMode!]} />
     </>
   )
 })
