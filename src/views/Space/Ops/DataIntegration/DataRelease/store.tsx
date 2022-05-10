@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useRef } from 'react'
 import { makeAutoObservable, set } from 'mobx'
 
 export class DataReleaseStore {
@@ -7,6 +7,10 @@ export class DataReleaseStore {
   showDataSource: boolean = false
 
   showOffline: boolean = false
+
+  showResume: boolean = false
+
+  showSuspend: boolean = false
 
   selectedData?: Record<string, any> = undefined
 
@@ -44,5 +48,14 @@ export const DataReleaseContext = createContext<DataReleaseStore>(
   {} as DataReleaseStore
 )
 export const useDataReleaseStore = () => useContext(DataReleaseContext)
+
+export const DataReleaseStoreProvider: React.FC = ({ children }) => {
+  const store = useRef(new DataReleaseStore())
+  return (
+    <DataReleaseContext.Provider value={store.current}>
+      {children}
+    </DataReleaseContext.Provider>
+  )
+}
 
 export default DataReleaseStore

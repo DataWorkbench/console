@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import React from 'react'
 import { pick } from 'lodash-es'
 import { IColumn } from 'hooks/useHooks/useColumns'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import {
   alarmStatus,
   dataReleaseActions,
@@ -49,14 +50,14 @@ export const getColumnsRender = (
         return <DataReleaseStatusCmp type={status} />
       },
     },
-    alarm_status: {
+    alert_status: {
       onFilter: (v: string) => {
         setFilter((draft) => {
           draft.alarm_status = v
           draft.offset = 0
         })
       },
-      filter: filter.alarm_status,
+      filter: filter.alert_status,
       filterAble: true,
       filtersNew: Object.values(alarmStatus) as any,
       render: (text: keyof typeof alarmStatus, record: Record<string, any>) => {
@@ -64,7 +65,7 @@ export const getColumnsRender = (
           <AlarmStatusCmp
             type={text}
             onClick={
-              actions?.alarm_status
+              actions?.alert_status
                 ? () => actions.alarm_status(record)
                 : undefined
             }
@@ -165,21 +166,25 @@ export const getColumnsRender = (
 }
 
 export const getOperations = (
-  handleMenuClick: (selectedData: any, menuKey: DataReleaseActionType) => void
+  handleMenuClick: (selectedData: any, menuKey: DataReleaseActionType) => void,
+  type: JobMode
 ) => {
   const getActions = (record: Record<string, any>) => {
-    let key = ''
+    const emitKey = new Set()
     if (
       dataReleaseScheduleType[record.status as 2]?.type ===
       DataReleaseSchedule.DOWNED
     ) {
-      key = 'offline'
+      emitKey.add('offline')
     } else {
-      key = 're-publish'
+      emitKey.add('resume')
+    }
+    if (type === JobMode.DI) {
+      emitKey.add('suspend')
     }
 
     return dataReleaseActions
-      .filter((i) => i.key !== key)
+      .filter((i) => !emitKey.has(i.key))
       .map((i) => ({ ...i, value: record }))
   }
 

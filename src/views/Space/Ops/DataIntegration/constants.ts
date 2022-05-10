@@ -191,6 +191,14 @@ export const dataReleaseSuggestions: ISuggestion[] = [
     })),
   },
   {
+    label: '告警状态',
+    key: 'alert_status',
+    options: Object.values(alarmStatus).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
     label: '开发模式',
     key: 'job_mode',
     options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
@@ -246,8 +254,8 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '告警状态',
-    dataIndex: 'alarm_status',
-    key: 'alarm_status',
+    dataIndex: 'alert_status',
+    key: 'alert_status',
     width: 100,
   },
   {
@@ -286,7 +294,7 @@ export const dataReleaseColumns: IColumn[] = [
 const versionSet = new Set([
   'id',
   'status',
-  'alarm_status',
+  'alert_status',
   'version',
   'updated',
 ])
@@ -329,9 +337,18 @@ export const dataReleaseActions = [
   {
     icon: 'q-upload2Fill',
     text: '重新发布',
-    key: 're-publish',
+    key: 'resume',
+  },
+  {
+    icon: 'if-stop',
+    text: '暂停',
+    key: 'suspend',
   },
 ] as const
+
+// suspend 暂停 xxx
+// offline 下线
+// resume 重新发布
 
 export const dataReleaseDetailActions = [
   {

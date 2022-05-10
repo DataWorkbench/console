@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
-import { Icon, PageTab } from '@QCFE/qingcloud-portal-ui'
-import React, { useMemo, useRef } from 'react'
+import { PageTab } from '@QCFE/qingcloud-portal-ui'
+import React, { useMemo } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
@@ -10,20 +10,14 @@ import {
   Center,
   FlexBox,
   InstanceName,
-  Modal,
   SelectTreeTable,
   TextEllipsis,
   Tooltip,
 } from 'components'
-import { Checkbox } from '@QCFE/lego-ui'
-import {
-  getJobReleaseKey,
-  useMutationJobRelease,
-  useQuerySyncJobRelease,
-} from 'hooks/useJobRelease'
-import { useQueryClient } from 'react-query'
+import { getJobReleaseKey, useQuerySyncJobRelease } from 'hooks/useJobRelease'
 import { listSyncJobVersions } from 'stores/api/syncJobVersion'
 import { useParams } from 'react-router-dom'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
@@ -33,7 +27,7 @@ import {
 } from '../constants'
 import { getColumnsRender, getOperations } from './utils'
 import { useDataReleaseStore } from './store'
-import VersionsModal from './VersionsModal'
+import { VersionsModalContainer } from './VersionsModal'
 import TableHeader from './TableHeader'
 
 import DataSourceModal from './DataSourceModal'
@@ -64,28 +58,10 @@ const jobNameStyle = css`
   }
 `
 
-const ModalWrapper = styled(Modal)(() => [
-  css`
-    .modal-card-head {
-      border-bottom: 0;
-    }
-
-    .modal-card-body {
-      padding-top: 0;
-    }
-
-    .modal-card-foot {
-      border-top: 0;
-      ${tw`pb-4!`}
-    }
-  `,
-])
-
 const dataReleaseSettingKey = 'DATA_RELEASE_SETTING'
 
 const DataRelease = observer(() => {
-  const { showDataSource, showVersion, showOffline, selectedData, set } =
-    useDataReleaseStore()
+  const { showDataSource, selectedData, set } = useDataReleaseStore()
   const { filter, setFilter, pagination, sort } = useFilter<
     {
       source?: string
@@ -108,8 +84,6 @@ const DataRelease = observer(() => {
     dataReleaseSettingKey
   )
 
-  const mutation = useMutationJobRelease()
-
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     window.open(
       `./data-release/${record.id}?version=${record.version}${
@@ -118,8 +92,6 @@ const DataRelease = observer(() => {
       '_blank'
     )
   }
-
-  const checkRef = useRef(false)
 
   const handleDatasource = (record: Record<string, any>) => {
     if (
@@ -139,11 +111,6 @@ const DataRelease = observer(() => {
     target: handleDatasource,
   })
 
-  const queryClient = useQueryClient()
-  const refetchData = () => {
-    queryClient.invalidateQueries(getJobReleaseKey())
-  }
-
   const handleMenuClick = (
     record: Record<string, any>,
     key: DataReleaseActionType
@@ -162,23 +129,24 @@ const DataRelease = observer(() => {
           selectedData: record,
         })
         break
-      case 're-publish':
-        mutation
-          .mutateAsync({
-            op: 'release',
-            jobId: record.id,
-          })
-          .then(() => {
-            refetchData()
-          })
-
+      case 'resume':
+        set({
+          showResume: true,
+          selectedData: record,
+        })
+        break
+      case 'suspend':
+        set({
+          showSuspend: true,
+          selectedData: record,
+        })
         break
       default:
         break
     }
   }
 
-  const operations = getOperations(handleMenuClick)
+  const operations = getOperations(handleMenuClick, JobMode.DI)
 
   const jobNameColumn = {
     ...dataReleaseColumns[0],
@@ -319,15 +287,11 @@ const DataRelease = observer(() => {
           />
         </FlexBox>
       </FlexBox>
-      {showVersion && (
-        <VersionsModal
-          onCancel={() => {
-            set({
-              showVersion: false,
-            })
-          }}
-        />
-      )}
+      <VersionsModalContainer
+        type={JobMode.DI}
+        jobId={selectedData?.id}
+        refetchDataKey={getJobReleaseKey()}
+      />
       {showDataSource && (
         <DataSourceModal
           onCancel={() => {
@@ -336,67 +300,6 @@ const DataRelease = observer(() => {
             })
           }}
         />
-      )}
-      {showOffline && (
-        <ModalWrapper
-          visible
-          width={400}
-          appendToBody
-          onCancel={() => {
-            set({
-              showOffline: false,
-            })
-            checkRef.current = false
-          }}
-          okText="下线"
-          okType="danger"
-          onOk={() => {
-            Promise.all([
-              mutation.mutateAsync({
-                op: 'offline',
-                jobId: selectedData?.id,
-                stop_running: checkRef.current,
-              }),
-              // mutation.mutateAsync({
-              //   op: checkRef.current ? 'suspend' : '',
-              //   jobId: selectedData?.id,
-              // }),
-            ]).then(() => {
-              set({
-                showOffline: false,
-              })
-              checkRef.current = false
-              refetchData()
-            })
-          }}
-        >
-          <div>
-            <FlexBox tw="gap-3">
-              <Icon
-                name="if-exclamation"
-                size={24}
-                tw="text-[24px] text-[#FFD127] leading-6"
-              />
-              <div tw="grid gap-2">
-                <div tw="text-white text-[16px] leading-6">
-                  下线作业 {selectedData?.name}
-                </div>
-                <div tw="text-neut-8 leading-5">
-                  作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?
-                </div>
-                <div tw="leading-5">
-                  <Checkbox
-                    onChange={(e, checked) => {
-                      checkRef.current = checked
-                    }}
-                  >
-                    <span tw="text-white ml-1">同时停止运行中的实例</span>
-                  </Checkbox>
-                </div>
-              </div>
-            </FlexBox>
-          </div>
-        </ModalWrapper>
       )}
     </>
   )
