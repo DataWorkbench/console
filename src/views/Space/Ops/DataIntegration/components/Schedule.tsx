@@ -73,7 +73,6 @@ const schedulePolicy = {
 }
 
 const Schedule = ({ data }: { data: Record<string, any> }) => {
-  console.log(data)
   return (
     <div tw="w-full">
       <Context>
