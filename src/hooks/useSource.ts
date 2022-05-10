@@ -13,6 +13,7 @@ import {
   updateDataSource,
   describeDataSourceTables,
   describeDataSourceTableSchema,
+  dataSourceManage,
 } from 'stores/api'
 import { get } from 'lodash-es'
 import { getIsFormalEnv } from 'utils/index'
@@ -191,4 +192,17 @@ export const useMutationSource = () => {
     }
     return ret
   })
+}
+
+export const useDescribeDataSource = (sourceId: string) => {
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const params = {
+    space_id: spaceId,
+    regionId,
+    source_id: sourceId,
+  }
+
+  const key: any = ['datasourceDetail', params]
+  return useQuery(key, async () => dataSourceManage.describeDataSource(params))
 }

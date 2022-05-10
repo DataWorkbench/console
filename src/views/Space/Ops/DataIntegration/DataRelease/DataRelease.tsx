@@ -2,7 +2,7 @@ import DataReleaseDetail from 'views/Space/Ops/DataIntegration/DataRelease/DataR
 import qs from 'qs'
 import { useHistory, useLocation } from 'react-router-dom'
 import emitter from 'utils/emitter'
-import { AlertStore, AlertContext } from '../../Alert/AlertStore'
+import { AlertStoreProvider } from '../../Alert/AlertStore'
 import { DataReleaseContext, DataReleaseStore } from './store'
 
 const DataRelease = (props: Record<string, any>) => {
@@ -21,9 +21,9 @@ const DataRelease = (props: Record<string, any>) => {
   }
   return (
     <DataReleaseContext.Provider value={new DataReleaseStore()}>
-      <AlertContext.Provider value={new AlertStore()}>
+      <AlertStoreProvider>
         <DataReleaseDetail id={id} version={version as string} />
-      </AlertContext.Provider>
+      </AlertStoreProvider>
     </DataReleaseContext.Provider>
   )
 }

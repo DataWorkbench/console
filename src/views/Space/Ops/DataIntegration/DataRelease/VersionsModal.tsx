@@ -1,88 +1,122 @@
-import { FlexBox, Modal, ModalContent, TextEllipsis, Tooltip } from 'components'
+import {
+  FlexBox,
+  Modal,
+  ModalContent,
+  TextEllipsis,
+  Tooltip,
+  TableHeader,
+} from 'components'
 import { observer } from 'mobx-react-lite'
 import useFilter from 'hooks/useHooks/useFilter'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
+  dataReleaseSuggestions,
   versionColumns,
 } from 'views/Space/Ops/DataIntegration/constants'
-import React, { useMemo } from 'react'
-import { useColumns } from 'hooks/useHooks/useColumns'
+import React, { useMemo, useRef } from 'react'
+import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
 import { Table } from 'views/Space/styled'
-import TableHeader from 'views/Space/Ops/DataIntegration/DataRelease/TableHeader'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
-import { useQuerySyncJobVersions } from 'hooks/useJobVersion'
+import compilePath from 'utils/compilePath'
+
+import { useParams } from 'react-router-dom'
+import { Checkbox, Icon } from '@QCFE/lego-ui'
+import tw, { css, styled } from 'twin.macro'
+import {
+  useMutationJobRelease,
+  getJobVersionKey,
+  useQuerySyncJobVersions,
+  getJobReleaseKey,
+} from 'hooks'
+import { useQueryClient } from 'react-query'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { getColumnsRender, getOperations } from './utils'
 
 interface IProps {
   onCancel: () => void
+  type: JobMode
+  jumpDetail: (tab?: string) => (record: Record<string, any>) => void
+  jobId: string
+  operations?: IColumn
 }
 
-const dataReleaseVersionSettingKey = 'DATA_RELEASE_VERSION_SETTING'
+export const getPathConfig = (type: JobMode) => {
+  switch (type) {
+    case JobMode.RT:
+      return {
+        type: 'release',
+      }
+    case JobMode.OLE:
+      return {
+        type: 'ole-release',
+      }
+    case JobMode.DI:
+      return {
+        type: 'data-release',
+      }
+    default:
+      return {}
+  }
+}
 
-const VersionsModal = observer((props: IProps) => {
-  const { set, selectedData } = useDataReleaseStore()
-  const { onCancel } = props
+const ModalWrapper = styled(Modal)(() => [
+  css`
+    .modal-card-head {
+      border-bottom: 0;
+    }
+
+    .modal-card-body {
+      padding-top: 0;
+    }
+
+    .modal-card-foot {
+      border-top: 0;
+      ${tw`pb-4!`}
+    }
+  `,
+])
+
+export const getJumpDetail = (config: Record<string, any>, tab?: string) => {
+  window.open(
+    compilePath(
+      `/dataomnis/{regionId}/workspace/{spaceId}/ops/{type}/{id}?version={version}${
+        tab ? `&tab=${tab}` : ''
+      }`,
+      config
+    )[0],
+    '_blank'
+  )
+}
+
+const VersionsModal = (props: IProps) => {
+  const { onCancel, type, jobId, jumpDetail, operations } = props
+
+  const dataReleaseVersionSettingKey = `DATA_RELEASE_VERSION_SETTING_${type}`
   const { filter, setFilter, pagination, sort } = useFilter<
     {
       reverse?: 'asc' | 'desc'
       sort_by?: string
-      alarm_status?: string
+      alert_status?: string
       status?: number
       offset: number
       limit: number
-      jobId: string
+      job_id: string
     },
-    { pagination: true; sort: true },
-    dataReleaseVersionSettingKey
+    { pagination: true; sort: true }
   >(
-    { limit: 15, jobId: selectedData?.key },
+    { limit: 15, job_id: jobId },
     { pagination: true, sort: true },
     dataReleaseVersionSettingKey
   )
 
-  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
-    window.open(
-      `./data-release/${record.id}?version=${record.version}${
-        tab ? `&tab=${tab}` : ''
-      }`,
-      '_blank'
-    )
-  }
-
   const columnsRender = getColumnsRender(filter, setFilter, [
-    'alarm_status',
+    'alert_status',
     'status',
     'version',
     'updated',
   ])
 
-  const handleMenuClick = (
-    record: Record<string, any>,
-    key: DataReleaseActionType
-  ) => {
-    switch (key) {
-      case 'link':
-      case 'dev':
-      case 'cluster':
-      case 'alarm':
-      case 'schedule':
-        jumpDetail(key)(record)
-        break
-      case 'offline':
-        set({
-          showOffline: true,
-          selectedData: record,
-        })
-        break
-      case 're-publish':
-        break
-      default:
-        break
-    }
-  }
-
-  const operations = getOperations(handleMenuClick)
   const jobNameColumn = {
     ...dataReleaseColumns[0],
     // width: 250,
@@ -119,9 +153,9 @@ const VersionsModal = observer((props: IProps) => {
       onSave: setColumnSettings as any,
       storageKey: dataReleaseVersionSettingKey,
     }),
-    [setColumnSettings]
+    [dataReleaseVersionSettingKey, setColumnSettings]
   )
-  const { data } = useQuerySyncJobVersions(filter)
+  const { data } = useQuerySyncJobVersions(filter, { enabled: true }, type)
   return (
     <Modal
       width={800}
@@ -134,7 +168,16 @@ const VersionsModal = observer((props: IProps) => {
     >
       <ModalContent>
         <FlexBox orient="column" tw="gap-3">
-          <TableHeader columnsSetting={columnsSetting} />
+          <TableHeader
+            columnsSetting={columnsSetting}
+            queryKey={() => getJobVersionKey('list')}
+            suggestions={dataReleaseSuggestions.filter((i) =>
+              ['alert_status', 'status'].includes(i.key as string)
+            )}
+            filterInputConfig={{
+              defaultKeywordLabel: '作业名称',
+            }}
+          />
           <Table
             columns={columns}
             dataSource={data?.infos || []}
@@ -149,5 +192,192 @@ const VersionsModal = observer((props: IProps) => {
       </ModalContent>
     </Modal>
   )
-})
-export default VersionsModal
+}
+
+const getHelp = (
+  title: string,
+  type: false | 'offline' | 'resume' | 'suspend'
+) => {
+  switch (type) {
+    case 'offline':
+      return {
+        icon: 'if-exclamation',
+        title: `下线作业 ${title}?`,
+        desc: '作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?',
+        button: '下线',
+        showKey: 'showOffline',
+        buttonType: 'danger',
+      }
+    case 'resume':
+      return {
+        icon: 'if-information',
+        title: `重新发布调度作业 ${title}?`,
+        desc: `确认重新发布调度作业 ${title}`,
+        button: '重新发布',
+        showKey: 'showResume',
+        buttonType: 'primary',
+      }
+    case 'suspend':
+      return {
+        icon: 'if-information',
+        title: `暂停调度作业 ${title}?`,
+        desc: '暂停后，相关实例需要手动恢复执行，确认暂停么?',
+        button: '暂停',
+        showKey: 'showSuspend',
+        buttonType: 'danger',
+      }
+    default:
+      return undefined
+  }
+}
+
+export const VersionsModalContainer = observer(
+  ({
+    type = JobMode.DI,
+    refetchDataKey: refetchDataProp,
+    jobId,
+  }: {
+    type: JobMode
+    refetchDataKey?: string
+    jobId: string
+  }) => {
+    const {
+      set,
+      selectedData,
+      showVersion,
+      showOffline,
+      showResume,
+      showSuspend,
+    } = useDataReleaseStore()
+    const onCancel = () => {
+      set({
+        showVersion: false,
+      })
+    }
+
+    const { regionId, spaceId } =
+      useParams<{ regionId: string; spaceId: string }>()
+
+    const detail = { ...getPathConfig(type), regionId, spaceId }
+
+    const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+      getJumpDetail({ ...record, ...detail }, tab)
+    }
+    const handleMenuClick = (
+      record: Record<string, any>,
+      key: DataReleaseActionType
+    ) => {
+      switch (key) {
+        case 'link':
+        case 'dev':
+        case 'cluster':
+        case 'alarm':
+        case 'schedule':
+          jumpDetail(key)(record)
+          break
+        case 'offline':
+          set({
+            showOffline: true,
+            selectedData: record,
+          })
+          break
+        case 'resume':
+          set({
+            showResume: true,
+            selectedData: record,
+          })
+          break
+        case 'suspend':
+          set({
+            showSuspend: true,
+            selectedData: record,
+          })
+          break
+        default:
+          break
+      }
+    }
+
+    const operations = getOperations(handleMenuClick, type)
+    const queryClient = useQueryClient()
+    const checkRef = useRef(false)
+
+    const mutation = useMutationJobRelease()
+    const op =
+      (showOffline && 'offline') ||
+      (showResume && 'resume') ||
+      (showSuspend && 'suspend')
+    const help = getHelp(selectedData?.name, op)
+    const refetchData = () => {
+      queryClient.invalidateQueries(refetchDataProp ?? getJobReleaseKey())
+    }
+    return (
+      <>
+        {showVersion && (
+          <VersionsModal
+            onCancel={onCancel}
+            type={type}
+            jumpDetail={jumpDetail}
+            jobId={jobId}
+            operations={operations}
+          />
+        )}
+        {op && (
+          <ModalWrapper
+            visible
+            width={400}
+            appendToBody
+            onCancel={() => {
+              set({
+                [help!.showKey]: false,
+              })
+              checkRef.current = false
+            }}
+            okText={help!.button}
+            okType={help!.buttonType}
+            onOk={() => {
+              mutation
+                .mutateAsync({
+                  op,
+                  jobId: selectedData?.id,
+                  stop_running: checkRef.current,
+                })
+                .then(() => {
+                  set({
+                    [help!.showKey]: false,
+                  })
+                  checkRef.current = false
+                  refetchData()
+                })
+            }}
+          >
+            <div>
+              <FlexBox tw="gap-3">
+                <Icon
+                  name={help!.icon}
+                  size={24}
+                  tw="text-[24px] text-[#FFD127] leading-6"
+                />
+                <div tw="grid gap-2">
+                  <div tw="text-white text-[16px] leading-6">{help!.title}</div>
+                  <div tw="text-neut-8 leading-5">{help!.desc}</div>
+                  <div tw="leading-5">
+                    <Checkbox
+                      onChange={(e, checked) => {
+                        checkRef.current = checked
+                      }}
+                    >
+                      <span tw="text-white ml-1">同时停止运行中的实例</span>
+                    </Checkbox>
+                  </div>
+                </div>
+              </FlexBox>
+            </div>
+          </ModalWrapper>
+        )}
+      </>
+    )
+  }
+)
+
+export default VersionsModalContainer

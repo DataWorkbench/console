@@ -1,4 +1,10 @@
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import {
+  PropsWithChildren,
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import tw, { TwStyle } from 'twin.macro'
 import { Tooltip } from '../Tooltip'
 
@@ -6,9 +12,11 @@ export const TextEllipsis = ({
   children: text,
   twStyle,
   theme = 'darker',
+  content,
 }: PropsWithChildren<{
   twStyle?: TwStyle
   theme?: 'dark' | 'light' | 'darker'
+  content?: ReactElement
 }>) => {
   const ref = useRef<HTMLDivElement>(null)
   const boxRef = useRef<HTMLDivElement>(null)
@@ -39,7 +47,7 @@ export const TextEllipsis = ({
   )
   return isOver ? (
     <Tooltip
-      content={text}
+      content={content ?? text}
       theme={theme}
       twChild={tw`block overflow-hidden`}
       hasPadding

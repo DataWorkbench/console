@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Modal } from '@QCFE/qingcloud-portal-ui'
-import tw from 'twin.macro'
+import { Alert, Modal } from '@QCFE/qingcloud-portal-ui'
 import { noop } from 'lodash-es'
+import { HelpCenterLink } from 'components/Link'
 import DataSourceList from './DataSourceList'
 
 interface DataSourceSelectModalProps {
@@ -20,22 +20,44 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
   useEffect(() => {
     setVisible(show)
   }, [show])
-
   return (
-    <Modal
-      title={title}
-      visible={visible !== null}
-      draggable
-      width={1200}
-      appendToBody
-      css={!visible && tw`hidden!`}
-      onCancel={onCancel}
-      onOk={() => {
-        onOk(source)
-      }}
-    >
-      <DataSourceList selectMode sourceType={sourceType} onCheck={setSource} />
-    </Modal>
+    <>
+      {visible && (
+        <Modal
+          title={title}
+          visible
+          draggable
+          width={1200}
+          appendToBody
+          onCancel={onCancel}
+          onOk={() => {
+            onOk(source)
+          }}
+        >
+          <Alert
+            type="info"
+            message={
+              <div>
+                <span>
+                  请选择运行当前作业的来源端数据源，请注意保证网络连通性，具体可参考：
+                </span>
+                <HelpCenterLink
+                  isIframe={false}
+                  href="/manual/data_up_cloud/connect/"
+                >
+                  网络连通文档
+                </HelpCenterLink>
+              </div>
+            }
+          />
+          <DataSourceList
+            selectMode
+            sourceType={sourceType}
+            onCheck={setSource}
+          />
+        </Modal>
+      )}
+    </>
   )
 }
 

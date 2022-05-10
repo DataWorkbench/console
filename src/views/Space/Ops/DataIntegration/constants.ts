@@ -150,8 +150,8 @@ export enum DataReleaseDevMode {
 }
 
 export const dataReleaseDevModeType = {
-  '0': { label: '向导模式', value: '0', type: DataReleaseDevMode.UI },
-  '1': { label: '脚本模式', value: '1', type: DataReleaseDevMode.SCRIPT },
+  1: { label: '向导模式', value: 1, type: DataReleaseDevMode.UI },
+  2: { label: '脚本模式', value: 2, type: DataReleaseDevMode.SCRIPT },
 } as const
 
 export const sourceTypes = {
@@ -176,7 +176,7 @@ export const sourceTypes = {
 export const dataReleaseSuggestions: ISuggestion[] = [
   {
     label: '作业名称',
-    key: 'name',
+    key: 'search',
   },
   {
     label: '作业 ID',
@@ -186,6 +186,14 @@ export const dataReleaseSuggestions: ISuggestion[] = [
     label: '调度状态',
     key: 'status',
     options: Object.values(dataReleaseScheduleType).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
+    label: '告警状态',
+    key: 'alert_status',
+    options: Object.values(alarmStatus).map(({ label, value }) => ({
       label,
       key: value,
     })),
@@ -242,11 +250,13 @@ export const dataReleaseColumns: IColumn[] = [
     title: '调度状态',
     dataIndex: 'status',
     key: 'status',
+    width: 120,
   },
   {
     title: '告警状态',
-    dataIndex: 'alarm_status',
-    key: 'alarm_status',
+    dataIndex: 'alert_status',
+    key: 'alert_status',
+    width: 100,
   },
   {
     title: '版本 ID',
@@ -284,7 +294,7 @@ export const dataReleaseColumns: IColumn[] = [
 const versionSet = new Set([
   'id',
   'status',
-  'alarm_status',
+  'alert_status',
   'version',
   'updated',
 ])
@@ -327,9 +337,18 @@ export const dataReleaseActions = [
   {
     icon: 'q-upload2Fill',
     text: '重新发布',
-    key: 're-publish',
+    key: 'resume',
+  },
+  {
+    icon: 'if-stop',
+    text: '暂停',
+    key: 'suspend',
   },
 ] as const
+
+// suspend 暂停 xxx
+// offline 下线
+// resume 重新发布
 
 export const dataReleaseDetailActions = [
   {

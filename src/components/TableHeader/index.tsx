@@ -1,45 +1,49 @@
 import { Button, Icon, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { FilterInput, FlexBox } from 'components'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { observer } from 'mobx-react-lite'
 import { useIsFetching, useQueryClient } from 'react-query'
-import { dataReleaseSuggestions } from '../constants'
-import { getJobReleaseKey } from '../../../../../hooks/useJobRelease'
-
-// const { FilterInput } = Table as any
+import { FilterInput } from '../FilterInput'
+import { FlexBox } from '../Box'
 
 const { ColumnsSetting } = ToolBar as any
 
-interface ITableHeaderProps {
+export interface ITableHeaderProps {
   columnsSetting: {
     columns: IColumn[]
     storageKey: string
     onSave: (s: Record<string, any>[]) => void
   }
+  filterLinkKey?: string
+  queryKey: () => string
+  suggestions: Record<string, any>[]
+  filterInputConfig?: Record<string, any>
 }
 
-const TableHeader = observer((props: ITableHeaderProps) => {
+export const TableHeader = observer((props: ITableHeaderProps) => {
   const {
     columnsSetting: { storageKey, onSave, columns },
+    filterLinkKey,
+    queryKey,
+    suggestions,
   } = props
 
-  const queryClient = useQueryClient()
   const isFetching = useIsFetching()
+  const queryClient = useQueryClient()
 
   const refetchData = () => {
-    queryClient.invalidateQueries(getJobReleaseKey())
+    queryClient.invalidateQueries(queryKey())
   }
 
   return (
-    <FlexBox tw=" gap-2">
+    <FlexBox tw="gap-2">
       <FilterInput
-        filterLinkKey={storageKey}
-        suggestions={dataReleaseSuggestions}
+        filterLinkKey={filterLinkKey ?? storageKey}
+        suggestions={suggestions}
         tw="border-line-dark!"
         searchKey="search"
         placeholder="搜索关键字或输入过滤条件"
         // isMultiKeyword
-        defaultKeywordLabel="作业名称"
+        {...props.filterInputConfig}
       />
 
       <Button
@@ -60,5 +64,3 @@ const TableHeader = observer((props: ITableHeaderProps) => {
     </FlexBox>
   )
 })
-
-export default TableHeader

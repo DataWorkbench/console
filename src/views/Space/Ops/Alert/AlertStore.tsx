@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useRef } from 'react'
 import { makeAutoObservable, set } from 'mobx'
 
 export class AlertStore {
@@ -31,5 +31,18 @@ export class AlertStore {
 
 export const AlertContext = createContext<AlertStore>({} as AlertStore)
 export const useAlertStore = () => useContext(AlertContext)
+
+export const AlertStoreProvider = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
+  const store = useRef(new AlertStore())
+  return (
+    <AlertContext.Provider value={store.current}>
+      {children}
+    </AlertContext.Provider>
+  )
+}
 
 export default AlertStore

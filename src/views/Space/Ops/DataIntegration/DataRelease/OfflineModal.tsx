@@ -69,7 +69,6 @@ const OfflineModal = observer(({ refetch }: { refetch?: Function }) => {
               })
               checkRef.current = false
               if (refetch) {
-                console.log(11111)
                 refetch()
               } else {
                 refetchData()

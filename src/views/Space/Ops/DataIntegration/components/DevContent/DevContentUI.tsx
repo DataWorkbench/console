@@ -5,7 +5,7 @@ import { AffixLabel, FieldMappings } from 'components'
 import { findKey, get } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { dataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import SyncDataSource from 'views/Space/Dm/RealTime/Sync/SyncDataSource'
 import { nanoid } from 'nanoid'
@@ -76,11 +76,6 @@ interface IProps {
 const DevContentUI = (props: IProps) => {
   const { data: confData = {}, curJob = {} } = props
   const { channel_control: channel } = confData
-
-  const dbDataRef = useRef({
-    source: {},
-    target: {},
-  })
 
   const [db, setDb] = useImmer<{
     source: Record<string, any>
@@ -171,9 +166,6 @@ const DevContentUI = (props: IProps) => {
                       })
                     }}
                     conf={confData}
-                    onChangeDb={(dbData) => {
-                      dbDataRef.current = dbData
-                    }}
                   />
                 </div>
                 <div tw="absolute inset-0 z-50" />
@@ -193,7 +185,7 @@ const DevContentUI = (props: IProps) => {
                 <Grid>
                   <div>
                     <AffixLabel
-                      theme="light"
+                      theme="green"
                       required={false}
                       help="作业期望最大并行数"
                     >
@@ -202,24 +194,30 @@ const DevContentUI = (props: IProps) => {
                   </div>
                   <div>{channel.parallelism || ''}</div>
                   <div>
-                    <AffixLabel
-                      theme="light"
-                      required={false}
-                      help="作业期望最大并行数"
-                    >
+                    <AffixLabel theme="green" required={false} help="同步速率">
                       同步速率
                     </AffixLabel>
                   </div>
                   <div>{{ 1: '限流', 2: '不限流' }[channel.rate as 1]}</div>
-                  <div>
-                    <AffixLabel theme="light" required={false} help="同步速率">
-                      错误记录数超过
-                    </AffixLabel>
-                  </div>
-                  <div>
-                    {channel.record_num ?? ''} 条或 {channel.percentage ?? ''}
-                    比例，达到任一条件时，任务自动结束
-                  </div>
+                  {channel.rat === 1 && (
+                    <>
+                      <div>
+                        <AffixLabel
+                          theme="light"
+                          required={false}
+                          help="错误记录数超过"
+                        >
+                          错误记录数超过
+                        </AffixLabel>
+                      </div>
+
+                      <div>
+                        {channel.record_num ?? ''} 条或{' '}
+                        {channel.percentage ?? ''}
+                        %比例，达到任一条件时，任务自动结束
+                      </div>
+                    </>
+                  )}
                 </Grid>
               </div>
             )}

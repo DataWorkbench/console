@@ -14,6 +14,7 @@ import {
   useQuerySyncJobConf,
   useStore,
 } from 'hooks'
+import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -33,6 +34,9 @@ const CollapseWrapper = styled('div')(() => [
       .collapse-item-content {
         ${tw`bg-neut-17`}
       }
+    }
+    li:last-child {
+      ${tw`mb-1`}
     }
   `,
 ])
@@ -101,7 +105,7 @@ const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
   const { workFlowStore } = useStore()
-  const { data: confData } = useQuerySyncJobConf()
+  const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
 
   const {
     workFlowStore: { curJob },
@@ -298,6 +302,7 @@ const SyncJob = () => {
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
+        confRefetch()
         Notify.success({
           title: '操作提示',
           content: '配置保存成功',
@@ -313,6 +318,10 @@ const SyncJob = () => {
       setShowRelaseModal(true)
     }
   }
+
+  const columns = useMemo<[any, any]>(() => {
+    return [sourceColumn, targetColumn]
+  }, [sourceColumn, targetColumn])
 
   const renderGuideMode = () => {
     return (
@@ -361,7 +370,7 @@ const SyncJob = () => {
                   rightFields={db.target.fields || []}
                   leftTypeName={sourceTypeName}
                   // rightTypeName={targetTypeName}
-                  columns={[sourceColumn, targetColumn]}
+                  columns={columns}
                   topHelp={
                     <HelpCenterLink href="/xxx" isIframe={false}>
                       字段映射说明文档
@@ -469,16 +478,26 @@ const SyncJob = () => {
         <Button
           type="primary"
           onClick={release}
-          disabled={get(confData, 'source_id') === ''}
+          disabled={!enableRelease}
+          // disabled={get(confData, 'source_id') === '' && enableRelease}
         >
           <Icon name="export" />
           发布
         </Button>
       </JobToolBar>
-      {mode === 1 ? renderGuideMode() : renderScriptMode()}
+      <div tw="flex-1 overflow-hidden">
+        <SimpleBar tw="h-full">
+          {mode === 1 ? renderGuideMode() : renderScriptMode()}
+        </SimpleBar>
+      </div>
       {showRelaseModal && (
         <ReleaseModal
-          // onSuccess={handleReleaseSuccess}
+          onSuccess={() => {
+            setShowRelaseModal(false)
+            workFlowStore.set({
+              showNotify: true,
+            })
+          }}
           onCancel={() => setShowRelaseModal(false)}
         />
       )}
