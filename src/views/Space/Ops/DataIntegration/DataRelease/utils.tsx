@@ -7,6 +7,10 @@ import { pick } from 'lodash-es'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import {
+  StreamReleaseScheduleType,
+  streamReleaseScheduleTypes,
+} from 'views/Space/Ops/Stream1/common/constants'
+import {
   alarmStatus,
   dataReleaseActions,
   DataReleaseActionType,
@@ -167,20 +171,35 @@ export const getColumnsRender = (
 
 export const getOperations = (
   handleMenuClick: (selectedData: any, menuKey: DataReleaseActionType) => void,
-  type: JobMode
+  type: JobMode,
+  isVersion?: boolean
 ) => {
   const getActions = (record: Record<string, any>) => {
     const emitKey = new Set()
-    if (
-      dataReleaseScheduleType[record.status as 2]?.type ===
-      DataReleaseSchedule.DOWNED
-    ) {
-      emitKey.add('offline')
-    } else {
+    if (isVersion || record.__level > 1) {
+      // TODO: 历史版本没有调度信息 是否有下线操作???
+      emitKey.add('suspend')
       emitKey.add('resume')
     }
     if (type === JobMode.DI) {
       emitKey.add('suspend')
+      if (
+        dataReleaseScheduleType[record.status as 2]?.type ===
+        DataReleaseSchedule.DOWNED
+      ) {
+        emitKey.add('offline')
+      } else {
+        emitKey.add('online')
+      }
+    } else if (JobMode.RT === type) {
+      if (
+        streamReleaseScheduleTypes[record.status as 2]?.type ===
+        StreamReleaseScheduleType.SUSPENDED
+      ) {
+        emitKey.add('suspend')
+      } else {
+        emitKey.add('resume')
+      }
     }
 
     return dataReleaseActions

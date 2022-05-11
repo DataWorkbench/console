@@ -2,9 +2,9 @@ import {
   FlexBox,
   Modal,
   ModalContent,
+  TableHeader,
   TextEllipsis,
   Tooltip,
-  TableHeader,
 } from 'components'
 import { observer } from 'mobx-react-lite'
 import useFilter from 'hooks/useHooks/useFilter'
@@ -24,13 +24,14 @@ import { useParams } from 'react-router-dom'
 import { Checkbox, Icon } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
 import {
-  useMutationJobRelease,
-  getJobVersionKey,
-  useQuerySyncJobVersions,
   getJobReleaseKey,
+  getJobVersionKey,
+  useMutationJobRelease,
+  useQuerySyncJobVersions,
 } from 'hooks'
 import { useQueryClient } from 'react-query'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { streamReleaseScheduleTypes } from 'views/Space/Ops/Stream1/common/constants'
 import { getColumnsRender, getOperations } from './utils'
 
 interface IProps {
@@ -95,7 +96,7 @@ const VersionsModal = (props: IProps) => {
   const dataReleaseVersionSettingKey = `DATA_RELEASE_VERSION_SETTING_${type}`
   const { filter, setFilter, pagination, sort } = useFilter<
     {
-      reverse?: 'asc' | 'desc'
+      reverse?: boolean
       sort_by?: string
       alert_status?: string
       status?: number
@@ -105,7 +106,7 @@ const VersionsModal = (props: IProps) => {
     },
     { pagination: true; sort: true }
   >(
-    { limit: 15, job_id: jobId },
+    { limit: 15, job_id: jobId, reverse: true, sort_by: 'updated' },
     { pagination: true, sort: true },
     dataReleaseVersionSettingKey
   )
@@ -144,7 +145,30 @@ const VersionsModal = (props: IProps) => {
   const { columns, setColumnSettings } = useColumns(
     dataReleaseVersionSettingKey,
     [jobNameColumn, ...versionColumns.slice(1)],
-    columnsRender,
+    {
+      ...columnsRender,
+      // TODO: fix it 根据type判断
+      // eslint-disable-next-line no-nested-ternary
+      status: (type === JobMode.DI
+        ? columnsRender.status
+        : type === JobMode.RT
+        ? {
+            filter: filter.status,
+            onFilter: (v: number) => {
+              setFilter((draft) => {
+                draft.status = v
+                draft.offset = 0
+              })
+            },
+            filterAble: true,
+            filtersNew: Object.values(streamReleaseScheduleTypes) as any,
+            render: () => null,
+            // render: (status: keyof typeof streamReleaseScheduleTypes) => {
+            //   return <StreamReleaseStatusCmp type={status} />
+            // },
+          }
+        : undefined) as any,
+    },
     operations
   )
   const columnsSetting = useMemo(
@@ -298,11 +322,11 @@ export const VersionsModalContainer = observer(
       }
     }
 
-    const operations = getOperations(handleMenuClick, type)
+    const operations = getOperations(handleMenuClick, type, true)
     const queryClient = useQueryClient()
     const checkRef = useRef(false)
 
-    const mutation = useMutationJobRelease()
+    const mutation = useMutationJobRelease(undefined, type)
     const op =
       (showOffline && 'offline') ||
       (showResume && 'resume') ||
@@ -339,7 +363,7 @@ export const VersionsModalContainer = observer(
               mutation
                 .mutateAsync({
                   op,
-                  jobId: selectedData?.id,
+                  job_id: selectedData?.id,
                   stop_running: checkRef.current,
                 })
                 .then(() => {

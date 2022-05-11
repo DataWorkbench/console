@@ -340,7 +340,7 @@ export const dataReleaseActions = [
     key: 'resume',
   },
   {
-    icon: 'if-stop',
+    icon: 'stop',
     text: '暂停',
     key: 'suspend',
   },
