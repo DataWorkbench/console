@@ -11,6 +11,7 @@ import StreamInstance from 'views/Space/Ops/Stream1/StreamInstance'
 import useIcon from 'hooks/useHooks/useIcon'
 import StreamReleaseDetail from 'views/Space/Ops/Stream1/StreamReleaseDetail'
 import StreamInstanceDetail from 'views/Space/Ops/Stream1/StreamInstanceDetail'
+import { DataReleaseStoreProvider } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import { Sider } from '../Sider'
 import icons from './icons'
 // import Release from './Stream/Release'
@@ -24,7 +25,11 @@ export const Ops = () => {
       <Sider funcMod="ops" />
       <div tw="flex-1 overflow-y-auto">
         {/* {(mod === 'overview' || !mod) && <OverView />} */}
-        {((mod === 'release' && !detail) || !mod) && <StreamRelease />}
+        {((mod === 'release' && !detail) || !mod) && (
+          <DataReleaseStoreProvider>
+            <StreamRelease />
+          </DataReleaseStoreProvider>
+        )}
         {mod === 'release' && detail && <StreamReleaseDetail id={detail} />}
         {mod === 'job' && !detail && <StreamInstance />}
         {mod === 'job' && detail && <StreamInstanceDetail id={detail} />}

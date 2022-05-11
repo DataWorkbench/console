@@ -36,7 +36,7 @@ export const streamReleaseTabs: ITab[] = [
     title: '流式计算-已发布作业',
     description:
       '具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定。',
-    icon: 'q-bellLightningDuotone',
+    icon: 'q-eventDuotone',
     helpLink: '###',
   },
 ]
@@ -45,7 +45,7 @@ export const streamInstanceTabs: ITab[] = [
   {
     title: '流式计算-作业实例',
     description: '流式计算-作业实例',
-    icon: 'q-eventDuoton',
+    icon: 'q-eventDuotone',
     helpLink: '###',
   },
 ]
@@ -70,16 +70,19 @@ export const streamDevModeType = {
     label: 'SQL 模式',
     value: 1,
     type: StreamDevMode.SQL,
+    icon: 'sql',
   },
   2: {
     label: '代码开发-Jar 模式',
     value: 2,
     type: StreamDevMode.JAR,
+    icon: 'q-javaFill',
   },
   3: {
     label: '代码开发-python 模式',
     value: 3,
     type: StreamDevMode.PYTHON,
+    icon: 'q-pythonFill',
   },
 }
 
