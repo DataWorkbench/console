@@ -7,15 +7,15 @@ import DataReleaseDetail from 'views/Space/Ops/DataIntegration/DataRelease/DataR
 import AlertHistory from 'views/Space/Ops/Alert/AlertHistory'
 import AlertPolicy from 'views/Space/Ops/Alert/AlertPolicy'
 import StreamRelease from 'views/Space/Ops/Stream1/StreamRelease'
-import StreamInstance from 'views/Space/Ops/Stream1/StreamInstance'
+// import StreamInstance from 'views/Space/Ops/Stream1/StreamInstance'
 import useIcon from 'hooks/useHooks/useIcon'
 import StreamReleaseDetail from 'views/Space/Ops/Stream1/StreamReleaseDetail'
-import StreamInstanceDetail from 'views/Space/Ops/Stream1/StreamInstanceDetail'
+// import StreamInstanceDetail from 'views/Space/Ops/Stream1/StreamInstanceDetail'
 import { DataReleaseStoreProvider } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import { Sider } from '../Sider'
 import icons from './icons'
 // import Release from './Stream/Release'
-// import Job from './Stream/Job'
+import Job from './Stream/Job'
 
 export const Ops = () => {
   useIcon(icons)
@@ -31,8 +31,9 @@ export const Ops = () => {
           </DataReleaseStoreProvider>
         )}
         {mod === 'release' && detail && <StreamReleaseDetail id={detail} />}
-        {mod === 'job' && !detail && <StreamInstance />}
-        {mod === 'job' && detail && <StreamInstanceDetail id={detail} />}
+        {mod === 'job' && <Job />}
+        {/* {mod === 'job' && !detail && <StreamInstance />} */}
+        {/* {mod === 'job' && detail && <StreamInstanceDetail id={detail} />} */}
         {mod === 'data-release' && detail && <DataReleaseDetail id={detail} />}
         {mod === 'data-release' && !detail && <DataRelease />}
         {mod === 'data-job' && detail && <DataJobInstanceDetail id={detail!} />}
