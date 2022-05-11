@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button, InputSearch, Select } from '@QCFE/lego-ui'
-import { Center, FlexBox } from 'components'
+import { Center, FlexBox } from 'components/index'
 import useFilter from 'hooks/useHooks/useFilter'
 import {
   dataJobInstanceColumns,
@@ -11,17 +11,18 @@ import React from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
 import JobInstanceTable from 'views/Space/Ops/DataIntegration/JobInstance/JobInstanceTable'
 import { getSyncJobInstanceKey } from 'hooks/useSyncJobInstance'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 
 const LinkInstance = ({
   jobId,
   version,
-  type,
+  type = JobMode.DI,
 }: {
   jobId: string
   version: string
-  type?: 'stream' | 'sync'
+  type?: JobMode
 }) => {
   const { filter, setFilter } = useFilter<
     {

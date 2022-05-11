@@ -10,9 +10,9 @@ import {
   JobInstanceStatusCmp,
 } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
-import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
-import Cluster from 'views/Space/Ops/DataIntegration/components/Cluster'
-import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
+import DevContent from 'views/Space/Ops/components/DevContent'
+import Cluster from 'views/Space/Ops/components/Cluster'
+import Schedule from 'views/Space/Ops/components/Schedule'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
 import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
 import React, { useState } from 'react'
@@ -24,7 +24,7 @@ import { HorizonTabs } from 'views/Space/Dm/styled'
 import { CopyText } from '@QCFE/qingcloud-portal-ui'
 import { AlertContext, AlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import { TextLink } from 'components/Link'
-import { useQueryStreamJobVersionDetail } from 'hooks'
+import { useQueryStreamInstanceDetail } from 'hooks'
 
 const { TabPanel } = Tabs as any
 
@@ -92,9 +92,7 @@ const CopyTextWrapper = styled(CopyText)`
 `
 
 const StreamInstanceDetail = ({ id }: { id: string }) => {
-  const { data, isFetching } = useQueryStreamJobVersionDetail<
-    Record<string, any>
-  >({ id })
+  const { data, isFetching } = useQueryStreamInstanceDetail(id)
 
   const history = useHistory()
   const { search } = useLocation()
@@ -122,12 +120,12 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
             tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
             onClick={() => toList()}
             css={css`
-            &:hover {
-              ${tw`bg-white cursor-pointer`}
-            .icon svg.qicon {
-              ${tw`text-neut-15!`}
-            }
-          `}
+              &:hover {
+                ${tw`bg-white cursor-pointer`}
+                .icon svg.qicon {
+                  ${tw`text-neut-15!`}
+                }
+            `}
           >
             <Icon
               name="previous"

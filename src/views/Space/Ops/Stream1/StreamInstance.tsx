@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import { useColumns } from 'hooks/useHooks/useColumns'
 import {
   dataReleaseScheduleType,
@@ -8,20 +9,45 @@ import {
   streamReleaseColumns,
 } from 'views/Space/Ops/Stream1/common/constants'
 import { FlexBox } from 'components/Box'
-import { PageTab, ToolBar, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon, PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
-import { alarmStatus } from 'views/Space/Ops/DataIntegration/constants'
+import {
+  alarmStatus,
+  jobInstanceStatus,
+  JobInstanceStatusType,
+} from 'views/Space/Ops/DataIntegration/constants'
 import { Table } from 'views/Space/styled'
-import { get } from 'lodash-es'
-import React from 'react'
-import { useIsFetching } from 'react-query'
+import { get, isNil } from 'lodash-es'
+import React, { useCallback } from 'react'
+import { useIsFetching, useQueryClient } from 'react-query'
 import { MappingKey } from 'utils/types'
 import { streamInstanceFieldMapping } from 'views/Space/Ops/Stream1/common/mappings'
 import dayjs from 'dayjs'
 import useFilter from 'hooks/useHooks/useFilter'
-import { FilterInput } from 'components'
+import {
+  FilterInput,
+  IMoreActionItem,
+  MoreAction,
+  TextEllipsis,
+  TextLink,
+  Tooltip,
+} from 'components'
+import {
+  AlarmStatusCmp,
+  Divider,
+  JobInstanceStatusCmp,
+} from 'views/Space/Ops/styledComponents'
+import tw, { css } from 'twin.macro'
+import { useParams } from 'react-router-dom'
+import { describeFlinkUiByInstanceId } from 'stores/api'
+import { getReleaseJobsKey, useQueryJobInstances } from 'hooks'
 
 const { ColumnsSetting } = ToolBar as any
+
+interface IRouteParams {
+  regionId: string
+  spaceId: string
+}
 
 const getName = (name: MappingKey<typeof streamInstanceFieldMapping>) =>
   streamInstanceFieldMapping.get(name)!.apiField
@@ -30,7 +56,7 @@ const streamInstanceSettingKey = 'STREAM_INSTANCE_SETTING'
 
 const StreamInstance = () => {
   const {
-    // filter,
+    filter,
     // setFilter,
     pagination,
     sort,
@@ -48,22 +74,72 @@ const StreamInstance = () => {
     },
     [getName('status')]: {
       ...getFilter(getName('status'), dataReleaseScheduleType),
-      render: (text: string) => {
-        return <span tw="text-neut-8">{text}</span>
+      render: (text: number) => {
+        return <JobInstanceStatusCmp type={text as any} />
       },
     },
     [getName('alarmStatus')]: {
       ...getFilter(getName('alarmStatus'), alarmStatus),
-      render: (text: string) => {
-        return <span tw="text-neut-8">{text}</span>
+      render: (type: number) => {
+        return <AlarmStatusCmp type={type as any} />
       },
     },
     [getName('job')]: {
-      // TODO: render
+      render: (v: string, record: Record<string, any>) => {
+        const child = (
+          <div
+            tw="truncate"
+            css={css`
+              &:hover {
+                .pit-job-name-text {
+                  ${tw`text-green-11`}
+                }
+              }
+            `}
+          >
+            <div tw="truncate">
+              <TextEllipsis theme="light">
+                <span tw="text-white" className="pit-job-name-text">
+                  {record.job_name}
+                </span>
+                <span tw="text-neut-8"> {`(${record.job_id})`}</span>
+              </TextEllipsis>
+            </div>
+            <div tw="truncate">
+              <TextEllipsis theme="light">
+                <span tw="text-neut-8">{`版本 ID： ${record.version}`}</span>
+              </TextEllipsis>
+            </div>
+          </div>
+        )
+        // TODO: desc 字段未定
+        if (record.desc) {
+          return (
+            <Tooltip
+              theme="light"
+              hasPadding
+              content={`发布描述: ${record.desc}`}
+            >
+              {child}
+            </Tooltip>
+          )
+        }
+        return child
+      },
     },
     [getName('devMode')]: {
       ...getFilter(getName('devMode'), streamDevModeType),
-      // TODO: render
+      render: (type?: keyof typeof streamDevModeType) =>
+        !isNil(type) && (
+          <span
+            tw="border px-1.5 text-white border-white rounded-sm"
+            css={css`
+              transform: scale(0.8);
+            `}
+          >
+            {streamDevModeType[type]?.label}
+          </span>
+        ),
     },
     [getName('createTime')]: {
       render: (d: number) => {
@@ -88,7 +164,109 @@ const StreamInstance = () => {
       },
     },
   }
-  const operations = {}
+
+  const queryClient = useQueryClient()
+  const refetchData = useCallback(() => {
+    queryClient.invalidateQueries(getReleaseJobsKey())
+  }, [queryClient])
+
+  const getActions = (
+    status: JobInstanceStatusType,
+    record: Record<string, any>
+  ): IMoreActionItem[] => {
+    const stopAble =
+      JobInstanceStatusType.RUNNING |
+      JobInstanceStatusType.FAILED_AND_RETRY |
+      JobInstanceStatusType.PREPARING
+    const result = []
+    if (status & stopAble) {
+      result.push({
+        text: '中止',
+        icon: 'q-closeCircleFill',
+        key: 'stop',
+        value: record,
+      })
+    }
+    result.push({
+      text: '查看详情',
+      icon: 'eye',
+      key: 'info',
+      value: record,
+    })
+    return result
+  }
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    window.open(`./job/${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
+  }
+
+  const handleMenuClick = (
+    record: Record<string, any>,
+    key: 'stop' | 'info'
+  ) => {
+    switch (key) {
+      case 'stop':
+        // mutation
+        //   .mutateAsync({
+        //     op: 'terminate',
+        //     ids: [record.id],
+        //   })
+        //   .then(() => {
+        //     refetchData()
+        //   })
+        break
+      case 'info':
+        jumpDetail()(record)
+        break
+      default:
+        break
+    }
+  }
+  const operations = {
+    title: '操作',
+    key: 'operation',
+    render: (_: never, record: Record<string, any>) => {
+      return (
+        <FlexBox tw="gap-4">
+          <TextLink
+            disabled={
+              jobInstanceStatus[record.state as 1]?.type ===
+              JobInstanceStatusType.PREPARING
+            }
+            onClick={() => {
+              if (
+                jobInstanceStatus[record.state as 1]?.type ===
+                JobInstanceStatusType.PREPARING
+              ) {
+                return
+              }
+              describeFlinkUiByInstanceId({
+                instanceId: record.id,
+                regionId,
+                spaceId,
+              }).then((web_ui: string) => {
+                if (web_ui) {
+                  window.open(web_ui, '_blank')
+                }
+              })
+            }}
+          >
+            Flink UI
+          </TextLink>
+          <Divider />
+          <MoreAction
+            theme="darker"
+            items={getActions(
+              jobInstanceStatus[record.state as 1]?.type,
+              record
+            )}
+            onMenuClick={handleMenuClick as any}
+          />
+        </FlexBox>
+      )
+    },
+  }
 
   const { columns, setColumnSettings } = useColumns(
     streamInstanceSettingKey,
@@ -97,14 +275,9 @@ const StreamInstance = () => {
     operations
   )
 
-  // const queryClient = useQueryClient()
   const isFetching = useIsFetching()
 
-  // const refetchData = () => {
-  // queryClient.invalidateQueries(getJobReleaseKey())
-  // }
-
-  const { data } = { data: { infos: [] } }
+  const { data } = useQueryJobInstances(filter)
   const infos = get(data, 'infos', [])
 
   return (
@@ -125,7 +298,7 @@ const StreamInstance = () => {
           <Button
             type="black"
             onClick={() => {
-              // refetchData()
+              refetchData()
             }}
             loading={!!isFetching}
             tw="px-[5px] border-line-dark!"

@@ -27,10 +27,10 @@ export const streamInstanceFieldMapping: Mapping<
   | 'createTime'
   | 'updateTime'
 > = new Map()
-  .set('instanceId', { label: '实例 ID', apiField: 'instanceId' })
-  .set('status', { label: '状态', apiField: 'status' })
+  .set('instanceId', { label: '实例 ID', apiField: 'id' })
+  .set('status', { label: '状态', apiField: 'state' })
   .set('alarmStatus', { label: '告警状态', apiField: 'alarmStatus' })
-  .set('job', { label: '所属作业', apiField: 'job' })
+  .set('job', { label: '所属作业', apiField: 'job_id' })
   .set('devMode', { label: '开发模式', apiField: 'devMode' })
-  .set('createTime', { label: '创建时间', apiField: 'createTime' })
-  .set('updateTime', { label: '更新时间', apiField: 'updateTime' })
+  .set('createTime', { label: '创建时间', apiField: 'created' })
+  .set('updateTime', { label: '更新时间', apiField: 'updated' })

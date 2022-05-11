@@ -7,6 +7,7 @@ import {
   terminateSyncInstances,
 } from 'stores/api'
 import { isNull, omitBy } from 'lodash-es'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 interface IRouteParams {
   regionId: string
@@ -24,8 +25,22 @@ export const getSyncJobInstanceKey = (key: keyof typeof queryKey = 'list') =>
 
 export const useQuerySyncJobInstances = (
   filter: any,
-  { enabled = true }: Record<string, any> = { enabled: true }
+  { enabled = true }: Record<string, any> = { enabled: true },
+  type: JobMode = JobMode.DI
 ) => {
+  let typePath = 'sync'
+  switch (type) {
+    case JobMode.RT:
+      typePath = 'stream'
+      break
+    case JobMode.OLE:
+      typePath = '???'
+      break
+    case JobMode.DI:
+    default:
+      break
+  }
+
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = omitBy(
     {
@@ -34,6 +49,7 @@ export const useQuerySyncJobInstances = (
       limit: 10,
       offset: 0,
       ...filter,
+      apiType: typePath,
     },
     isNull
   )

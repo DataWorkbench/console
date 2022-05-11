@@ -36,6 +36,7 @@ import {
   useQuerySyncJobInstances,
 } from 'hooks/useSyncJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -43,6 +44,7 @@ interface IJobInstanceTable {
   defaultColumns: IColumn[]
   settingKey: string
   jumpDetail: (tab?: string) => (record: Record<string, any>) => void
+  type?: JobMode
 }
 
 const instanceNameStyle = css`
@@ -70,6 +72,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     defaultColumns,
     filter: filterProp,
     jumpDetail,
+    type = JobMode.DI,
   } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
@@ -96,7 +99,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     }
   }, [filterProp, setFilter])
 
-  const { data, isFetching } = useQuerySyncJobInstances(filter)
+  const { data, isFetching } = useQuerySyncJobInstances(filter, undefined, type)
 
   const infos = get(data, 'infos', []) || []
 

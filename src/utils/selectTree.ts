@@ -180,7 +180,7 @@ class SelectTreeData {
 
   // 添加节点
   setChildren(nodeKey: string, children: TreeNode[]) {
-    console.log(1111, nodeKey, children)
+    // console.log(1111, nodeKey, children)
     let list = [this.root]
     while (Array.isArray(list) && list.length > 0) {
       const node = list[0]

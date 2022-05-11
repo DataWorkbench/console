@@ -33,7 +33,7 @@ import {
   useDescribeInstanceWithFlinkUIByInstanceId,
   useMutationJobInstance,
 } from 'hooks'
-import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
+import DevContent from 'views/Space/Ops/components/DevContent'
 import {
   AlarmStatusCmp,
   Circle,
@@ -42,8 +42,8 @@ import {
   JobTypeCmp,
 } from '../../styledComponents'
 import AlertModal from '../../Alert/Modal'
-import Schedule from '../components/Schedule'
-import Cluster from '../components/Cluster'
+import Schedule from '../../components/Schedule'
+import Cluster from '../../components/Cluster'
 
 interface IDataJobInstanceDetailProps {
   id: string

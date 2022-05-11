@@ -1,10 +1,17 @@
 /* eslint-disable no-underscore-dangle */
 import { css } from 'twin.macro'
 import { Table } from 'views/Space/styled'
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import SelectTreeData from 'utils/selectTree'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { Checkbox } from '@QCFE/lego-ui'
+import { Checkbox, Loading } from '@QCFE/lego-ui'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { FlexBox } from '../Box'
 
@@ -36,6 +43,10 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
   } = props
 
   const [, fourUpdate] = useReducer((x) => x + 1, 0)
+
+  const [loading, setLoading] = useState(false)
+  const loadingKeySet = useRef<Set<string>>(new Set())
+
   const tableTreeRef = useRef<SelectTreeData>(
     new SelectTreeData({
       key: SelectTreeData.rootKey,
@@ -62,6 +73,8 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
   const handleOpen = useCallback(
     (key: string, record: Record<string, any>) => {
       if (!tableTreeRef.current.keyChildrenMap?.get(key)?.children?.size) {
+        loadingKeySet.current.add(key)
+        setLoading(true)
         getChildren(key, record).then((data: Record<string, any>[]) => {
           tableTreeRef.current.setChildren(
             key,
@@ -71,6 +84,8 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
             })) as any
           )
           tableTreeRef.current.onOpen(key)
+          loadingKeySet.current.delete(key)
+          setLoading(false)
           fourUpdate()
         })
       } else {
@@ -91,7 +106,6 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
 
   const renderFirstTd = useCallback(
     (column) => (text: string, record: Record<string, any>) => {
-      console.log(record)
       let show = true
       if (showItemCheckboxFn) {
         show = showItemCheckboxFn(record)
@@ -104,19 +118,23 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
           `}
         >
           <FlexBox tw="flex-none gap-2 items-center">
-            {record.__level <= openLevel && show && (
-              <Icon
-                name={
-                  tableTreeRef.current.state.openedAll?.has(record[rowKey])
-                    ? 'chevron-up'
-                    : 'chevron-down'
-                }
-                type="light"
-                clickable
-                size={16}
-                onClick={() => handleOpen(record[rowKey], record)}
-              />
-            )}
+            {record.__level <= openLevel &&
+              show &&
+              (loading && loadingKeySet.current.has(record[rowKey]) ? (
+                <Loading size="small" />
+              ) : (
+                <Icon
+                  name={
+                    tableTreeRef.current.state.openedAll?.has(record[rowKey])
+                      ? 'chevron-up'
+                      : 'chevron-down'
+                  }
+                  type="light"
+                  clickable
+                  size={16}
+                  onClick={() => handleOpen(record[rowKey], record)}
+                />
+              ))}
             {record.__level <= selectedLevel && (
               <Checkbox
                 indeterminate={record.__isSelected === 2}
@@ -139,6 +157,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     [
       handleOpen,
       indentSpace,
+      loading,
       openLevel,
       rowKey,
       selectedLevel,

@@ -1,6 +1,6 @@
 import { Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import tw, { styled } from 'twin.macro'
-import { AffixLabel, TextLink, FlexBox } from 'components'
+import { AffixLabel, TextLink, FlexBox } from 'components/index'
 import React from 'react'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'

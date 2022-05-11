@@ -243,7 +243,7 @@ const DataRelease = observer(() => {
           ...i,
           uuid: `${i.id}=-=${i.version}=-=${record.__level + 1}`,
         }))
-      if (arr.length === 11) {
+      if (arr.length >= 11) {
         const value = arr.slice(0, 10).concat({
           key: arr[10].id,
           hasMore: true,
