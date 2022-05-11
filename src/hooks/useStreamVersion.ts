@@ -107,3 +107,19 @@ export const useQuerySteamJobVersionArgs = (filter: Record<string, any>) => {
     streamJobVersionManage.getStreamJobVersionArgs(params)
   )
 }
+
+export const useQuerySteamJobVersionCode = (filter: Record<string, any>) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const params = {
+    regionId,
+    spaceId,
+    job_id: filter.jobId,
+    ver_id: filter.versionId,
+    ...filter,
+  }
+
+  queryKey.conf = ['jobVersionCode', params]
+  return useQuery(queryKey.conf, async () =>
+    streamJobVersionManage.getStreamJobVersionCode(params)
+  )
+}

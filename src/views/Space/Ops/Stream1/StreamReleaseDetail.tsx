@@ -13,7 +13,6 @@ import {
 } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
 import LinkInstance from 'views/Space/Ops/components/LinkInstance'
-import DevContent from 'views/Space/Ops/components/DevContent'
 import Cluster from 'views/Space/Ops/components/Cluster'
 import Schedule from 'views/Space/Ops/components/Schedule'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
@@ -26,6 +25,7 @@ import { AlertStoreProvider } from 'views/Space/Ops/Alert/AlertStore'
 import emitter from 'utils/emitter'
 import {
   useQuerySteamJobVersionArgs,
+  useQuerySteamJobVersionCode,
   useQueryStreamJobVersionDetail,
   useQueryStreamJobVersionSchedule,
 } from 'hooks'
@@ -34,6 +34,7 @@ import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 import { observer } from 'mobx-react-lite'
 import Depends from 'views/Space/Ops/components/Depends'
+import StreamDevContent from '../components/StreamDevContent'
 
 const { TabPanel } = Tabs as any
 
@@ -119,6 +120,13 @@ const StreamReleaseDetail = observer(
       versionId: version,
     })
 
+    const { data: code } = useQuerySteamJobVersionCode({
+      jobId: id,
+      versionId: version,
+    })
+
+    console.log(code)
+
     const history = useHistory()
     const { search } = useLocation()
     const { tab = 'link' } = qs.parse(search.slice(1))
@@ -129,7 +137,7 @@ const StreamReleaseDetail = observer(
 
     const [activeName, setActiveName] = useState(tab)
     const toList = () => {
-      history.push('../data-release')
+      history.push('../release')
     }
 
     return (
@@ -295,14 +303,7 @@ const StreamReleaseDetail = observer(
             {/* <Monitor /> */}
           </TabPanel>
           <TabPanel label="开发内容" name="dev">
-            <DevContent
-              data={
-                {
-                  // TODO: config
-                }
-              }
-              curJob={data}
-            />
+            <StreamDevContent data={code} />
           </TabPanel>
           <TabPanel label="计算集群" name="cluster">
             <Cluster clusterId={args?.cluster_id} />
