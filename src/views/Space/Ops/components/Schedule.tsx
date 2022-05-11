@@ -1,5 +1,5 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox } from 'components'
+import { FlexBox } from 'components/index'
 import tw, { styled } from 'twin.macro'
 import dayjs from 'dayjs'
 

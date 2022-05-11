@@ -1,7 +1,7 @@
 import { RadioButton, RadioGroup } from '@QCFE/lego-ui'
-import Strategies from 'views/Space/Ops/DataIntegration/components/Monitor/Strategies'
+import Strategies from 'views/Space/Ops/components/Monitor/Strategies'
 import { useState } from 'react'
-import MonitorHistory from 'views/Space/Ops/DataIntegration/components/Monitor/MonitorHistory'
+import MonitorHistory from 'views/Space/Ops/components/Monitor/MonitorHistory'
 
 const Monitor = () => {
   const [value, setValue] = useState('0')

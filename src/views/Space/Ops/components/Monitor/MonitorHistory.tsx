@@ -1,5 +1,5 @@
 import { Icon, InputSearch, Button } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox } from 'components'
+import { FlexBox } from 'components/index'
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
 import { Circle } from 'views/Space/Ops/styledComponents'
 import { Table } from 'views/Space/styled'

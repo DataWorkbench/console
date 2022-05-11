@@ -2,7 +2,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import Editor from 'react-monaco-editor'
 import { isUndefined } from 'lodash-es'
 import { useRef, useState } from 'react'
-import { Center, FlexBox, ArrowLine } from 'components'
+import { Center, FlexBox, ArrowLine } from 'components/index'
 
 const defaultCode = `
 `
