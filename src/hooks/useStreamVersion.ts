@@ -63,6 +63,8 @@ export const useQueryStreamJobVersionDetail = <T extends Object>(
   const params = {
     regionId,
     spaceId,
+    job_id: filter.jobId,
+    ver_id: filter.versionId,
     ...filter,
   }
 
@@ -79,6 +81,8 @@ export const useQueryStreamJobVersionSchedule = (
   const params = {
     regionId,
     spaceId,
+    job_id: filter.jobId,
+    ver_id: filter.versionId,
     ...filter,
   }
 
@@ -93,6 +97,8 @@ export const useQuerySteamJobVersionArgs = (filter: Record<string, any>) => {
   const params = {
     regionId,
     spaceId,
+    job_id: filter.jobId,
+    ver_id: filter.versionId,
     ...filter,
   }
 

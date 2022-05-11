@@ -10,9 +10,9 @@ import {
   JobInstanceStatusCmp,
 } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
-import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
-import Cluster from 'views/Space/Ops/DataIntegration/components/Cluster'
-import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
+import DevContent from 'views/Space/Ops/components/DevContent'
+import Cluster from 'views/Space/Ops/components/Cluster'
+import Schedule from 'views/Space/Ops/components/Schedule'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
 import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
 import React, { useState } from 'react'
