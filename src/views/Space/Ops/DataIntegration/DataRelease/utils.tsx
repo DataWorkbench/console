@@ -5,6 +5,11 @@ import dayjs from 'dayjs'
 import React from 'react'
 import { pick } from 'lodash-es'
 import { IColumn } from 'hooks/useHooks/useColumns'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import {
+  StreamReleaseScheduleType,
+  streamReleaseScheduleTypes,
+} from 'views/Space/Ops/Stream1/common/constants'
 import {
   alarmStatus,
   dataReleaseActions,
@@ -20,7 +25,7 @@ import {
   DataReleaseStatusCmp,
   DbTypeCmp,
   JobTypeCmp,
-} from '../styledComponents'
+} from '../../styledComponents'
 
 export const getColumnsRender = (
   filter: Record<string, any>,
@@ -39,32 +44,40 @@ export const getColumnsRender = (
       },
       filterAble: true,
       filtersNew: Object.values(dataReleaseScheduleType) as any,
-      render: (status: keyof typeof dataReleaseScheduleType) => {
+      render: (
+        status: keyof typeof dataReleaseScheduleType,
+        record: Record<string, any>
+      ) => {
+        if (record.__level !== 1) {
+          return null
+        }
         return <DataReleaseStatusCmp type={status} />
       },
     },
-    alarm_status: {
+    alert_status: {
       onFilter: (v: string) => {
         setFilter((draft) => {
           draft.alarm_status = v
           draft.offset = 0
         })
       },
-      filter: filter.alarm_status,
+      filter: filter.alert_status,
       filterAble: true,
       filtersNew: Object.values(alarmStatus) as any,
-      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
-        <AlarmStatusCmp
-          type={text}
-          onClick={
-            actions?.alarm_status
-              ? () => actions.alarm_status(record)
-              : undefined
-          }
-        />
-      ),
+      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => {
+        return (
+          <AlarmStatusCmp
+            type={text}
+            onClick={
+              actions?.alert_status
+                ? () => actions.alarm_status(record)
+                : undefined
+            }
+          />
+        )
+      },
     },
-    dev_mode: {
+    job_mode: {
       onFilter: (v: string) => {
         setFilter((draft) => {
           draft.job_type = v
@@ -87,6 +100,7 @@ export const getColumnsRender = (
           draft.offset = 0
         })
       },
+      filter: filter.type,
       filterAble: true,
       filtersNew: Object.values(jobType) as any,
       render: (text: keyof typeof jobType, record: Record<string, any>) => {
@@ -140,6 +154,7 @@ export const getColumnsRender = (
     },
     updated: {
       sortable: true,
+      sortKey: filter.sort_by,
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
@@ -155,27 +170,47 @@ export const getColumnsRender = (
 }
 
 export const getOperations = (
-  handleMenuClick: (selectedData: any, menuKey: DataReleaseActionType) => void
+  handleMenuClick: (selectedData: any, menuKey: DataReleaseActionType) => void,
+  type: JobMode,
+  isVersion?: boolean
 ) => {
   const getActions = (record: Record<string, any>) => {
-    let key = ''
-    if (
-      dataReleaseScheduleType[record.status as 2]?.type ===
-      DataReleaseSchedule.DOWNED
-    ) {
-      key = 'offline'
-    } else {
-      key = 're-publish'
+    const emitKey = new Set()
+    if (isVersion || record.__level > 1) {
+      // TODO: 历史版本没有调度信息 是否有下线操作???
+      emitKey.add('suspend')
+      emitKey.add('resume')
+    }
+    if (type === JobMode.DI) {
+      emitKey.add('suspend')
+      if (
+        dataReleaseScheduleType[record.status as 2]?.type ===
+        DataReleaseSchedule.DOWNED
+      ) {
+        emitKey.add('offline')
+      } else {
+        emitKey.add('online')
+      }
+    } else if (JobMode.RT === type) {
+      if (
+        streamReleaseScheduleTypes[record.status as 2]?.type ===
+        StreamReleaseScheduleType.SUSPENDED
+      ) {
+        emitKey.add('suspend')
+      } else {
+        emitKey.add('resume')
+      }
     }
 
     return dataReleaseActions
-      .filter((i) => i.key !== key)
+      .filter((i) => !emitKey.has(i.key))
       .map((i) => ({ ...i, value: record }))
   }
 
   return {
     title: '操作',
     key: 'operation',
+    width: 64,
     render: (_: never, record: Record<string, any>) => {
       return (
         <MoreAction<DataReleaseActionType>

@@ -182,4 +182,21 @@ export const useMutationInstance = () => {
   )
 }
 
-export default {}
+let queryStreamInstanceDetailKey: any = ''
+export const getQueryStreamInstanceDetailKey = () =>
+  queryStreamInstanceDetailKey
+export const useQueryStreamInstanceDetail = (id: string) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  const params = {
+    regionId,
+    spaceId,
+    instanceId: id,
+  }
+
+  queryStreamInstanceDetailKey = ['STREAM_INSTANCE_DETAIL', params]
+  return useQuery(
+    ['STREAM_INSTANCE_DETAIL', params],
+    async () => ({} as Record<string, any>)
+  )
+}

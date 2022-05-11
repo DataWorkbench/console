@@ -3,7 +3,7 @@ import { Center } from 'components/Center'
 import { ArrowLine } from 'components/ArrowLine'
 import { FlexBox } from 'components/Box'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { Divider } from 'components'
+import { Divider } from 'components/index'
 import { Collapse } from '@QCFE/lego-ui'
 import { useState } from 'react'
 

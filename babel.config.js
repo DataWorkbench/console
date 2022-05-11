@@ -35,6 +35,9 @@ module.exports = (api) => {
       development: {
         plugins: [['react-refresh/babel']],
       },
+      production: {
+        plugins: [['transform-remove-console', { exclude: ['error', 'warn'] }]],
+      },
     },
   }
 }

@@ -1,6 +1,6 @@
 import { Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import tw, { styled } from 'twin.macro'
-import { AffixLabel, TextLink, FlexBox } from 'components'
+import { AffixLabel, TextLink, FlexBox } from 'components/index'
 import React from 'react'
 import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
@@ -65,7 +65,11 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
   )
 
   if (!clusterId || isFetching) {
-    return <Loading size="large" />
+    return (
+      <div tw="min-h-[300px] w-full">
+        <Loading size="large" />
+      </div>
+    )
   }
 
   return (
@@ -96,14 +100,19 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
             <div>
               {
                 restartStrategy.find(
-                  (i) => i.value === data?.config?.restart_strategy
+                  (i) =>
+                    i.value === data?.config?.restart_strategy?.restart_strategy
                 )?.label
               }
             </div>
             <div>尝试重启次数</div>
-            <div>2</div>
+            <div>{data?.config?.fixed_delay_attempts}</div>
             <div>重启时间间隔</div>
-            <div>30s</div>
+            <div>
+              {data?.config?.failure_rate_delay
+                ? `${data?.config?.failure_rate_delay} s`
+                : ''}
+            </div>
           </Grid>
         </div>
         <div>
@@ -151,29 +160,34 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
             <div>网络配置</div>
             <div>
               <div>
-                <span>{data?.network_info?.name}</span>
-                <span tw="text-neut-8">{`(${data?.network_info?.id})`}</span>
+                <span>{data?.name}</span>
+                <span tw="text-neut-8">{`(${data?.network_id})`}</span>
               </div>
-              <div>
-                <span tw="text-neut-8 mr-1">VPC 网络：</span>
-                <TextLink
-                  style={{ fontWeight: 'bold' }}
-                  href={`/${regionId}/routers/${data?.network_info?.router_id}`}
-                  target="_blank"
-                >
-                  {data?.network_info?.router_id}
-                </TextLink>
-              </div>
-              <div>
-                <span tw="text-neut-8 mr-1">私有网络：</span>
-                <TextLink
-                  style={{ fontWeight: 'bold' }}
-                  href={`/${regionId}/routers/${data?.network_info?.vxnet_id}`}
-                  target="_blank"
-                >
-                  {data?.network_info?.vxnet_id}
-                </TextLink>
-              </div>
+              {data?.network_info && (
+                <>
+                  <div>
+                    <span tw="text-neut-8 mr-1">VPC 网络：</span>
+                    <TextLink
+                      style={{ fontWeight: 'bold' }}
+                      href={`/${regionId}/routers/${data?.network_info?.router_id}`}
+                      target="_blank"
+                    >
+                      {data?.network_info?.router_id}
+                    </TextLink>
+                  </div>
+
+                  <div>
+                    <span tw="text-neut-8 mr-1">私有网络：</span>
+                    <TextLink
+                      style={{ fontWeight: 'bold' }}
+                      href={`/${regionId}/routers/${data?.network_info?.vxnet_id}`}
+                      target="_blank"
+                    >
+                      {data?.network_info?.vxnet_id}
+                    </TextLink>
+                  </div>
+                </>
+              )}
             </div>
           </Grid>
         </div>

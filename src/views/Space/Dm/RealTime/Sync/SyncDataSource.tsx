@@ -30,6 +30,7 @@ import {
   HelpCenterLink,
   SqlGroupField,
   TConditionParameterVal,
+  PopConfirm,
 } from 'components'
 import {
   useStore,
@@ -403,6 +404,12 @@ const SyncDataSource = observer(
               dbInfo.networkId && (
                 <div>网络配置名称（ID：{dbInfo.networkId}）</div>
               )
+            }
+            popConfirm={
+              <PopConfirm
+                type="warning"
+                content="移除数据源会清空所数据源表、条件参数配置、字段映射等所有信息，请确认是否移除？"
+              />
             }
             icon={
               <Icon

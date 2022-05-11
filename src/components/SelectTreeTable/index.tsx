@@ -1,22 +1,33 @@
 /* eslint-disable no-underscore-dangle */
 import { css } from 'twin.macro'
 import { Table } from 'views/Space/styled'
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
 import SelectTreeData from 'utils/selectTree'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { Checkbox } from '@QCFE/lego-ui'
+import { Checkbox, Loading } from '@QCFE/lego-ui'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { FlexBox } from '../Box'
 
 export interface ISelectTreeTableProps {
   columns: IColumn[]
   dataSource: Record<string, any>[]
-  getChildren: (key: string) => PromiseLike<Record<string, any>[]>
+  getChildren: (
+    key: string,
+    record: Record<string, any>
+  ) => PromiseLike<Record<string, any>[]>
   openLevel?: number
   selectedLevel?: number
   indentSpace?: number
   [propName: string]: any
   rowKey?: string
+  showItemCheckboxFn?: (item: Record<string, any>) => boolean
 }
 
 export const SelectTreeTable = (props: ISelectTreeTableProps) => {
@@ -26,11 +37,16 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     rowKey = 'id',
     openLevel = 1000,
     selectedLevel = 1000,
-    indentSpace = 20,
+    indentSpace = 32,
     getChildren = async () => [],
+    showItemCheckboxFn,
   } = props
 
   const [, fourUpdate] = useReducer((x) => x + 1, 0)
+
+  const [loading, setLoading] = useState(false)
+  const loadingKeySet = useRef<Set<string>>(new Set())
+
   const tableTreeRef = useRef<SelectTreeData>(
     new SelectTreeData({
       key: SelectTreeData.rootKey,
@@ -55,9 +71,11 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
   }, [dataSource, rowKey])
 
   const handleOpen = useCallback(
-    (key: string) => {
+    (key: string, record: Record<string, any>) => {
       if (!tableTreeRef.current.keyChildrenMap?.get(key)?.children?.size) {
-        getChildren(key).then((data: Record<string, any>[]) => {
+        loadingKeySet.current.add(key)
+        setLoading(true)
+        getChildren(key, record).then((data: Record<string, any>[]) => {
           tableTreeRef.current.setChildren(
             key,
             data.map((i) => ({
@@ -66,6 +84,8 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
             })) as any
           )
           tableTreeRef.current.onOpen(key)
+          loadingKeySet.current.delete(key)
+          setLoading(false)
           fourUpdate()
         })
       } else {
@@ -86,6 +106,10 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
 
   const renderFirstTd = useCallback(
     (column) => (text: string, record: Record<string, any>) => {
+      let show = true
+      if (showItemCheckboxFn) {
+        show = showItemCheckboxFn(record)
+      }
       return (
         <FlexBox
           tw="flex-auto gap-2"
@@ -94,20 +118,24 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
           `}
         >
           <FlexBox tw="flex-none gap-2 items-center">
-            {record.__level <= openLevel && (
-              <Icon
-                name={
-                  tableTreeRef.current.state.openedAll?.has(record[rowKey])
-                    ? 'chevron-up'
-                    : 'chevron-down'
-                }
-                type="light"
-                clickable
-                size={16}
-                onClick={() => handleOpen(record[rowKey])}
-              />
-            )}
-            {record._level <= selectedLevel && (
+            {record.__level <= openLevel &&
+              show &&
+              (loading && loadingKeySet.current.has(record[rowKey]) ? (
+                <Loading size="small" />
+              ) : (
+                <Icon
+                  name={
+                    tableTreeRef.current.state.openedAll?.has(record[rowKey])
+                      ? 'chevron-up'
+                      : 'chevron-down'
+                  }
+                  type="light"
+                  clickable
+                  size={16}
+                  onClick={() => handleOpen(record[rowKey], record)}
+                />
+              ))}
+            {record.__level <= selectedLevel && (
               <Checkbox
                 indeterminate={record.__isSelected === 2}
                 checked={record.__isSelected === 1 || record.isSelected === 2}
@@ -126,7 +154,15 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
         </FlexBox>
       )
     },
-    [handleOpen, indentSpace, openLevel, rowKey, selectedLevel]
+    [
+      handleOpen,
+      indentSpace,
+      loading,
+      openLevel,
+      rowKey,
+      selectedLevel,
+      showItemCheckboxFn,
+    ]
   )
 
   const columns = useMemo(() => {

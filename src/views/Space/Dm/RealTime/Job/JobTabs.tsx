@@ -60,7 +60,7 @@ const TabWrapper = styled(Tabs)(() => [
       }
     }
     .tab-content {
-      ${tw`flex-1 py-0!`}
+      ${tw`flex-1 py-0! overflow-hidden`}
       .tab-panel {
         ${tw`flex h-full`}
       }
@@ -135,7 +135,7 @@ const JobTabs = observer(() => {
   }
 
   return (
-    <div tw="flex-1 w-full overflow-x-hidden ">
+    <div tw="flex-1 w-full overflow-x-hidden">
       {showNotify && (
         <div tw="relative">
           <div tw="absolute left-0 top-9 w-full pointer-events-none z-10">
@@ -154,7 +154,9 @@ const JobTabs = observer(() => {
                   调度作业发布成功，您可前往
                   <RouterLink
                     color="blue"
-                    to={`/${regionId}/workspace/${spaceId}/ops/release`}
+                    to={`/${regionId}/workspace/${spaceId}/ops/${
+                      curJob?.jobMode === 'DI' ? 'data-' : ''
+                    }release`}
                   >
                     运维中心-已发布作业
                   </RouterLink>{' '}

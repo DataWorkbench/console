@@ -28,4 +28,15 @@ export const getApiJobMode = (jobId: string) => {
   return null
 }
 
-export { request, customRequest, emitter }
+const autoIncrementKey = new Proxy({} as Record<string, any>, {
+  get: (target, p: string) => {
+    if (p in target) {
+      target[p] += 1
+    } else {
+      target[p] = 0
+    }
+    return target[p]
+  },
+})
+
+export { request, customRequest, emitter, autoIncrementKey }

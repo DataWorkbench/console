@@ -38,6 +38,7 @@ const InputWrapper = styled(Control)(
       }
     `,
     focused && tw`border-green-11`,
+    tw`dark:bg-neut-13 dark:border-neut-13`,
   ]
 )
 
@@ -68,11 +69,13 @@ export const Input = forwardRef<IControlRef, IInputProps>((props, ref) => {
   }))
 
   return (
-    <InputWrapper className={className} data-focused={focused}>
-      {prefix && <span tw="flex items-center flex-none ">{prefix}</span>}
-      <LInput {...rest} onBlur={handleBlur} onFocus={handleFocus} ref={ref} />
-      {suffix && <span tw="flex items-center flex-none ">{suffix}</span>}
-    </InputWrapper>
+    <>
+      <InputWrapper className={className} data-focused={focused}>
+        {prefix && <span tw="flex items-center flex-none ">{prefix}</span>}
+        <LInput {...rest} onBlur={handleBlur} onFocus={handleFocus} ref={ref} />
+        {suffix && <span tw="flex items-center flex-none ">{suffix}</span>}
+      </InputWrapper>
+    </>
   )
 })
 

@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import useIcon from 'hooks/useHooks/useIcon'
 import { DataReleaseContext, DataReleaseStore } from './store'
 import DataReleaseTable from './DataReleaseTable'
-import icons from '../icons'
+import icons from '../../icons'
 
 const DataRelease = () => {
   useIcon(icons)

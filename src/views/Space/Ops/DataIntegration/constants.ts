@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { IColumn } from 'hooks/useHooks/useColumns'
-import { getHelpCenterLink } from 'utils/index'
+import { autoIncrementKey, getHelpCenterLink } from 'utils/index'
 import { ISuggestion, ITab } from './interfaces'
 
 export const dataJobReleaseTab: ITab[] = [
@@ -22,13 +22,13 @@ export const dataJobInstanceTab: ITab[] = [
 ]
 
 export enum JobInstanceStatusType {
-  FAILED_AND_RETRY = 2 << 0,
-  RUNNING = 2 << 1,
-  PREPARING = 2 << 2,
-  FAILED = 2 << 3,
-  SUCCEEDED = 2 << 4,
-  TIMEOUT = 2 << 5,
-  FINISHED = 2 << 6,
+  FAILED_AND_RETRY = 2 << autoIncrementKey.statusKey,
+  RUNNING = 2 << autoIncrementKey.statusKey,
+  PREPARING = 2 << autoIncrementKey.statusKey,
+  FAILED = 2 << autoIncrementKey.statusKey,
+  SUCCEEDED = 2 << autoIncrementKey.statusKey,
+  TIMEOUT = 2 << autoIncrementKey.statusKey,
+  FINISHED = 2 << autoIncrementKey.statusKey,
 }
 
 export const jobInstanceStatus = {
@@ -133,13 +133,13 @@ export const dataJobInstanceColumns: IColumn[] = [
 ]
 
 export enum DataReleaseSchedule {
-  RUNNING = 2 << 0,
-  FINISHED = 2 << 1,
-  DOWNED = 2 << 2,
+  RUNNING = 2 << autoIncrementKey.statusKey,
+  FINISHED = 2 << autoIncrementKey.statusKey,
+  DOWNED = 2 << autoIncrementKey.statusKey,
 }
 
 export const dataReleaseScheduleType = {
-  2: { label: '运行中', value: 2, type: DataReleaseSchedule.RUNNING },
+  2: { label: '调度中', value: 2, type: DataReleaseSchedule.RUNNING },
   4: { label: '已完成', value: 4, type: DataReleaseSchedule.FINISHED },
   3: { label: '已下线', value: 3, type: DataReleaseSchedule.DOWNED },
 } as const
@@ -150,8 +150,8 @@ export enum DataReleaseDevMode {
 }
 
 export const dataReleaseDevModeType = {
-  '0': { label: '向导模式', value: '0', type: DataReleaseDevMode.UI },
-  '1': { label: '脚本模式', value: '1', type: DataReleaseDevMode.SCRIPT },
+  1: { label: '向导模式', value: 1, type: DataReleaseDevMode.UI },
+  2: { label: '脚本模式', value: 2, type: DataReleaseDevMode.SCRIPT },
 } as const
 
 export const sourceTypes = {
@@ -176,10 +176,10 @@ export const sourceTypes = {
 export const dataReleaseSuggestions: ISuggestion[] = [
   {
     label: '作业名称',
-    key: 'name',
+    key: 'search',
   },
   {
-    label: 'ID',
+    label: '作业 ID',
     key: 'ID',
   },
   {
@@ -191,9 +191,25 @@ export const dataReleaseSuggestions: ISuggestion[] = [
     })),
   },
   {
+    label: '告警状态',
+    key: 'alert_status',
+    options: Object.values(alarmStatus).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
     label: '开发模式',
-    key: 'dev_mode',
+    key: 'job_mode',
     options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
+      label,
+      key: value,
+    })),
+  },
+  {
+    label: '作业类型',
+    key: 'type',
+    options: Object.values(jobType).map(({ label, value }) => ({
       label,
       key: value,
     })),
@@ -234,11 +250,13 @@ export const dataReleaseColumns: IColumn[] = [
     title: '调度状态',
     dataIndex: 'status',
     key: 'status',
+    width: 120,
   },
   {
     title: '告警状态',
-    dataIndex: 'alarm_status',
-    key: 'alarm_status',
+    dataIndex: 'alert_status',
+    key: 'alert_status',
+    width: 100,
   },
   {
     title: '版本 ID',
@@ -247,8 +265,8 @@ export const dataReleaseColumns: IColumn[] = [
   },
   {
     title: '开发模式',
-    dataIndex: 'dev_mode',
-    key: 'dev_mode',
+    dataIndex: 'job_mode',
+    key: 'job_mode',
   },
   {
     title: '作业类型',
@@ -276,7 +294,7 @@ export const dataReleaseColumns: IColumn[] = [
 const versionSet = new Set([
   'id',
   'status',
-  'alarm_status',
+  'alert_status',
   'version',
   'updated',
 ])
@@ -319,9 +337,18 @@ export const dataReleaseActions = [
   {
     icon: 'q-upload2Fill',
     text: '重新发布',
-    key: 're-publish',
+    key: 'resume',
+  },
+  {
+    icon: 'stop',
+    text: '暂停',
+    key: 'suspend',
   },
 ] as const
+
+// suspend 暂停 xxx
+// offline 下线
+// resume 重新发布
 
 export const dataReleaseDetailActions = [
   {

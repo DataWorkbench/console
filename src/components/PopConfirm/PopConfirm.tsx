@@ -212,7 +212,7 @@ export const PopConfirm = (
             <section tw="flex-1">{content}</section>
           </FlexBox>
           {(showCancel || showOk) && (
-            <div tw="pt-5 text-right">
+            <div tw="pt-1 text-right">
               <>
                 {showCancel && (
                   <Button tw="mr-2 px-4" onClick={handleCancel}>

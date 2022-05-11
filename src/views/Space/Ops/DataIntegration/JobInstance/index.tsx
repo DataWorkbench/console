@@ -5,7 +5,7 @@ import React from 'react'
 import useIcon from 'hooks/useHooks/useIcon'
 import JobInstanceTable from 'views/Space/Ops/DataIntegration/JobInstance/JobInstanceTable'
 import { dataJobInstanceColumns, dataJobInstanceTab } from '../constants'
-import icons from '../icons'
+import icons from '../../icons'
 
 const settingKey = 'DATA_JOB_INSTANCE_TABLE_SETTING'
 

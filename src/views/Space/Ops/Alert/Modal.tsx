@@ -16,7 +16,6 @@ const AlertModal = observer(() => {
     showMonitor,
   } = useAlertStore()
   useIcon(icons)
-  console.log(222233333, showMonitor)
   return (
     <>
       {showMonitor && (

@@ -17,7 +17,6 @@ import {
 import tw, { css } from 'twin.macro'
 import dayjs from 'dayjs'
 import { useQueryClient } from 'react-query'
-import { describeFlinkUiByInstanceId } from 'stores/api'
 import React, { useEffect, useMemo } from 'react'
 import TableHeader from 'views/Space/Ops/DataIntegration/JobInstance/TableHeader'
 import { Table } from 'views/Space/styled'
@@ -35,9 +34,9 @@ import {
   getSyncJobInstanceKey,
   useMutationJobInstance,
   useQuerySyncJobInstances,
-} from 'hooks/useJobInstance'
+} from 'hooks/useSyncJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
-import { useParams } from 'react-router-dom'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -45,6 +44,7 @@ interface IJobInstanceTable {
   defaultColumns: IColumn[]
   settingKey: string
   jumpDetail: (tab?: string) => (record: Record<string, any>) => void
+  type?: JobMode
 }
 
 const instanceNameStyle = css`
@@ -65,11 +65,6 @@ const instanceNameStyle = css`
 const actionsType = tuple('info', 'stop')
 type ActionsType = typeof actionsType[number]
 
-interface IRouteParams {
-  regionId: string
-  spaceId: string
-}
-
 const JobInstanceTable = (props: IJobInstanceTable) => {
   const {
     settingKey,
@@ -77,6 +72,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     defaultColumns,
     filter: filterProp,
     jumpDetail,
+    type = JobMode.DI,
   } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
@@ -88,9 +84,10 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       job_id?: string
       version?: string
       instance_id?: string
+      verbose: number
     },
     { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, settingKey)
+  >({ verbose: 1 }, { pagination: true, sort: true }, settingKey)
 
   useEffect(() => {
     if (filterProp) {
@@ -102,7 +99,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     }
   }, [filterProp, setFilter])
 
-  const { data, isFetching } = useQuerySyncJobInstances(filter)
+  const { data, isFetching } = useQuerySyncJobInstances(filter, undefined, type)
 
   const infos = get(data, 'infos', []) || []
 
@@ -151,7 +148,18 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       ),
     },
     job_id: {
+      // width: 180,
       render: (v: string, record: Record<string, any>) => {
+        const getContent = (children?: React.ReactElement) => {
+          return record?.sync_job?.desc ? (
+            <div>
+              <div>{`发布描述: ${record?.sync_job?.desc}`}</div>
+              <div>{children}</div>
+            </div>
+          ) : (
+            children
+          )
+        }
         const child = (
           <div
             tw="truncate"
@@ -164,27 +172,44 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
             `}
           >
             <div tw="truncate">
-              <TextEllipsis theme="light">
-                <span tw="text-white" className="pit-job-name-text">
-                  {record.job_name}
+              <TextEllipsis
+                theme="light"
+                content={getContent(
+                  <div>{`${record?.sync_job?.name}(${record.job_id})`}</div>
+                )}
+              >
+                <span
+                  tw="text-white cursor-pointer"
+                  className="pit-job-name-text"
+                  onClick={() => {
+                    window.open(
+                      `./data-release/${record.job_id}?version=${record.version}`,
+                      '_blank'
+                    )
+                  }}
+                >
+                  {record?.sync_job?.name}
                 </span>
                 <span tw="text-neut-8"> {`(${record.job_id})`}</span>
               </TextEllipsis>
             </div>
             <div tw="truncate">
-              <TextEllipsis theme="light">
+              <TextEllipsis
+                theme="light"
+                content={getContent(<div>{`版本 ID： ${record.version}`}</div>)}
+              >
                 <span tw="text-neut-8">{`版本 ID： ${record.version}`}</span>
               </TextEllipsis>
             </div>
           </div>
         )
-        // TODO: desc 字段未定
-        if (record.desc) {
+        if (record?.sync_job?.desc) {
           return (
             <Tooltip
               theme="light"
               hasPadding
-              content={`发布描述: ${record.desc}`}
+              content={`发布描述: ${record?.sync_job?.desc}`}
+              twChild={tw`truncate text-neut-13!`}
             >
               {child}
             </Tooltip>
@@ -210,7 +235,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
-      render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (v: number) => (
+        <span tw="text-neut-8">
+          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+      ),
     },
 
     updated: {
@@ -218,7 +247,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
-      render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (v: number) => (
+        <span tw="text-neut-8">
+          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+      ),
     },
   }
 
@@ -254,7 +287,6 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     })
     return result
   }
-  const { regionId, spaceId } = useParams<IRouteParams>()
 
   const handleMenuClick = (record: Record<string, any>, key: ActionsType) => {
     switch (key) {
@@ -293,15 +325,15 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
               ) {
                 return
               }
-              describeFlinkUiByInstanceId({
-                instanceId: record.id,
-                regionId,
-                spaceId,
-              }).then((web_ui: string) => {
-                if (web_ui) {
-                  window.open(web_ui, '_blank')
-                }
-              })
+              // describeFlinkUiByInstanceId({
+              //   instanceId: record.id,
+              //   regionId,
+              //   spaceId,
+              // }).then((web_ui: string) => {
+              if (record?.flink_ui) {
+                window.open(`//${record?.flink_ui}`, '_blank')
+              }
+              // })
             }}
           >
             Flink UI
@@ -345,7 +377,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         dataSource={infos}
         loading={!!isFetching}
         rowKey="id"
-        sort={sort}
+        onSort={sort}
         pagination={{
           total: get(data, 'total', 0),
           ...pagination,

@@ -3,9 +3,11 @@ import { useParams } from 'react-router-dom'
 import {
   describeFlinkUiByInstanceId,
   listSyncInstances,
+  syncJobInstanceManage,
   terminateSyncInstances,
 } from 'stores/api'
 import { isNull, omitBy } from 'lodash-es'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 interface IRouteParams {
   regionId: string
@@ -23,8 +25,22 @@ export const getSyncJobInstanceKey = (key: keyof typeof queryKey = 'list') =>
 
 export const useQuerySyncJobInstances = (
   filter: any,
-  { enabled = true }: Record<string, any> = { enabled: true }
+  { enabled = true }: Record<string, any> = { enabled: true },
+  type: JobMode = JobMode.DI
 ) => {
+  let typePath = 'sync'
+  switch (type) {
+    case JobMode.RT:
+      typePath = 'stream'
+      break
+    case JobMode.OLE:
+      typePath = '???'
+      break
+    case JobMode.DI:
+    default:
+      break
+  }
+
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = omitBy(
     {
@@ -33,6 +49,7 @@ export const useQuerySyncJobInstances = (
       limit: 10,
       offset: 0,
       ...filter,
+      apiType: typePath,
     },
     isNull
   )
@@ -93,4 +110,20 @@ export const useMutationJobInstance = (options?: {}) => {
     }
     return undefined
   }, options)
+}
+
+export const useDescribeInstanceWithFlinkUIByInstanceId = (id: string) => {
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const params = {
+    space_id: spaceId,
+    regionId,
+    verbose: 1,
+    instance_id: id,
+  }
+
+  const key: any = ['describeSyncInstance', params]
+  return useQuery(key, async () =>
+    syncJobInstanceManage.describeSyncInstance(params)
+  )
 }

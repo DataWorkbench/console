@@ -2,7 +2,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import Editor from 'react-monaco-editor'
 import { isUndefined } from 'lodash-es'
 import { useRef, useState } from 'react'
-import { Center, FlexBox, ArrowLine } from 'components'
+import { ArrowLine, Center, FlexBox } from 'components/index'
 
 const defaultCode = `
 `
@@ -27,8 +27,12 @@ const Line = () => {
   )
 }
 
-const DevContentJSON = (props: { data?: { job_content?: string } }) => {
-  const { data: { job_content: codeStr = defaultCode } = {} } = props
+const DevContentJSON = (props: {
+  data?: { job_content?: string }
+  showStep?: boolean
+}) => {
+  const { data: { job_content: codeStr = defaultCode } = {}, showStep = true } =
+    props
   const editorRef = useRef(null)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
 
@@ -55,13 +59,15 @@ const DevContentJSON = (props: { data?: { job_content?: string } }) => {
 
   return (
     <div tw="h-full w-full grid">
-      <Center tw="bg-neut-18 h-14">
-        <Item>来源: mysql</Item>
-        <ArrowLine tw="w-[20%] flex-none" />
-        <Item>离线-增量</Item>
-        <ArrowLine tw="w-[20%] flex-none" />
-        <Item>目的: kafka</Item>
-      </Center>
+      {showStep !== false && (
+        <Center tw="bg-neut-18 h-14">
+          <Item>来源: mysql</Item>
+          <ArrowLine tw="w-[20%] flex-none" />
+          <Item>离线-增量</Item>
+          <ArrowLine tw="w-[20%] flex-none" />
+          <Item>目的: kafka</Item>
+        </Center>
+      )}
       <div tw="flex-1 relative overflow-hidden h-auto ">
         <div
           css={[!showPlaceholder && tw`hidden`]}
