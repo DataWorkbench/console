@@ -1,7 +1,18 @@
 import { FC } from 'react'
-import { Card, CardHeader, CardContent, HelpCenterLink } from 'components'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Center,
+  FlexBox,
+  HelpCenterLink,
+  Tooltip,
+} from 'components'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled, theme } from 'twin.macro'
+import useIcon from 'hooks/useHooks/useIcon'
+import qrcode from 'assets/qrcode.png'
+import icons from './icons'
 
 const questions = [
   {
@@ -35,10 +46,64 @@ const Question = styled('div')(() => [
   `,
 ])
 
-const FAQ: FC = ({ className }) => {
+const JoinUs = () => {
+  useIcon(icons)
+  return (
+    <div tw="m-5">
+      <Tooltip
+        placement="top"
+        theme="light"
+        content={
+          <div tw="w-[184px] h-[212px] p-3">
+            <img src={qrcode} tw="w-full" alt="" />
+            <div tw="mt-2 text-center text-neut-19 leading-4">
+              微信扫一扫，立即加入
+            </div>
+          </div>
+        }
+        twChild={
+          css`
+            &[aria-expanded='true'] {
+              .join-us {
+                ${tw`cursor-pointer text-green-11`}
+              }
+
+              .icon svg.qicon {
+                ${tw`text-green-11`}
+                fill: ${theme('colors.green.4')};
+              }
+            }
+          ` as any
+        }
+      >
+        <Center
+          className="join-us"
+          css={css`
+            ${tw`gap-1`}
+            .join-us:hover {
+              ${tw`cursor-pointer`}
+              .icon svg.qicon {
+                ${tw`text-green-11`}
+                fill: ${theme('colors.green.4')};
+              }
+            }
+          `}
+        >
+          <Icon size={14} name="q-messageCircleDuotone" />
+          <span>加入产品交流群</span>
+        </Center>
+      </Tooltip>
+    </div>
+  )
+}
+
+const FAQ: FC = ({ className }: { className?: string }) => {
   return (
     <Card className={className} tw="leading-5" hasBoxShadow>
-      <CardHeader title="常见问题" />
+      <FlexBox tw="justify-between">
+        <CardHeader title="常见问题" />
+        <JoinUs />
+      </FlexBox>
       <CardContent>
         <div tw="rounded-sm border border-neut-2">
           <div tw="text-neut-15 p-4 space-y-2">

@@ -11,11 +11,20 @@ import {
 } from 'components'
 import { useStore } from 'stores'
 import { getHelpCenterLink } from 'utils'
+import topBg from 'assets/top-ad-bg.png'
+import tw, { css, styled } from 'twin.macro'
 import SpaceListModal from './SpaceListModal'
 import Services from './Services'
 import PlatformFeat from './PlatformFeat/PlatformFeat'
 import FAQ from './FAQ'
 import Practice from './Practice'
+
+const TopBg = styled.div(() => [
+  tw`flex justify-center w-full h-16 items-center bg-no-repeat bg-center bg-cover text-[18px] font-medium text-[#33343C]`,
+  css`
+    background-image: url(${topBg});
+  `,
+])
 
 function getTabs() {
   const h = new Date().getHours()
@@ -47,37 +56,45 @@ function Overview() {
   } = useStore()
 
   return (
-    <div tw="p-5 space-y-5">
-      <PageTab tabs={getTabs()} />
-      <Services />
-      <FlexBox>
-        <FlexBox flex="1" tw="mr-4">
-          <PlatformFeat />
+    <div>
+      <TopBg>
+        <div>
+          <span>大数据工作台火热公测中，免费提供</span>
+          <span tw="text-green-11">12 CPU 48 G 内存</span>
+        </div>
+      </TopBg>
+      <div tw="p-5 space-y-5">
+        <PageTab tabs={getTabs()} />
+        <Services />
+        <FlexBox>
+          <FlexBox flex="1" tw="mr-4">
+            <PlatformFeat />
+          </FlexBox>
+          <FAQ tw="w-4/12 2xl:w-[360px]" />
         </FlexBox>
-        <FAQ tw="w-4/12 2xl:w-[360px]" />
-      </FlexBox>
-      <FlexBox>
-        <Practice tw="flex-1 mr-4" />
-        <Card tw="w-4/12 2xl:w-[360px]" hasBoxShadow>
-          <CardHeader title="视频介绍" />
-          <CardContent>
-            <HelpCenterLink
-              href="/video/video/"
-              isIframe={false}
-              hasIcon={false}
-              color=""
-              tw="flex-1 no-underline font-normal text-left"
-            >
-              <IconCard
-                icon="laptop"
-                title="大数据工作台数据开发实操视频"
-                subtitle={<div tw="h-10">大数据开发的全流程实操演示</div>}
-              />
-            </HelpCenterLink>
-          </CardContent>
-        </Card>
-      </FlexBox>
-      {showSpaceModal && <SpaceListModal />}
+        <FlexBox>
+          <Practice tw="flex-1 mr-4" />
+          <Card tw="w-4/12 2xl:w-[360px]" hasBoxShadow>
+            <CardHeader title="视频介绍" />
+            <CardContent>
+              <HelpCenterLink
+                href="/video/video/"
+                isIframe={false}
+                hasIcon={false}
+                color=""
+                tw="flex-1 no-underline font-normal text-left"
+              >
+                <IconCard
+                  icon="laptop"
+                  title="大数据工作台数据开发实操视频"
+                  subtitle={<div tw="h-10">大数据开发的全流程实操演示</div>}
+                />
+              </HelpCenterLink>
+            </CardContent>
+          </Card>
+        </FlexBox>
+        {showSpaceModal && <SpaceListModal />}
+      </div>
     </div>
   )
 }
