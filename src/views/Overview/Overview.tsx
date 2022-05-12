@@ -59,8 +59,12 @@ function Overview() {
     <div>
       <TopBg>
         <div>
-          <span>大数据工作台火热公测中，免费提供</span>
-          <span tw="text-green-11">12 CPU 48 G 内存</span>
+          <span tw="inline-block leading-[25px]">
+            大数据工作台火热公测中，免费提供
+          </span>
+          <span tw="inline-block text-green-11 leading-[25px]">
+            12 CPU 48 G 内存
+          </span>
         </div>
       </TopBg>
       <div tw="p-5 space-y-5">
