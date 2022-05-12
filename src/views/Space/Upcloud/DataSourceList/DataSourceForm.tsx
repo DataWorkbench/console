@@ -11,7 +11,6 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { get, omit, toLower } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
 import { AffixLabel, Center, Divider } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
@@ -160,17 +159,6 @@ const DataSourceForm = ({
   theme = 'light',
   className,
 }: IFormProps) => {
-  const [network, setNetWork] = useImmer<{
-    type: 'vpc' | 'eip'
-    id: string
-    name: string
-    network_info: Record<string, any>
-  }>({
-    type: 'vpc',
-    id: '',
-    name: '',
-    network_info: {},
-  })
   const ref = useRef<Form>(null)
 
   // const {
@@ -274,16 +262,6 @@ const DataSourceForm = ({
       onChange?.(v)
     },
   }
-
-  useMount(() => {
-    if (sourceInfo) {
-      setNetWork((draft) => {
-        draft.id = get(sourceInfo, `last_connection.network_id`)
-        draft.name = get(sourceInfo, 'last_connection.network_info.name')
-        draft.type = 'vpc'
-      })
-    }
-  })
 
   const parseFormData = useCallback(
     (needValid = true) => {
@@ -570,9 +548,7 @@ const DataSourceForm = ({
               <DataSourcePingButton
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
-                network={network}
                 hasPing={!!get(sourceInfo, 'last_connection')}
-                withNetwork
               />
             </Field>
           </CollapseItem>

@@ -427,11 +427,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       title: '数据源可用性',
       dataIndex: 'last_connection',
       render: (v?: Record<string, any>, row?: Record<string, any>) => {
-        const {
-          result = CONNECTION_STATUS.UNDO,
-          network_info: networkInfo,
-          network_id: networkId,
-        } = v ?? { result: 0 }
+        const { result = CONNECTION_STATUS.UNDO } = v ?? { result: 0 }
         const isItemLoading = itemLoadingHistories?.[row?.id]?.size
         return (
           <>
@@ -471,24 +467,6 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                 </TextLink>
               )}
             </Center>
-            {v && (
-              <Tooltip
-                hasPadding
-                theme="instead"
-                content={
-                  <div>
-                    <div>VPC: {networkInfo?.space_id}</div>
-                    <div>vxnet: {networkInfo?.vxnet_id}</div>
-                  </div>
-                }
-                twChild={tw`truncate`}
-              >
-                <span title={`${networkInfo?.name} (${networkId})`}>
-                  <span>{networkInfo?.name} </span>
-                  <span>({networkId})</span>
-                </span>
-              </Tooltip>
-            )}
           </>
         )
       },
@@ -540,8 +518,9 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               查看详情
             </Button>
             <Tooltip
-              theme="instead"
+              theme="auto"
               trigger="click"
+              placement="bottom-end"
               arrow={false}
               twChild={
                 css`
