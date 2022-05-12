@@ -49,9 +49,20 @@ const Question = styled('div')(() => [
 const JoinUs = () => {
   useIcon(icons)
   return (
-    <div tw="m-5">
+    <div
+      tw="m-5"
+      css={css`
+        .tippy-box {
+          .tippy-arrow::before {
+            ${tw`border-t-white!`}
+          }
+          box-shadow: 0px 8px 16px rgba(11, 18, 25, 0.1);
+        }
+      `}
+    >
       <Tooltip
         placement="top"
+        appendTo="parent"
         theme="light"
         content={
           <div tw="w-[184px] h-[212px] p-3">
