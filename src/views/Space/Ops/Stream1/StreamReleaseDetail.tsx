@@ -125,8 +125,6 @@ const StreamReleaseDetail = observer(
       versionId: version,
     })
 
-    console.log(code)
-
     const history = useHistory()
     const { search } = useLocation()
     const { tab = 'link' } = qs.parse(search.slice(1))
