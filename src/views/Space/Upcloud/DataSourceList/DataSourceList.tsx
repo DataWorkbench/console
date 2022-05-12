@@ -444,7 +444,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               content={
                 <Menu
                   onClick={(e: React.SyntheticEvent, key: any) => {
-                    if (op !== 'ping') {
+                    if (key !== 'ping') {
                       mutateOperation(key, [info])
                     } else {
                       handlePing(info)
