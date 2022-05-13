@@ -473,6 +473,24 @@ var2=\${yyyy-mm-dd HH-1H}`}
                     validateOnChange
                     schemas={[
                       {
+                        // eslint-disable-next-line no-template-curly-in-string
+                        help: '参数值不合法, 请参考格式: ${yyyy-mm-dd HH:MM:SS}',
+                        status: 'error',
+                        rule: (v: string) => {
+                          return v
+                            .split(/[\r\n]/)
+                            .filter((str) => !isEmpty(str))
+                            .every((str) => {
+                              const [, val] = str.split('=')
+                              if (val === undefined || !/^\${\w+}$/.test(val)) {
+                                return false
+                              }
+                              return true
+                            })
+                          return true
+                        },
+                      },
+                      {
                         help: '不能为空，且变量名必须唯一',
                         status: 'error',
                         rule: (v: string) => {
@@ -1134,73 +1152,79 @@ var2=\${yyyy-mm-dd HH-1H}`}
                       ]}
                     />
                     {false && (
-                      <Field>
-                        <Label>
-                          <AffixLabel>重试策略</AffixLabel>
-                        </Label>
-                        <Control>
-                          <Toggle
+                      <>
+                        <Field>
+                          <Label>
+                            <AffixLabel>重试策略</AffixLabel>
+                          </Label>
+                          <Control>
+                            <Toggle
+                              disabled={disabled}
+                              checked={params.retryPolicy === 2}
+                              onChange={(checked: boolean) => {
+                                setParams((draft) => {
+                                  draft.retryPolicy = checked ? 2 : 1
+                                })
+                              }}
+                            />
+                          </Control>
+                          <div tw="leading-6 ml-2">出错自动重试</div>
+                        </Field>
+                        <div
+                          css={params.retryPolicy === 1 && tw`hidden`}
+                          tw="mb-6"
+                        >
+                          <SliderField
+                            key={disabled ? 'initSlider' : 'updateSlider'}
                             disabled={disabled}
-                            checked={params.retryPolicy === 2}
-                            onChange={(checked: boolean) => {
-                              setParams((draft) => {
-                                draft.retryPolicy = checked ? 2 : 1
-                              })
-                            }}
-                          />
-                        </Control>
-                        <div tw="leading-6 ml-2">出错自动重试</div>
-                      </Field>
-                    )}
-                    <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
-                      <SliderField
-                        key={disabled ? 'initSlider' : 'updateSlider'}
-                        disabled={disabled}
-                        name="p2"
-                        label="出错重试最大次数"
-                        hasTooltip
-                        value={params.retryLimit}
-                        markDots
-                        min={1}
-                        max={99}
-                        onChange={(v: string) => {
-                          setParams((draft) => {
-                            draft.retryLimit = +v
-                          })
-                        }}
-                        marks={{
-                          1: '1',
-                          20: '20',
-                          40: '40',
-                          60: '60',
-                          80: '80',
-                          99: '99',
-                        }}
-                        hasInput
-                        inputProps={{ disabled }}
-                      />
-                      <Field>
-                        <Label>
-                          <AffixLabel>出错重试间隔</AffixLabel>
-                        </Label>
-                        <Control>
-                          <InputNumber
-                            key={disabled ? 'initInput' : 'updateInput'}
-                            disabled={disabled}
-                            isMini
+                            name="p2"
+                            label="出错重试最大次数"
+                            hasTooltip
+                            value={params.retryLimit}
+                            markDots
                             min={1}
-                            max={30}
-                            value={params.retryInterval}
-                            onChange={(v: number) => {
+                            max={99}
+                            onChange={(v: string) => {
                               setParams((draft) => {
-                                draft.retryInterval = v
+                                draft.retryLimit = +v
                               })
                             }}
+                            marks={{
+                              1: '1',
+                              20: '20',
+                              40: '40',
+                              60: '60',
+                              80: '80',
+                              99: '99',
+                            }}
+                            hasInput
+                            inputProps={{ disabled }}
                           />
-                        </Control>
-                        <div tw="leading-8 ml-2">分钟</div>
-                      </Field>
-                    </div>
+                          <Field>
+                            <Label>
+                              <AffixLabel>出错重试间隔</AffixLabel>
+                            </Label>
+                            <Control>
+                              <InputNumber
+                                key={disabled ? 'initInput' : 'updateInput'}
+                                disabled={disabled}
+                                isMini
+                                min={1}
+                                max={30}
+                                value={params.retryInterval}
+                                onChange={(v: number) => {
+                                  setParams((draft) => {
+                                    draft.retryInterval = v
+                                  })
+                                }}
+                              />
+                            </Control>
+                            <div tw="leading-8 ml-2">分钟</div>
+                          </Field>
+                        </div>
+                      </>
+                    )}
+
                     <Field>
                       <Label>超时时间</Label>
                       <Control>
