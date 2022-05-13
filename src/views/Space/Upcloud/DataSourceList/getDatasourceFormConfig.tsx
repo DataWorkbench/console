@@ -752,7 +752,7 @@ localhost:6379
             },
           ],
         },
-        database,
+        { ...database, required: false, schemas: [] },
         user,
         { ...password, placeholder: '请输入访问密码（Password）' },
       ]
