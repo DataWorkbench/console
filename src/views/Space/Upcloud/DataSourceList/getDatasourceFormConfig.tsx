@@ -376,15 +376,18 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           required: false,
           placeholder: 'hdfs://127.0.0.1:9000',
           help: 'hdfs://ServerIP:Port',
-          // schemas: [ // defaultFS 非必填
-          //   {
-          //     rule: {
-          //       required: true,
-          //     },
-          //     message: '请输入 NameNode 节点地址',
-          //     status: 'error',
-          //   },
-          // ],
+          schemas: [
+            {
+              rule: (v: string) => {
+                if (!v) {
+                  return true
+                }
+                return /^hdfs:\/\/[\w.]+:[\d]+$/.test(v)
+              },
+              message: 'NameNode 节点地址格式不正确',
+              status: 'error',
+            },
+          ],
         },
         {
           fieldType: 'dbUrl',
