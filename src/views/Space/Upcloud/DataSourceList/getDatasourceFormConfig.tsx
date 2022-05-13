@@ -192,12 +192,12 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
           labelClassName: 'label-required',
           name: '__dbUrl',
-          space: [':', '/'],
+          space: [':', ':'],
           items: [
             {
               ...host,
               label: null,
-              help: '例：jdbc:oracle:thin:@1.1.1.1',
+              help: '例：jdbc:oracle:thin:@127.0.0.1:1521:testdb',
               component: InputField,
               prefix: 'jdbc:oracle:thin:@',
               css: tw`w-[328px]`,
@@ -231,10 +231,10 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:sqlserver://127.0.0.1:1433;DatabaseName=test',
+              help: '例：jdbc:jtds:sqlserver://0.0.0.1:1433;DatabaseName=testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
-              prefix: 'jdbc:sqlserver://',
+              prefix: 'jdbc:jtds:sqlserver://',
               css: tw`w-[328px]`,
             },
             {
@@ -299,12 +299,12 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           label: 'JDBC 连接 URL（IP 地址 : 端口？SCHEMA）',
           labelClassName: 'label-required',
           name: '__dbUrl',
-          space: [':', '/'],
+          space: [':', '?'],
           items: [
             {
               ...host,
               label: null,
-              help: '例：jdbc:sap://1.1.1.1',
+              help: '例：jdbc:sap://127.0.0.1:30015?currentschema=test',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:sap://',
