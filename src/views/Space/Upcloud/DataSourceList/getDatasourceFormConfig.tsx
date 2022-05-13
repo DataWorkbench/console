@@ -12,6 +12,7 @@ import {
   ftpProtocol,
   hadoopLink,
   hbaseLink,
+  hostReg,
   ipReg,
   SourceType,
 } from './constant'
@@ -34,6 +35,37 @@ const mapProps = (props: Record<string, any>) => {
     theme: 'light',
     addText: '添加地址',
   }
+}
+
+export const str2Arr = (v: string) => {
+  return trim(v)
+    .split(/[\r\n]/)
+    .filter((item) => item !== '')
+    .map((item) => {
+      const [host, p] = item.split(division)
+      const port = trim(p)
+      try {
+        return {
+          host: trim(host),
+          port: /^\d+$/.test(port) ? parseInt(port, 10) : undefined,
+        }
+      } catch (e) {
+        return {
+          host: trim(host),
+          port: undefined,
+        }
+      }
+    })
+}
+
+const hostsRule = (v: string) => {
+  const value = str2Arr(v)
+  if (!value.length) {
+    return false
+  }
+  return !value.find(
+    ({ host: h, port: p }) => !hostReg.test(h) || !p || p < 0 || p > 65536
+  )
 }
 
 const KVTextAreaFieldWrapper = styled(getKvTextAreaFieldByMap(mapProps))(() => [
@@ -750,6 +782,11 @@ localhost:6379
               help: '请输入访问地址（Host：Port）',
               status: 'error',
             },
+            {
+              rule: hostsRule,
+              help: 'Host 或者 Port 格式错误',
+              status: 'error',
+            },
           ],
         },
         { ...database, required: false, schemas: [] },
@@ -773,6 +810,11 @@ localhost:6379
           division: ':',
           kvs: ['IP', 'Port'],
           schemas: [
+            {
+              rule: hostsRule,
+              help: 'Host 或者 Port 格式错误',
+              status: 'error',
+            },
             {
               rule: { required: true },
               help: '请输入访问地址（Host：Port）',
@@ -799,6 +841,11 @@ localhost:6379
           division: ':',
           kvs: ['IP', 'Port'],
           schemas: [
+            {
+              rule: hostsRule,
+              help: 'IP 或者 Port 格式错误',
+              status: 'error',
+            },
             {
               rule: { required: true },
               help: '请输入 kafkabrokers',
@@ -846,27 +893,6 @@ const arr2str = (arr: { host: string; port: number }[]) => {
       .join('\r\n')
   }
   return ''
-}
-
-export const str2Arr = (v: string) => {
-  return trim(v)
-    .split(/[\r\n]/)
-    .filter((item) => item !== '')
-    .map((item) => {
-      const [host, p] = item.split(division)
-      const port = trim(p)
-      try {
-        return {
-          host: trim(host),
-          port: /^\d+$/.test(port) ? parseInt(port, 10) : undefined,
-        }
-      } catch (e) {
-        return {
-          host: trim(host),
-          port: undefined,
-        }
-      }
-    })
 }
 
 export const source2DBStrategy = [
