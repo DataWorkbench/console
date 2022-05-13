@@ -95,7 +95,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:mysql://1.1.1.1',
+              help: '例：jdbc:mysql://127.0.0.1:3306/testdb',
               component: InputField,
               prefix: 'jdbc:mysql://',
               css: tw`w-[328px]`,
@@ -129,7 +129,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:postgresql://1.1.1.1',
+              help: '例：jdbc:postgresql://127.0.0.1:5432/testdb',
               component: InputField,
               prefix: 'jdbc:postgresql://',
               css: tw`w-[328px]`,
@@ -269,7 +269,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:db2://1.1.1.1',
+              help: '例：jdbc:db2://127.0.0.1:50000/testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:db2://',
@@ -343,7 +343,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:clickhouse://1.1.1.1',
+              help: '例：jdbc:clickhouse://127.0.0.1:8123/testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:clickhouse://',
@@ -395,7 +395,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:hive2://1.1.1.1',
+              help: '例：jdbc:hive2://127.0.0.1:10000/testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:hive2://',
@@ -509,6 +509,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
+              help: '例：ftp://127.0.0.1:21',
               placeholder: '请输入 FTP 的主机别名（Host）',
             },
             {
