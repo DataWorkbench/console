@@ -75,6 +75,13 @@ export const ScheSettingForm = styled(ScheForm)(() => [
   css`
     &.is-horizon-layout {
       .field {
+        ${tw`flex-wrap`}
+        > .control {
+          ${tw`flex`}
+        }
+        > label.label {
+          ${tw`flex-none`}
+        }
         > .control {
           div.select {
             ${tw`w-28`}
