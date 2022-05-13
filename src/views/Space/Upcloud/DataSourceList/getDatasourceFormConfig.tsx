@@ -1,4 +1,4 @@
-import { set, trim } from 'lodash-es'
+import { get, set, trim } from 'lodash-es'
 import { HelpCenterLink } from 'components/Link'
 import tw, { css, styled } from 'twin.macro'
 import { strlen } from 'utils/convert'
@@ -29,45 +29,10 @@ const TextAreaWrapper = styled(TextAreaField)(() => [
 
 const division = ':'
 const mapProps = (props: Record<string, any>) => {
-  const parseValue = (arr: { host: string; port: number }[]) => {
-    if (!Array.isArray(arr)) {
-      return undefined
-    }
-    if (arr.length > 0) {
-      return arr
-        .map(({ host: k, port: v }) => {
-          if (!k || !v) {
-            return ''
-          }
-          return `${k}${division}${v}`
-        })
-        .filter((s) => s !== '')
-        .join('\r\n')
-    }
-    return ''
-  }
   return {
     ...props,
     theme: 'light',
     addText: '添加地址',
-    value: parseValue(props.value),
-    onChange: (v: string) => {
-      if (props.onChange) {
-        props.onChange(
-          trim(v)
-            .split(/[\r\n]/)
-            .filter((item) => item !== '')
-            .map((item) => {
-              const [host, p] = item.split(division)
-              const port = trim(p)
-              return {
-                host: trim(host),
-                port: /^\d+$/.test(port) ? parseInt(port, 10) : null,
-              }
-            })
-        )
-      }
-    },
   }
 }
 
@@ -768,7 +733,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
       fieldsInfo = [
         {
           component: KVTextAreaFieldWrapper,
-          name: 'hostPort',
+          name: 'hosts',
           title: 'IP:Port',
           label: '访问地址（Host：Port）',
           placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
@@ -796,7 +761,7 @@ localhost:6379
       fieldsInfo = [
         {
           component: KVTextAreaFieldWrapper,
-          name: 'port',
+          name: 'hosts',
           title: 'IP:Port',
           label: '访问地址（Host：Port）',
           placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
@@ -841,6 +806,7 @@ localhost:6379
             },
             {
               rule: (value: { host: string; port: number }[]) => {
+                return true
                 // const l = strlen(value)
                 // return l >= 1 && l <= 1024
                 if (!Array.isArray(value) || !value.length) {
@@ -863,4 +829,135 @@ localhost:6379
   }
   return filters ? fieldsInfo.filter((i) => filters.has(i.name)) : fieldsInfo
 }
+
+const arr2str = (arr: { host: string; port: number }[]) => {
+  if (!Array.isArray(arr)) {
+    return undefined
+  }
+  if (arr.length > 0) {
+    return arr
+      .map(({ host: k, port: v }) => {
+        if (!k || !v) {
+          return ''
+        }
+        return `${k}${division}${v}`
+      })
+      .filter((s) => s !== '')
+      .join('\r\n')
+  }
+  return ''
+}
+
+export const str2Arr = (v: string) => {
+  return trim(v)
+    .split(/[\r\n]/)
+    .filter((item) => item !== '')
+    .map((item) => {
+      const [host, p] = item.split(division)
+      const port = trim(p)
+      try {
+        return {
+          host: trim(host),
+          port: /^\d+$/.test(port) ? parseInt(port, 10) : undefined,
+        }
+      } catch (e) {
+        return {
+          host: trim(host),
+          port: undefined,
+        }
+      }
+    })
+}
+
+export const source2DBStrategy = [
+  {
+    key: 'redis&mongo',
+    check: (source: SourceType) =>
+      new Set([SourceType.Redis, SourceType.MongoDB]).has(source),
+    value: (v: Record<string, any>) => {
+      return { ...v, hosts: str2Arr(v.hosts) }
+    },
+  },
+  {
+    key: 'hdfs',
+    check: (source: SourceType) => source === SourceType.HDFS,
+    value: (v: Record<string, any>) => {
+      return { ...v, default_fs: `hdfs://${v.name_node}:${v.port}` }
+    },
+  },
+  {
+    key: 'kafka',
+    check: (source: SourceType) => source === SourceType.Kafka,
+    value: (v: Record<string, any>) => {
+      return { ...v, kafka_brokers: str2Arr(v.kafka_brokers) }
+    },
+  },
+]
+
+export const sourceStrategy = [
+  {
+    key: 'hive.hiveAuth',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Hive && name === 'hiveAuth'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+        return 2
+      }
+      return 1
+    },
+  },
+  {
+    key: 'elastic_search.esAuth',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.ElasticSearch && name === 'esAuth'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return 2
+      }
+      return 1
+    },
+  },
+  {
+    key: 'redis.hosts',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Redis && name === 'hosts'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.redis.hosts')) {
+        return arr2str(get(sourceInfo, 'url.redis.hosts'))
+      }
+      return ''
+    },
+  },
+  {
+    key: 'kafka.kafka_brokers',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Kafka && name === 'kafka_brokers'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.kafka.kafka_brokers')) {
+        return arr2str(get(sourceInfo, 'url.kafka.kafka_brokers'))
+      }
+      return ''
+    },
+  },
+  {
+    key: 'mongo_db.hosts',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.MongoDB && name === 'hosts'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.mongo_db.hosts')) {
+        return arr2str(get(sourceInfo, 'url.mongo_db.hosts'))
+      }
+      return ''
+    },
+  },
+]
+
 export default getFieldsInfo

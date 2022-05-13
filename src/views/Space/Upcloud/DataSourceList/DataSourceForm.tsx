@@ -17,6 +17,7 @@ import { AffixLabel, Center, Divider, HelpCenterLink } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { toJS } from 'mobx'
+import { compose } from 'utils/functions'
 import { DataSourcePingButton } from './DataSourcePing'
 import {
   esAnonymousFilters,
@@ -29,9 +30,11 @@ import {
   sftpFilters,
   sFtpProtocolValue,
   SourceType,
-  // urlType2Api,
 } from './constant'
-import getFieldsInfo from './getDatasourceFormConfig'
+import getFieldsInfo, {
+  source2DBStrategy,
+  sourceStrategy,
+} from './getDatasourceFormConfig'
 
 const { CollapseItem } = Collapse
 const { TextField, TextAreaField } = Form
@@ -130,6 +133,9 @@ const getInitValue = (path: string) => {
         auth01: 1,
         auth02: 2,
       },
+      elastic_search: {
+        version: '7',
+      },
     },
   }
   return get(initValues, path, '')
@@ -178,6 +184,7 @@ const DataSourceForm = ({
   // } = useStore()
 
   const urlType = resInfo?.urlType ?? resInfo.name.toLowerCase()
+  const { source_type: sourceType } = resInfo
   const sourceInfo =
     ['update', 'view'].includes(op) &&
     opSourceList.length > 0 &&
@@ -298,11 +305,17 @@ const DataSourceForm = ({
           network_id: netWorkId,
           ...others
         } = formElem.getFieldsValue()
-        const rest = omit(others, 'utype')
+        let rest = omit(others, 'utype')
         if (urlType === 'hdfs') {
           Object.assign(rest, {
             default_fs: `hdfs://${rest.name_node}:${rest.port}`,
           })
+        }
+        const strategy = source2DBStrategy
+          .filter((i) => i.check(sourceType!))
+          .map((i) => i.value)
+        if (strategy.length) {
+          rest = compose(...strategy)(rest)
         }
         // if (urlType === 'hdfs') {
         //   const shiftArr = ['name_node', 'port']
@@ -320,7 +333,7 @@ const DataSourceForm = ({
       }
       return null
     },
-    [ref, urlType, resInfo]
+    [urlType, resInfo.source_type, sourceType]
   )
 
   useEffect(() => {
@@ -330,25 +343,9 @@ const DataSourceForm = ({
   }, [getFormData, parseFormData])
 
   function getDefaultValue(name: string) {
-    // 如果 hive ，有 hadoop config auth 取 2， 后端未存储值。 默认为 1
-    if (urlType === 'hive' && name === 'hiveAuth') {
-      if (get(sourceInfo, 'url.hive.hadoop_config')) {
-        return 2
-      }
-      return 1
-    }
-    if (urlType === 'elastic_search' && name === 'esAuth') {
-      if (
-        get(sourceInfo, 'url.elastic_search.host') &&
-        !get(sourceInfo, 'url.elastic_search.user')
-      ) {
-        return 2
-      }
-      return 1
-    }
-
-    if (urlType === 'elastic_search' && name === 'version') {
-      return '7'
+    const strategy = sourceStrategy.find((i) => i.check(sourceType!, name))
+    if (strategy) {
+      return strategy.value(sourceInfo as Record<string, any>)
     }
 
     const defaultPath =
