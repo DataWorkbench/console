@@ -53,20 +53,17 @@ export const Divider = styled((props: PropsWithChildren<DividerPropsType>) => {
     <>
       <Global
         styles={css`
-      .light {
         .pitrix-divider {
           ${tw`border-neut-3 text-neut-15`}
         }
         
-      }
       .dark {
         .pitrix-divider {
           ${tw`border-line-dark text-white`}}
-        }
-        
-        .icon .qicon {
+            .icon .qicon {
           ${tw`text-white`}
           }
+        }
         }`}
       />
       <DividerWarp
