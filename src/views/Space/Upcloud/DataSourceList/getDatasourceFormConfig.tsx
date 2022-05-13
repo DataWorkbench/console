@@ -49,6 +49,7 @@ const mapProps = (props: Record<string, any>) => {
   return {
     ...props,
     theme: 'light',
+    addText: '添加地址',
     value: parseValue(props.value),
     onChange: (v: string) => {
       if (props.onChange) {
@@ -791,7 +792,7 @@ localhost:6379
         },
         database,
         user,
-        password,
+        { ...password, placeholder: '请输入访问密码（Password）' },
       ]
       break
     case SourceType.Redis:
@@ -817,7 +818,7 @@ localhost:6379
             },
           ],
         },
-        password,
+        { ...password, placeholder: '请输入访问密码（Password）' },
       ]
       break
     case SourceType.Kafka:

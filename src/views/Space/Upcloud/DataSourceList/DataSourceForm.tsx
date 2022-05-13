@@ -13,7 +13,7 @@ import { get, omit, toLower } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
-import { AffixLabel, Center, Divider } from 'components'
+import { AffixLabel, Center, Divider, HelpCenterLink } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { toJS } from 'mobx'
@@ -347,6 +347,10 @@ const DataSourceForm = ({
       return 1
     }
 
+    if (urlType === 'elastic_search' && name === 'version') {
+      return '7'
+    }
+
     const defaultPath =
       urlType === 'ftp' && name === 'port'
         ? `url.${toLower(get(ftpProtocol, `${ftpProtocolType}.label`))}.${name}`
@@ -567,6 +571,19 @@ const DataSourceForm = ({
               </Divider>
             </Field>
             <Field css={showPing ? visibleStyle : hiddenStyle}>
+              <AffixLabel
+                help={
+                  <div>
+                    <span tw="mr-1">详情请查看</span>
+                    <HelpCenterLink href="##" hasIcon>
+                      网络连通方案
+                    </HelpCenterLink>
+                  </div>
+                }
+                theme="darker"
+              >
+                数据源可用性测试
+              </AffixLabel>
               <DataSourcePingButton
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
