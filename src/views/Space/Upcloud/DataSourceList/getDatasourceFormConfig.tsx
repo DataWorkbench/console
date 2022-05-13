@@ -547,22 +547,16 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           name: '__dbUrl',
           items: [
             {
+              ...host,
               name: 'name_node',
               label: null,
               placeholder: '请输入主节点地址',
               css: tw`w-[330px]`,
               component: InputField,
               prefix: 'hdfs://',
-              validateOnBlur: true,
-              schemas: [
-                {
-                  rule: { required: true },
-                  help: '请输入主节点地址',
-                  status: 'error',
-                },
-              ],
             },
             {
+              ...port,
               name: 'port',
               label: null,
               placeholder: '请输入',
@@ -571,13 +565,13 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
               min: 1,
               max: 65536,
               showButton: false,
-              schemas: [
-                {
-                  rule: { required: true },
-                  help: '请输入 port',
-                  status: 'error',
-                },
-              ],
+              // schemas: [
+              //   {
+              //     rule: { required: true },
+              //     help: '请输入 port',
+              //     status: 'error',
+              //   },
+              // ],
             },
           ],
           space: [':'],
