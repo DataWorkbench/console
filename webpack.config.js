@@ -23,7 +23,6 @@ const getTheme = () => {
   return {theme: process.env.THEME || 'default'}
 }
 
-console.log(process.env.NODE_ENV)
 
 let config = {
   mode: NODE_ENV,
