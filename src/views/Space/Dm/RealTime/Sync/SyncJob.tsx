@@ -459,7 +459,7 @@ const SyncJob = () => {
               setMode(2)
             }}
           >
-            <Button type="black" disabled>
+            <Button type="black">
               <Icon name="coding" type="light" />
               脚本模式
             </Button>
