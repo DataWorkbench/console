@@ -348,7 +348,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                 }
 
                 .ping-connection-status {
-                  ${tw`text-neut-15`}
+                  ${tw`text-font`}
                 }
 
                 .${connectionListCls} {
@@ -610,6 +610,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             tw="flex-1 pb-5 dark:bg-neut-16"
             css={[!selectMode && tw`px-5`]}
           >
+            {/* TODO: radio disabled 连通性过滤 */}
             <Table
               selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
