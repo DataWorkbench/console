@@ -15,6 +15,16 @@ const { NODE_ENV } = process.env
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
+const getTheme = () => {
+  // const themeStr = process.argv.find(arg => arg.startsWith('theme='))
+  // if (!themeStr) {
+  //   return {theme: 'default'}
+  // }
+  return {theme: process.env.THEME}
+}
+
+console.log(process.env.NODE_ENV)
+
 let config = {
   mode: NODE_ENV,
   target: 'web',
@@ -46,6 +56,15 @@ let config = {
             },
           },
         ],
+      },
+      {
+        test: /\.tpl$/,
+        use: [
+          {loader: 'babel-loader'},
+          {loader: resolve('./loaders/tpl-loader.js'), options: {
+               tplValue: getTheme(),
+            }},
+        ]
       },
       {
         test: /\.svg$/i,

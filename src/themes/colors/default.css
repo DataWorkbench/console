@@ -1,0 +1,9 @@
+:root {
+  --color-text-default: #324558;
+  --color-line-dark: #4c5e70;
+}
+
+.dark {
+  --color-text-default: #fff;
+  --color-line-dark: #4c5e70;
+}
