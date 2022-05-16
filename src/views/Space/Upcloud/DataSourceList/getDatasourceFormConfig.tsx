@@ -1,4 +1,4 @@
-import { set, trim } from 'lodash-es'
+import { get, set, trim } from 'lodash-es'
 import { HelpCenterLink } from 'components/Link'
 import tw, { css, styled } from 'twin.macro'
 import { strlen } from 'utils/convert'
@@ -12,6 +12,7 @@ import {
   ftpProtocol,
   hadoopLink,
   hbaseLink,
+  hostReg,
   ipReg,
   SourceType,
 } from './constant'
@@ -29,45 +30,42 @@ const TextAreaWrapper = styled(TextAreaField)(() => [
 
 const division = ':'
 const mapProps = (props: Record<string, any>) => {
-  const parseValue = (arr: { host: string; port: number }[]) => {
-    if (!Array.isArray(arr)) {
-      return undefined
-    }
-    if (arr.length > 0) {
-      return arr
-        .map(({ host: k, port: v }) => {
-          if (!k || !v) {
-            return ''
-          }
-          return `${k}${division}${v}`
-        })
-        .filter((s) => s !== '')
-        .join('\r\n')
-    }
-    return ''
-  }
   return {
     ...props,
     theme: 'light',
-    value: parseValue(props.value),
-    onChange: (v: string) => {
-      if (props.onChange) {
-        props.onChange(
-          trim(v)
-            .split(/[\r\n]/)
-            .filter((item) => item !== '')
-            .map((item) => {
-              const [host, p] = item.split(division)
-              const port = trim(p)
-              return {
-                host: trim(host),
-                port: /^\d+$/.test(port) ? parseInt(port, 10) : null,
-              }
-            })
-        )
-      }
-    },
+    addText: '添加地址',
   }
+}
+
+export const str2Arr = (v: string) => {
+  return trim(v)
+    .split(/[\r\n]/)
+    .filter((item) => item !== '')
+    .map((item) => {
+      const [host, p] = item.split(division)
+      const port = trim(p)
+      try {
+        return {
+          host: trim(host),
+          port: /^\d+$/.test(port) ? parseInt(port, 10) : undefined,
+        }
+      } catch (e) {
+        return {
+          host: trim(host),
+          port: undefined,
+        }
+      }
+    })
+}
+
+const hostsRule = (v: string) => {
+  const value = str2Arr(v)
+  if (!value.length) {
+    return false
+  }
+  return !value.find(
+    ({ host: h, port: p }) => !hostReg.test(h) || !p || p < 0 || p > 65536
+  )
 }
 
 const KVTextAreaFieldWrapper = styled(getKvTextAreaFieldByMap(mapProps))(() => [
@@ -95,7 +93,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:mysql://1.1.1.1',
+              help: '例：jdbc:mysql://127.0.0.1:3306/testdb',
               component: InputField,
               prefix: 'jdbc:mysql://',
               css: tw`w-[328px]`,
@@ -129,7 +127,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:postgresql://1.1.1.1',
+              help: '例：jdbc:postgresql://127.0.0.1:5432/testdb',
               component: InputField,
               prefix: 'jdbc:postgresql://',
               css: tw`w-[328px]`,
@@ -192,12 +190,12 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
           labelClassName: 'label-required',
           name: '__dbUrl',
-          space: [':', '/'],
+          space: [':', ':'],
           items: [
             {
               ...host,
               label: null,
-              help: '例：jdbc:oracle:thin:@1.1.1.1',
+              help: '例：jdbc:oracle:thin:@127.0.0.1:1521:testdb',
               component: InputField,
               prefix: 'jdbc:oracle:thin:@',
               css: tw`w-[328px]`,
@@ -231,10 +229,10 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:sqlserver://127.0.0.1:1433;DatabaseName=test',
+              help: '例：jdbc:jtds:sqlserver://0.0.0.1:1433;DatabaseName=testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
-              prefix: 'jdbc:sqlserver://',
+              prefix: 'jdbc:jtds:sqlserver://',
               css: tw`w-[328px]`,
             },
             {
@@ -269,7 +267,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:db2://1.1.1.1',
+              help: '例：jdbc:db2://127.0.0.1:50000/testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:db2://',
@@ -299,12 +297,12 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           label: 'JDBC 连接 URL（IP 地址 : 端口？SCHEMA）',
           labelClassName: 'label-required',
           name: '__dbUrl',
-          space: [':', '/'],
+          space: [':', '?'],
           items: [
             {
               ...host,
               label: null,
-              help: '例：jdbc:sap://1.1.1.1',
+              help: '例：jdbc:sap://127.0.0.1:30015?currentschema=test',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:sap://',
@@ -343,7 +341,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:clickhouse://1.1.1.1',
+              help: '例：jdbc:clickhouse://127.0.0.1:8123/testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:clickhouse://',
@@ -375,15 +373,18 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           required: false,
           placeholder: 'hdfs://127.0.0.1:9000',
           help: 'hdfs://ServerIP:Port',
-          // schemas: [ // defaultFS 非必填
-          //   {
-          //     rule: {
-          //       required: true,
-          //     },
-          //     message: '请输入 NameNode 节点地址',
-          //     status: 'error',
-          //   },
-          // ],
+          schemas: [
+            {
+              rule: (v: string) => {
+                if (!v) {
+                  return true
+                }
+                return /^hdfs:\/\/[\w.]+:[\d]+$/.test(v)
+              },
+              message: 'NameNode 节点地址格式不正确',
+              status: 'error',
+            },
+          ],
         },
         {
           fieldType: 'dbUrl',
@@ -395,7 +396,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:hive2://1.1.1.1',
+              help: '例：jdbc:hive2://127.0.0.1:10000/testdb',
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:hive2://',
@@ -509,6 +510,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
+              help: '例：ftp://127.0.0.1:21',
               placeholder: '请输入 FTP 的主机别名（Host）',
             },
             {
@@ -542,22 +544,16 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           name: '__dbUrl',
           items: [
             {
+              ...host,
               name: 'name_node',
               label: null,
               placeholder: '请输入主节点地址',
               css: tw`w-[330px]`,
               component: InputField,
               prefix: 'hdfs://',
-              validateOnBlur: true,
-              schemas: [
-                {
-                  rule: { required: true },
-                  help: '请输入主节点地址',
-                  status: 'error',
-                },
-              ],
             },
             {
+              ...port,
               name: 'port',
               label: null,
               placeholder: '请输入',
@@ -566,13 +562,13 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
               min: 1,
               max: 65536,
               showButton: false,
-              schemas: [
-                {
-                  rule: { required: true },
-                  help: '请输入 port',
-                  status: 'error',
-                },
-              ],
+              // schemas: [
+              //   {
+              //     rule: { required: true },
+              //     help: '请输入 port',
+              //     status: 'error',
+              //   },
+              // ],
             },
           ],
           space: [':'],
@@ -769,7 +765,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
       fieldsInfo = [
         {
           component: KVTextAreaFieldWrapper,
-          name: 'hostPort',
+          name: 'hosts',
           title: 'IP:Port',
           label: '访问地址（Host：Port）',
           placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
@@ -786,18 +782,23 @@ localhost:6379
               help: '请输入访问地址（Host：Port）',
               status: 'error',
             },
+            {
+              rule: hostsRule,
+              help: 'Host 或者 Port 格式错误',
+              status: 'error',
+            },
           ],
         },
-        database,
+        { ...database, required: false, schemas: [] },
         user,
-        password,
+        { ...password, placeholder: '请输入访问密码（Password）' },
       ]
       break
     case SourceType.Redis:
       fieldsInfo = [
         {
           component: KVTextAreaFieldWrapper,
-          name: 'port',
+          name: 'hosts',
           title: 'IP:Port',
           label: '访问地址（Host：Port）',
           placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
@@ -810,13 +811,18 @@ localhost:6379
           kvs: ['IP', 'Port'],
           schemas: [
             {
+              rule: hostsRule,
+              help: 'Host 或者 Port 格式错误',
+              status: 'error',
+            },
+            {
               rule: { required: true },
               help: '请输入访问地址（Host：Port）',
               status: 'error',
             },
           ],
         },
-        password,
+        { ...password, placeholder: '请输入访问密码（Password）' },
       ]
       break
     case SourceType.Kafka:
@@ -836,12 +842,18 @@ localhost:6379
           kvs: ['IP', 'Port'],
           schemas: [
             {
+              rule: hostsRule,
+              help: 'IP 或者 Port 格式错误',
+              status: 'error',
+            },
+            {
               rule: { required: true },
               help: '请输入 kafkabrokers',
               status: 'error',
             },
             {
               rule: (value: { host: string; port: number }[]) => {
+                return true
                 // const l = strlen(value)
                 // return l >= 1 && l <= 1024
                 if (!Array.isArray(value) || !value.length) {
@@ -864,4 +876,114 @@ localhost:6379
   }
   return filters ? fieldsInfo.filter((i) => filters.has(i.name)) : fieldsInfo
 }
+
+const arr2str = (arr: { host: string; port: number }[]) => {
+  if (!Array.isArray(arr)) {
+    return undefined
+  }
+  if (arr.length > 0) {
+    return arr
+      .map(({ host: k, port: v }) => {
+        if (!k || !v) {
+          return ''
+        }
+        return `${k}${division}${v}`
+      })
+      .filter((s) => s !== '')
+      .join('\r\n')
+  }
+  return ''
+}
+
+export const source2DBStrategy = [
+  {
+    key: 'redis&mongo',
+    check: (source: SourceType) =>
+      new Set([SourceType.Redis, SourceType.MongoDB]).has(source),
+    value: (v: Record<string, any>) => {
+      return { ...v, hosts: str2Arr(v.hosts) }
+    },
+  },
+  {
+    key: 'hdfs',
+    check: (source: SourceType) => source === SourceType.HDFS,
+    value: (v: Record<string, any>) => {
+      return { ...v, default_fs: `hdfs://${v.name_node}:${v.port}` }
+    },
+  },
+  {
+    key: 'kafka',
+    check: (source: SourceType) => source === SourceType.Kafka,
+    value: (v: Record<string, any>) => {
+      return { ...v, kafka_brokers: str2Arr(v.kafka_brokers) }
+    },
+  },
+]
+
+export const sourceStrategy = [
+  {
+    key: 'hive.hiveAuth',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Hive && name === 'hiveAuth'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+        return 2
+      }
+      return 1
+    },
+  },
+  {
+    key: 'elastic_search.esAuth',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.ElasticSearch && name === 'esAuth'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return 2
+      }
+      return 1
+    },
+  },
+  {
+    key: 'redis.hosts',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Redis && name === 'hosts'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.redis.hosts')) {
+        return arr2str(get(sourceInfo, 'url.redis.hosts'))
+      }
+      return ''
+    },
+  },
+  {
+    key: 'kafka.kafka_brokers',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Kafka && name === 'kafka_brokers'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.kafka.kafka_brokers')) {
+        return arr2str(get(sourceInfo, 'url.kafka.kafka_brokers'))
+      }
+      return ''
+    },
+  },
+  {
+    key: 'mongo_db.hosts',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.MongoDB && name === 'hosts'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.mongo_db.hosts')) {
+        return arr2str(get(sourceInfo, 'url.mongo_db.hosts'))
+      }
+      return ''
+    },
+  },
+]
+
 export default getFieldsInfo

@@ -307,7 +307,7 @@ export const sourceKinds = [
   },
   {
     name: 'SapHana',
-    showname: 'SPA HANA',
+    showname: 'SAP HANA',
     urlType: 'sap_hana',
     desc: 'SAP HANA 是 SAP 公司于2011年6月推出的基于内存计算技术的高性能实时数据计算平台，用户可以基于 SAP HANA 提供的内存计算技术，直接对大量实时业务数据进行查询和分析。SAP HANA 的数据存储在内存数据库中，访问速度极快。',
     source_type: SourceType.SapHana,

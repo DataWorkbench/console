@@ -161,7 +161,7 @@ export const sourceTypes = {
   Oracle: 'Oracle',
   SqlServer: 'SqlServer',
   DB2: 'DB2',
-  SapHana: 'SPA HANA',
+  SapHana: 'SAP HANA',
   ClickHouse: 'ClickHouse',
   Hive: 'Hive',
   Ftp: 'FTP',
