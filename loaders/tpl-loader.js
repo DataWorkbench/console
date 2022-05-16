@@ -1,8 +1,4 @@
-function compileTpl(
-    tpl,
-    params
-) {
-  const keys = []
+function compileTpl(tpl, params) {
   let start = 0
   let end = 0
   let re = tpl
@@ -19,7 +15,6 @@ function compileTpl(
       const item = tpl.slice(start, end)
       if (params[item] !== undefined) {
         re = re.replace(`{${item}}`, params[item])
-        keys.push(item)
       }
     }
   }
@@ -28,7 +23,5 @@ function compileTpl(
 
 module.exports = function (source) {
   const { tplValue: value } = this.getOptions()
-  const re = compileTpl(source, value)
-  console.log(1111, source, re)
-  return re
+  return compileTpl(source, value)
 }

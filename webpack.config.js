@@ -20,7 +20,7 @@ const getTheme = () => {
   // if (!themeStr) {
   //   return {theme: 'default'}
   // }
-  return {theme: process.env.THEME}
+  return {theme: process.env.THEME || 'default'}
 }
 
 console.log(process.env.NODE_ENV)

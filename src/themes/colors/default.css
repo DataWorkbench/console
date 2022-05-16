@@ -1,9 +1,7 @@
 :root {
-  --color-text-default: #324558;
-  --color-line-dark: #4c5e70;
+  --dw-color-text-default: #324558;
 }
 
 .dark {
-  --color-text-default: #fff;
-  --color-line-dark: #4c5e70;
+  --dw-color-text-default: #fff;
 }
