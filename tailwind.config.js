@@ -1,5 +1,6 @@
 const colors = require('tailwindcss/colors')
 const plugin = require('tailwindcss/plugin')
+const themes = require("./themes");
 
 const neut = {
   20: '#020508',
@@ -74,6 +75,7 @@ module.exports = {
       line: {
         dark: '#4C5E70',
       },
+      ...themes,
     },
     extend: {
       fontSize: {
