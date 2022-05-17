@@ -3,6 +3,7 @@ import { Menu } from '@QCFE/lego-ui'
 import React, { ReactElement, SyntheticEvent } from 'react'
 import tw, { css } from 'twin.macro'
 import { FlexBox } from 'components/Box'
+import { isDarkTheme } from 'utils/theme'
 import { Center } from '../Center'
 import { Tooltip } from '../Tooltip'
 
@@ -13,7 +14,7 @@ export interface IMoreActionItem {
   value?: any
 }
 export interface IMoreActionProps<T> {
-  theme?: 'darker' | 'light'
+  theme?: 'darker' | 'light' | 'auto' | 'instead'
   onMenuClick?: (selectedData: any, menuKey: T) => void
   items: IMoreActionItem[]
   type?: 'icon' | 'button'
@@ -39,37 +40,59 @@ export interface IMoreActionProps<T> {
 const { MenuItem } = Menu as any
 
 export const moreActionStyle = {
-  child: ({ theme = 'darker' }: { theme: 'darker' | 'light' }) => {
+  child: () => {
     return [
-      theme === 'darker' &&
-        css`
-          &[aria-expanded='true'] {
-            ${tw`bg-line-dark`}
+      css`
+        &[aria-expanded='true'] {
+          .button.is-outlined,
+          & > div {
+            ${tw`bg-button-thirdly-hover`}
           }
-
-          svg {
-            ${tw`text-white! bg-transparent! fill-[transparent]!`}
-          }
-        `,
+        }
+        svg {
+          ${tw`text-icon-single-dark! dark:text-icon-single-white! bg-transparent! fill-[transparent]!`}
+        }
+      `,
     ]
   },
 }
 
-const getStyles = (theme: 'darker') => {
-  switch (theme) {
-    case 'darker':
-      return {
-        button: tw`border border-line-dark! text-white hover:bg-line-dark! hover:text-white`,
-        icon: tw`flex items-center p-0.5 cursor-pointer dark:hover:bg-line-dark rounded-sm`,
-      }
-    default:
-      return {}
+const getTheme = (theme?: string) => {
+  if (!theme) {
+    return 'darker'
+  }
+  if (theme === 'auto') {
+    if (isDarkTheme()) {
+      return 'darker'
+    }
+    return 'light'
+  }
+  if (theme === 'instead') {
+    if (isDarkTheme()) {
+      return 'light'
+    }
+    return 'darker'
+  }
+  return theme
+}
+
+const getStyles = () => {
+  return {
+    button: [
+      tw`border border-separator! text-font! bg-transparent! hover:text-font! hover:bg-transparent!`,
+      css`
+        & .icon svg.qicon {
+          ${tw`text-icon-single-dark! dark:text-icon-single-white!`}
+        }
+      `,
+    ],
+    icon: tw`h-6 w-6 flex justify-center items-center hover:bg-button-thirdly-hover!`,
   }
 }
 
 export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
   const {
-    theme = 'darker',
+    theme: themeProp,
     onMenuClick,
     items,
     type = 'icon',
@@ -77,6 +100,7 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
     placement = 'bottom-end',
   } = props
 
+  const theme = getTheme(themeProp)
   const handleMenuClick = (
     e: SyntheticEvent,
     key: T,
@@ -88,14 +112,13 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
     }
   }
 
-  // todo light style
-  const styles = getStyles(theme as 'darker')
+  const styles = getStyles()
   let children: ReactElement
 
   switch (type) {
     case 'button':
       children = (
-        <Button css={styles.button} type="outlined">
+        <Button type="outlined">
           <Icon
             name="more"
             clickable
@@ -129,9 +152,13 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
         arrow={false}
         trigger="click"
         placement={placement}
-        twChild={moreActionStyle.child({ theme }) as any}
+        theme={theme}
+        twChild={moreActionStyle.child() as any}
         content={
-          <Menu onClick={handleMenuClick}>
+          <Menu
+            onClick={handleMenuClick}
+            tw="dark:border-separator dark:border"
+          >
             {items.map(({ key, value, text, icon }) => (
               <MenuItem key={key} value={value}>
                 <FlexBox tw="justify-between items-center">

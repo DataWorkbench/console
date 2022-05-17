@@ -14,20 +14,46 @@ export interface IInstanceNameProps {
   iconClassName?: string
   iconHasBorder?: boolean
   onClick?: MouseEventHandler<HTMLDivElement>
+  iconSize?: 'small' | 'medium' | 'large'
 }
 
 const Circle = styled(Center)(
   ({ theme = 'dark' }: { theme: 'dark' | 'light' }) => {
     return [
-      tw`border-2 box-content rounded-full w-6 h-6`,
+      tw`box-content rounded-full w-6 h-6`,
       theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
       theme === 'light' && tw`bg-neut-2 border-white`,
     ]
   }
 )
 
+const getIconSize = ({ size }: { size: 'small' | 'medium' | 'large' }) =>
+  ({
+    small: {
+      container: tw`w-4 h-4`,
+      icon: 12,
+    },
+    medium: {
+      container: tw`w-6 h-6`,
+      icon: 16,
+    },
+    large: {
+      container: tw`w-10 h-10`,
+      icon: 22,
+    },
+  }[size])
+
 export const InstanceName: FC<IInstanceNameProps> = (props) => {
-  const { theme, name, desc, icon, className, iconClassName, onClick } = props
+  const {
+    theme,
+    name,
+    desc,
+    icon,
+    className,
+    iconClassName,
+    onClick,
+    iconSize = 'medium',
+  } = props
   return (
     <FlexBox
       tw="items-center truncate flex-auto gap-2"
@@ -36,11 +62,17 @@ export const InstanceName: FC<IInstanceNameProps> = (props) => {
       onClick={onClick}
     >
       {typeof icon === 'string' ? (
-        <Circle tw="flex-none" theme={theme} className="instance-name-icon">
+        <Circle
+          tw="flex-none"
+          css={getIconSize({ size: iconSize! })?.container}
+          theme={theme}
+          className="instance-name-icon"
+        >
           <Icon
             name={icon}
             type={theme === 'dark' ? 'light' : 'dark'}
             className={iconClassName}
+            size={getIconSize({ size: iconSize! })?.icon}
           />
         </Circle>
       ) : (
