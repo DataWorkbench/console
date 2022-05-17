@@ -1,5 +1,5 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { FC, MouseEventHandler, ReactElement } from 'react'
+import { FC, MouseEventHandler, ReactElement, ReactNode } from 'react'
 import tw, { styled } from 'twin.macro'
 import { FlexBox } from 'components/Box'
 import { Center } from '../Center'
@@ -7,7 +7,7 @@ import { TextEllipsis } from '../TextEllipsis'
 
 export interface IInstanceNameProps {
   theme: 'dark' | 'light'
-  name: string
+  name: ReactNode
   desc?: string
   icon?: string | ReactElement
   className?: string

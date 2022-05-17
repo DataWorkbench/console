@@ -16,11 +16,12 @@ const colorVars = {
 }
 
 const Content = styled('div')(() => [
-  tw`grid grid-cols-2 flex-wrap 2xl:grid-cols-3 gap-x-4`,
+  tw`grid grid-cols-2 flex-wrap 2xl:grid-cols-workspace gap-x-4`,
   css`
     & > div {
       ${tw`mb-4`}
     }
+    //grid-template-columns: repeat(3, minmax(530px, 1fr));
   `,
 ])
 
