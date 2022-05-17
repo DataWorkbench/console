@@ -18,10 +18,12 @@ interface IRouteParams {
 let queryKey: any = ''
 let queryRoutersKey: any = ''
 let queryVxnetsKey: any = ''
+let queryAllVxnetsKey: any = ''
 
 export const getNetworkKey = () => queryKey
 export const getRoutersKey = () => queryRoutersKey
 export const getVxnetsKey = () => queryVxnetsKey
+export const getAllVxnetsKey = () => queryAllVxnetsKey
 
 export const useQueryNetworks = (filter: any) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
@@ -77,6 +79,8 @@ export const useInfiniteQueryNetworks = (filter: any) => {
 export const useQueryDescribeRouters = (filter: {
   offset?: number
   limit?: number
+  regionId?: string
+  search_word?: string
 }) => {
   const { regionId } = useParams<IRouteParams>()
   const params = {
@@ -116,6 +120,8 @@ export const useQueryDescribeRoutersVxnets = (filter: {
   router: string
   offset?: number
   limit?: number
+  regionId?: string
+  search_word?: string
 }) => {
   const { regionId } = useParams<IRouteParams>()
   const params = {
@@ -148,6 +154,47 @@ export const useQueryDescribeRoutersVxnets = (filter: {
 
         return undefined
       },
+    }
+  )
+}
+
+export const useQueryDescribeRoutersAllVxnets = (filter: {
+  router: string
+  offset?: number
+  limit?: number
+  regionId?: string
+}) => {
+  const { regionId } = useParams<IRouteParams>()
+  const params = {
+    regionId,
+    offset: 0,
+    ...filter,
+    limit: 200,
+  }
+  queryAllVxnetsKey = ['DescribeRouterVxnets', omit(params, 'offset')]
+  return useQuery(
+    queryAllVxnetsKey,
+    async () => {
+      const params1 = {
+        ...params,
+      }
+      const params2 = {
+        ...params,
+        offset: 200,
+      }
+      const [res1, res2] = await Promise.all([
+        describeRouterVxnets(params1),
+        describeRouterVxnets(params2),
+      ])
+
+      const allVxnets = [...res1.router_vxnet_set, ...res2.router_vxnet_set]
+      return {
+        router_vxnet_set: allVxnets,
+        total: allVxnets.length,
+      }
+    },
+    {
+      enabled: !!params.router,
     }
   )
 }

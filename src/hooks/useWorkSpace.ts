@@ -56,7 +56,7 @@ export const useQueryPageWorkSpace = (filter: any) => {
   })
 }
 // {IWorkSpaceParams, 'disable' | 'enable' | 'delete' | 'create'}
-interface MutationWorkSpaceParams {
+export interface MutationWorkSpaceParams {
   regionId: string
   op: 'disable' | 'enable' | 'delete' | 'create' | 'update'
   spaceIds?: string[]
