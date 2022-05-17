@@ -11,7 +11,7 @@ module.exports = {
     black: 'var(--dw-color-text-black)',
     DEFAULT: 'var(--dw-color-text-default)',
   },
-  bg: {
+  bgColor: {
     DEFAULT: 'var-(--dw-color-background)',
     dark: 'var(--dw-color-background-dark)',
     light: 'var(--dw-color-background-light)',
@@ -22,7 +22,7 @@ module.exports = {
   separator: {
     DEFAULT: 'var(--dw-color-border-separator-default)',
     light: 'var(--dw-color-border-separator-light)',
-    dark: 'var(--dw-color-border-separator-dark)',
+    // dark: 'var(--dw-color-border-separator-dark)',
   },
   // 品牌色
   brand: {
@@ -37,6 +37,7 @@ module.exports = {
     active: 'var(--dw-color-function-info-active)',
     border: 'var(--dw-color-function-info-border)',
     bg: 'var(--dw-color-function-info-bg)',
+    light: 'var(--dw-color-function-info-light)',
   },
   // 成功色
   success: {
