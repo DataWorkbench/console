@@ -1,6 +1,6 @@
 import { Icon, Button } from '@QCFE/qingcloud-portal-ui'
 import { Menu } from '@QCFE/lego-ui'
-import React, { ReactElement, SyntheticEvent } from 'react'
+import React, { ReactElement, ReactNode, SyntheticEvent } from 'react'
 import tw, { css } from 'twin.macro'
 import { FlexBox } from 'components/Box'
 import { isDarkTheme } from 'utils/theme'
@@ -9,9 +9,10 @@ import { Tooltip } from '../Tooltip'
 
 export interface IMoreActionItem {
   key: string
-  text: string
+  text: string | ReactNode
   icon?: string
   value?: any
+  disabled?: boolean
 }
 export interface IMoreActionProps<T> {
   theme?: 'darker' | 'light' | 'auto' | 'instead'
@@ -159,8 +160,8 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
             onClick={handleMenuClick}
             tw="dark:border-separator dark:border"
           >
-            {items.map(({ key, value, text, icon }) => (
-              <MenuItem key={key} value={value}>
+            {items.map(({ key, value, text, icon, disabled }) => (
+              <MenuItem key={key} value={value} disabled={disabled}>
                 <FlexBox tw="justify-between items-center">
                   {icon ? (
                     <Icon
