@@ -10,7 +10,7 @@ import {
   useQueryDescribeRouters,
   useQueryDescribeRoutersAllVxnets,
 } from 'hooks'
-import { flatten, throttle } from 'lodash-es'
+import { flatten } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
 import { useQueryClient } from 'react-query'
@@ -84,9 +84,7 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
     300,
     [routerSearch]
   )
-  const searchRouter = useDebounce((search: string) => {
-    setRouterSearch(search)
-  }, 300)
+
   const routersRet = useQueryDescribeRouters({
     offset: 0,
     limit: 10,
@@ -289,11 +287,11 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                     </div>
                   </FlexBox>
                 )}
-                onChange={searchRouter}
+                // onChange={searchRouter}
                 searchable
-                onInputChange={throttle((v: string) => {
+                onInputChange={(v: string) => {
                   setRouterSearch(v)
-                }, 400)}
+                }}
                 openOnClick
                 isLoadingAtBottom
                 isLoading={routersRet.isFetching}

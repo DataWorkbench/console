@@ -1,11 +1,19 @@
-import tw, { css, styled } from 'twin.macro'
-import { Card } from 'components/Card'
+import tw, { css, styled, theme } from 'twin.macro'
+import {
+  Card,
+  Center,
+  Tooltip,
+  InstanceName,
+  FlexBox,
+  MoreAction,
+} from 'components'
 import { Button, Collapse, Icon } from '@QCFE/lego-ui'
-import { FlexBox } from 'components/Box'
-import { MoreAction } from 'components/MoreAction'
-import { dataReleaseDetailActions } from 'views/Space/Ops/DataIntegration/constants'
 import React, { useState } from 'react'
-import { InstanceName } from 'components/InstanceName'
+import { observer } from 'mobx-react-lite'
+import { useStore } from 'stores/index'
+import { useParams } from 'react-router-dom'
+import { isDarkTheme } from 'utils/theme'
+import NetworkModal from './NetworkModal'
 import NetworkList from './NetworkList'
 
 const Root = styled.div`
@@ -32,9 +40,15 @@ const GridItem = styled.div(({ labelWidth = 88 }: { labelWidth?: number }) => [
 ])
 
 const networkSettingKey = 'NETWORK_SETTING'
-const Network = () => {
-  const data = {}
+const Network = observer(() => {
+  const {
+    globalStore: { curRegionInfo },
+  } = useStore()
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  // const data = {}
   const [isOpen, setOpen] = useState(true)
+  const [showModal, setShowModal] = useState(true)
   return (
     <Root>
       <Card hasBoxShadow tw="bg-bgColor">
@@ -49,12 +63,40 @@ const Network = () => {
           <FlexBox tw="gap-4">
             <MoreAction
               theme="auto"
-              items={dataReleaseDetailActions
-                // .filter(filterActionFn)
-                .map((i) => ({
-                  ...i,
-                  value: data,
-                }))}
+              items={[
+                { key: 'update', text: '更换 VPC', icon: 'changing-over' },
+                {
+                  key: 'close',
+                  text: (
+                    <Center>
+                      <span tw="mr-1.5">解绑 VPC</span>
+                      <Tooltip
+                        hasPadding
+                        content="删除工作空间即可解绑 VPC"
+                        theme="instead"
+                      >
+                        <Icon
+                          name="information"
+                          css={css`
+                            svg.qicon {
+                              fill: ${
+                                isDarkTheme()
+                                  ? theme('colors.icon.single.white')
+                                  : theme('colors.icon.single.dark')
+                              };
+                              ${tw`text-icon-single-white! dark:text-icon-single-dark!`}
+                            }
+                          }
+                          `}
+                          type={isDarkTheme() ? 'light' : 'dark'}
+                        />
+                      </Tooltip>
+                    </Center>
+                  ),
+                  icon: 'close',
+                  disabled: true,
+                },
+              ]}
               type="button"
               buttonText="更多操作"
               placement="bottom-start"
@@ -105,8 +147,20 @@ const Network = () => {
       <Card tw="p-5">
         <NetworkList settingKey={networkSettingKey} />
       </Card>
+      {showModal && (
+        <NetworkModal
+          regionId={regionId}
+          spaceId={spaceId}
+          regionName={(curRegionInfo! as Record<string, any>)?.name as string}
+          vpcId=""
+          xnetId=""
+          onClose={() => {
+            setShowModal(false)
+          }}
+        />
+      )}
     </Root>
   )
-}
+})
 
 export default Network

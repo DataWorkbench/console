@@ -81,6 +81,7 @@ export const useQueryDescribeRouters = (filter: {
   limit?: number
   regionId?: string
   search_word?: string
+  spaceId?: string
 }) => {
   const { regionId } = useParams<IRouteParams>()
   const params = {
