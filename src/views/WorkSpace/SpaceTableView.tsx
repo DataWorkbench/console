@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { useWindowSize } from 'react-use'
+// import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get, omitBy } from 'lodash-es'
 import { useImmer } from 'use-immer'
@@ -13,7 +13,7 @@ import { Tooltip, FlexBox, TextEllipsis } from 'components'
 import { useHistory } from 'react-router-dom'
 import TableRowOpt from './TableRowOpt'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
 const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
@@ -26,7 +26,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   } = stateStore
   // const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const selectedRowKeys = selectedSpaces.map((i: Record<string, any>) => i.id)
-  const { width: winW } = useWindowSize()
+  // const { width: winW } = useWindowSize()
   const [sort, setSort] = useImmer<{
     name: string
     created: string
@@ -59,7 +59,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     status: '',
   })
 
-  const ifExceedMaxWidth = winW > 1535
+  // const ifExceedMaxWidth = winW > 1535
 
   const columns = useMemo(() => {
     return defaultColumns.map(
@@ -70,7 +70,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             dataIndex,
             sortable: true,
             sortKey: 'name',
-            width: 200,
+            // width: 200,
             sortOrder: sort.name,
             render: (field: string, row: any) => (
               <div tw="flex items-center w-full">
@@ -83,7 +83,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                 <div tw="ml-2 flex-1 overflow-hidden">
                   <TextEllipsis>
                     <span
-                      className={row.status === 1 && 'row-name'}
+                      className={row.status === 1 ? 'row-name' : ''}
                       css={[
                         tw`font-semibold`,
                         row.status === 1 && tw`cursor-pointer`,
@@ -110,6 +110,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             { value: 2, text: '已禁用' },
           ]
           return {
+            width: 130,
             title: (
               <FlexBox tw="items-center">
                 <span>{title}</span>
@@ -223,6 +224,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             title,
             dataIndex,
             sortable: true,
+            width: 200,
             sortKey: 'created',
             sortOrder: sort.created,
             render: (filed: number) => formatDate(filed),
@@ -232,8 +234,9 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
           return {
             title,
             dataIndex,
+            width: 400,
             // width: ifExceedMaxWidth ? 380 : 330,
-            width: ifExceedMaxWidth ? 320 : 280,
+            // width: ifExceedMaxWidth ? 320 : 280,
             render: (filed: any, row: any) => (
               <TableRowOpt space={row} regionId={regionId} />
             ),
@@ -247,7 +250,6 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     sort.name,
     sort.created,
     filter.status,
-    ifExceedMaxWidth,
     history,
     regionId,
     setFilter,
@@ -301,7 +303,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     })
   }
 
-  const handleSelect = (keys, rows) => {
+  const handleSelect = (_: string[], rows: Record<string, any>[]) => {
     stateStore.set({ selectedSpaces: rows })
     // setSelectedRowKeys(keys)
   }
