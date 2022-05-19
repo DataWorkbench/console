@@ -15,8 +15,8 @@ export const getHelpCenterLink = (path: string, ifHostPrefix = false) => {
 export const getHelpCenterLinkWithHost = (path: string) =>
   getHelpCenterLink(path, true)
 
-export const getIsFormalEnv = () =>
-  /console\d*\.qingcloud\.com$/.test(window.location.hostname)
+export const getIsFormalEnv = () => false
+// /console\d*\.qingcloud\.com$/.test(window.location.hostname)
 
 export const getApiJobMode = (jobId: string) => {
   if (/^syj-/.test(jobId)) {
