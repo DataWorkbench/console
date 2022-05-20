@@ -462,6 +462,7 @@ const SyncDataSource = observer(
                   status: 'error',
                   rule: (v?: string) => !!v,
                 },
+                // todo:当前数据源不可用，请前往 [数据源管理] 页面配置
               ]}
               help={
                 <HelpCenterLink href="xxx" hasIcon>

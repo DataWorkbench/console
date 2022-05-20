@@ -37,7 +37,7 @@ import tw, { styled, css, theme } from 'twin.macro'
 import { useWindowSize } from 'react-use'
 import ClusterModal from './ClusterModal'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
 const TableWrapper = styled(Table)(() => [
   css`
@@ -256,37 +256,6 @@ const ClusterTable = observer(
                 <Icon name="radio" color={statusObj?.color} />
                 <span>{statusObj?.text}</span>
               </FlexBox>
-            )
-          },
-        },
-        {
-          title: '网络配置名称/ID',
-          width: 160,
-          dataIndex: 'network_id',
-          render: (v: string, row: any) => {
-            const networkInfo = get(row, 'network_info')
-            return (
-              <>
-                {networkInfo ? (
-                  <div tw="cursor-pointer text-white hover:text-green-11">
-                    <Tooltip
-                      content={
-                        <>
-                          <div>VPC: {get(row, 'network_info.router_id')}</div>
-                          <div>Vxnet: {get(row, 'network_info.vxnet_id')}</div>
-                        </>
-                      }
-                      theme="light"
-                      hasPadding
-                    >
-                      <div>{get(row, 'network_info.name')}</div>
-                    </Tooltip>
-                    <div tw="text-neut-8">{get(row, 'network_id')}</div>
-                  </div>
-                ) : (
-                  <div tw="text-neut-8">{get(row, 'network_id')}</div>
-                )}
-              </>
             )
           },
         },

@@ -690,83 +690,87 @@ const ClusterModal = observer(
                   </Field>
                 </Form>
               </CollapseItem>
-              <CollapseItem
-                key="p3"
-                label={
-                  <FlexBox tw="items-center space-x-1">
-                    <Icon
-                      name="record"
-                      tw="(relative top-0 left-0)!"
-                      type="light"
-                    />
-                    <span>网络配置</span>
-                  </FlexBox>
-                }
-              >
-                <Form ref={networkFormRef} layout="column">
-                  <SelectWithRefresh
-                    label={
-                      <AffixLabel tw="font-medium text-sm">网络配置</AffixLabel>
-                    }
-                    name="network_id"
-                    value={params.network_id}
-                    validateOnChange
-                    disabled={viewMode}
-                    onChange={(v: string) => {
-                      setParams((draft) => {
-                        draft.network_id = v
-                      })
-                    }}
-                    onRefresh={() => {
-                      queryClient.invalidateQueries(getNetworkKey())
-                    }}
-                    schemas={[
-                      {
-                        rule: {
-                          required: true,
-                          isExisty: false,
-                        },
-                        status: 'error',
-                        help: (
-                          <>
-                            请选择网络,如需选择新的 VPC，您可以
-                            <span
-                              tw="text-green-11 cursor-pointer"
-                              onClick={() => dmStore.setNetWorkOp('create')}
-                            >
-                              绑定 VPC
-                            </span>
-                          </>
-                        ),
-                      },
-                    ]}
-                    options={networks.map(({ name, id }) => ({
-                      label: name,
-                      value: id,
-                    }))}
-                    isLoading={networksRet.isFetching}
-                    isLoadingAtBottom
-                    searchable={false}
-                    onMenuScrollToBottom={() => {
-                      if (networksRet.hasNextPage) {
-                        networksRet.fetchNextPage()
+              {false && (
+                <CollapseItem
+                  key="p3"
+                  label={
+                    <FlexBox tw="items-center space-x-1">
+                      <Icon
+                        name="record"
+                        tw="(relative top-0 left-0)!"
+                        type="light"
+                      />
+                      <span>网络配置</span>
+                    </FlexBox>
+                  }
+                >
+                  <Form ref={networkFormRef} layout="column">
+                    <SelectWithRefresh
+                      label={
+                        <AffixLabel tw="font-medium text-sm">
+                          网络配置
+                        </AffixLabel>
                       }
-                    }}
-                    bottomTextVisible
-                    help={
-                      <div>
-                        如需选择新的 VPC，您可以
-                        <span
-                          tw="text-green-11 cursor-pointer"
-                          onClick={() => dmStore.setNetWorkOp('create')}
-                        >
-                          绑定 VPC
-                        </span>
-                      </div>
-                    }
-                  />
-                </Form>
-              </CollapseItem>
+                      name="network_id"
+                      value={params.network_id}
+                      validateOnChange
+                      disabled={viewMode}
+                      onChange={(v: string) => {
+                        setParams((draft) => {
+                          draft.network_id = v
+                        })
+                      }}
+                      onRefresh={() => {
+                        queryClient.invalidateQueries(getNetworkKey())
+                      }}
+                      schemas={[
+                        {
+                          rule: {
+                            required: true,
+                            isExisty: false,
+                          },
+                          status: 'error',
+                          help: (
+                            <>
+                              请选择网络,如需选择新的 VPC，您可以
+                              <span
+                                tw="text-green-11 cursor-pointer"
+                                onClick={() => dmStore.setNetWorkOp('create')}
+                              >
+                                绑定 VPC
+                              </span>
+                            </>
+                          ),
+                        },
+                      ]}
+                      options={networks.map(({ name, id }) => ({
+                        label: name,
+                        value: id,
+                      }))}
+                      isLoading={networksRet.isFetching}
+                      isLoadingAtBottom
+                      searchable={false}
+                      onMenuScrollToBottom={() => {
+                        if (networksRet.hasNextPage) {
+                          networksRet.fetchNextPage()
+                        }
+                      }}
+                      bottomTextVisible
+                      help={
+                        <div>
+                          如需选择新的 VPC，您可以
+                          <span
+                            tw="text-green-11 cursor-pointer"
+                            onClick={() => dmStore.setNetWorkOp('create')}
+                          >
+                            绑定 VPC
+                          </span>
+                        </div>
+                      }
+                    />
+                  </Form>
+                </CollapseItem>
+              )}
               <CollapseItem
                 key="p4"
                 label={

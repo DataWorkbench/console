@@ -5,21 +5,12 @@ import { merge, now, pick } from 'lodash-es'
 
 import emitter from 'utils/emitter'
 import { useMutationSource, useStore } from 'hooks'
-import { TextLink, Tooltip } from 'components'
-import { useImmer } from 'use-immer'
-import { createPortal } from 'react-dom'
-import DataSourcePingCreateModal from './DataSourcePingCreateModal'
+import { AffixLabel, HelpCenterLink, TextLink } from 'components'
 import {
   DATASOURCE_PING_STAGE,
   SOURCE_PING_RESULT,
   SOURCE_PING_START,
 } from '../constant'
-
-interface INetwork {
-  id: string
-  name: string
-  network_info: Record<string, any>
-}
 
 interface IDataSourcePingButtonProps {
   getValue: () => Record<string, any> | undefined
@@ -28,42 +19,15 @@ interface IDataSourcePingButtonProps {
     message?: string
   }
   sourceId?: string
-  network?: INetwork
   hasPing?: boolean
-  withNetwork?: boolean
 }
 
 export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
-  const {
-    getValue,
-    defaultStatus,
-    sourceId,
-    network: networkProp,
-    hasPing = false,
-    withNetwork,
-  } = props
+  const { getValue, defaultStatus, sourceId, hasPing = false } = props
   const mutation = useMutationSource()
   const {
     dataSourceStore: { setShowPingHistories },
   } = useStore()
-
-  const [showNetwork, setShowNetwork] = useState(false)
-  const [network, setNetwork] =
-    useImmer<
-      | {
-          id: string
-          name: string
-          network_info: Record<string, any>
-        }
-      | undefined
-    >(networkProp)
-
-  useEffect(() => {
-    if (networkProp) {
-      setNetwork(() => networkProp)
-    }
-  }, [networkProp, setNetwork])
-  // const {} = useContext(NetworkContext)
 
   const onOpen = useCallback(() => {
     setShowPingHistories(true)
@@ -74,73 +38,60 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
 
   useEffect(() => {
     setStatus(defaultStatus)
-  }, [defaultStatus, network])
+  }, [defaultStatus])
 
   const [hasPingStatus, setHasPingStatus] = useState(hasPing)
 
-  const networkRef = useRef(network)
-
-  const handlePing = useCallback(
-    async (_network: INetwork) => {
-      hasPingRef.current = true
-      const formData = getValue()
-      if (formData) {
-        let pingStatus = false
-        let msg = ''
-        const item = {
-          uuid: Math.random().toString(32).substring(2),
-          name: _network?.name,
-          network_id: _network?.id,
-          network_info: _network?.network_info,
-          created: now() / 1000,
-          sourceId,
+  const handlePing = useCallback(async () => {
+    hasPingRef.current = true
+    const formData = getValue()
+    if (formData) {
+      let pingStatus = false
+      let msg = ''
+      const item = {
+        uuid: Math.random().toString(32).substring(2),
+        created: now() / 1000,
+        sourceId,
+        stage: sourceId
+          ? DATASOURCE_PING_STAGE.UPDATE
+          : DATASOURCE_PING_STAGE.CREATE,
+        result: -1, // 测试中
+      }
+      try {
+        emitter.emit(SOURCE_PING_START, item)
+        const ret = await mutation.mutateAsync({
+          op: 'ping',
+          ...pick(formData, 'type', 'url'),
+          source_id: sourceId,
           stage: sourceId
             ? DATASOURCE_PING_STAGE.UPDATE
             : DATASOURCE_PING_STAGE.CREATE,
-          result: -1, // 测试中
-        }
-        try {
-          emitter.emit(SOURCE_PING_START, item)
-          const ret = await mutation.mutateAsync({
-            op: 'ping',
-            ...pick(formData, 'type', 'url'),
-            network_id: _network?.id,
-            source_id: sourceId,
-            stage: sourceId
-              ? DATASOURCE_PING_STAGE.UPDATE
-              : DATASOURCE_PING_STAGE.CREATE,
-          })
-          if (ret.ret_code === 0) {
-            pingStatus = ret.result === 1
-            msg = ret.message
-            emitter.emit(
-              SOURCE_PING_RESULT,
-              merge(
-                item,
-                pick(ret, ['created', 'elapse', 'message', 'result']),
-                {
-                  last_connection: ret,
-                }
-              )
-            )
-          }
-        } catch (e: any) {
-          pingStatus = false
-          msg = e.message
+        })
+        if (ret.ret_code === 0) {
+          pingStatus = ret.result === 1
+          msg = ret.message
           emitter.emit(
             SOURCE_PING_RESULT,
-            merge(item, { message: msg, result: pingStatus ? 1 : 2 })
+            merge(item, pick(ret, ['created', 'elapse', 'message', 'result']), {
+              last_connection: ret,
+            })
           )
         }
-        setHasPingStatus(true)
-        setStatus({
-          status: pingStatus,
-          message: msg,
-        })
+      } catch (e: any) {
+        pingStatus = false
+        msg = e.message
+        emitter.emit(
+          SOURCE_PING_RESULT,
+          merge(item, { message: msg, result: pingStatus ? 1 : 2 })
+        )
       }
-    },
-    [getValue, mutation, sourceId]
-  )
+      setHasPingStatus(true)
+      setStatus({
+        status: pingStatus,
+        message: msg,
+      })
+    }
+  }, [getValue, mutation, sourceId])
 
   const pingHistory = useMemo(() => {
     return (
@@ -155,36 +106,33 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       <Button
         type="outlined"
         onClick={() => {
-          if (getValue() === null) {
-            return
-          }
-          if (!withNetwork && network) {
-            handlePing(network)
-          } else {
-            setShowNetwork(true)
-          }
+          handlePing()
         }}
-        disabled={!withNetwork && !network?.id}
       >
         {status ? '重新测试' : '开始测试'}
       </Button>
     )
-    if (!withNetwork && !network?.id) {
-      return (
-        <Tooltip
-          theme="darker"
-          content="完成数据源连接信息且选择网络配置后，可以点击“开始测试”测试数据源可用性"
-          hasPadding
-        >
-          {tempButton}
-        </Tooltip>
-      )
-    }
+
     return tempButton
-  }, [withNetwork, network, status, getValue, handlePing])
+  }, [status, handlePing])
 
   return (
     <>
+      <div>
+        <AffixLabel
+          theme="darker"
+          help={
+            <div>
+              <span tw="mr-1">详情请查看</span>
+              <HelpCenterLink href="###" hasIcon>
+                网络连通方案
+              </HelpCenterLink>
+            </div>
+          }
+        >
+          数据源可用性测试
+        </AffixLabel>
+      </div>
       <Control>
         {mutation.isLoading ? (
           <Button type="outlined">
@@ -214,8 +162,13 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         >
           <Icon name="error" />
           <span tw="text-neut-15 dark:text-neut-8">
-            不可用，{status.message ? `${status.message}，` : ''}
-            如需查看更多可点击
+            <span tw="mr-1">
+              不可用，{status.message ? `${status.message}，` : ''}
+              如需查看更多可点击
+            </span>
+            <HelpCenterLink tw="mr-1" hasIcon href="###">
+              网络连通方案
+            </HelpCenterLink>
             {pingHistory}
           </span>
         </div>
@@ -245,37 +198,6 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           {pingHistory}
         </div>
       )}
-      {withNetwork &&
-        showNetwork &&
-        createPortal(
-          <DataSourcePingCreateModal
-            networkId={network?.id}
-            onChange={(record) => {
-              if (record) {
-                const network1 = {
-                  id: record.id,
-                  name: record.name,
-                  network_info: record,
-                }
-                setNetwork(network1)
-                networkRef.current = network1
-              } else {
-                setNetwork(undefined)
-                networkRef.current = undefined
-              }
-            }}
-            onOk={() => {
-              if (networkRef.current?.id) {
-                handlePing(networkRef.current)
-              }
-              setShowNetwork(false)
-            }}
-            onClose={() => {
-              setShowNetwork(false)
-            }}
-          />,
-          document.body
-        )}
     </>
   )
 }

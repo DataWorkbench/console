@@ -9,6 +9,9 @@ import {
   createWorkSpace,
   updateWorkSpace,
 } from 'stores/api'
+import { apiHooks } from './apiHooks'
+import { DescribePlatformConfigRequestType } from '../types/request'
+import { PlatformManageDescribePlatformConfigType } from '../types/response'
 
 const keys: {
   infinite: any
@@ -56,7 +59,7 @@ export const useQueryPageWorkSpace = (filter: any) => {
   })
 }
 // {IWorkSpaceParams, 'disable' | 'enable' | 'delete' | 'create'}
-interface MutationWorkSpaceParams {
+export interface MutationWorkSpaceParams {
   regionId: string
   op: 'disable' | 'enable' | 'delete' | 'create' | 'update'
   spaceIds?: string[]
@@ -86,5 +89,11 @@ export const useMutationWorkSpace = (options?: {}) => {
     return undefined
   }, options)
 }
+
+export const useDescribePlatformConfig = apiHooks<
+  'platformManage',
+  DescribePlatformConfigRequestType,
+  PlatformManageDescribePlatformConfigType
+>('platformManage', 'describePlatformConfig')
 
 export default useQueryWorkSpace

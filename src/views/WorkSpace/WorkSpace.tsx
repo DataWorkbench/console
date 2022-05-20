@@ -15,7 +15,7 @@ import {
 import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
 import { WorkSpaceContext } from 'contexts'
-import { useQueryRegion, useStore } from 'hooks'
+import { useDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
 import { getHelpCenterLink } from 'utils'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
@@ -55,6 +55,7 @@ const WorkSpace = observer(
   ({ isModal, onItemCheck, onHide, showCreate = false }: IWrokSpaceProps) => {
     const [zone] = useCookie('zone')
     const { status, refetch, data: regionInfos } = useQueryRegion()
+
     const { globalStore } = useStore()
     // const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
     const stateStore = useLocalObservable(() => ({
@@ -95,6 +96,12 @@ const WorkSpace = observer(
       queryRefetch: false,
       queryKeyWord: '',
     }))
+
+    console.log(zone)
+    const { data: platforms } = useDescribePlatformConfig({
+      regionId: stateStore.curRegionId,
+    })
+    console.log(platforms)
 
     useEffect(() => {
       if (regionInfos?.length) {
