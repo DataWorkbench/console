@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, lowerCase, pick, merge } from 'lodash-es'
+import { get, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
@@ -32,22 +32,22 @@ import {
   RouterLink,
   Tooltip,
 } from 'components'
-import { getHelpCenterLink } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
 
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
 import {
-  DataSourcePingHistoriesModal,
-  DataSourcePingModal,
   getPingConnection,
+  DataSourcePingHistoriesModal,
 } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
 import {
+  confirmMsgInfo,
   CONNECTION_STATUS,
   DATASOURCE_STATUS,
-  ftpProtocol,
+  getUrl,
   sourceKinds,
+  tabs,
 } from './constant'
 import { SourceKindImg } from './styled'
 
@@ -69,31 +69,6 @@ const getEllipsisText = (text: string, lenght: number) => {
     index += 1
   }
   return text
-}
-
-const tabs = [
-  {
-    title: '数据源',
-    description:
-      '数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。',
-    icon: 'blockchain',
-    helpLink: getHelpCenterLink('/manual/data_up_cloud/data_summary/'),
-  },
-]
-
-const confirmMsgInfo: any = {
-  disable: {
-    name: '停用',
-    desc: '已发布调度未运行的任务将不会再使用该数据源内的所有表数据，是否确认进行停用操作？',
-  },
-  enable: {
-    name: '启动',
-    desc: '启用该数据源，已发布调度未运行的任务将使用该数据源内的所有表数据，是否确认进行启用操作？',
-  },
-  delete: {
-    name: '删除',
-    desc: '数据源删除后新建作业将无法引用，该操作无法撤回，请谨慎操作。',
-  },
 }
 
 const Root = styled('div')(() => [
@@ -122,91 +97,6 @@ const ModalWrapper = styled(Modal)(() => [
 ])
 
 const columnSettingsKey = 'DATAOMNIS_SOURCELISTS_COLUMN_SETTINGS'
-
-const getUrl = (
-  urlObj: Record<string, any>,
-  type:
-    | 'hbase'
-    | 'kafka'
-    | 'ftp'
-    | 'hdfs'
-    | 'mysql'
-    | 'clickhouse'
-    | 'postgresql'
-    | 'sap_hana'
-    | 'tidb'
-    | 'oracle'
-    | 'mssql'
-    | 'sqlserver'
-    | 'mongo_db'
-    | 'elastic_search'
-    | 'redis'
-    | 'db2'
-    | 'hive'
-) => {
-  try {
-    switch (type) {
-      // mysql default
-      case 'tidb':
-        return `jdbc:mysql://${urlObj.host}:${urlObj.port}/${urlObj.database}`
-      case 'oracle':
-        return `jdbc:oracle:thin:@${urlObj.host}:${urlObj.port}:${urlObj.database}`
-      case 'sqlserver':
-        return `jdbc:jtds:sqlserver://${urlObj.host}:${urlObj.port};DatabaseName=${urlObj.database}`
-      // PostgreSQL default
-      case 'db2':
-        return `jdbc:db2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
-      // ClickHouse default
-      case 'mongo_db':
-        return `mongodb://${urlObj.mongodb_brokers
-          .map(
-            ({ host, port }: { host: string; port: number }) =>
-              `${host}:${port}`
-          )
-          .join(',')}`
-      case 'sap_hana':
-        return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
-      case 'elastic_search':
-        return `elasticsearch://${urlObj.host}:${urlObj.port}`
-      case 'ftp':
-        return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
-          urlObj?.host
-        }:${urlObj?.port}`
-      case 'hdfs':
-        return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
-      case 'redis':
-        return `redis://${urlObj.port
-          .map(
-            ({ host, port }: { host: string; port: number }) =>
-              `${host}:${port}`
-          )
-          .join(',')}`
-      case 'hive':
-        return `jdbc:hive2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
-      case 'hbase': {
-        try {
-          return `${
-            JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']
-          }`
-        } catch (e) {
-          return ''
-        }
-      }
-      case 'kafka':
-        return urlObj.kafka_brokers
-          .map(
-            ({ host, port }: { host: string; port: number }) =>
-              `${host}:${port}`
-          )
-          .join(',')
-
-      default:
-        return `jdbc:${type}://${urlObj?.host}:${urlObj?.port}/${urlObj?.database}`
-    }
-  } catch (e) {
-    return ''
-  }
-}
 
 export interface DataSourceListProps {
   selectMode?: boolean
@@ -281,7 +171,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     }
   }, [op, refetch])
 
-  usePingEvent({
+  const { add: addPing, update: updatePing } = usePingEvent({
     addEmpty: addEmptyHistories,
     addItem: addItemHistories,
     updateEmpty: addEmptyHistories,
@@ -312,6 +202,23 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     })
   }
 
+  const handlePing = (record: Record<string, any>) => {
+    const { id } = record
+    const item = {
+      uuid: Math.random().toString(32),
+      sourceId: id,
+    }
+    addPing(item)
+    mutation
+      .mutateAsync({
+        op: 'ping',
+        source_id: id,
+      })
+      .finally(() => {
+        updatePing(item)
+        refetch()
+      })
+  }
   const handleOk = () => {
     if (op === '') {
       return
@@ -427,11 +334,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       title: '数据源可用性',
       dataIndex: 'last_connection',
       render: (v?: Record<string, any>, row?: Record<string, any>) => {
-        const {
-          result = CONNECTION_STATUS.UNDO,
-          network_info: networkInfo,
-          network_id: networkId,
-        } = v ?? { result: 0 }
+        const { result = CONNECTION_STATUS.UNDO } = v ?? { result: 0 }
         const isItemLoading = itemLoadingHistories?.[row?.id]?.size
         return (
           <>
@@ -445,7 +348,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                 }
 
                 .ping-connection-status {
-                  ${tw`text-neut-15`}
+                  ${tw`text-font`}
                 }
 
                 .${connectionListCls} {
@@ -471,24 +374,6 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                 </TextLink>
               )}
             </Center>
-            {v && (
-              <Tooltip
-                hasPadding
-                theme="instead"
-                content={
-                  <div>
-                    <div>VPC: {networkInfo?.space_id}</div>
-                    <div>vxnet: {networkInfo?.vxnet_id}</div>
-                  </div>
-                }
-                twChild={tw`truncate`}
-              >
-                <span title={`${networkInfo?.name} (${networkId})`}>
-                  <span>{networkInfo?.name} </span>
-                  <span>({networkId})</span>
-                </span>
-              </Tooltip>
-            )}
           </>
         )
       },
@@ -521,7 +406,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             <span
               tw="cursor-pointer"
               onClick={() => {
-                mutateOperation('ping', [info])
+                handlePing(info)
               }}
             >
               可用性测试
@@ -540,8 +425,9 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               查看详情
             </Button>
             <Tooltip
-              theme="instead"
+              theme="auto"
               trigger="click"
+              placement="bottom-end"
               arrow={false}
               twChild={
                 css`
@@ -558,7 +444,11 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               content={
                 <Menu
                   onClick={(e: React.SyntheticEvent, key: any) => {
-                    mutateOperation(key, [info])
+                    if (key !== 'ping') {
+                      mutateOperation(key, [info])
+                    } else {
+                      handlePing(info)
+                    }
                   }}
                 >
                   <MenuItem key="ping">
@@ -720,6 +610,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             tw="flex-1 pb-5 dark:bg-neut-16"
             css={[!selectMode && tw`px-5`]}
           >
+            {/* TODO: radio disabled 连通性过滤 */}
             <Table
               selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
@@ -858,7 +749,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
         }
         return null
       })()}
-      {op === 'ping' && <DataSourcePingModal />}
+      {/* {op === 'ping' && <DataSourcePingModal />} */}
       {showPingHistories && <DataSourcePingHistoriesModal />}
       {networkOp === 'create' && <NetworkModal appendToBody />}
     </>

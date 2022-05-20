@@ -3,7 +3,7 @@ import tw, { styled } from 'twin.macro'
 import { AffixLabel, TextLink, FlexBox } from 'components/index'
 import React from 'react'
 import dayjs from 'dayjs'
-import { useParams } from 'react-router-dom'
+// import { useParams } from 'react-router-dom'
 import { useQueryDescribeFlinkCluster } from 'hooks'
 
 const Header = styled(FlexBox)`
@@ -58,7 +58,7 @@ const logs = [
 ]
 
 const Cluster = ({ clusterId }: { clusterId?: string }) => {
-  const { regionId } = useParams<{ regionId: string }>()
+  // const { regionId } = useParams<{ regionId: string }>()
   const { data, isFetching } = useQueryDescribeFlinkCluster(
     { clusterId },
     { enabled: !!clusterId }
@@ -151,46 +151,6 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
           </Grid>
         </div>
 
-        <div>
-          <Title>
-            <Icon type="light" name="q-networkFill" />
-            <span>网络配置信息</span>
-          </Title>
-          <Grid>
-            <div>网络配置</div>
-            <div>
-              <div>
-                <span>{data?.name}</span>
-                <span tw="text-neut-8">{`(${data?.network_id})`}</span>
-              </div>
-              {data?.network_info && (
-                <>
-                  <div>
-                    <span tw="text-neut-8 mr-1">VPC 网络：</span>
-                    <TextLink
-                      style={{ fontWeight: 'bold' }}
-                      href={`/${regionId}/routers/${data?.network_info?.router_id}`}
-                      target="_blank"
-                    >
-                      {data?.network_info?.router_id}
-                    </TextLink>
-                  </div>
-
-                  <div>
-                    <span tw="text-neut-8 mr-1">私有网络：</span>
-                    <TextLink
-                      style={{ fontWeight: 'bold' }}
-                      href={`/${regionId}/routers/${data?.network_info?.vxnet_id}`}
-                      target="_blank"
-                    >
-                      {data?.network_info?.vxnet_id}
-                    </TextLink>
-                  </div>
-                </>
-              )}
-            </div>
-          </Grid>
-        </div>
         <div>
           <Title>
             <Icon type="light" name="if-book" />
