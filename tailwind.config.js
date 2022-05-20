@@ -82,6 +82,10 @@ module.exports = {
         xs: ['12px', '20px'],
         '2xs': ['14px', '24px'],
       },
+      gridTemplateColumns: {
+        // Simple 8 row grid
+        'workspace': 'repeat(auto-fit, minmax(560px, 32.5%))',
+      },
     },
   },
   variants: {
