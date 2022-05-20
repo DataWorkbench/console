@@ -7,23 +7,10 @@ export default {
     listNotifications: ['GET', '/v1/workspace/{space_id}/op/notice'],
   },
 
-  convertSyncJobMode: {
-    generateJobJson: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/convert',
-    ],
-  },
+  iaaSProxy: {
+    listIaaSRouterVXNets: ['GET', '/v1/proxy/iaas/routers/{router_id}/vxnets'],
 
-  uDFManage: {
-    unknown_error: ['GET', '/v1/workspace/{space_id}/udf/{udf_id}'],
-
-    createUDF: ['POST', '/v1/workspace/{space_id}/udf'],
-
-    deleteUDFs: ['POST', '/v1/workspace/{space_id}/udf/deletes'],
-
-    listUDFs: ['GET', '/v1/workspace/{space_id}/udf'],
-
-    updateUDF: ['PUT', '/v1/workspace/{space_id}/udf/{udf_id}'],
+    listIaaSRouters: ['GET', '/v1/proxy/iaas/routers'],
   },
 
   resourceManage: {
@@ -130,7 +117,12 @@ export default {
       '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
     ],
 
-    createSyncJob: ['POST', '/v1/workspace/{space_id}/sync/job'],
+    convertSyncJobMode: [
+      'POST',
+      '/v1/workspace/{space_id}/sync/job/{job_id}/convert',
+    ],
+
+    deleteSyncJobs: ['POST', '/v1/workspace/{space_id}/sync/job/deletes'],
 
     describeSyncConnection: [
       'GET',
@@ -146,7 +138,7 @@ export default {
 
     getSyncJobConf: ['GET', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
 
-    deleteSyncJobs: ['POST', '/v1/workspace/{space_id}/sync/job/deletes'],
+    createSyncJob: ['POST', '/v1/workspace/{space_id}/sync/job'],
 
     listSyncJobs: ['GET', '/v1/workspace/{space_id}/sync/job'],
 
@@ -359,6 +351,8 @@ export default {
     disableWorkspaces: ['POST', '/v1/workspace/disables'],
 
     createWorkspace: ['POST', '/v1/workspace'],
+
+    describeNetworkConfig: ['GET', '/v1/workspace/{space_id}/config/networks'],
 
     describeResourceBinding: [
       'GET',
