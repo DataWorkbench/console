@@ -1,0 +1,7 @@
+:root {
+  --dw-color-text-default: #324558;
+}
+
+.dark {
+  --dw-color-text-default: #fff;
+}
