@@ -110,15 +110,18 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
 
   const handleOk = (params?: MutationWorkSpaceParams) => {
     if (params) {
-      mutation.mutate(params, {
-        onSuccess: async () => {
-          handleModalClose()
-          // stateStore.set({ curSpaceOpt: '' })
-          const queryKey = getWorkSpaceKey(cardView ? 'infinite' : 'page')
-          await queryClient.invalidateQueries(queryKey)
-          stateStore.set({ optSpaces: [] })
-        },
-      })
+      mutation.mutate(
+        { ...params, regionId },
+        {
+          onSuccess: async () => {
+            handleModalClose()
+            // stateStore.set({ curSpaceOpt: '' })
+            const queryKey = getWorkSpaceKey(cardView ? 'infinite' : 'page')
+            await queryClient.invalidateQueries(queryKey)
+            stateStore.set({ optSpaces: [] })
+          },
+        }
+      )
     }
   }
 

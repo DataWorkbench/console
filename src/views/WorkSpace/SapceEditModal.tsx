@@ -287,7 +287,12 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                     </div>
                   </FlexBox>
                 )}
-                // onChange={searchRouter}
+                onChange={(v: string) => {
+                  setParams((draft) => {
+                    draft.router_id = v
+                  })
+                }}
+                clearable={false}
                 searchable
                 onInputChange={(v: string) => {
                   setRouterSearch(v)

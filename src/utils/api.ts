@@ -4,7 +4,7 @@ import { request } from 'utils/index'
 import apiList from 'stores/api/apiList'
 
 type RequestParams = {
-  uri: Record<string, any>
+  uri?: Record<string, any>
   params?: Record<string, any>
   data?: any
   regionId?: string
