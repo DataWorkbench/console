@@ -4,6 +4,9 @@ const inputStyles = css`
   .input-search {
     ${tw`text-base`}
   }
+  .textarea[disabled] {
+    opacity: 0.5;
+  }
   .dark {
     .input,
     .input-search {

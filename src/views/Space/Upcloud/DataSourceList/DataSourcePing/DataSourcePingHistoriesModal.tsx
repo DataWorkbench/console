@@ -7,37 +7,11 @@ import { useImmer } from 'use-immer'
 import { useQuerySourceHistories } from 'hooks'
 import emitter from 'utils/emitter'
 import { useStore } from 'stores'
-import { Tooltip } from 'components'
 import { timeFormat } from 'utils/convert'
 import { SOURCE_PING_RESULT } from '../constant'
 import { getPingConnection } from './getPingConnection'
 
 const columns = [
-  {
-    title: '网络配置',
-    dataIndex: 'name',
-    render: (val: string, record: Record<string, any>) => {
-      const { network_info: networkInfo } = record
-      const children = networkInfo?.name || val
-      if (networkInfo) {
-        return (
-          <Tooltip
-            theme="darker"
-            content={
-              <div>
-                <div>VPC: {networkInfo?.space_id}</div>
-                <div>vxnet: {networkInfo?.vxnet_id}</div>
-              </div>
-            }
-            hasPadding
-          >
-            {children}
-          </Tooltip>
-        )
-      }
-      return children
-    },
-  },
   {
     title: '可用性测试',
     dataIndex: 'result',

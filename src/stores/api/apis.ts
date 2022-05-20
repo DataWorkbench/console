@@ -4,6 +4,32 @@ export const auditManage = apiConfig({
   ListOpAudits: ['get', '/v1/audit'],
 })
 
+export const notifierManage = apiConfig({
+  ListNotifications: ['get', '/v1/workspace/{space_id}/op/notice'],
+})
+
+export const convertSyncJobMode = apiConfig({
+  GenerateJobJson: [
+    'post',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/convert',
+  ],
+})
+
+export const uDFManage = apiConfig({
+  '/v1/workspace/{space_id}/udf/{udf_id}': [
+    'get',
+    '/v1/workspace/{space_id}/udf/{udf_id}',
+  ],
+
+  CreateUDF: ['post', '/v1/workspace/{space_id}/udf'],
+
+  DeleteUDFs: ['post', '/v1/workspace/{space_id}/udf/deletes'],
+
+  ListUDFs: ['get', '/v1/workspace/{space_id}/udf'],
+
+  UpdateUDF: ['put', '/v1/workspace/{space_id}/udf/{udf_id}'],
+})
+
 export const resourceManage = apiConfig({
   DeleteFiles: ['post', '/v1/workspace/{space_id}/resource/deletes'],
 
@@ -43,11 +69,6 @@ export const fileManage = apiConfig({
 })
 
 export const syncJobInstanceManage = apiConfig({
-  DescribeFlinkUIByInstanceId: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/instance/{instance_id}/flink-ui',
-  ],
-
   DescribeSyncInstance: [
     'get',
     '/v1/workspace/{space_id}/sync/job/instance/{instance_id}',
@@ -105,6 +126,49 @@ export const syncJobVersionManage = apiConfig({
     'get',
     '/v1/workspace/{space_id}/sync/job/{job_id}/version',
   ],
+})
+
+export const syncJobDevManage = apiConfig({
+  GetSyncJobSchedule: [
+    'get',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
+  ],
+
+  CreateSyncJob: ['post', '/v1/workspace/{space_id}/sync/job'],
+
+  DescribeSyncConnection: [
+    'get',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
+  ],
+
+  DescribeSyncJob: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}'],
+
+  GenerateJobJson: [
+    'post',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/generate',
+  ],
+
+  GetSyncJobConf: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
+
+  DeleteSyncJobs: ['post', '/v1/workspace/{space_id}/sync/job/deletes'],
+
+  ListSyncJobs: ['get', '/v1/workspace/{space_id}/sync/job'],
+
+  MoveSyncJobs: ['post', '/v1/workspace/{space_id}/sync/job/moves'],
+
+  PingSyncJobConnection: [
+    'post',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
+  ],
+
+  SetSyncJobConf: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
+
+  SetSyncJobSchedule: [
+    'put',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
+  ],
+
+  UpdateSyncJob: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}'],
 })
 
 export const roleManage = apiConfig({
@@ -240,91 +304,50 @@ export const streamJobReleaseManage = apiConfig({
   ],
 })
 
-export const syncJobDevManage = apiConfig({
-  ListSyncJobs: ['get', '/v1/workspace/{space_id}/sync/job'],
-
-  CreateSyncJob: ['post', '/v1/workspace/{space_id}/sync/job'],
-
-  DescribeSyncConnection: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
-  ],
-
-  DescribeSyncJob: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}'],
-
-  GenerateJobJson: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/generate',
-  ],
-
-  GetSyncJobSchedule: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
-  ],
-
-  DeleteSyncJobs: ['post', '/v1/workspace/{space_id}/sync/job/deletes'],
-
-  MoveSyncJobs: ['post', '/v1/workspace/{space_id}/sync/job/moves'],
-
-  PingSyncJobConnection: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
-  ],
-
-  SetSyncJobConf: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
-
-  SetSyncJobSchedule: [
-    'put',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
-  ],
-
-  UpdateSyncJob: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}'],
-})
-
-export const notifierManage = apiConfig({
-  DescNotificationList: ['post', '/v1/notifier/{user_id}/desc'],
-})
-
 export const alertManage = apiConfig({
+  JobBoundAlertPolicies: [
+    'post',
+    '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/bound',
+  ],
+
+  AlertPolicyBoundJobs: [
+    'post',
+    '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/bound',
+  ],
+
   CreateAlertPolicy: ['post', '/v1/workspace/{space_id}/op/alert'],
 
   DeleteAlertPolicies: ['post', '/v1/workspace/{space_id}/op/alert/deletes'],
 
   DescribeAlertPolicy: ['get', '/v1/workspace/{space_id}/op/alert/{alert_id}'],
 
+  AlertPolicyUnboundJobs: [
+    'post',
+    '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/unbound',
+  ],
+
+  JobUnboundAlertPolicies: [
+    'post',
+    '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/unbound',
+  ],
+
   ListAlertPolicies: ['get', '/v1/workspace/{space_id}/op/alert'],
+
+  ListAlertPoliciesByJob: [
+    'get',
+    '/v1/workspace/{space_id}/op/alert/map/job/{job_id}',
+  ],
+
+  ListJobsByAlertPolicy: [
+    'get',
+    '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}',
+  ],
 
   UpdateAlertPolicy: ['put', '/v1/workspace/{space_id}/op/alert/{alert_id}'],
 })
 
-export const syncJobDevManages = apiConfig({
-  GetSyncJobConf: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
-})
-
-export const uDFManage = apiConfig({
-  '/v1/workspace/{space_id}/udf/{udf_id}': [
-    'get',
-    '/v1/workspace/{space_id}/udf/{udf_id}',
-  ],
-
-  CreateUDF: ['post', '/v1/workspace/{space_id}/udf'],
-
-  DeleteUDFs: ['post', '/v1/workspace/{space_id}/udf/deletes'],
-
-  ListUDFs: ['get', '/v1/workspace/{space_id}/udf'],
-
-  UpdateUDF: ['put', '/v1/workspace/{space_id}/udf/{udf_id}'],
-})
-
 export const platformManage = apiConfig({
   DescribePlatformConfig: ['get', '/v1/platform/config'],
-})
-
-export const convertSyncJobMode = apiConfig({
-  GenerateJobJson: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/convert',
-  ],
 })
 
 export const spaceManage = apiConfig({
