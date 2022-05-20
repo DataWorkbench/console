@@ -76,16 +76,17 @@ class WorkSpaceStore {
         // { name: 'logs', title: '操作日志', icon: 'blockchain' },
       ],
     },
-    // {
-    //   name: 'manage',
-    //   title: '空间管理',
-    //   subFuncList: [
-    //     { name: 'setting', title: '空间配置', icon: 'blockchain' },
-    //     { name: 'engine', title: '引擎管理', icon: 'blockchain' },
-    //     { name: 'users', title: '成员管理', icon: 'blockchain' },
-    //     { name: 'permissions', title: '列表权限', icon: 'blockchain' },
-    //   ],
-    // },
+    {
+      name: 'manage',
+      title: '空间管理',
+      subFuncList: [
+        { name: 'network', title: '网络管理', icon: 'earth' },
+        // { name: 'setting', title: '空间配置', icon: 'blockchain' },
+        // { name: 'engine', title: '引擎管理', icon: 'blockchain' },
+        // { name: 'users', title: '成员管理', icon: 'blockchain' },
+        // { name: 'permissions', title: '列表权限', icon: 'blockchain' },
+      ],
+    },
   ]
 
   constructor(rootStore: RootStore) {

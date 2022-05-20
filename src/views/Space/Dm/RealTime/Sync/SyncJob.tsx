@@ -74,7 +74,7 @@ const stepsData = [
   {
     key: 'p2',
     title: '计算集群',
-    desc: <>数据来源、目的、计算集群不在同一 VPC？请前往</>,
+    desc: null,
   },
   {
     key: 'p3',

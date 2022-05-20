@@ -1,5 +1,7 @@
 import { Form } from '@QCFE/lego-ui'
 import { nameMatchRegex, strlen } from 'utils/convert'
+import { get, lowerCase } from 'lodash-es'
+import { getHelpCenterLink } from 'utils/index'
 
 const { NumberField, PasswordField, RadioGroupField } = Form
 
@@ -390,3 +392,113 @@ export const sourceKinds = [
 //   sap_hana: 'saphana',
 //   elastic_search: 'elasticsearch',
 // }
+
+export const getUrl = (
+  urlObj: Record<string, any>,
+  type:
+    | 'hbase'
+    | 'kafka'
+    | 'ftp'
+    | 'hdfs'
+    | 'mysql'
+    | 'clickhouse'
+    | 'postgresql'
+    | 'sap_hana'
+    | 'tidb'
+    | 'oracle'
+    | 'mssql'
+    | 'sqlserver'
+    | 'mongo_db'
+    | 'elastic_search'
+    | 'redis'
+    | 'db2'
+    | 'hive'
+) => {
+  try {
+    switch (type) {
+      // mysql default
+      case 'tidb':
+        return `jdbc:mysql://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      case 'oracle':
+        return `jdbc:oracle:thin:@${urlObj.host}:${urlObj.port}:${urlObj.database}`
+      case 'sqlserver':
+        return `jdbc:jtds:sqlserver://${urlObj.host}:${urlObj.port};DatabaseName=${urlObj.database}`
+      // PostgreSQL default
+      case 'db2':
+        return `jdbc:db2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      // ClickHouse default
+      case 'mongo_db':
+        return `mongodb://${urlObj.mongodb_brokers
+          .map(
+            ({ host, port }: { host: string; port: number }) =>
+              `${host}:${port}`
+          )
+          .join(',')}`
+      case 'sap_hana':
+        return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
+      case 'elastic_search':
+        return `elasticsearch://${urlObj.host}:${urlObj.port}`
+      case 'ftp':
+        return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
+          urlObj?.host
+        }:${urlObj?.port}`
+      case 'hdfs':
+        return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
+      case 'redis':
+        return `redis://${urlObj.port
+          .map(
+            ({ host, port }: { host: string; port: number }) =>
+              `${host}:${port}`
+          )
+          .join(',')}`
+      case 'hive':
+        return `jdbc:hive2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
+      case 'hbase': {
+        try {
+          return `${
+            JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']
+          }`
+        } catch (e) {
+          return ''
+        }
+      }
+      case 'kafka':
+        return urlObj.kafka_brokers
+          .map(
+            ({ host, port }: { host: string; port: number }) =>
+              `${host}:${port}`
+          )
+          .join(',')
+
+      default:
+        return `jdbc:${type}://${urlObj?.host}:${urlObj?.port}/${urlObj?.database}`
+    }
+  } catch (e) {
+    return ''
+  }
+}
+
+export const tabs = [
+  {
+    title: '数据源',
+    description:
+      '数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。',
+    icon: 'blockchain',
+    helpLink: getHelpCenterLink('/manual/data_up_cloud/data_summary/'),
+  },
+]
+
+export const confirmMsgInfo: any = {
+  disable: {
+    name: '停用',
+    desc: '已发布调度未运行的任务将不会再使用该数据源内的所有表数据，是否确认进行停用操作？',
+  },
+  enable: {
+    name: '启动',
+    desc: '启用该数据源，已发布调度未运行的任务将使用该数据源内的所有表数据，是否确认进行启用操作？',
+  },
+  delete: {
+    name: '删除',
+    desc: '数据源删除后新建作业将无法引用，该操作无法撤回，请谨慎操作。',
+  },
+}

@@ -17,659 +17,20 @@ export type ListNotificationsRequestType = {
     space_id: string
   }
   data?: {
-    offset: number
     limit: number
+    offset: number
   }
 }
-export type GenerateJobJsonRequestType = {
-  uri: {
-    job_id: string
-  }
-  data?: {
-    conf: {
-      job_mode: number
-      target_id: string
-      channel_control: {
-        rate: number
-        parallelism: number
-        record_num: number
-        percentage: number
-        bytes: number
-      }
-      cluster_id: string
-      job_content: string
-      sync_resource: {
-        oracle_target: {
-          pre_sql: string[]
-          write_mode: number
-          column: {
-            value: string
-            name: string
-            format: string
-            type: string
-            is_part: boolean
-            index: number
-          }[]
-          schema: string
-          batch_size: number
-          semantic: number
-          post_sql: string[]
-          update_key: string[]
-          table: string[]
-          with_no_lock: string
-        }
-        mysql_source: {
-          where: string
-          schema: string
-          split_pk: string
-          condition_type: number
-          visualization: {
-            start_condition: string
-            column: string
-            start_value: string
-            end_value: string
-            end_condition: string
-          }
-          express: string
-          column: {
-            is_part: boolean
-            index: number
-            name: string
-            format: string
-            type: string
-            value: string
-          }[]
-          mapping_type: number
-          table: string[]
-        }
-        hdfs_target: {
-          field_delimiter: string
-          path: string
-          compress: number
-          file_name: string
-          file_type: number
-          encoding: number
-          column: {
-            type: string
-            value: string
-            index: number
-            name: string
-            format: string
-            is_part: boolean
-          }[]
-          write_mode: number
-        }
-        mongodb_target: {
-          batch_size: number
-          collection_name: string
-          replace_key: string
-          write_mode: number
-          database: string
-          column: {
-            index: number
-            is_part: boolean
-            name: string
-            value: string
-            type: string
-            format: string
-          }[]
-          flush_interval_mills: number
-        }
-        ftp_source: {
-          encoding: string
-          column: {
-            is_part: boolean
-            format: string
-            value: string
-            type: string
-            index: number
-            name: string
-          }[]
-          is_first_line_header: boolean
-          path: string
-          timeout: string
-          file_type: string
-          private_key_path: string
-          file_config: string
-          connect_pattern: string
-          compress_type: string
-          field_delimiter: string
-          control_encoding: string
-        }
-        pg_wal_source: {
-          lsn: number
-          database_name: string
-          allow_created: boolean
-          slot_name: string
-          paving_data: boolean
-          table_list: string[]
-          temporary: boolean
-          slot_available: boolean
-          status_interval: number
-        }
-        sap_hana_source: {
-          where: string
-          split_pk: string
-          express: string
-          column: {
-            is_part: boolean
-            value: string
-            name: string
-            format: string
-            index: number
-            type: string
-          }[]
-          mapping_type: number
-          table: string[]
-          visualization: {
-            end_condition: string
-            start_value: string
-            start_condition: string
-            column: string
-            end_value: string
-          }
-          schema: string
-          condition_type: number
-        }
-        hive_target: {
-          compress: number
-          table: string
-          partition_type: number
-          write_mode: number
-          field_delimiter: string
-          encoding: number
-          tables_column: string
-          column: {
-            key: string
-            type: string
-          }[]
-          use_partition: boolean
-          file_type: number
-          partition: string
-        }
-        click_house_target: {
-          with_no_lock: string
-          update_key: string[]
-          schema: string
-          write_mode: number
-          column: {
-            is_part: boolean
-            name: string
-            type: string
-            index: number
-            value: string
-            format: string
-          }[]
-          batch_size: number
-          semantic: number
-          table: string[]
-          post_sql: string[]
-          pre_sql: string[]
-        }
-        binlog_source: {
-          split_update: boolean
-          filter: string
-          paving_data: boolean
-          query_timeout: number
-          table: string[]
-          connect_timeout: number
-          is_gtid_mode: boolean
-          start: {
-            journal_name: string
-            position: number
-            timestamp: number
-          }
-          schema: string
-          cat: string
-        }
-        logminer_source: {
-          support_auto_add_log: boolean
-          table: string[]
-          read_position: string
-          split_update: boolean
-          cat: string
-          fetch_size: number
-          start_time: number
-          paving_data: boolean
-          start_scn: string
-          query_timeout: number
-        }
-        hbase_source: {
-          parameter: {
-            hbaseConfig: string
-            column: {
-              index: number
-              is_part: boolean
-              name: string
-              format: string
-              type: string
-              value: string
-            }[]
-            hadoopConfig: string
-            change_log: string
-            range: {
-              start_row_key: string
-              is_binary_rowkey: boolean
-              end_row_key: string
-            }
-            scan_batch_size: number
-            scan_cache_size: number
-            encoding: string
-          }
-          name: string
-          table: {
-            table_name: string
-          }
-        }
-        postgresql_target: {
-          pre_sql: string[]
-          schema: string
-          table: string[]
-          semantic: number
-          column: {
-            index: number
-            is_part: boolean
-            type: string
-            value: string
-            name: string
-            format: string
-          }[]
-          update_key: string[]
-          with_no_lock: string
-          write_mode: number
-          post_sql: string[]
-          batch_size: number
-        }
-        kafka_target: {
-          topic: string
-          consumer_settings: {
-            auto_commit_enable: string
-          }
-          tableFields: {
-            type: string
-            name: string
-            is_part: boolean
-            index: number
-            value: string
-            format: string
-          }[]
-        }
-        click_house_source: {
-          column: {
-            type: string
-            is_part: boolean
-            value: string
-            format: string
-            index: number
-            name: string
-          }[]
-          mapping_type: number
-          visualization: {
-            start_condition: string
-            end_value: string
-            start_value: string
-            end_condition: string
-            column: string
-          }
-          split_pk: string
-          table: string[]
-          express: string
-          condition_type: number
-          where: string
-          schema: string
-        }
-        db2_source: {
-          column: {
-            name: string
-            index: number
-            type: string
-            value: string
-            format: string
-            is_part: boolean
-          }[]
-          express: string
-          condition_type: number
-          visualization: {
-            start_condition: string
-            start_value: string
-            end_condition: string
-            column: string
-            end_value: string
-          }
-          mapping_type: number
-          where: string
-          table: string[]
-          split_pk: string
-          schema: string
-        }
-        elastic_search_source: {
-          version: string
-          batch_size: number
-          column: {
-            format: string
-            index: number
-            type: string
-            is_part: boolean
-            value: string
-            name: string
-          }[]
-          index: string
-        }
-        hbase_target: {
-          name: string
-          table: {
-            table_name: string
-          }
-          parameter: {
-            column: {
-              type: string
-              value: string
-              is_part: boolean
-              index: number
-              format: string
-              name: string
-            }[]
-            hbase_config: string
-            null_mode: string
-            scan_batch_size: number
-            wal_flag: boolean
-            rowkey_express: string
-            version_column_index: number
-            version_column_value: string
-            change_log: string
-            write_buffer_size: number
-            scan_cache_size: number
-          }
-        }
-        db2_target: {
-          pre_sql: string[]
-          update_key: string[]
-          with_no_lock: string
-          post_sql: string[]
-          write_mode: number
-          column: {
-            format: string
-            name: string
-            type: string
-            index: number
-            is_part: boolean
-            value: string
-          }[]
-          batch_size: number
-          schema: string
-          semantic: number
-          table: string[]
-        }
-        sqlserver_source: {
-          split_pk: string
-          express: string
-          condition_type: number
-          mapping_type: number
-          schema: string
-          visualization: {
-            end_value: string
-            end_condition: string
-            start_condition: string
-            start_value: string
-            column: string
-          }
-          where: string
-          table: string[]
-          column: {
-            is_part: boolean
-            name: string
-            index: number
-            format: string
-            value: string
-            type: string
-          }[]
-        }
-        oracle_source: {
-          column: {
-            name: string
-            value: string
-            index: number
-            is_part: boolean
-            format: string
-            type: string
-          }[]
-          express: string
-          split_pk: string
-          condition_type: number
-          visualization: {
-            column: string
-            start_condition: string
-            end_condition: string
-            start_value: string
-            end_value: string
-          }
-          schema: string
-          where: string
-          table: string[]
-          mapping_type: number
-        }
-        sql_server_cdc_source: {
-          paving_data: boolean
-          database_name: string
-          split_update: boolean
-          cat: string
-          lsn: string
-          table_list: string[]
-          poll_interval: number
-        }
-        kafka_source: {
-          mode: string
-          offset: string
-          codec: string
-          encoding: string
-          group_id: string
-          consumer_settings: {
-            auto_commit_enable: string
-          }
-          timestamp: number
-          topic: string
-          column: {
-            format: string
-            is_part: boolean
-            index: number
-            name: string
-            type: string
-            value: string
-          }[]
-        }
-        ftp_target: {
-          encoding: string
-          connect_pattern: string
-          column: {
-            is_part: boolean
-            name: string
-            type: string
-            format: string
-            value: string
-            index: number
-          }[]
-          private_key_path: string
-          timeout: number
-          path: string
-          control_encoding: string
-          field_delimiter: string
-          is_first_line_header: boolean
-          ftp_file_name: string
-        }
-        sqlserver_target: {
-          batch_size: number
-          update_key: string[]
-          with_no_lock: string
-          post_sql: string[]
-          schema: string
-          table: string[]
-          pre_sql: string[]
-          column: {
-            type: string
-            index: number
-            is_part: boolean
-            name: string
-            format: string
-            value: string
-          }[]
-          semantic: number
-          write_mode: number
-        }
-        elastic_search_target: {
-          index: string
-          batch_size: number
-          version: string
-          key_delimiter: string
-          column: {
-            is_part: boolean
-            value: string
-            index: number
-            format: string
-            type: string
-            name: string
-          }[]
-        }
-        redis_target: {
-          value_field_delimiter: string
-          expire_time: number
-          timeout: number
-          date_format: string
-          database: number
-          type: number
-          keyIndexes: number[]
-          mode: string
-          key_field_delimiter: string
-        }
-        hdfs_source: {
-          encoding: number
-          filter_regex: string
-          path: string
-          field_delimiter: string
-          file_type: number
-          column: {
-            format: string
-            type: string
-            index: number
-            value: string
-            is_part: boolean
-            name: string
-          }[]
-        }
-        postgresql_source: {
-          visualization: {
-            start_value: string
-            start_condition: string
-            end_value: string
-            end_condition: string
-            column: string
-          }
-          condition_type: number
-          column: {
-            format: string
-            name: string
-            type: string
-            is_part: boolean
-            index: number
-            value: string
-          }[]
-          table: string[]
-          express: string
-          schema: string
-          split_pk: string
-          where: string
-          mapping_type: number
-        }
-        mongodb_source: {
-          collection_name: string
-          database: string
-          filter: string
-          fetch_size: number
-          column: {
-            name: string
-            value: string
-            format: string
-            is_part: boolean
-            index: number
-            type: string
-          }[]
-        }
-        mysql_target: {
-          write_mode: number
-          post_sql: string[]
-          schema: string
-          with_no_lock: string
-          update_key: string[]
-          table: string[]
-          column: {
-            format: string
-            name: string
-            type: string
-            value: string
-            is_part: boolean
-            index: number
-          }[]
-          batch_size: number
-          semantic: number
-          pre_sql: string[]
-        }
-        sap_hana_target: {
-          write_mode: number
-          post_sql: string[]
-          batch_size: number
-          pre_sql: string[]
-          with_no_lock: string
-          schema: string
-          column: {
-            format: string
-            index: number
-            name: string
-            value: string
-            is_part: boolean
-            type: string
-          }[]
-          semantic: number
-          table: string[]
-          update_key: string[]
-        }
-      }
-      source_id: string
-    }
-    job_id: string
-  }
-}
-export type CreateUDFRequestType = {
-  data?: {
-    name: string
-    desc: string
-    language: number
-    usage_sample: string
-    type: number
-    file_id: string
-    code: string
-  }
-}
-export type DeleteUDFsRequestType = {
-  data?: {
-    udf_ids: string[]
-  }
-}
-export type ListUDFsRequestType = {
+export type ListIaaSRouterVXNetsRequestType = {
   params?: {
     limit?: string
     offset?: string
-    reverse?: string
-    search?: string
-    sort_by?: string
-    type?: string
   }
 }
-export type UpdateUDFRequestType = {
-  data?: {
-    file_id: string
-    desc: string
-    name: string
-    usage_sample: string
-    code: string
+export type ListIaaSRoutersRequestType = {
+  params?: {
+    limit?: string
+    offset?: string
   }
 }
 export type DeleteFilesRequestType = {
@@ -722,9 +83,9 @@ export type UpdateFileMetaRequestType = {
     resource_id: string
   }
   data?: {
-    description: string
-    resource_type: number
     resource_name: string
+    resource_type: number
+    description: string
   }
 }
 export type UploadFileRequestType = {
@@ -855,19 +216,627 @@ export type GetSyncJobScheduleRequestType = {
     job_id: string
   }
 }
-export type CreateSyncJobRequestType = {
+export type ConvertSyncJobModeRequestType = {
+  uri: {
+    job_id: string
+  }
+  data?: {
+    conf: {
+      job_content: string
+      cluster_id: string
+      sync_resource: {
+        mysql_source: {
+          express: string
+          mapping_type: number
+          split_pk: string
+          table: string[]
+          where: string
+          condition_type: number
+          column: {
+            format: string
+            is_part: boolean
+            value: string
+            index: number
+            type: string
+            name: string
+          }[]
+          visualization: {
+            start_value: string
+            start_condition: string
+            end_condition: string
+            end_value: string
+            column: string
+          }
+          schema: string
+        }
+        mysql_target: {
+          table: string[]
+          schema: string
+          update_key: string[]
+          semantic: number
+          batch_size: number
+          post_sql: string[]
+          write_mode: number
+          column: {
+            format: string
+            index: number
+            type: string
+            value: string
+            is_part: boolean
+            name: string
+          }[]
+          pre_sql: string[]
+          with_no_lock: string
+        }
+        db2_target: {
+          post_sql: string[]
+          column: {
+            type: string
+            is_part: boolean
+            index: number
+            name: string
+            value: string
+            format: string
+          }[]
+          write_mode: number
+          schema: string
+          semantic: number
+          update_key: string[]
+          with_no_lock: string
+          batch_size: number
+          pre_sql: string[]
+          table: string[]
+        }
+        mongodb_source: {
+          column: {
+            name: string
+            value: string
+            format: string
+            is_part: boolean
+            type: string
+            index: number
+          }[]
+          collection_name: string
+          fetch_size: number
+          filter: string
+          database: string
+        }
+        logminer_source: {
+          fetch_size: number
+          read_position: string
+          support_auto_add_log: boolean
+          table: string[]
+          cat: string
+          paving_data: boolean
+          split_update: boolean
+          query_timeout: number
+          start_time: number
+          start_scn: string
+        }
+        kafka_target: {
+          tableFields: {
+            value: string
+            format: string
+            index: number
+            name: string
+            is_part: boolean
+            type: string
+          }[]
+          topic: string
+          consumer_settings: {
+            auto_commit_enable: string
+          }
+        }
+        mongodb_target: {
+          database: string
+          column: {
+            index: number
+            type: string
+            format: string
+            name: string
+            value: string
+            is_part: boolean
+          }[]
+          batch_size: number
+          replace_key: string
+          write_mode: number
+          collection_name: string
+          flush_interval_mills: number
+        }
+        postgresql_target: {
+          with_no_lock: string
+          pre_sql: string[]
+          update_key: string[]
+          write_mode: number
+          schema: string
+          column: {
+            is_part: boolean
+            format: string
+            index: number
+            value: string
+            name: string
+            type: string
+          }[]
+          semantic: number
+          batch_size: number
+          post_sql: string[]
+          table: string[]
+        }
+        sqlserver_target: {
+          post_sql: string[]
+          table: string[]
+          with_no_lock: string
+          schema: string
+          batch_size: number
+          column: {
+            index: number
+            value: string
+            is_part: boolean
+            format: string
+            name: string
+            type: string
+          }[]
+          pre_sql: string[]
+          semantic: number
+          update_key: string[]
+          write_mode: number
+        }
+        binlog_source: {
+          is_gtid_mode: boolean
+          connect_timeout: number
+          schema: string
+          split_update: boolean
+          start: {
+            position: number
+            timestamp: number
+            journal_name: string
+          }
+          paving_data: boolean
+          table: string[]
+          filter: string
+          cat: string
+          query_timeout: number
+        }
+        hive_target: {
+          use_partition: boolean
+          encoding: number
+          tables_column: string
+          compress: number
+          write_mode: number
+          table: string
+          file_type: number
+          field_delimiter: string
+          column: {
+            type: string
+            key: string
+          }[]
+          partition_type: number
+          partition: string
+        }
+        ftp_source: {
+          control_encoding: string
+          connect_pattern: string
+          path: string
+          private_key_path: string
+          compress_type: string
+          is_first_line_header: boolean
+          column: {
+            is_part: boolean
+            name: string
+            index: number
+            type: string
+            value: string
+            format: string
+          }[]
+          encoding: string
+          file_config: string
+          file_type: string
+          timeout: string
+          field_delimiter: string
+        }
+        kafka_source: {
+          topic: string
+          group_id: string
+          mode: string
+          consumer_settings: {
+            auto_commit_enable: string
+          }
+          offset: string
+          timestamp: number
+          column: {
+            value: string
+            name: string
+            index: number
+            format: string
+            is_part: boolean
+            type: string
+          }[]
+          encoding: string
+          codec: string
+        }
+        redis_target: {
+          value_field_delimiter: string
+          key_field_delimiter: string
+          expire_time: number
+          timeout: number
+          database: number
+          date_format: string
+          mode: string
+          keyIndexes: number[]
+          type: number
+        }
+        oracle_target: {
+          update_key: string[]
+          table: string[]
+          batch_size: number
+          semantic: number
+          column: {
+            type: string
+            index: number
+            is_part: boolean
+            name: string
+            format: string
+            value: string
+          }[]
+          pre_sql: string[]
+          post_sql: string[]
+          schema: string
+          with_no_lock: string
+          write_mode: number
+        }
+        hbase_source: {
+          table: {
+            table_name: string
+          }
+          name: string
+          parameter: {
+            change_log: string
+            hadoopConfig: string
+            hbaseConfig: string
+            encoding: string
+            scan_cache_size: number
+            column: {
+              name: string
+              type: string
+              format: string
+              is_part: boolean
+              value: string
+              index: number
+            }[]
+            range: {
+              end_row_key: string
+              start_row_key: string
+              is_binary_rowkey: boolean
+            }
+            scan_batch_size: number
+          }
+        }
+        sap_hana_target: {
+          column: {
+            value: string
+            is_part: boolean
+            format: string
+            name: string
+            index: number
+            type: string
+          }[]
+          with_no_lock: string
+          post_sql: string[]
+          write_mode: number
+          pre_sql: string[]
+          batch_size: number
+          schema: string
+          semantic: number
+          table: string[]
+          update_key: string[]
+        }
+        hbase_target: {
+          table: {
+            table_name: string
+          }
+          parameter: {
+            version_column_value: string
+            column: {
+              type: string
+              format: string
+              value: string
+              index: number
+              name: string
+              is_part: boolean
+            }[]
+            scan_batch_size: number
+            hbase_config: string
+            rowkey_express: string
+            null_mode: string
+            change_log: string
+            version_column_index: number
+            scan_cache_size: number
+            write_buffer_size: number
+            wal_flag: boolean
+          }
+          name: string
+        }
+        elastic_search_target: {
+          batch_size: number
+          index: string
+          key_delimiter: string
+          column: {
+            format: string
+            index: number
+            name: string
+            value: string
+            is_part: boolean
+            type: string
+          }[]
+          version: string
+        }
+        hdfs_source: {
+          filter_regex: string
+          path: string
+          column: {
+            name: string
+            index: number
+            format: string
+            type: string
+            is_part: boolean
+            value: string
+          }[]
+          field_delimiter: string
+          encoding: number
+          file_type: number
+        }
+        click_house_source: {
+          mapping_type: number
+          table: string[]
+          express: string
+          where: string
+          column: {
+            name: string
+            format: string
+            type: string
+            is_part: boolean
+            index: number
+            value: string
+          }[]
+          split_pk: string
+          condition_type: number
+          visualization: {
+            start_value: string
+            end_value: string
+            column: string
+            end_condition: string
+            start_condition: string
+          }
+          schema: string
+        }
+        sqlserver_source: {
+          visualization: {
+            end_condition: string
+            end_value: string
+            start_condition: string
+            start_value: string
+            column: string
+          }
+          express: string
+          where: string
+          table: string[]
+          column: {
+            format: string
+            name: string
+            is_part: boolean
+            type: string
+            value: string
+            index: number
+          }[]
+          schema: string
+          condition_type: number
+          mapping_type: number
+          split_pk: string
+        }
+        elastic_search_source: {
+          column: {
+            value: string
+            type: string
+            index: number
+            format: string
+            is_part: boolean
+            name: string
+          }[]
+          batch_size: number
+          version: string
+          index: string
+        }
+        ftp_target: {
+          path: string
+          connect_pattern: string
+          encoding: string
+          field_delimiter: string
+          column: {
+            format: string
+            is_part: boolean
+            index: number
+            name: string
+            type: string
+            value: string
+          }[]
+          is_first_line_header: boolean
+          control_encoding: string
+          private_key_path: string
+          timeout: number
+          ftp_file_name: string
+        }
+        hdfs_target: {
+          file_name: string
+          write_mode: number
+          file_type: number
+          encoding: number
+          compress: number
+          field_delimiter: string
+          path: string
+          column: {
+            name: string
+            is_part: boolean
+            type: string
+            format: string
+            index: number
+            value: string
+          }[]
+        }
+        pg_wal_source: {
+          slot_available: boolean
+          slot_name: string
+          lsn: number
+          temporary: boolean
+          allow_created: boolean
+          status_interval: number
+          database_name: string
+          paving_data: boolean
+          table_list: string[]
+        }
+        sap_hana_source: {
+          condition_type: number
+          mapping_type: number
+          visualization: {
+            end_condition: string
+            start_condition: string
+            start_value: string
+            end_value: string
+            column: string
+          }
+          where: string
+          column: {
+            name: string
+            format: string
+            value: string
+            index: number
+            is_part: boolean
+            type: string
+          }[]
+          express: string
+          split_pk: string
+          table: string[]
+          schema: string
+        }
+        sql_server_cdc_source: {
+          poll_interval: number
+          lsn: string
+          split_update: boolean
+          paving_data: boolean
+          table_list: string[]
+          database_name: string
+          cat: string
+        }
+        postgresql_source: {
+          express: string
+          schema: string
+          table: string[]
+          where: string
+          split_pk: string
+          condition_type: number
+          visualization: {
+            start_value: string
+            start_condition: string
+            end_condition: string
+            end_value: string
+            column: string
+          }
+          mapping_type: number
+          column: {
+            name: string
+            index: number
+            type: string
+            value: string
+            is_part: boolean
+            format: string
+          }[]
+        }
+        oracle_source: {
+          condition_type: number
+          split_pk: string
+          column: {
+            is_part: boolean
+            value: string
+            index: number
+            type: string
+            name: string
+            format: string
+          }[]
+          schema: string
+          express: string
+          visualization: {
+            end_condition: string
+            start_condition: string
+            start_value: string
+            column: string
+            end_value: string
+          }
+          mapping_type: number
+          table: string[]
+          where: string
+        }
+        click_house_target: {
+          schema: string
+          pre_sql: string[]
+          table: string[]
+          post_sql: string[]
+          semantic: number
+          batch_size: number
+          update_key: string[]
+          write_mode: number
+          column: {
+            format: string
+            index: number
+            type: string
+            name: string
+            is_part: boolean
+            value: string
+          }[]
+          with_no_lock: string
+        }
+        db2_source: {
+          table: string[]
+          column: {
+            index: number
+            type: string
+            value: string
+            format: string
+            is_part: boolean
+            name: string
+          }[]
+          condition_type: number
+          schema: string
+          where: string
+          split_pk: string
+          mapping_type: number
+          visualization: {
+            start_condition: string
+            end_value: string
+            end_condition: string
+            start_value: string
+            column: string
+          }
+          express: string
+        }
+      }
+      job_mode: number
+      target_id: string
+      channel_control: {
+        percentage: number
+        bytes: number
+        record_num: number
+        parallelism: number
+        rate: number
+      }
+      source_id: string
+    }
+  }
+}
+export type DeleteSyncJobsRequestType = {
   uri: {
     space_id: string
   }
   data?: {
-    cluster_id: string
-    name: string
-    source_type: number
-    is_directory: boolean
-    pid: string
-    desc: string
-    target_type: number
-    type: number
+    job_ids: string[]
   }
 }
 export type DescribeSyncConnectionRequestType = {
@@ -887,18 +856,30 @@ export type DescribeSyncJobRequestType = {
     job_id: string
   }
 }
+export type GenerateJobJsonRequestType = {
+  uri: {
+    job_id: string
+  }
+}
 export type GetSyncJobConfRequestType = {
   uri: {
     space_id: string
     job_id: string
   }
 }
-export type DeleteSyncJobsRequestType = {
+export type CreateSyncJobRequestType = {
   uri: {
     space_id: string
   }
   data?: {
-    job_ids: string[]
+    desc: string
+    cluster_id: string
+    is_directory: boolean
+    target_type: number
+    source_type: number
+    type: number
+    pid: string
+    name: string
   }
 }
 export type ListSyncJobsRequestType = {
@@ -920,8 +901,8 @@ export type MoveSyncJobsRequestType = {
     space_id: string
   }
   data?: {
-    job_ids: string[]
     target: string
+    job_ids: string[]
   }
 }
 export type PingSyncJobConnectionRequestType = {
@@ -941,612 +922,612 @@ export type SetSyncJobConfRequestType = {
     job_id: string
   }
   data?: {
-    job_content: string
     channel_control: {
-      record_num: number
-      bytes: number
       percentage: number
       parallelism: number
+      bytes: number
       rate: number
+      record_num: number
     }
+    job_mode: number
     source_id: string
+    job_content: string
+    cluster_id: string
     sync_resource: {
-      oracle_source: {
-        express: string
-        column: {
-          type: string
-          value: string
-          index: number
-          name: string
-          format: string
-          is_part: boolean
-        }[]
-        schema: string
-        condition_type: number
-        table: string[]
-        visualization: {
-          column: string
-          start_value: string
-          end_value: string
-          end_condition: string
-          start_condition: string
-        }
-        where: string
-        mapping_type: number
-        split_pk: string
-      }
-      logminer_source: {
-        split_update: boolean
-        query_timeout: number
-        read_position: string
-        start_scn: string
-        fetch_size: number
-        paving_data: boolean
-        cat: string
-        table: string[]
-        start_time: number
-        support_auto_add_log: boolean
-      }
-      mongodb_target: {
-        column: {
-          index: number
-          type: string
-          is_part: boolean
-          name: string
-          value: string
-          format: string
-        }[]
-        batch_size: number
-        database: string
-        write_mode: number
-        replace_key: string
-        collection_name: string
-        flush_interval_mills: number
-      }
-      ftp_source: {
-        path: string
-        control_encoding: string
-        field_delimiter: string
-        file_type: string
-        is_first_line_header: boolean
-        private_key_path: string
-        file_config: string
-        column: {
-          value: string
-          index: number
-          name: string
-          format: string
-          is_part: boolean
-          type: string
-        }[]
-        connect_pattern: string
-        encoding: string
-        timeout: string
-        compress_type: string
-      }
-      ftp_target: {
-        column: {
-          type: string
-          value: string
-          is_part: boolean
-          format: string
-          index: number
-          name: string
-        }[]
-        connect_pattern: string
-        encoding: string
-        is_first_line_header: boolean
-        ftp_file_name: string
-        private_key_path: string
-        timeout: number
-        control_encoding: string
-        field_delimiter: string
-        path: string
-      }
-      hdfs_source: {
-        filter_regex: string
-        file_type: number
-        field_delimiter: string
-        column: {
-          value: string
-          index: number
-          is_part: boolean
-          name: string
-          format: string
-          type: string
-        }[]
-        encoding: number
-        path: string
-      }
-      mysql_source: {
-        split_pk: string
-        table: string[]
-        schema: string
-        express: string
-        mapping_type: number
-        visualization: {
-          column: string
-          start_value: string
-          end_value: string
-          start_condition: string
-          end_condition: string
-        }
-        condition_type: number
-        where: string
-        column: {
-          is_part: boolean
-          name: string
-          value: string
-          type: string
-          format: string
-          index: number
-        }[]
-      }
-      sap_hana_target: {
-        update_key: string[]
-        with_no_lock: string
-        pre_sql: string[]
-        column: {
-          name: string
-          value: string
-          type: string
-          index: number
-          is_part: boolean
-          format: string
-        }[]
-        batch_size: number
-        schema: string
-        post_sql: string[]
-        semantic: number
-        write_mode: number
-        table: string[]
-      }
-      click_house_target: {
-        post_sql: string[]
-        schema: string
-        column: {
-          name: string
-          type: string
-          value: string
-          format: string
-          index: number
-          is_part: boolean
-        }[]
-        with_no_lock: string
-        pre_sql: string[]
-        update_key: string[]
-        write_mode: number
-        table: string[]
-        semantic: number
-        batch_size: number
-      }
-      hbase_source: {
-        parameter: {
-          hbaseConfig: string
-          scan_cache_size: number
-          column: {
-            index: number
-            value: string
-            type: string
-            format: string
-            is_part: boolean
-            name: string
-          }[]
-          change_log: string
-          encoding: string
-          hadoopConfig: string
-          range: {
-            end_row_key: string
-            is_binary_rowkey: boolean
-            start_row_key: string
-          }
-          scan_batch_size: number
-        }
-        name: string
-        table: {
-          table_name: string
-        }
-      }
-      hdfs_target: {
-        file_type: number
-        field_delimiter: string
-        file_name: string
-        encoding: number
-        path: string
-        column: {
-          type: string
-          format: string
-          index: number
-          value: string
-          is_part: boolean
-          name: string
-        }[]
-        compress: number
-        write_mode: number
-      }
-      hbase_target: {
-        parameter: {
-          scan_batch_size: number
-          version_column_index: number
-          change_log: string
-          column: {
-            format: string
-            index: number
-            is_part: boolean
-            name: string
-            type: string
-            value: string
-          }[]
-          write_buffer_size: number
-          wal_flag: boolean
-          rowkey_express: string
-          version_column_value: string
-          hbase_config: string
-          scan_cache_size: number
-          null_mode: string
-        }
-        table: {
-          table_name: string
-        }
-        name: string
-      }
-      elastic_search_target: {
-        column: {
-          value: string
-          index: number
-          type: string
-          name: string
-          format: string
-          is_part: boolean
-        }[]
-        batch_size: number
-        index: string
-        key_delimiter: string
-        version: string
-      }
-      postgresql_target: {
-        batch_size: number
-        pre_sql: string[]
-        column: {
-          index: number
-          format: string
-          type: string
-          name: string
-          value: string
-          is_part: boolean
-        }[]
-        write_mode: number
-        update_key: string[]
-        semantic: number
-        table: string[]
-        schema: string
-        with_no_lock: string
-        post_sql: string[]
-      }
-      oracle_target: {
-        update_key: string[]
-        with_no_lock: string
-        pre_sql: string[]
-        post_sql: string[]
-        column: {
-          name: string
-          index: number
-          is_part: boolean
-          format: string
-          value: string
-          type: string
-        }[]
-        write_mode: number
-        semantic: number
-        table: string[]
-        batch_size: number
-        schema: string
-      }
-      mysql_target: {
-        column: {
-          type: string
-          value: string
-          is_part: boolean
-          format: string
-          index: number
-          name: string
-        }[]
-        post_sql: string[]
-        pre_sql: string[]
-        update_key: string[]
-        batch_size: number
-        schema: string
-        with_no_lock: string
-        table: string[]
-        write_mode: number
-        semantic: number
-      }
-      mongodb_source: {
-        filter: string
-        database: string
-        collection_name: string
-        column: {
-          format: string
-          type: string
-          is_part: boolean
-          value: string
-          index: number
-          name: string
-        }[]
-        fetch_size: number
-      }
-      pg_wal_source: {
-        temporary: boolean
-        database_name: string
-        status_interval: number
-        slot_available: boolean
-        table_list: string[]
-        slot_name: string
-        allow_created: boolean
-        lsn: number
-        paving_data: boolean
-      }
-      binlog_source: {
-        start: {
-          timestamp: number
-          position: number
-          journal_name: string
-        }
-        table: string[]
-        split_update: boolean
-        connect_timeout: number
-        filter: string
-        schema: string
-        cat: string
-        query_timeout: number
-        is_gtid_mode: boolean
-        paving_data: boolean
-      }
-      sqlserver_source: {
-        where: string
-        column: {
-          format: string
-          is_part: boolean
-          index: number
-          value: string
-          name: string
-          type: string
-        }[]
-        condition_type: number
-        visualization: {
-          start_condition: string
-          end_value: string
-          column: string
-          end_condition: string
-          start_value: string
-        }
-        table: string[]
-        schema: string
-        split_pk: string
-        mapping_type: number
-        express: string
-      }
-      db2_source: {
-        split_pk: string
-        express: string
-        column: {
-          name: string
-          is_part: boolean
-          index: number
-          format: string
-          type: string
-          value: string
-        }[]
-        visualization: {
-          start_value: string
-          end_condition: string
-          column: string
-          end_value: string
-          start_condition: string
-        }
-        table: string[]
-        mapping_type: number
-        schema: string
-        where: string
-        condition_type: number
-      }
-      sap_hana_source: {
-        schema: string
-        condition_type: number
-        table: string[]
-        express: string
-        column: {
-          is_part: boolean
-          name: string
-          type: string
-          format: string
-          value: string
-          index: number
-        }[]
-        split_pk: string
-        visualization: {
-          start_value: string
-          end_value: string
-          column: string
-          start_condition: string
-          end_condition: string
-        }
-        mapping_type: number
-        where: string
-      }
-      postgresql_source: {
-        visualization: {
-          end_condition: string
-          start_condition: string
-          column: string
-          end_value: string
-          start_value: string
-        }
-        express: string
-        split_pk: string
-        condition_type: number
-        table: string[]
-        column: {
-          index: number
-          is_part: boolean
-          name: string
-          type: string
-          value: string
-          format: string
-        }[]
-        schema: string
-        where: string
-        mapping_type: number
-      }
-      db2_target: {
-        schema: string
-        post_sql: string[]
-        update_key: string[]
-        table: string[]
-        column: {
-          value: string
-          is_part: boolean
-          format: string
-          name: string
-          type: string
-          index: number
-        }[]
-        semantic: number
-        write_mode: number
-        batch_size: number
-        with_no_lock: string
-        pre_sql: string[]
-      }
-      sql_server_cdc_source: {
-        cat: string
-        lsn: string
-        poll_interval: number
-        database_name: string
-        paving_data: boolean
-        table_list: string[]
-        split_update: boolean
-      }
-      elastic_search_source: {
-        version: string
-        index: string
-        column: {
-          is_part: boolean
-          index: number
-          name: string
-          format: string
-          type: string
-          value: string
-        }[]
-        batch_size: number
-      }
-      kafka_target: {
-        topic: string
-        consumer_settings: {
-          auto_commit_enable: string
-        }
-        tableFields: {
-          value: string
-          index: number
-          format: string
-          name: string
-          type: string
-          is_part: boolean
-        }[]
-      }
-      click_house_source: {
-        schema: string
-        table: string[]
-        express: string
-        visualization: {
-          end_condition: string
-          end_value: string
-          start_condition: string
-          start_value: string
-          column: string
-        }
-        condition_type: number
-        mapping_type: number
-        column: {
-          name: string
-          index: number
-          is_part: boolean
-          value: string
-          type: string
-          format: string
-        }[]
-        split_pk: string
-        where: string
-      }
-      redis_target: {
-        expire_time: number
-        date_format: string
-        timeout: number
-        database: number
-        keyIndexes: number[]
-        key_field_delimiter: string
-        mode: string
-        type: number
-        value_field_delimiter: string
-      }
-      kafka_source: {
-        group_id: string
-        topic: string
-        encoding: string
-        mode: string
-        timestamp: number
-        column: {
-          type: string
-          is_part: boolean
-          format: string
-          value: string
-          name: string
-          index: number
-        }[]
-        consumer_settings: {
-          auto_commit_enable: string
-        }
-        offset: string
-        codec: string
-      }
-      sqlserver_target: {
-        column: {
-          type: string
-          value: string
-          index: number
-          name: string
-          format: string
-          is_part: boolean
-        }[]
-        with_no_lock: string
-        write_mode: number
-        schema: string
-        semantic: number
-        post_sql: string[]
-        update_key: string[]
-        table: string[]
-        pre_sql: string[]
-        batch_size: number
-      }
       hive_target: {
-        encoding: number
+        use_partition: boolean
+        field_delimiter: string
+        table: string
+        partition_type: number
+        compress: number
+        partition: string
+        tables_column: string
+        write_mode: number
         column: {
           type: string
           key: string
         }[]
         file_type: number
-        field_delimiter: string
-        partition: string
-        tables_column: string
-        compress: number
+        encoding: number
+      }
+      oracle_target: {
+        pre_sql: string[]
+        update_key: string[]
+        batch_size: number
         write_mode: number
-        table: string
-        use_partition: boolean
-        partition_type: number
+        post_sql: string[]
+        table: string[]
+        with_no_lock: string
+        column: {
+          is_part: boolean
+          type: string
+          value: string
+          index: number
+          name: string
+          format: string
+        }[]
+        schema: string
+        semantic: number
+      }
+      sql_server_cdc_source: {
+        cat: string
+        lsn: string
+        paving_data: boolean
+        table_list: string[]
+        split_update: boolean
+        database_name: string
+        poll_interval: number
+      }
+      db2_target: {
+        post_sql: string[]
+        with_no_lock: string
+        column: {
+          type: string
+          index: number
+          format: string
+          is_part: boolean
+          name: string
+          value: string
+        }[]
+        semantic: number
+        schema: string
+        update_key: string[]
+        write_mode: number
+        batch_size: number
+        pre_sql: string[]
+        table: string[]
+      }
+      mysql_source: {
+        table: string[]
+        condition_type: number
+        express: string
+        column: {
+          name: string
+          value: string
+          index: number
+          format: string
+          is_part: boolean
+          type: string
+        }[]
+        schema: string
+        mapping_type: number
+        visualization: {
+          start_condition: string
+          end_condition: string
+          column: string
+          end_value: string
+          start_value: string
+        }
+        split_pk: string
+        where: string
+      }
+      mongodb_source: {
+        collection_name: string
+        database: string
+        filter: string
+        column: {
+          format: string
+          index: number
+          name: string
+          is_part: boolean
+          value: string
+          type: string
+        }[]
+        fetch_size: number
+      }
+      oracle_source: {
+        schema: string
+        visualization: {
+          start_value: string
+          column: string
+          end_value: string
+          end_condition: string
+          start_condition: string
+        }
+        mapping_type: number
+        column: {
+          value: string
+          index: number
+          format: string
+          name: string
+          type: string
+          is_part: boolean
+        }[]
+        condition_type: number
+        express: string
+        table: string[]
+        where: string
+        split_pk: string
+      }
+      sqlserver_source: {
+        table: string[]
+        split_pk: string
+        column: {
+          name: string
+          type: string
+          value: string
+          index: number
+          format: string
+          is_part: boolean
+        }[]
+        visualization: {
+          end_condition: string
+          start_condition: string
+          start_value: string
+          end_value: string
+          column: string
+        }
+        express: string
+        condition_type: number
+        mapping_type: number
+        where: string
+        schema: string
+      }
+      elastic_search_source: {
+        batch_size: number
+        version: string
+        column: {
+          value: string
+          type: string
+          format: string
+          index: number
+          is_part: boolean
+          name: string
+        }[]
+        index: string
+      }
+      sap_hana_source: {
+        column: {
+          type: string
+          index: number
+          name: string
+          is_part: boolean
+          format: string
+          value: string
+        }[]
+        table: string[]
+        mapping_type: number
+        schema: string
+        split_pk: string
+        express: string
+        condition_type: number
+        visualization: {
+          start_condition: string
+          start_value: string
+          end_condition: string
+          column: string
+          end_value: string
+        }
+        where: string
+      }
+      mysql_target: {
+        pre_sql: string[]
+        update_key: string[]
+        column: {
+          index: number
+          name: string
+          type: string
+          value: string
+          format: string
+          is_part: boolean
+        }[]
+        schema: string
+        table: string[]
+        batch_size: number
+        post_sql: string[]
+        with_no_lock: string
+        write_mode: number
+        semantic: number
+      }
+      pg_wal_source: {
+        slot_name: string
+        slot_available: boolean
+        paving_data: boolean
+        database_name: string
+        lsn: number
+        temporary: boolean
+        status_interval: number
+        table_list: string[]
+        allow_created: boolean
+      }
+      redis_target: {
+        keyIndexes: number[]
+        key_field_delimiter: string
+        type: number
+        expire_time: number
+        timeout: number
+        database: number
+        mode: string
+        value_field_delimiter: string
+        date_format: string
+      }
+      kafka_target: {
+        consumer_settings: {
+          auto_commit_enable: string
+        }
+        tableFields: {
+          value: string
+          is_part: boolean
+          index: number
+          format: string
+          name: string
+          type: string
+        }[]
+        topic: string
+      }
+      binlog_source: {
+        table: string[]
+        cat: string
+        paving_data: boolean
+        connect_timeout: number
+        is_gtid_mode: boolean
+        query_timeout: number
+        split_update: boolean
+        start: {
+          journal_name: string
+          position: number
+          timestamp: number
+        }
+        schema: string
+        filter: string
+      }
+      elastic_search_target: {
+        version: string
+        column: {
+          type: string
+          value: string
+          format: string
+          index: number
+          is_part: boolean
+          name: string
+        }[]
+        index: string
+        batch_size: number
+        key_delimiter: string
+      }
+      db2_source: {
+        where: string
+        column: {
+          format: string
+          value: string
+          is_part: boolean
+          index: number
+          name: string
+          type: string
+        }[]
+        visualization: {
+          start_value: string
+          end_value: string
+          end_condition: string
+          start_condition: string
+          column: string
+        }
+        mapping_type: number
+        schema: string
+        condition_type: number
+        table: string[]
+        express: string
+        split_pk: string
+      }
+      hbase_source: {
+        table: {
+          table_name: string
+        }
+        parameter: {
+          hadoopConfig: string
+          range: {
+            is_binary_rowkey: boolean
+            start_row_key: string
+            end_row_key: string
+          }
+          scan_cache_size: number
+          column: {
+            type: string
+            index: number
+            is_part: boolean
+            format: string
+            name: string
+            value: string
+          }[]
+          encoding: string
+          scan_batch_size: number
+          change_log: string
+          hbaseConfig: string
+        }
+        name: string
+      }
+      hdfs_target: {
+        column: {
+          index: number
+          is_part: boolean
+          format: string
+          type: string
+          name: string
+          value: string
+        }[]
+        file_name: string
+        compress: number
+        path: string
+        encoding: number
+        write_mode: number
+        file_type: number
+        field_delimiter: string
+      }
+      ftp_source: {
+        field_delimiter: string
+        encoding: string
+        is_first_line_header: boolean
+        column: {
+          type: string
+          value: string
+          name: string
+          index: number
+          format: string
+          is_part: boolean
+        }[]
+        compress_type: string
+        file_type: string
+        private_key_path: string
+        timeout: string
+        connect_pattern: string
+        control_encoding: string
+        file_config: string
+        path: string
+      }
+      mongodb_target: {
+        database: string
+        replace_key: string
+        collection_name: string
+        flush_interval_mills: number
+        write_mode: number
+        column: {
+          type: string
+          format: string
+          index: number
+          is_part: boolean
+          value: string
+          name: string
+        }[]
+        batch_size: number
+      }
+      logminer_source: {
+        start_scn: string
+        table: string[]
+        fetch_size: number
+        paving_data: boolean
+        query_timeout: number
+        cat: string
+        split_update: boolean
+        start_time: number
+        read_position: string
+        support_auto_add_log: boolean
+      }
+      sap_hana_target: {
+        pre_sql: string[]
+        write_mode: number
+        post_sql: string[]
+        schema: string
+        with_no_lock: string
+        semantic: number
+        update_key: string[]
+        column: {
+          is_part: boolean
+          name: string
+          value: string
+          index: number
+          type: string
+          format: string
+        }[]
+        batch_size: number
+        table: string[]
+      }
+      sqlserver_target: {
+        update_key: string[]
+        with_no_lock: string
+        column: {
+          index: number
+          value: string
+          name: string
+          is_part: boolean
+          format: string
+          type: string
+        }[]
+        write_mode: number
+        batch_size: number
+        table: string[]
+        post_sql: string[]
+        pre_sql: string[]
+        semantic: number
+        schema: string
+      }
+      hbase_target: {
+        table: {
+          table_name: string
+        }
+        parameter: {
+          scan_cache_size: number
+          version_column_index: number
+          change_log: string
+          hbase_config: string
+          column: {
+            index: number
+            type: string
+            format: string
+            is_part: boolean
+            name: string
+            value: string
+          }[]
+          version_column_value: string
+          null_mode: string
+          write_buffer_size: number
+          wal_flag: boolean
+          rowkey_express: string
+          scan_batch_size: number
+        }
+        name: string
+      }
+      postgresql_target: {
+        schema: string
+        column: {
+          value: string
+          format: string
+          index: number
+          name: string
+          is_part: boolean
+          type: string
+        }[]
+        table: string[]
+        semantic: number
+        update_key: string[]
+        batch_size: number
+        post_sql: string[]
+        with_no_lock: string
+        pre_sql: string[]
+        write_mode: number
+      }
+      postgresql_source: {
+        express: string
+        condition_type: number
+        mapping_type: number
+        split_pk: string
+        column: {
+          name: string
+          value: string
+          index: number
+          is_part: boolean
+          type: string
+          format: string
+        }[]
+        schema: string
+        visualization: {
+          end_condition: string
+          end_value: string
+          start_value: string
+          column: string
+          start_condition: string
+        }
+        where: string
+        table: string[]
+      }
+      click_house_target: {
+        post_sql: string[]
+        schema: string
+        batch_size: number
+        write_mode: number
+        table: string[]
+        semantic: number
+        update_key: string[]
+        column: {
+          name: string
+          type: string
+          value: string
+          index: number
+          format: string
+          is_part: boolean
+        }[]
+        pre_sql: string[]
+        with_no_lock: string
+      }
+      click_house_source: {
+        column: {
+          type: string
+          value: string
+          index: number
+          format: string
+          is_part: boolean
+          name: string
+        }[]
+        express: string
+        split_pk: string
+        where: string
+        condition_type: number
+        schema: string
+        mapping_type: number
+        table: string[]
+        visualization: {
+          end_condition: string
+          start_value: string
+          start_condition: string
+          column: string
+          end_value: string
+        }
+      }
+      kafka_source: {
+        group_id: string
+        mode: string
+        consumer_settings: {
+          auto_commit_enable: string
+        }
+        timestamp: number
+        column: {
+          is_part: boolean
+          name: string
+          index: number
+          type: string
+          format: string
+          value: string
+        }[]
+        encoding: string
+        topic: string
+        offset: string
+        codec: string
+      }
+      ftp_target: {
+        field_delimiter: string
+        ftp_file_name: string
+        private_key_path: string
+        column: {
+          type: string
+          value: string
+          format: string
+          index: number
+          is_part: boolean
+          name: string
+        }[]
+        connect_pattern: string
+        encoding: string
+        is_first_line_header: boolean
+        path: string
+        control_encoding: string
+        timeout: number
+      }
+      hdfs_source: {
+        column: {
+          value: string
+          format: string
+          index: number
+          name: string
+          is_part: boolean
+          type: string
+        }[]
+        encoding: number
+        filter_regex: string
+        path: string
+        field_delimiter: string
+        file_type: number
       }
     }
     target_id: string
-    cluster_id: string
-    job_mode: number
   }
 }
 export type SetSyncJobScheduleRequestType = {
@@ -1555,18 +1536,18 @@ export type SetSyncJobScheduleRequestType = {
     job_id: string
   }
   data?: {
-    started: number
-    period_type: string
-    schedule_policy: number
-    concurrency_policy: number
     ended: number
-    executed: number
+    concurrency_policy: number
     parameters: {
-      key: string
       value: string
+      key: string
     }[]
     express: string
+    schedule_policy: number
+    started: number
     timeout: number
+    period_type: string
+    executed: number
   }
 }
 export type UpdateSyncJobRequestType = {
@@ -1575,8 +1556,8 @@ export type UpdateSyncJobRequestType = {
     job_id: string
   }
   data?: {
-    name: string
     desc: string
+    name: string
   }
 }
 export type ListSystemRolePermissionsRequestType = {
@@ -1608,12 +1589,12 @@ export type CreateStreamJobRequestType = {
     space_id: string
   }
   data?: {
+    name: string
     cluster_id: string
     desc: string
-    is_directory: boolean
     pid: string
-    name: string
     type: number
+    is_directory: boolean
   }
 }
 export type DescribeStreamJobRequestType = {
@@ -1669,11 +1650,11 @@ export type SetStreamJobArgsRequestType = {
     job_id: string
   }
   data?: {
+    built_in_connectors: string[]
+    parallelism: number
     delete_cluster_id: string
     cluster_id: string
-    parallelism: number
     files: string[]
-    built_in_connectors: string[]
     delete_files: string[]
   }
 }
@@ -1683,159 +1664,101 @@ export type SetStreamJobCodeRequestType = {
     job_id: string
   }
   data?: {
-    jar: {
-      delete_file_id: string
-      jar_args: string
-      file_id: string
-      jar_entry: string
-    }
-    python: {
-      code: string
-    }
-    sql: {
-      code: string
-    }
     type: number
+    jar: {
+      jar_entry: string
+      delete_file_id: string
+      file_id: string
+      jar_args: string
+    }
     operators: {
-      point_x: number
+      upstream: string
       point_y: number
-      down_stream: string
       upstream_right: string
       name: string
+      point_x: number
+      down_stream: string
+      type: number
       id: string
       property: {
-        udttf: {
-          udf_id: string
-          column: {
-            as: string
-            type: string
-            func: string
-            field: string
-          }[]
-          args: string
-        }
-        filter: {
-          expression: string
-          exists: string
-          in: string
-          where: string
-        }
-        dest: {
-          columns: string[]
-          table_id: string
-        }
-        udtf: {
-          table_as: string
-          udf_id: string
-          select_column: {
-            as: string
-            func: string
-            field: string
-            type: string
-          }[]
-          column: {
-            type: string
-            field: string
-            as: string
-            func: string
-          }[]
-          args: string
-        }
-        offset: {
-          offset: number
-        }
-        join: {
-          args: string
-          generate_column: {
-            func: string
-            field: string
-            as: string
-            type: string
-          }[]
-          table_as: string
-          table_as_right: string
-          join: string
-          column: {
-            func: string
-            as: string
-            type: string
-            field: string
-          }[]
-          expression: string
-        }
+        intersect: {}
         order_by: {
           column: {
             order: string
             field: string
           }[]
         }
-        except: {}
-        intersect: {}
-        limit: {
-          limit: number
-        }
-        dimension: {
-          time_column: {
-            func: string
-            as: string
-            field: string
-            type: string
-          }
-          custom_column: {
-            as: string
-            func: string
-            field: string
-            type: string
-          }[]
-          table_as: string
-          column: {
-            field: string
-            func: string
-            as: string
-            type: string
-          }[]
-          distinct: string
+        dest: {
           table_id: string
+          columns: string[]
         }
-        group_by: {
-          group_by: string[]
-        }
-        fetch: {
-          fetch: number
+        udttf: {
+          udf_id: string
+          column: {
+            as: string
+            type: string
+            field: string
+            func: string
+          }[]
+          args: string
         }
         union: {
           all: boolean
         }
-        values: {
-          rows: {
-            values: string[]
-          }[]
-        }
-        source: {
-          table_as: string
+        dimension: {
+          distinct: string
           custom_column: {
+            func: string
             as: string
+            field: string
+            type: string
+          }[]
+          table_as: string
+          table_id: string
+          column: {
             field: string
             func: string
             type: string
+            as: string
           }[]
           time_column: {
             type: string
             field: string
             func: string
             as: string
-          }[]
-          table_id: string
+          }
+        }
+        filter: {
+          in: string
+          where: string
+          expression: string
+          exists: string
+        }
+        source: {
           column: {
-            func: string
+            field: string
             as: string
             type: string
+            func: string
+          }[]
+          table_as: string
+          distinct: string
+          time_column: {
+            as: string
+            func: string
+            field: string
+            type: string
+          }[]
+          table_id: string
+          custom_column: {
+            func: string
+            type: string
+            as: string
             field: string
           }[]
-          distinct: string
         }
-        having: {
-          having: string
+        limit: {
+          limit: number
         }
         const: {
           column: {
@@ -1846,10 +1769,68 @@ export type SetStreamJobCodeRequestType = {
           }[]
           table: string
         }
+        fetch: {
+          fetch: number
+        }
+        having: {
+          having: string
+        }
+        values: {
+          rows: {
+            values: string[]
+          }[]
+        }
+        group_by: {
+          group_by: string[]
+        }
+        offset: {
+          offset: number
+        }
+        join: {
+          column: {
+            type: string
+            as: string
+            field: string
+            func: string
+          }[]
+          table_as_right: string
+          expression: string
+          generate_column: {
+            field: string
+            as: string
+            type: string
+            func: string
+          }[]
+          args: string
+          join: string
+          table_as: string
+        }
+        except: {}
+        udtf: {
+          column: {
+            as: string
+            type: string
+            field: string
+            func: string
+          }[]
+          select_column: {
+            field: string
+            func: string
+            type: string
+            as: string
+          }[]
+          args: string
+          table_as: string
+          udf_id: string
+        }
       }
-      upstream: string
-      type: number
     }[]
+    python: {
+      code: string
+    }
+    sql: {
+      code: string
+    }
   }
 }
 export type SetStreamJobScheduleRequestType = {
@@ -1858,17 +1839,17 @@ export type SetStreamJobScheduleRequestType = {
     job_id: string
   }
   data?: {
-    timeout: number
-    ended: number
-    retry_limit: number
-    executed: number
-    express: string
-    period_type: string
     started: number
-    concurrency_policy: number
-    retry_policy: number
-    retry_interval: number
+    retry_limit: number
     schedule_policy: number
+    timeout: number
+    period_type: string
+    concurrency_policy: number
+    express: string
+    ended: number
+    executed: number
+    retry_interval: number
+    retry_policy: number
   }
 }
 export type StreamJobCodeRunRequestType = {
@@ -1884,27 +1865,69 @@ export type StreamJobCodeSyntaxRequestType = {
   }
   data?: {
     type: number
-    sql: {
+    python: {
       code: string
     }
     operators: {
-      point_y: number
-      point_x: number
-      upstream_right: string
-      type: number
-      down_stream: string
       id: string
       property: {
+        offset: {
+          offset: number
+        }
+        except: {}
+        fetch: {
+          fetch: number
+        }
+        dimension: {
+          time_column: {
+            func: string
+            type: string
+            as: string
+            field: string
+          }
+          table_as: string
+          column: {
+            func: string
+            as: string
+            field: string
+            type: string
+          }[]
+          custom_column: {
+            func: string
+            type: string
+            as: string
+            field: string
+          }[]
+          table_id: string
+          distinct: string
+        }
         const: {
           column: {
-            field: string
             as: string
+            field: string
             type: string
             func: string
           }[]
           table: string
         }
-        dimension: {
+        filter: {
+          where: string
+          expression: string
+          in: string
+          exists: string
+        }
+        intersect: {}
+        limit: {
+          limit: number
+        }
+        dest: {
+          columns: string[]
+          table_id: string
+        }
+        union: {
+          all: boolean
+        }
+        source: {
           table_as: string
           table_id: string
           time_column: {
@@ -1912,120 +1935,51 @@ export type StreamJobCodeSyntaxRequestType = {
             type: string
             as: string
             func: string
-          }
-          column: {
-            func: string
-            field: string
-            as: string
-            type: string
           }[]
           custom_column: {
-            as: string
             field: string
             type: string
+            as: string
             func: string
+          }[]
+          column: {
+            type: string
+            field: string
+            func: string
+            as: string
           }[]
           distinct: string
-        }
-        filter: {
-          where: string
-          expression: string
-          exists: string
-          in: string
-        }
-        udttf: {
-          column: {
-            type: string
-            as: string
-            field: string
-            func: string
-          }[]
-          udf_id: string
-          args: string
-        }
-        group_by: {
-          group_by: string[]
-        }
-        intersect: {}
-        dest: {
-          table_id: string
-          columns: string[]
-        }
-        join: {
-          expression: string
-          column: {
-            field: string
-            func: string
-            as: string
-            type: string
-          }[]
-          join: string
-          args: string
-          table_as_right: string
-          generate_column: {
-            as: string
-            field: string
-            func: string
-            type: string
-          }[]
-          table_as: string
-        }
-        limit: {
-          limit: number
         }
         values: {
           rows: {
             values: string[]
           }[]
         }
-        except: {}
-        fetch: {
-          fetch: number
-        }
-        having: {
-          having: string
-        }
-        udtf: {
+        udttf: {
           args: string
-          select_column: {
+          column: {
+            as: string
+            field: string
             func: string
             type: string
-            field: string
-            as: string
           }[]
           udf_id: string
+        }
+        udtf: {
           column: {
             as: string
             type: string
             field: string
             func: string
           }[]
+          args: string
+          udf_id: string
           table_as: string
-        }
-        union: {
-          all: boolean
-        }
-        source: {
-          column: {
-            as: string
-            field: string
-            type: string
-            func: string
-          }[]
-          time_column: {
-            func: string
-            field: string
+          select_column: {
             as: string
             type: string
-          }[]
-          table_as: string
-          distinct: string
-          table_id: string
-          custom_column: {
-            as: string
             field: string
             func: string
-            type: string
           }[]
         }
         order_by: {
@@ -2034,21 +1988,48 @@ export type StreamJobCodeSyntaxRequestType = {
             order: string
           }[]
         }
-        offset: {
-          offset: number
+        having: {
+          having: string
+        }
+        join: {
+          table_as: string
+          table_as_right: string
+          join: string
+          column: {
+            as: string
+            func: string
+            type: string
+            field: string
+          }[]
+          generate_column: {
+            as: string
+            field: string
+            type: string
+            func: string
+          }[]
+          expression: string
+          args: string
+        }
+        group_by: {
+          group_by: string[]
         }
       }
       name: string
+      point_x: number
+      point_y: number
+      type: number
+      down_stream: string
       upstream: string
+      upstream_right: string
     }[]
-    python: {
+    sql: {
       code: string
     }
     jar: {
-      delete_file_id: string
       jar_entry: string
-      file_id: string
       jar_args: string
+      delete_file_id: string
+      file_id: string
     }
   }
 }
@@ -2058,8 +2039,8 @@ export type UpdateStreamJobRequestType = {
     job_id: string
   }
   data?: {
-    desc: string
     name: string
+    desc: string
   }
 }
 export type DescribeStreamJobVersionRequestType = {
@@ -2199,26 +2180,26 @@ export type CreateAlertPolicyRequestType = {
     space_id: string
   }
   data?: {
-    desc: string
-    space_id: string
-    monitor_object: number
     job_ids: string[]
-    notification_ids: string[]
-    trigger_rule: number
     trigger_action: number
+    monitor_object: number
     name: string
+    notification_ids: string[]
     monitor_item: {
       stream_job: {
         instance_timeout: number
-        instance_run_timeout: boolean
         instance_run_failed: boolean
+        instance_run_timeout: boolean
       }
       sync_job: {
-        instance_run_failed: boolean
         instance_run_timeout: boolean
+        instance_run_failed: boolean
         instance_timeout: number
       }
     }
+    desc: string
+    trigger_rule: number
+    space_id: string
   }
 }
 export type DeleteAlertPoliciesRequestType = {
@@ -2286,26 +2267,26 @@ export type UpdateAlertPolicyRequestType = {
     alert_id: string
   }
   data?: {
-    space_id: string
-    notification_ids: string[]
-    trigger_rule: number
-    monitor_object: number
-    trigger_action: number
-    desc: string
-    job_ids: string[]
-    name: string
     monitor_item: {
-      sync_job: {
-        instance_run_timeout: boolean
-        instance_timeout: number
-        instance_run_failed: boolean
-      }
       stream_job: {
         instance_timeout: number
-        instance_run_timeout: boolean
         instance_run_failed: boolean
+        instance_run_timeout: boolean
+      }
+      sync_job: {
+        instance_timeout: number
+        instance_run_failed: boolean
+        instance_run_timeout: boolean
       }
     }
+    name: string
+    trigger_rule: number
+    desc: string
+    job_ids: string[]
+    monitor_object: number
+    trigger_action: number
+    space_id: string
+    notification_ids: string[]
   }
 }
 export type DescribePlatformConfigRequestType = {}
@@ -2316,8 +2297,15 @@ export type DisableWorkspacesRequestType = {
 }
 export type CreateWorkspaceRequestType = {
   data?: {
-    name: string
+    vxnet_id: string
+    router_id: string
     desc: string
+    name: string
+  }
+}
+export type DescribeNetworkConfigRequestType = {
+  uri: {
+    space_id: string
   }
 }
 export type DescribeResourceBindingRequestType = {
@@ -2342,8 +2330,8 @@ export type DeleteWorkspacesRequestType = {
 }
 export type EnableWorkspacesRequestType = {
   data?: {
-    space_ids: string[]
     resume_job: boolean
+    space_ids: string[]
   }
 }
 export type ListMemberWorkspacesRequestType = {
@@ -2383,13 +2371,19 @@ export type UpsertWorkspaceQuotaRequestType = {
   }
   data?: {
     quota_set: {
+      custom_role: {
+        limit: number
+      }
+      workspace: {
+        limit: number
+      }
       udf: {
         limit: number
       }
-      member: {
+      network: {
         limit: number
       }
-      custom_role: {
+      sync_job: {
         limit: number
       }
       file: {
@@ -2400,22 +2394,16 @@ export type UpsertWorkspaceQuotaRequestType = {
       data_source: {
         limit: number
       }
-      sync_job: {
+      flink_cluster: {
+        cu: unknown
+        cu_total: unknown
+        limit: number
+      }
+      member: {
         limit: number
       }
       stream_job: {
         limit: number
-      }
-      network: {
-        limit: number
-      }
-      workspace: {
-        limit: number
-      }
-      flink_cluster: {
-        limit: number
-        cu: unknown
-        cu_total: unknown
       }
     }
   }
@@ -2425,9 +2413,9 @@ export type AddMembersRequestType = {
     space_id: string
   }
   data?: {
+    user_ids: string[]
     desc: string
     system_role_ids: string[]
-    user_ids: string[]
   }
 }
 export type DeleteMembersRequestType = {
@@ -2461,8 +2449,8 @@ export type UpdateMemberRequestType = {
     user_id: string
   }
   data?: {
-    system_role_ids: string[]
     user_id: string
+    system_role_ids: string[]
     desc: string
   }
 }
@@ -2473,38 +2461,38 @@ export type UpsertMemberQuotaRequestType = {
   }
   data?: {
     quota_set: {
-      udf: {
+      sync_job: {
         limit: number
       }
+      flink_cluster: {
+        limit: number
+        cu: unknown
+        cu_total: unknown
+      }
       file: {
-        size: number
+        limit: number
         size_total: number
+        size: number
+      }
+      workspace: {
         limit: number
       }
       stream_job: {
         limit: number
       }
-      flink_cluster: {
-        limit: number
-        cu_total: unknown
-        cu: unknown
-      }
-      workspace: {
-        limit: number
-      }
-      custom_role: {
-        limit: number
-      }
-      sync_job: {
+      data_source: {
         limit: number
       }
       member: {
         limit: number
       }
-      data_source: {
+      udf: {
         limit: number
       }
       network: {
+        limit: number
+      }
+      custom_role: {
         limit: number
       }
     }
@@ -2567,64 +2555,113 @@ export type CreateDataSourceRequestType = {
     space_id: string
   }
   data?: {
-    type: number
     last_connection: {
-      space_id: string
       created: number
-      network_id: string
-      result: number
+      status: number
       elapse: number
+      source_id: string
       network_info: {
-        name: string
         updated: number
-        vxnet_id: string
         created: number
+        router_id: string
         status: number
         space_id: string
-        router_id: string
+        name: string
+        vxnet_id: string
         created_by: string
         id: string
       }
+      space_id: string
       message: string
-      status: number
-      source_id: string
+      network_id: string
+      result: number
     }
     name: string
+    desc: string
+    type: number
     url: {
-      hbase: {
-        config: string
-      }
-      redis: {
-        hosts: {
-          port: number
-          host: string
-        }[]
+      s3: {}
+      db2: {
         password: string
+        port: number
+        host: string
+        user: string
+        database: string
+      }
+      hive: {
+        config: string
+        defaultFS: string
+        port: number
+        user: string
+        host: string
+        password: string
+        database: string
       }
       elastic_search: {
         version: string
         port: number
-        user: string
         password: string
         host: string
+        user: string
+      }
+      sqlserver: {
+        host: string
+        database: string
+        user: string
+        port: number
+        password: string
+      }
+      ftp: {
+        password: string
+        connection_mode: number
+        port: number
+        user: string
+        private_key: string
+        protocol: number
+        host: string
+      }
+      kafka: {
+        kafka_brokers: {
+          host: string
+          port: number
+        }[]
+      }
+      sap_hana: {
+        user: string
+        port: number
+        database: string
+        host: string
+        password: string
+      }
+      hbase: {
+        config: string
+      }
+      hdfs: {
+        name_node: string
+        port: number
+        config: string
+      }
+      redis: {
+        password: string
+        hosts: {
+          host: string
+          port: number
+        }[]
       }
       clickhouse: {
-        port: number
+        user: string
         database: string
         password: string
         host: string
-        user: string
-      }
-      ftp: {
-        host: string
-        private_key: string
-        password: string
-        connection_mode: number
-        protocol: number
-        user: string
         port: number
       }
-      s3: {}
+      oracle: {
+        user: string
+        port: number
+        database: string
+        host: string
+        password: string
+      }
       mongo_db: {
         database: string
         password: string
@@ -2634,70 +2671,21 @@ export type CreateDataSourceRequestType = {
           port: number
         }[]
       }
-      kafka: {
-        kafka_brokers: {
-          port: number
-          host: string
-        }[]
-      }
-      db2: {
-        database: string
-        host: string
-        password: string
-        user: string
-        port: number
-      }
-      oracle: {
-        user: string
-        password: string
-        port: number
-        host: string
-        database: string
-      }
-      hive: {
-        config: string
-        defaultFS: string
-        host: string
-        database: string
-        password: string
-        port: number
-        user: string
-      }
       mysql: {
-        password: string
-        host: string
         port: number
-        user: string
         database: string
-      }
-      sqlserver: {
-        user: string
-        password: string
         host: string
-        database: string
-        port: number
-      }
-      sap_hana: {
-        database: string
-        port: number
         password: string
-        host: string
         user: string
-      }
-      hdfs: {
-        config: string
-        name_node: string
-        port: number
       }
       postgresql: {
-        user: string
-        password: string
-        host: string
         database: string
+        password: string
+        user: string
         port: number
+        host: string
       }
     }
-    desc: string
   }
 }
 export type DescribeDataSourceRequestType = {
@@ -2758,11 +2746,11 @@ export type ListDataSourceConnectionsRequestType = {
     verbose?: string
   }
   data?: {
-    verbose: number
     reverse: boolean
-    sort_by: string
-    limit: number
     offset: number
+    limit: number
+    verbose: number
+    sort_by: string
   }
 }
 export type ListDataSourcesRequestType = {
@@ -2782,114 +2770,114 @@ export type PingDataSourceConnectionRequestType = {
     space_id: string
   }
   data?: {
-    source_id: string
-    type: number
-    stage: number
     network_id: string
+    type: number
+    source_id: string
+    stage: number
     url: {
-      mysql: {
-        user: string
-        database: string
+      hive: {
         port: number
-        password: string
         host: string
-      }
-      s3: {}
-      hbase: {
+        password: string
+        database: string
         config: string
-      }
-      redis: {
-        hosts: {
-          port: number
-          host: string
-        }[]
-        password: string
-      }
-      elastic_search: {
-        version: string
         user: string
-        port: number
-        host: string
-        password: string
-      }
-      oracle: {
-        database: string
-        host: string
-        user: string
-        password: string
-        port: number
-      }
-      sqlserver: {
-        user: string
-        port: number
-        database: string
-        host: string
-        password: string
+        defaultFS: string
       }
       kafka: {
         kafka_brokers: {
-          port: number
           host: string
+          port: number
         }[]
       }
-      hdfs: {
-        config: string
-        port: number
-        name_node: string
-      }
-      hive: {
-        host: string
-        config: string
-        defaultFS: string
+      s3: {}
+      redis: {
         password: string
-        port: number
-        database: string
-        user: string
-      }
-      ftp: {
-        protocol: number
-        host: string
-        password: string
-        private_key: string
-        connection_mode: number
-        user: string
-        port: number
-      }
-      db2: {
-        password: string
-        host: string
-        port: number
-        database: string
-        user: string
-      }
-      mongo_db: {
         hosts: {
           port: number
           host: string
         }[]
-        password: string
-        user: string
-        database: string
+      }
+      hbase: {
+        config: string
       }
       sap_hana: {
+        database: string
+        password: string
+        port: number
+        host: string
+        user: string
+      }
+      sqlserver: {
+        database: string
         host: string
         port: number
-        database: string
         user: string
         password: string
       }
       clickhouse: {
-        password: string
-        port: number
         database: string
         host: string
+        port: number
         user: string
+        password: string
+      }
+      mysql: {
+        password: string
+        database: string
+        port: number
+        user: string
+        host: string
+      }
+      oracle: {
+        port: number
+        user: string
+        password: string
+        host: string
+        database: string
       }
       postgresql: {
-        user: string
+        host: string
         database: string
+        password: string
+        user: string
+        port: number
+      }
+      db2: {
+        database: string
+        port: number
         host: string
         password: string
+        user: string
+      }
+      ftp: {
+        protocol: number
+        port: number
+        password: string
+        connection_mode: number
+        user: string
+        host: string
+        private_key: string
+      }
+      mongo_db: {
+        password: string
+        database: string
+        user: string
+        hosts: {
+          host: string
+          port: number
+        }[]
+      }
+      elastic_search: {
+        host: string
+        port: number
+        user: string
+        version: string
+        password: string
+      }
+      hdfs: {
+        name_node: string
+        config: string
         port: number
       }
     }
@@ -2902,115 +2890,115 @@ export type UpdateDataSourceRequestType = {
   }
   data?: {
     name: string
-    desc: string
     url: {
-      mongo_db: {
-        user: string
-        password: string
-        database: string
-        hosts: {
-          port: number
-          host: string
-        }[]
-      }
-      redis: {
-        password: string
-        hosts: {
-          port: number
-          host: string
-        }[]
-      }
-      sap_hana: {
-        database: string
-        port: number
-        user: string
+      ftp: {
+        connection_mode: number
+        private_key: string
         host: string
-        password: string
-      }
-      elastic_search: {
-        host: string
-        version: string
-        password: string
+        protocol: number
         user: string
+        password: string
         port: number
       }
       sqlserver: {
-        user: string
-        database: string
-        host: string
         password: string
-        port: number
-      }
-      db2: {
         host: string
         database: string
-        password: string
         port: number
         user: string
       }
       hdfs: {
+        name_node: string
         config: string
         port: number
-        name_node: string
+      }
+      sap_hana: {
+        password: string
+        host: string
+        database: string
+        port: number
+        user: string
+      }
+      oracle: {
+        host: string
+        user: string
+        port: number
+        database: string
+        password: string
+      }
+      hbase: {
+        config: string
+      }
+      elastic_search: {
+        port: number
+        version: string
+        user: string
+        host: string
+        password: string
       }
       mysql: {
+        database: string
+        port: number
+        user: string
+        password: string
+        host: string
+      }
+      db2: {
+        port: number
+        host: string
         user: string
         database: string
-        host: string
+        password: string
+      }
+      postgresql: {
+        user: string
+        database: string
         password: string
         port: number
+        host: string
+      }
+      hive: {
+        host: string
+        config: string
+        defaultFS: string
+        port: number
+        user: string
+        database: string
+        password: string
+      }
+      clickhouse: {
+        port: number
+        password: string
+        database: string
+        host: string
+        user: string
+      }
+      mongo_db: {
+        user: string
+        password: string
+        hosts: {
+          host: string
+          port: number
+        }[]
+        database: string
+      }
+      redis: {
+        hosts: {
+          port: number
+          host: string
+        }[]
+        password: string
       }
       s3: {}
-      postgresql: {
-        host: string
-        port: number
-        password: string
-        user: string
-        database: string
-      }
       kafka: {
         kafka_brokers: {
           host: string
           port: number
         }[]
       }
-      hive: {
-        port: number
-        user: string
-        password: string
-        database: string
-        defaultFS: string
-        config: string
-        host: string
-      }
-      ftp: {
-        user: string
-        password: string
-        port: number
-        host: string
-        private_key: string
-        protocol: number
-        connection_mode: number
-      }
-      hbase: {
-        config: string
-      }
-      clickhouse: {
-        database: string
-        host: string
-        user: string
-        password: string
-        port: number
-      }
-      oracle: {
-        port: number
-        database: string
-        user: string
-        host: string
-        password: string
-      }
     }
     type: number
+    desc: string
   }
 }
 export type CreateFlinkClusterRequestType = {
@@ -3018,35 +3006,35 @@ export type CreateFlinkClusterRequestType = {
     space_id: string
   }
   data?: {
-    network_id: string
+    version: string
     config: {
       logger: {
         root_log_level: string
+      }
+      restart_strategy: {
+        failure_rate_max_failures_per_interval: number
+        restart_strategy: string
+        failure_rate_delay: number
+        failure_rate_failure_rate_interval: number
+        fixed_delay_attempts: number
+        fixed_delay_delay: number
       }
       custom: {
         value: string
         key: string
       }[]
-      restart_strategy: {
-        restart_strategy: string
-        fixed_delay_delay: number
-        fixed_delay_attempts: number
-        failure_rate_failure_rate_interval: number
-        failure_rate_delay: number
-        failure_rate_max_failures_per_interval: number
-      }
     }
-    task_num: number
-    task_cu: unknown
-    job_cu: unknown
-    name: string
     host_aliases: {
       items: {
-        ip: string
         hostname: string
+        ip: string
       }[]
     }
-    version: string
+    job_cu: unknown
+    network_id: string
+    name: string
+    task_cu: unknown
+    task_num: number
   }
 }
 export type DeleteFlinkClustersRequestType = {
@@ -3105,34 +3093,34 @@ export type UpdateFlinkClusterRequestType = {
     cluster_id: string
   }
   data?: {
-    name: string
+    network_id: string
     task_cu: unknown
     task_num: number
-    network_id: string
     host_aliases: {
       items: {
-        ip: string
         hostname: string
+        ip: string
       }[]
     }
+    name: string
+    job_cu: unknown
     config: {
       custom: {
-        key: string
         value: string
+        key: string
       }[]
+      restart_strategy: {
+        fixed_delay_attempts: number
+        fixed_delay_delay: number
+        restart_strategy: string
+        failure_rate_delay: number
+        failure_rate_failure_rate_interval: number
+        failure_rate_max_failures_per_interval: number
+      }
       logger: {
         root_log_level: string
       }
-      restart_strategy: {
-        fixed_delay_delay: number
-        restart_strategy: string
-        failure_rate_failure_rate_interval: number
-        failure_rate_max_failures_per_interval: number
-        failure_rate_delay: number
-        fixed_delay_attempts: number
-      }
     }
-    job_cu: unknown
   }
 }
 export type CreateNetworkRequestType = {
@@ -3140,9 +3128,9 @@ export type CreateNetworkRequestType = {
     space_id: string
   }
   data?: {
-    router_id: string
-    name: string
     vxnet_id: string
+    name: string
+    router_id: string
   }
 }
 export type DeleteNetworksRequestType = {
@@ -3178,8 +3166,8 @@ export type UpdateNetworkRequestType = {
     network_id: string
   }
   data?: {
+    name: string
     router_id: string
     vxnet_id: string
-    name: string
   }
 }

@@ -10,7 +10,7 @@ export type IResponse<T> = Omit<
 >
 
 export type RequestParams = {
-  uri: Record<string, any>
+  uri?: Record<string, any>
   params?: Record<string, any>
   data?: any
   regionId?: string

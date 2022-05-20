@@ -23,7 +23,7 @@ export const usePingEvent = (params: {
     if (isCreate) {
       addEmpty(uuid, item)
     } else {
-      addItem(sourceId, item)
+      addItem(sourceId!, item)
     }
   }
   const update = (item: PingEvent) => {
@@ -32,7 +32,7 @@ export const usePingEvent = (params: {
     if (isCreate) {
       updateEmpty(uuid, item)
     } else {
-      removeItem(sourceId, item)
+      removeItem(sourceId!, item)
     }
   }
 
@@ -45,6 +45,8 @@ export const usePingEvent = (params: {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  return { add, update }
 }
 
 export default usePingEvent
