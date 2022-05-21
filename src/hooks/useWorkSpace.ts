@@ -9,7 +9,7 @@ import {
   createWorkSpace,
   updateWorkSpace,
 } from 'stores/api'
-import { apiHooks } from './apiHooks'
+import { apiHooks, queryKeyObj } from './apiHooks'
 import { DescribePlatformConfigRequestType } from '../types/request'
 import { PlatformManageDescribePlatformConfigType } from '../types/response'
 
@@ -95,5 +95,8 @@ export const useDescribePlatformConfig = apiHooks<
   DescribePlatformConfigRequestType,
   PlatformManageDescribePlatformConfigType
 >('platformManage', 'describePlatformConfig')
+
+export const getQueryKeyDescribePlatformConfig = () =>
+  queryKeyObj.describePlatformConfig
 
 export default useQueryWorkSpace

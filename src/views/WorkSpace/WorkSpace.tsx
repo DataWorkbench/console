@@ -80,6 +80,7 @@ const WorkSpace = observer(
       get curSpaceId(): any {
         return get(this, 'curSpace.id', '')
       },
+      platformConfig: null,
       optSpaces: [],
       selectedSpaces: [],
       get optSpaceIds() {
@@ -97,11 +98,18 @@ const WorkSpace = observer(
       queryKeyWord: '',
     }))
 
-    console.log(zone)
-    const { data: platforms } = useDescribePlatformConfig({
-      regionId: stateStore.curRegionId,
-    })
-    console.log(platforms)
+    const { data: platform } = useDescribePlatformConfig(
+      {
+        regionId: stateStore.curRegionId,
+      },
+      { enabled: !!stateStore.curRegionId }
+    )
+
+    useEffect(() => {
+      stateStore.set({
+        platformConfig: platform,
+      })
+    }, [platform, stateStore])
 
     useEffect(() => {
       if (regionInfos?.length) {
