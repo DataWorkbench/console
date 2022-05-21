@@ -102,7 +102,7 @@ const WorkSpace = observer(
       {
         regionId: stateStore.curRegionId,
       },
-      { enabled: !!stateStore.curRegionId }
+      { enabled: !!stateStore.curRegionId, staleTime: 12 * 60 * 60 * 1000 }
     )
 
     useEffect(() => {
