@@ -74,6 +74,7 @@ const defaultFuncList = [
     ],
   },
   {
+    hideInHeader: true,
     name: 'manage',
     title: '空间管理',
     subFuncList: [

@@ -10,8 +10,14 @@ import {
   updateWorkSpace,
 } from 'stores/api'
 import { apiHooks, queryKeyObj } from './apiHooks'
-import { DescribePlatformConfigRequestType } from '../types/request'
-import { PlatformManageDescribePlatformConfigType } from '../types/response'
+import {
+  DescribePlatformConfigRequestType,
+  DescribeNetworkConfigRequestType,
+} from '../types/request'
+import {
+  PlatformManageDescribePlatformConfigType,
+  SpaceManageDescribeNetworkConfigType,
+} from '../types/response'
 
 const keys: {
   infinite: any
@@ -90,7 +96,7 @@ export const useMutationWorkSpace = (options?: {}) => {
   }, options)
 }
 
-export const useDescribePlatformConfig = apiHooks<
+export const useQueryDescribePlatformConfig = apiHooks<
   'platformManage',
   DescribePlatformConfigRequestType,
   PlatformManageDescribePlatformConfigType
@@ -98,5 +104,14 @@ export const useDescribePlatformConfig = apiHooks<
 
 export const getQueryKeyDescribePlatformConfig = () =>
   queryKeyObj.describePlatformConfig
+
+export const useQueryDescribeNetworkConfig = apiHooks<
+  'spaceManage',
+  DescribeNetworkConfigRequestType,
+  SpaceManageDescribeNetworkConfigType
+>('spaceManage', 'describeNetworkConfig')
+
+export const getQueryKeyDescribeNetworkConfig = () =>
+  queryKeyObj.describeNetworkConfig
 
 export default useQueryWorkSpace
