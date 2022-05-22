@@ -15,9 +15,9 @@ import {
 import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
 import { WorkSpaceContext } from 'contexts'
-import { useDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
+import { useQueryDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
 import { getHelpCenterLink } from 'utils'
-import { collect, filter, map } from 'utils/functions'
+import { collect, map } from 'utils/functions'
 
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
@@ -46,7 +46,7 @@ const Content = styled(Card)(({ isModal }: { isModal?: boolean }) => [
 
 type RouteListType = { name: string; subFuncList: { name: string }[] }
 
-const filterEmpty = (item: RouteListType) => item.subFuncList.length > 0
+// const filterEmpty = (item: RouteListType) => item.subFuncList.length > 0
 
 const getMapPlatformRoute =
   (platformConfig: { enable_network: boolean; work_in_iaas: boolean }) =>
@@ -119,7 +119,7 @@ const WorkSpace = observer(
       queryKeyWord: '',
     }))
 
-    const { data: platform } = useDescribePlatformConfig(
+    const { data: platform } = useQueryDescribePlatformConfig(
       {
         regionId: stateStore.curRegionId,
       },
@@ -133,8 +133,8 @@ const WorkSpace = observer(
       const { defaultFuncList } = workSpaceStore
       workSpaceStore.set({
         funcList: collect(
-          map(getMapPlatformRoute(platform!)),
-          filter(filterEmpty)
+          map(getMapPlatformRoute(platform!))
+          // filter(filterEmpty)
         )(defaultFuncList!),
       })
     }, [platform, stateStore, workSpaceStore])
