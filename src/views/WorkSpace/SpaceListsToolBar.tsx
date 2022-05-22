@@ -58,7 +58,7 @@ const SpaceListsToolBar = observer(() => {
             type="primary"
             tw="font-medium px-5 mr-2"
             onClick={toggleShowModal}
-            loading={isPlatformLoading}
+            loading={!!isPlatformLoading}
           >
             创建工作空间
           </Button>
