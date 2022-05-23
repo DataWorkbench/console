@@ -9,8 +9,8 @@ function Manage() {
     <div tw="flex-1 flex h-full">
       <Sider funcMod="manage" />
       <div tw="flex-1 overflow-y-auto">
-        {(mod === 'setting' || !mod) && <Setting />}
-        {mod === 'network' && <Network />}
+        {mod === 'setting' && <Setting />}
+        {(mod === 'network' || !mod) && <Network />}
       </div>
     </div>
   )
