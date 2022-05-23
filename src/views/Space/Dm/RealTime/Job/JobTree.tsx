@@ -350,22 +350,23 @@ export const JobTree = observer(
       const { key } = curOpNode
       let data: any = { op, jobMode: curOpNode.jobMode }
       if (op === 'create' || op === 'edit' || op === 'move') {
-        if (form.current?.validateForm()) {
-          const fields = form.current.getFieldsValue()
-          const pid = op === 'move' ? targetNodeKey : curOpNode.key
-          data = {
-            ...data,
-            ...fields,
-          }
-          if (op === 'create') {
-            data.pid = getJobIdByKey(pid)
-            data.is_directory = true
-          } else if (op === 'edit') {
-            data.jobId = key
-          } else if (op === 'move') {
-            data.job_ids = [key]
-            data.target = getJobIdByKey(targetNodeKey)
-          }
+        if (!form.current?.validateForm()) {
+          return
+        }
+        const fields = form.current.getFieldsValue()
+        const pid = op === 'move' ? targetNodeKey : curOpNode.key
+        data = {
+          ...data,
+          ...fields,
+        }
+        if (op === 'create') {
+          data.pid = getJobIdByKey(pid)
+          data.is_directory = true
+        } else if (op === 'edit') {
+          data.jobId = key
+        } else if (op === 'move') {
+          data.job_ids = [key]
+          data.target = getJobIdByKey(targetNodeKey)
         }
       } else if (op === 'delete') {
         data = {
