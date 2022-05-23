@@ -10,11 +10,13 @@ import Editor from 'react-monaco-editor'
 import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
   useMutationSyncJobConf,
+  useQueryGenerateJobJson,
   useQueryJobSchedule,
   useQuerySyncJobConf,
   useStore,
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { useParams } from 'react-router-dom'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -180,6 +182,32 @@ const SyncJob = () => {
     return []
   }, [confData, targetTypeName, db.target.tableName])
 
+  const editorRef = useRef<any>(null)
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const { data: defaultJobContent, isFetching } = useQueryGenerateJobJson(
+    {
+      uri: {
+        job_id: curJob?.id!,
+        space_id: spaceId,
+      },
+      regionId,
+    } as any,
+    { enabled: !!curJob?.id && mode === 2 }
+  )
+  const loadingWord = '代码加载中......'
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current?.setValue(
+        JSON.stringify(
+          JSON.parse(defaultJobContent?.sync_job_script || ''),
+          null,
+          4
+        )
+      )
+    }
+  }, [defaultJobContent])
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
@@ -234,6 +262,8 @@ const SyncJob = () => {
   }
 
   const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor
+    // editor.setValue(defaultJobContent?.sync_job_script || '')
     editor.focus()
   }
 
@@ -403,10 +433,18 @@ const SyncJob = () => {
     const step = stepsData[2]
     return (
       <>
-        <div tw="pt-2 flex-1 pb-[68px] h-[calc(100%-64px)] overflow-y-auto">
+        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 64px)] overflow-y-auto">
           <Editor
             language="json"
-            defaultValue=""
+            defaultValue={
+              isFetching
+                ? loadingWord
+                : JSON.stringify(
+                    JSON.parse(defaultJobContent?.sync_job_script || ''),
+                    null,
+                    4
+                  )
+            }
             theme="my-theme"
             options={{
               minimap: { enabled: false },
