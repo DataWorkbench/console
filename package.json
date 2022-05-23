@@ -5,7 +5,8 @@
   "author": "QingCloud F2E Group",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV=development webpack serve",
+    "dev": "cross-env CURRENT_ENV=qa NODE_ENV=development webpack serve",
+    "dev:test": "cross-env CURRENT_ENV=test NODE_ENV=development webpack serve",
     "build": "NODE_ENV=production webpack && cp -r configs ./dist",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
@@ -108,6 +109,7 @@
     "@tippyjs/react": "^4.2.5",
     "axios": "^0.21.1",
     "core-js": "^3.13.1",
+    "cross-env": "^7.0.3",
     "dayjs": "^1.10.6",
     "echarts": "^5.1.2",
     "framer-motion": "^4.1.17",

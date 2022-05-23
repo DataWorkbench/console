@@ -5,23 +5,23 @@ module.exports = {
     browser: true,
     es2021: true,
     node: true,
-    'jest/globals': true,
+    'jest/globals': true
   },
   extends: [
     'airbnb',
     'airbnb-typescript',
     'airbnb/hooks',
-    'plugin:prettier/recommended',
+    'plugin:prettier/recommended'
     // 'plugin:@typescript-eslint/recommended',
     // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
   parserOptions: {
     ecmaFeatures: {
-      jsx: true,
+      jsx: true
     },
     ecmaVersion: 'es2020',
     sourceType: 'module',
-    project: './tsconfig.json',
+    project: './tsconfig.json'
   },
   plugins: ['@emotion', 'jest', '@typescript-eslint'],
   rules: {
@@ -36,19 +36,20 @@ module.exports = {
     'jsx-a11y/click-events-have-key-events': 0,
     'jsx-a11y/no-static-element-interactions': 0,
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'import/no-named-as-defaul': 0
   },
   settings: {
     'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
+      '@typescript-eslint/parser': ['.ts', '.tsx']
     },
     'import/resolver': [
       'node',
       {
         webpack: {
-          config: 'webpack.config.js',
-        },
-      },
-    ],
+          config: 'webpack.config.js'
+        }
+      }
+    ]
   },
   globals: {
     _: true,
@@ -58,6 +59,6 @@ module.exports = {
     USER: true,
     GLOBAL_CONFIG: true,
     EMITTER: true,
-    getText: true,
-  },
+    getText: true
+  }
 }

@@ -8,10 +8,17 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const WebpackBar = require('webpackbar')
 const path = require('path')
 const dotenv = require('dotenv')
-dotenv.config()
 
 const resolve = (dir) => path.join(__dirname, dir)
 const { NODE_ENV } = process.env
+const envConfigPath = {
+  qa: resolve('./env/.env.qa'),
+  test: resolve('./env/.env.test'),
+}
+
+dotenv.config({
+  path: envConfigPath[process.env.CURRENT_ENV],
+})
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
@@ -34,7 +41,7 @@ let config = {
     path: resolve('dist'),
     publicPath: '/dataomnis/',
     filename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
-    chunkFilename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
+    // chunkFilename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
     clean: true,
   },
   module: {
@@ -214,39 +221,39 @@ if (isDev) {
     ],
     optimization: {
       minimizer: [`...`, new CssMinimizerPlugin()],
-      splitChunks: {
-        chunks: 'all',
-        minChunks: 1,
-        cacheGroups: {
-          vendors: {
-            chunks: 'initial',
-            name: 'vendor',
-            minChunks: 1,
-            priority: 3,
-            test: /[\\/]node_modules[\\/].*\.js$/,
-          },
-          'async-vendors': {
-            chunks: 'async',
-            minChunks: 1,
-            name: 'async-vendors',
-            priority: 2,
-            test: /[\\/]node_modules[\\/].*\.js$/,
-          },
-          'css-vendor': {
-            chunks: 'all',
-            test: /[\\/]node_modules[\\/].*\.css$/,
-            name: 'css-vendor',
-            minChunks: 1,
-            priority: 3,
-          },
-          default: {
-            name: 'common',
-            chunks: 'all',
-            minChunks: 2,
-            priority: 1,
-          },
-        },
-      },
+      // splitChunks: {
+      //   chunks: 'all',
+      //   minChunks: 1,
+      //   cacheGroups: {
+      //     vendors: {
+      //       chunks: 'initial',
+      //       name: 'vendor',
+      //       minChunks: 1,
+      //       priority: 3,
+      //       test: /[\\/]node_modules[\\/].*\.js$/,
+      //     },
+      //     'async-vendors': {
+      //       chunks: 'async',
+      //       minChunks: 1,
+      //       name: 'async-vendors',
+      //       priority: 2,
+      //       test: /[\\/]node_modules[\\/].*\.js$/,
+      //     },
+      //     'css-vendor': {
+      //       chunks: 'all',
+      //       test: /[\\/]node_modules[\\/].*\.css$/,
+      //       name: 'css-vendor',
+      //       minChunks: 1,
+      //       priority: 3,
+      //     },
+      //     default: {
+      //       name: 'common',
+      //       chunks: 'all',
+      //       minChunks: 2,
+      //       priority: 1,
+      //     },
+      //   },
+      // },
     },
   })
 }

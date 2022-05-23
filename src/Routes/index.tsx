@@ -1,44 +1,56 @@
-import { lazy, useEffect } from 'react'
+/* eslint-disable import/no-named-as-default */
+import { useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
 import { useDarkMode } from 'hooks'
 
-// describeDataOmnis
-const DescribeDataOmnis = lazy(
-  () =>
-    import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
-)
+import DescribeDataOmnis from 'views/DataOmnis/DescribeDataOmnis'
+import ActivateDataOmnis from 'views/DataOmnis/ActivateDataOmnis'
+import Layout from 'views/Layout'
+import Overview from 'views/Overview'
+import WorkSpace from 'views/WorkSpace'
+import SpaceLayout from 'views/Layout/SpaceLayout'
+import Dm from 'views/Space/Dm'
+import Ops from 'views/Space/Ops'
+import Upcloud from 'views/Space/Upcloud'
+import Manage from 'views/Space/Manage'
 
-// activateDataOmnis
-const ActivateDataOmnis = lazy(
-  () =>
-    import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
-)
+// // describeDataOmnis
+// const DescribeDataOmnis = lazy(
+//   () =>
+//     import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
+// )
 
-// home
-const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
+// // activateDataOmnis
+// const ActivateDataOmnis = lazy(
+//   () =>
+//     import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
+// )
 
-const Overview = lazy(
-  () => import(/* webpackChunkName: "home" */ 'views/Overview')
-)
-const WorkSpace = lazy(
-  () => import(/* webpackChunkName: "home" */ 'views/WorkSpace')
-)
+// // home
+// const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
 
-// space
-const SpaceLayout = lazy(
-  () => import(/* webpackChunkName: "space" */ 'views/Layout/SpaceLayout')
-)
-const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
-const Manage = lazy(
-  () => import(/* webpackChunkName: "space" */ 'views/Space/Manage')
-)
-const Ops = lazy(
-  () => import(/* webpackChunkName: "space" */ 'views/Space/Ops')
-)
-const Upcloud = lazy(
-  () => import(/* webpackChunkName: "space" */ 'views/Space/Upcloud')
-)
+// const Overview = lazy(
+//   () => import(/* webpackChunkName: "home" */ 'views/Overview')
+// )
+// const WorkSpace = lazy(
+//   () => import(/* webpackChunkName: "home" */ 'views/WorkSpace')
+// )
+
+// // space
+// const SpaceLayout = lazy(
+//   () => import(/* webpackChunkName: "space" */ 'views/Layout/SpaceLayout')
+// )
+// const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
+// const Manage = lazy(
+//   () => import(/* webpackChunkName: "space" */ 'views/Space/Manage')
+// )
+// const Ops = lazy(
+//   () => import(/* webpackChunkName: "space" */ 'views/Space/Ops')
+// )
+// const Upcloud = lazy(
+//   () => import(/* webpackChunkName: "space" */ 'views/Space/Upcloud')
+// )import default from '../hooks/useNetwork';
 
 const Routes = () => {
   const { globalStore } = useStore()
