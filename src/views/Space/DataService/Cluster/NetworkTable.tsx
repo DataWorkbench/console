@@ -1,17 +1,21 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { useParams } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
-import { get, omitBy, pick } from 'lodash-es'
+import { omitBy } from 'lodash-es'
 import dayjs from 'dayjs'
 import tw, { css } from 'twin.macro'
+import { useColumns } from 'hooks/useHooks/useColumns'
+import { MappingKey } from 'utils/types'
 
-import { FlexBox, Center, Modal, TextLink, TextEllipsis } from 'components'
+import { FlexBox, Center, Modal, TextEllipsis, StatusBar } from 'components'
 import { useStore, useQueryNetworks, getNetworkKey, useMutationNetwork } from 'hooks'
 
 import NetworkModal from './NetworkModal'
+import { ClusterColumns, StatusMap } from './common/constants'
+import { ClusterFieldMapping } from './common/mappings'
 
 interface IFilter {
   name?: string
@@ -32,6 +36,8 @@ const NetworkTable = observer(() => {
   const [columnSettings, setColumnSettings] = useState([])
   const { regionId } = useParams<{ regionId: string }>()
 
+  console.log(regionId)
+
   const [filter, setFilter] = useImmer<IFilter>({
     name: '',
     offset: 0,
@@ -49,110 +55,113 @@ const NetworkTable = observer(() => {
     }
   }, [networkOp])
 
-  const columns = useMemo(
-    () => [
-      {
-        title: '名称/ID',
-        fixedInSetting: true,
-        dataIndex: 'name',
-        width: 200,
-        render: (v: any, row: any) => (
-          <FlexBox tw="items-center space-x-1 truncate">
-            <Center
-              className="clusterIcon"
-              tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
-            >
-              <Icon name="earth" type="light" />
-            </Center>
-            <div tw="truncate">
-              <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>
-              <div tw="dark:text-neut-8">{row.id}</div>
-            </div>
-          </FlexBox>
-        )
-      },
-      {
-        title: 'VPC 网络',
-        dataIndex: 'router_id',
-        render: (v: string) =>
-          v ? (
-            <TextLink
-              style={{ fontWeight: 'bold' }}
-              href={`/${regionId}/routers/${v}`}
-              target="_blank"
-            >
-              {v}
-            </TextLink>
-          ) : null
-      },
-      {
-        title: '私有网络',
-        dataIndex: 'vxnet_id',
-        render: (v: string) =>
-          v ? (
-            <TextLink
-              style={{ fontWeight: 'bold' }}
-              href={`/${regionId}/vxnets/${v}`}
-              target="_blank"
-            >
-              {v}
-            </TextLink>
-          ) : null
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'created',
-        sortable: true,
-        sortOrder:
-          // filter.reverse ? 'asc' : 'desc',
-          // eslint-disable-next-line no-nested-ternary
-          filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
-        render: (v: number) => (
-          <span tw="dark:text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
-        )
-      },
-      {
-        title: '最近更新时间',
-        dataIndex: 'updated',
-        sortable: true,
-        sortOrder:
-          // filter.reverse ? 'asc' : 'desc',
-          // eslint-disable-next-line no-nested-ternary
-          filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
+  // const columns = useMemo(() => [
+  //   {
+  //     title: '名称/ID',
+  //     fixedInSetting: true,
+  //     dataIndex: 'name',
+  //     width: 200,
+  // render: (v: any, row: any) => (
+  //   <FlexBox tw="items-center space-x-1 truncate">
+  //     <Center
+  //       className="clusterIcon"
+  //       tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
+  //     >
+  //       <Icon name="earth" type="light" />
+  //     </Center>
+  //     <div tw="truncate">
+  //       <TextEllipsis twStyle={tw`font-semibold`}>
+  //         {row.name}
+  //       </TextEllipsis>
+  //       <div tw="dark:text-neut-8">{row.id}</div>
+  //     </div>
+  //   </FlexBox>
+  // ),
+  //   },
+  //   {
+  //     title: 'VPC 网络',
+  //     dataIndex: 'router_id',
+  //     render: (v: string) =>
+  //       v ? (
+  //         <TextLink
+  //           style={{ fontWeight: 'bold' }}
+  //           href={`/${regionId}/routers/${v}`}
+  //           target="_blank"
+  //         >
+  //           {v}
+  //         </TextLink>
+  //       ) : null,
+  //   },
+  //   {
+  //     title: '私有网络',
+  //     dataIndex: 'vxnet_id',
+  //     render: (v: string) =>
+  //       v ? (
+  //         <TextLink
+  //           style={{ fontWeight: 'bold' }}
+  //           href={`/${regionId}/vxnets/${v}`}
+  //           target="_blank"
+  //         >
+  //           {v}
+  //         </TextLink>
+  //       ) : null,
+  //   },
+  //   {
+  //     title: '创建时间',
+  //     dataIndex: 'created',
+  //     sortable: true,
+  //     sortOrder:
+  //       // filter.reverse ? 'asc' : 'desc',
+  //       // eslint-disable-next-line no-nested-ternary
+  //       filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
+  // render: (v: number) => (
+  //   <span tw="dark:text-neut-8">
+  //     {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+  //   </span>
+  // ),
+  //   },
+  //   {
+  //     title: '最近更新时间',
+  //     dataIndex: 'updated',
+  //     sortable: true,
+  //     sortOrder:
+  //       // filter.reverse ? 'asc' : 'desc',
+  //       // eslint-disable-next-line no-nested-ternary
+  //       filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
 
-        render: (v: number) => (
-          <span tw="dark:text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
-        )
-      },
-      {
-        title: '操作',
-        dataIndex: 'id',
-        render: (v: any, row: any) => (
-          <FlexBox tw="items-center">
-            <Button
-              type="text"
-              onClick={() => {
-                setNetWorkOp('update')
-                setOpNetworkList([row])
-              }}
-            >
-              修改
-            </Button>
-            <Button
-              type="text"
-              onClick={() => {
-                setNetWorkOp('delete')
-                setOpNetworkList([row])
-              }}
-            >
-              删除
-            </Button>
-          </FlexBox>
-        )
-      }
-    ],
-    [setNetWorkOp, setOpNetworkList, filter.sort_by, regionId, filter.reverse]
-  )
+  //     render: (v: number) => (
+  //       <span tw="dark:text-neut-8">
+  //         {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+  //       </span>
+  //     ),
+  //   },
+  //   {
+  //     title: '操作',
+  //     dataIndex: 'id',
+  //     render: (v: any, row: any) => (
+  //       <FlexBox tw="items-center">
+  //         <Button
+  //           type="text"
+  //           onClick={() => {
+  //             setNetWorkOp('update')
+  //             setOpNetworkList([row])
+  //           }}
+  //         >
+  //           修改
+  //         </Button>
+  //         <Button
+  //           type="text"
+  //           onClick={() => {
+  //             setNetWorkOp('delete')
+  //             setOpNetworkList([row])
+  //           }}
+  //         >
+  //           删除
+  //         </Button>
+  //       </FlexBox>
+  //     ),
+  //   },
+  // ], [setNetWorkOp, setOpNetworkList, filter.sort_by, regionId, filter.reverse])
 
   const refetchData = () => {
     queryClient.invalidateQueries(getNetworkKey())
@@ -178,15 +187,112 @@ const NetworkTable = observer(() => {
   }
 
   const { isFetching, isRefetching, data } = useQueryNetworks(omitBy(filter, (v) => v === ''))
-  const infos = get(data, 'infos', []) || []
-  const filterNetworkInfos = infos.filter((info: any) => selectedRowKeys.includes(info.id)) || []
+  // const infos = get(data, 'infos', []) || []
+  // const filterNetworkInfos =
+  //   infos.filter((info: any) => selectedRowKeys.includes(info.id)) || []
 
+  const getName = (name: MappingKey<typeof ClusterFieldMapping>) =>
+    ClusterFieldMapping.get(name)!.apiField
+
+  const columnsRender = {
+    [getName('name')]: {
+      render: (v: any, row: any) => (
+        <FlexBox tw="items-center space-x-1 truncate">
+          <Center
+            className="clusterIcon"
+            tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
+          >
+            <Icon name="earth" type="light" />
+          </Center>
+          <div tw="truncate">
+            <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>
+            <div tw="dark:text-neut-8">{row.id}</div>
+          </div>
+        </FlexBox>
+      )
+    },
+    [getName('cu')]: {
+      render: (_: never, record: Record<string, any>) => (
+        <StatusBar
+          type={StatusMap.get(record?.router?.status)?.style}
+          label={StatusMap.get(record?.router?.status)?.label}
+        />
+      )
+    },
+    [getName('last_updated')]: {
+      render: (v: number) => (
+        <span tw="dark:text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+      )
+    },
+    [getName('term_validity')]: {
+      render: (v: number) => (
+        <span tw="dark:text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+      )
+    }
+  }
+  const operation = {
+    title: '操作',
+    dataIndex: 'operation',
+    key: 'operation',
+    render: (v: any, row: any) => (
+      <FlexBox tw="items-center">
+        <Button
+          type="text"
+          onClick={() => {
+            setNetWorkOp('update')
+            setOpNetworkList([row])
+          }}
+        >
+          修改
+        </Button>
+        <Button
+          type="text"
+          onClick={() => {
+            setNetWorkOp('delete')
+            setOpNetworkList([row])
+          }}
+        >
+          删除
+        </Button>
+      </FlexBox>
+    )
+  }
+
+  const { columns } = useColumns('', ClusterColumns, columnsRender, operation)
   const filterColumn = columnSettings
     .map(
       (o: { key: string; checked: boolean }) =>
         o.checked && columns.find((col) => col.dataIndex === o.key)
     )
     .filter((o) => o)
+
+  // TODO: mock
+  //   / ['name', { label: '名称/ID', apiField: 'vxnet_name' }],
+  //   ['status', { label: '状态', apiField: 'status' }],
+  // ['cu', { label: 'CU 规格', apiField: 'network_address' }],
+  //   [
+  //     'mode',
+  //     { label: '计费模式', apiField: 'network_address_v6' },
+  //   ],
+  //   [
+  //     'term_validity',
+  //     { label: '购买有效期', apiField: 'network_address_v6' },
+  //   ],
+  //   [
+  //     'last_updated',
+  //     { label: '最近更新时间', apiField: 'network_address_v6' },
+  //   ],
+
+  const dataSource = [
+    {
+      name: 'item01',
+      status: 'error',
+      cu: 'cu01',
+      mode: 'mode01',
+      term_validity: 'term_validity01',
+      last_updated: '2020-03-11 22:22:22'
+    }
+  ]
 
   return (
     <FlexBox tw="w-full flex-1" orient="column">
@@ -195,19 +301,7 @@ const NetworkTable = observer(() => {
           <Center tw="space-x-3">
             <Button type="primary" onClick={() => setNetWorkOp('create')}>
               <Icon name="add" />
-              创建网络
-            </Button>
-            <Button
-              disabled={selectedRowKeys.length === 0 || filterNetworkInfos.length === 0}
-              onClick={() => {
-                if (filterNetworkInfos.length) {
-                  setOpNetworkList(filterNetworkInfos)
-                  setNetWorkOp('delete')
-                }
-              }}
-            >
-              <Icon name="trash" type="light" />
-              <span>删除</span>
+              创建
             </Button>
           </Center>
           <Center tw="space-x-3">
@@ -247,9 +341,9 @@ const NetworkTable = observer(() => {
           </Center>
         </FlexBox>
       </div>
+
       <Table
-        selectType="checkbox"
-        dataSource={infos || []}
+        dataSource={dataSource}
         loading={isFetching}
         columns={filterColumn.length > 0 ? filterColumn : columns}
         rowKey="id"
@@ -313,6 +407,7 @@ const NetworkTable = observer(() => {
                 line-height: 24px;
               `}
             />
+
             <section tw="flex-1">
               {(() => {
                 const opText = '删除'
@@ -341,17 +436,13 @@ const NetworkTable = observer(() => {
             </section>
           </FlexBox>
           <>
-            {opNetworkList.length > 1 && (
-              <Table
-                dataSource={opNetworkList}
-                rowKey="id"
-                columns={columns
-                  .filter((col) =>
-                    ['name', 'router_id', 'vxnet_id', 'created', 'updated'].includes(col.dataIndex)
-                  )
-                  .map((row) => pick(row, ['title', 'dataIndex', 'render']))}
-              />
-            )}
+            {/* {opNetworkList.length > 1 && (
+                <Table
+                  dataSource={[{ name: 1 }, { name: 1 }]}
+                  rowKey="id"
+                  columns={columns}
+                />
+              )} */}
           </>
         </Modal>
       )}

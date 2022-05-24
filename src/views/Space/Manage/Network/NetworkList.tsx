@@ -1,8 +1,5 @@
 import { Table } from '@QCFE/qingcloud-portal-ui'
-import {
-  networkColumns,
-  networkStatusMap,
-} from 'views/Space/Manage/Network/common/constants'
+import { networkColumns, networkStatusMap } from 'views/Space/Manage/Network/common/constants'
 import tw, { css, styled } from 'twin.macro'
 import { Tooltip, Center, InstanceName, StatusBar } from 'components'
 import { useColumns } from 'hooks/useHooks/useColumns'
@@ -55,81 +52,59 @@ export default function NetworkList(props: INetworkProps) {
     title: '',
     dataIndex: 'operation',
     key: 'operation',
-    render: () => {
-      return (
-        <Center>
-          <Tooltip
-            hasPadding
-            content="默认私有网络暂不支持移除、更换（如需彻底释放，请删除工作空间）"
-            theme="instead"
-          >
-            <Tag>默认</Tag>
-          </Tooltip>
-        </Center>
-      )
-    },
+    render: () => (
+      <Center>
+        <Tooltip
+          hasPadding
+          content="默认私有网络暂不支持移除、更换（如需彻底释放，请删除工作空间）"
+          theme="instead"
+        >
+          <Tag>默认</Tag>
+        </Tooltip>
+      </Center>
+    )
   }
   const columnsRender = {
     [getName('name')]: {
-      render: (name: string, record: Record<string, any>) => {
-        return (
-          <InstanceName
-            css={nameStyle}
-            theme={isDarkTheme() ? 'dark' : 'light'}
-            name={
-              <div
-                tw="text-[#334155] leading-5 font-semibold hover:cursor-pointer"
-                onClick={() => {
-                  window.open(
-                    `/${regionId}/vxnets/${record?.vxnet_id}`,
-                    '_blank'
-                  )
-                }}
-              >
-                {name}
-              </div>
-            }
-            desc={record.vxnet_id}
-            icon="network"
-          />
-        )
-      },
+      render: (name: string, record: Record<string, any>) => (
+        <InstanceName
+          css={nameStyle}
+          theme={isDarkTheme() ? 'dark' : 'light'}
+          name={
+            <div
+              tw="text-[#334155] leading-5 font-semibold hover:cursor-pointer"
+              onClick={() => {
+                window.open(`/${regionId}/vxnets/${record?.vxnet_id}`, '_blank')
+              }}
+            >
+              {name}
+            </div>
+          }
+          desc={record.vxnet_id}
+          icon="network"
+        />
+      )
     },
     [getName('status')]: {
-      render: (_: never, record: Record<string, any>) => {
-        return (
-          <StatusBar
-            type={networkStatusMap.get(record?.router?.status)?.style}
-            label={networkStatusMap.get(record?.router?.status)?.label}
-          />
-        )
-      },
+      render: (_: never, record: Record<string, any>) => (
+        <StatusBar
+          type={networkStatusMap.get(record?.router?.status)?.style}
+          label={networkStatusMap.get(record?.router?.status)?.label}
+        />
+      )
     },
     [getName('network_address')]: {
-      render: (_: never, record: Record<string, any>) => {
-        return record.router?.ip_network
-      },
+      render: (_: never, record: Record<string, any>) => record.router?.ip_network
     },
     [getName('network_address_v6')]: {
-      render: (_: never, record: Record<string, any>) => {
-        return record.router?.vpc_ipv6_network
-      },
-    },
+      render: (_: never, record: Record<string, any>) => record.router?.vpc_ipv6_network
+    }
   }
 
-  const { columns } = useColumns(
-    settingKey,
-    networkColumns,
-    columnsRender,
-    operation
-  )
+  const { columns } = useColumns(settingKey, networkColumns, columnsRender, operation)
   return (
     <TableWrapper>
-      <Table
-        columns={columns}
-        dataSource={datasource ?? []}
-        loading={!!isLoading}
-      />
+      <Table columns={columns} dataSource={datasource ?? []} loading={!!isLoading} />
     </TableWrapper>
   )
 }

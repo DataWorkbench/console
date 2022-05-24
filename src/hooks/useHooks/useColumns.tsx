@@ -39,13 +39,9 @@ export const useColumns = (
         if (columnsRender[column.key]) {
           const item = {
             ...column,
-            ...columnsRender[column.key],
+            ...columnsRender[column.key]
           }
-          if (
-            typeof item.title === 'string' &&
-            item.filterAble &&
-            item.filtersNew?.length
-          ) {
+          if (typeof item.title === 'string' && item.filterAble && item.filtersNew?.length) {
             item.title = (
               <FlexBox tw="items-center">
                 <span>{item.title}</span>
@@ -57,37 +53,23 @@ export const useColumns = (
                       selectedKey={String(item.filter || 'all')}
                       onClick={
                         item.onFilter
-                          ? (e: React.SyntheticEvent, k: string, v: number) =>
-                              item.onFilter(v)
+                          ? (e: React.SyntheticEvent, k: string, v: number) => item.onFilter(v)
                           : undefined
                       }
                     >
                       <MenuItem value="" key="all">
                         全部
                       </MenuItem>
-                      {item.filtersNew.map(
-                        ({
-                          value,
-                          label,
-                        }: {
-                          value: string
-                          label: string
-                        }) => (
-                          <MenuItem value={value} key={value}>
-                            <FlexBox tw="justify-between flex-auto">
-                              <span>{label}</span>
-                              {item.filter === value && (
-                                <Icon
-                                  name="check"
-                                  tw="ml-4"
-                                  size={16}
-                                  type="light"
-                                />
-                              )}
-                            </FlexBox>
-                          </MenuItem>
-                        )
-                      )}
+                      {item.filtersNew.map(({ value, label }: { value: string; label: string }) => (
+                        <MenuItem value={value} key={value}>
+                          <FlexBox tw="justify-between flex-auto">
+                            <span>{label}</span>
+                            {item.filter === value && (
+                              <Icon name="check" tw="ml-4" size={16} type="light" />
+                            )}
+                          </FlexBox>
+                        </MenuItem>
+                      ))}
                     </Menu>
                   }
                 >
@@ -98,9 +80,7 @@ export const useColumns = (
                     tw="ml-1 block"
                     css={css`
                       &.icon .qicon {
-                        ${item.filter
-                          ? tw`dark:text-white!`
-                          : tw`dark:text-[#fff6]!`}
+                        ${item.filter ? tw`dark:text-white!` : tw`dark:text-[#fff6]!`}
                       }
                     `}
                   />
@@ -118,24 +98,21 @@ export const useColumns = (
   const filterColumn =
     Array.isArray(columnSettings) && columnSettings.length
       ? columnSettings
-          .map((o: { key: string; checked: boolean }) => {
-            return (
-              o.checked &&
-              columnsWithRender.find((col: any) => col.key === o.key)
-            )
-          })
+          .map(
+            (o: { key: string; checked: boolean }) =>
+              o.checked && columnsWithRender.find((col: any) => col.key === o.key)
+          )
           .filter(Boolean)
       : columnsWithRender
 
   const columns: IColumn[] = useMemo(
-    () =>
-      (operation ? [...filterColumn, operation] : filterColumn) as IColumn[],
+    () => (operation ? [...filterColumn, operation] : filterColumn) as IColumn[],
     [filterColumn, operation]
   )
 
   return {
     columns,
     columnSettings,
-    setColumnSettings,
+    setColumnSettings
   }
 }

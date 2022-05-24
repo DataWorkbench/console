@@ -41,7 +41,7 @@ let config = {
     path: resolve('dist'),
     publicPath: '/dataomnis/',
     filename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
-    // chunkFilename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
+    chunkFilename: `static/js/[name]${isDev ? '' : '.[contenthash:7]'}.js`,
     clean: true,
   },
   module: {
@@ -221,39 +221,39 @@ if (isDev) {
     ],
     optimization: {
       minimizer: [`...`, new CssMinimizerPlugin()],
-      // splitChunks: {
-      //   chunks: 'all',
-      //   minChunks: 1,
-      //   cacheGroups: {
-      //     vendors: {
-      //       chunks: 'initial',
-      //       name: 'vendor',
-      //       minChunks: 1,
-      //       priority: 3,
-      //       test: /[\\/]node_modules[\\/].*\.js$/,
-      //     },
-      //     'async-vendors': {
-      //       chunks: 'async',
-      //       minChunks: 1,
-      //       name: 'async-vendors',
-      //       priority: 2,
-      //       test: /[\\/]node_modules[\\/].*\.js$/,
-      //     },
-      //     'css-vendor': {
-      //       chunks: 'all',
-      //       test: /[\\/]node_modules[\\/].*\.css$/,
-      //       name: 'css-vendor',
-      //       minChunks: 1,
-      //       priority: 3,
-      //     },
-      //     default: {
-      //       name: 'common',
-      //       chunks: 'all',
-      //       minChunks: 2,
-      //       priority: 1,
-      //     },
-      //   },
-      // },
+      splitChunks: {
+        chunks: 'all',
+        minChunks: 1,
+        cacheGroups: {
+          vendors: {
+            chunks: 'initial',
+            name: 'vendor',
+            minChunks: 1,
+            priority: 3,
+            test: /[\\/]node_modules[\\/].*\.js$/,
+          },
+          'async-vendors': {
+            chunks: 'async',
+            minChunks: 1,
+            name: 'async-vendors',
+            priority: 2,
+            test: /[\\/]node_modules[\\/].*\.js$/,
+          },
+          'css-vendor': {
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/].*\.css$/,
+            name: 'css-vendor',
+            minChunks: 1,
+            priority: 3,
+          },
+          default: {
+            name: 'common',
+            chunks: 'all',
+            minChunks: 2,
+            priority: 1,
+          },
+        },
+      },
     },
   })
 }

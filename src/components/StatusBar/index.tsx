@@ -6,6 +6,7 @@ export enum StatusBarEnum {
   red,
   gray,
   green,
+  purple
 }
 
 const statusStyles = [
@@ -16,8 +17,8 @@ const statusStyles = [
       text: tw`text-info`,
       out: tw`bg-[#C5EAFF]`,
       border: tw`border-[#2FB4FF]`,
-      bg: tw`bg-info`,
-    },
+      bg: tw`bg-info`
+    }
   },
   {
     type: StatusBarEnum.yellow,
@@ -26,8 +27,8 @@ const statusStyles = [
       text: tw`text-warning`,
       out: tw`bg-[#fff0ba]`,
       border: tw`border-[#ffe278]`,
-      bg: tw`bg-warning`,
-    },
+      bg: tw`bg-warning`
+    }
   },
   {
     type: StatusBarEnum.red,
@@ -36,8 +37,8 @@ const statusStyles = [
       text: tw`text-error`,
       out: tw`bg-[#f6dbda]`,
       border: tw`border-[#e0a9a8]`,
-      bg: tw`bg-error`,
-    },
+      bg: tw`bg-error`
+    }
   },
   {
     type: StatusBarEnum.gray,
@@ -46,8 +47,8 @@ const statusStyles = [
       text: tw`text-neut-8`,
       out: tw`bg-[#dee7f1]`,
       border: tw`border-[#b7c8d8]`,
-      bg: tw`bg-neut-8`,
-    },
+      bg: tw`bg-neut-8`
+    }
   },
   {
     type: StatusBarEnum.green,
@@ -56,18 +57,22 @@ const statusStyles = [
       text: tw`text-success`,
       out: tw`bg-[#c6f4e4]`,
       border: tw`border-[#47CB9F]`,
-      bg: tw`bg-success`,
-    },
+      bg: tw`bg-success`
+    }
   },
+  {
+    type: StatusBarEnum.purple,
+    style: {
+      wrapper: tw`bg-success-bg`,
+      text: tw`text-success`,
+      out: tw`bg-[#eaafe2]`,
+      border: tw`border-[#960577]`,
+      bg: tw`bg-success`
+    }
+  }
 ]
 
-export const StatusBar = ({
-  type,
-  label,
-}: {
-  type: StatusBarEnum
-  label: string
-}) => {
+export const StatusBar = ({ type, label }: { type: StatusBarEnum; label: string }) => {
   const styles = statusStyles.find((s) => s.type === type)
   if (!styles) {
     return null
@@ -75,10 +80,7 @@ export const StatusBar = ({
 
   const { wrapper, text: textStyle, out, border, bg } = styles.style
   return (
-    <div
-      css={wrapper}
-      tw="inline-flex gap-2 leading-5 items-center rounded-full px-1"
-    >
+    <div css={wrapper} tw="inline-flex gap-2 leading-5 items-center rounded-full px-1">
       <div css={[out]} tw="w-3 h-3 rounded-full p-0.5 inline-flex items-center">
         <div css={[border, bg]} tw="inline-block w-2 h-2 rounded-full border" />
       </div>

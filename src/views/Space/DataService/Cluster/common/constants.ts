@@ -1,7 +1,7 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { Mapping } from 'utils/types'
 import { StatusBarEnum } from 'components/StatusBar'
-import { networkFieldMapping } from './mappings'
+import { ClusterFieldMapping } from './mappings'
 
 function getField<T>(mapping: Mapping<T>): IColumn[] {
   return Array.from(mapping.values()).map((i) => ({
@@ -12,22 +12,22 @@ function getField<T>(mapping: Mapping<T>): IColumn[] {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export const networkColumns: IColumn[] = getField(networkFieldMapping)
+export const ClusterColumns: IColumn[] = getField(ClusterFieldMapping)
 
-export const networkStatusMap = new Map()
-  .set('active', {
-    label: '活跃',
-    style: StatusBarEnum.green
+export const StatusMap = new Map()
+  .set('error', {
+    label: '异常',
+    style: StatusBarEnum.red
   })
   .set('pending', {
-    label: '进行中',
+    label: '启动中',
     style: StatusBarEnum.blue
   })
   .set('poweroffed', {
-    label: '已关机',
-    style: StatusBarEnum.red
+    label: '已停用',
+    style: StatusBarEnum.gray
   })
   .set('suspended', {
-    label: '已挂起',
-    style: StatusBarEnum.gray
+    label: '欠费',
+    style: StatusBarEnum.yellow
   })
