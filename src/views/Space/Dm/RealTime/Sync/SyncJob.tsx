@@ -10,11 +10,13 @@ import Editor from 'react-monaco-editor'
 import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
   useMutationSyncJobConf,
+  useQueryGenerateJobJson,
   useQueryJobSchedule,
   useQuerySyncJobConf,
   useStore,
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { useParams } from 'react-router-dom'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -180,6 +182,32 @@ const SyncJob = () => {
     return []
   }, [confData, targetTypeName, db.target.tableName])
 
+  const editorRef = useRef<any>(null)
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const { data: defaultJobContent, isFetching } = useQueryGenerateJobJson(
+    {
+      uri: {
+        job_id: curJob?.id!,
+        space_id: spaceId,
+      },
+      regionId,
+    } as any,
+    { enabled: !!curJob?.id && mode === 2 }
+  )
+  const loadingWord = '代码加载中......'
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current?.setValue(
+        JSON.stringify(
+          JSON.parse(defaultJobContent?.sync_job_script || '{}'),
+          null,
+          4
+        )
+      )
+    }
+  }, [defaultJobContent])
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
@@ -234,6 +262,8 @@ const SyncJob = () => {
   }
 
   const handleEditorDidMount = (editor: any) => {
+    editorRef.current = editor
+    // editor.setValue(defaultJobContent?.sync_job_script ||'{}')
     editor.focus()
   }
 
@@ -245,7 +275,7 @@ const SyncJob = () => {
     })
   }
 
-  const save = () => {
+  const save = (isSubmit?: boolean, cb?: Function) => {
     if (
       !dbRef.current ||
       !mappingRef.current ||
@@ -256,7 +286,7 @@ const SyncJob = () => {
     }
 
     const resource = dbRef.current.getResource()
-    if (!resource) {
+    if (!resource && isSubmit) {
       showConfWarn('未配置数据源信息')
       return
     }
@@ -264,22 +294,22 @@ const SyncJob = () => {
     const sourceTypeNames = dbRef.current.getTypeNames()
 
     const mapping = mappingRef.current.rowMapping()
-    if (!mapping) {
+    if (!mapping && isSubmit) {
       showConfWarn('未配置字段映射信息')
       return
     }
 
     const cluster = clusterRef.current.getCluster()
-    if (!cluster) {
+    if (!cluster && isSubmit) {
       showConfWarn('未配置计算集群信息')
       return
     }
-    if (!clusterRef.current.checkPingSuccess()) {
-      showConfWarn('计算集群连通性未测试或者未通过测试')
-      return
-    }
+    // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
+    //   showConfWarn('计算集群连通性未测试或者未通过测试')
+    //   return
+    // }
     const channel = channelRef.current.getChannel()
-    if (!channel) {
+    if (isSubmit && !channel) {
       showConfWarn('未配置通道控制信息')
       return
     }
@@ -302,15 +332,20 @@ const SyncJob = () => {
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
-        confRefetch()
-        Notify.success({
-          title: '操作提示',
-          content: '配置保存成功',
-          placement: 'bottomRight',
-        })
+        if (cb) {
+          cb()
+        } else {
+          confRefetch()
+          Notify.success({
+            title: '操作提示',
+            content: '配置保存成功',
+            placement: 'bottomRight',
+          })
+        }
       },
     })
   }
+
   const release = () => {
     if (!enableRelease) {
       workFlowStore.set({ showScheSetting: true })
@@ -403,10 +438,18 @@ const SyncJob = () => {
     const step = stepsData[2]
     return (
       <>
-        <div tw="pt-2 flex-1 pb-[68px] h-[calc(100%-64px)] overflow-y-auto">
+        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 64px)] overflow-y-auto">
           <Editor
             language="json"
-            defaultValue=""
+            defaultValue={
+              isFetching
+                ? loadingWord
+                : JSON.stringify(
+                    JSON.parse(defaultJobContent?.sync_job_script || '{}'),
+                    null,
+                    4
+                  )
+            }
             theme="my-theme"
             options={{
               minimap: { enabled: false },
@@ -459,7 +502,7 @@ const SyncJob = () => {
               setMode(2)
             }}
           >
-            <Button type="black" disabled>
+            <Button type="black">
               <Icon name="coding" type="light" />
               脚本模式
             </Button>
@@ -470,7 +513,7 @@ const SyncJob = () => {
             语法检查
           </Button>
         )}
-        <Button onClick={save} loading={mutation.isLoading}>
+        <Button onClick={() => save()} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存
         </Button>
@@ -492,6 +535,7 @@ const SyncJob = () => {
       </div>
       {showRelaseModal && (
         <ReleaseModal
+          onOk={save}
           onSuccess={() => {
             setShowRelaseModal(false)
             workFlowStore.set({

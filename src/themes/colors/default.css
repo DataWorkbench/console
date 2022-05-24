@@ -47,7 +47,7 @@
   --dw-color-function-error-hover: #bd3633; /* red 12 */
   --dw-color-function-error-active: #992c2b; /* red 13 */
   --dw-color-function-error-border: #ca2621; /* red 11 */
-  --dw-color-function-error-bg: #d5dee7; /* red 0 */
+  --dw-color-function-error-bg: #fff9fa; /* red 0 */
 
   /* warning */
   --dw-color-function-warning-default: #ffd127; /* y 11 */

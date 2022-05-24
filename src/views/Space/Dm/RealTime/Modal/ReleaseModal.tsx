@@ -27,9 +27,11 @@ const ModalWrapper = styled(Modal)(() => [
 const ReleaseModal = ({
   onCancel,
   onSuccess,
+  onOk: onOkProp,
 }: {
   onCancel?: () => void
   onSuccess?: () => void
+  onOk: (isSubmit?: boolean, cb?: Function) => void
 }) => {
   const {
     workFlowStore: { curJob },
@@ -75,19 +77,21 @@ const ReleaseModal = ({
 
   const onOk = () => {
     if (form.current?.validateForm()) {
-      releaseMutation.mutate(
-        {
-          desc: params.desc,
-          stop_running: params.stopRunning,
-        },
-        {
-          onSuccess: () => {
-            if (onSuccess) {
-              onSuccess()
-            }
+      onOkProp(true, () => {
+        releaseMutation.mutate(
+          {
+            desc: params.desc,
+            stop_running: params.stopRunning,
           },
-        }
-      )
+          {
+            onSuccess: () => {
+              if (onSuccess) {
+                onSuccess()
+              }
+            },
+          }
+        )
+      })
     }
   }
   return (

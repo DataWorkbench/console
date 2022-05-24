@@ -25,6 +25,7 @@ import {
   TextLink,
 } from 'components'
 import { isDarkTheme } from 'utils/theme'
+import { useWorkSpaceContext } from 'contexts/index'
 
 interface ISpaceEditProps {
   curSpaceOpt: 'create' | 'update'
@@ -68,6 +69,7 @@ const CollapseWrapper = styled(Collapse)(() => [
 
 const SpaceEditModal = observer((props: ISpaceEditProps) => {
   const { curSpaceOpt, curSpace, region, onClose, onOk, confirmLoading } = props
+  const stateStore = useWorkSpaceContext()
   const regionId = region.id
 
   const [params, setParams] = useImmer(
@@ -254,184 +256,191 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                 }
               />
             </CollapseItem>
-            <CollapseItem
-              key="p1"
-              label={
-                <Center tw="gap-2">
-                  <Icon
-                    name="earth"
-                    size={20}
-                    type={isDarkTheme() ? 'light' : 'dark'}
-                  />
-                  <span>网络信息</span>
-                </Center>
-              }
-            >
-              <SelectWithRefresh
-                label={<AffixLabel>VPC 网络</AffixLabel>}
-                placeholder="请选择 VPC"
-                validateOnBlur
-                name="router_id"
-                onRefresh={refectRouters}
-                value={params.router_id}
-                options={routers.map(({ router_id, router_name }) => ({
-                  value: router_id,
-                  label: router_name,
-                }))}
-                optionRenderer={(option: { label: string; value: string }) => (
-                  <FlexBox tw="items-center">
-                    <Icon name="vpc" tw="mr-2.5" size={18} />
-                    <div>
-                      <div>{option.label || option.value}</div>
-                      <div tw="text-neut-8">{option.value}</div>
-                    </div>
-                  </FlexBox>
-                )}
-                onChange={(v: string) => {
-                  setParams((draft) => {
-                    draft.router_id = v
-                  })
-                }}
-                clearable={false}
-                searchable
-                onInputChange={(v: string) => {
-                  setRouterSearch(v)
-                }}
-                openOnClick
-                isLoadingAtBottom
-                isLoading={routersRet.isFetching}
-                onMenuScrollToBottom={() => {
-                  if (routersRet.hasNextPage) {
-                    routersRet.fetchNextPage()
-                  }
-                }}
-                bottomTextVisible
-                help={
-                  <>
-                    如需选择新的 VPC，您可以
-                    <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
-                      新建 VPC 网络
-                    </TextLink>
-                    {renderVpcWarn()}
-                  </>
+            {stateStore.platformConfig?.enable_network && (
+              <CollapseItem
+                key="p1"
+                label={
+                  <Center tw="gap-2">
+                    <Icon
+                      name="earth"
+                      size={20}
+                      type={isDarkTheme() ? 'light' : 'dark'}
+                    />
+                    <span>网络信息</span>
+                  </Center>
                 }
-                searchAb
-                schemas={[
-                  {
-                    rule: {
-                      required: true,
-                      isExisty: false,
-                    },
-                    status: 'error',
-                    help: (
-                      <>
-                        <span>不能为空,</span>
-                        <span tw="text-neut-8 ml-2">
-                          如需选择新的 VPC，您可以
-                        </span>
-                        <TextLink
-                          href="/iaas/vpc/create"
-                          target="_blank"
-                          hasIcon
-                        >
-                          新建 VPC 网络
-                        </TextLink>
-                        {renderVpcWarn()}
-                      </>
-                    ),
-                  },
-                ]}
-              />
-
-              <SelectWithRefresh
-                label={<AffixLabel>私有网络</AffixLabel>}
-                placeholder="请选择私有网络"
-                validateOnBlur
-                name="vxnet_id"
-                value={params.vxnet_id}
-                key={params.router_id}
-                onRefresh={refectVxnets}
-                options={vxnets
-                  .map(({ vxnet_id, vxnet_name }) => ({
-                    value: vxnet_id,
-                    label: vxnet_name,
-                  }))
-                  .filter(
-                    (v) =>
-                      v.value.includes(xnetSearch) ||
-                      v.label.includes(xnetSearch)
+              >
+                <SelectWithRefresh
+                  label={<AffixLabel>VPC 网络</AffixLabel>}
+                  placeholder="请选择 VPC"
+                  validateOnBlur
+                  name="router_id"
+                  onRefresh={refectRouters}
+                  value={params.router_id}
+                  options={routers.map(({ router_id, router_name }) => ({
+                    value: router_id,
+                    label: router_name,
+                  }))}
+                  optionRenderer={(option: {
+                    label: string
+                    value: string
+                  }) => (
+                    <FlexBox tw="items-center">
+                      <Icon name="vpc" tw="mr-2.5" size={18} />
+                      <div>
+                        <div>{option.label || option.value}</div>
+                        <div tw="text-neut-8">{option.value}</div>
+                      </div>
+                    </FlexBox>
                   )}
-                optionRenderer={(option: { label: string; value: string }) => (
-                  <FlexBox tw="items-center">
-                    <Icon name="network" tw="mr-2.5" size={18} type="light" />
-                    <div>
-                      <div>{option.label || option.value}</div>
-                      <div tw="text-neut-8">{option.value}</div>
-                    </div>
-                  </FlexBox>
-                )}
-                onChange={(v: string) => {
-                  setParams((draft) => {
-                    draft.vxnet_id = v
-                  })
-                }}
-                isLoading={vxnetsRet.isFetching}
-                // isLoadingAtBottom
-                searchable
-                onInputChange={(v: string) => {
-                  setXnetSearch(v)
-                }}
-                openOnClick
-                schemas={[
-                  {
-                    rule: {
-                      required: true,
-                      isExisty: false,
+                  onChange={(v: string) => {
+                    setParams((draft) => {
+                      draft.router_id = v
+                    })
+                  }}
+                  clearable={false}
+                  searchable
+                  onInputChange={(v: string) => {
+                    setRouterSearch(v)
+                  }}
+                  openOnClick
+                  isLoadingAtBottom
+                  isLoading={routersRet.isFetching}
+                  onMenuScrollToBottom={() => {
+                    if (routersRet.hasNextPage) {
+                      routersRet.fetchNextPage()
+                    }
+                  }}
+                  bottomTextVisible
+                  help={
+                    <>
+                      如需选择新的 VPC，您可以
+                      <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
+                        新建 VPC 网络
+                      </TextLink>
+                      {renderVpcWarn()}
+                    </>
+                  }
+                  searchAb
+                  schemas={[
+                    {
+                      rule: {
+                        required: true,
+                        isExisty: false,
+                      },
+                      status: 'error',
+                      help: (
+                        <>
+                          <span>不能为空,</span>
+                          <span tw="text-neut-8 ml-2">
+                            如需选择新的 VPC，您可以
+                          </span>
+                          <TextLink
+                            href="/iaas/vpc/create"
+                            target="_blank"
+                            hasIcon
+                          >
+                            新建 VPC 网络
+                          </TextLink>
+                          {renderVpcWarn()}
+                        </>
+                      ),
                     },
-                    status: 'error',
-                    help: (
-                      <>
-                        不能为空, <span tw="text-neut-8 ml-2">您可以</span>
-                        <TextLink
-                          href={
-                            params.router_id
-                              ? `/${regionId}/routers/${params.router_id}`
-                              : `/${regionId}/vxnets`
-                          }
-                          target="_blank"
-                          rel="noreferrer"
-                          hasIcon
-                          // className="link"
-                        >
-                          新建私有网络
-                        </TextLink>
-                        {renderVxnetWarn()}
-                      </>
-                    ),
-                  },
-                ]}
-                help={
-                  <>
-                    您可以
-                    <TextLink
-                      href={
-                        params.router_id
-                          ? `/${regionId}/routers/${params.router_id}`
-                          : `/${regionId}/vxnets`
-                      }
-                      target="_blank"
-                      // tw="text-green-11"
-                      rel="noreferrer"
-                      hasIcon
-                      // className="link"
-                    >
-                      新建私有网络
-                    </TextLink>
-                    {renderVxnetWarn()}
-                  </>
-                }
-              />
-            </CollapseItem>
+                  ]}
+                />
+                <SelectWithRefresh
+                  label={<AffixLabel>私有网络</AffixLabel>}
+                  placeholder="请选择私有网络"
+                  validateOnBlur
+                  name="vxnet_id"
+                  value={params.vxnet_id}
+                  key={params.router_id}
+                  onRefresh={refectVxnets}
+                  options={vxnets
+                    .map(({ vxnet_id, vxnet_name }) => ({
+                      value: vxnet_id,
+                      label: vxnet_name,
+                    }))
+                    .filter(
+                      (v) =>
+                        v.value.includes(xnetSearch) ||
+                        v.label.includes(xnetSearch)
+                    )}
+                  optionRenderer={(option: {
+                    label: string
+                    value: string
+                  }) => (
+                    <FlexBox tw="items-center">
+                      <Icon name="network" tw="mr-2.5" size={18} type="light" />
+                      <div>
+                        <div>{option.label || option.value}</div>
+                        <div tw="text-neut-8">{option.value}</div>
+                      </div>
+                    </FlexBox>
+                  )}
+                  onChange={(v: string) => {
+                    setParams((draft) => {
+                      draft.vxnet_id = v
+                    })
+                  }}
+                  isLoading={vxnetsRet.isFetching}
+                  // isLoadingAtBottom
+                  searchable
+                  onInputChange={(v: string) => {
+                    setXnetSearch(v)
+                  }}
+                  openOnClick
+                  schemas={[
+                    {
+                      rule: {
+                        required: true,
+                        isExisty: false,
+                      },
+                      status: 'error',
+                      help: (
+                        <>
+                          不能为空, <span tw="text-neut-8 ml-2">您可以</span>
+                          <TextLink
+                            href={
+                              params.router_id
+                                ? `/${regionId}/routers/${params.router_id}`
+                                : `/${regionId}/vxnets`
+                            }
+                            target="_blank"
+                            rel="noreferrer"
+                            hasIcon
+                            // className="link"
+                          >
+                            新建私有网络
+                          </TextLink>
+                          {renderVxnetWarn()}
+                        </>
+                      ),
+                    },
+                  ]}
+                  help={
+                    <>
+                      您可以
+                      <TextLink
+                        href={
+                          params.router_id
+                            ? `/${regionId}/routers/${params.router_id}`
+                            : `/${regionId}/vxnets`
+                        }
+                        target="_blank"
+                        // tw="text-green-11"
+                        rel="noreferrer"
+                        hasIcon
+                        // className="link"
+                      >
+                        新建私有网络
+                      </TextLink>
+                      {renderVxnetWarn()}
+                    </>
+                  }
+                />
+              </CollapseItem>
+            )}
           </CollapseWrapper>
         </Form>
       </Root>

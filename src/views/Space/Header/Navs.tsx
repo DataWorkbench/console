@@ -52,18 +52,20 @@ export const Navs = ({ mod }: NavsProps) => {
   }, [location, globalStore, setDarkMode])
   return (
     <div tw="flex gap-6">
-      {funcList.map(({ title, name }) => (
-        <FuncWrapper key={name} current={mod === name}>
-          <Link
-            tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
-            to={`/${regionId}/workspace/${spaceId}/${
-              name === 'ops' ? 'ops/release' : name
-            }`}
-          >
-            {title}
-          </Link>
-        </FuncWrapper>
-      ))}
+      {funcList
+        .filter((i) => !i.hideInHeader)
+        .map(({ title, name }) => (
+          <FuncWrapper key={name} current={mod === name}>
+            <Link
+              tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
+              to={`/${regionId}/workspace/${spaceId}/${
+                name === 'ops' ? 'ops/release' : name
+              }`}
+            >
+              {title}
+            </Link>
+          </FuncWrapper>
+        ))}
     </div>
   )
 }

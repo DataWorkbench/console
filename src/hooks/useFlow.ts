@@ -7,7 +7,6 @@ import {
 import { useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
-
 import {
   createJob,
   updateJob,
@@ -32,6 +31,10 @@ import {
   streamJobCodeSyntax,
   streamJobCodeRun,
 } from 'stores/api'
+import { SyncJobDevManageGenerateJobJsonType } from '../types/response'
+import { GenerateJobJsonRequestType } from '../types/request'
+
+import { apiHooks, queryKeyObj } from './apiHooks'
 
 interface IRouteParams {
   regionId: string
@@ -426,3 +429,11 @@ export const useQueryInConnectorsQuery = () => {
   }
   return useQuery('In_Connectors', async () => inConnectors(params))
 }
+
+export const useQueryGenerateJobJson = apiHooks<
+  'syncJobDevManage',
+  GenerateJobJsonRequestType,
+  SyncJobDevManageGenerateJobJsonType
+>('syncJobDevManage', 'generateJobJson')
+
+export const getQueryKeyGenerateJobJson = () => queryKeyObj.generateJobJson

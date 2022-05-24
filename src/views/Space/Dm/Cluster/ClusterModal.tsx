@@ -176,7 +176,7 @@ const ClusterModal = observer(
     const handleOk = () => {
       const baseForm = baseFormRef.current
       const optForm = optFormRef.current
-      const networkForm = networkFormRef.current
+      // const networkForm = networkFormRef.current
       if (viewMode) {
         setOp('')
         return
@@ -184,7 +184,7 @@ const ClusterModal = observer(
       if (
         baseForm?.validateFields() &&
         optForm?.validateFields() &&
-        networkForm?.validateFields() &&
+        // networkForm?.validateFields() &&
         totalCU <= 12
       ) {
         const paramsData = assign(

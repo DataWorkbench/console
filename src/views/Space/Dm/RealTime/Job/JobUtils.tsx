@@ -80,7 +80,7 @@ export const dataSourceTypes: { [key in DataSourceType]?: number } = {
   // TIDB: 2,
   // Kafka: 3,
   // S3: 4,
-  // ClickHouse: 5,
+  ClickHouse: 5,
   // HBase: 6,
   // FTP: 7,
   // HDFS: 8,
