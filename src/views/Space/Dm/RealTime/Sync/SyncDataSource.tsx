@@ -155,7 +155,8 @@ interface SyncDataSourceProps {
   onSelectTable?: (
     tp: OpType,
     tableName: string,
-    data: Record<string, any>[]
+    data: Record<string, any>[],
+    item: Record<string, any>
   ) => void
   conf?: {
     source_id?: string
@@ -215,7 +216,7 @@ const SyncDataSource = observer(
             draft.source.columns = columns
           })
           if (onSelectTable) {
-            onSelectTable('source', db.source.tableName!, columns)
+            onSelectTable('source', db.source.tableName!, columns, db.source)
           }
         },
       }
@@ -234,7 +235,7 @@ const SyncDataSource = observer(
             draft.target.columns = columns
           })
           if (onSelectTable) {
-            onSelectTable('target', db.target.tableName!, columns)
+            onSelectTable('target', db.target.tableName!, columns, db.target)
           }
         },
       }
