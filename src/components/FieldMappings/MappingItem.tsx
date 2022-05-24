@@ -273,18 +273,23 @@ const MappingItem = (props: MappingItemProps) => {
             tw="bg-neut-16"
             onClick={(_: any, key: string) => handleMoreClick(key)}
           >
-            <MenuItem key="edit" disabled={item.custom !== true}>
-              <Icon name="pen" />
-              编辑
-            </MenuItem>
-            <MenuItem key="constant" disabled={item.custom !== true}>
-              <Icon name="pen" />
-              设置常量
-            </MenuItem>
-            <MenuItem key="parse" disabled={item.custom !== true}>
-              <Icon name="pen" />
-              时间转换
-            </MenuItem>
+            {item.custom && (
+              <>
+                <MenuItem key="edit">
+                  <Icon name="pen" />
+                  编辑
+                </MenuItem>
+
+                <MenuItem key="constant">
+                  <Icon name="pen" />
+                  设置常量
+                </MenuItem>
+                <MenuItem key="parse">
+                  <Icon name="pen" />
+                  时间转换
+                </MenuItem>
+              </>
+            )}
             <MenuItem key="delete">
               <Icon name="pen" />
               删除
