@@ -176,7 +176,7 @@ export const JobTree = observer(
           workFlowStore.toggleJobModal(true)
         } else if (val === 'scheSetting') {
           workFlowStore.set({
-            curJob: get(curOpNode, 'job'),
+            curJob: { ...get(curOpNode, 'job'), jobMode: curOpNode.jobMode },
             showScheSetting: true,
           })
         } else if (val === 'argsSetting') {
