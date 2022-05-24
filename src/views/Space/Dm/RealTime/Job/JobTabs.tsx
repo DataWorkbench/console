@@ -22,6 +22,9 @@ const { TabPanel } = Tabs
 const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full flex flex-col`,
   css`
+    .simplebar-content {
+      ${tw`h-full`}
+    }
     &.tabs-container .tabs.is-boxed {
       ${tw`bg-neut-17 h-8 flex-none`};
       ul {

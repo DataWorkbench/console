@@ -74,56 +74,58 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         >
           {clusterName || clusterId}
         </ButtonWithClearField>
-        <Field>
-          <Label>
-            <AffixLabel
-              help="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
-              theme="light"
-            >
-              计算集群连通性
-            </AffixLabel>
-          </Label>
-          <Control tw="flex-wrap">
-            <Tooltip
-              disabled={enablePing}
-              theme="light"
-              content="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
-              hasPadding
-            >
-              <Button
-                type="outlined"
-                loading={mutation.isLoading}
-                css={[
-                  tw`text-green-11!`,
-                  !enablePing && tw`cursor-not-allowed opacity-50`,
-                ]}
-                onClick={() => {
-                  if (enablePing) {
-                    handlePingConnection()
-                  }
-                }}
+        {false && (
+          <Field>
+            <Label>
+              <AffixLabel
+                help="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
+                theme="light"
               >
-                连通性测试
-              </Button>
-            </Tooltip>
-          </Control>
-          {clusterId && mutation.isSuccess && (
-            <FlexBox
-              className="help"
-              tw="w-full ml-[132px]! items-center text-green-11! space-x-0.5"
-            >
-              <Icon
-                name="clock"
-                size={16}
-                color={{
-                  primary: theme('colors.transparent'),
-                  secondary: theme('colors.green.11'),
-                }}
-              />
-              <span>测试通过</span>
-            </FlexBox>
-          )}
-        </Field>
+                计算集群连通性
+              </AffixLabel>
+            </Label>
+            <Control tw="flex-wrap">
+              <Tooltip
+                disabled={enablePing}
+                theme="light"
+                content="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
+                hasPadding
+              >
+                <Button
+                  type="outlined"
+                  loading={mutation.isLoading}
+                  css={[
+                    tw`text-green-11!`,
+                    !enablePing && tw`cursor-not-allowed opacity-50`,
+                  ]}
+                  onClick={() => {
+                    if (enablePing) {
+                      handlePingConnection()
+                    }
+                  }}
+                >
+                  连通性测试
+                </Button>
+              </Tooltip>
+            </Control>
+            {clusterId && mutation.isSuccess && (
+              <FlexBox
+                className="help"
+                tw="w-full ml-[132px]! items-center text-green-11! space-x-0.5"
+              >
+                <Icon
+                  name="clock"
+                  size={16}
+                  color={{
+                    primary: theme('colors.transparent'),
+                    secondary: theme('colors.green.11'),
+                  }}
+                />
+                <span>测试通过</span>
+              </FlexBox>
+            )}
+          </Field>
+        )}
       </Form>
       <ClusterTableModal
         visible={visible}
