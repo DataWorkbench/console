@@ -117,7 +117,7 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
     return (
       <Control
         tabIndex="0"
-        tw="flex-1 relative max-w-[328px]"
+        tw="flex-none relative max-w-[328px]"
         onFocus={() => {
           setFocused(true)
         }}
