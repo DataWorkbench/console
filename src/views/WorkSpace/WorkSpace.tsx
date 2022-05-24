@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { get } from 'lodash-es'
+import { get, filter as lodashFilter } from 'lodash-es'
 import { useCookie } from 'react-use'
 import tw, { styled } from 'twin.macro'
 import {
@@ -15,8 +15,10 @@ import {
 import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
 import { WorkSpaceContext } from 'contexts'
-import { useDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
+import { useQueryDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
 import { getHelpCenterLink } from 'utils'
+import { collect, map } from 'utils/functions'
+
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
 import BestPractice from './BestPractice'
@@ -42,6 +44,25 @@ const Content = styled(Card)(({ isModal }: { isModal?: boolean }) => [
   isModal && tw`shadow-none mb-0`,
 ])
 
+type RouteListType = { name: string; subFuncList: { name: string }[] }
+
+// const filterEmpty = (item: RouteListType) => item.subFuncList.length > 0
+
+const getMapPlatformRoute =
+  (platformConfig: { enable_network: boolean; work_in_iaas: boolean }) =>
+  (item: RouteListType): RouteListType => {
+    if (
+      item.name !== 'manage' ||
+      (platformConfig?.enable_network && platformConfig?.work_in_iaas)
+    ) {
+      return item
+    }
+    return {
+      ...item,
+      subFuncList: lodashFilter(item.subFuncList, (i) => i.name !== 'network'),
+    }
+  }
+
 interface IWrokSpaceProps {
   isModal?: boolean
   onItemCheck?: (regionId: string, spaceId: string) => void
@@ -56,7 +77,7 @@ const WorkSpace = observer(
     const [zone] = useCookie('zone')
     const { status, refetch, data: regionInfos } = useQueryRegion()
 
-    const { globalStore } = useStore()
+    const { globalStore, workSpaceStore } = useStore()
     // const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
     const stateStore = useLocalObservable(() => ({
       isModal,
@@ -80,6 +101,7 @@ const WorkSpace = observer(
       get curSpaceId(): any {
         return get(this, 'curSpace.id', '')
       },
+      platformConfig: null,
       optSpaces: [],
       selectedSpaces: [],
       get optSpaceIds() {
@@ -97,11 +119,25 @@ const WorkSpace = observer(
       queryKeyWord: '',
     }))
 
-    console.log(zone)
-    const { data: platforms } = useDescribePlatformConfig({
-      regionId: stateStore.curRegionId,
-    })
-    console.log(platforms)
+    const { data: platform } = useQueryDescribePlatformConfig(
+      {
+        regionId: stateStore.curRegionId,
+      },
+      { enabled: !!stateStore.curRegionId, staleTime: 12 * 60 * 60 * 1000 }
+    )
+
+    useEffect(() => {
+      stateStore.set({
+        platformConfig: platform,
+      })
+      const { defaultFuncList } = workSpaceStore
+      workSpaceStore.set({
+        funcList: collect(
+          map(getMapPlatformRoute(platform!))
+          // filter(filterEmpty)
+        )(defaultFuncList!),
+      })
+    }, [platform, stateStore, workSpaceStore])
 
     useEffect(() => {
       if (regionInfos?.length) {
