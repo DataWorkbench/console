@@ -87,7 +87,7 @@ const stepsData = [
 
 const removeUndefined = (obj: any) => {
   const newObj: any = isArray(obj) ? [] : {}
-  Object.entries(obj).forEach(([key, value]) => {
+  Object.entries(obj ?? {}).forEach(([key, value]) => {
     if (isObject(value)) {
       newObj[key] = removeUndefined(value)
     } else if (!isUndefined(value)) {
