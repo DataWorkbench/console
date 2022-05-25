@@ -174,9 +174,9 @@ const DataSourceForm = ({
   const urlType = resInfo?.urlType ?? resInfo.name.toLowerCase()
   const { source_type: sourceType } = resInfo
   const sourceInfo =
-    ['update', 'view'].includes(op) &&
-    opSourceList.length > 0 &&
-    parseRemoteData(opSourceList[0])
+    ['update', 'view'].includes(op) && opSourceList.length > 0
+      ? parseRemoteData(opSourceList[0])
+      : {}
 
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
     if (urlType === 'ftp') {
@@ -560,6 +560,7 @@ const DataSourceForm = ({
               {/*   数据源可用性测试 */}
               {/* </AffixLabel> */}
               <DataSourcePingButton
+                sourceId={get(sourceInfo, 'id')}
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
                 hasPing={!!get(sourceInfo, 'last_connection')}
