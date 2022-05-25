@@ -610,13 +610,22 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             tw="flex-1 pb-5 dark:bg-neut-16"
             css={[!selectMode && tw`px-5`]}
           >
-            {/* TODO: radio disabled 连通性过滤 */}
             <Table
               selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
               columns={columns}
               rowKey="id"
               tw="pb-4 "
+              disabledRowKeys={
+                selectMode
+                  ? sourceList
+                      .filter(
+                        (i: Record<string, any>) =>
+                          !i.last_connection || i.last_connection.result !== 1
+                      )
+                      .map((i: Record<string, any>) => i.id)
+                  : []
+              }
               selectedRowKeys={selectedRowKeys}
               onSelect={(rowKeys: string[]) => {
                 if (selectMode && rowKeys.length) {
