@@ -90,7 +90,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
           validateOnChange
           value={channel.parallelism || ''}
           min={1}
-          max={300}
+          max={100}
           onChange={(value: number) =>
             setChannel((draft) => {
               draft.parallelism = value
@@ -103,7 +103,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               rule: { required: true },
             },
           ]}
-          help="范围：1~300"
+          help="范围：1~100"
         />
         <Field>
           <Label>

@@ -149,15 +149,16 @@ const DevContentUI = (props: IProps) => {
                 <div tw="absolute invisible">
                   <SyncDataSource
                     curJob={curJob}
-                    onSelectTable={(tp, tableName, data) => {
+                    onSelectTable={(tp, tableName, data, table) => {
                       const fieldData = data.map((field) => ({
                         ...field,
                         uuid: nanoid(),
                       })) as TMappingField[]
                       setDb((draft) => {
-                        const soruceInfo = draft[tp]
-                        soruceInfo.tableName = tableName
-                        soruceInfo.fields = fieldData
+                        const sourceInfo = draft[tp]
+                        sourceInfo.tableName = tableName
+                        sourceInfo.fields = fieldData
+                        sourceInfo.tableConfig = table
                       })
                     }}
                     onDbChange={(tp: 'source' | 'target', data) => {
