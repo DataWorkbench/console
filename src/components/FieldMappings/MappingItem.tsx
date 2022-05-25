@@ -266,6 +266,31 @@ const MappingItem = (props: MappingItemProps) => {
   }
 
   const renderMore = () => {
+    let menuItems: { key: string; icon: string; text: string }[] = []
+    if (item.custom) {
+      menuItems = [
+        {
+          key: 'edit',
+          icon: 'pen',
+          text: '编辑',
+        },
+        {
+          key: 'constant',
+          icon: 'pen',
+          text: '设置常量',
+        },
+        {
+          key: 'parse',
+          icon: 'pen',
+          text: '时间转换',
+        },
+      ]
+    }
+    menuItems.push({
+      key: 'delete',
+      icon: 'trash',
+      text: '删除',
+    })
     return (
       <Tippy
         content={
@@ -273,27 +298,12 @@ const MappingItem = (props: MappingItemProps) => {
             tw="bg-neut-16"
             onClick={(_: any, key: string) => handleMoreClick(key)}
           >
-            {item.custom && (
-              <>
-                <MenuItem key="edit">
-                  <Icon name="pen" />
-                  编辑
-                </MenuItem>
-
-                <MenuItem key="constant">
-                  <Icon name="pen" />
-                  设置常量
-                </MenuItem>
-                <MenuItem key="parse">
-                  <Icon name="pen" />
-                  时间转换
-                </MenuItem>
-              </>
-            )}
-            <MenuItem key="delete">
-              <Icon name="pen" />
-              删除
-            </MenuItem>
+            {menuItems.map((i) => (
+              <MenuItem key={i.key}>
+                <Icon icon={i.icon} />
+                {i.text}
+              </MenuItem>
+            ))}
           </Menu>
         }
         arrow={false}

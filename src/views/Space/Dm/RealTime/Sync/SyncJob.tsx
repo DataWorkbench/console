@@ -521,7 +521,8 @@ const SyncJob = () => {
             }
             okText="转变"
             onOk={() => {
-              setMode(2)
+              save(false, () => setMode(2))
+              // setMode(2)
             }}
           >
             <Button type="black">
