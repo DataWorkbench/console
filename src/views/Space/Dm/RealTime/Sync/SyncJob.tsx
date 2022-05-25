@@ -336,6 +336,21 @@ const SyncJob = () => {
           showConfWarn('未配置通道控制信息')
           return
         }
+
+        // 如果并发数大于1  则切分键不能为空
+        if (isSubmit) {
+          const parallelism = get(resource, 'channel_control.parallelism', 0)
+          const splitKey = get(
+            Object.entries(resource.sync_resource ?? ({} as any)).find(([k]) =>
+              k.endsWith('_source')
+            )?.[1] ?? {},
+            'split_pk'
+          )
+          if (parallelism > 1 && !splitKey) {
+            showConfWarn('并发数大于1时，切分键不能为空')
+            return
+          }
+        }
         if (cb) {
           cb()
         } else {
