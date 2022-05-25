@@ -382,8 +382,8 @@ const ClusterModal = observer(
                           ]}
                           label={null}
                           optionRenderer={(option: { label: string; value: string }) => (
-                            <FlexBox orient="row">
-                              <div>
+                            <FlexBox orient="row" tw="w-full">
+                              <div tw="flex-auto">
                                 <div>
                                   {option.label || option.value}
                                   <span tw="ml-2 inline-block bg-red-13 w-[36px] h-[18px] text-center rounded-sm">

@@ -1,10 +1,36 @@
 // import { localstorage } from '@QCFE/qingcloud-portal-ui'
-import { makeAutoObservable, set } from 'mobx'
+import { makeAutoObservable, set, observable } from 'mobx'
 import type RootStore from './RootStore'
 
 type TUdf = 'UDF' | 'UDTF' | 'UDTTF'
 
 type ColumnSettingsType = { key: string; checked: boolean }
+
+const initTreeData = [
+  {
+    key: 'di-root',
+    pid: 'di-root',
+    jobMode: 'DI',
+    title: 'API组',
+    isLeaf: false,
+    children: [
+      {
+        key: 'di-root1',
+        pid: 'di-root1',
+        jobMode: 'DI2',
+        title: 'API',
+        isLeaf: false
+      },
+      {
+        key: 'di-root2',
+        pid: 'di-root3',
+        jobMode: 'DI2',
+        title: 'API',
+        isLeaf: false
+      }
+    ]
+  }
+]
 
 class DmStore {
   rootStore
@@ -12,7 +38,9 @@ class DmStore {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore
     makeAutoObservable(this, {
-      rootStore: false
+      rootStore: false,
+      APItreeData: observable.ref,
+      loadedKeys: observable.ref
     })
   }
 
@@ -20,6 +48,10 @@ class DmStore {
   op: OP = ''
 
   networkOp: OP = ''
+
+  APItreeData = initTreeData
+
+  loadedKeys: (string | number)[] = []
 
   setOp = (op: OP) => {
     this.op = op
@@ -65,6 +97,11 @@ class DmStore {
 
   setModalData = (data: Record<string, any>) => {
     this.modalData = data
+  }
+
+  resetTreeData = () => {
+    this.APItreeData = initTreeData
+    this.loadedKeys = []
   }
 }
 

@@ -28,7 +28,8 @@ const defaultFuncList = [
     name: 'dts',
     title: '数据服务',
     subFuncList: [
-      { name: 'cluster', title: '服务集群', icon: 'cogwheel' }
+      { name: 'cluster', title: '服务集群', icon: 'cogwheel' },
+      { name: 'serviceDev', title: '服务开发', icon: 'pod' }
       // { name: 'network', title: '网络配置', icon: 'earth' },
       // { name: 'cluster', title: '计算集群', icon: 'pod' },
       // { name: 'table', title: '表管理', icon: 'listview' },

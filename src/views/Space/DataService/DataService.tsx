@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-// import RealTime from './RealTime'
+import ServiceDev from './ServiceDev'
 // import Network from './Network'
 // import Resource from './Resource'
 import Cluster from './Cluster/index'
@@ -13,11 +13,11 @@ function Dts() {
     <div tw="flex-1 flex h-full w-full">
       <Sider funcMod="dts" />
       <div tw="flex-1 h-full">
-        {/* {(mod === 'realtime' || !mod) && <RealTime />}
-        {mod === 'network' && <Network />}
+        {(mod === 'cluster' || !mod) && <Cluster />}
+        {mod === 'serviceDev' && <ServiceDev />}
+        {/*  {mod === 'network' && <Network />}
         {mod === 'resource' && <Resource />}
         {mod === 'udf' && <Udf />} */}
-        {(mod === 'cluster' || !mod) && <Cluster />}
       </div>
     </div>
   )
