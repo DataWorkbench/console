@@ -1,6 +1,6 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { HelpCenterLink, FieldMappings, PopConfirm } from 'components'
+import { HelpCenterLink, FieldMappings, PopConfirm, Modal } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
@@ -87,7 +87,7 @@ const stepsData = [
 
 const removeUndefined = (obj: any) => {
   const newObj: any = isArray(obj) ? [] : {}
-  Object.entries(obj).forEach(([key, value]) => {
+  Object.entries(obj ?? {}).forEach(([key, value]) => {
     if (isObject(value)) {
       newObj[key] = removeUndefined(value)
     } else if (!isUndefined(value)) {
@@ -277,61 +277,80 @@ const SyncJob = () => {
 
   const save = (isSubmit?: boolean, cb?: Function) => {
     if (
-      !dbRef.current ||
-      !mappingRef.current ||
-      !clusterRef.current ||
-      !channelRef.current
+      isSubmit &&
+      (!dbRef.current ||
+        !mappingRef.current ||
+        !clusterRef.current ||
+        !channelRef.current)
     ) {
       return
     }
 
-    const resource = dbRef.current.getResource()
-    if (!resource && isSubmit) {
-      showConfWarn('未配置数据源信息')
-      return
-    }
+    const resource = dbRef.current!.getResource()
+    const mapping = mappingRef.current!.rowMapping()
+    const sourceTypeNames = dbRef.current!.getTypeNames()
+    const cluster = clusterRef.current!.getCluster()
+    const channel = channelRef.current!.getChannel()
 
-    const sourceTypeNames = dbRef.current.getTypeNames()
+    try {
+      set(
+        resource,
+        `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
+        mapping[0]
+      )
+      set(
+        resource,
+        `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+        mapping[1]
+      )
 
-    const mapping = mappingRef.current.rowMapping()
-    if (!mapping && isSubmit) {
-      showConfWarn('未配置字段映射信息')
-      return
+      set(resource, 'cluster_id', cluster.id)
+      set(resource, 'job_mode', 1)
+      set(resource, 'job_content', '')
+      set(resource, 'channel_control', channel)
+    } catch (e) {
+      // showConfWarn(e.message)
+      // return
     }
-
-    const cluster = clusterRef.current.getCluster()
-    if (!cluster && isSubmit) {
-      showConfWarn('未配置计算集群信息')
-      return
-    }
-    // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
-    //   showConfWarn('计算集群连通性未测试或者未通过测试')
-    //   return
-    // }
-    const channel = channelRef.current.getChannel()
-    if (isSubmit && !channel) {
-      showConfWarn('未配置通道控制信息')
-      return
-    }
-
-    set(
-      resource,
-      `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
-      mapping[0]
-    )
-    set(
-      resource,
-      `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-      mapping[1]
-    )
-    set(resource, 'cluster_id', cluster.id)
-    set(resource, 'job_mode', 1)
-    set(resource, 'job_content', '')
-    set(resource, 'channel_control', channel)
     const filterResouce = removeUndefined(resource)
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
+        if (!resource && isSubmit) {
+          showConfWarn('未配置数据源信息')
+          return
+        }
+        if (!mapping && isSubmit) {
+          showConfWarn('未配置字段映射信息')
+          return
+        }
+        if (!cluster && isSubmit) {
+          showConfWarn('未配置计算集群信息')
+          return
+        }
+        // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
+        //   showConfWarn('计算集群连通性未测试或者未通过测试')
+        //   return
+        // }
+        if (isSubmit && !channel) {
+          showConfWarn('未配置通道控制信息')
+          return
+        }
+
+        // 如果并发数大于1  则切分键不能为空
+        if (isSubmit) {
+          const parallelism = get(resource, 'channel_control.parallelism', 0)
+          const splitKey = get(
+            Object.entries(resource.sync_resource ?? ({} as any)).find(([k]) =>
+              k.endsWith('_source')
+            )?.[1] ?? {},
+            'split_pk'
+          )
+          if (parallelism > 1 && !splitKey) {
+            showConfWarn('并发数大于1时，切分键不能为空')
+            return
+          }
+        }
         if (cb) {
           cb()
         } else {
@@ -346,9 +365,12 @@ const SyncJob = () => {
     })
   }
 
+  const [showScheModal, toggleScheModal] = useState(false)
+
   const release = () => {
     if (!enableRelease) {
-      workFlowStore.set({ showScheSetting: true })
+      toggleScheModal(true)
+      // workFlowStore.set({showScheSetting: true})
     } else {
       setShowRelaseModal(true)
     }
@@ -520,8 +542,8 @@ const SyncJob = () => {
         {/* loading={releaseMutation.isLoading} disabled={!enableRelease} */}
         <Button
           type="primary"
-          onClick={release}
-          disabled={!enableRelease}
+          onClick={() => save(true, release)}
+          // disabled={!enableRelease}
           // disabled={get(confData, 'source_id') === '' && enableRelease}
         >
           <Icon name="export" />
@@ -535,7 +557,7 @@ const SyncJob = () => {
       </div>
       {showRelaseModal && (
         <ReleaseModal
-          onOk={save}
+          // onOk={() => {}}
           onSuccess={() => {
             setShowRelaseModal(false)
             workFlowStore.set({
@@ -544,6 +566,36 @@ const SyncJob = () => {
           }}
           onCancel={() => setShowRelaseModal(false)}
         />
+      )}
+      {showScheModal && (
+        <Modal
+          visible
+          noBorder
+          width={400}
+          onCancel={() => toggleScheModal(false)}
+          okText="调度配置"
+          onOk={() => {
+            workFlowStore.set({
+              showScheSetting: true,
+            })
+            // setShowScheSettingModal(true)
+            toggleScheModal(false)
+          }}
+        >
+          <div tw="flex">
+            <Icon
+              name="exclamation"
+              color={{ secondary: '#F5C414' }}
+              size={20}
+            />
+            <div tw="ml-3">
+              <div tw="text-base">尚未配置调度任务</div>
+              <div tw="mt-2 text-neut-8">
+                发布调度任务前，请先完成调度配置，否则无法发布
+              </div>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   )

@@ -27,11 +27,10 @@ const ModalWrapper = styled(Modal)(() => [
 const ReleaseModal = ({
   onCancel,
   onSuccess,
-  onOk: onOkProp,
 }: {
   onCancel?: () => void
   onSuccess?: () => void
-  onOk: (isSubmit?: boolean, cb?: Function) => void
+  // onOk: (isSubmit?: boolean, cb?: Function) => void
 }) => {
   const {
     workFlowStore: { curJob },
@@ -77,21 +76,19 @@ const ReleaseModal = ({
 
   const onOk = () => {
     if (form.current?.validateForm()) {
-      onOkProp(true, () => {
-        releaseMutation.mutate(
-          {
-            desc: params.desc,
-            stop_running: params.stopRunning,
+      releaseMutation.mutate(
+        {
+          desc: params.desc,
+          stop_running: params.stopRunning,
+        },
+        {
+          onSuccess: () => {
+            if (onSuccess) {
+              onSuccess()
+            }
           },
-          {
-            onSuccess: () => {
-              if (onSuccess) {
-                onSuccess()
-              }
-            },
-          }
-        )
-      })
+        }
+      )
     }
   }
   return (
@@ -164,6 +161,7 @@ const ReleaseModal = ({
             }}
             options={[
               {
+                // @ts-ignore
                 label: (
                   <>
                     <span>不终止 当前作业正在运行中的实例</span>
@@ -173,6 +171,7 @@ const ReleaseModal = ({
                 value: false,
               },
               {
+                // @ts-ignore
                 label: (
                   <>
                     <span>终止 当前作业正在运行中的实例</span>

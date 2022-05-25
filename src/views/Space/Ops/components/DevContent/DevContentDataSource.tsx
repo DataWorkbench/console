@@ -74,24 +74,24 @@ const DevContentDataSource = (props: Record<string, any>) => {
         </div>
         <div>数据源表</div>
         <div>{sourceTypeName}</div>
-        {source?.condition && (
+        {Object.values(source?.tableConfig?.condition ?? {}).every(Boolean) && (
           <>
             <div>条件参数配置</div>
             <div>
-              [{source?.condition?.startValue || '开始条件'}] [
-              {source?.condition?.startCondition ?? '关系符号'}] [
-              {source?.condition?.column ?? '列名'}] [
-              {source?.condition?.endCondition ?? '关系符号'}] [
-              {source?.condition?.endValue || '结束条件'}]
+              [{source?.tableConfig?.condition?.startValue || '开始条件'}] [
+              {source?.tableConfig?.condition?.startCondition ?? '关系符号'}] [
+              {source?.tableConfig?.condition?.column ?? '列名'}] [
+              {source?.tableConfig?.condition?.endCondition ?? '关系符号'}] [
+              {source?.tableConfig?.condition?.endValue || '结束条件'}]
             </div>
             <div>切分键</div>
-            <div>{source.splitPk ?? ''}</div>
+            <div>{source?.tableConfig?.splitPk ?? ''}</div>
           </>
         )}
-        {source?.where && (
+        {source?.tableConfig?.where && (
           <>
             <div>过滤条件</div>
-            <div>{source?.where}</div>
+            <div>{source?.tableConfig?.where}</div>
           </>
         )}
       </Grid>
@@ -123,20 +123,21 @@ const DevContentDataSource = (props: Record<string, any>) => {
                   label: 'update: on duplicate key update',
                   value: WriteMode.Update,
                 },
-              ].find((i) => i.value === target.writeMode)?.label
+              ].find((i) => i.value === target?.tableConfig?.writeMode)?.label
             }
           </div>
           <div>写入一致性语义</div>
+          {/* TODO: 文案确认 */}
           <div>
             {
               [
                 { label: 'exactly-once', value: Semantic.ExactlyOnce },
                 { label: 'at-least-once', value: Semantic.AtLeastOnce },
-              ].find((i) => i.value === target.semantic)?.label
+              ].find((i) => i.value === target?.tableConfig?.semantic)?.label
             }
           </div>
           <div>批量写入条数</div>
-          <div>{target.batchSize}</div>
+          <div>{target?.tableConfig?.batchSize}</div>
         </Grid>
         <Divider tw="my-3 border-line-dark text-white">
           <Center tw="cursor-pointer" onClick={() => setVisible(!visible)}>
