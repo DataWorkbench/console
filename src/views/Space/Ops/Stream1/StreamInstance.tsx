@@ -6,7 +6,7 @@ import {
   streamInstanceColumns,
   streamInstanceSuggestions,
   streamInstanceTabs,
-  streamReleaseColumns,
+  streamReleaseColumns
 } from 'views/Space/Ops/Stream1/common/constants'
 import { FlexBox } from 'components/Box'
 import { Icon, PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
@@ -14,7 +14,7 @@ import { Button } from '@QCFE/lego-ui'
 import {
   alarmStatus,
   jobInstanceStatus,
-  JobInstanceStatusType,
+  JobInstanceStatusType
 } from 'views/Space/Ops/DataIntegration/constants'
 import { Table } from 'views/Space/styled'
 import { get, isNil } from 'lodash-es'
@@ -30,13 +30,9 @@ import {
   MoreAction,
   TextEllipsis,
   TextLink,
-  Tooltip,
+  Tooltip
 } from 'components'
-import {
-  AlarmStatusCmp,
-  Divider,
-  JobInstanceStatusCmp,
-} from 'views/Space/Ops/styledComponents'
+import { AlarmStatusCmp, Divider, JobInstanceStatusCmp } from 'views/Space/Ops/styledComponents'
 import tw, { css } from 'twin.macro'
 import { useParams } from 'react-router-dom'
 import { describeFlinkUiByInstanceId } from 'stores/api'
@@ -60,7 +56,7 @@ const StreamInstance = () => {
     // setFilter,
     pagination,
     sort,
-    getColumnFilter: getFilter,
+    getColumnFilter: getFilter
   } = useFilter<
     Record<ReturnType<typeof getName>, number | string>,
     { pagination: true; sort: true }
@@ -68,21 +64,15 @@ const StreamInstance = () => {
 
   const columnsRender = {
     [getName('instanceId')]: {
-      render: (text: string) => {
-        return <span tw="text-neut-8">{text}</span>
-      },
+      render: (text: string) => <span tw="text-neut-8">{text}</span>
     },
     [getName('status')]: {
       ...getFilter(getName('status'), dataReleaseScheduleType),
-      render: (text: number) => {
-        return <JobInstanceStatusCmp type={text as any} />
-      },
+      render: (text: number) => <JobInstanceStatusCmp type={text as any} />
     },
     [getName('alarmStatus')]: {
       ...getFilter(getName('alarmStatus'), alarmStatus),
-      render: (type: number) => {
-        return <AlarmStatusCmp type={type as any} />
-      },
+      render: (type: number) => <AlarmStatusCmp type={type as any} />
     },
     [getName('job')]: {
       render: (v: string, record: Record<string, any>) => {
@@ -115,17 +105,13 @@ const StreamInstance = () => {
         // TODO: desc 字段未定
         if (record.desc) {
           return (
-            <Tooltip
-              theme="light"
-              hasPadding
-              content={`发布描述: ${record.desc}`}
-            >
+            <Tooltip theme="light" hasPadding content={`发布描述: ${record.desc}`}>
               {child}
             </Tooltip>
           )
         }
         return child
-      },
+      }
     },
     [getName('devMode')]: {
       ...getFilter(getName('devMode'), streamDevModeType),
@@ -139,30 +125,16 @@ const StreamInstance = () => {
           >
             {streamDevModeType[type]?.label}
           </span>
-        ),
+        )
     },
     [getName('createTime')]: {
-      render: (d: number) => {
-        return (
-          d && (
-            <span tw="text-neut-8">
-              {dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          )
-        )
-      },
+      render: (d: number) =>
+        d && <span tw="text-neut-8">{dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
     },
     [getName('updateTime')]: {
-      render: (d: number) => {
-        return (
-          d && (
-            <span tw="text-neut-8">
-              {dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          )
-        )
-      },
-    },
+      render: (d: number) =>
+        d && <span tw="text-neut-8">{dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+    }
   }
 
   const queryClient = useQueryClient()
@@ -184,14 +156,14 @@ const StreamInstance = () => {
         text: '中止',
         icon: 'q-closeCircleFill',
         key: 'stop',
-        value: record,
+        value: record
       })
     }
     result.push({
       text: '查看详情',
       icon: 'eye',
       key: 'info',
-      value: record,
+      value: record
     })
     return result
   }
@@ -201,10 +173,7 @@ const StreamInstance = () => {
     window.open(`./job/${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
   }
 
-  const handleMenuClick = (
-    record: Record<string, any>,
-    key: 'stop' | 'info'
-  ) => {
+  const handleMenuClick = (record: Record<string, any>, key: 'stop' | 'info') => {
     switch (key) {
       case 'stop':
         // mutation
@@ -226,46 +195,35 @@ const StreamInstance = () => {
   const operations = {
     title: '操作',
     key: 'operation',
-    render: (_: never, record: Record<string, any>) => {
-      return (
-        <FlexBox tw="gap-4">
-          <TextLink
-            disabled={
-              jobInstanceStatus[record.state as 1]?.type ===
-              JobInstanceStatusType.PREPARING
+    render: (_: never, record: Record<string, any>) => (
+      <FlexBox tw="gap-4">
+        <TextLink
+          disabled={jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING}
+          onClick={() => {
+            if (jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING) {
+              return
             }
-            onClick={() => {
-              if (
-                jobInstanceStatus[record.state as 1]?.type ===
-                JobInstanceStatusType.PREPARING
-              ) {
-                return
+            describeFlinkUiByInstanceId({
+              instanceId: record.id,
+              regionId,
+              spaceId
+            }).then((web_ui: string) => {
+              if (web_ui) {
+                window.open(web_ui, '_blank')
               }
-              describeFlinkUiByInstanceId({
-                instanceId: record.id,
-                regionId,
-                spaceId,
-              }).then((web_ui: string) => {
-                if (web_ui) {
-                  window.open(web_ui, '_blank')
-                }
-              })
-            }}
-          >
-            Flink UI
-          </TextLink>
-          <Divider />
-          <MoreAction
-            theme="darker"
-            items={getActions(
-              jobInstanceStatus[record.state as 1]?.type,
-              record
-            )}
-            onMenuClick={handleMenuClick as any}
-          />
-        </FlexBox>
-      )
-    },
+            })
+          }}
+        >
+          Flink UI
+        </TextLink>
+        <Divider />
+        <MoreAction
+          theme="darker"
+          items={getActions(jobInstanceStatus[record.state as 1]?.type, record)}
+          onMenuClick={handleMenuClick as any}
+        />
+      </FlexBox>
+    )
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -318,7 +276,7 @@ const StreamInstance = () => {
           onSort={sort}
           pagination={{
             total: get(data, 'total', 0),
-            ...pagination,
+            ...pagination
           }}
         />
       </FlexBox>

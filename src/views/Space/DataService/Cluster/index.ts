@@ -1,6 +1,6 @@
-import Network from './Network'
-import NetworkModal from './NetworkModal'
+import Network from './Cluster'
+import ClusterModal from './ClusterModal'
 
 export default Network
 
-export { NetworkModal }
+export { ClusterModal }

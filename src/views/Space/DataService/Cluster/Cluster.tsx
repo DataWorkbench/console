@@ -1,7 +1,7 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components'
 import { getHelpCenterLink } from 'utils'
-import NetworkTable from './NetworkTable'
+import NetworkTable from './ClusterTable'
 
 const pageTabsData = [
   {

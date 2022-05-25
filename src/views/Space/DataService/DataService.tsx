@@ -12,8 +12,7 @@ function Dts() {
   return (
     <div tw="flex-1 flex h-full w-full">
       <Sider funcMod="dts" />
-      <div tw="flex-1 w-full">
-        服务器监控
+      <div tw="flex-1 h-full">
         {/* {(mod === 'realtime' || !mod) && <RealTime />}
         {mod === 'network' && <Network />}
         {mod === 'resource' && <Resource />}

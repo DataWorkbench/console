@@ -63,11 +63,10 @@ const statusStyles = [
   {
     type: StatusBarEnum.purple,
     style: {
-      wrapper: tw`bg-success-bg`,
-      text: tw`text-success`,
-      out: tw`bg-[#eaafe2]`,
-      border: tw`border-[#960577]`,
-      bg: tw`bg-success`
+      text: tw`text-white`,
+      out: tw`bg-[#F6EDFF]`,
+      border: tw`border-[#A855F7]`,
+      bg: tw`bg-[#A855F7]`
     }
   }
 ]

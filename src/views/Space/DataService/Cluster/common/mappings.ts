@@ -7,7 +7,7 @@ export const ClusterFieldMapping: Mapping<
   ['name', { label: '名称/ID', apiField: 'vxnet_name' }],
   ['status', { label: '状态', apiField: 'status' }],
   ['cu', { label: 'CU 规格', apiField: 'network_address' }],
-  ['mode', { label: '计费模式', apiField: 'network_address_v6' }],
-  ['term_validity', { label: '购买有效期', apiField: 'network_address_v6' }],
+  ['mode', { label: '计费模式', apiField: 'network_address_v1' }],
+  ['term_validity', { label: '购买有效期', apiField: 'network_address_v2' }],
   ['last_updated', { label: '最近更新时间', apiField: 'network_address_v6' }]
 ])
