@@ -18,7 +18,9 @@ import { followCursor } from 'tippy.js'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
+import useIcon from 'hooks/useHooks/useIcon'
 import MappingItem, { TMappingField, FieldRow } from './MappingItem'
+import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
 
 /* @refresh reset */
@@ -125,6 +127,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     hasHeader = true,
   } = props
 
+  useIcon(icons)
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
   const jsPlumbInstRef = useRef<jsPlumbInstance>()

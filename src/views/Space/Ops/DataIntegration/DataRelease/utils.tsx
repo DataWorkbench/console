@@ -177,9 +177,9 @@ export const getOperations = (
   const getActions = (record: Record<string, any>) => {
     const emitKey = new Set()
     if (isVersion || record.__level > 1) {
-      // TODO: 历史版本没有调度信息 是否有下线操作???
       emitKey.add('suspend')
       emitKey.add('resume')
+      emitKey.add('offline')
     }
     if (type === JobMode.DI) {
       emitKey.add('suspend')
