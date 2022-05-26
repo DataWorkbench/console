@@ -25,7 +25,7 @@ import { PopConfirm } from '../PopConfirm'
 
 /* @refresh reset */
 const styles = {
-  wrapper: tw`border flex-1 border-neut-13`,
+  wrapper: tw`border flex-1 border-neut-13 w-[40%]`,
   fieldType: tw`w-44 pl-5 xl:pl-12`,
   row: tw`flex border-b border-neut-13 last:border-b-0 p-1.5`,
   // row: tw`grid grid-template-columns[1fr 1.5fr 48px] text-left border-b border-neut-13 last:border-b-0 p-1.5`,
