@@ -13,6 +13,7 @@ import {
   useMutationWorkSpace,
 } from 'hooks'
 import SpaceEditModal from 'views/WorkSpace/SapceEditModal'
+import NetworkModal from 'views/Space/Manage/Network/NetworkModal'
 
 const columns = [
   {
@@ -72,7 +73,7 @@ const columns = [
 interface SpaceModalProps {
   onHide?: () => void
 
-  [propName: string]: unknown
+  [propName: string]: any
 }
 
 const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
@@ -261,6 +262,19 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
         region={region as Record<string, any>}
         onClose={handleModalClose}
         onOk={handleOk}
+        confirmLoading={mutation.isLoading}
+      />
+    )
+  }
+  if (curSpaceOpt === 'network') {
+    return (
+      <NetworkModal
+        actionName="绑定"
+        regionId={region?.id!}
+        regionName={region?.name!}
+        spaceId={curSpace.id}
+        onClose={handleModalClose}
+        onOk={(e) => handleOk({ regionId: region?.id!, ...e, op: 'network' })}
         confirmLoading={mutation.isLoading}
       />
     )
