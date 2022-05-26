@@ -44,6 +44,7 @@ import { usePingEvent } from './DataSourcePing/hooks'
 import {
   confirmMsgInfo,
   CONNECTION_STATUS,
+  DATASOURCE_PING_STAGE,
   DATASOURCE_STATUS,
   getUrl,
   sourceKinds,
@@ -207,12 +208,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     const item = {
       uuid: Math.random().toString(32),
       sourceId: id,
+      stage: DATASOURCE_PING_STAGE.UPDATE,
     }
     addPing(item)
     mutation
       .mutateAsync({
         op: 'ping',
         source_id: id,
+        stage: DATASOURCE_PING_STAGE.UPDATE,
       })
       .finally(() => {
         updatePing(item)
