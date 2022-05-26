@@ -117,7 +117,7 @@ const SyncTypeRadioGroup = forwardRef<
         >
           <div tw="font-medium mb-1">全量同步</div>
           <div tw="text-neut-8 mb-1">
-            全量同步的简短说明（文案暂时占位文案暂时占位文案暂时占位）
+            周期性或一次性将来源数据源中全量数据同步到目标数据源中
           </div>
           <div
             tw="flex py-4 items-center space-x-2"
@@ -146,7 +146,7 @@ const SyncTypeRadioGroup = forwardRef<
         >
           <div tw="font-medium mb-1">增量同步</div>
           <div tw="text-neut-8 mb-1">
-            增量同步的简短说明（文案暂时占位文案暂时占位文案暂时占位）
+            周期性将来源数据源中新增及变化的数据同步到目标数据源中
           </div>
           <div
             tw="flex py-4 items-center space-x-2"

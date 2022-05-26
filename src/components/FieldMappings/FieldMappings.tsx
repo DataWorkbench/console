@@ -154,7 +154,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   useEffect(() => {
     const [leftColumns, rightColumns] = columns || [[], []]
-    if (leftColumns.length > 0 && rightColumns.length > 0) {
+    if (leftColumns?.length > 0 && rightColumns?.length > 0) {
       const mappingArr = leftColumns.map<[string, string]>((column, i) => [
         column.name,
         rightColumns[i].name,
@@ -185,7 +185,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       })
       setRightFields((fields) => {
         const filedNames: string[] = []
-        const mappingFields = rightColumns.map((c) => {
+        const mappingFields = rightColumns?.map((c) => {
           filedNames.push(c.name)
           const field = fields.find((f) => f.name === c.name)
           const uuid = nanoid()

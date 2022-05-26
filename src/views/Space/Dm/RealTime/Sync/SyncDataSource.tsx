@@ -599,10 +599,10 @@ const SyncDataSource = observer(
                 label={<AffixLabel>写入模式</AffixLabel>}
                 name="write_mode"
                 options={[
-                  { label: 'insert: insert into', value: WriteMode.Insert },
-                  { label: 'replace: replace into', value: WriteMode.Replace },
+                  { label: 'insert 插入', value: WriteMode.Insert },
+                  { label: 'replace 替换', value: WriteMode.Replace },
                   {
-                    label: 'update: on duplicate key update',
+                    label: 'update 更新插入',
                     value: WriteMode.Update,
                   },
                 ]}
@@ -627,8 +627,14 @@ const SyncDataSource = observer(
                 name="semantic"
                 value={dbInfo.semantic}
                 options={[
-                  { label: 'exactly-once', value: Semantic.ExactlyOnce },
-                  { label: 'at-least-once', value: Semantic.AtLeastOnce },
+                  {
+                    label: 'exactly-once 正好一次',
+                    value: Semantic.ExactlyOnce,
+                  },
+                  {
+                    label: 'at-least-once 至少一次',
+                    value: Semantic.AtLeastOnce,
+                  },
                 ]}
                 onChange={(v: Semantic) => {
                   setDB((draft) => {

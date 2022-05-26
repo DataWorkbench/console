@@ -82,7 +82,14 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
           name="bytes"
           showButton={false}
           placeholder="请输入并行数"
-          label={<AffixLabel>作业期望最大并行数</AffixLabel>}
+          label={
+            <AffixLabel
+              help="提供数据集成作业可并行的数量，最大支持300并发度"
+              theme="green"
+            >
+              作业期望最大并行数
+            </AffixLabel>
+          }
           validateOnChange
           value={channel.parallelism || ''}
           min={1}
@@ -103,7 +110,9 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
         />
         <Field>
           <Label>
-            <AffixLabel>同步速率</AffixLabel>
+            <AffixLabel help="选择是否限制作业同步的最大速度" theme="green">
+              同步速率
+            </AffixLabel>
           </Label>
           <Control
             css={[
@@ -151,7 +160,9 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
         </Field>
         <Field>
           <Label>
-            <AffixLabel>错误记录数超过</AffixLabel>
+            <AffixLabel help="xxx" required={false}>
+              错误记录数超过
+            </AffixLabel>
           </Label>
           <Control tw="max-w-full! items-center space-x-1">
             <Input

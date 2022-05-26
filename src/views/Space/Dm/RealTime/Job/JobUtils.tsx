@@ -124,7 +124,7 @@ export const jobModeData = [
   {
     mode: JobMode.RT,
     title: '实时-流式开发',
-    desc: '实时开发说明占位文字实时开发说明占位文字实时开发说明占位文字。占位文字',
+    desc: '使用流批一体 Flink 分布式实时计算引擎进行数据开发',
     icon: 'EventFill',
     selTitle: '实时开发模式',
     items: [
@@ -166,7 +166,7 @@ export const jobModeData = [
   {
     mode: JobMode.OLE,
     title: '离线-批量开发（敬请期待）',
-    desc: '离线开发说明占位文字离线开发说明占位文字离线开发说明占位文字。占位文字',
+    desc: '使用基于内存计算的 Spark 大数据计算引擎进行数据开发',
     icon: 'DownloadBox2Fill',
     items: [],
   },
