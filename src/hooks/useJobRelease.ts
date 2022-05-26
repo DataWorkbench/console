@@ -76,11 +76,16 @@ export const useMutationJobRelease = (options?: {}, type = JobMode.DI) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async ({ op, ...rest }: Record<string, any>) => {
     if (['offline', 'resume', 'suspend', 'release'].includes(op)) {
+      let op1 = op
+      // 作业这里重新发布接口特殊
+      if (jobMode === 'sync' && op === 'resume') {
+        op1 = 'reopen'
+      }
       const ret = api.post(path)({
         ...rest,
         spaceId,
         regionId,
-        action: op,
+        action: op1,
         jobMode,
       })
       return ret
