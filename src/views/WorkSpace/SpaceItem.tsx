@@ -48,6 +48,18 @@ interface IProps {
   className?: string
 }
 
+const isNetworkInit = (
+  platform: Record<string, any>,
+  space: Record<string, any>
+) => {
+  return (
+    platform.work_in_iaas &&
+    platform.enable_network &&
+    space.status !== 2 &&
+    !space.network_is_init
+  )
+}
+
 const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const stateStore = useWorkSpaceContext()
   const { isModal, curSpaceId, onItemCheck, platformConfig } = stateStore
@@ -145,7 +157,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
       `}
       onClick={handleCardClick}
     >
-      {!space.network_is_init && (
+      {isNetworkInit(stateStore.platformConfig, space) && (
         <div
           tw="absolute inset-0 z-50"
           title="请单击以绑定网络信息"

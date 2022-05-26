@@ -15,6 +15,18 @@ import TableRowOpt from './TableRowOpt'
 
 const { MenuItem } = Menu as any
 
+const isNetworkInit = (
+  platform: Record<string, any>,
+  space: Record<string, any>
+) => {
+  return (
+    platform.work_in_iaas &&
+    platform.enable_network &&
+    space.status !== 2 &&
+    !space.network_is_init
+  )
+}
+
 const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
   const {
@@ -58,7 +70,6 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     sort_by: '',
     status: '',
   })
-
   // const ifExceedMaxWidth = winW > 1535
 
   const columns = useMemo(() => {
@@ -308,12 +319,46 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     // setSelectedRowKeys(keys)
   }
 
+  const columnsWithNetwork = useMemo(() => {
+    const defaultColumns1: Record<string, any>[] =
+      filterColumn.length > 0 ? filterColumn : columns
+    return defaultColumns1.map((column) => {
+      return {
+        ...column,
+        render: (i: any, record: Record<string, any>) => {
+          const child = column.render ? column.render(i, record) : i
+          if (isNetworkInit(stateStore.platformConfig, record)) {
+            return (
+              <div tw="relative w-full h-full flex items-center">
+                <div
+                  tw="absolute inset-0 z-50"
+                  title="请单击以绑定网络信息"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    stateStore.set({
+                      curSpaceOpt: 'network',
+                      optSpaces: [record],
+                    })
+                  }}
+                />
+                {child}
+              </div>
+            )
+          }
+          return child
+        },
+      }
+    })
+  }, [filterColumn, columns, stateStore])
   return (
     <Table
       rowKey="id"
       loading={isFetching}
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
+      disabledRowKeys={(data?.infos || [])
+        .filter((i) => isNetworkInit(stateStore.platformConfig, i))
+        .map((i) => i.id)}
       onSelect={handleSelect}
       css={[
         tw`table-auto`,
@@ -333,7 +378,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
         `,
       ]}
       dataSource={data?.infos || []}
-      columns={filterColumn.length > 0 ? filterColumn : columns}
+      columns={columnsWithNetwork}
       onSort={handleSort}
       pagination={{
         total: get(data, 'total', 0),
