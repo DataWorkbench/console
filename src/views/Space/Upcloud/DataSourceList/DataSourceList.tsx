@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, pick, merge } from 'lodash-es'
+import { get, pick, merge, filter as filterLodash } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
@@ -518,7 +518,11 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     )
   }
 
-  const sourceList = data?.infos || []
+  const sourceList =
+    filterLodash(
+      data?.infos,
+      (list) => list.status === DATASOURCE_STATUS.ENABLED
+    ) || []
 
   return (
     <>
