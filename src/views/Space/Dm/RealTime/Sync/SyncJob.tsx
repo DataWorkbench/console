@@ -200,14 +200,17 @@ const SyncJob = () => {
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current?.setValue(
-        JSON.stringify(
-          JSON.parse(defaultJobContent?.sync_job_script || '{}'),
-          null,
-          4
-        )
+        isFetching
+          ? loadingWord
+          : JSON.stringify(
+              JSON.parse(defaultJobContent?.sync_job_script || '{}'),
+              null,
+              4
+            )
       )
     }
-  }, [defaultJobContent])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultJobContent, isFetching, editorRef.current])
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
@@ -251,6 +254,7 @@ const SyncJob = () => {
 
   // console.log(db, fields)
   const handleEditorWillMount = (monaco: any) => {
+    // editorRef.current = null
     monaco.editor.defineTheme('my-theme', {
       base: 'vs-dark',
       inherit: true,
@@ -459,8 +463,8 @@ const SyncJob = () => {
   const renderScriptMode = () => {
     const step = stepsData[2]
     return (
-      <>
-        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 64px)] overflow-y-auto">
+      <div tw="h-full">
+        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 64px)] overflow-y-auto ">
           <Editor
             language="json"
             defaultValue={
@@ -501,7 +505,7 @@ const SyncJob = () => {
             </CollapseItem>
           </Collapse>
         </CollapseWrapper>
-      </>
+      </div>
     )
   }
 
@@ -552,7 +556,17 @@ const SyncJob = () => {
         </Button>
       </JobToolBar>
       <div tw="flex-1 overflow-hidden">
-        <SimpleBar tw="h-full">
+        <SimpleBar
+          tw="h-full"
+          css={
+            mode !== 1 &&
+            css`
+              .simplebar-content {
+                ${tw`h-full`}
+              }
+            `
+          }
+        >
           {mode === 1 ? renderGuideMode() : renderScriptMode()}
         </SimpleBar>
       </div>
