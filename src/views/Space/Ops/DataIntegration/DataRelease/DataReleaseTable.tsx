@@ -159,7 +159,7 @@ const DataRelease = observer(() => {
             onClick={() => {
               set({
                 showVersion: true,
-                selectedData: record,
+                selectedData: { id: record?.key },
               })
             }}
           >
