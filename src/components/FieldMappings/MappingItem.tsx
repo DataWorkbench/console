@@ -4,7 +4,8 @@ import { noop, isEmpty } from 'lodash-es'
 import { useDrag, useDrop, XYCoord } from 'react-dnd'
 import { useUnmount } from 'react-use'
 import tw, { styled, css } from 'twin.macro'
-import { Button, Form, Icon, Input, Menu } from '@QCFE/lego-ui'
+import { Button, Form, Input, Menu } from '@QCFE/lego-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { Tooltip } from 'components/Tooltip'
@@ -271,26 +272,27 @@ const MappingItem = (props: MappingItemProps) => {
       menuItems = [
         {
           key: 'edit',
-          icon: 'pen',
+          icon: 'if-pen',
           text: '编辑',
         },
         {
           key: 'constant',
-          icon: 'pen',
+          icon: 'q-counterFill',
           text: '设置常量',
         },
         {
           key: 'parse',
-          icon: 'pen',
+          icon: 'q-textFill',
           text: '时间转换',
         },
       ]
     }
     menuItems.push({
       key: 'delete',
-      icon: 'trash',
+      icon: 'if-trash',
       text: '删除',
     })
+    console.log(menuItems)
     return (
       <Tippy
         content={
@@ -300,7 +302,7 @@ const MappingItem = (props: MappingItemProps) => {
           >
             {menuItems.map((i) => (
               <MenuItem key={i.key}>
-                <Icon icon={i.icon} />
+                <Icon name={i.icon} type="light" />
                 {i.text}
               </MenuItem>
             ))}
