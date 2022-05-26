@@ -789,7 +789,7 @@ localhost:6379
             },
           ],
         },
-        { ...database, required: false, schemas: [] },
+        { ...database },
         user,
         { ...password, placeholder: '请输入访问密码（Password）' },
       ]
