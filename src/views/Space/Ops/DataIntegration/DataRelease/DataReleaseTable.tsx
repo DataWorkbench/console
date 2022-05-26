@@ -222,7 +222,10 @@ const DataRelease = observer(() => {
     [setColumnSettings]
   )
 
-  const { data, isFetching } = useQuerySyncJobRelease(filter)
+  const { data, isFetching } = useQuerySyncJobRelease(filter, {
+    enabled: true,
+    refetchInterval: 1000 * 60,
+  })
 
   const infos = get(data, 'infos', []) || []
 

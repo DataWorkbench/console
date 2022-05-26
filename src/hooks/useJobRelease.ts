@@ -15,7 +15,7 @@ export const getJobReleaseKey = () => queryKey
 
 export const useQuerySyncJobRelease = (
   filter: any,
-  { enabled = true }: Record<string, any> = { enable: true }
+  config: Record<string, any> = {}
 ) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
@@ -25,6 +25,7 @@ export const useQuerySyncJobRelease = (
     offset: 0,
     ...filter,
   }
+  const { enabled = true } = config
   queryKey = ['jobRelease', params]
   return useQuery(
     queryKey,
@@ -49,6 +50,7 @@ export const useQuerySyncJobRelease = (
 
         return undefined
       },
+      ...config,
     }
   )
 }
