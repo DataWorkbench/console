@@ -219,7 +219,8 @@ const SyncDataSource = observer(
             onSelectTable('source', db.source.tableName!, columns, db.source)
           }
         },
-      }
+      },
+      'source'
     )
 
     const { refetch: targetRefetch } = useQuerySourceTableSchema(
@@ -238,7 +239,8 @@ const SyncDataSource = observer(
             onSelectTable('target', db.target.tableName!, columns, db.target)
           }
         },
-      }
+      },
+      'source'
     )
 
     useImperativeHandle(ref, () => ({

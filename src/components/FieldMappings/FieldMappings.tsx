@@ -558,6 +558,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 同行映射
               </OutlinedGreenButton>
             </PopConfirm>
+            ,,
             <PopConfirm
               content="取消映射会去除所有现有映射，确定取消映射么？"
               type="warning"
@@ -565,7 +566,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               okType="danger"
               onOk={handleClearMapping}
             >
-              <Button type="black">解除全部映射</Button>
+              <Button type="black" disabled={!mappings.length}>
+                解除全部映射
+              </Button>
             </PopConfirm>
             <PopConfirm
               content="置为初始状态会重新将表结构恢复到获取时的状态且去掉已有的映射和新增字段，确认置为初始状态么？"

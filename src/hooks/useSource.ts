@@ -140,7 +140,8 @@ export const useQuerySourceTables = (
 
 export const useQuerySourceTableSchema = (
   { sourceId, tableName }: { sourceId: string; tableName: string },
-  options = {}
+  options = {},
+  type: 'source' | 'target' = 'source'
 ) => {
   const { regionId, spaceId } = useParams<IUseParams>()
   const params = {
@@ -150,7 +151,7 @@ export const useQuerySourceTableSchema = (
     tableName,
   }
   return useQuery(
-    ['tableSchema', params],
+    [`${type}_tableSchema`, params],
     async () => describeDataSourceTableSchema(params),
     options
   )
