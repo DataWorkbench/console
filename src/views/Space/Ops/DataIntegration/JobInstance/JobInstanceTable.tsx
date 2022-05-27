@@ -76,7 +76,6 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
-      reverse?: 'asc' | 'desc'
       sort_by?: string
       job_type?: any
       alarm_status?: string
@@ -85,9 +84,14 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       version?: string
       instance_id?: string
       verbose: number
+      reverse: boolean
     },
     { pagination: true; sort: true }
-  >({ verbose: 1 }, { pagination: true, sort: true }, settingKey)
+  >(
+    { verbose: 1, sort_by: 'created', reverse: true },
+    { pagination: true, sort: true },
+    settingKey
+  )
 
   useEffect(() => {
     if (filterProp) {
