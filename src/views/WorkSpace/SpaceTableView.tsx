@@ -20,6 +20,7 @@ const isNetworkInit = (
   space: Record<string, any>
 ) => {
   return (
+    platform &&
     platform.work_in_iaas &&
     platform.enable_network &&
     space.status !== 2 &&
