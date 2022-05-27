@@ -19,13 +19,14 @@ import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
 import useIcon from 'hooks/useHooks/useIcon'
+import { Tooltip } from 'components/Tooltip'
 import MappingItem, { TMappingField, FieldRow } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
 
 /* @refresh reset */
 const styles = {
-  wrapper: tw`border flex-1 border-neut-13 w-[40%]`,
+  wrapper: tw`border flex-1 border-neut-13 w-[40%] min-w-[540px]`,
   fieldType: tw`w-44 pl-5 xl:pl-12`,
   row: tw`flex border-b border-neut-13 last:border-b-0 p-1.5`,
   // row: tw`grid grid-template-columns[1fr 1.5fr 48px] text-left border-b border-neut-13 last:border-b-0 p-1.5`,
@@ -537,17 +538,25 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             <OutlinedGreenButton type="outlined" onClick={handleParallel}>
               全部平行
             </OutlinedGreenButton>
-            <PopConfirm
-              type="warning"
-              okType="danger"
-              okText="确认"
-              content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
-              onOk={handleNameMapping}
-            >
-              <OutlinedGreenButton type="outlined">
-                同名映射
-              </OutlinedGreenButton>
-            </PopConfirm>
+            {intersectionBy(leftFields, rightFields, 'name').length ? (
+              <PopConfirm
+                type="warning"
+                okType="danger"
+                okText="确认"
+                content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
+                onOk={handleNameMapping}
+              >
+                <OutlinedGreenButton type="outlined">
+                  同名映射
+                </OutlinedGreenButton>
+              </PopConfirm>
+            ) : (
+              <Tooltip content="暂无同名字段" theme="light" hasPadding>
+                <OutlinedGreenButton type="outlined" disabled>
+                  同名映射
+                </OutlinedGreenButton>
+              </Tooltip>
+            )}
             <PopConfirm
               type="warning"
               okText="确认"
@@ -558,7 +567,6 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 同行映射
               </OutlinedGreenButton>
             </PopConfirm>
-            ,,
             <PopConfirm
               content="取消映射会去除所有现有映射，确定取消映射么？"
               type="warning"
@@ -583,7 +591,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         )}
       </div>
       <Container ref={containerRef}>
-        <FlexBox tw="flex items-start transition-all duration-500">
+        <FlexBox tw="flex items-start transition-all duration-500 overflow-x-auto">
           {leftFields.length ? (
             <div css={styles.wrapper}>
               <FieldRow isHeader>
@@ -663,7 +671,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             appendTo={() => document.body}
           >
             <div
-              tw="w-1/12 self-stretch"
+              tw="w-1/12 self-stretch min-w-[32px]"
               onContextMenu={(e) => e.preventDefault()}
             />
           </Tippy>
