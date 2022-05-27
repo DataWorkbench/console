@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, pick, merge, filter as filterLodash } from 'lodash-es'
+import { get, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { Input, Menu } from '@QCFE/lego-ui'
 import {
@@ -147,6 +147,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     offset: 0,
     limit: 10,
     verbose: 2,
+    status: DATASOURCE_STATUS.ENABLED,
   })
   const { isLoading, refetch, data } = useQuerySource(
     merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})
@@ -518,11 +519,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     )
   }
 
-  const sourceList =
-    filterLodash(
-      data?.infos,
-      (list) => list.status === DATASOURCE_STATUS.ENABLED
-    ) || []
+  const sourceList = data?.infos || []
 
   return (
     <>

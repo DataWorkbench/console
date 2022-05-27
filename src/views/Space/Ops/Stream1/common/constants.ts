@@ -35,7 +35,7 @@ export const streamReleaseTabs: ITab[] = [
   {
     title: '流式计算-已发布作业',
     description:
-      '具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定。',
+      '计算任务提交和发布后，即可在周期任务列表中对任务进行运维操作。包括查看任务运行详情、暂停任务、下线任务等。',
     icon: 'q-eventDuotone',
     helpLink: '###',
   },
@@ -44,7 +44,8 @@ export const streamReleaseTabs: ITab[] = [
 export const streamInstanceTabs: ITab[] = [
   {
     title: '流式计算-作业实例',
-    description: '流式计算-作业实例',
+    description:
+      '作业实例是任务达到启用调度所配置的周期性运行时间时，被自动调度的实例快照。',
     icon: 'q-eventDuotone',
     helpLink: '###',
   },

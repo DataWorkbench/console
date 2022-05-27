@@ -26,7 +26,6 @@ const LinkInstance = ({
 }) => {
   const { filter, setFilter } = useFilter<
     {
-      id: string | null
       job_id: string
       version: string
       instance_id?: string
@@ -97,12 +96,12 @@ const LinkInstance = ({
             placeholder="搜索作业 ID"
             onPressEnter={(e: React.SyntheticEvent) => {
               setFilter((draft) => {
-                draft.id = (e.currentTarget as HTMLInputElement).value
+                draft.instance_id = (e.currentTarget as HTMLInputElement).value
               })
             }}
             onClear={() => {
               setFilter((draft) => {
-                draft.id = ''
+                draft.instance_id = ''
               })
             }}
           />
