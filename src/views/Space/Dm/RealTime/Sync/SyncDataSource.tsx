@@ -240,7 +240,7 @@ const SyncDataSource = observer(
           }
         },
       },
-      'target'
+      'source'
     )
 
     useImperativeHandle(ref, () => ({
