@@ -373,7 +373,7 @@ const MappingItem = (props: MappingItemProps) => {
             />
             <div tw="text-neut-8">
               {popuState === 'constant'
-                ? '常量字段值'
+                ? '当字段值为 null 时，会返回此 value 值'
                 : '将字段类型转为日期格式返回'}
             </div>
           </>
