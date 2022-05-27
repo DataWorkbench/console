@@ -569,7 +569,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                   <RouterLink
                     to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
                   >
-                    新建 MySQL 数据源
+                    新建数据源
                   </RouterLink>
                 </div>
               )}
