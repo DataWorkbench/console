@@ -5,7 +5,8 @@ import { Center, FlexBox } from 'components/index'
 import useFilter from 'hooks/useHooks/useFilter'
 import {
   dataJobInstanceColumns,
-  dataReleaseScheduleType,
+  jobInstanceStatus,
+  alarmStatus,
 } from 'views/Space/Ops/DataIntegration/constants'
 import React from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -57,8 +58,8 @@ const LinkInstance = ({
             tw="w-[200px]"
             placeholder="请选择"
             options={[
-              { value: 0, label: '全部' },
-              ...Object.values(dataReleaseScheduleType).map((v) => ({
+              { value: '', label: '全部' },
+              ...Object.values(jobInstanceStatus).map((v) => ({
                 value: v.value,
                 label: v.label,
               })),
@@ -77,9 +78,11 @@ const LinkInstance = ({
             tw="w-[200px]"
             placeholder="请选择"
             options={[
-              { value: 0, label: '全部' },
-              { value: 1, label: '正常' },
-              { value: 2, label: '告警' },
+              { value: '', label: '全部' },
+              ...Object.values(alarmStatus).map((v) => ({
+                value: v.value,
+                label: v.label,
+              })),
             ]}
             onChange={(value: number) => {
               setFilter((draft) => {
@@ -133,6 +136,7 @@ const LinkInstance = ({
           job_id: jobId,
           version,
         }}
+        setFatherFilter={setFilter}
         showHeader={false}
         jumpDetail={jumpDetail}
         type={type}

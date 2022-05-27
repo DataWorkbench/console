@@ -185,17 +185,13 @@ const DevContentUI = (props: IProps) => {
               <div>
                 <Grid>
                   <div>
-                    <AffixLabel
-                      theme="green"
-                      required={false}
-                      help="作业期望最大并行数"
-                    >
+                    <AffixLabel theme="green" required={false}>
                       作业期望最大并行数
                     </AffixLabel>
                   </div>
                   <div>{channel.parallelism || ''}</div>
                   <div>
-                    <AffixLabel theme="green" required={false} help="同步速率">
+                    <AffixLabel theme="green" required={false}>
                       同步速率
                     </AffixLabel>
                   </div>
@@ -203,11 +199,7 @@ const DevContentUI = (props: IProps) => {
                   {channel.rat === 1 && (
                     <>
                       <div>
-                        <AffixLabel
-                          theme="light"
-                          required={false}
-                          help="错误记录数超过"
-                        >
+                        <AffixLabel theme="light" required={false}>
                           错误记录数超过
                         </AffixLabel>
                       </div>

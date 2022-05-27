@@ -45,6 +45,7 @@ interface IJobInstanceTable {
   settingKey: string
   jumpDetail: (tab?: string) => (record: Record<string, any>) => void
   type?: JobMode
+  setFatherFilter?: (filter?: (record: Record<string, any>) => void) => void
 }
 
 const instanceNameStyle = css`
@@ -72,6 +73,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     defaultColumns,
     filter: filterProp,
     jumpDetail,
+    setFatherFilter,
     type = JobMode.DI,
   } = props
   const { filter, setFilter, pagination, sort } = useFilter<
@@ -123,6 +125,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           draft.state = v
           draft.offset = 0
         })
+        if (setFatherFilter) {
+          setFatherFilter((draft) => {
+            draft.state = v
+          })
+        }
       },
       filterAble: true,
       filtersNew: Object.values(jobInstanceStatus) as any,
@@ -136,6 +143,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           draft.alarm_status = v
           draft.offset = 0
         })
+        if (setFatherFilter) {
+          setFatherFilter((draft) => {
+            draft.alarm_status = v
+          })
+        }
       },
       filter: filter.alarm_status,
       filterAble: true,
