@@ -452,7 +452,7 @@ const MappingItem = (props: MappingItemProps) => {
                 },
                 {
                   rule: (v: string) => {
-                    if (exist) {
+                    if (v !== item.name && exist) {
                       return !exist(v)
                     }
                     return true
