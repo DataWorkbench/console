@@ -718,6 +718,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
               css: tw`w-24`,
               min: 1,
               max: 65536,
+              defaultValue: '9200',
               placeholder: '9200',
               showButton: false,
               schemas: [
