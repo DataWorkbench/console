@@ -6,7 +6,6 @@ import useFilter from 'hooks/useHooks/useFilter'
 import {
   dataJobInstanceColumns,
   jobInstanceStatus,
-  alarmStatus,
 } from 'views/Space/Ops/DataIntegration/constants'
 import React from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -72,7 +71,7 @@ const LinkInstance = ({
             value={filter.state}
           />
         </Center>
-        <Center tw="gap-1">
+        {/* <Center tw="gap-1">
           <div tw="text-white w-auto ">告警状态</div>
           <Select
             tw="w-[200px]"
@@ -91,7 +90,7 @@ const LinkInstance = ({
             }}
             value={filter.alarm_status}
           />
-        </Center>
+        </Center> */}
         <Center tw="gap-1">
           <div tw="text-white w-auto ">实例 ID</div>
           <InputSearch

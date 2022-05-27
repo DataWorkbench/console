@@ -106,11 +106,11 @@ export const dataJobInstanceColumns: IColumn[] = [
     dataIndex: 'state',
     key: 'state',
   },
-  {
-    title: '告警状态',
-    dataIndex: 'alarm_status',
-    key: 'alarm_status',
-  },
+  // {
+  //   title: '告警状态',
+  //   dataIndex: 'alarm_status',
+  //   key: 'alarm_status',
+  // },
   {
     title: '所属作业',
     dataIndex: 'job_id',

@@ -2,14 +2,12 @@
 import { get } from 'lodash-es'
 import { InstanceName } from 'components/InstanceName'
 import {
-  alarmStatus,
   dataJobInstanceColumns,
   jobInstanceStatus,
   JobInstanceStatusType,
   jobType,
 } from 'views/Space/Ops/DataIntegration/constants'
 import {
-  AlarmStatusCmp,
   Divider,
   JobInstanceStatusCmp,
   JobTypeCmp,
@@ -137,28 +135,28 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         <JobInstanceStatusCmp type={text} />
       ),
     },
-    alarm_status: {
-      onFilter: (v: string) => {
-        setFilter((draft) => {
-          draft.alarm_status = v
-          draft.offset = 0
-        })
-        if (setFatherFilter) {
-          setFatherFilter((draft) => {
-            draft.alarm_status = v
-          })
-        }
-      },
-      filter: filter.alarm_status,
-      filterAble: true,
-      filtersNew: Object.values(alarmStatus) as any,
-      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
-        <AlarmStatusCmp
-          type={text}
-          onClick={() => jumpDetail('alarm')(record)}
-        />
-      ),
-    },
+    // alarm_status: {
+    //   onFilter: (v: string) => {
+    //     setFilter((draft) => {
+    //       draft.alarm_status = v
+    //       draft.offset = 0
+    //     })
+    //     if (setFatherFilter) {
+    //       setFatherFilter((draft) => {
+    //         draft.alarm_status = v
+    //       })
+    //     }
+    //   },
+    //   filter: filter.alarm_status,
+    //   filterAble: true,
+    //   filtersNew: Object.values(alarmStatus) as any,
+    //   render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
+    //     <AlarmStatusCmp
+    //       type={text}
+    //       onClick={() => jumpDetail('alarm')(record)}
+    //     />
+    //   ),
+    // },
     job_id: {
       // width: 180,
       render: (v: string, record: Record<string, any>) => {
