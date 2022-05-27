@@ -129,6 +129,7 @@ const SyncJob = () => {
     useRef<{
       getResource: () => Record<string, string>
       getTypeNames: () => string[]
+      refetchColumns: () => void
     }>(null)
   const mappingRef =
     useRef<{
@@ -425,6 +426,11 @@ const SyncJob = () => {
               )}
               {index === 1 && (
                 <FieldMappings
+                  onReInit={() => {
+                    if (dbRef.current && dbRef.current?.refetchColumns) {
+                      dbRef.current?.refetchColumns()
+                    }
+                  }}
                   ref={mappingRef}
                   // mappings={mappings}
                   leftFields={db.source.fields || []}
