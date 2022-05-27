@@ -718,7 +718,6 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
               css: tw`w-24`,
               min: 1,
               max: 65536,
-              defaultValue: '9200',
               placeholder: '9200',
               showButton: false,
               schemas: [
@@ -853,17 +852,8 @@ localhost:6379
               status: 'error',
             },
             {
-              rule: (value: { host: string; port: number }[]) => {
+              rule: () => {
                 return true
-                // const l = strlen(value)
-                // return l >= 1 && l <= 1024
-                if (!Array.isArray(value) || !value.length) {
-                  return false
-                }
-                return !value.find(({ host: h, port: p }) => {
-                  const l = strlen(h)
-                  return l < 1 || l > 64 || !h || !p
-                })
               },
               help: 'IP 不能为空且长度为 1 ～ 64，Port 不能为空且为整数，kafka_brokers 个数在 1 ～ 128 之内',
               status: 'error',
