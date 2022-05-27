@@ -25,10 +25,13 @@ import {
 interface ISpaceEditProps {
   spaceId: string
   regionId: string
-  vpcId: string
-  xnetId: string
+  vpcId?: string
+  xnetId?: string
   regionName: string
   onClose: () => void
+  actionName?: string
+  onOk: (v: Record<string, any>) => void
+  confirmLoading: boolean
 }
 
 const FormWrapper = styled('div')(() => [
@@ -61,18 +64,24 @@ const FormWrapper = styled('div')(() => [
 ])
 
 const WarnWrapper = styled('div')(() => [
-  tw`w-full border rounded border-[#F5C414] bg-[rgba(254, 249, 195, 0.1)] mt-2 px-4 py-2 text-[#FACC15]`,
+  tw`w-full border rounded border-info-border bg-info-bg mt-2 px-4 py-2 text-info`,
 ])
 
-const SpaceEditModal = observer((props: ISpaceEditProps) => {
-  const { spaceId, vpcId, regionId, regionName, onClose, xnetId } = props
+export const NetworkFormItem = (
+  props: Pick<
+    ISpaceEditProps,
+    'spaceId' | 'vpcId' | 'regionId' | 'regionName' | 'xnetId'
+  >
+) => {
+  const { spaceId, vpcId, regionId, regionName, xnetId } = props
 
-  const [params, setParams] = useImmer<{ router_id: string; vxnet_id: string }>(
-    {
-      router_id: vpcId,
-      vxnet_id: xnetId,
-    }
-  )
+  const [params, setParams] = useImmer<{
+    router_id?: string
+    vxnet_id?: string
+  }>({
+    router_id: vpcId,
+    vxnet_id: xnetId,
+  })
 
   const [xnetSearch, setXnetSearch] = useState('')
   const [routerSearch, setRouterSearch] = useState('')
@@ -129,10 +138,7 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
             <b>{regionName}</b>
             VPC
           </div>
-          <div>
-            2. 不支持使用免费型 VPC（由于免费型 VPC
-            不具备公网访问能力，暂时不支持在免费型 VPC 中创建计算集群）
-          </div>
+          <div>2. 不支持使用免费型 VPC</div>
         </WarnWrapper>
       )
     }
@@ -150,169 +156,128 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
     </WarnWrapper>
   )
 
-  const form = useRef<Form>()
-  const handleOk = () => {}
-
-  const confirmLoading = true
-
   return (
-    <Modal
-      title="更换 VPC"
-      // @ts-ignore
-      closable
-      visible
-      width={800}
-      onOk={handleOk}
-      onCancel={onClose}
-      confirmLoading={confirmLoading}
-      okText="更换"
-      cancelText="取消"
-    >
-      <FormWrapper>
-        <Form ref={form} tw="max-w-[100%]!">
-          <SelectWithRefresh
-            label={<AffixLabel>VPC 网络</AffixLabel>}
-            placeholder="请选择 VPC"
-            validateOnBlur
-            name="router_id"
-            onRefresh={refectRouters}
-            value={params.router_id}
-            options={routers.map(({ router_id, router_name }) => ({
-              value: router_id,
-              label: router_name,
-            }))}
-            optionRenderer={(option: { label: string; value: string }) => (
-              <FlexBox tw="items-center">
-                <Icon name="vpc" tw="mr-2.5" size={18} />
-                <div>
-                  <div>{option.label || option.value}</div>
-                  <div tw="text-neut-8">{option.value}</div>
-                </div>
-              </FlexBox>
-            )}
-            // onChange={searchRouter}
-            searchable
-            onInputChange={(v: string) => {
-              setRouterSearch(v)
-            }}
-            openOnClick
-            isLoadingAtBottom
-            isLoading={routersRet.isFetching}
-            onMenuScrollToBottom={() => {
-              if (routersRet.hasNextPage) {
-                routersRet.fetchNextPage()
-              }
-            }}
-            bottomTextVisible
-            help={
+    <>
+      <SelectWithRefresh
+        label={<AffixLabel>VPC 网络</AffixLabel>}
+        placeholder="请选择 VPC"
+        validateOnBlur
+        name="router_id"
+        onRefresh={refectRouters}
+        value={params.router_id}
+        options={routers.map(({ router_id, router_name }) => ({
+          value: router_id,
+          label: router_name,
+        }))}
+        optionRenderer={(option: { label: string; value: string }) => (
+          <FlexBox tw="items-center">
+            <Icon name="vpc" tw="mr-2.5" size={18} />
+            <div>
+              <div>{option.label || option.value}</div>
+              <div tw="text-neut-8">{option.value}</div>
+            </div>
+          </FlexBox>
+        )}
+        // onChange={searchRouter}
+        searchable
+        onInputChange={(v: string) => {
+          setRouterSearch(v)
+        }}
+        openOnClick
+        isLoadingAtBottom
+        isLoading={routersRet.isFetching}
+        onMenuScrollToBottom={() => {
+          if (routersRet.hasNextPage) {
+            routersRet.fetchNextPage()
+          }
+        }}
+        bottomTextVisible
+        help={
+          <>
+            如需选择新的 VPC，您可以
+            <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
+              新建 VPC 网络
+            </TextLink>
+            {renderVpcWarn()}
+          </>
+        }
+        onChange={(v: string) => {
+          setParams((draft) => {
+            draft.router_id = v
+            draft.vxnet_id = ''
+          })
+        }}
+        searchAb
+        schemas={[
+          {
+            rule: {
+              required: true,
+              isExisty: false,
+            },
+            status: 'error',
+            help: (
               <>
-                如需选择新的 VPC，您可以
+                <span>不能为空,</span>
+                <span tw="text-neut-8 ml-2">如需选择新的 VPC，您可以</span>
                 <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
                   新建 VPC 网络
                 </TextLink>
                 {renderVpcWarn()}
               </>
-            }
-            onChange={(v: string) => {
-              setParams((draft) => {
-                draft.router_id = v
-                draft.vxnet_id = ''
-              })
+            ),
+          },
+        ]}
+      />
 
-              console.log(1111, v)
-            }}
-            searchAb
-            schemas={[
-              {
-                rule: {
-                  required: true,
-                  isExisty: false,
-                },
-                status: 'error',
-                help: (
-                  <>
-                    <span>不能为空,</span>
-                    <span tw="text-neut-8 ml-2">如需选择新的 VPC，您可以</span>
-                    <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
-                      新建 VPC 网络
-                    </TextLink>
-                    {renderVpcWarn()}
-                  </>
-                ),
+      {params.router_id && params.router_id !== vpcId && (
+        <SelectWithRefresh
+          label={<AffixLabel>私有网络</AffixLabel>}
+          placeholder="请选择私有网络"
+          validateOnBlur
+          name="vxnet_id"
+          value={params.vxnet_id}
+          key={params.router_id}
+          onRefresh={refectVxnets}
+          options={vxnets
+            .map(({ vxnet_id, vxnet_name }) => ({
+              value: vxnet_id,
+              label: vxnet_name,
+            }))
+            .filter(
+              (v) =>
+                v.value.includes(xnetSearch) || v.label.includes(xnetSearch)
+            )}
+          optionRenderer={(option: { label: string; value: string }) => (
+            <FlexBox tw="items-center">
+              <Icon name="network" tw="mr-2.5" size={18} type="light" />
+              <div>
+                <div>{option.label || option.value}</div>
+                <div tw="text-neut-8">{option.value}</div>
+              </div>
+            </FlexBox>
+          )}
+          onChange={(v: string) => {
+            setParams((draft) => {
+              draft.vxnet_id = v
+            })
+          }}
+          isLoading={vxnetsRet.isFetching}
+          // isLoadingAtBottom
+          searchable
+          onInputChange={(v: string) => {
+            setXnetSearch(v)
+          }}
+          openOnClick
+          schemas={[
+            {
+              rule: {
+                required: true,
+                isExisty: false,
               },
-            ]}
-          />
-
-          {params.router_id && params.router_id !== vpcId && (
-            <SelectWithRefresh
-              label={<AffixLabel>私有网络</AffixLabel>}
-              placeholder="请选择私有网络"
-              validateOnBlur
-              name="vxnet_id"
-              value={params.vxnet_id}
-              key={params.router_id}
-              onRefresh={refectVxnets}
-              options={vxnets
-                .map(({ vxnet_id, vxnet_name }) => ({
-                  value: vxnet_id,
-                  label: vxnet_name,
-                }))
-                .filter(
-                  (v) =>
-                    v.value.includes(xnetSearch) || v.label.includes(xnetSearch)
-                )}
-              optionRenderer={(option: { label: string; value: string }) => (
-                <FlexBox tw="items-center">
-                  <Icon name="network" tw="mr-2.5" size={18} type="light" />
-                  <div>
-                    <div>{option.label || option.value}</div>
-                    <div tw="text-neut-8">{option.value}</div>
-                  </div>
-                </FlexBox>
-              )}
-              onChange={(v: string) => {
-                setParams((draft) => {
-                  draft.vxnet_id = v
-                })
-              }}
-              isLoading={vxnetsRet.isFetching}
-              // isLoadingAtBottom
-              searchable
-              onInputChange={(v: string) => {
-                setXnetSearch(v)
-              }}
-              openOnClick
-              schemas={[
-                {
-                  rule: {
-                    required: true,
-                    isExisty: false,
-                  },
-                  status: 'error',
-                  help: (
-                    <>
-                      不能为空, <span tw="text-neut-8 ml-2">您可以</span>
-                      <TextLink
-                        href={
-                          params.router_id
-                            ? `/${regionId}/routers/${params.router_id}`
-                            : `/${regionId}/vxnets`
-                        }
-                        target="_blank"
-                        rel="noreferrer"
-                        hasIcon
-                        // className="link"
-                      >
-                        新建私有网络
-                      </TextLink>
-                      {renderVxnetWarn()}
-                    </>
-                  ),
-                },
-              ]}
-              help={
+              status: 'error',
+              help: (
                 <>
-                  您可以
+                  不能为空, <span tw="text-neut-8 ml-2">您可以</span>
                   <TextLink
                     href={
                       params.router_id
@@ -320,7 +285,6 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                         : `/${regionId}/vxnets`
                     }
                     target="_blank"
-                    // tw="text-green-11"
                     rel="noreferrer"
                     hasIcon
                     // className="link"
@@ -329,13 +293,84 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                   </TextLink>
                   {renderVxnetWarn()}
                 </>
-              }
-            />
-          )}
+              ),
+            },
+          ]}
+          help={
+            <>
+              您可以
+              <TextLink
+                href={
+                  params.router_id
+                    ? `/${regionId}/routers/${params.router_id}`
+                    : `/${regionId}/vxnets`
+                }
+                target="_blank"
+                // tw="text-green-11"
+                rel="noreferrer"
+                hasIcon
+                // className="link"
+              >
+                新建私有网络
+              </TextLink>
+              {renderVxnetWarn()}
+            </>
+          }
+        />
+      )}
+    </>
+  )
+}
+
+const NetworkModal = observer((props: ISpaceEditProps) => {
+  const {
+    spaceId,
+    vpcId,
+    regionId,
+    regionName,
+    onClose,
+    xnetId,
+    actionName = '更换',
+    onOk,
+    confirmLoading,
+  } = props
+
+  const form = useRef<Form>()
+
+  return (
+    <Modal
+      title={`${actionName} VPC`}
+      // @ts-ignore
+      closable
+      visible
+      width={800}
+      onOk={() => {
+        if (form.current?.validateFields()) {
+          onOk({
+            ...form.current?.getFieldsValue(),
+            spaceId,
+          })
+        }
+      }}
+      onCancel={onClose}
+      confirmLoading={confirmLoading}
+      appendToBody
+      okText={actionName}
+      cancelText="取消"
+    >
+      <FormWrapper>
+        <Form ref={form} tw="max-w-[100%]!">
+          <NetworkFormItem
+            vpcId={vpcId}
+            xnetId={xnetId}
+            regionId={regionId}
+            regionName={regionName}
+            spaceId={spaceId}
+          />
         </Form>
       </FormWrapper>
     </Modal>
   )
 })
 
-export default SpaceEditModal
+export default NetworkModal

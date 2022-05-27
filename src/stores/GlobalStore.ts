@@ -1,6 +1,7 @@
 import { makeAutoObservable, set } from 'mobx'
 // import { parseI18n } from 'utils/convert'
 import type RootStore from './RootStore'
+
 // import { loadRegion } from './api'
 
 export interface MenuType {
@@ -11,6 +12,7 @@ export interface MenuType {
   link?: string
   items?: MenuType[]
 }
+
 export interface MenuInfoType {
   title: string
   menus: MenuType[]
@@ -24,7 +26,8 @@ class GlobalStore {
 
   regionInfos = []
 
-  curRegionInfo = null
+  curRegionInfo: { id: string; name: string; [propName: string]: any } | null =
+    null
 
   menuInfo: MenuInfoType = {
     title: '大数据工作台',
