@@ -157,27 +157,28 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                 }
               />
             </CollapseItem>
-            {stateStore.platformConfig?.enable_network && (
-              <CollapseItem
-                key="p1"
-                label={
-                  <Center tw="gap-2">
-                    <Icon
-                      name="earth"
-                      size={20}
-                      type={isDarkTheme() ? 'light' : 'dark'}
-                    />
-                    <span>网络信息</span>
-                  </Center>
-                }
-              >
-                <NetworkFormItem
-                  spaceId={curSpace?.id}
-                  regionId={regionId}
-                  regionName={region?.name}
-                />
-              </CollapseItem>
-            )}
+            {stateStore.platformConfig?.enable_network &&
+              curSpaceOpt === 'create' && (
+                <CollapseItem
+                  key="p1"
+                  label={
+                    <Center tw="gap-2">
+                      <Icon
+                        name="earth"
+                        size={20}
+                        type={isDarkTheme() ? 'light' : 'dark'}
+                      />
+                      <span>网络信息</span>
+                    </Center>
+                  }
+                >
+                  <NetworkFormItem
+                    spaceId={curSpace?.id}
+                    regionId={regionId}
+                    regionName={region?.name}
+                  />
+                </CollapseItem>
+              )}
           </CollapseWrapper>
         </Form>
       </Root>
