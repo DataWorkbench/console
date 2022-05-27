@@ -222,7 +222,7 @@ const SyncDataSource = observer(
       }
     )
 
-    useQuerySourceTableSchema(
+    const { refetch: targetRefetch } = useQuerySourceTableSchema(
       {
         sourceId: db.target.id!,
         tableName: db.target.tableName!,
@@ -242,6 +242,10 @@ const SyncDataSource = observer(
     )
 
     useImperativeHandle(ref, () => ({
+      refetchColumns: () => {
+        sourceColumnRet.refetch()
+        targetRefetch()
+      },
       getResource: () => {
         const srcform = sourceForm.current as any
         const tgtform = targetForm.current as any

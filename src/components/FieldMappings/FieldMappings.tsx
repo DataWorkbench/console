@@ -107,6 +107,7 @@ export interface IFieldMappingsProps {
   columns?: [Column[], Column[]]
   readonly?: boolean
   hasHeader?: boolean
+  onReInit: () => void
 }
 
 export interface IFieldMappingsRecord {
@@ -117,6 +118,7 @@ export interface IFieldMappingsRecord {
 
 export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const {
+    onReInit,
     leftFields: leftFieldsProp,
     rightFields: rightFieldsProp,
     leftTypeName,
@@ -420,8 +422,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   const handleReset = () => {
     handleClearMapping()
-    setLeftFields(leftFieldsProp)
-    setRightFields(rightFieldsProp)
+    onReInit()
+    // setLeftFields(leftFieldsProp)
+    // setRightFields(rightFieldsProp)
   }
 
   const handleDeleteConnection = () => {
