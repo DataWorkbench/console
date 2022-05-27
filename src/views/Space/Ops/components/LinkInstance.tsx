@@ -5,7 +5,7 @@ import { Center, FlexBox } from 'components/index'
 import useFilter from 'hooks/useHooks/useFilter'
 import {
   dataJobInstanceColumns,
-  dataReleaseScheduleType,
+  jobInstanceStatus,
 } from 'views/Space/Ops/DataIntegration/constants'
 import React from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -57,8 +57,8 @@ const LinkInstance = ({
             tw="w-[200px]"
             placeholder="请选择"
             options={[
-              { value: 0, label: '全部' },
-              ...Object.values(dataReleaseScheduleType).map((v) => ({
+              { value: '', label: '全部' },
+              ...Object.values(jobInstanceStatus).map((v) => ({
                 value: v.value,
                 label: v.label,
               })),
@@ -71,15 +71,17 @@ const LinkInstance = ({
             value={filter.state}
           />
         </Center>
-        <Center tw="gap-1">
+        {/* <Center tw="gap-1">
           <div tw="text-white w-auto ">告警状态</div>
           <Select
             tw="w-[200px]"
             placeholder="请选择"
             options={[
-              { value: 0, label: '全部' },
-              { value: 1, label: '正常' },
-              { value: 2, label: '告警' },
+              { value: '', label: '全部' },
+              ...Object.values(alarmStatus).map((v) => ({
+                value: v.value,
+                label: v.label,
+              })),
             ]}
             onChange={(value: number) => {
               setFilter((draft) => {
@@ -88,7 +90,7 @@ const LinkInstance = ({
             }}
             value={filter.alarm_status}
           />
-        </Center>
+        </Center> */}
         <Center tw="gap-1">
           <div tw="text-white w-auto ">实例 ID</div>
           <InputSearch
@@ -133,6 +135,7 @@ const LinkInstance = ({
           job_id: jobId,
           version,
         }}
+        setFatherFilter={setFilter}
         showHeader={false}
         jumpDetail={jumpDetail}
         type={type}

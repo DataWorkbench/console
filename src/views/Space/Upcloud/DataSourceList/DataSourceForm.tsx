@@ -134,6 +134,7 @@ const getInitValue = (path: string) => {
       },
       elastic_search: {
         version: '7',
+        port: 9200,
       },
     },
   }
