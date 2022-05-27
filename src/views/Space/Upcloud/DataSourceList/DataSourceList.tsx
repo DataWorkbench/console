@@ -138,6 +138,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     reverse: boolean
     search?: string
     verbose?: 1 | 2
+    status?: number
     [k: string]: any
   }>({
     regionId,
@@ -147,6 +148,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     offset: 0,
     limit: 10,
     verbose: 2,
+    status: selectMode ? DATASOURCE_STATUS.ENABLED : 0,
   })
   const { isLoading, refetch, data } = useQuerySource(
     merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})

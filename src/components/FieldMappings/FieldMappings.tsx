@@ -188,7 +188,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       })
       setRightFields((fields) => {
         const filedNames: string[] = []
-        const mappingFields = rightColumns.map((c) => {
+        const mappingFields = rightColumns?.map((c) => {
           filedNames.push(c.name)
           const field = fields.find((f) => f.name === c.name)
           const uuid = nanoid()

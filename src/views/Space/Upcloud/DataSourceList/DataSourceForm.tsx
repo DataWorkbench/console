@@ -152,7 +152,7 @@ interface IFormProps {
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
   op: string
   opSourceList: Record<string, any>[]
-  theme: 'dark' | 'light'
+  theme?: 'dark' | 'light'
   className?: string
 }
 

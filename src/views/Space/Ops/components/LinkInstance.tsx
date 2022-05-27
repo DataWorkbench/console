@@ -90,7 +90,7 @@ const LinkInstance = ({
           />
         </Center>
         <Center tw="gap-1">
-          <div tw="text-white w-auto ">作业 ID</div>
+          <div tw="text-white w-auto ">实例 ID</div>
           <InputSearch
             tw="w-[200px]"
             placeholder="搜索作业 ID"

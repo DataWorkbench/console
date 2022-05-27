@@ -106,7 +106,7 @@ const VersionsModal = (props: IProps) => {
     },
     { pagination: true; sort: true }
   >(
-    { limit: 15, job_id: jobId, reverse: true, sort_by: 'updated' },
+    { limit: 10, job_id: jobId, reverse: true, sort_by: 'updated' },
     { pagination: true, sort: true },
     dataReleaseVersionSettingKey
   )
