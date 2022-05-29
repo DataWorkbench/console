@@ -44,6 +44,7 @@ import { usePingEvent } from './DataSourcePing/hooks'
 import {
   confirmMsgInfo,
   CONNECTION_STATUS,
+  DATASOURCE_PING_STAGE,
   DATASOURCE_STATUS,
   getUrl,
   sourceKinds,
@@ -137,6 +138,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     reverse: boolean
     search?: string
     verbose?: 1 | 2
+    status?: number
     [k: string]: any
   }>({
     regionId,
@@ -146,6 +148,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     offset: 0,
     limit: 10,
     verbose: 2,
+    status: selectMode ? DATASOURCE_STATUS.ENABLED : 0,
   })
   const { isLoading, refetch, data } = useQuerySource(
     merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})
@@ -207,12 +210,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     const item = {
       uuid: Math.random().toString(32),
       sourceId: id,
+      stage: DATASOURCE_PING_STAGE.UPDATE,
     }
     addPing(item)
     mutation
       .mutateAsync({
         op: 'ping',
         source_id: id,
+        stage: DATASOURCE_PING_STAGE.UPDATE,
       })
       .finally(() => {
         updatePing(item)
@@ -566,7 +571,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                   <RouterLink
                     to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
                   >
-                    新建 MySQL 数据源
+                    新建数据源
                   </RouterLink>
                 </div>
               )}
@@ -610,13 +615,22 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             tw="flex-1 pb-5 dark:bg-neut-16"
             css={[!selectMode && tw`px-5`]}
           >
-            {/* TODO: radio disabled 连通性过滤 */}
             <Table
               selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
               columns={columns}
               rowKey="id"
               tw="pb-4 "
+              disabledRowKeys={
+                selectMode
+                  ? sourceList
+                      .filter(
+                        (i: Record<string, any>) =>
+                          !i.last_connection || i.last_connection.result !== 1
+                      )
+                      .map((i: Record<string, any>) => i.id)
+                  : []
+              }
               selectedRowKeys={selectedRowKeys}
               onSelect={(rowKeys: string[]) => {
                 if (selectMode && rowKeys.length) {

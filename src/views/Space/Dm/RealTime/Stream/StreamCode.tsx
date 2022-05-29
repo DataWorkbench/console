@@ -73,7 +73,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [boxRef, boxDimensions] = useMeasure()
   const history = useHistory()
   const [show, toggleShow] = useState(false)
-  const [enableRelease, setEnableRelease] = useState(false)
+  const [, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
   const [showRunLog, setShowRunLog] = useState(false)
   // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
@@ -159,7 +159,11 @@ def main(args: Array[String]): Unit = {
     )
   }
 
-  const mutateCodeData = (op: 'codeSave' | 'codeSyntax', cb?: () => void) => {
+  const mutateCodeData = (
+    op: 'codeSave' | 'codeSyntax',
+    cb?: () => void,
+    hideNotify = false
+  ) => {
     const code = trim(editorRef.current?.getValue())
     if (code === '') {
       showWarn()
@@ -202,11 +206,13 @@ def main(args: Array[String]): Unit = {
           queryClient.invalidateQueries(getFlowKey('streamJobCode'))
           setEnableRelease(true)
           setShowPlaceholder(false)
-          Notify.success({
-            title: '操作提示',
-            content: isSaveOp ? '代码保存成功' : '语法检查成功',
-            placement: 'bottomRight',
-          })
+          if (!hideNotify) {
+            Notify.success({
+              title: '操作提示',
+              content: isSaveOp ? '代码保存成功' : '语法检查成功',
+              placement: 'bottomRight',
+            })
+          }
           if (cb) {
             cb()
           }
@@ -393,9 +399,9 @@ def main(args: Array[String]): Unit = {
             </Button>
             <Button
               type="primary"
-              onClick={onRelease}
+              onClick={() => mutateCodeData('codeSave', onRelease, true)}
               loading={releaseMutation.isLoading}
-              disabled={!enableRelease}
+              // disabled={!enableRelease}
             >
               <Icon name="export" />
               发布

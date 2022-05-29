@@ -176,7 +176,7 @@ export const JobTree = observer(
           workFlowStore.toggleJobModal(true)
         } else if (val === 'scheSetting') {
           workFlowStore.set({
-            curJob: get(curOpNode, 'job'),
+            curJob: { ...get(curOpNode, 'job'), jobMode: curOpNode.jobMode },
             showScheSetting: true,
           })
         } else if (val === 'argsSetting') {
@@ -207,8 +207,8 @@ export const JobTree = observer(
                 <Icons name="NoteGearFill" size={14} tw="mr-2" />
                 <span>移动作业</span>
               </MenuItem>
-              {isRt && (
-                <MenuItem value="association" disabled>
+              {false && (
+                <MenuItem value="association">
                   <Icon
                     name="listview"
                     size={14}
@@ -223,7 +223,7 @@ export const JobTree = observer(
               )}
               <MenuItem
                 value="scheSetting"
-                disabled={isDi}
+                // disabled={isDi}
                 onClick={onRightMenuClick}
               >
                 <Icons name="Topology2Fill" size={14} tw="mr-2" />
@@ -287,7 +287,11 @@ export const JobTree = observer(
                   <Icons name="sql" size={14} tw="mr-2" />
                   <span>SQL 模式</span>
                 </MenuItem>
-                <MenuItem value={JobType.PYTHON} onClick={onRightMenuClick}>
+                <MenuItem
+                  disabled
+                  value={JobType.PYTHON}
+                  onClick={onRightMenuClick}
+                >
                   <Icons name="PythonFill" size={14} tw="mr-2" />
                   <span>Python 模式</span>
                 </MenuItem>
@@ -295,10 +299,24 @@ export const JobTree = observer(
                   <Icons name="JavaFill" size={14} tw="mr-2" />
                   <span>Jar 包模式</span>
                 </MenuItem>
-                <MenuItem disabled onClick={onRightMenuClick}>
-                  <Icons name="Branch2Fill" size={14} tw="mr-2" />
-                  <span>算子编排模式</span>
-                </MenuItem>
+
+                {false && (
+                  <>
+                    <MenuItem
+                      disabled
+                      value={JobType.SCALA}
+                      onClick={onRightMenuClick}
+                    >
+                      <Icons name="scala" size={14} tw="mr-2" />
+                      <span>Scala 包模式</span>
+                    </MenuItem>
+
+                    <MenuItem disabled onClick={onRightMenuClick}>
+                      <Icons name="Branch2Fill" size={14} tw="mr-2" />
+                      <span>算子编排模式</span>
+                    </MenuItem>
+                  </>
+                )}
               </>
             )}
 
@@ -350,22 +368,23 @@ export const JobTree = observer(
       const { key } = curOpNode
       let data: any = { op, jobMode: curOpNode.jobMode }
       if (op === 'create' || op === 'edit' || op === 'move') {
-        if (form.current?.validateForm()) {
-          const fields = form.current.getFieldsValue()
-          const pid = op === 'move' ? targetNodeKey : curOpNode.key
-          data = {
-            ...data,
-            ...fields,
-          }
-          if (op === 'create') {
-            data.pid = getJobIdByKey(pid)
-            data.is_directory = true
-          } else if (op === 'edit') {
-            data.jobId = key
-          } else if (op === 'move') {
-            data.job_ids = [key]
-            data.target = getJobIdByKey(targetNodeKey)
-          }
+        if (!form.current?.validateForm()) {
+          return
+        }
+        const fields = form.current.getFieldsValue()
+        const pid = op === 'move' ? targetNodeKey : curOpNode.key
+        data = {
+          ...data,
+          ...fields,
+        }
+        if (op === 'create') {
+          data.pid = getJobIdByKey(pid)
+          data.is_directory = true
+        } else if (op === 'edit') {
+          data.jobId = key
+        } else if (op === 'move') {
+          data.job_ids = [key]
+          data.target = getJobIdByKey(targetNodeKey)
         }
       } else if (op === 'delete') {
         data = {

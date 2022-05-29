@@ -30,7 +30,7 @@ const PlatformFeat = ({ className }) => {
   )
 
   return (
-    <Card className={className} hasBoxShadow>
+    <Card className={className} hasBoxShadow tw="w-full">
       <CardHeader
         title="平台特性"
         subtitle="帮助您更加全面了解和使用大数据工作台，满足您的业务需求"

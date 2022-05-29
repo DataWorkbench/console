@@ -15,7 +15,8 @@ export const dataJobReleaseTab: ITab[] = [
 export const dataJobInstanceTab: ITab[] = [
   {
     title: '数据集成-作业实例',
-    description: 'Instance data job',
+    description:
+      '作业实例是任务达到启用调度所配置的周期性运行时间时，被自动调度的实例快照。',
     icon: 'q-mergeFillDuotone',
     helpLink: getHelpCenterLink('data-job-instance'),
   },
@@ -105,11 +106,11 @@ export const dataJobInstanceColumns: IColumn[] = [
     dataIndex: 'state',
     key: 'state',
   },
-  {
-    title: '告警状态',
-    dataIndex: 'alarm_status',
-    key: 'alarm_status',
-  },
+  // {
+  //   title: '告警状态',
+  //   dataIndex: 'alarm_status',
+  //   key: 'alarm_status',
+  // },
   {
     title: '所属作业',
     dataIndex: 'job_id',
@@ -234,7 +235,8 @@ export const dataReleaseSuggestions: ISuggestion[] = [
 export const dataReleaseTabs: ITab[] = [
   {
     title: '数据集成-已发布作业',
-    description: 'Release data job',
+    description:
+      '数据集成任务提交和发布后，即可在周期任务列表中对任务进行运维操作。包括查看任务运行详情、暂停任务、下线任务等。',
     icon: 'equalizer',
     helpLink: getHelpCenterLink('data-job-release'),
   },

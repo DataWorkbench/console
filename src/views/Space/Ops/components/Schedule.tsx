@@ -98,37 +98,69 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
           <Grid>
             <div>调度策略：</div>
             <div>{schedulePolicy[data?.schedule_policy as 1]?.label}</div>
-            <div>生效时间：</div>
-            <div>
-              {dayjs(data?.started * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </div>
-            <div>调度周期：</div>
-            <div>
-              {periodType.find((i) => i.value === data?.period_type)?.label}
-            </div>
-            {data?.schedule_policy === 2 && (
+            {data?.schedule_policy === 1 && (
               <>
-                <div>定时调度时间：</div>
+                <div>生效时间：</div>
                 <div>
-                  {dayjs(data?.executed * 1000).format('YYYY-MM-DD HH:mm:ss')}
+                  <span>
+                    {dayjs(data?.started * 1000).format('YYYY-MM-DD HH:mm')}
+                  </span>
+                  <span>至</span>
+                  <span>
+                    {dayjs(data?.ended * 1000).format('YYYY-MM-DD HH:mm')}
+                  </span>
+                </div>
+                <div>调度周期：</div>
+                <div>
+                  {periodType.find((i) => i.value === data?.period_type)?.label}
+                </div>
+                <div>开始时间:</div>
+                <div>
+                  <span>
+                    {dayjs(data?.minute?.startHour * 1000).format(
+                      'YYYY-MM-DD HH:mm'
+                    )}
+                  </span>
+                  <span>至</span>
+                  <span>
+                    {dayjs(data?.minute?.endHour * 1000).format(
+                      'YYYY-MM-DD HH:mm'
+                    )}
+                  </span>
+                </div>
+                <div>时间间隔:</div>
+                <div>{data?.minute?.stampMinu} </div>
+
+                <div>cron 表达式：</div>
+                <div>{data?.express}</div>
+                <div>并发策略：</div>
+                <div>
+                  {data?.concurrency_policy &&
+                    concurrencys[data?.concurrency_policy as 1].label}
+                </div>
+                <div>超时时间：</div>
+                <div>
+                  {data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}
                 </div>
               </>
             )}
-            {/* {data?.schedule_policy === 1 && ( */}
-            <>
-              <div>cron 表达式：</div>
-              <div>{data?.express}</div>
-            </>
-            {/* )} */}
-            <div>并发策略：</div>
-            <div>
-              {data?.concurrency_policy &&
-                concurrencys[data?.concurrency_policy as 1].label}
-            </div>
-            <div>超时时间：</div>
-            <div>
-              {data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}
-            </div>
+            {data?.schedule_policy !== 1 && (
+              <>
+                <div>执行时间：</div>
+                <div>
+                  {dayjs(data?.executed * 1000).format('YYYY-MM-DD HH:mm:ss')}
+                </div>
+                <div>并发策略：</div>
+                <div>
+                  {data?.concurrency_policy &&
+                    concurrencys[data?.concurrency_policy as 1].label}
+                </div>
+                <div>超时时间：</div>
+                <div>
+                  {data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}
+                </div>
+              </>
+            )}
           </Grid>
         </div>
       </Context>

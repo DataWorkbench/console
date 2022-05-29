@@ -30,6 +30,7 @@ const ReleaseModal = ({
 }: {
   onCancel?: () => void
   onSuccess?: () => void
+  // onOk: (isSubmit?: boolean, cb?: Function) => void
 }) => {
   const {
     workFlowStore: { curJob },
@@ -160,6 +161,7 @@ const ReleaseModal = ({
             }}
             options={[
               {
+                // @ts-ignore
                 label: (
                   <>
                     <span>不终止 当前作业正在运行中的实例</span>
@@ -169,6 +171,7 @@ const ReleaseModal = ({
                 value: false,
               },
               {
+                // @ts-ignore
                 label: (
                   <>
                     <span>终止 当前作业正在运行中的实例</span>

@@ -155,7 +155,8 @@ interface SyncDataSourceProps {
   onSelectTable?: (
     tp: OpType,
     tableName: string,
-    data: Record<string, any>[]
+    data: Record<string, any>[],
+    item: Record<string, any>
   ) => void
   conf?: {
     source_id?: string
@@ -215,13 +216,14 @@ const SyncDataSource = observer(
             draft.source.columns = columns
           })
           if (onSelectTable) {
-            onSelectTable('source', db.source.tableName!, columns)
+            onSelectTable('source', db.source.tableName!, columns, db.source)
           }
         },
-      }
+      },
+      'source'
     )
 
-    useQuerySourceTableSchema(
+    const { refetch: targetRefetch } = useQuerySourceTableSchema(
       {
         sourceId: db.target.id!,
         tableName: db.target.tableName!,
@@ -234,13 +236,18 @@ const SyncDataSource = observer(
             draft.target.columns = columns
           })
           if (onSelectTable) {
-            onSelectTable('target', db.target.tableName!, columns)
+            onSelectTable('target', db.target.tableName!, columns, db.target)
           }
         },
-      }
+      },
+      'source'
     )
 
     useImperativeHandle(ref, () => ({
+      refetchColumns: () => {
+        sourceColumnRet.refetch()
+        targetRefetch()
+      },
       getResource: () => {
         const srcform = sourceForm.current as any
         const tgtform = targetForm.current as any
@@ -490,67 +497,66 @@ const SyncDataSource = observer(
         <Form css={styles.form} ref={sourceForm}>
           {renderCommon(from)}
           {hasTable && isOfflineIncrement && (
-            <>
-              <ConditionParameterField
-                name="condition"
-                columns={(db.source.columns || []).map((c) => c.name)}
-                label={<AffixLabel>条件参数配置</AffixLabel>}
-                loading={op.current === from && schemaRet.isFetching}
-                onRefresh={() => {
-                  schemaRet.refetch()
-                }}
-                value={dbInfo.condition}
-                onChange={(v: any) => {
-                  setDB((draft) => {
-                    draft.source.condition = v
-                  })
-                }}
-                css={css`
-                  .help {
-                    ${tw`w-full`}
-                  }
-                `}
-                validateOnChange={
-                  dbInfo.condition &&
-                  !isEqual(dbInfo.condition, { type: 1 }) &&
-                  !isEqual(dbInfo.condition, { type: 2 })
+            <ConditionParameterField
+              name="condition"
+              columns={(db.source.columns || []).map((c) => c.name)}
+              label={<AffixLabel>条件参数配置</AffixLabel>}
+              loading={op.current === from && schemaRet.isFetching}
+              onRefresh={() => {
+                schemaRet.refetch()
+              }}
+              value={dbInfo.condition}
+              onChange={(v: any) => {
+                setDB((draft) => {
+                  draft.source.condition = v
+                })
+              }}
+              css={css`
+                .help {
+                  ${tw`w-full`}
                 }
-                schemas={[
-                  {
-                    help: '条件参数未配置',
-                    status: 'error',
-                    rule: (v: TConditionParameterVal) => {
-                      let valid = false
-                      if (v.type === 2) {
-                        valid = !isEmpty(v.expression)
-                      } else {
-                        valid =
-                          !isEmpty(v.startValue) &&
-                          !isEmpty(v.endValue) &&
-                          !isEmpty(v.startCondition) &&
-                          !isEmpty(v.endCondition) &&
-                          !isEmpty(v.column)
-                      }
+              `}
+              validateOnChange={
+                dbInfo.condition &&
+                !isEqual(dbInfo.condition, { type: 1 }) &&
+                !isEqual(dbInfo.condition, { type: 2 })
+              }
+              schemas={[
+                {
+                  help: '条件参数未配置',
+                  status: 'error',
+                  rule: (v: TConditionParameterVal) => {
+                    let valid = false
+                    if (v.type === 2) {
+                      valid = !isEmpty(v.expression)
+                    } else {
+                      valid =
+                        !isEmpty(v.startValue) &&
+                        !isEmpty(v.endValue) &&
+                        !isEmpty(v.startCondition) &&
+                        !isEmpty(v.endCondition) &&
+                        !isEmpty(v.column)
+                    }
 
-                      return valid
-                    },
+                    return valid
                   },
-                ]}
-              />
-              <TextField
-                name="split_pk"
-                label="切分键"
-                placeholder="推荐使用表主键，仅支持整型数据切分"
-                help="如果通道设置中作业期望最大并发数大于 1 时必须配置此参数"
-                value={dbInfo.splitPk || ''}
-                onChange={(v: string) => {
-                  setDB((draft) => {
-                    draft[from].splitPk = v
-                  })
-                }}
-              />
-            </>
+                },
+              ]}
+            />
           )}
+
+          <TextField
+            name="split_pk"
+            label="切分键"
+            placeholder="推荐使用表主键，仅支持整型数据切分"
+            help="如果通道设置中作业期望最大并行数大于 1 时必须配置此参数"
+            value={dbInfo.splitPk || ''}
+            onChange={(v: string) => {
+              setDB((draft) => {
+                draft[from].splitPk = v
+              })
+            }}
+          />
           {hasTable && isOffLineFull && (
             <>
               <FlexBox>
@@ -599,10 +605,10 @@ const SyncDataSource = observer(
                 label={<AffixLabel>写入模式</AffixLabel>}
                 name="write_mode"
                 options={[
-                  { label: 'insert: insert into', value: WriteMode.Insert },
-                  { label: 'replace: replace into', value: WriteMode.Replace },
+                  { label: 'insert 插入', value: WriteMode.Insert },
+                  { label: 'replace 替换', value: WriteMode.Replace },
                   {
-                    label: 'update: on duplicate key update',
+                    label: 'update 更新插入',
                     value: WriteMode.Update,
                   },
                 ]}
@@ -627,8 +633,14 @@ const SyncDataSource = observer(
                 name="semantic"
                 value={dbInfo.semantic}
                 options={[
-                  { label: 'exactly-once', value: Semantic.ExactlyOnce },
-                  { label: 'at-least-once', value: Semantic.AtLeastOnce },
+                  {
+                    label: 'exactly-once 正好一次',
+                    value: Semantic.ExactlyOnce,
+                  },
+                  {
+                    label: 'at-least-once 至少一次',
+                    value: Semantic.AtLeastOnce,
+                  },
                 ]}
                 onChange={(v: Semantic) => {
                   setDB((draft) => {

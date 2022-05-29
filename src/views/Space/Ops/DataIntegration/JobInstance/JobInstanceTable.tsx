@@ -2,14 +2,12 @@
 import { get } from 'lodash-es'
 import { InstanceName } from 'components/InstanceName'
 import {
-  alarmStatus,
   dataJobInstanceColumns,
   jobInstanceStatus,
   JobInstanceStatusType,
   jobType,
 } from 'views/Space/Ops/DataIntegration/constants'
 import {
-  AlarmStatusCmp,
   Divider,
   JobInstanceStatusCmp,
   JobTypeCmp,
@@ -45,6 +43,7 @@ interface IJobInstanceTable {
   settingKey: string
   jumpDetail: (tab?: string) => (record: Record<string, any>) => void
   type?: JobMode
+  setFatherFilter?: (filter?: (record: Record<string, any>) => void) => void
 }
 
 const instanceNameStyle = css`
@@ -72,11 +71,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     defaultColumns,
     filter: filterProp,
     jumpDetail,
+    setFatherFilter,
     type = JobMode.DI,
   } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
-      reverse?: 'asc' | 'desc'
       sort_by?: string
       job_type?: any
       alarm_status?: string
@@ -85,9 +84,14 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       version?: string
       instance_id?: string
       verbose: number
+      reverse: boolean
     },
     { pagination: true; sort: true }
-  >({ verbose: 1 }, { pagination: true, sort: true }, settingKey)
+  >(
+    { verbose: 1, sort_by: 'created', reverse: true },
+    { pagination: true, sort: true },
+    settingKey
+  )
 
   useEffect(() => {
     if (filterProp) {
@@ -123,6 +127,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           draft.state = v
           draft.offset = 0
         })
+        if (setFatherFilter) {
+          setFatherFilter((draft) => {
+            draft.state = v
+          })
+        }
       },
       filterAble: true,
       filtersNew: Object.values(jobInstanceStatus) as any,
@@ -130,23 +139,28 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         <JobInstanceStatusCmp type={text} />
       ),
     },
-    alarm_status: {
-      onFilter: (v: string) => {
-        setFilter((draft) => {
-          draft.alarm_status = v
-          draft.offset = 0
-        })
-      },
-      filter: filter.alarm_status,
-      filterAble: true,
-      filtersNew: Object.values(alarmStatus) as any,
-      render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
-        <AlarmStatusCmp
-          type={text}
-          onClick={() => jumpDetail('alarm')(record)}
-        />
-      ),
-    },
+    // alarm_status: {
+    //   onFilter: (v: string) => {
+    //     setFilter((draft) => {
+    //       draft.alarm_status = v
+    //       draft.offset = 0
+    //     })
+    //     if (setFatherFilter) {
+    //       setFatherFilter((draft) => {
+    //         draft.alarm_status = v
+    //       })
+    //     }
+    //   },
+    //   filter: filter.alarm_status,
+    //   filterAble: true,
+    //   filtersNew: Object.values(alarmStatus) as any,
+    //   render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
+    //     <AlarmStatusCmp
+    //       type={text}
+    //       onClick={() => jumpDetail('alarm')(record)}
+    //     />
+    //   ),
+    // },
     job_id: {
       // width: 180,
       render: (v: string, record: Record<string, any>) => {

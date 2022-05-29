@@ -149,15 +149,16 @@ const DevContentUI = (props: IProps) => {
                 <div tw="absolute invisible">
                   <SyncDataSource
                     curJob={curJob}
-                    onSelectTable={(tp, tableName, data) => {
+                    onSelectTable={(tp, tableName, data, table) => {
                       const fieldData = data.map((field) => ({
                         ...field,
                         uuid: nanoid(),
                       })) as TMappingField[]
                       setDb((draft) => {
-                        const soruceInfo = draft[tp]
-                        soruceInfo.tableName = tableName
-                        soruceInfo.fields = fieldData
+                        const sourceInfo = draft[tp]
+                        sourceInfo.tableName = tableName
+                        sourceInfo.fields = fieldData
+                        sourceInfo.tableConfig = table
                       })
                     }}
                     onDbChange={(tp: 'source' | 'target', data) => {
@@ -184,17 +185,13 @@ const DevContentUI = (props: IProps) => {
               <div>
                 <Grid>
                   <div>
-                    <AffixLabel
-                      theme="green"
-                      required={false}
-                      help="作业期望最大并行数"
-                    >
+                    <AffixLabel theme="green" required={false}>
                       作业期望最大并行数
                     </AffixLabel>
                   </div>
                   <div>{channel.parallelism || ''}</div>
                   <div>
-                    <AffixLabel theme="green" required={false} help="同步速率">
+                    <AffixLabel theme="green" required={false}>
                       同步速率
                     </AffixLabel>
                   </div>
@@ -202,11 +199,7 @@ const DevContentUI = (props: IProps) => {
                   {channel.rat === 1 && (
                     <>
                       <div>
-                        <AffixLabel
-                          theme="light"
-                          required={false}
-                          help="错误记录数超过"
-                        >
+                        <AffixLabel theme="light" required={false}>
                           错误记录数超过
                         </AffixLabel>
                       </div>

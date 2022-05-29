@@ -20,7 +20,7 @@ const Root = styled('div')(() => [
       ${tw`pl-0! w-full`}
       .field {
         .label {
-          ${tw`w-[162px]!`}
+          ${tw`w-[140px]!`}
         }
 
         .help {
@@ -82,15 +82,11 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
           name="bytes"
           showButton={false}
           placeholder="请输入并行数"
-          label={
-            <AffixLabel help="xxx" theme="green">
-              作业期望最大并行数
-            </AffixLabel>
-          }
+          label={<AffixLabel>作业期望最大并行数</AffixLabel>}
           validateOnChange
           value={channel.parallelism || ''}
           min={1}
-          max={300}
+          max={100}
           onChange={(value: number) =>
             setChannel((draft) => {
               draft.parallelism = value
@@ -103,13 +99,11 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               rule: { required: true },
             },
           ]}
-          help="范围：1~300"
+          help="范围：1~100"
         />
         <Field>
           <Label>
-            <AffixLabel help="xxx" theme="green">
-              同步速率
-            </AffixLabel>
+            <AffixLabel>同步速率</AffixLabel>
           </Label>
           <Control
             css={[
@@ -157,9 +151,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
         </Field>
         <Field>
           <Label>
-            <AffixLabel help="xxx" required={false}>
-              错误记录数超过
-            </AffixLabel>
+            <AffixLabel>错误记录数超过</AffixLabel>
           </Label>
           <Control tw="max-w-full! items-center space-x-1">
             <Input

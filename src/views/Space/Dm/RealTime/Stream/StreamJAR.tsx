@@ -78,7 +78,7 @@ const StreamJAR = () => {
     resouceRet.data?.pages.map((page: Record<string, any>) => page.infos || [])
   )
   const form = useRef()
-  const handleSave = () => {
+  const handleSave = (cb?: Function) => {
     const formEl: any = form.current
     if (formEl.validateFields()) {
       const jarData = formEl.getFieldsValue()
@@ -90,11 +90,15 @@ const StreamJAR = () => {
         {
           onSuccess: () => {
             setEnableRelease(true)
-            Notify.success({
-              title: '操作提示',
-              content: '保存成功',
-              placement: 'bottomRight',
-            })
+            if (cb) {
+              cb()
+            } else {
+              Notify.success({
+                title: '操作提示',
+                content: '保存成功',
+                placement: 'bottomRight',
+              })
+            }
           },
         }
       )
@@ -146,9 +150,9 @@ const StreamJAR = () => {
               <Button
                 type="primary"
                 tw="w-[68px] px-0"
-                onClick={handleRelease}
+                onClick={() => handleSave(handleRelease)}
                 loading={releaseMutation.isLoading}
-                disabled={!enableRelease}
+                // disabled={!enableRelease}
               >
                 <Icon name="export" />
                 发布
