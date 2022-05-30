@@ -174,7 +174,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           const field = fields.find((f) => f.name === c.name)
           const uuid = nanoid()
           if (field) {
-            return { ...field, uuid }
+            return { ...field, uuid: field.uuid || uuid }
           }
           return {
             type: c.type,
@@ -535,7 +535,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         {topHelp && <Center tw="absolute left-0 bottom-0">{topHelp}</Center>}
         {hasHeader && (
           <Center tw="gap-4">
-            <OutlinedGreenButton type="outlined" onClick={handleParallel}>
+            <OutlinedGreenButton
+              type="outlined"
+              onClick={handleParallel}
+              disabled={!(leftFields.length && rightFields.length)}
+            >
               全部平行
             </OutlinedGreenButton>
             {intersectionBy(leftFields, rightFields, 'name').length ? (
@@ -563,7 +567,10 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
               onOk={handleRowMapping}
             >
-              <OutlinedGreenButton type="outlined">
+              <OutlinedGreenButton
+                type="outlined"
+                disabled={!(leftFields.length && rightFields.length)}
+              >
                 同行映射
               </OutlinedGreenButton>
             </PopConfirm>
@@ -604,7 +611,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   item={item}
                   key={item.name}
                   index={i}
-                  hasConnection={!!mappings.find(([l]) => l === item.name)}
+                  hasConnection={!!mappings.find(([l]) => l === item?.name)}
                   anchor="Right"
                   typeName={leftTypeName}
                   moveItem={moveItem}
