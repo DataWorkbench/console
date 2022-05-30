@@ -280,7 +280,11 @@ const SyncJob = () => {
     })
   }
 
-  const save = (isSubmit?: boolean, cb?: Function) => {
+  const save = (
+    isSubmit?: boolean,
+    cb?: Function,
+    isValidateSource?: boolean
+  ) => {
     if (
       isSubmit &&
       (!dbRef.current ||
@@ -298,6 +302,10 @@ const SyncJob = () => {
     const channel = channelRef.current!.getChannel()
 
     try {
+      if (!resource && isValidateSource) {
+        showConfWarn('未配置数据源信息')
+        return
+      }
       set(
         resource,
         `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
@@ -538,7 +546,7 @@ const SyncJob = () => {
             }
             okText="转变"
             onOk={() => {
-              save(false, () => setMode(2))
+              save(false, () => setMode(2), true)
               // setMode(2)
             }}
           >
