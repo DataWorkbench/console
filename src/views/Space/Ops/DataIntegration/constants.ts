@@ -77,21 +77,21 @@ export const dataJobInstanceSuggestions: ISuggestion[] = [
       key: value,
     })),
   },
-  {
-    label: '告警状态',
-    key: 'alarm_status',
-    options: Object.values(alarmStatus).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
+  // {
+  //   label: '告警状态',
+  //   key: 'alarm_status',
+  //   options: Object.values(alarmStatus).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
   {
     label: '作业名称',
     key: 'job_name',
   },
   {
-    label: '作业 ID',
-    key: 'job_id',
+    label: '实例 ID',
+    key: 'instance_id',
   },
 ]
 

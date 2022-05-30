@@ -53,7 +53,7 @@ const TableHeader = observer((props: ITableHeaderProps) => {
           tw="border-line-dark!"
           placeholder="搜索关键字或输入过滤条件"
           // isMultiKeyword
-          defaultKeywordLabel="作业 ID"
+          defaultKeywordLabel="实例 ID"
           searchKey="job_id"
           filterLinkKey={storageKey}
         />
