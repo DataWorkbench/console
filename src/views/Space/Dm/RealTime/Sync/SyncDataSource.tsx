@@ -472,7 +472,7 @@ const SyncDataSource = observer(
                 // todo:当前数据源不可用，请前往 [数据源管理] 页面配置
               ]}
               help={
-                <HelpCenterLink href="xxx" hasIcon isIframe>
+                <HelpCenterLink href="/manual/connect/" hasIcon isIframe>
                   {from === 'source'
                     ? `${sourceTypeName} Source `
                     : `${targetTypeName} Sink `}

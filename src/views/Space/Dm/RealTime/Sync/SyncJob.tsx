@@ -59,7 +59,7 @@ const stepsData = [
         <HelpCenterLink
           hasIcon
           isIframe={false}
-          href="/xxx"
+          href="/source_data/add_data/"
           onClick={(e) => e.stopPropagation()}
         >
           数据源管理
@@ -439,7 +439,10 @@ const SyncJob = () => {
                   // rightTypeName={targetTypeName}
                   columns={columns}
                   topHelp={
-                    <HelpCenterLink href="/xxx" isIframe={false}>
+                    <HelpCenterLink
+                      href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+                      isIframe={false}
+                    >
                       字段映射说明文档
                     </HelpCenterLink>
                   }
