@@ -181,7 +181,7 @@ export const dataReleaseSuggestions: ISuggestion[] = [
   },
   {
     label: '作业 ID',
-    key: 'ID',
+    key: 'job_id',
   },
   {
     label: '调度状态',
@@ -191,14 +191,14 @@ export const dataReleaseSuggestions: ISuggestion[] = [
       key: value,
     })),
   },
-  {
-    label: '告警状态',
-    key: 'alert_status',
-    options: Object.values(alarmStatus).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
+  // {
+  //   label: '告警状态',
+  //   key: 'alert_status',
+  //   options: Object.values(alarmStatus).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
   {
     label: '开发模式',
     key: 'job_mode',
@@ -254,12 +254,12 @@ export const dataReleaseColumns: IColumn[] = [
     key: 'status',
     width: 120,
   },
-  {
-    title: '告警状态',
-    dataIndex: 'alert_status',
-    key: 'alert_status',
-    width: 100,
-  },
+  // {
+  //   title: '告警状态',
+  //   dataIndex: 'alert_status',
+  //   key: 'alert_status',
+  //   width: 100,
+  // },
   {
     title: '版本 ID',
     dataIndex: 'version',
