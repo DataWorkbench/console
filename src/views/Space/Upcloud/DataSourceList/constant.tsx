@@ -428,12 +428,12 @@ export const getUrl = (
         return `jdbc:db2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
       // ClickHouse default
       case 'mongo_db':
-        return `mongodb://${urlObj.mongodb_brokers
+        return `mongodb://${urlObj.hosts
           .map(
             ({ host, port }: { host: string; port: number }) =>
               `${host}:${port}`
           )
-          .join(',')}`
+          .join(',')}/${urlObj.database}`
       case 'sap_hana':
         return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
       case 'elastic_search':
@@ -445,7 +445,7 @@ export const getUrl = (
       case 'hdfs':
         return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
       case 'redis':
-        return `redis://${urlObj.port
+        return `redis://${urlObj.hosts
           .map(
             ({ host, port }: { host: string; port: number }) =>
               `${host}:${port}`
