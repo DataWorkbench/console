@@ -10,14 +10,20 @@ import {
   Icon,
   Menu,
   Form,
-  Modal,
   Control,
   Field,
   Label,
   Input,
   Button,
 } from '@QCFE/lego-ui'
-import { Icons, AffixLabel, Confirm, Tree, SelectTreeField } from 'components'
+import {
+  Icons,
+  AffixLabel,
+  Confirm,
+  Tree,
+  SelectTreeField,
+  PortalModal,
+} from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useMutationStreamJob, useFetchJob } from 'hooks'
@@ -540,7 +546,7 @@ export const JobTree = observer(
               move: '移动',
             }[curOp]
             return (
-              <Modal
+              <PortalModal
                 title={opTxt}
                 visible
                 appendToBody
@@ -632,7 +638,7 @@ export const JobTree = observer(
                     </>
                   )}
                 </Form>
-              </Modal>
+              </PortalModal>
             )
           })()}
         {showConfirm &&
