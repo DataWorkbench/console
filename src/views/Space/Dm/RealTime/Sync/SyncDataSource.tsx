@@ -467,6 +467,25 @@ const SyncDataSource = observer(
               }}
               validateOnChange
               value={dbInfo.tableName}
+              {...(!tables.length &&
+              !(tablesRet.isFetching && op.current === from)
+                ? {
+                    validateStatus: 'error',
+                    validateHelp: (
+                      <div>
+                        当前数据源不可用，请前往{' '}
+                        <HelpCenterLink
+                          hasIcon
+                          isIframe={false}
+                          href="/manual/source_data/add_data/"
+                        >
+                          数据源管理
+                        </HelpCenterLink>{' '}
+                        页面配置
+                      </div>
+                    ),
+                  }
+                : {})}
               schemas={[
                 {
                   help: '请选择数据源表',
