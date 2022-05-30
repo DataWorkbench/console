@@ -236,7 +236,7 @@ export const JobTree = observer(
                 <span>调度设置</span>
               </MenuItem>
               {isRt && (
-                <MenuItem value="scheSetting">
+                <MenuItem value="argsSetting">
                   <Icons name="Topology3Fill" size={14} tw="mr-2" />
                   <span>运行参数配置</span>
                 </MenuItem>
