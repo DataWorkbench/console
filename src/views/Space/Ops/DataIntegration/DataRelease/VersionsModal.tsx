@@ -113,7 +113,7 @@ const VersionsModal = (props: IProps) => {
 
   const columnsRender = getColumnsRender(filter, setFilter, [
     'alert_status',
-    'status',
+    // 'status',
     'version',
     'updated',
   ])
