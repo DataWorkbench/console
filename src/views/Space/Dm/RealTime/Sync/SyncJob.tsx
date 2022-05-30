@@ -59,7 +59,7 @@ const stepsData = [
         <HelpCenterLink
           hasIcon
           isIframe={false}
-          href="/source_data/add_data/"
+          href="/manual/source_data/add_data/"
           onClick={(e) => e.stopPropagation()}
         >
           数据源管理
