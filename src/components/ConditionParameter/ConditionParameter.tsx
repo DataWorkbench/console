@@ -1,9 +1,4 @@
-import React, {
-  ChangeEvent,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from 'react'
+import React, { ChangeEvent, useEffect, useRef } from 'react'
 import {
   Button,
   Form,
@@ -47,7 +42,7 @@ export type TConditionParameterVal = {
 interface IConditionParameterProps {
   value?: TConditionParameterVal
   onChange?: (value: TConditionParameterVal) => void
-  help?: React.ReactElement
+  helpStr?: string
   helpLink?: string
   className?: string
   width?: number
@@ -94,11 +89,11 @@ const types = [
   },
 ]
 export const ConditionParameter = React.forwardRef(
-  (props: IConditionParameterProps, ref: React.ForwardedRef<any>) => {
+  (props: IConditionParameterProps) => {
     const {
       value: defaultValue = { type: ConditionType.Visualization },
       onChange,
-      help,
+      helpStr,
       helpLink,
       className,
       width,
@@ -119,8 +114,6 @@ export const ConditionParameter = React.forwardRef(
         prevValue.current = v
       }
     }, [defaultValue, setValue])
-
-    useImperativeHandle(ref, () => {})
 
     useEffect(() => {
       if (value && onChange) {
@@ -165,6 +158,7 @@ export const ConditionParameter = React.forwardRef(
       //   }
       // })
     }
+
     const keys =
       value.type === ConditionType.Visualization
         ? ['endValue', 'startValue', 'startCondition', 'endCondition', 'column']
@@ -172,11 +166,11 @@ export const ConditionParameter = React.forwardRef(
     const hasChange = !!values(pick(value, keys)).find((i) => !isNil(i))
     return (
       <div className={className} tw="flex-auto" style={{ width }}>
-        <FlexBox>
+        <FlexBox tw="mb-1">
           <RadioGroup
             value={value?.type}
             onChange={hasChange ? undefined : handleTypeChange}
-            style={{ marginBottom: 4 }}
+            style={{ marginBottom: 0 }}
           >
             {types.map((item) => {
               if (!hasChange) {
@@ -199,9 +193,14 @@ export const ConditionParameter = React.forwardRef(
               )
             })}
           </RadioGroup>
-          <div>
-            {help ? (
-              <Tooltip hasPadding theme="light" content={help}>
+          <div tw="flex flex-auto items-center ml-1">
+            {helpStr ? (
+              <Tooltip
+                twChild={tw`inline-flex`}
+                hasPadding
+                theme="light"
+                content={helpStr}
+              >
                 <Icon name="information" />
               </Tooltip>
             ) : (

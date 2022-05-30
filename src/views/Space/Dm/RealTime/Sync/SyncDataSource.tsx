@@ -508,6 +508,7 @@ const SyncDataSource = observer(
               columns={(db.source.columns || []).map((c) => c.name)}
               label={<AffixLabel>条件参数配置</AffixLabel>}
               loading={op.current === from && schemaRet.isFetching}
+              helpStr="可在条件参数中填写增量同步条件"
               onRefresh={() => {
                 schemaRet.refetch()
               }}
