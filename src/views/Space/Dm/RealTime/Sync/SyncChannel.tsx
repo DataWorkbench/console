@@ -4,6 +4,7 @@ import {
   Field,
   Form,
   Input,
+  InputNumber,
   Label,
   Radio,
   RadioGroup,
@@ -151,13 +152,14 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
         </Field>
         <Field>
           <Label>
-            <AffixLabel>错误记录数超过</AffixLabel>
+            <AffixLabel required={false}>错误记录数超过</AffixLabel>
           </Label>
           <Control tw="max-w-full! items-center space-x-1">
-            <Input
-              type="text"
-              value={channel.record_num || ''}
-              onChange={(e, v) => {
+            <InputNumber
+              showButton={false}
+              step={1}
+              value={(channel.record_num as number) || undefined}
+              onChange={(v) => {
                 const num = +v
                 if (!isNAN(num)) {
                   setChannel((draft) => {
@@ -168,10 +170,12 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               placeholder="请输入条数"
             />
             <span>条，或者</span>
-            <Input
-              type="text"
-              value={channel.percentage || ''}
-              onChange={(e, v) => {
+            <InputNumber
+              min={0}
+              max={100}
+              showButton={false}
+              value={(channel.percentage as number) || undefined}
+              onChange={(v) => {
                 const num = +v
                 if (!isNAN(num)) {
                   setChannel((draft) => {
