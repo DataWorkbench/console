@@ -95,7 +95,7 @@ const LinkInstance = ({
           <div tw="text-white w-auto ">实例 ID</div>
           <InputSearch
             tw="w-[200px]"
-            placeholder="搜索作业 ID"
+            placeholder="搜索实例 ID"
             onPressEnter={(e: React.SyntheticEvent) => {
               setFilter((draft) => {
                 draft.instance_id = (e.currentTarget as HTMLInputElement).value
