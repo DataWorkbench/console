@@ -472,10 +472,10 @@ const SyncDataSource = observer(
                 // todo:当前数据源不可用，请前往 [数据源管理] 页面配置
               ]}
               help={
-                <HelpCenterLink href="xxx" hasIcon>
+                <HelpCenterLink href="xxx" hasIcon isIframe>
                   {from === 'source'
-                    ? `${sourceTypeName} Source`
-                    : `${targetTypeName} Sink`}
+                    ? `${sourceTypeName} Source `
+                    : `${targetTypeName} Sink `}
                   配置文档
                 </HelpCenterLink>
               }
@@ -544,19 +544,20 @@ const SyncDataSource = observer(
               ]}
             />
           )}
-
-          <TextField
-            name="split_pk"
-            label="切分键"
-            placeholder="推荐使用表主键，仅支持整型数据切分"
-            help="如果通道设置中作业期望最大并行数大于 1 时必须配置此参数"
-            value={dbInfo.splitPk || ''}
-            onChange={(v: string) => {
-              setDB((draft) => {
-                draft[from].splitPk = v
-              })
-            }}
-          />
+          {hasTable && (
+            <TextField
+              name="split_pk"
+              label="切分键"
+              placeholder="推荐使用表主键，仅支持整型数据切分"
+              help="如果通道设置中作业期望最大并行数大于 1 时必须配置此参数"
+              value={dbInfo.splitPk || ''}
+              onChange={(v: string) => {
+                setDB((draft) => {
+                  draft[from].splitPk = v
+                })
+              }}
+            />
+          )}
           {hasTable && isOffLineFull && (
             <>
               <FlexBox>
