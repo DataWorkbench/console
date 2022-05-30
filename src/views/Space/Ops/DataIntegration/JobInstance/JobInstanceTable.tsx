@@ -35,6 +35,8 @@ import {
 } from 'hooks/useSyncJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { describeFlinkUI } from 'stores/api'
+import { useParams } from 'react-router-dom'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -275,6 +277,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   }
 
   const mutation = useMutationJobInstance()
+  const { spaceId, regionId } =
+    useParams<{ spaceId: string; regionId: string }>()
 
   const getActions = (
     status: JobInstanceStatusType,
@@ -339,14 +343,26 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
               ) {
                 return
               }
+              if (type === JobMode.DI) {
+                if (record?.flink_ui) {
+                  window.open(`//${record?.flink_ui}`, '_blank')
+                }
+              } else if (type === JobMode.RT) {
+                describeFlinkUI({
+                  inst_id: record.id,
+                  regionId,
+                  spaceId,
+                }).then((res) => {
+                  window.open(`//${res?.web_ui || ''}`, '_blank')
+                })
+              }
+
               // describeFlinkUiByInstanceId({
               //   instanceId: record.id,
               //   regionId,
               //   spaceId,
               // }).then((web_ui: string) => {
-              if (record?.flink_ui) {
-                window.open(`//${record?.flink_ui}`, '_blank')
-              }
+
               // })
             }}
           >
