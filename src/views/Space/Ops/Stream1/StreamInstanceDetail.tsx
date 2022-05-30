@@ -216,11 +216,23 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
               </span>
               <span>所属作业:</span>
               <span tw="inline-block">
-                <Tooltip
-                  theme="light"
-                  hasPadding
-                  content={`发布描述：${data?.desc}`}
-                >
+                {data?.desc ? (
+                  <Tooltip
+                    theme="light"
+                    hasPadding
+                    content={`发布描述：${data?.desc}`}
+                  >
+                    <div>
+                      <div>
+                        <span tw="text-white font-semibold mr-1">
+                          {data?.job_name}
+                        </span>
+                        <span tw="text-neut-8">({data?.job_id})</span>
+                      </div>
+                      <div tw="text-neut-8">版本 ID: {data?.version}</div>
+                    </div>
+                  </Tooltip>
+                ) : (
                   <div>
                     <div>
                       <span tw="text-white font-semibold mr-1">
@@ -230,7 +242,7 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
                     </div>
                     <div tw="text-neut-8">版本 ID: {data?.version}</div>
                   </div>
-                </Tooltip>
+                )}
               </span>
             </GridItem>
             <GridItem>
