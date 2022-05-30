@@ -43,7 +43,7 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
                   请选择运行当前作业的来源端数据源，请注意保证网络连通性，具体可参考：
                 </span>
                 <HelpCenterLink
-                  // isIframe={false}
+                  isIframe={false}
                   href="/manual/data_up_cloud/connect/"
                 >
                   网络连通文档

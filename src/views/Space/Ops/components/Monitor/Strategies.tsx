@@ -45,7 +45,13 @@ const Strategies = observer(() => {
           message={
             <div>
               <span>告警策略对作业每个版本的所有实例生效，具体可参考：</span>
-              <HelpCenterLink hasIcon>告警策略文档</HelpCenterLink>
+              <HelpCenterLink
+                isIframe={false}
+                href="/manual/operation_center/monitor/alert_rules/"
+                hasIcon
+              >
+                告警策略文档
+              </HelpCenterLink>
             </div>
           }
           type="info"

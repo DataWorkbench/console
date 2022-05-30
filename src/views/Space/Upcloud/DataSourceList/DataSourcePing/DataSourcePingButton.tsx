@@ -124,7 +124,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           help={
             <div>
               <span tw="mr-1">详情请查看</span>
-              <HelpCenterLink href="###" hasIcon>
+              <HelpCenterLink href="/manual/connect/" isIframe={false} hasIcon>
                 网络连通方案
               </HelpCenterLink>
             </div>
@@ -166,7 +166,12 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
               不可用，{status.message ? `${status.message}，` : ''}
               如需查看更多可点击
             </span>
-            <HelpCenterLink tw="mr-1" hasIcon href="###">
+            <HelpCenterLink
+              tw="mr-1"
+              hasIcon
+              href="/manual/connect/"
+              isIframe={false}
+            >
               网络连通方案
             </HelpCenterLink>
             {pingHistory}

@@ -520,7 +520,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           message="提示：选择来源端与目的端的数据源与表，才会显示字段映射。"
           type="info"
           linkBtn={
-            <HelpCenterLink href="/xxx" isIframe={false} hasIcon={false}>
+            <HelpCenterLink
+              href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+              isIframe={false}
+              hasIcon={false}
+            >
               查看详情 →
             </HelpCenterLink>
           }
