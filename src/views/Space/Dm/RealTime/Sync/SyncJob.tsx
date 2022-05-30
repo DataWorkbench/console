@@ -426,6 +426,10 @@ const SyncJob = () => {
               )}
               {index === 1 && (
                 <FieldMappings
+                  key={
+                    // NOTE: 无法解决拖拽 bug, 只能这样了
+                    `${db?.source?.tableName}_${db?.target?.tableName}`
+                  }
                   onReInit={() => {
                     if (dbRef.current && dbRef.current?.refetchColumns) {
                       dbRef.current?.refetchColumns()
