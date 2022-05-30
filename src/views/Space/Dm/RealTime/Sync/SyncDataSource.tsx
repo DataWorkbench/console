@@ -593,6 +593,32 @@ const SyncDataSource = observer(
                       draft.source.where = v
                     })
                   }}
+                  validateOnChange
+                  schemas={[
+                    {
+                      help: '过滤条件不能包含 where',
+                      status: 'error',
+                      rule: (v: string) => {
+                        if (v && v.includes('where ')) {
+                          return false
+                        }
+                        return true
+                      },
+                    },
+                    {
+                      help: '不能存在多条过滤条件',
+                      status: 'error',
+                      rule: (v: string) => {
+                        if (
+                          v.trim() &&
+                          v.trim().split(';').filter(Boolean).length > 1
+                        ) {
+                          return false
+                        }
+                        return true
+                      },
+                    },
+                  ]}
                   label="过滤条件"
                   placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"
                 />
