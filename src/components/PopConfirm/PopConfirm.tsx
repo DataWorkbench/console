@@ -14,6 +14,7 @@ import { omit } from 'lodash-es'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
 
+import { SerializedStyles } from '@emotion/react'
 import { FlexBox } from '../Box'
 
 const iconConfig = {
@@ -70,7 +71,7 @@ interface IPopConfirmProps {
   trigger?: 'hover' | 'click'
   type?: 'info' | 'warning' | 'error'
   content: ReactNode
-  twChild?: TwStyle
+  twChild?: TwStyle | SerializedStyles
   placement?: PlacementType
   showOk?: boolean
   showCancel?: boolean

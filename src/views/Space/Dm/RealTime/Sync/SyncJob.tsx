@@ -329,29 +329,34 @@ const SyncJob = () => {
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
-        if (!resource && isSubmit) {
-          showConfWarn('未配置数据源信息')
-          return
-        }
-        if (!mapping && isSubmit) {
-          showConfWarn('未配置字段映射信息')
-          return
-        }
-        if (!cluster && isSubmit) {
-          showConfWarn('未配置计算集群信息')
-          return
-        }
-        // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
-        //   showConfWarn('计算集群连通性未测试或者未通过测试')
-        //   return
-        // }
-        if (isSubmit && !channel) {
-          showConfWarn('未配置通道控制信息')
-          return
-        }
-
-        // 如果并发数大于1  则切分键不能为空
         if (isSubmit) {
+          if (!resource) {
+            showConfWarn('未配置数据源信息')
+            return
+          }
+          if (!mapping) {
+            showConfWarn('未配置字段映射信息')
+            return
+          }
+          if (!cluster) {
+            showConfWarn('未配置计算集群信息')
+            return
+          }
+          // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
+          //   showConfWarn('计算集群连通性未测试或者未通过测试')
+          //   return
+          // }
+          if (!channel) {
+            showConfWarn('未配置通道控制信息')
+            return
+          }
+
+          if (channel.rate && !channel.bytes) {
+            showConfWarn('通道控制未配置同步速率限流字节数')
+            return
+          }
+
+          // 如果并发数大于1  则切分键不能为空
           const parallelism = get(resource, 'channel_control.parallelism', 0)
           const splitKey = get(
             Object.entries(resource.sync_resource ?? ({} as any)).find(([k]) =>
