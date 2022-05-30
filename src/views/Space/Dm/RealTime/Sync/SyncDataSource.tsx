@@ -245,8 +245,12 @@ const SyncDataSource = observer(
 
     useImperativeHandle(ref, () => ({
       refetchColumns: () => {
-        sourceColumnRet.refetch()
-        targetRefetch()
+        if (db.source.id && db.source.tableName) {
+          sourceColumnRet.refetch()
+        }
+        if (db.target.id && db.target.tableName) {
+          targetRefetch()
+        }
       },
       getResource: () => {
         const srcform = sourceForm.current as any
