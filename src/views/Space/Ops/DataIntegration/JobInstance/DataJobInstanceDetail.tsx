@@ -159,6 +159,16 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
 
   const mutation = useMutationJobInstance()
 
+  const jumpDataReleaseDetail = ({
+    jobId,
+    version,
+  }: {
+    jobId: string
+    version: string
+  }) => {
+    window.open(`../data-release/${jobId}?version=${version}`, '_blank')
+  }
+
   const handleMenuClick = (record: Record<string, any>, key: any) => {
     switch (key) {
       case 'stop':
@@ -292,7 +302,15 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                 >
                   <div>
                     <div>
-                      <span tw="text-white font-semibold mr-1">
+                      <span
+                        tw="text-white font-semibold mr-1 cursor-pointer"
+                        onClick={() =>
+                          jumpDataReleaseDetail({
+                            jobId: data?.job_id,
+                            version: data?.version,
+                          })
+                        }
+                      >
                         {get(data, 'sync_job.name')}
                       </span>
                       <span tw="text-neut-8">({data?.job_id})</span>
