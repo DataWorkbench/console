@@ -295,7 +295,7 @@ export const dataReleaseColumns: IColumn[] = [
 
 const versionSet = new Set([
   'id',
-  'status',
+  // 'status',
   'alert_status',
   'version',
   'updated',
