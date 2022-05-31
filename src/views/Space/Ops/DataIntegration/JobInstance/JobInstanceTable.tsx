@@ -301,12 +301,14 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         value: record,
       })
     }
-    result.push({
-      text: '查看详情',
-      icon: 'eye',
-      key: 'info',
-      value: record,
-    })
+    if (type !== JobMode.RT) {
+      result.push({
+        text: '查看详情',
+        icon: 'eye',
+        key: 'info',
+        value: record,
+      })
+    }
     return result
   }
 
@@ -372,15 +374,20 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           >
             Flink UI
           </TextLink>
-          <Divider />
-          <MoreAction
-            theme="darker"
-            items={getActions(
-              jobInstanceStatus[record.state as 1]?.type,
-              record
-            )}
-            onMenuClick={handleMenuClick as any}
-          />
+          {!!getActions(jobInstanceStatus[record.state as 1]?.type, record)
+            .length && (
+            <>
+              <Divider />
+              <MoreAction
+                theme="darker"
+                items={getActions(
+                  jobInstanceStatus[record.state as 1]?.type,
+                  record
+                )}
+                onMenuClick={handleMenuClick as any}
+              />
+            </>
+          )}
         </FlexBox>
       )
     },
