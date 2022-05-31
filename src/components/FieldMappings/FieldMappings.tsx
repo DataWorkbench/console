@@ -546,25 +546,37 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             >
               全部平行
             </OutlinedGreenButton>
-            {intersectionBy(leftFields, rightFields, 'name').length ? (
-              <PopConfirm
-                type="warning"
-                okType="danger"
-                okText="确认"
-                content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
-                onOk={handleNameMapping}
-              >
-                <OutlinedGreenButton type="outlined">
-                  同名映射
-                </OutlinedGreenButton>
-              </PopConfirm>
-            ) : (
-              <Tooltip content="暂无同名字段" theme="light" hasPadding>
-                <OutlinedGreenButton type="outlined" disabled>
-                  同名映射
-                </OutlinedGreenButton>
-              </Tooltip>
-            )}
+            {
+              // eslint-disable-next-line no-nested-ternary
+              intersectionBy(leftFields, rightFields, 'name').length ? (
+                mappings.length ? (
+                  <PopConfirm
+                    type="warning"
+                    okType="danger"
+                    okText="确认"
+                    content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
+                    onOk={handleNameMapping}
+                  >
+                    <OutlinedGreenButton type="outlined">
+                      同名映射
+                    </OutlinedGreenButton>
+                  </PopConfirm>
+                ) : (
+                  <OutlinedGreenButton
+                    type="outlined"
+                    onClick={handleNameMapping}
+                  >
+                    同名映射
+                  </OutlinedGreenButton>
+                )
+              ) : (
+                <Tooltip content="暂无同名字段" theme="light" hasPadding>
+                  <OutlinedGreenButton type="outlined" disabled>
+                    同名映射
+                  </OutlinedGreenButton>
+                </Tooltip>
+              )
+            }
             <PopConfirm
               type="warning"
               okText="确认"
