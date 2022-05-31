@@ -427,6 +427,11 @@ export const JobTree = observer(
             }
             if (op === 'delete') {
               setDelBtnEnable(false)
+              if (workFlowStore.curJob?.id === data.job_ids[0]) {
+                workFlowStore.set({
+                  curJob: null,
+                })
+              }
             }
           }
         },
