@@ -29,7 +29,6 @@ import {
   Icons,
   TextEllipsis,
   TextLink,
-  RouterLink,
   Tooltip,
 } from 'components'
 import { NetworkModal } from 'views/Space/Dm/Network'
@@ -568,11 +567,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               ) : (
                 <div tw="text-neut-8">
                   如需选择新的数据源，您可以前往
-                  <RouterLink
-                    to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                  <TextLink
+                    tw="ml-2 text-green-11!"
+                    href={`./${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                    target="_blank"
+                    hasIcon={false}
                   >
                     新建数据源
-                  </RouterLink>
+                  </TextLink>
                 </div>
               )}
             </ToolBarLeft>

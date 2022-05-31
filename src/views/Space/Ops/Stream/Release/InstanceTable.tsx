@@ -76,7 +76,8 @@ export const InstanceTable = observer(
 
     const { isFetching, isRefetching, data } = useQueryJobInstances(
       omitBy(filter, (v) => v === ''),
-      type
+      type,
+      { refetchInterval: 1000 * 60 }
     )
     const infos = get(data, 'infos', []) || []
 

@@ -254,7 +254,9 @@ const StreamRelease = observer(() => {
   // const mutation = useMutationUdfReleaseJobs()
 
   const isFetching = useIsFetching()
-  const { data } = useQueryReleaseJobs(omitBy(filter, isNil))
+  const { data } = useQueryReleaseJobs(omitBy(filter, isNil), {
+    refetchInterval: 1000 * 60,
+  })
 
   const infos = get(data, 'infos', []) || []
 
