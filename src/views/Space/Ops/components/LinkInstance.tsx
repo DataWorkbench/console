@@ -2,7 +2,7 @@
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button, InputSearch, Select } from '@QCFE/lego-ui'
 import { Center, FlexBox } from 'components/index'
-import useFilter from 'hooks/useHooks/useFilter'
+// import useFilter from 'hooks/useHooks/useFilter'
 import {
   dataJobInstanceColumns,
   jobInstanceStatus,
@@ -12,6 +12,7 @@ import { useIsFetching, useQueryClient } from 'react-query'
 import JobInstanceTable from 'views/Space/Ops/DataIntegration/JobInstance/JobInstanceTable'
 import { getSyncJobInstanceKey } from 'hooks/useSyncJobInstance'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { useImmer } from 'use-immer'
 
 const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 
@@ -24,19 +25,12 @@ const LinkInstance = ({
   version: string
   type?: JobMode
 }) => {
-  const { filter, setFilter } = useFilter<
-    {
-      job_id: string
-      version: string
-      instance_id?: string
-      state?: number
-      alarm_status?: number
-    },
-    {
-      pagination: true
-      sort: true
-    }
-  >({ job_id: jobId, version })
+  const [filter, setFilter] = useImmer<{
+    job_id: string
+    version: string
+    instance_id?: string
+    state?: number
+  }>({ job_id: jobId, version })
 
   const queryClient = useQueryClient()
   const isFetching = useIsFetching()
@@ -130,12 +124,7 @@ const LinkInstance = ({
         defaultColumns={dataJobInstanceColumns.filter(
           (i) => !['job_id', 'type'].includes(i.key as any)
         )}
-        filter={{
-          ...filter,
-          job_id: jobId,
-          version,
-        }}
-        setFatherFilter={setFilter}
+        filter={filter}
         showHeader={false}
         jumpDetail={jumpDetail}
         type={type}

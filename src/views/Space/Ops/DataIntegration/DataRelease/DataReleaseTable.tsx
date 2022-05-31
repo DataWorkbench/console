@@ -266,7 +266,7 @@ const DataRelease = observer(() => {
         <TabsWrapper>
           <PageTab tabs={dataReleaseTabs} />
         </TabsWrapper>
-        <FlexBox orient="column" tw="gap-3">
+        <FlexBox orient="column" tw="gap-3 p-5 bg-bgColor-light">
           <TableHeader columnsSetting={columnsSetting} />
           <SelectTreeTable
             openLevel={1}

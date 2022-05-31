@@ -71,7 +71,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     settingKey,
     showHeader = true,
     defaultColumns,
-    filter: filterProp,
+    filter: filterProp = {},
     jumpDetail,
     setFatherFilter,
     type = JobMode.DI,
@@ -98,9 +98,10 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   useEffect(() => {
     if (filterProp) {
       setFilter((draft: any) => {
-        Object.entries(filterProp).forEach(([key, value]) => {
-          draft[key] = value
-        })
+        return {
+          ...draft,
+          ...filterProp,
+        }
       })
     }
   }, [filterProp, setFilter])
