@@ -634,7 +634,26 @@ const SyncDataSource = observer(
                     draft[from].writeMode = +v
                   })
                 }}
-                help="当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现"
+                help={(() => {
+                  let helpStr = ''
+                  switch (dbInfo.writeMode) {
+                    case WriteMode.Insert:
+                      helpStr =
+                        '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
+                      break
+                    case WriteMode.Replace:
+                      helpStr =
+                        '没有遇到主键/唯一性索引冲突时，冲突时会用新行替换已经指定的字段的语句。'
+                      break
+                    case WriteMode.Update:
+                      helpStr =
+                        '没有遇到主键/唯一性索引冲突时，冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
+                      break
+                    default:
+                      break
+                  }
+                  return helpStr
+                })()}
               />
               <SelectField
                 label={<AffixLabel>写入一致性语义</AffixLabel>}
