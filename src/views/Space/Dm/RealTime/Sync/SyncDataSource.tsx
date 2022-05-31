@@ -245,8 +245,12 @@ const SyncDataSource = observer(
 
     useImperativeHandle(ref, () => ({
       refetchColumns: () => {
-        sourceColumnRet.refetch()
-        targetRefetch()
+        if (db.source.id && db.source.tableName) {
+          sourceColumnRet.refetch()
+        }
+        if (db.target.id && db.target.tableName) {
+          targetRefetch()
+        }
       },
       getResource: () => {
         const srcform = sourceForm.current as any
@@ -463,6 +467,25 @@ const SyncDataSource = observer(
               }}
               validateOnChange
               value={dbInfo.tableName}
+              {...(!tables.length &&
+              !(tablesRet.isFetching && op.current === from)
+                ? {
+                    validateStatus: 'error',
+                    validateHelp: (
+                      <div>
+                        当前数据源不可用，请前往{' '}
+                        <HelpCenterLink
+                          hasIcon
+                          isIframe={false}
+                          href="/manual/source_data/add_data/"
+                        >
+                          数据源管理
+                        </HelpCenterLink>{' '}
+                        页面配置
+                      </div>
+                    ),
+                  }
+                : {})}
               schemas={[
                 {
                   help: '请选择数据源表',
@@ -472,10 +495,16 @@ const SyncDataSource = observer(
                 // todo:当前数据源不可用，请前往 [数据源管理] 页面配置
               ]}
               help={
-                <HelpCenterLink href="xxx" hasIcon>
+                <HelpCenterLink
+                  href={`/manual/integration_job/cfg_source/
+                    ${from === 'source' ? sourceTypeName : targetTypeName}
+                  /`.toLowerCase()}
+                  hasIcon
+                  isIframe
+                >
                   {from === 'source'
-                    ? `${sourceTypeName} Source`
-                    : `${targetTypeName} Sink`}
+                    ? `${sourceTypeName} Source `
+                    : `${targetTypeName} Sink `}
                   配置文档
                 </HelpCenterLink>
               }
@@ -502,6 +531,7 @@ const SyncDataSource = observer(
               columns={(db.source.columns || []).map((c) => c.name)}
               label={<AffixLabel>条件参数配置</AffixLabel>}
               loading={op.current === from && schemaRet.isFetching}
+              helpStr="可在条件参数中填写增量同步条件"
               onRefresh={() => {
                 schemaRet.refetch()
               }}
@@ -544,19 +574,20 @@ const SyncDataSource = observer(
               ]}
             />
           )}
-
-          <TextField
-            name="split_pk"
-            label="切分键"
-            placeholder="推荐使用表主键，仅支持整型数据切分"
-            help="如果通道设置中作业期望最大并行数大于 1 时必须配置此参数"
-            value={dbInfo.splitPk || ''}
-            onChange={(v: string) => {
-              setDB((draft) => {
-                draft[from].splitPk = v
-              })
-            }}
-          />
+          {hasTable && (
+            <TextField
+              name="split_pk"
+              label="切分键"
+              placeholder="推荐使用表主键，仅支持整型数据切分"
+              help="如果通道设置中作业期望最大并行数大于 1 时必须配置此参数"
+              value={dbInfo.splitPk || ''}
+              onChange={(v: string) => {
+                setDB((draft) => {
+                  draft[from].splitPk = v
+                })
+              }}
+            />
+          )}
           {hasTable && isOffLineFull && (
             <>
               <FlexBox>
@@ -582,6 +613,32 @@ const SyncDataSource = observer(
                       draft.source.where = v
                     })
                   }}
+                  validateOnChange
+                  schemas={[
+                    {
+                      help: '过滤条件不能包含 where',
+                      status: 'error',
+                      rule: (v: string) => {
+                        if (v && v.includes('where ')) {
+                          return false
+                        }
+                        return true
+                      },
+                    },
+                    {
+                      help: '不能存在多条过滤条件',
+                      status: 'error',
+                      rule: (v: string) => {
+                        if (
+                          v.trim() &&
+                          v.trim().split(';').filter(Boolean).length > 1
+                        ) {
+                          return false
+                        }
+                        return true
+                      },
+                    },
+                  ]}
                   label="过滤条件"
                   placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"
                 />
@@ -626,7 +683,26 @@ const SyncDataSource = observer(
                     draft[from].writeMode = +v
                   })
                 }}
-                help="当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现"
+                help={(() => {
+                  let helpStr = ''
+                  switch (dbInfo.writeMode) {
+                    case WriteMode.Insert:
+                      helpStr =
+                        '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
+                      break
+                    case WriteMode.Replace:
+                      helpStr =
+                        '没有遇到主键/唯一性索引冲突时，冲突时会用新行替换已经指定的字段的语句。'
+                      break
+                    case WriteMode.Update:
+                      helpStr =
+                        '没有遇到主键/唯一性索引冲突时，冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
+                      break
+                    default:
+                      break
+                  }
+                  return helpStr
+                })()}
               />
               <SelectField
                 label={<AffixLabel>写入一致性语义</AffixLabel>}

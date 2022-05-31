@@ -195,22 +195,21 @@ const DevContentUI = (props: IProps) => {
                       同步速率
                     </AffixLabel>
                   </div>
-                  <div>{{ 1: '限流', 2: '不限流' }[channel.rate as 1]}</div>
-                  {channel.rat === 1 && (
-                    <>
-                      <div>
-                        <AffixLabel theme="light" required={false}>
-                          错误记录数超过
-                        </AffixLabel>
-                      </div>
+                  <div>
+                    {(channel.rate as 1) === 1
+                      ? `限流 ${channel.bytes} Byte/s`
+                      : '不限流'}
+                  </div>
+                  <div>
+                    <AffixLabel theme="light" required={false}>
+                      错误记录数超过
+                    </AffixLabel>
+                  </div>
 
-                      <div>
-                        {channel.record_num ?? ''} 条或{' '}
-                        {channel.percentage ?? ''}
-                        %比例，达到任一条件时，任务自动结束
-                      </div>
-                    </>
-                  )}
+                  <div>
+                    {channel.record_num ?? ''} 条或 {channel.percentage ?? ''}
+                    %比例，达到任一条件时，任务自动结束
+                  </div>
                 </Grid>
               </div>
             )}

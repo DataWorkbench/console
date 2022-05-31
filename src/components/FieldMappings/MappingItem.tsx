@@ -295,7 +295,6 @@ const MappingItem = (props: MappingItemProps) => {
       icon: 'if-trash',
       text: '删除',
     })
-    console.log(menuItems)
     return (
       <Tippy
         content={

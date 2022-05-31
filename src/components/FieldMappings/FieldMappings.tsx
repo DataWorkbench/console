@@ -174,7 +174,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           const field = fields.find((f) => f.name === c.name)
           const uuid = nanoid()
           if (field) {
-            return { ...field, uuid }
+            return { ...field, uuid: field.uuid || uuid }
           }
           return {
             type: c.type,
@@ -520,7 +520,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           message="提示：选择来源端与目的端的数据源与表，才会显示字段映射。"
           type="info"
           linkBtn={
-            <HelpCenterLink href="/xxx" isIframe={false} hasIcon={false}>
+            <HelpCenterLink
+              href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+              isIframe={false}
+              hasIcon={false}
+            >
               查看详情 →
             </HelpCenterLink>
           }
@@ -535,35 +539,54 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         {topHelp && <Center tw="absolute left-0 bottom-0">{topHelp}</Center>}
         {hasHeader && (
           <Center tw="gap-4">
-            <OutlinedGreenButton type="outlined" onClick={handleParallel}>
+            <OutlinedGreenButton
+              type="outlined"
+              onClick={handleParallel}
+              disabled={!(leftFields.length && rightFields.length)}
+            >
               全部平行
             </OutlinedGreenButton>
-            {intersectionBy(leftFields, rightFields, 'name').length ? (
-              <PopConfirm
-                type="warning"
-                okType="danger"
-                okText="确认"
-                content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
-                onOk={handleNameMapping}
-              >
-                <OutlinedGreenButton type="outlined">
-                  同名映射
-                </OutlinedGreenButton>
-              </PopConfirm>
-            ) : (
-              <Tooltip content="暂无同名字段" theme="light" hasPadding>
-                <OutlinedGreenButton type="outlined" disabled>
-                  同名映射
-                </OutlinedGreenButton>
-              </Tooltip>
-            )}
+            {
+              // eslint-disable-next-line no-nested-ternary
+              intersectionBy(leftFields, rightFields, 'name').length ? (
+                mappings.length ? (
+                  <PopConfirm
+                    type="warning"
+                    okType="danger"
+                    okText="确认"
+                    content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
+                    onOk={handleNameMapping}
+                  >
+                    <OutlinedGreenButton type="outlined">
+                      同名映射
+                    </OutlinedGreenButton>
+                  </PopConfirm>
+                ) : (
+                  <OutlinedGreenButton
+                    type="outlined"
+                    onClick={handleNameMapping}
+                  >
+                    同名映射
+                  </OutlinedGreenButton>
+                )
+              ) : (
+                <Tooltip content="暂无同名字段" theme="light" hasPadding>
+                  <OutlinedGreenButton type="outlined" disabled>
+                    同名映射
+                  </OutlinedGreenButton>
+                </Tooltip>
+              )
+            }
             <PopConfirm
               type="warning"
               okText="确认"
               content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
               onOk={handleRowMapping}
             >
-              <OutlinedGreenButton type="outlined">
+              <OutlinedGreenButton
+                type="outlined"
+                disabled={!(leftFields.length && rightFields.length)}
+              >
                 同行映射
               </OutlinedGreenButton>
             </PopConfirm>
@@ -604,7 +627,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   item={item}
                   key={item.name}
                   index={i}
-                  hasConnection={!!mappings.find(([l]) => l === item.name)}
+                  hasConnection={!!mappings.find(([l]) => l === item?.name)}
                   anchor="Right"
                   typeName={leftTypeName}
                   moveItem={moveItem}

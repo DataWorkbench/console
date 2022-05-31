@@ -159,6 +159,16 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
 
   const mutation = useMutationJobInstance()
 
+  const jumpDataReleaseDetail = ({
+    jobId,
+    version,
+  }: {
+    jobId: string
+    version: string
+  }) => {
+    window.open(`../data-release/${jobId}?version=${version}`, '_blank')
+  }
+
   const handleMenuClick = (record: Record<string, any>, key: any) => {
     switch (key) {
       case 'stop':
@@ -285,21 +295,41 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
               </span>
               <span>所属作业:</span>
               <span tw="inline-block">
-                <Tooltip
-                  theme="light"
-                  hasPadding
-                  content={`发布描述：${get(data, 'sync_job.desc', '')}`}
-                >
+                {get(data, 'sync_job.desc') ? (
+                  <Tooltip
+                    theme="light"
+                    hasPadding
+                    content={`发布描述：${get(data, 'sync_job.desc', '')}`}
+                  >
+                    <div>
+                      <div>
+                        <span tw="text-white font-semibold mr-1">
+                          {get(data, 'sync_job.name')}
+                        </span>
+                        <span tw="text-neut-8">({data?.job_id})</span>
+                      </div>
+                      <div tw="text-neut-8">版本 ID: {data?.version}</div>
+                    </div>
+                  </Tooltip>
+                ) : (
                   <div>
                     <div>
-                      <span tw="text-white font-semibold mr-1">
+                      <span
+                        tw="text-white font-semibold mr-1 cursor-pointer"
+                        onClick={() =>
+                          jumpDataReleaseDetail({
+                            jobId: data?.job_id,
+                            version: data?.version,
+                          })
+                        }
+                      >
                         {get(data, 'sync_job.name')}
                       </span>
                       <span tw="text-neut-8">({data?.job_id})</span>
                     </div>
                     <div tw="text-neut-8">版本 ID: {data?.version}</div>
                   </div>
-                </Tooltip>
+                )}
               </span>
               <span>作业模式:</span>
               <span>

@@ -10,14 +10,20 @@ import {
   Icon,
   Menu,
   Form,
-  Modal,
   Control,
   Field,
   Label,
   Input,
   Button,
 } from '@QCFE/lego-ui'
-import { Icons, AffixLabel, Confirm, Tree, SelectTreeField } from 'components'
+import {
+  Icons,
+  AffixLabel,
+  Confirm,
+  Tree,
+  SelectTreeField,
+  PortalModal,
+} from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useMutationStreamJob, useFetchJob } from 'hooks'
@@ -230,7 +236,7 @@ export const JobTree = observer(
                 <span>调度设置</span>
               </MenuItem>
               {isRt && (
-                <MenuItem value="scheSetting">
+                <MenuItem value="argsSetting">
                   <Icons name="Topology3Fill" size={14} tw="mr-2" />
                   <span>运行参数配置</span>
                 </MenuItem>
@@ -421,6 +427,11 @@ export const JobTree = observer(
             }
             if (op === 'delete') {
               setDelBtnEnable(false)
+              if (workFlowStore.curJob?.id === data.job_ids[0]) {
+                workFlowStore.set({
+                  curJob: null,
+                })
+              }
             }
           }
         },
@@ -540,7 +551,7 @@ export const JobTree = observer(
               move: '移动',
             }[curOp]
             return (
-              <Modal
+              <PortalModal
                 title={opTxt}
                 visible
                 appendToBody
@@ -632,7 +643,7 @@ export const JobTree = observer(
                     </>
                   )}
                 </Form>
-              </Modal>
+              </PortalModal>
             )
           })()}
         {showConfirm &&

@@ -1,4 +1,6 @@
 import { useParams } from 'react-router-dom'
+import useIcon from 'hooks/useHooks/useIcon'
+import icons from 'views/Space/Ops/icons'
 import RealTime from './RealTime'
 import Network from './Network'
 import Resource from './Resource'
@@ -8,6 +10,7 @@ import { Sider } from '../Sider'
 
 function Dm() {
   const { mod } = useParams<{ mod: string }>()
+  useIcon(icons)
 
   return (
     <div tw="flex-1 flex h-full w-full">

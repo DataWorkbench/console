@@ -35,6 +35,8 @@ import {
 } from 'hooks/useSyncJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { describeFlinkUI } from 'stores/api'
+import { useParams } from 'react-router-dom'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -69,7 +71,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     settingKey,
     showHeader = true,
     defaultColumns,
-    filter: filterProp,
+    filter: filterProp = {},
     jumpDetail,
     setFatherFilter,
     type = JobMode.DI,
@@ -96,14 +98,19 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   useEffect(() => {
     if (filterProp) {
       setFilter((draft: any) => {
-        Object.entries(filterProp).forEach(([key, value]) => {
-          draft[key] = value
-        })
+        return {
+          ...draft,
+          ...filterProp,
+        }
       })
     }
   }, [filterProp, setFilter])
 
-  const { data, isFetching } = useQuerySyncJobInstances(filter, undefined, type)
+  const { data, isFetching } = useQuerySyncJobInstances(
+    filter,
+    { refetchInterval: 1000 * 60 },
+    type
+  )
 
   const infos = get(data, 'infos', []) || []
 
@@ -115,7 +122,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           theme="dark"
           name={record.id}
           icon="q-dotLine2Fill"
-          onClick={() => jumpDetail()(record)}
+          onClick={() => {
+            if (type === JobMode.DI) {
+              jumpDetail()(record)
+            }
+          }}
         />
       ),
     },
@@ -275,6 +286,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   }
 
   const mutation = useMutationJobInstance()
+  const { spaceId, regionId } =
+    useParams<{ spaceId: string; regionId: string }>()
 
   const getActions = (
     status: JobInstanceStatusType,
@@ -293,12 +306,14 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         value: record,
       })
     }
-    result.push({
-      text: '查看详情',
-      icon: 'eye',
-      key: 'info',
-      value: record,
-    })
+    if (type !== JobMode.RT) {
+      result.push({
+        text: '查看详情',
+        icon: 'eye',
+        key: 'info',
+        value: record,
+      })
+    }
     return result
   }
 
@@ -339,28 +354,45 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
               ) {
                 return
               }
+              if (type === JobMode.DI) {
+                if (record?.flink_ui) {
+                  window.open(`//${record?.flink_ui}`, '_blank')
+                }
+              } else if (type === JobMode.RT) {
+                describeFlinkUI({
+                  inst_id: record.id,
+                  regionId,
+                  spaceId,
+                }).then((res) => {
+                  window.open(`//${res?.web_ui || ''}`, '_blank')
+                })
+              }
+
               // describeFlinkUiByInstanceId({
               //   instanceId: record.id,
               //   regionId,
               //   spaceId,
               // }).then((web_ui: string) => {
-              if (record?.flink_ui) {
-                window.open(`//${record?.flink_ui}`, '_blank')
-              }
+
               // })
             }}
           >
             Flink UI
           </TextLink>
-          <Divider />
-          <MoreAction
-            theme="darker"
-            items={getActions(
-              jobInstanceStatus[record.state as 1]?.type,
-              record
-            )}
-            onMenuClick={handleMenuClick as any}
-          />
+          {!!getActions(jobInstanceStatus[record.state as 1]?.type, record)
+            .length && (
+            <>
+              <Divider />
+              <MoreAction
+                theme="darker"
+                items={getActions(
+                  jobInstanceStatus[record.state as 1]?.type,
+                  record
+                )}
+                onMenuClick={handleMenuClick as any}
+              />
+            </>
+          )}
         </FlexBox>
       )
     },

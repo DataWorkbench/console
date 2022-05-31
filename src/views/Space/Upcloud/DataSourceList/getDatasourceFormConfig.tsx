@@ -428,7 +428,13 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           help: (
             <div>
               <span tw="mr-0.5">可参考</span>
-              <HelpCenterLink hasIcon>网络配置选择说明文档</HelpCenterLink>
+              <HelpCenterLink
+                href="/manual/network/create_network/"
+                hasIcon
+                isIframe={false}
+              >
+                网络配置选择说明文档
+              </HelpCenterLink>
             </div>
           ),
           css: css`

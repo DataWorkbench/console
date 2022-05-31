@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Alert, Modal } from '@QCFE/qingcloud-portal-ui'
+import { Alert } from '@QCFE/qingcloud-portal-ui'
 import { noop } from 'lodash-es'
 import { HelpCenterLink } from 'components/Link'
+import { PortalModal } from 'components/Modal'
 import DataSourceList from './DataSourceList'
 
 interface DataSourceSelectModalProps {
@@ -23,7 +24,7 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
   return (
     <>
       {visible && (
-        <Modal
+        <PortalModal
           title={title}
           visible
           draggable
@@ -55,7 +56,7 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
             sourceType={sourceType}
             onCheck={setSource}
           />
-        </Modal>
+        </PortalModal>
       )}
     </>
   )

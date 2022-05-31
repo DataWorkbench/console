@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { get, filter as lodashFilter } from 'lodash-es'
+import { get, filter as lodashFilter, set as lodashSet } from 'lodash-es'
 import { useCookie } from 'react-use'
 import tw, { styled } from 'twin.macro'
 import {
@@ -130,6 +130,11 @@ const WorkSpace = observer(
       stateStore.set({
         platformConfig: platform,
       })
+      lodashSet(
+        window,
+        'GLOBAL_CONFIG.new_docs_url',
+        platform?.documents_address
+      )
       const { defaultFuncList } = workSpaceStore
       workSpaceStore.set({
         funcList: collect(

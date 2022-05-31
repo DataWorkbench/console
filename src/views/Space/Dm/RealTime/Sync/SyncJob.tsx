@@ -59,7 +59,7 @@ const stepsData = [
         <HelpCenterLink
           hasIcon
           isIframe={false}
-          href="/xxx"
+          href="/manual/source_data/add_data/"
           onClick={(e) => e.stopPropagation()}
         >
           数据源管理
@@ -280,7 +280,11 @@ const SyncJob = () => {
     })
   }
 
-  const save = (isSubmit?: boolean, cb?: Function) => {
+  const save = (
+    isSubmit?: boolean,
+    cb?: Function,
+    isValidateSource?: boolean
+  ) => {
     if (
       isSubmit &&
       (!dbRef.current ||
@@ -298,6 +302,10 @@ const SyncJob = () => {
     const channel = channelRef.current!.getChannel()
 
     try {
+      if (!resource && isValidateSource) {
+        showConfWarn('未配置数据源信息')
+        return
+      }
       set(
         resource,
         `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
@@ -321,29 +329,34 @@ const SyncJob = () => {
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
-        if (!resource && isSubmit) {
-          showConfWarn('未配置数据源信息')
-          return
-        }
-        if (!mapping && isSubmit) {
-          showConfWarn('未配置字段映射信息')
-          return
-        }
-        if (!cluster && isSubmit) {
-          showConfWarn('未配置计算集群信息')
-          return
-        }
-        // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
-        //   showConfWarn('计算集群连通性未测试或者未通过测试')
-        //   return
-        // }
-        if (isSubmit && !channel) {
-          showConfWarn('未配置通道控制信息')
-          return
-        }
-
-        // 如果并发数大于1  则切分键不能为空
         if (isSubmit) {
+          if (!resource) {
+            showConfWarn('未配置数据源信息')
+            return
+          }
+          if (!mapping) {
+            showConfWarn('未配置字段映射信息')
+            return
+          }
+          if (!cluster) {
+            showConfWarn('未配置计算集群信息')
+            return
+          }
+          // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
+          //   showConfWarn('计算集群连通性未测试或者未通过测试')
+          //   return
+          // }
+          if (!channel) {
+            showConfWarn('未配置通道控制信息')
+            return
+          }
+
+          if (channel.rate && !channel.bytes) {
+            showConfWarn('通道控制未配置同步速率限流字节数')
+            return
+          }
+
+          // 如果并发数大于1  则切分键不能为空
           const parallelism = get(resource, 'channel_control.parallelism', 0)
           const splitKey = get(
             Object.entries(resource.sync_resource ?? ({} as any)).find(([k]) =>
@@ -426,6 +439,10 @@ const SyncJob = () => {
               )}
               {index === 1 && (
                 <FieldMappings
+                  key={
+                    // NOTE: 无法解决拖拽 bug, 只能这样了
+                    `${db?.source?.tableName}_${db?.target?.tableName}`
+                  }
                   onReInit={() => {
                     if (dbRef.current && dbRef.current?.refetchColumns) {
                       dbRef.current?.refetchColumns()
@@ -439,7 +456,10 @@ const SyncJob = () => {
                   // rightTypeName={targetTypeName}
                   columns={columns}
                   topHelp={
-                    <HelpCenterLink href="/xxx" isIframe={false}>
+                    <HelpCenterLink
+                      href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+                      isIframe={false}
+                    >
                       字段映射说明文档
                     </HelpCenterLink>
                   }
@@ -531,7 +551,7 @@ const SyncJob = () => {
             }
             okText="转变"
             onOk={() => {
-              save(false, () => setMode(2))
+              save(false, () => setMode(2), true)
               // setMode(2)
             }}
           >

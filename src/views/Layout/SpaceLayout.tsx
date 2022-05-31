@@ -23,7 +23,7 @@ export const SpaceLayout = observer(({ children }) => {
       tw="h-screen bg-neut-2 dark:bg-neut-17 transition-colors duration-500"
     >
       <Header />
-      <FlexBox flex="1" tw="overflow-y-auto">
+      <FlexBox flex="1" tw="overflow-y-auto pb-5">
         {children}
       </FlexBox>
     </FlexBox>

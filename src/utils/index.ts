@@ -5,15 +5,13 @@ import emitter from './emitter'
 
 export * from './convert'
 
-export const getHelpCenterLink = (path: string, ifHostPrefix = false) => {
-  const prefix = ifHostPrefix
-    ? get(window, 'GLOBAL_CONFIG.new_docs_url', '')
-    : ''
+export const getHelpCenterLink = (path: string) => {
+  const prefix = get(window, 'GLOBAL_CONFIG.new_docs_url', '')
   return `${prefix}/bigdata/dataomnis${path}`
 }
 
 export const getHelpCenterLinkWithHost = (path: string) =>
-  getHelpCenterLink(path, true)
+  getHelpCenterLink(path)
 
 export const getIsFormalEnv = () => false
 // /console\d*\.qingcloud\.com$/.test(window.location.hostname)
