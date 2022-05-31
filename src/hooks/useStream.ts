@@ -21,7 +21,10 @@ let releaseQueryKey: any = ''
 
 export const getReleaseJobsKey = () => releaseQueryKey
 
-export const useQueryReleaseJobs = (filter: any) => {
+export const useQueryReleaseJobs = (
+  filter: any,
+  options?: { refetchInterval: number }
+) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
@@ -33,6 +36,7 @@ export const useQueryReleaseJobs = (filter: any) => {
   releaseQueryKey = ['RELEASE_STREAM_JOBS', params]
   return useQuery(releaseQueryKey, async () => listReleaseStreamJobs(params), {
     keepPreviousData: true,
+    refetchInterval: options?.refetchInterval,
   })
 }
 
@@ -100,7 +104,11 @@ let instanceQueryKey: any = ''
 
 export const getJobInstanceKey = () => instanceQueryKey
 
-export const useQueryJobInstances = (filter: any, type?: string) => {
+export const useQueryJobInstances = (
+  filter: any,
+  type?: string,
+  options?: { refetchInterval: number }
+) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
@@ -117,6 +125,7 @@ export const useQueryJobInstances = (filter: any, type?: string) => {
     instanceQueryKey,
     async () => listStreamJobInstances(params),
     {
+      refetchInterval: options?.refetchInterval,
       keepPreviousData: true,
       enabled: type === 'modal' ? !!filter.job_id : true,
     }
