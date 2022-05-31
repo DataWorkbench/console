@@ -1,4 +1,9 @@
-import React, { ChangeEvent, useEffect, useRef } from 'react'
+import React, {
+  ChangeEvent,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react'
 import {
   Button,
   Form,
@@ -89,7 +94,7 @@ const types = [
   },
 ]
 export const ConditionParameter = React.forwardRef(
-  (props: IConditionParameterProps) => {
+  (props: IConditionParameterProps, ref: React.ForwardedRef<any>) => {
     const {
       value: defaultValue = { type: ConditionType.Visualization },
       onChange,
@@ -114,6 +119,8 @@ export const ConditionParameter = React.forwardRef(
         prevValue.current = v
       }
     }, [defaultValue, setValue])
+
+    useImperativeHandle(ref, () => ({}))
 
     useEffect(() => {
       if (value && onChange) {
