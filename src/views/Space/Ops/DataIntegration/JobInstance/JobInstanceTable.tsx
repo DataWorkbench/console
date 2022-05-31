@@ -117,7 +117,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           theme="dark"
           name={record.id}
           icon="q-dotLine2Fill"
-          onClick={() => jumpDetail()(record)}
+          onClick={() => {
+            if (type === JobMode.DI) {
+              jumpDetail()(record)
+            }
+          }}
         />
       ),
     },
