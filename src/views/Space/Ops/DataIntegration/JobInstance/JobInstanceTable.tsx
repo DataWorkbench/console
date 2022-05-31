@@ -103,7 +103,11 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     }
   }, [filterProp, setFilter])
 
-  const { data, isFetching } = useQuerySyncJobInstances(filter, undefined, type)
+  const { data, isFetching } = useQuerySyncJobInstances(
+    filter,
+    { refetchInterval: 1000 * 60 },
+    type
+  )
 
   const infos = get(data, 'infos', []) || []
 
