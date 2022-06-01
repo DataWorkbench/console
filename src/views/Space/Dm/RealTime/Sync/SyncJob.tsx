@@ -351,7 +351,7 @@ const SyncJob = () => {
             return
           }
 
-          if (channel.rate && !channel.bytes) {
+          if (parseInt(channel?.rate, 10) === 1 && !channel.bytes) {
             showConfWarn('通道控制未配置同步速率限流字节数')
             return
           }
