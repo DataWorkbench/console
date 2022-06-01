@@ -75,8 +75,8 @@ export const JobModal = observer((props: JobModalProps) => {
   const { isEdit = false, jobType = JobType.OFFLINE, jobNode, onClose } = props
   const fetchJob = useFetchJob()
   const {
-    workFlowStore,
-    workFlowStore: { treeData, loadedKeys }
+    dtsDevStore,
+    dtsDevStore: { treeData, loadedKeys }
   } = useStore()
   const form = useRef<Form>(null)
   const [showCluster, setShowCluster] = useState(false)
@@ -131,7 +131,7 @@ export const JobModal = observer((props: JobModalProps) => {
     }).then((data) => {
       const jobs = get(data, 'infos') || []
       const newTreeData = getNewTreeData(treeData, node, jobs)
-      workFlowStore.set({
+      dtsDevStore.set({
         treeData: newTreeData,
         loadedKeys: [...loadedKeys, node.key]
       })
@@ -381,7 +381,7 @@ export const JobModal = observer((props: JobModalProps) => {
                       )}
                       loadData={fetchJobTreeData}
                       loadedKeys={loadedKeys}
-                      onLoad={(keys: string | number) => workFlowStore.set({ loadedKeys: keys })}
+                      onLoad={(keys: string | number) => dtsDevStore.set({ loadedKeys: keys })}
                       value={params.pid}
                       onChange={(v: string, node: Record<string, any>) => {
                         setParams((draft) => {

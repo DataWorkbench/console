@@ -1,7 +1,7 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components'
 import { getHelpCenterLink } from 'utils'
-import NetworkTable from './ClusterTable'
+import ClusterTable from './ClusterTable'
 
 const pageTabsData = [
   {
@@ -14,10 +14,10 @@ const pageTabsData = [
 ]
 
 const Network = () => (
-  <FlexBox orient="column" tw="p-5 min-h-full">
+  <FlexBox orient="column" tw="p-5 min-h-full overflow-y-auto">
     <PageTab tabs={pageTabsData} />
     <div tw="flex flex-1 bg-neut-16 px-5 pt-3">
-      <NetworkTable />
+      <ClusterTable />
     </div>
   </FlexBox>
 )

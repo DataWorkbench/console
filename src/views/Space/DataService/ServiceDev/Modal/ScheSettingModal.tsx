@@ -127,7 +127,7 @@ const ScheSettingModal = ({ visible, origin = '', onCancel, onSuccess }: IScheSe
   })
 
   const {
-    workFlowStore: { curJob }
+    dtsDevStore: { curJob }
   } = useStore()
 
   const isStreamJob = curJob!.jobMode === JobMode.RT
@@ -450,8 +450,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                         // eslint-disable-next-line no-template-curly-in-string
                         help: '参数值不合法, 请参考格式: ${yyyy-mm-dd HH:MM:SS}',
                         status: 'error',
-                        rule: (v: string) => {
-                          return v
+                        rule: (v: string) => v
                             .split(/[\r\n]/)
                             .filter((str) => !isEmpty(str))
                             .every((str) => {
@@ -461,8 +460,6 @@ var2=\${yyyy-mm-dd HH-1H}`}
                               }
                               return true
                             })
-                          return true
-                        }
                       },
                       {
                         help: '不能为空，且变量名必须唯一',
@@ -706,9 +703,9 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                       disabled={disabled}
                                       backspaceRemoves={false}
                                       options={hourOpts.map((opt) => ({
-                                          ...opt,
-                                          disabled: opt.value < curPeriodData.startHour
-                                        }))}
+                                        ...opt,
+                                        disabled: opt.value < curPeriodData.startHour
+                                      }))}
                                       value={curPeriodData.endHour}
                                       onChange={(v: number) =>
                                         setPeriodData((draft) => {
@@ -789,9 +786,9 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                           <Select
                                             backspaceRemoves={false}
                                             options={hourOpts.map((opt) => ({
-                                                ...opt,
-                                                disabled: opt.value < curPeriodData.startHour
-                                              }))}
+                                              ...opt,
+                                              disabled: opt.value < curPeriodData.startHour
+                                            }))}
                                             value={curPeriodData.endHour}
                                             onChange={(v: number) => {
                                               setPeriodData((draft) => {

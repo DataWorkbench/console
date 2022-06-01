@@ -32,7 +32,7 @@ const ReleaseModal = ({
   onSuccess?: () => void
 }) => {
   const {
-    workFlowStore: { curJob }
+    dtsDevStore: { curJob }
   } = useStore()
   const form = useRef<Form>(null)
   const useMutationReleaseJob =

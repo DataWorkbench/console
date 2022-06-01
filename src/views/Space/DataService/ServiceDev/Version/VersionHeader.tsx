@@ -44,8 +44,8 @@ const SelectWrapper = styled(Select)(() => [
 
 export default function VersionHeader() {
   const {
-    workFlowStore,
-    workFlowStore: { curVersion }
+    dtsDevStore,
+    dtsDevStore: { curVersion }
   } = useStore()
 
   const versionRet = useInfiniteQueryJobVersions()
@@ -53,7 +53,7 @@ export default function VersionHeader() {
   const versions = flatten(versionRet.data?.pages.map((page) => page.infos || []))
 
   const handleVersionChange = (value: any) => {
-    workFlowStore.set({
+    dtsDevStore.set({
       curVersion: versions.find((el: any) => el.version === value)
     })
   }
@@ -111,7 +111,7 @@ export default function VersionHeader() {
         </div>
         <FlexBox
           tw="items-center cursor-pointer ml-auto"
-          onClick={() => workFlowStore.set({ curVersion: null })}
+          onClick={() => dtsDevStore.set({ curVersion: null })}
         >
           <Icon
             name="if-close"

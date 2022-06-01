@@ -19,14 +19,14 @@ const initTreeData = [
         pid: 'di-root1',
         jobMode: 'DI2',
         title: 'API',
-        isLeaf: false
+        isLeaf: true
       },
       {
         key: 'di-root2',
         pid: 'di-root3',
         jobMode: 'DI2',
         title: 'API',
-        isLeaf: false
+        isLeaf: true
       }
     ]
   }
@@ -47,7 +47,7 @@ class DmStore {
   // 增、删、改操作状态
   op: OP = ''
 
-  networkOp: OP = ''
+  dataServiceOp: OP = ''
 
   APItreeData = initTreeData
 
@@ -57,8 +57,8 @@ class DmStore {
     this.op = op
   }
 
-  setNetWorkOp = (op: OP) => {
-    this.networkOp = op
+  setDataServiceOp = (op: OP) => {
+    this.dataServiceOp = op
   }
 
   // 函数管理相关

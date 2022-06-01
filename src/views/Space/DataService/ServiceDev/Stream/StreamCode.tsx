@@ -54,8 +54,8 @@ interface IProp {
 
 const StreamCode = observer(({ tp }: IProp) => {
   const {
-    workFlowStore,
-    workFlowStore: { curJob, curVersion, showSaveJobConfirm }
+    dtsDevStore,
+    dtsDevStore: { curJob, curVersion, showSaveJobConfirm }
   } = useStore()
   const readOnly = !!curVersion
 
@@ -253,11 +253,11 @@ def main(args: Array[String]): Unit = {
       monaco.languages.registerCompletionItemProvider(codeName, {
         provideCompletionItems: () => ({
           suggestions: keywords.map((value: string) => ({
-              label: value,
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: value,
-              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-            }))
+            label: value,
+            kind: monaco.languages.CompletionItemKind.Keyword,
+            insertText: value,
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+          }))
         })
       })
     }
@@ -287,7 +287,7 @@ def main(args: Array[String]): Unit = {
     if (!codeStr && v === defaultCode) {
       isDirty = false
     }
-    workFlowStore.set({
+    dtsDevStore.set({
       isDirty
     })
   }
@@ -302,7 +302,7 @@ def main(args: Array[String]): Unit = {
   }
 
   const handlePrompt = (location: any) => {
-    workFlowStore.showSaveConfirm(curJob?.id, 'leave')
+    dtsDevStore.showSaveConfirm(curJob?.id, 'leave')
     setNextLocation(location)
     return false
   }
@@ -327,17 +327,17 @@ def main(args: Array[String]): Unit = {
   }, [codeStr, defaultCode, curVersion?.version, isFetching])
 
   useUnmount(() => {
-    workFlowStore.set({
+    dtsDevStore.set({
       showNotify: false
     })
-    workFlowStore.resetNeedSave()
+    dtsDevStore.resetNeedSave()
   })
 
-  useBeforeUnload(workFlowStore.isDirty, '未保存')
+  useBeforeUnload(dtsDevStore.isDirty, '未保存')
 
   const handleReleaseSuccess = () => {
     toggleShow(false)
-    workFlowStore.set({
+    dtsDevStore.set({
       showNotify: true
     })
   }
@@ -420,7 +420,7 @@ def main(args: Array[String]): Unit = {
           onCancel={() => toggleScheModal(false)}
           okText="调度配置"
           onOk={() => {
-            workFlowStore.set({
+            dtsDevStore.set({
               showScheSetting: true
             })
             // setShowScheSettingModal(true)
@@ -472,34 +472,34 @@ def main(args: Array[String]): Unit = {
           escClosable={false}
           maskClosable={false}
           width={400}
-          onCancel={() => workFlowStore.hideSaveConfirm()}
+          onCancel={() => dtsDevStore.hideSaveConfirm()}
           footer={
             <div tw="flex justify-between w-full pl-9">
               <Button
                 type="danger"
                 onClick={() => {
-                  if (workFlowStore.tabOp === 'leave') {
-                    workFlowStore.resetNeedSave()
+                  if (dtsDevStore.tabOp === 'leave') {
+                    dtsDevStore.resetNeedSave()
                     setShouldNav(true)
                   } else {
-                    workFlowStore.switchPanel()
+                    dtsDevStore.switchPanel()
                   }
                 }}
               >
                 不保存
               </Button>
               <div>
-                <Button onClick={() => workFlowStore.hideSaveConfirm()}>取消</Button>
+                <Button onClick={() => dtsDevStore.hideSaveConfirm()}>取消</Button>
                 <Button
                   type="primary"
                   loading={mutation.isLoading}
                   onClick={() => {
                     mutateCodeData('codeSave', () => {
-                      if (workFlowStore.tabOp === 'leave') {
-                        workFlowStore.resetNeedSave()
+                      if (dtsDevStore.tabOp === 'leave') {
+                        dtsDevStore.resetNeedSave()
                         setShouldNav(true)
                       } else {
-                        workFlowStore.switchPanel()
+                        dtsDevStore.switchPanel()
                       }
                     })
                   }}
@@ -519,7 +519,7 @@ def main(args: Array[String]): Unit = {
           </div>
         </Modal>
       )}
-      <Prompt when={workFlowStore.isDirty} message={handlePrompt} />
+      <Prompt when={dtsDevStore.isDirty} message={handlePrompt} />
       {syntaxState.showBox && (
         <SyntaxBox isBigger={syntaxMutation.isSuccess && syntaxState.errMsg !== ''}>
           <div tw="absolute right-2 top-2">

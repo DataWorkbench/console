@@ -299,7 +299,7 @@ export const renderIcon = (props: any) => {
   if (loading) {
     return <Loading size={16} />
   }
-  const iconName = 'FolderFill'
+  const iconName = 'EqualizerFill'
   const theme: TreeIconTheme = TreeIconTheme.YELLOW
   if (data) {
     const { key } = data

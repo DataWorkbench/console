@@ -142,7 +142,7 @@ const SyncDataSource = observer(
   (props: SyncDataSourceProps, ref) => {
     const { onSelectTable, onDbChange, conf, curJob: curJobProp } = props
     const {
-      workFlowStore: { curJob: curJobStore }
+      dtsDevStore: { curJob: curJobStore }
     } = useStore()
     const curJob = curJobProp ?? curJobStore
     const [visible, setVisible] = useState<boolean | null>(null)

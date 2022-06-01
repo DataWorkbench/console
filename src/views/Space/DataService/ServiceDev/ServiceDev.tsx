@@ -16,17 +16,17 @@ import VersionDisplay from './Version/VersionDisplay'
 const RealTime = observer(() => {
   const { spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const {
-    workFlowStore,
-    workFlowStore: { curJob, curVersion }
+    dtsDevStore,
+    dtsDevStore: { curJob, curVersion }
   } = useStore()
   const [sideCollapsed, setSideCollapsed] = useLocalStorage('NAV_SIDER_COLLAPSED', false)
 
   useUpdateEffect(() => {
-    workFlowStore.set({ panels: [], curJob: null, curVersion: null })
-  }, [spaceId, workFlowStore])
+    dtsDevStore.set({ panels: [], curJob: null, curVersion: null })
+  }, [spaceId, dtsDevStore])
 
   useUnmount(() => {
-    workFlowStore.set({
+    dtsDevStore.set({
       panels: [],
       curJob: null,
       curViewJobId: null,

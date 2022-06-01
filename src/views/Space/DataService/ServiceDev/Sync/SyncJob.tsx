@@ -94,11 +94,11 @@ interface DbInfo {
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
-  const { workFlowStore } = useStore()
+  const { dtsDevStore } = useStore()
   const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
 
   const {
-    workFlowStore: { curJob }
+    dtsDevStore: { curJob }
   } = useStore()
 
   const [db, setDb] = useImmer<{
@@ -284,84 +284,87 @@ const SyncJob = () => {
   }
   const release = () => {
     if (!enableRelease) {
-      workFlowStore.set({ showScheSetting: true })
+      dtsDevStore.set({ showScheSetting: true })
     } else {
       setShowRelaseModal(true)
     }
   }
 
-  const columns = useMemo<[any, any]>(() => [sourceColumn, targetColumn], [sourceColumn, targetColumn])
+  const columns = useMemo<[any, any]>(
+    () => [sourceColumn, targetColumn],
+    [sourceColumn, targetColumn]
+  )
 
   const renderGuideMode = () => (
-      <CollapseWrapper>
-        <Collapse defaultActiveKey={stepsData.map((step) => step.key)}>
-          {stepsData.map(({ key, title, desc }, index) => (
-            <CollapseItem
-              key={key}
-              label={
-                <>
-                  <div css={styles.stepTag}>
-                    <span css={styles.stepNum}>{index + 1}</span>
-                    <span css={styles.stepText}>{title}</span>
-                  </div>
-                  <div tw="text-neut-13">{desc}</div>
-                </>
-              }
-            >
-              {index === 0 && (
-                <SyncDataSource
-                  ref={dbRef}
-                  onSelectTable={(tp, tableName, data) => {
-                    const fieldData = data.map((field) => ({
-                      ...field,
-                      uuid: nanoid()
-                    })) as TMappingField[]
-                    setDb((draft) => {
-                      const soruceInfo = draft[tp]
-                      soruceInfo.tableName = tableName
-                      soruceInfo.fields = fieldData
-                    })
-                  }}
-                  onDbChange={(tp: 'source' | 'target', data) => {
-                    setDb((draft) => {
-                      draft[tp] = data
-                    })
-                  }}
-                  conf={confData}
-                />
-              )}
-              {index === 1 && (
-                <FieldMappings
-                  ref={mappingRef}
-                  // mappings={mappings}
-                  leftFields={db.source.fields || []}
-                  rightFields={db.target.fields || []}
-                  leftTypeName={sourceTypeName}
-                  // rightTypeName={targetTypeName}
-                  columns={columns}
-                  topHelp={
-                    <HelpCenterLink href="/xxx" isIframe={false}>
-                      字段映射说明文档
-                    </HelpCenterLink>
-                  }
-                />
-              )}
-              {index === 2 && (
-                <SyncCluster
-                  sourceId={db.source?.id}
-                  targetId={db.target?.id}
-                  ref={clusterRef}
-                  clusterId={get(confData, 'cluster_id')}
-                />
-              )}
-              {index === 3 && (
-                <SyncChannel ref={channelRef} channelControl={get(confData, 'channel_control')} />
-              )}
-            </CollapseItem>
-          ))}
-        </Collapse>
-      </CollapseWrapper>
-    )
+    <CollapseWrapper>
+      <Collapse defaultActiveKey={stepsData.map((step) => step.key)}>
+        {stepsData.map(({ key, title, desc }, index) => (
+          <CollapseItem
+            key={key}
+            label={
+              <>
+                <div css={styles.stepTag}>
+                  <span css={styles.stepNum}>{index + 1}</span>
+                  <span css={styles.stepText}>{title}</span>
+                </div>
+                <div tw="text-neut-13">{desc}</div>
+              </>
+            }
+          >
+            {index === 0 && (
+              <SyncDataSource
+                ref={dbRef}
+                onSelectTable={(tp, tableName, data) => {
+                  const fieldData = data.map((field) => ({
+                    ...field,
+                    uuid: nanoid()
+                  })) as TMappingField[]
+                  setDb((draft) => {
+                    const soruceInfo = draft[tp]
+                    soruceInfo.tableName = tableName
+                    soruceInfo.fields = fieldData
+                  })
+                }}
+                onDbChange={(tp: 'source' | 'target', data) => {
+                  setDb((draft) => {
+                    draft[tp] = data
+                  })
+                }}
+                conf={confData}
+              />
+            )}
+            {index === 1 && (
+              <FieldMappings
+                ref={mappingRef}
+                // mappings={mappings}
+                leftFields={db.source.fields || []}
+                rightFields={db.target.fields || []}
+                leftTypeName={sourceTypeName}
+                // rightTypeName={targetTypeName}
+                columns={columns}
+                topHelp={
+                  <HelpCenterLink href="/xxx" isIframe={false}>
+                    字段映射说明文档
+                  </HelpCenterLink>
+                }
+              />
+            )}
+            {index === 2 && (
+              <SyncCluster
+                sourceId={db.source?.id}
+                targetId={db.target?.id}
+                ref={clusterRef}
+                clusterId={get(confData, 'cluster_id')}
+              />
+            )}
+            {index === 3 && (
+              <SyncChannel ref={channelRef} channelControl={get(confData, 'channel_control')} />
+            )}
+          </CollapseItem>
+        ))}
+      </Collapse>
+    </CollapseWrapper>
+  )
 
   const renderScriptMode = () => {
     const step = stepsData[2]
@@ -456,7 +459,7 @@ const SyncJob = () => {
         <ReleaseModal
           onSuccess={() => {
             setShowRelaseModal(false)
-            workFlowStore.set({
+            dtsDevStore.set({
               showNotify: true
             })
           }}

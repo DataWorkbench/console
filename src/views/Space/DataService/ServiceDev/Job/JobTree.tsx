@@ -21,7 +21,7 @@ import {
   renderSwitcherIcon
 } from './JobUtils'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
 const TreeWrapper = styled('div')(() => [
   tw`relative`,
@@ -53,12 +53,12 @@ export const JobTree = observer(
     const fetchJob = useFetchJob()
 
     const {
-      dtsStore,
-      dtsStore: { APItreeData, loadedKeys }
+      dtsDevStore,
+      dtsDevStore: { treeData, loadedKeys }
     } = useStore()
 
     const [expandedKeys, setExpandedKeys] = useState<string[]>(expandedKeysProp || [])
-    const [curOpNode, setCurOpNode] = useState(APItreeData[1])
+    const [curOpNode, setCurOpNode] = useState(treeData[1])
     const [autoExpandParent, setAutoExpandParent] = useState(false)
     const [selectedKeys, setSelectedKeys] = useState<string[]>([])
     const treeEl = useRef(null)
@@ -79,7 +79,7 @@ export const JobTree = observer(
     console.log(mutation, curOpNode, jobInfo)
 
     useUnmount((): void => {
-      dtsStore.resetTreeData()
+      dtsDevStore.resetTreeData()
     })
 
     useEffect(() => {
@@ -101,7 +101,7 @@ export const JobTree = observer(
         })
       },
       search: (v: string) => {
-        dtsStore.resetTreeData()
+        dtsDevStore.resetTreeData()
         setSearch(v)
         setExpandedKeys(['di-root', 'rt-root'])
       }
@@ -130,8 +130,8 @@ export const JobTree = observer(
       })
         .then((data) => {
           const jobs = get(data, 'infos') || []
-          const newTreeData = getNewTreeData(dtsStore.APItreeData, node, jobs, movingNode)
-          dtsStore.set({
+          const newTreeData = getNewTreeData(dtsDevStore.APItreeData, node, jobs, movingNode)
+          dtsDevStore.set({
             APItreeData: newTreeData
           })
           setExpandedKeys([...expandedKeys, node.key])
@@ -143,8 +143,8 @@ export const JobTree = observer(
     }
 
     useEffect(() => {
-      dtsStore.resetTreeData()
-    }, [spaceId, dtsStore])
+      dtsDevStore.resetTreeData()
+    }, [spaceId, dtsDevStore])
 
     return (
       <>
@@ -174,7 +174,7 @@ export const JobTree = observer(
           <TreeWrapper ref={treeEl}>
             <Tree
               autoExpandParent={autoExpandParent}
-              treeData={APItreeData}
+              treeData={treeData}
               loadedKeys={loadedKeys}
               expandedKeys={expandedKeys}
               selectedKeys={selectedKeys}
@@ -197,28 +197,23 @@ export const JobTree = observer(
               loadData={fetchJobTreeData}
               onExpand={(keys) => setExpandedKeys(keys as string[])}
               onLoad={(keys) => {
-                dtsStore.set({ loadedKeys: keys })
+                dtsDevStore.set({ loadedKeys: keys })
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
                 }
               }}
               onSelect={(keys: (string | number)[], { selected, node }) => {
                 const job = get(node, 'job')
-                console.log(job)
-
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
                 }
-                // if (
-                //   dtsStore.curJob?.id !== job?.id &&
-                //   dtsStore.isDirty
-                // ) {
-                //   dtsStore.set({ nextJob: job })
-                //   dtsStore.showSaveConfirm(job.id, 'switch')
-                //   return
-                // }
+                if (dtsDevStore.curJob?.id !== job?.id && dtsDevStore.isDirty) {
+                  dtsDevStore.set({ nextJob: job })
+                  dtsDevStore.showSaveConfirm(job.id, 'switch')
+                  return
+                }
                 if (node.isLeaf) {
-                  dtsStore.set({
+                  dtsDevStore.set({
                     curJob: { ...job, jobMode: get(node, 'jobMode') }
                   })
                 } else if (node.expanded) {

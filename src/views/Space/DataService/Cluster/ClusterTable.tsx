@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { Menu } from '@QCFE/lego-ui'
+import { MoreAction, FlexBox, Center, Modal, TextEllipsis, StatusBar } from 'components'
 
 import { useParams } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
@@ -11,7 +11,6 @@ import tw, { css } from 'twin.macro'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
 
-import { FlexBox, Center, Modal, TextEllipsis, StatusBar, AffixLabel, Tooltip } from 'components'
 import { useStore, useQueryNetworks, getNetworkKey, useMutationNetwork } from 'hooks'
 import useFilter from 'hooks/useHooks/useFilter'
 
@@ -29,13 +28,12 @@ import { ClusterFieldMapping } from './common/mappings'
 // }
 
 const { ColumnsSetting } = ToolBar as any
-const { MenuItem } = Menu as any
 
 const columnSettingsKey = 'DATAOMNIS_NETWORK_COLUMN_SETTINGS'
 
 const ClusterTable = observer(() => {
   const {
-    dtsStore: { setNetWorkOp, networkOp }
+    dtsStore: { setDataServiceOp, dataServiceOp }
   } = useStore()
 
   const [opNetworkList, setOpNetworkList] = useState<any[]>([])
@@ -60,10 +58,10 @@ const ClusterTable = observer(() => {
   const mutation = useMutationNetwork()
 
   useEffect(() => {
-    if (networkOp === '') {
+    if (dataServiceOp === '') {
       setOpNetworkList([])
     }
-  }, [networkOp])
+  }, [dataServiceOp])
 
   const refetchData = () => {
     queryClient.invalidateQueries(getNetworkKey())
@@ -73,14 +71,14 @@ const ClusterTable = observer(() => {
     const networkIds = opNetworkList.map((o) => o.id)
     mutation.mutate(
       {
-        op: networkOp,
+        op: dataServiceOp,
         networkIds
       },
       {
         onSuccess: () => {
-          setNetWorkOp('')
+          setDataServiceOp('')
           refetchData()
-          if (networkOp === 'delete') {
+          if (dataServiceOp === 'delete') {
             setSelectedRowKeys(selectedRowKeys.filter((k) => !networkIds.includes(k)))
           }
         }
@@ -147,61 +145,105 @@ const ClusterTable = observer(() => {
       )
     }
   }
+
+  const handleMenuClick = (record: Record<string, any>, key: string) => {
+    console.log(record, key)
+  }
+  const getActions = (row: any) => {
+    const result = [
+      {
+        text: '恢复',
+        icon: 'q-rmbCircleFill',
+        key: 'recovery',
+        value: row
+      },
+      {
+        text: '启动',
+        icon: 'q-closeCircleFill',
+        key: 'start',
+        value: row
+      },
+      {
+        text: '停用',
+        icon: 'q-closeCircleFill',
+        key: 'stop',
+        value: row
+      },
+      {
+        text: '修改',
+        icon: 'q-closeCircleFill',
+        key: 'edit',
+        value: row,
+        help: '如需修改，请先停用服务集群'
+      },
+      {
+        text: '删除',
+        icon: 'q-closeCircleFill',
+        key: 'delete',
+        value: row,
+        help: '如需删除，请先停用服务集群'
+      }
+    ]
+    return result
+  }
+
   const operation = {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
-    render: (v: any, row: any) => (
-      <FlexBox tw="items-center">
-        <Center>
-          <Tooltip
-            trigger="click"
-            placement="bottom"
-            arrow={false}
-            twChild={
-              css`
-                &[aria-expanded='true'] {
-                  ${tw`bg-line-dark`}
-                }
-                svg {
-                  ${tw`text-white! bg-transparent! fill-[transparent]!`}
-                }
-              ` as any
-            }
-            content={
-              <Menu>
-                <MenuItem key="view">查看详情</MenuItem>
-                {(row.status === 2 || row.status === 4) && <MenuItem key="stop">停用</MenuItem>}
-                {row.status === 3 && <MenuItem key="start">启动</MenuItem>}
-                <MenuItem key="update" disabled={[2, 4].includes(row.status)}>
-                  <AffixLabel
-                    required={false}
-                    // help="如需修改，请先停用计算集群"
-                    help={[2, 4].includes(row.status) && '如需修改，请先停用计算集群'}
-                    theme="light"
-                  >
-                    修改
-                  </AffixLabel>
-                </MenuItem>
-                <MenuItem key="delete" disabled={[2, 4].includes(row.status)}>
-                  <AffixLabel
-                    required={false}
-                    help={[2, 4].includes(row.status) && '如需删除，请先停用计算集群'}
-                    theme="light"
-                  >
-                    删除
-                  </AffixLabel>
-                </MenuItem>
-              </Menu>
-            }
-          >
-            <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
-              <Icon name="more" clickable changeable type="light" size={20} />
-            </div>
-          </Tooltip>
-        </Center>
-      </FlexBox>
+    render: (_: never, record: Record<string, any>) => (
+      <MoreAction theme="darker" items={getActions(record)} onMenuClick={handleMenuClick} />
     )
+    // render: (v: any, row: any) => (
+    //   <FlexBox tw="items-center">
+    //     <Center>
+    //       <Tooltip
+    //         trigger="click"
+    //         placement="bottom"
+    //         arrow={false}
+    //         twChild={
+    //           css`
+    //             &[aria-expanded='true'] {
+    //               ${tw`bg-line-dark`}
+    //             }
+    //             svg {
+    //               ${tw`text-white! bg-transparent! fill-[transparent]!`}
+    //             }
+    //           ` as any
+    //         }
+    //         content={
+    //           <Menu>
+    //             {(row.status === 2 || row.status === 4) && <MenuItem key="stop">停用</MenuItem>}
+    //             {row.status === 3 && <MenuItem key="start">启动</MenuItem>}
+    //             <MenuItem key="update" disabled={[2, 4].includes(row.status)}>
+    //               <AffixLabel
+    //                 required={false}
+    //                 // help="如需修改，请先停用计算集群"
+    //                 help={[2, 4].includes(row.status) && '如需修改，请先停用服务集群'}
+    //                 theme="light"
+    //               >
+    //                 修改
+    //               </AffixLabel>
+    //             </MenuItem>
+    //             <MenuItem key="delete" disabled={[2, 4].includes(row.status)}>
+    //               <AffixLabel
+    //                 required={false}
+    //                 help={[2, 4].includes(row.status) && '如需删除，请先停用服务集群'}
+    //                 theme="light"
+    //               >
+    //                 删除
+    //               </AffixLabel>
+    //             </MenuItem>
+    //           </Menu>
+    //         }
+    //       >
+    //         <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
+    //           <Icon name="more" clickable changeable type="light" size={20} />
+    //         </div>
+    //       </Tooltip>
+    //     </Center>
+    //   </FlexBox>
+    // )
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -216,7 +258,7 @@ const ClusterTable = observer(() => {
       <div tw="mb-3">
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
-            <Button type="primary" onClick={() => setNetWorkOp('create')}>
+            <Button type="primary" onClick={() => setDataServiceOp('create')}>
               <Icon name="add" />
               创建
             </Button>
@@ -298,22 +340,22 @@ const ClusterTable = observer(() => {
         //   })
         // }}
       />
-      {(networkOp === 'create' || networkOp === 'update') && (
+      {(dataServiceOp === 'create' || dataServiceOp === 'update') && (
         <NewClusterModal opNetwork={opNetworkList[0]} />
       )}
-      {(networkOp === 'start' || networkOp === 'stop' || networkOp === 'delete') && (
+      {(dataServiceOp === 'start' || dataServiceOp === 'stop' || dataServiceOp === 'delete') && (
         <Modal
           noBorder
           visible
           width={opNetworkList.length > 1 ? 800 : 400}
-          onCancel={() => setNetWorkOp('')}
+          onCancel={() => setDataServiceOp('')}
           okText="删除"
           onOk={mutateData}
           footer={
             <FlexBox tw="justify-end">
-              <Button onClick={() => setNetWorkOp('')}>取消</Button>
+              <Button onClick={() => setDataServiceOp('')}>取消</Button>
               <Button
-                type={networkOp === 'start' ? 'primary' : 'danger'}
+                type={dataServiceOp === 'start' ? 'primary' : 'danger'}
                 loading={mutation.isLoading}
                 onClick={mutateData}
               >

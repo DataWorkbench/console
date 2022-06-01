@@ -133,7 +133,7 @@ const ClusterModal = observer(
     appendToBody?: boolean
   }) => {
     const {
-      dtsStore: { setNetWorkOp, networkOp }
+      dtsStore: { setDataServiceOp, dataServiceOp }
       // globalStore: { curRegionInfo }
     } = useStore()
 
@@ -162,14 +162,14 @@ const ClusterModal = observer(
       if (form?.validateFields()) {
         const paramsData = assign(
           {
-            op: networkOp,
+            op: dataServiceOp,
             ...params
           },
           opNetwork && { network_id: opNetwork.id }
         )
         mutation.mutate(paramsData, {
           onSuccess: () => {
-            setNetWorkOp('')
+            setDataServiceOp('')
             queryClient.invalidateQueries(getNetworkKey())
           }
         })
@@ -195,15 +195,15 @@ const ClusterModal = observer(
 
     return (
       <ModalWrapper
-        title={`${networkOp === 'create' ? '创建' : '修改'}服务集群`}
+        title={`${dataServiceOp === 'create' ? '创建' : '修改'}服务集群`}
         confirmLoading={mutation.isLoading}
         visible
         onOk={handleOk}
-        onCancel={() => setNetWorkOp('')}
+        onCancel={() => setDataServiceOp('')}
         width={1000}
         height={800}
         draggable
-        okText={networkOp === 'create' ? '立即创建' : '确认'}
+        okText={dataServiceOp === 'create' ? '立即创建' : '确认'}
         appendToBody={appendToBody}
       >
         <FlexBox tw="h-full overflow-hidden">

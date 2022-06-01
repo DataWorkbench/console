@@ -6,6 +6,7 @@ import { FlexBox } from 'components/Box'
 import { isDarkTheme } from 'utils/theme'
 import { Center } from '../Center'
 import { Tooltip } from '../Tooltip'
+import { AffixLabel } from '../AffixLabel'
 
 export interface IMoreActionItem {
   key: string
@@ -13,6 +14,7 @@ export interface IMoreActionItem {
   icon?: string
   value?: any
   disabled?: boolean
+  help?: string
 }
 export interface IMoreActionProps<T> {
   theme?: 'darker' | 'light' | 'auto' | 'instead'
@@ -41,21 +43,19 @@ export interface IMoreActionProps<T> {
 const { MenuItem } = Menu as any
 
 export const moreActionStyle = {
-  child: () => {
-    return [
-      css`
-        &[aria-expanded='true'] {
-          .button.is-outlined,
-          & > div {
-            ${tw`bg-button-thirdly-hover`}
-          }
+  child: () => [
+    css`
+      &[aria-expanded='true'] {
+        .button.is-outlined,
+        & > div {
+          ${tw`bg-button-thirdly-hover`}
         }
-        svg {
-          ${tw`text-icon-single-dark! dark:text-icon-single-white! bg-transparent! fill-[transparent]!`}
-        }
-      `,
-    ]
-  },
+      }
+      svg {
+        ${tw`text-icon-single-dark! dark:text-icon-single-white! bg-transparent! fill-[transparent]!`}
+      }
+    `
+  ]
 }
 
 const getTheme = (theme?: string) => {
@@ -77,19 +77,17 @@ const getTheme = (theme?: string) => {
   return theme
 }
 
-const getStyles = () => {
-  return {
-    button: [
-      tw`border border-separator! text-font! bg-transparent! hover:text-font! hover:bg-transparent!`,
-      css`
-        & .icon svg.qicon {
-          ${tw`text-icon-single-dark! dark:text-icon-single-white!`}
-        }
-      `,
-    ],
-    icon: tw`h-6 w-6 flex justify-center items-center hover:bg-button-thirdly-hover!`,
-  }
-}
+const getStyles = () => ({
+  button: [
+    tw`border border-separator! text-font! bg-transparent! hover:text-font! hover:bg-transparent!`,
+    css`
+      & .icon svg.qicon {
+        ${tw`text-icon-single-dark! dark:text-icon-single-white!`}
+      }
+    `
+  ],
+  icon: tw`h-6 w-6 flex justify-center items-center hover:bg-button-thirdly-hover!`
+})
 
 export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
   const {
@@ -98,15 +96,11 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
     items,
     type = 'icon',
     buttonText,
-    placement = 'bottom-end',
+    placement = 'bottom-end'
   } = props
 
   const theme = getTheme(themeProp)
-  const handleMenuClick = (
-    e: SyntheticEvent,
-    key: T,
-    value: string | number
-  ) => {
+  const handleMenuClick = (e: SyntheticEvent, key: T, value: string | number) => {
     // e.stopPropagation()
     if (onMenuClick) {
       onMenuClick(value, key)
@@ -156,21 +150,21 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
         theme={theme}
         twChild={moreActionStyle.child() as any}
         content={
-          <Menu
-            onClick={handleMenuClick}
-            tw="dark:border-separator dark:border"
-          >
-            {items.map(({ key, value, text, icon, disabled }) => (
+          <Menu onClick={handleMenuClick} tw="dark:border-separator dark:border">
+            {items.map(({ key, value, text, icon, disabled, help }) => (
               <MenuItem key={key} value={value} disabled={disabled}>
                 <FlexBox tw="justify-between items-center">
                   {icon ? (
-                    <Icon
-                      name={icon}
-                      size={16}
-                      type={theme !== 'light' ? 'light' : 'dark'}
-                    />
+                    <Icon name={icon} size={16} type={theme !== 'light' ? 'light' : 'dark'} />
                   ) : null}
-                  <span>{text}</span>
+
+                  {help ? (
+                    <AffixLabel required={false} help={help} theme="light">
+                      {text}
+                    </AffixLabel>
+                  ) : (
+                    <span>{text}</span>
+                  )}
                 </FlexBox>
               </MenuItem>
             ))}

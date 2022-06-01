@@ -26,8 +26,8 @@ const { TextField } = Form
 
 const StreamJAR = () => {
   const {
-    workFlowStore,
-    workFlowStore: { curVersion }
+    dtsDevStore,
+    dtsDevStore: { curVersion }
   } = useStore()
   const readOnly = !!curVersion
 
@@ -105,14 +105,14 @@ const StreamJAR = () => {
   }
 
   useUnmount(() => {
-    workFlowStore.set({
+    dtsDevStore.set({
       showNotify: false
     })
   })
 
   const handleReleaseSuccess = () => {
     toggleShow(false)
-    workFlowStore.set({
+    dtsDevStore.set({
       showNotify: true
     })
   }
@@ -285,7 +285,7 @@ const StreamJAR = () => {
             okText="调度配置"
             onOk={() => {
               // setShowScheSettingModal(true)
-              workFlowStore.set({ showScheSetting: true })
+              dtsDevStore.set({ showScheSetting: true })
               toggleScheModal(false)
             }}
           >

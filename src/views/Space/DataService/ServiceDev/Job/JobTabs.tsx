@@ -17,7 +17,7 @@ import StreamJAR from '../Stream/StreamJAR'
 import SyncJob from '../Sync/SyncJob'
 import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
 
-const { TabPanel } = Tabs
+const { TabPanel } = Tabs as any
 
 const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full flex flex-col`,
@@ -72,8 +72,8 @@ const JobTabs = observer(() => {
   const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const notifyTmRef = useRef<any>(null)
   const {
-    workFlowStore,
-    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify }
+    dtsDevStore,
+    dtsDevStore: { curJob, panels, addPanel, removePanel, showNotify }
   } = useStore()
 
   const added = curJob && findIndex(panels, (p) => p.id === curJob.id) > -1
@@ -90,19 +90,19 @@ const JobTabs = observer(() => {
         clearTimeout(notifyTmRef.current)
       }
       notifyTmRef.current = setTimeout(() => {
-        workFlowStore.set({
+        dtsDevStore.set({
           showNotify: false
         })
       }, 5000)
     }
-  }, [showNotify, notifyTmRef, workFlowStore])
+  }, [showNotify, notifyTmRef, dtsDevStore])
 
   useUpdateEffect(() => {
-    workFlowStore.set({ panels: [], curJob: null })
-  }, [spaceId, workFlowStore])
+    dtsDevStore.set({ panels: [], curJob: null })
+  }, [spaceId, dtsDevStore])
 
   useUnmount(() => {
-    workFlowStore.set({ panels: [], curJob: null, curViewJobId: null })
+    dtsDevStore.set({ panels: [], curJob: null, curViewJobId: null })
   })
 
   const getTag = (job) => {
@@ -167,17 +167,17 @@ const JobTabs = observer(() => {
         type="card"
         activeName={curJob?.id}
         onChange={(name) => {
-          if (workFlowStore.isDirty) {
-            workFlowStore.showSaveConfirm(name, 'switch')
+          if (dtsDevStore.isDirty) {
+            dtsDevStore.showSaveConfirm(name, 'switch')
           } else {
-            workFlowStore.set({
+            dtsDevStore.set({
               curJob: panels.find((p) => p.id === name)
             })
           }
         }}
         onClose={(name: string) => {
-          if (workFlowStore.isDirty) {
-            workFlowStore.showSaveConfirm(name, 'close')
+          if (dtsDevStore.isDirty) {
+            dtsDevStore.showSaveConfirm(name, 'close')
           } else {
             removePanel(name)
           }

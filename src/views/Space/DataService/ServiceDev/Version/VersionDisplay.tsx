@@ -4,7 +4,7 @@ import StreamJAR from '../Stream/StreamJAR'
 
 const VersionDisplay = () => {
   const {
-    workFlowStore: { curVersion }
+    dtsDevStore: { curVersion }
   } = useStore()
   return (
     <div tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
