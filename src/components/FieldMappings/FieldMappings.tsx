@@ -181,6 +181,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             name: c.name,
             default: c.value,
             formatter: c.format,
+            custom: true,
             uuid,
           }
         })
@@ -203,6 +204,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             name: c.name,
             default: c.value,
             formatter: c.format,
+            custom: true,
             uuid,
           }
         })
