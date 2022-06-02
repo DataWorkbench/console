@@ -26,7 +26,8 @@ import {
   ftpProtocolValue,
   hiveAnonymousFilters,
   hivePwdFilters,
-  sftpFilters,
+  sftpFiltersWithKey,
+  sftpFiltersWithPwd,
   sFtpProtocolValue,
   SourceType,
 } from './constant'
@@ -182,7 +183,10 @@ const DataSourceForm = ({
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
     if (urlType === 'ftp') {
       if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
-        return sftpFilters
+        if (get(sourceInfo, 'url.ftp.auth_mode') === 2) {
+          return sftpFiltersWithPwd
+        }
+        return sftpFiltersWithKey
       }
       return ftpFilters
     }
@@ -238,7 +242,7 @@ const DataSourceForm = ({
 
   const handleChange = {
     ftp_protocol: (onChange?: Function) => (type: number) => {
-      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFilters)
+      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFiltersWithPwd)
       setFtpProtocol(type)
       if (!ftpPortConfig.changed) {
         setFtpPortConfig((_) => {
@@ -246,6 +250,13 @@ const DataSourceForm = ({
         })
       }
       onChange?.(type)
+    },
+    ftp_auth_mode: () => (type: number) => {
+      if (type === 2) {
+        setFilters(sftpFiltersWithKey)
+      } else {
+        setFilters(sftpFiltersWithPwd)
+      }
     },
     ftp_port: (onChange?: Function) => (v: number) => {
       setFtpPortConfig((_) => {

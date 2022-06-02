@@ -8,6 +8,7 @@ import { getKvTextAreaFieldByMap } from 'components/KVTextArea'
 import { ReactElement } from 'react'
 import {
   compInfo,
+  ftpAuthMode,
   ftpConnectionMode,
   ftpProtocol,
   hadoopLink,
@@ -464,6 +465,25 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             },
           ],
         },
+
+        {
+          fieldType: 'dbUrl',
+          label: '主机别名和端口（Host : Port）',
+          name: '__dbUrl',
+          space: [':'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：ftp://127.0.0.1:21',
+              placeholder: '请输入 FTP 的主机别名（Host）',
+            },
+            {
+              ...port,
+              label: null,
+            },
+          ],
+        },
         {
           name: 'connection_mode',
           label: '连接模式 （Connection Mode）',
@@ -475,6 +495,21 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                 required: true,
               },
               help: '请选择连接模式',
+              status: 'error',
+            },
+          ],
+        },
+        {
+          name: 'auth_mode',
+          label: '认证方式',
+          component: RadioGroupField,
+          options: Object.values(ftpAuthMode),
+          schemas: [
+            {
+              rule: {
+                required: true,
+              },
+              help: '请选择认证方式',
               status: 'error',
             },
           ],
@@ -504,24 +539,6 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
               },
               help: '最大长度: 2048, 最小长度: 1',
               status: 'error',
-            },
-          ],
-        },
-        {
-          fieldType: 'dbUrl',
-          label: '主机别名和端口（Host : Port）',
-          name: '__dbUrl',
-          space: [':'],
-          items: [
-            {
-              ...host,
-              label: null,
-              help: '例：ftp://127.0.0.1:21',
-              placeholder: '请输入 FTP 的主机别名（Host）',
-            },
-            {
-              ...port,
-              label: null,
             },
           ],
         },
@@ -918,6 +935,18 @@ export const source2DBStrategy = [
 ]
 
 export const sourceStrategy = [
+  {
+    key: 'sftp.auth_mode',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Ftp && name === 'auth_mode'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.ftp.private_key')) {
+        return 2
+      }
+      return 1
+    },
+  },
   {
     key: 'hive.hiveAuth',
     check: (type: SourceType, name: string) => {
