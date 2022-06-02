@@ -488,6 +488,7 @@ const SyncJob = () => {
                   targetId={db.target?.id}
                   ref={clusterRef}
                   clusterId={get(confData, 'cluster_id')}
+                  defaultClusterName={get(confData, 'cluster_info.name')}
                 />
               )}
               {index === 3 && (
