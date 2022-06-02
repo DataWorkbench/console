@@ -483,7 +483,7 @@ const SyncDataSource = observer(
                         </HelpCenterLink>{' '}
                         页面配置
                       </div>
-                    ),
+                    ) as any,
                   }
                 : {})}
               schemas={[

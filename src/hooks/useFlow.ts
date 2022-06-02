@@ -31,8 +31,13 @@ import {
   streamJobCodeSyntax,
   streamJobCodeRun,
 } from 'stores/api'
+import { apiRequest } from 'utils/api'
+import { merge } from 'lodash-es'
 import { SyncJobDevManageGenerateJobJsonType } from '../types/response'
-import { GenerateJobJsonRequestType } from '../types/request'
+import {
+  ConvertSyncJobModeRequestType,
+  GenerateJobJsonRequestType,
+} from '../types/request'
 
 import { apiHooks, queryKeyObj } from './apiHooks'
 
@@ -322,7 +327,7 @@ export const useQueryStreamJobArgs = (options?: UseQueryOptions) => {
     key,
     async () =>
       getStreamJobArgs({ ...params, regionId, spaceId, jobId: curJob?.id }),
-    options
+    options as any
   )
 }
 
@@ -437,3 +442,13 @@ export const useQueryGenerateJobJson = apiHooks<
 >('syncJobDevManage', 'generateJobJson')
 
 export const getQueryKeyGenerateJobJson = () => queryKeyObj.generateJobJson
+
+export const useMutationSyncJobConvert = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  return useMutation(async (params: ConvertSyncJobModeRequestType) =>
+    apiRequest(
+      'syncJobDevManage',
+      'convertSyncJobMode'
+    )(merge({ regionId, uri: { space_id: spaceId } }, params))
+  )
+}

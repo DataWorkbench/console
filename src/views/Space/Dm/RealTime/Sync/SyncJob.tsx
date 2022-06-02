@@ -10,6 +10,7 @@ import Editor from 'react-monaco-editor'
 import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
   useMutationSyncJobConf,
+  useMutationSyncJobConvert,
   useQueryGenerateJobJson,
   useQueryJobSchedule,
   useQuerySyncJobConf,
@@ -286,6 +287,7 @@ const SyncJob = () => {
     isValidateSource?: boolean
   ) => {
     if (
+      mode === 1 &&
       isSubmit &&
       (!dbRef.current ||
         !mappingRef.current ||
@@ -295,78 +297,93 @@ const SyncJob = () => {
       return
     }
 
-    const resource = dbRef.current!.getResource()
-    const mapping = mappingRef.current!.rowMapping()
-    const sourceTypeNames = dbRef.current!.getTypeNames()
-    const cluster = clusterRef.current!.getCluster()
-    const channel = channelRef.current!.getChannel()
+    const resource = dbRef.current?.getResource() ?? {}
+    const mapping = mappingRef.current?.rowMapping() ?? []
+    const sourceTypeNames = dbRef.current?.getTypeNames() ?? []
+    const cluster = clusterRef.current?.getCluster()
+    const channel = channelRef.current?.getChannel() ?? {}
+    const syncJobScript = editorRef.current?.getValue() ?? ''
 
     try {
-      if (!resource && isValidateSource) {
-        showConfWarn('未配置数据源信息')
-        return
-      }
-      set(
-        resource,
-        `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
-        mapping[0]
-      )
-      set(
-        resource,
-        `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-        mapping[1]
-      )
+      if (mode === 2) {
+        if (typeof JSON.parse(syncJobScript) !== 'object') {
+          showConfWarn('脚本格式不正确')
+          return
+        }
+        set(resource, 'job_content', JSON.stringify(JSON.parse(syncJobScript)))
+      } else {
+        set(resource, 'job_content', '')
 
-      set(resource, 'cluster_id', cluster.id)
-      set(resource, 'job_mode', 1)
-      set(resource, 'job_content', '')
-      set(resource, 'channel_control', channel)
+        if (!resource && isValidateSource) {
+          showConfWarn('未配置数据源信息')
+          return
+        }
+        set(
+          resource,
+          `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
+          mapping[0]
+        )
+        set(
+          resource,
+          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+          mapping[1]
+        )
+
+        set(resource, 'channel_control', channel)
+      }
     } catch (e) {
       // showConfWarn(e.message)
       // return
     }
     const filterResouce = removeUndefined(resource)
+
+    set(filterResouce, 'job_mode', mode)
+    set(filterResouce, 'cluster_id', cluster?.id)
+
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
         if (isSubmit) {
-          if (!resource) {
-            showConfWarn('未配置数据源信息')
-            return
-          }
-          if (!mapping) {
-            showConfWarn('未配置字段映射信息')
-            return
-          }
           if (!cluster) {
             showConfWarn('未配置计算集群信息')
             return
           }
-          // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
-          //   showConfWarn('计算集群连通性未测试或者未通过测试')
-          //   return
-          // }
-          if (!channel) {
-            showConfWarn('未配置通道控制信息')
-            return
-          }
+          if (mode === 1) {
+            if (!resource) {
+              showConfWarn('未配置数据源信息')
+              return
+            }
+            if (!mapping) {
+              showConfWarn('未配置字段映射信息')
+              return
+            }
 
-          if (channel.rate && !channel.bytes) {
-            showConfWarn('通道控制未配置同步速率限流字节数')
-            return
-          }
+            // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
+            //   showConfWarn('计算集群连通性未测试或者未通过测试')
+            //   return
+            // }
+            if (!channel) {
+              showConfWarn('未配置通道控制信息')
+              return
+            }
 
-          // 如果并发数大于1  则切分键不能为空
-          const parallelism = get(resource, 'channel_control.parallelism', 0)
-          const splitKey = get(
-            Object.entries(resource.sync_resource ?? ({} as any)).find(([k]) =>
-              k.endsWith('_source')
-            )?.[1] ?? {},
-            'split_pk'
-          )
-          if (parallelism > 1 && !splitKey) {
-            showConfWarn('并发数大于1时，切分键不能为空')
-            return
+            if (parseInt(channel?.rate, 10) === 1 && !channel.bytes) {
+              showConfWarn('通道控制未配置同步速率限流字节数')
+              return
+            }
+
+            // 如果并发数大于1  则切分键不能为空
+            const parallelism = get(resource, 'channel_control.parallelism', 0)
+            const splitKey = get(
+              Object.entries(resource.sync_resource ?? ({} as any)).find(
+                ([k]) => k.endsWith('_source')
+              )?.[1] ?? {},
+              'split_pk'
+            )
+            if (parallelism > 1 && !splitKey) {
+              showConfWarn('并发数大于1时，切分键不能为空')
+              return
+            }
           }
         }
         if (cb) {
@@ -527,11 +544,61 @@ const SyncJob = () => {
                 </>
               }
             >
-              <SyncCluster />
+              <SyncCluster
+                ref={clusterRef}
+                clusterId={get(confData, 'cluster_id')}
+              />
             </CollapseItem>
           </Collapse>
         </CollapseWrapper>
       </div>
+    )
+  }
+  const mutationConvert = useMutationSyncJobConvert()
+  const handleConvert = () => {
+    if (
+      !dbRef.current ||
+      !mappingRef.current ||
+      !clusterRef.current ||
+      !channelRef.current
+    ) {
+      return
+    }
+
+    const resource = dbRef.current.getResource()
+    const mapping = mappingRef.current!.rowMapping()
+    const sourceTypeNames = dbRef.current!.getTypeNames()
+    const cluster = clusterRef.current?.getCluster()
+    const channel = channelRef.current!.getChannel()
+
+    try {
+      set(
+        resource,
+        `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
+        mapping[0]
+      )
+      set(
+        resource,
+        `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+        mapping[1]
+      )
+
+      set(resource, 'cluster_id', cluster.id)
+      set(resource, 'job_mode', 1)
+      set(resource, 'job_content', '')
+      set(resource, 'channel_control', channel)
+    } catch (e) {
+      // showConfWarn(e.message)
+      // return
+    }
+    const filterResouce = removeUndefined(resource)
+    mutationConvert.mutate(
+      { data: { conf: filterResouce }, uri: { job_id: curJob?.id! } },
+      {
+        onSuccess: () => {
+          setMode(2)
+        },
+      }
     )
   }
 
@@ -550,10 +617,10 @@ const SyncJob = () => {
               </>
             }
             okText="转变"
-            onOk={() => {
-              save(false, () => setMode(2), true)
-              // setMode(2)
-            }}
+            onOk={handleConvert}
+            // onOk={() => {
+            //   save(false, () => setMode(2), false)
+            // }}
           >
             <Button type="black">
               <Icon name="coding" type="light" />
