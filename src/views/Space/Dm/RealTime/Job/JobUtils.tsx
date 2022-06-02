@@ -75,18 +75,18 @@ export type DataSourceType =
   | 'Redis'
   | 'ElasticSearch'
 
-export const dataSourceTypes: { [key in DataSourceType]?: number } = {
-  MySQL: 1,
+export const dataSourceTypes: { [key in string]?: number } = {
+  mysql: 1,
   // TIDB: 2,
   // Kafka: 3,
   // S3: 4,
-  ClickHouse: 5,
+  click_house: 5,
   // HBase: 6,
   // FTP: 7,
   // HDFS: 8,
-  SQLServer: 9,
+  sqlserver: 9,
   // Oracle: 10,
-  PostgreSQL: 2,
+  postgresql: 2,
   // DB2: 11,
   // 'SAP HANA': 12,
   // Hive: 13,

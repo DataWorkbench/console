@@ -158,6 +158,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
             <InputNumber
               showButton={false}
               step={1}
+              min={-1}
               value={(channel.record_num as number) || undefined}
               onChange={(v) => {
                 const num = +v
