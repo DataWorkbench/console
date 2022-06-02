@@ -207,14 +207,14 @@ export const dataReleaseSuggestions: ISuggestion[] = [
       key: value,
     })),
   },
-  {
-    label: '作业类型',
-    key: 'type',
-    options: Object.values(jobType).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
+  // {
+  //   label: '作业类型',
+  //   key: 'type',
+  //   options: Object.values(jobType).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
   {
     label: '来源',
     key: 'source',

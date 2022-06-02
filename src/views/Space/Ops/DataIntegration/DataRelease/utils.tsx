@@ -3,7 +3,7 @@
 import { MoreAction } from 'components'
 import dayjs from 'dayjs'
 import React from 'react'
-import { pick } from 'lodash-es'
+import { get, pick } from 'lodash-es'
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import {
@@ -94,15 +94,6 @@ export const getColumnsRender = (
       render: (text: string) => <span tw="text-neut-8">{text}</span>,
     },
     type: {
-      onFilter: (v: string) => {
-        setFilter((draft) => {
-          draft.type = v
-          draft.offset = 0
-        })
-      },
-      filter: filter.type,
-      filterAble: true,
-      filtersNew: Object.values(jobType) as any,
       render: (text: keyof typeof jobType, record: Record<string, any>) => {
         if (record.__level > 1) {
           return null
@@ -126,7 +117,7 @@ export const getColumnsRender = (
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
         record.__level === 1 ? (
           <DbTypeCmp
-            type={text as any}
+            type={get(record, 'sync_job.source_type', '')}
             onClick={() => actions?.source(record)}
           />
         ) : null,
@@ -147,7 +138,7 @@ export const getColumnsRender = (
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
         record.__level === 1 ? (
           <DbTypeCmp
-            type={text as any}
+            type={get(record, 'sync_job.target_type', '')}
             onClick={() => actions?.target(record)}
           />
         ) : null,

@@ -73,6 +73,7 @@ const DataRelease = observer(() => {
       status?: number
       offset: number
       limit: number
+      verbose?: number
     },
     { pagination: true; sort: true }
   >(
