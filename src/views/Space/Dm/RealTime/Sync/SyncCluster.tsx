@@ -11,14 +11,21 @@ interface SyncClusterProps {
   sourceId?: string
   targetId?: string
   clusterId?: string
+  defaultClusterName?: string
 }
 
 const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
-  const { onChange, sourceId, targetId, clusterId: clusterIdProps } = props
+  const {
+    onChange,
+    sourceId,
+    targetId,
+    clusterId: clusterIdProps,
+    defaultClusterName = '',
+  } = props
   const [visible, setVisible] = useState(false)
   const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
-  const clusterName = get(cluster, 'name', '')
+  const clusterName = get(cluster, 'name', defaultClusterName)
   const enablePing = !!(sourceId && targetId && clusterId)
   const mutation = useMutationPingSyncJobConnection()
   useEffect(() => {
