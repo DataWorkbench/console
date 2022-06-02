@@ -87,6 +87,7 @@ export const useMutationJobRelease = (options?: {}, type = JobMode.DI) => {
         regionId,
         action: op1,
         jobMode,
+        job_id: rest.jobId ?? rest.job_id,
       })
       return ret
     }
