@@ -85,10 +85,10 @@ export const dataJobInstanceSuggestions: ISuggestion[] = [
   //     key: value,
   //   })),
   // },
-  {
-    label: '作业名称',
-    key: 'job_name',
-  },
+  // {
+  //   label: '作业名称',
+  //   key: 'job_name',
+  // },
   {
     label: '实例 ID',
     key: 'instance_id',
@@ -199,38 +199,38 @@ export const dataReleaseSuggestions: ISuggestion[] = [
   //     key: value,
   //   })),
   // },
-  {
-    label: '开发模式',
-    key: 'job_mode',
-    options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
-  {
-    label: '作业类型',
-    key: 'type',
-    options: Object.values(jobType).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
-  {
-    label: '来源',
-    key: 'source',
-    options: Object.entries(sourceTypes).map(([key, value]) => ({
-      label: value,
-      key,
-    })),
-  },
-  {
-    label: '目的',
-    key: 'target',
-    options: Object.entries(sourceTypes).map(([key, value]) => ({
-      label: value,
-      key,
-    })),
-  },
+  // {
+  //   label: '开发模式',
+  //   key: 'job_mode',
+  //   options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
+  // {
+  //   label: '作业类型',
+  //   key: 'type',
+  //   options: Object.values(jobType).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
+  // {
+  //   label: '来源',
+  //   key: 'source',
+  //   options: Object.entries(sourceTypes).map(([key, value]) => ({
+  //     label: value,
+  //     key,
+  //   })),
+  // },
+  // {
+  //   label: '目的',
+  //   key: 'target',
+  //   options: Object.entries(sourceTypes).map(([key, value]) => ({
+  //     label: value,
+  //     key,
+  //   })),
+  // },
 ]
 export const dataReleaseTabs: ITab[] = [
   {
