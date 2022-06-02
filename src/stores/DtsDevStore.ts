@@ -21,10 +21,16 @@ const initTreeData = [
   {
     key: 'di-root',
     pid: 'di-root',
-    jobMode: 'DI',
     title: 'API组',
     isLeaf: false,
-    children: []
+    children: [
+      {
+        key: 'di-root2',
+        pid: 'di-root',
+        title: 'API',
+        isLeaf: true
+      }
+    ]
   }
 ]
 

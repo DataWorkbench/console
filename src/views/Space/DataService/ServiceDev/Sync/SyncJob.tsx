@@ -1,21 +1,14 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { HelpCenterLink, FieldMappings, PopConfirm } from 'components'
-import tw, { css, styled, theme } from 'twin.macro'
-import { useImmer } from 'use-immer'
-import { nanoid } from 'nanoid'
-import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import Editor from 'react-monaco-editor'
-import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
-import { useMutationSyncJobConf, useQueryJobSchedule, useQuerySyncJobConf, useStore } from 'hooks'
+import { HelpCenterLink } from 'components'
+import tw, { css, styled } from 'twin.macro'
+import { useRef, useState } from 'react'
+import { isArray, isObject, isUndefined, set } from 'lodash-es'
+import { useMutationSyncJobConf, useStore } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
-import SyncDataSource from './SyncDataSource'
-import SyncCluster from './SyncCluster'
-import SyncChannel from './SyncChannel'
 import ReleaseModal from '../Modal/ReleaseModal'
-import { dataSourceTypes } from '../Job/JobUtils'
+import SyncDataSource from './SyncDataSource'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -58,18 +51,13 @@ const stepsData = [
   },
   {
     key: 'p1',
-    title: '字段映射',
+    title: '字段设置',
     desc: null
   },
   {
     key: 'p2',
-    title: '计算集群',
+    title: '字段排序',
     desc: null
-  },
-  {
-    key: 'p3',
-    title: '通道控制',
-    desc: <>您可以配置作业的传输速率和错误记录来控制整个数据同步过程</>
   }
 ]
 
@@ -85,31 +73,25 @@ const removeUndefined = (obj: any) => {
   return newObj
 }
 
-interface DbInfo {
-  id?: string
-  tableName?: string
-  fields?: TMappingField[]
-}
-
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
-  const { data: scheData } = useQueryJobSchedule()
+  // const { data: scheData } = useQueryJobSchedule()
   const { dtsDevStore } = useStore()
-  const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
+  // const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
 
   const {
     dtsDevStore: { curJob }
   } = useStore()
 
-  const [db, setDb] = useImmer<{
-    source: DbInfo
-    target: DbInfo
-  }>({
-    source: { id: get(confData, 'source_id') },
-    target: { id: get(confData, 'target_id') }
-  })
+  console.log(curJob)
 
-  const [mode, setMode] = useState<1 | 2>(1)
+  // const [db, setDb] = useImmer<{
+  //   source: DbInfo
+  //   target: DbInfo
+  // }>({
+  //   source: { id: '' },
+  //   target: { id: '' }
+  // })
   const [showRelaseModal, setShowRelaseModal] = useState(false)
   // const [mappings, setMappings] = useState([])
 
@@ -131,48 +113,48 @@ const SyncJob = () => {
     useRef<{
       getChannel: () => Record<string, string>
     }>(null)
-  const enableRelease = get(scheData, 'schedule_policy') !== 0
+  // const enableRelease = get(scheData, 'schedule_policy') !== 0
 
-  const [sourceTypeName, targetTypeName] = useMemo(() => {
-    const sourceType = curJob?.source_type
-    const targetType = curJob?.target_type
-    return [
-      findKey(dataSourceTypes, (v) => v === sourceType),
-      findKey(dataSourceTypes, (v) => v === targetType)
-    ]
-  }, [curJob])
+  // const [sourceTypeName, targetTypeName] = useMemo(() => {
+  //   const sourceType = curJob?.source_type
+  //   const targetType = curJob?.target_type
+  //   return [
+  //     findKey(dataSourceTypes, (v) => v === sourceType),
+  //     findKey(dataSourceTypes, (v) => v === targetType)
+  //   ]
+  // }, [curJob])
 
-  const sourceColumn = useMemo(() => {
-    if (confData && db.source.tableName && sourceTypeName) {
-      const source = get(confData, `sync_resource.${sourceTypeName?.toLowerCase()}_source`)
-      const table = get(source, 'table[0]')
-      if (source && table === db.source.tableName) {
-        return get(source, 'column')
-      }
-    }
-    return []
-  }, [confData, sourceTypeName, db.source.tableName])
+  // const sourceColumn = useMemo(() => {
+  //   if (confData && db.source.tableName && sourceTypeName) {
+  //     const source = get(confData, `sync_resource.${sourceTypeName?.toLowerCase()}_source`)
+  //     const table = get(source, 'table[0]')
+  //     if (source && table === db.source.tableName) {
+  //       return get(source, 'column')
+  //     }
+  //   }
+  //   return []
+  // }, [confData, sourceTypeName, db.source.tableName])
 
-  const targetColumn = useMemo(() => {
-    if (confData && db.target.tableName && targetTypeName) {
-      const source = get(confData, `sync_resource.${targetTypeName?.toLowerCase()}_target`)
-      const table = get(source, 'table[0]')
-      if (source && table === db.target.tableName) {
-        return get(source, 'column')
-      }
-    }
-    return []
-  }, [confData, targetTypeName, db.target.tableName])
+  // const targetColumn = useMemo(() => {
+  //   if (confData && db.target.tableName && targetTypeName) {
+  //     const source = get(confData, `sync_resource.${targetTypeName?.toLowerCase()}_target`)
+  //     const table = get(source, 'table[0]')
+  //     if (source && table === db.target.tableName) {
+  //       return get(source, 'column')
+  //     }
+  //   }
+  //   return []
+  // }, [confData, targetTypeName, db.target.tableName])
 
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
-  useEffect(() => {
-    setDb((draft) => {
-      draft.source.id = get(confData, 'source_id')
-      draft.target.id = get(confData, 'target_id')
-    })
-  }, [confData, setDb])
+  // useEffect(() => {
+  //   setDb((draft) => {
+  //     draft.source.id = get(confData, 'source_id')
+  //     draft.target.id = get(confData, 'target_id')
+  //   })
+  // }, [confData, setDb])
   // useEffect(() => {
   //   if (confData && sourceTypeName && targetTypeName) {
   //     // const sourceColumn =
@@ -206,20 +188,6 @@ const SyncJob = () => {
   // }, [confData, sourceTypeName, targetTypeName, setDb])
 
   // console.log(db, fields)
-  const handleEditorWillMount = (monaco: any) => {
-    monaco.editor.defineTheme('my-theme', {
-      base: 'vs-dark',
-      inherit: true,
-      rules: [],
-      colors: {
-        'editor.background': theme('colors.neut.18')
-      }
-    })
-  }
-
-  const handleEditorDidMount = (editor: any) => {
-    editor.focus()
-  }
 
   const showConfWarn = (content: string) => {
     Notify.warning({
@@ -273,7 +241,6 @@ const SyncJob = () => {
     // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
-        confRefetch()
         Notify.success({
           title: '操作提示',
           content: '配置保存成功',
@@ -283,17 +250,17 @@ const SyncJob = () => {
     })
   }
   const release = () => {
-    if (!enableRelease) {
-      dtsDevStore.set({ showScheSetting: true })
-    } else {
-      setShowRelaseModal(true)
-    }
+    // if (!enableRelease) {
+    //   dtsDevStore.set({ showScheSetting: true })
+    // } else {
+    //   setShowRelaseModal(true)
+    // }
   }
 
-  const columns = useMemo<[any, any]>(
-    () => [sourceColumn, targetColumn],
-    [sourceColumn, targetColumn]
-  )
+  // const columns = useMemo<[any, any]>(
+  //   () => [sourceColumn, targetColumn],
+  //   [sourceColumn, targetColumn]
+  // )
 
   const renderGuideMode = () => (
     <CollapseWrapper>
@@ -311,132 +278,16 @@ const SyncJob = () => {
               </>
             }
           >
-            {index === 0 && (
-              <SyncDataSource
-                ref={dbRef}
-                onSelectTable={(tp, tableName, data) => {
-                  const fieldData = data.map((field) => ({
-                    ...field,
-                    uuid: nanoid()
-                  })) as TMappingField[]
-                  setDb((draft) => {
-                    const soruceInfo = draft[tp]
-                    soruceInfo.tableName = tableName
-                    soruceInfo.fields = fieldData
-                  })
-                }}
-                onDbChange={(tp: 'source' | 'target', data) => {
-                  setDb((draft) => {
-                    draft[tp] = data
-                  })
-                }}
-                conf={confData}
-              />
-            )}
-            {index === 1 && (
-              <FieldMappings
-                ref={mappingRef}
-                // mappings={mappings}
-                leftFields={db.source.fields || []}
-                rightFields={db.target.fields || []}
-                leftTypeName={sourceTypeName}
-                // rightTypeName={targetTypeName}
-                columns={columns}
-                topHelp={
-                  <HelpCenterLink href="/xxx" isIframe={false}>
-                    字段映射说明文档
-                  </HelpCenterLink>
-                }
-              />
-            )}
-            {index === 2 && (
-              <SyncCluster
-                sourceId={db.source?.id}
-                targetId={db.target?.id}
-                ref={clusterRef}
-                clusterId={get(confData, 'cluster_id')}
-              />
-            )}
-            {index === 3 && (
-              <SyncChannel ref={channelRef} channelControl={get(confData, 'channel_control')} />
-            )}
+            {index === 0 && <SyncDataSource />}
           </CollapseItem>
         ))}
       </Collapse>
     </CollapseWrapper>
   )
 
-  const renderScriptMode = () => {
-    const step = stepsData[2]
-    return (
-      <>
-        <div tw="pt-2 flex-1 pb-[68px] h-[calc(100%-64px)] overflow-y-auto">
-          <Editor
-            language="json"
-            defaultValue=""
-            theme="my-theme"
-            options={{
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              automaticLayout: true
-              // readOnly: false,
-            }}
-            editorWillMount={handleEditorWillMount}
-            editorDidMount={handleEditorDidMount}
-            // onChange={handleEditorChange}
-          />
-        </div>
-        <CollapseWrapper tw="flex-none absolute bottom-0 left-0 w-full">
-          <Collapse>
-            <CollapseItem
-              key={step.key}
-              label={
-                <>
-                  <div css={styles.stepTag}>
-                    <span css={styles.stepText}>{step.title}</span>
-                  </div>
-                  <div tw="text-neut-13">{step.desc}</div>
-                </>
-              }
-            >
-              <SyncCluster />
-            </CollapseItem>
-          </Collapse>
-        </CollapseWrapper>
-      </>
-    )
-  }
-
   return (
     <div tw="flex flex-col flex-1 relative">
       <JobToolBar>
-        {mode === 1 ? (
-          <PopConfirm
-            type="warning"
-            content={
-              <>
-                <div tw="text-base font-medium">确认转变为脚本模式？</div>
-                <div tw="text-neut-8 mt-2">
-                  一旦数据集成过程由向导转变为脚本模式，不可逆转，且来源、目的数据源需要和向导模式保持一致，确认转变为脚本模式么？
-                </div>
-              </>
-            }
-            okText="转变"
-            onOk={() => {
-              setMode(2)
-            }}
-          >
-            <Button type="black">
-              <Icon name="coding" type="light" />
-              脚本模式
-            </Button>
-          </PopConfirm>
-        ) : (
-          <Button>
-            <Icon name="remark" type="dark" />
-            语法检查
-          </Button>
-        )}
         <Button onClick={save} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存
@@ -445,7 +296,7 @@ const SyncJob = () => {
         <Button
           type="primary"
           onClick={release}
-          disabled={!enableRelease}
+          // disabled={!enableRelease}
           // disabled={get(confData, 'source_id') === '' && enableRelease}
         >
           <Icon name="export" />
@@ -453,7 +304,7 @@ const SyncJob = () => {
         </Button>
       </JobToolBar>
       <div tw="flex-1 overflow-hidden">
-        <SimpleBar tw="h-full">{mode === 1 ? renderGuideMode() : renderScriptMode()}</SimpleBar>
+        <SimpleBar tw="h-full">{renderGuideMode()}</SimpleBar>
       </div>
       {showRelaseModal && (
         <ReleaseModal

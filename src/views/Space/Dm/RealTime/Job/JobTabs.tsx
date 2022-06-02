@@ -65,16 +65,15 @@ const TabWrapper = styled(Tabs)(() => [
         ${tw`flex h-full`}
       }
     }
-  `,
+  `
 ])
 
 const JobTabs = observer(() => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const notifyTmRef = useRef<any>(null)
   const {
     workFlowStore,
-    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify },
+    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify }
   } = useStore()
 
   const added = curJob && findIndex(panels, (p) => p.id === curJob.id) > -1
@@ -92,7 +91,7 @@ const JobTabs = observer(() => {
       }
       notifyTmRef.current = setTimeout(() => {
         workFlowStore.set({
-          showNotify: false,
+          showNotify: false
         })
       }, 5000)
     }
@@ -115,7 +114,7 @@ const JobTabs = observer(() => {
           2: 'Sql',
           3: 'Jar',
           4: 'Python',
-          5: 'Scala',
+          5: 'Scala'
         },
         job.type
       )
@@ -124,10 +123,7 @@ const JobTabs = observer(() => {
       const tp = getDiJobType(job.type)
       return (
         <IconWrapper theme="grey">
-          <Icons
-            name={tp === JobType.OFFLINE ? 'DownloadBoxFill' : 'LayerFill'}
-            size={16}
-          />
+          <Icons name={tp === JobType.OFFLINE ? 'DownloadBoxFill' : 'LayerFill'} size={16} />
         </IconWrapper>
       )
     }
@@ -147,7 +143,7 @@ const JobTabs = observer(() => {
                   size={20}
                   tw="mr-2"
                   color={{
-                    secondary: theme('colors.green.11'),
+                    secondary: theme('colors.green.11')
                   }}
                 />
                 <div tw="pointer-events-auto">
@@ -175,7 +171,7 @@ const JobTabs = observer(() => {
             workFlowStore.showSaveConfirm(name, 'switch')
           } else {
             workFlowStore.set({
-              curJob: panels.find((p) => p.id === name),
+              curJob: panels.find((p) => p.id === name)
             })
           }
         }}
@@ -194,10 +190,7 @@ const JobTabs = observer(() => {
             closable
             label={
               <div tw="inline-flex items-center justify-center">
-                <div
-                  tw="scale-75"
-                  className={job.jobMode === JobMode.RT ? 'tag' : ''}
-                >
+                <div tw="scale-75" className={job.jobMode === JobMode.RT ? 'tag' : ''}>
                   {getTag(job)}
                 </div>
                 <div>{job.name}</div>

@@ -4,16 +4,11 @@ import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { findIndex, get } from 'lodash-es'
 import { useParams } from 'react-router-dom'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import { DndProvider } from 'react-dnd'
 import tw, { theme, css, styled } from 'twin.macro'
 
 import { useStore } from 'stores'
 import { RouterLink, Icons } from 'components'
 
-import StreamOperator from '../Stream/StreamOperator'
-import StreamCode from '../Stream/StreamCode'
-import StreamJAR from '../Stream/StreamJAR'
 import SyncJob from '../Sync/SyncJob'
 import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
 
@@ -199,25 +194,9 @@ const JobTabs = observer(() => {
           >
             {(() => {
               const jobMode = get(job, 'jobMode') as JobMode
-              if (jobMode === JobMode.RT) {
-                if (job.type === 1) {
-                  return (
-                    <DndProvider backend={HTML5Backend}>
-                      <StreamOperator tw="flex-1 h-full" />
-                    </DndProvider>
-                  )
-                }
-                if ([2, 4, 5].includes(job.type)) {
-                  return <StreamCode tw="flex-1 h-full" tp={job.type as any} />
-                }
-                if (job.type === 3) {
-                  return <StreamJAR tw="flex-1 h-full" />
-                }
-              } else if (jobMode === JobMode.DI) {
-                return <SyncJob />
-              }
+              console.log(jobMode)
 
-              return null
+              return <SyncJob />
             })()}
           </TabPanel>
         ))}

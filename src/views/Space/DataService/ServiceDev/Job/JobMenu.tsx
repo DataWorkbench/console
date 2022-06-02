@@ -24,7 +24,7 @@ const JobMenu = observer((props: JobMenuProps) => {
   const [isOpenHelp, setIsOpenHelp] = useState(true)
   const [visible, setVisible] = useState<boolean>()
   const [showApiGroupModal, setShowApiGroupModal] = useState<boolean>()
-  const [showApiModal, setShowApiModal] = useState<boolean>(true)
+  const [showApiModal, setShowApiModal] = useState<boolean>()
   const showCreateModal = () => {
     setVisible(true)
   }

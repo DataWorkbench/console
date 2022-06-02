@@ -8,7 +8,7 @@ import { useMutationStreamJob, useFetchJob } from 'hooks'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { useUnmount } from 'react-use'
-import { get } from 'lodash-es'
+import { cloneDeep, get } from 'lodash-es'
 import { useStore } from 'stores'
 import { TreeNodeProps } from 'rc-tree'
 import { useParams } from 'react-router-dom'
@@ -20,6 +20,8 @@ import {
   renderIcon,
   renderSwitcherIcon
 } from './JobUtils'
+import ApiModal from '../Modal/ApiModal'
+import DelModal from '../Modal/DelModal'
 
 const { MenuItem } = Menu as any
 
@@ -63,6 +65,10 @@ export const JobTree = observer(
     const [selectedKeys, setSelectedKeys] = useState<string[]>([])
     const treeEl = useRef(null)
     const [visible, setVisible] = useState<any>(null)
+    const [curOp, setCurOp] = useState<string>('')
+    const [showApiModal, setShowApiModal] = useState<boolean>()
+    const [showDeleteModal, setShowDeleteModal] = useState<boolean>()
+
     const [search, setSearch] = useState('')
     const [jobInfo, setJobInfo] = useImmer<{
       op: 'create' | 'edit'
@@ -108,8 +114,6 @@ export const JobTree = observer(
     }))
 
     const onRightClick = useCallback(({ node }) => {
-      console.log(node)
-
       setCurOpNode(node)
       setVisible(false)
       setTimeout(() => {
@@ -118,7 +122,15 @@ export const JobTree = observer(
     }, [])
 
     const onRightMenuClick = useCallback((e, key: string, val: string | number) => {
-      console.log(e, key, val)
+      setCurOp(val)
+      if (val === 'createAPI') {
+        setShowApiModal(true)
+      } else if (val === 'deleteApiGroup') {
+        setShowDeleteModal(true)
+      } else if (val === 'deleteApi') {
+        setShowDeleteModal(true)
+      }
+      setVisible(false)
     }, [])
 
     const fetchJobTreeData = (node: any, movingNode = null) => {
@@ -142,6 +154,57 @@ export const JobTree = observer(
         })
     }
 
+    const renderRightMenu = useCallback(
+      (node) => {
+        if (!node) {
+          return null
+        }
+        if (!node.isLeaf) {
+          return (
+            <Menu onClick={onRightMenuClick}>
+              <MenuItem value="createAPI">
+                <Icon name="edit" size={14} type="light" />
+                <span>创建API</span>
+              </MenuItem>
+              <MenuItem value="deleteApiGroup">
+                <Icon name="delete" size={14} type="light" />
+                <span>删除</span>
+              </MenuItem>
+            </Menu>
+          )
+        }
+        return (
+          <Menu onClick={onRightMenuClick}>
+            <MenuItem value="createAPI">
+              <Icon name="edit" size={14} type="light" />
+              <span>编辑信息</span>
+            </MenuItem>
+            <MenuItem value="delete">
+              <Icon name="delete" size={14} type="light" />
+              <span>服务集群</span>
+            </MenuItem>
+            <MenuItem value="delete">
+              <Icon name="delete" size={14} type="light" />
+              <span>请求参数</span>
+            </MenuItem>
+            <MenuItem value="delete">
+              <Icon name="delete" size={14} type="light" />
+              <span>返回参数</span>
+            </MenuItem>
+            <MenuItem value="delete">
+              <Icon name="delete" size={14} type="light" />
+              <span>历史版本</span>
+            </MenuItem>
+            <MenuItem value="deleteApi">
+              <Icon name="delete" size={14} type="light" />
+              <span>删除</span>
+            </MenuItem>
+          </Menu>
+        )
+      },
+      [onRightMenuClick]
+    )
+
     useEffect(() => {
       dtsDevStore.resetTreeData()
     }, [spaceId, dtsDevStore])
@@ -160,16 +223,7 @@ export const JobTree = observer(
           duration={[100, 0]}
           offset={[5, 5]}
           appendTo={() => document.body}
-          content={
-            <div tw="border border-neut-13 rounded-sm">
-              <Menu onClick={onRightMenuClick}>
-                <MenuItem value="createAPI">
-                  <Icon name="edit" size={14} type="light" />
-                  <span>创建API</span>
-                </MenuItem>
-              </Menu>
-            </div>
-          }
+          content={<div tw="border border-neut-13 rounded-sm">{renderRightMenu(curOpNode)}</div>}
         >
           <TreeWrapper ref={treeEl}>
             <Tree
@@ -203,7 +257,13 @@ export const JobTree = observer(
                 }
               }}
               onSelect={(keys: (string | number)[], { selected, node }) => {
-                const job = get(node, 'job')
+                const job = {
+                  id: '111',
+                  name: 'api',
+                  type: 1,
+                  desc: 'dddd',
+                  version: '1.2'
+                }
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
                 }
@@ -214,7 +274,7 @@ export const JobTree = observer(
                 }
                 if (node.isLeaf) {
                   dtsDevStore.set({
-                    curJob: { ...job, jobMode: get(node, 'jobMode') }
+                    curJob: cloneDeep(job)
                   })
                 } else if (node.expanded) {
                   setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
@@ -229,6 +289,13 @@ export const JobTree = observer(
             />
           </TreeWrapper>
         </Tippy>
+        {showApiModal && <ApiModal onClose={() => setShowApiModal(false)} />}
+        {showDeleteModal && (
+          <DelModal
+            onClose={() => setShowDeleteModal(false)}
+            isApiGroup={curOp === 'deleteApiGroup'}
+          />
+        )}
       </>
     )
   },
