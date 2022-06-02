@@ -85,10 +85,10 @@ export const dataJobInstanceSuggestions: ISuggestion[] = [
   //     key: value,
   //   })),
   // },
-  {
-    label: '作业名称',
-    key: 'job_name',
-  },
+  // {
+  //   label: '作业名称',
+  //   key: 'job_name',
+  // },
   {
     label: '实例 ID',
     key: 'instance_id',

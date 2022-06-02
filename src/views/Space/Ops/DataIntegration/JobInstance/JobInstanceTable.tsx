@@ -253,7 +253,9 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       },
       filterAble: true,
       filtersNew: Object.values(jobType) as any,
-      render: (text: keyof typeof jobType) => <JobTypeCmp type={text} />,
+      render: (text: keyof typeof jobType, record: Record<string, any>) => (
+        <JobTypeCmp type={get(record, 'sync_job.type', '')} />
+      ),
     },
     created: {
       sortable: true,
