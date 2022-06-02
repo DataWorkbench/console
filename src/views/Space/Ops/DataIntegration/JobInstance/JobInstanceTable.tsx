@@ -37,6 +37,7 @@ import useFilter from 'hooks/useHooks/useFilter'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { describeFlinkUI } from 'stores/api'
 import { useParams } from 'react-router-dom'
+import { Modal } from '@QCFE/qingcloud-portal-ui'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -71,7 +72,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     settingKey,
     showHeader = true,
     defaultColumns,
-    filter: filterProp = {},
+    filter: filterProp,
     jumpDetail,
     setFatherFilter,
     type = JobMode.DI,
@@ -291,6 +292,29 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   const { spaceId, regionId } =
     useParams<{ spaceId: string; regionId: string }>()
 
+  const handleStop = (record: Record<string, any>) => {
+    Modal.warning({
+      title: `终止作业实例: ${record.id}`,
+      content: (
+        <div tw="text-neut-8">
+          实例终止后将取消运行，此操作无法撤回，您确定终止该实例吗？
+        </div>
+      ),
+      okType: 'danger',
+      okText: '终止',
+      confirmLoading: mutation.isLoading,
+      onOk: () => {
+        mutation
+          .mutateAsync({
+            op: 'terminate',
+            ids: [record.id],
+          })
+          .then(() => {
+            refetchData()
+          })
+      },
+    })
+  }
   const getActions = (
     status: JobInstanceStatusType,
     record: Record<string, any>
@@ -302,7 +326,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     const result = []
     if (status & stopAble) {
       result.push({
-        text: '中止',
+        text: '终止',
         icon: 'q-closeCircleFill',
         key: 'stop',
         value: record,
@@ -322,14 +346,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   const handleMenuClick = (record: Record<string, any>, key: ActionsType) => {
     switch (key) {
       case 'stop':
-        mutation
-          .mutateAsync({
-            op: 'terminate',
-            ids: [record.id],
-          })
-          .then(() => {
-            refetchData()
-          })
+        handleStop(record)
         break
       case 'info':
         jumpDetail()(record)
