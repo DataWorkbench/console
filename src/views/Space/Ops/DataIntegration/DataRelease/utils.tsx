@@ -78,17 +78,25 @@ export const getColumnsRender = (
       },
     },
     job_mode: {
-      onFilter: (v: string) => {
-        setFilter((draft) => {
-          draft.job_type = v
-          draft.offset = 0
-        })
-      },
-      filter: filter.job_type,
-      filterAble: true,
-      filtersNew: Object.values(dataReleaseDevModeType) as any,
-      render: (text: keyof typeof dataReleaseDevModeType) =>
-        dataReleaseDevModeType[text]?.label,
+      // onFilter: (v: string) => {
+      //   setFilter((draft) => {
+      //     draft.job_type = v
+      //     draft.offset = 0
+      //   })
+      // },
+      // filter: filter.job_type,
+      // filterAble: true,
+      // filtersNew: Object.values(dataReleaseDevModeType) as any,
+      render: (
+        text: keyof typeof dataReleaseDevModeType,
+        record: Record<string, any>
+      ) =>
+        dataReleaseDevModeType[
+          get(
+            record,
+            'sync_job_property.conf.job_mode'
+          ) as keyof typeof dataReleaseDevModeType
+        ]?.label,
     },
     version: {
       render: (text: string) => <span tw="text-neut-8">{text}</span>,

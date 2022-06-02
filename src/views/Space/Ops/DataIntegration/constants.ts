@@ -199,14 +199,14 @@ export const dataReleaseSuggestions: ISuggestion[] = [
   //     key: value,
   //   })),
   // },
-  {
-    label: '开发模式',
-    key: 'job_mode',
-    options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
+  // {
+  //   label: '开发模式',
+  //   key: 'job_mode',
+  //   options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
   // {
   //   label: '作业类型',
   //   key: 'type',
