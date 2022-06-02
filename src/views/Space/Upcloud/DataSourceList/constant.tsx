@@ -178,6 +178,17 @@ export const ftpProtocol = {
   },
 }
 
+export const ftpAuthMode = {
+  PWD: {
+    label: '密码',
+    value: 1,
+  },
+  key: {
+    label: '私钥',
+    value: 2,
+  },
+}
+
 export const ftpConnectionMode = {
   FTP: {
     label: '被动模式',
@@ -199,14 +210,24 @@ export const ftpFilters = new Set([
   'user',
 ])
 
-export const sftpFilters = new Set([
-  'private_key',
+export const sftpFiltersWithPwd = new Set([
   'host',
   'password',
   '__dbUrl',
   'port',
   'protocol',
   'user',
+  'auth_mode',
+])
+
+export const sftpFiltersWithKey = new Set([
+  'private_key',
+  'host',
+  '__dbUrl',
+  'port',
+  'protocol',
+  'user',
+  'auth_mode',
 ])
 
 export const hivePwdFilters = new Set([
