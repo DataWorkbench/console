@@ -103,6 +103,7 @@ const VersionsModal = (props: IProps) => {
       offset: number
       limit: number
       job_id: string
+      search?: string
     },
     { pagination: true; sort: true }
   >(
@@ -120,6 +121,7 @@ const VersionsModal = (props: IProps) => {
 
   const jobNameColumn = {
     ...dataReleaseColumns[0],
+    title: '作业名称',
     // width: 250,
     render: (text: string, record: Record<string, any>) => {
       const child = (
@@ -196,7 +198,7 @@ const VersionsModal = (props: IProps) => {
             columnsSetting={columnsSetting}
             queryKey={() => getJobVersionKey('list')}
             suggestions={dataReleaseSuggestions.filter((i) =>
-              ['alert_status', 'status'].includes(i.key as string)
+              ['search'].includes(i.key as string)
             )}
             filterInputConfig={{
               defaultKeywordLabel: '作业名称',
