@@ -102,18 +102,18 @@ export const getColumnsRender = (
       },
     },
     source: {
-      filter: filter.source,
-      onFilter: (v: string) => {
-        setFilter((draft) => {
-          draft.source = v
-          draft.offset = 0
-        })
-      },
-      filterAble: true,
-      filtersNew: Object.entries(sourceTypes).map(([value, label]) => ({
-        label,
-        value,
-      })),
+      // filter: filter.source,
+      // onFilter: (v: string) => {
+      //   setFilter((draft) => {
+      //     draft.source = v
+      //     draft.offset = 0
+      //   })
+      // },
+      // filterAble: true,
+      // filtersNew: Object.entries(sourceTypes).map(([value, label]) => ({
+      //   label,
+      //   value,
+      // })),
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
         record.__level === 1 ? (
           <DbTypeCmp
@@ -123,18 +123,18 @@ export const getColumnsRender = (
         ) : null,
     },
     target: {
-      filter: filter.target,
-      onFilter: (v: string) => {
-        setFilter((draft) => {
-          draft.target = v
-          draft.offset = 0
-        })
-      },
-      filterAble: true,
-      filtersNew: Object.entries(sourceTypes).map(([value, label]) => ({
-        label,
-        value,
-      })),
+      // filter: filter.target,
+      // onFilter: (v: string) => {
+      //   setFilter((draft) => {
+      //     draft.target = v
+      //     draft.offset = 0
+      //   })
+      // },
+      // filterAble: true,
+      // filtersNew: Object.entries(sourceTypes).map(([value, label]) => ({
+      //   label,
+      //   value,
+      // })),
       render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
         record.__level === 1 ? (
           <DbTypeCmp

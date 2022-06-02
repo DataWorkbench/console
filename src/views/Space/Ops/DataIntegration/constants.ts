@@ -215,22 +215,22 @@ export const dataReleaseSuggestions: ISuggestion[] = [
   //     key: value,
   //   })),
   // },
-  {
-    label: '来源',
-    key: 'source',
-    options: Object.entries(sourceTypes).map(([key, value]) => ({
-      label: value,
-      key,
-    })),
-  },
-  {
-    label: '目的',
-    key: 'target',
-    options: Object.entries(sourceTypes).map(([key, value]) => ({
-      label: value,
-      key,
-    })),
-  },
+  // {
+  //   label: '来源',
+  //   key: 'source',
+  //   options: Object.entries(sourceTypes).map(([key, value]) => ({
+  //     label: value,
+  //     key,
+  //   })),
+  // },
+  // {
+  //   label: '目的',
+  //   key: 'target',
+  //   options: Object.entries(sourceTypes).map(([key, value]) => ({
+  //     label: value,
+  //     key,
+  //   })),
+  // },
 ]
 export const dataReleaseTabs: ITab[] = [
   {

@@ -80,6 +80,7 @@ const DataRelease = observer(() => {
     {
       sort_by: 'updated',
       reverse: true,
+      verbose: 1,
     },
     { pagination: true, sort: true },
     dataReleaseSettingKey
