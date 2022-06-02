@@ -252,11 +252,17 @@ const SyncDataSource = observer(
           targetRefetch()
         }
       },
-      getResource: () => {
+      validate: () => {
         const srcform = sourceForm.current as any
         const tgtform = targetForm.current as any
+        return srcform?.validateForm() && tgtform?.validateForm()
+      },
+      getResource: () => {
+        // const srcform = sourceForm.current as any
+        // const tgtform = targetForm.current as any
 
-        if (srcform?.validateForm() && tgtform?.validateForm()) {
+        // if (srcform?.validateForm() && tgtform?.validateForm()) {
+        if (true) {
           const sourceKey = `${sourceTypeName!.toLowerCase()}_source`
           const targetKey = `${targetTypeName!.toLowerCase()}_target`
           const { condition } = db.source
@@ -264,29 +270,33 @@ const SyncDataSource = observer(
             source_id: db.source.id,
             target_id: db.target.id,
             sync_resource: {
-              [sourceKey]: {
-                table: [db.source.tableName],
-                schema: '',
-                where: db.source.where,
-                split_pk: db.source.splitPk,
-                condition_type: condition?.type,
-                visualization: {
-                  column: condition?.column,
-                  start_condition: condition?.startCondition,
-                  start_value: condition?.startValue,
-                  end_condition: condition?.endCondition,
-                  end_value: condition?.endValue,
-                },
-                express: condition?.expression,
-              },
-              [targetKey]: {
-                table: [db.target.tableName],
-                write_mode: db.target.writeMode,
-                semantic: db.target.semantic,
-                batch_size: db.target.batchSize,
-                pre_sql: db.target.preSql?.filter((v) => v !== ''),
-                post_sql: db.target.postSql?.filter((v) => v !== ''),
-              },
+              [sourceKey]: db.source.tableName
+                ? {
+                    table: [db.source.tableName],
+                    schema: '',
+                    where: db.source.where,
+                    split_pk: db.source.splitPk,
+                    condition_type: condition?.type,
+                    visualization: {
+                      column: condition?.column,
+                      start_condition: condition?.startCondition,
+                      start_value: condition?.startValue,
+                      end_condition: condition?.endCondition,
+                      end_value: condition?.endValue,
+                    },
+                    express: condition?.expression,
+                  }
+                : undefined,
+              [targetKey]: db.target.tableName
+                ? {
+                    table: [db.target.tableName],
+                    write_mode: db.target.writeMode,
+                    semantic: db.target.semantic,
+                    batch_size: db.target.batchSize,
+                    pre_sql: db.target.preSql?.filter((v) => v !== ''),
+                    post_sql: db.target.postSql?.filter((v) => v !== ''),
+                  }
+                : undefined,
             },
           }
 

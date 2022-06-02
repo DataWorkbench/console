@@ -131,6 +131,7 @@ const SyncJob = () => {
       getResource: () => Record<string, string>
       getTypeNames: () => string[]
       refetchColumns: () => void
+      validate: () => boolean
     }>(null)
   const mappingRef =
     useRef<{
@@ -349,6 +350,10 @@ const SyncJob = () => {
             return
           }
           if (mode === 1) {
+            if (!dbRef.current?.validate()) {
+              showConfWarn('未正确配置数据源信息')
+              return
+            }
             if (!resource) {
               showConfWarn('未配置数据源信息')
               return
