@@ -43,7 +43,7 @@ const DataSourceModal = (props: IDataSourceModalProps) => {
       footer={null}
       orient="fullright"
       visible
-      title="历史版本"
+      title="数据源详情"
     >
       <ModalContent>
         <div tw="relative min-h-[400px]">
