@@ -245,15 +245,6 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       },
     },
     type: {
-      filter: filter.job_type,
-      onFilter: (v: string) => {
-        setFilter((draft) => {
-          draft.job_type = v
-          draft.offset = 0
-        })
-      },
-      filterAble: true,
-      filtersNew: Object.values(jobType) as any,
       render: (text: keyof typeof jobType, record: Record<string, any>) => (
         <JobTypeCmp type={get(record, 'sync_job.type', '')} />
       ),
