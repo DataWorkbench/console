@@ -10,19 +10,26 @@ import { HelpCenterLink } from 'components'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { JobTree } from './JobTree'
+import ApiGroupModal from '../Modal/ApiGroupModal'
+import ApiModal from '../Modal/ApiModal'
 
 interface JobMenuProps {
   className?: string
 }
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
 const JobMenu = observer((props: JobMenuProps) => {
   const jobTree = useRef<{ reset: () => void; search: (v: string) => void }>(null)
   const [isOpenHelp, setIsOpenHelp] = useState(true)
-  const [visible, setVisible] = useState<boolean>(null)
+  const [visible, setVisible] = useState<boolean>()
+  const [showApiGroupModal, setShowApiGroupModal] = useState<boolean>()
+  const [showApiModal, setShowApiModal] = useState<boolean>(true)
   const showCreateModal = () => {
     setVisible(true)
+  }
+  const hideCreateModal = () => {
+    setVisible(false)
   }
 
   const handleSearch = (v: string) => {
@@ -32,7 +39,12 @@ const JobMenu = observer((props: JobMenuProps) => {
   }
 
   const onRightMenuClick = useCallback((e, key: string, val: string | number) => {
-    console.log(e, key, val)
+    if (val === 'createApiGroup') {
+      setShowApiGroupModal(true)
+    } else if (val === 'createApi') {
+      setShowApiModal(true)
+    }
+    hideCreateModal()
   }, [])
 
   return (
@@ -66,11 +78,11 @@ const JobMenu = observer((props: JobMenuProps) => {
         content={
           <div tw="border border-neut-13 rounded-sm">
             <Menu onClick={onRightMenuClick}>
-              <MenuItem value="editJob">
+              <MenuItem value="createApiGroup">
                 <Icon name="edit" size={14} type="light" />
                 <span>创建API服务组</span>
               </MenuItem>
-              <MenuItem value="editJob">
+              <MenuItem value="createApi">
                 <Icon name="edit" size={14} type="light" />
                 <span>创建API</span>
               </MenuItem>
@@ -166,6 +178,8 @@ const JobMenu = observer((props: JobMenuProps) => {
           </div>
         </>
       </Tippy>
+      {showApiGroupModal && <ApiGroupModal onClose={() => setShowApiGroupModal(false)} />}
+      {showApiModal && <ApiModal onClose={() => setShowApiModal(false)} />}
     </Rnd>
   )
 })
