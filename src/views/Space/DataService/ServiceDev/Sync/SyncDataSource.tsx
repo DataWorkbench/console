@@ -6,23 +6,42 @@ import { Form, Icon } from '@QCFE/lego-ui'
 import { AffixLabel, FlexBox, Center, ButtonWithClearField, PopConfirm } from 'components'
 import { useState } from 'react'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
+import { get, isEmpty, pick } from 'lodash-es'
+
+type SourceDataType = { id: string; name: string; networkId: string } | null
 
 const { SelectField } = Form
 
 const SyncDataSource = observer(
   (props, ref) => {
-    console.log(props)
     const [visible, setVisible] = useState<boolean | null>(null)
 
     const [sourceData, setSourceData] = useImmer<{
       sourceType: string
+      source: SourceDataType
     }>({
-      sourceType: ''
+      sourceType: '',
+      source: null
     })
 
     const handleClick = () => {
       setVisible(true)
     }
+
+    const handleClear = () => {
+      setSourceData((draft) => {
+        draft.source = null
+      })
+    }
+
+    const handleSelectDb = (data: SourceDataType) => {
+      console.log(data, 'data')
+
+      setSourceData((draft) => {
+        draft.source = data
+      })
+    }
+    console.log(sourceData)
 
     return (
       <FlexBox tw="flex-col">
@@ -51,42 +70,52 @@ const SyncDataSource = observer(
               })
             }}
           />
-          <ButtonWithClearField
-            name="source"
-            placeholder="选择数据来源"
-            label={<AffixLabel>数据源</AffixLabel>}
-            popConfirm={
-              <PopConfirm
-                type="warning"
-                content="移除数据源会清空所数据源表、条件参数配置、字段映射等所有信息，请确认是否移除？"
-              />
-            }
-            icon={
-              <Icon name="blockchain" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />
-            }
-            onClick={() => handleClick()}
-            onClear={() => handleClear()}
-            schemas={[
-              {
-                help: '请选择数据来源',
-                status: 'error',
-                rule: (v?: string) => !!v
+          {!isEmpty(sourceData.sourceType) && (
+            <ButtonWithClearField
+              name="source"
+              placeholder="选择数据来源"
+              label={<AffixLabel>数据源</AffixLabel>}
+              popConfirm={
+                <PopConfirm
+                  type="warning"
+                  content="移除数据源会清空所数据源表、条件参数配置、字段映射等所有信息，请确认是否移除？"
+                />
               }
-            ]}
-          >
-            <Center tw="space-x-1">
-              <span tw="ml-1">{2}</span>
-              <span tw="text-neut-8">(ID:{3})</span>
-            </Center>
-          </ButtonWithClearField>
+              icon={
+                <Icon name="blockchain" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />
+              }
+              onClick={() => handleClick()}
+              onClear={() => handleClear()}
+              value={sourceData.source?.id}
+              clearable={!isEmpty(sourceData.source)}
+              schemas={[
+                {
+                  help: '请选择数据来源',
+                  status: 'error',
+                  rule: (v?: string) => !!v
+                }
+              ]}
+            >
+              <Center tw="space-x-1">
+                <span tw="ml-1">{sourceData.source?.name}</span>
+                <span tw="text-neut-8">(ID:{sourceData.source?.id})</span>
+              </Center>
+            </ButtonWithClearField>
+          )}
         </Form>
         <DataSourceSelectModal
           title="选择数据源"
           visible={visible}
-          sourceType={1}
+          sourceType={1} // TODO: sourceType
           onCancel={() => setVisible(false)}
-          onOk={() => {
+          onOk={(v: any) => {
             setVisible(false)
+            if (v) {
+              handleSelectDb({
+                ...pick(v, ['id', 'name']),
+                networkId: get(v, 'last_connection.network_id', '')
+              })
+            }
           }}
         />
       </FlexBox>

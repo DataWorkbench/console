@@ -114,6 +114,7 @@
     "echarts": "^5.1.2",
     "framer-motion": "^4.1.17",
     "immer": "^9.0.5",
+    "immutability-helper": "^3.1.1",
     "js-cookie": "^2.2.1",
     "jsplumb": "^2.15.6",
     "lodash-es": "^4.17.21",

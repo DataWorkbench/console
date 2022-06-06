@@ -9,6 +9,7 @@ import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
 import ReleaseModal from '../Modal/ReleaseModal'
 import SyncDataSource from './SyncDataSource'
+import MappingsTable from './MappingsTable'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -279,6 +280,7 @@ const SyncJob = () => {
             }
           >
             {index === 0 && <SyncDataSource />}
+            {index === 1 && <MappingsTable />}
           </CollapseItem>
         ))}
       </Collapse>
