@@ -52,8 +52,18 @@ enum Semantic {
   'ExactlyOnce' = 2,
 }
 
+const getJobTypeName = (type: 1 | 2 | 3) => {
+  const typeNameMap = new Map([
+    [1, '离线 - 全量'],
+    [2, '离线 - 增量'],
+    [3, '实时'],
+  ])
+  return typeNameMap.get(type)
+}
+
 const DevContentDataSource = (props: Record<string, any>) => {
   const {
+    curJob,
     dbData: { source, target },
     sourceTypeName,
     targetTypeName,
@@ -67,13 +77,13 @@ const DevContentDataSource = (props: Record<string, any>) => {
         <div>
           <FlexBox tw="items-center">
             <Icon name="blockchain" type="light" />
-            <span>{source?.tableName}</span>
+            <span>{source?.name}</span>
             <span tw="text-neut-8">(ID: {source?.id})</span>
           </FlexBox>
           {/* <div tw="text-neut-8">网络配置名称(ID: 12112)</div> */}
         </div>
         <div>数据源表</div>
-        <div>{sourceTypeName}</div>
+        <div>{source?.tableName}</div>
         {Object.values(source?.tableConfig?.condition ?? {}).every(Boolean) && (
           <>
             <div>条件参数配置</div>
@@ -84,6 +94,10 @@ const DevContentDataSource = (props: Record<string, any>) => {
               {source?.tableConfig?.condition?.endCondition ?? '关系符号'}] [
               {source?.tableConfig?.condition?.endValue || '结束条件'}]
             </div>
+          </>
+        )}
+        {source?.tableConfig?.splitPk && (
+          <>
             <div>切分键</div>
             <div>{source?.tableConfig?.splitPk ?? ''}</div>
           </>
@@ -106,33 +120,38 @@ const DevContentDataSource = (props: Record<string, any>) => {
           <div>
             <FlexBox tw="items-center">
               <Icon name="blockchain" type="light" />
-              <span>{target.tableName}</span>
+              <span>{target?.name}</span>
               <span tw="text-neut-8">(ID: {target.id})</span>
             </FlexBox>
             {/* <div tw="text-neut-8">网络配置名称(ID: 12112)</div> */}
           </div>
           <div>数据源表</div>
-          <div>{targetTypeName}</div>
+          <div>{target.tableName}</div>
           <div>写入模式</div>
           <div>
             {
               [
-                { label: 'insert: insert into', value: WriteMode.Insert },
-                { label: 'replace: replace into', value: WriteMode.Replace },
+                { label: 'insert 插入', value: WriteMode.Insert },
+                { label: 'replace 替换', value: WriteMode.Replace },
                 {
-                  label: 'update: on duplicate key update',
+                  label: 'update 更新插入',
                   value: WriteMode.Update,
                 },
               ].find((i) => i.value === target?.tableConfig?.writeMode)?.label
             }
           </div>
           <div>写入一致性语义</div>
-          {/* TODO: 文案确认 */}
           <div>
             {
               [
-                { label: 'exactly-once', value: Semantic.ExactlyOnce },
-                { label: 'at-least-once', value: Semantic.AtLeastOnce },
+                {
+                  label: 'exactly-once 正好一次',
+                  value: Semantic.ExactlyOnce,
+                },
+                {
+                  label: 'at-least-once 至少一次',
+                  value: Semantic.AtLeastOnce,
+                },
               ].find((i) => i.value === target?.tableConfig?.semantic)?.label
             }
           </div>
@@ -154,14 +173,18 @@ const DevContentDataSource = (props: Record<string, any>) => {
           <Grid>
             <div>写入前SQL语句组</div>
             <div>
-              {target?.preSql
-                ? target?.preSql.map((i: string) => <div key={i}>{i}</div>)
+              {target?.tableConfig?.preSql
+                ? target?.tableConfig?.preSql.map((i: string) => (
+                    <div key={i}>{i}</div>
+                  ))
                 : '无'}
             </div>
             <div>写入后SQL语句组</div>
             <div>
-              {target?.postSql
-                ? target?.postSql.map((i: string) => <div key={i}>{i}</div>)
+              {target?.tableConfig?.postSql
+                ? target?.tableConfig?.postSql.map((i: string) => (
+                    <div key={i}>{i}</div>
+                  ))
                 : '无'}
             </div>
           </Grid>
@@ -170,15 +193,16 @@ const DevContentDataSource = (props: Record<string, any>) => {
     )
   }
 
+  console.log(props)
   return (
     <FlexBox tw="flex-col">
       <Center tw="mb-[-15px]">
         <Center css={styles.arrowBox}>
-          <Label>来源: Mysql</Label>
+          <Label>来源: {sourceTypeName}</Label>
           <ArrowLine />
-          <Label>离线-增量</Label>
+          <Label>{curJob && getJobTypeName(curJob.type)}</Label>
           <ArrowLine />
-          <Label>目的: Mysql</Label>
+          <Label>目的: {targetTypeName}</Label>
         </Center>
       </Center>
       <div css={styles.dashedBox}>

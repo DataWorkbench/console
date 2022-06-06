@@ -57,6 +57,7 @@ const DevContentJSON = (props: {
     }
   }
 
+  // TODO: 脚本模式判断
   return (
     <div tw="h-full w-full grid">
       {showStep !== false && (

@@ -170,23 +170,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               }}
               placeholder="请输入条数"
             />
-            <span>条，或者</span>
-            <InputNumber
-              min={0}
-              max={100}
-              showButton={false}
-              value={(channel.percentage as number) || undefined}
-              onChange={(v) => {
-                const num = +v
-                if (!isNAN(num)) {
-                  setChannel((draft) => {
-                    draft.percentage = num
-                  })
-                }
-              }}
-              placeholder="请输入比例"
-            />
-            <span>% 比例，达到任一条件时，任务自动结束</span>
+            <span>条，任务自动结束</span>
           </Control>
           <div className="help">
             <span>脏数据条数，默认允许脏数据</span>
