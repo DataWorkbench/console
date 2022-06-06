@@ -206,10 +206,7 @@ const DevContentUI = (props: IProps) => {
                     </AffixLabel>
                   </div>
 
-                  <div>
-                    {channel.record_num ?? ''} 条或 {channel.percentage ?? ''}
-                    %比例，达到任一条件时，任务自动结束
-                  </div>
+                  <div>{channel.record_num ?? ''} 条，任务自动结束</div>
                 </Grid>
               </div>
             )}
