@@ -581,6 +581,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             <ToolBarRight>
               <InputSearch
                 placeholder="请输入关键词进行搜索"
+                tw="border-2 rounded-sm  dark:border-neut-15"
                 value={searchName}
                 onChange={(e, v) => setSearchName(String(v))}
                 onPressEnter={() => handleQuery(searchName)}
