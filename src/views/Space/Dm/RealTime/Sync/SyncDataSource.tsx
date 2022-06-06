@@ -38,7 +38,12 @@ import {
   useQuerySourceTableSchema,
 } from 'hooks'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { dataSourceTypes, DataSourceType, SyncJobType } from '../Job/JobUtils'
+import {
+  dataSourceTypes,
+  DataSourceType,
+  SyncJobType,
+  getDataSourceTypes,
+} from '../Job/JobUtils'
 
 const { TextField, SelectField, TextAreaField } = Form
 
@@ -187,10 +192,7 @@ const SyncDataSource = observer(
     const [sourceTypeName, targetTypeName] = useMemo(() => {
       const sourceType = curJob?.source_type
       const targetType = curJob?.target_type
-      return [
-        findKey(dataSourceTypes, (v) => v === sourceType),
-        findKey(dataSourceTypes, (v) => v === targetType),
-      ]
+      return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
     }, [curJob])
 
     const sourceTablesRet = useQuerySourceTables(
