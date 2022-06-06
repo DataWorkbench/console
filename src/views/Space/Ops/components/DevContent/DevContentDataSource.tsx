@@ -52,8 +52,18 @@ enum Semantic {
   'ExactlyOnce' = 2,
 }
 
+const getJobTypeName = (type: 1 | 2 | 3) => {
+  const typeNameMap = new Map([
+    [1, '离线 - 全量'],
+    [2, '离线 - 增量'],
+    [3, '实时'],
+  ])
+  return typeNameMap.get(type)
+}
+
 const DevContentDataSource = (props: Record<string, any>) => {
   const {
+    curJob,
     dbData: { source, target },
     sourceTypeName,
     targetTypeName,
@@ -190,7 +200,7 @@ const DevContentDataSource = (props: Record<string, any>) => {
         <Center css={styles.arrowBox}>
           <Label>来源: {sourceTypeName}</Label>
           <ArrowLine />
-          <Label>离线-增量</Label>
+          <Label>{curJob && getJobTypeName(curJob.type)}</Label>
           <ArrowLine />
           <Label>目的: {targetTypeName}</Label>
         </Center>

@@ -140,6 +140,7 @@ const DevContentUI = (props: IProps) => {
             {index === 0 && (
               <DevContentDataSource
                 dbData={db}
+                curJob={curJob}
                 sourceTypeName={sourceTypeName}
                 targetTypeName={targetTypeName}
               />
