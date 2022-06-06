@@ -283,7 +283,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     {
       title: '数据源类型',
       dataIndex: 'type',
-      width: 92,
+      width: 110,
       render: (v: number) => {
         return sourceKinds.find((kind) => kind.source_type === v)?.name
       },
