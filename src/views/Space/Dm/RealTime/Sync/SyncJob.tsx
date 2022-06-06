@@ -122,7 +122,7 @@ const SyncJob = () => {
     target: { id: get(confData, 'target_id') },
   })
 
-  const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1))
+  const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
 
   const dbRef =
