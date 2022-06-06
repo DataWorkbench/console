@@ -76,6 +76,26 @@ export type DataSourceType =
   | 'Redis'
   | 'ElasticSearch'
 
+export const datasourceTypeKey = [
+  'MySQL',
+  // 'TIDB',
+  // 'Kafka',
+  // 'S3',
+  'ClickHouse',
+  // 'HBase',
+  // 'FTP',
+  // 'HDFS',
+  'SQLServer',
+  // 'Oracle',
+  'PostgreSQL',
+  // 'DB2',
+  // 'SAP HANA',
+  // 'Hive',
+  // 'MongoDB',
+  // 'Redis',
+  // 'ElasticSearch',
+]
+
 export const dataSourceTypes: { [key in string]?: number } = {
   mysql: 1,
   // TIDB: 2,

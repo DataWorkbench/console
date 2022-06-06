@@ -1,10 +1,10 @@
 import React, { forwardRef, useCallback, useEffect } from 'react'
 import { Control, Form, Select } from '@QCFE/lego-ui'
 import tw, { styled } from 'twin.macro'
-import { isFunction, keys } from 'lodash-es'
+import { isFunction } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { ArrowLine, HelpCenterLink } from 'components'
-import { dataSourceTypes } from '../Job/JobUtils'
+import { datasourceTypeKey, dataSourceTypes } from '../Job/JobUtils'
 
 type SyncType = 'full' | 'incr'
 type SyncSourceType = 'fullSource' | 'fullSink' | 'incrSource' | 'incrSink'
@@ -32,7 +32,7 @@ const SyncItem = styled('div')(({ selected = true }: { selected: boolean }) => [
   selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`,
 ])
 
-const sources = keys(dataSourceTypes)
+const sources = datasourceTypeKey
 const filterfullSources = ['TiDB', 'Hive', 'Redis', 'Kafka']
 const filterIncrSources = [
   'TiDB',
