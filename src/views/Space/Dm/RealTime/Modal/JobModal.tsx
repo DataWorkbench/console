@@ -325,6 +325,11 @@ export const JobModal = observer((props: JobModalProps) => {
                         </Field>
                         {!isEdit && (
                           <SyncTypeRadioGroupField
+                            css={css`
+                              .label {
+                                ${tw`items-start!`}
+                              }
+                            `}
                             label={<AffixLabel>同步类型</AffixLabel>}
                             name="syncTypeInfo"
                             value={params.syncTypeInfo}

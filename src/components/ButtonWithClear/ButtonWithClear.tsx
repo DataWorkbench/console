@@ -56,7 +56,7 @@ export const ButtonWithClear = React.forwardRef(
     }
     return (
       <div>
-        <Button tw="h-8" ref={ref} type="black" onClick={onClick}>
+        <Button tw="h-7" ref={ref} type="black" onClick={onClick}>
           {icon}
           {!value ? placeholder : children}
         </Button>

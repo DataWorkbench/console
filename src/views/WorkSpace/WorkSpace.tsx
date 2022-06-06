@@ -19,6 +19,8 @@ import { useQueryDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
 import { getHelpCenterLink } from 'utils'
 import { collect, map } from 'utils/functions'
 
+import useIcon from 'hooks/useHooks/useIcon'
+import icons from 'views/Space/Header/icons'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
 import BestPractice from './BestPractice'
@@ -118,6 +120,8 @@ const WorkSpace = observer(
       queryRefetch: false,
       queryKeyWord: '',
     }))
+
+    useIcon(icons)
 
     const { data: platform } = useQueryDescribePlatformConfig(
       {

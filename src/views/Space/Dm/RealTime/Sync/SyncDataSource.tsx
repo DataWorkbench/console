@@ -274,6 +274,7 @@ const SyncDataSource = observer(
         const tgtform = targetForm.current as any
         return srcform?.validateForm() && tgtform?.validateForm()
       },
+      // eslint-disable-next-line consistent-return
       getResource: () => {
         // const srcform = sourceForm.current as any
         // const tgtform = targetForm.current as any
@@ -319,8 +320,6 @@ const SyncDataSource = observer(
 
           return config
         }
-
-        return null
       },
       getTypeNames: () => [sourceTypeName, targetTypeName],
     }))
@@ -721,11 +720,11 @@ const SyncDataSource = observer(
                       break
                     case WriteMode.Replace:
                       helpStr =
-                        '没有遇到主键/唯一性索引冲突时，冲突时会用新行替换已经指定的字段的语句。'
+                        '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会用新行替换已经指定的字段的语句。'
                       break
                     case WriteMode.Update:
                       helpStr =
-                        '没有遇到主键/唯一性索引冲突时，冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
+                        '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
                       break
                     default:
                       break

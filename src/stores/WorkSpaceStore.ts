@@ -15,8 +15,8 @@ const defaultFuncList = [
     name: 'dm',
     title: '数据开发',
     subFuncList: [
-      { name: 'realtime', title: '实时计算', icon: 'cogwheel' },
-      { name: 'network', title: '网络配置', icon: 'earth' },
+      { name: 'realtime', title: '作业开发', icon: 'cogwheel' },
+      // { name: 'network', title: '网络配置', icon: 'earth' },
       { name: 'cluster', title: '计算集群', icon: 'pod' },
       // { name: 'table', title: '表管理', icon: 'listview' },
       { name: 'resource', title: '资源管理', icon: 'resource' },
@@ -32,7 +32,7 @@ const defaultFuncList = [
       {
         name: 'stream',
         title: '流式计算运维',
-        icon: 'stateful-set',
+        icon: 'q-event2Duotone',
         items: [
           { name: 'release', title: '已发布作业' },
           { name: 'job', title: '作业实例' },
@@ -41,7 +41,7 @@ const defaultFuncList = [
       {
         name: 'data-integration',
         title: '数据集成运维',
-        icon: 'slider',
+        icon: 'q-iot2Duotone',
         items: [
           {
             name: 'data-release',
