@@ -15,7 +15,7 @@ export const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
 ])
 
 export const JobToolBar = styled('div')(
-  () => [tw`flex px-2 pt-4 space-x-2`],
+  () => [tw`flex px-2 pt-2 space-x-2`],
   css`
     button.button {
       ${tw`h-7`}
