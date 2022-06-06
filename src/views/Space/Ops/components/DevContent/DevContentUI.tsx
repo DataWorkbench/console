@@ -2,11 +2,11 @@ import tw, { css, styled } from 'twin.macro'
 import { Collapse } from '@QCFE/lego-ui'
 import DevContentDataSource from 'views/Space/Ops/components/DevContent/DevContentDataSource'
 import { AffixLabel, FieldMappings } from 'components/index'
-import { findKey, get } from 'lodash-es'
+import { get } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
 import { useMemo } from 'react'
-import { dataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { getDataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import SyncDataSource from 'views/Space/Dm/RealTime/Sync/SyncDataSource'
 import { nanoid } from 'nanoid'
 
@@ -88,10 +88,7 @@ const DevContentUI = (props: IProps) => {
   const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
-    return [
-      findKey(dataSourceTypes, (v) => v === sourceType),
-      findKey(dataSourceTypes, (v) => v === targetType),
-    ]
+    return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
   }, [curJob])
 
   const sourceColumn = useMemo(() => {
