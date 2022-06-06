@@ -32,7 +32,7 @@ const defaultFuncList = [
       {
         name: 'stream',
         title: '流式计算运维',
-        icon: 'stateful-set',
+        icon: 'q-event2Duotone',
         items: [
           { name: 'release', title: '已发布作业' },
           { name: 'job', title: '作业实例' },
@@ -41,7 +41,7 @@ const defaultFuncList = [
       {
         name: 'data-integration',
         title: '数据集成运维',
-        icon: 'slider',
+        icon: 'q-iot2Duotone',
         items: [
           {
             name: 'data-release',
