@@ -173,8 +173,9 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
             <span>条，任务自动结束</span>
           </Control>
           <div className="help">
-            <span>脏数据条数，默认允许脏数据</span>
-            <span tw="ml-5">脏数据比例，默认允许脏数据</span>
+            <span tw="ml-5">
+              允许的脏数据条数，（写入一致性语义为 exactly-once 时无效）
+            </span>
           </div>
         </Field>
       </Form>
