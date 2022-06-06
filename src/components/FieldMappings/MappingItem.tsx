@@ -424,7 +424,7 @@ const MappingItem = (props: MappingItemProps) => {
               options={
                 typeName
                   ? fieldTypeMapper
-                      .get(typeName)
+                      .get(typeName.toString())
                       ?.map((v) => ({ label: v, value: v }))
                   : []
               }

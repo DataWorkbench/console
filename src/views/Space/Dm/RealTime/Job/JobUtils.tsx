@@ -3,6 +3,7 @@ import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { get, cloneDeep, findKey } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
 import { Icons, Center } from 'components'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 export enum JobMode {
   /** 数据集成 */
@@ -75,6 +76,26 @@ export type DataSourceType =
   | 'Redis'
   | 'ElasticSearch'
 
+export const datasourceTypeKey = [
+  'MySQL',
+  // 'TIDB',
+  // 'Kafka',
+  // 'S3',
+  'ClickHouse',
+  // 'HBase',
+  // 'FTP',
+  // 'HDFS',
+  'SQLServer',
+  // 'Oracle',
+  'PostgreSQL',
+  // 'DB2',
+  // 'SAP HANA',
+  // 'Hive',
+  // 'MongoDB',
+  // 'Redis',
+  // 'ElasticSearch',
+]
+
 export const dataSourceTypes: { [key in string]?: number } = {
   mysql: 1,
   // TIDB: 2,
@@ -93,6 +114,49 @@ export const dataSourceTypes: { [key in string]?: number } = {
   // MongoDB: 15,
   // Redis: 16,
   // ElasticSearch: 14,
+}
+
+export const datasourceTypeObjs = [
+  {
+    type: SourceType.Mysql,
+    name: 'mysql',
+    label: 'MySQL',
+  },
+  {
+    type: SourceType.ClickHouse,
+    name: 'click_house',
+    label: 'ClickHouse',
+  },
+  {
+    type: SourceType.SqlServer,
+    name: 'sqlserver',
+    label: 'SQLServer',
+  },
+  {
+    type: SourceType.PostgreSQL,
+    name: 'postgresql',
+    label: 'PostgreSQL',
+  },
+]
+
+export const getDataSourceTypes = (type?: SourceType): string | undefined => {
+  if (!type) {
+    return ''
+  }
+  const item = datasourceTypeObjs.find((i) => i.type === type!)!
+  return new Proxy(
+    { value: item?.label },
+    {
+      get(target: { value: string | undefined }, p: string | symbol): any {
+        if (p === 'toLowerCase') {
+          return () => item?.name
+        }
+        const prim = Reflect.get(target, 'value')
+        const value = prim[p]
+        return typeof value === 'function' ? value.bind(prim) : value
+      },
+    }
+  ) as unknown as string
 }
 
 export const getSourceNameByType = (type: DataSourceType) =>

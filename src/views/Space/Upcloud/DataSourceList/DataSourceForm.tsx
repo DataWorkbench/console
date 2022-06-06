@@ -191,7 +191,7 @@ const DataSourceForm = ({
       return ftpFilters
     }
     if (urlType === 'hive') {
-      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+      if (get(sourceInfo, 'url.hive.config')) {
         return hiveAnonymousFilters
       }
       return hivePwdFilters

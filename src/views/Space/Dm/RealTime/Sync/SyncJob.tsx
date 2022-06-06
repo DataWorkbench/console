@@ -1,13 +1,13 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { HelpCenterLink, FieldMappings, PopConfirm, Modal } from 'components'
+import { FieldMappings, HelpCenterLink, Modal, PopConfirm } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
-import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
+import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
   useMutationSyncJobConf,
   useMutationSyncJobConvert,
@@ -21,7 +21,7 @@ import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
 import ReleaseModal from '../Modal/ReleaseModal'
-import { dataSourceTypes } from '../Job/JobUtils'
+import { getDataSourceTypes } from '../Job/JobUtils'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -32,10 +32,12 @@ const CollapseWrapper = styled('div')(() => [
       .collapse-item-label {
         ${tw`h-11 border-none hover:bg-neut-16`}
       }
+
       .collapse-item-content {
         ${tw`bg-neut-17 p-3!`}
       }
     }
+
     li:last-child {
       ${tw`mb-1`}
     }
@@ -120,7 +122,7 @@ const SyncJob = () => {
     target: { id: get(confData, 'target_id') },
   })
 
-  const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1))
+  const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
 
   const dbRef =
@@ -148,10 +150,7 @@ const SyncJob = () => {
   const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
-    return [
-      findKey(dataSourceTypes, (v) => v === sourceType),
-      findKey(dataSourceTypes, (v) => v === targetType),
-    ]
+    return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
   }, [curJob])
 
   const sourceColumn = useMemo(() => {
@@ -211,39 +210,7 @@ const SyncJob = () => {
       draft.target.id = get(confData, 'target_id')
     })
   }, [confData, setDb])
-  // useEffect(() => {
-  //   if (confData && sourceTypeName && targetTypeName) {
-  //     // const sourceColumn =
-  //     //   get(
-  //     //     confData,
-  //     //     `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
-  //     //   ) || []
-  //     // const targetColumn =
-  //     //   get(
-  //     //     confData,
-  //     //     `sync_resource.${targetTypeName.toLowerCase()}_target.column`
-  //     //   ) || []
-  //     // setMappings(sourceColumn.map((v, i) => [v.name, targetColumn[i].name]))
-  //     setDb({
-  //       source: {
-  //         id: get(confData, 'source_id'),
-  //         tableName: get(
-  //           confData,
-  //           `sync_resource.${sourceTypeName.toLowerCase()}_source.table[0]`
-  //         ),
-  //       },
-  //       target: {
-  //         id: get(confData, 'target_id'),
-  //         tableName: get(
-  //           confData,
-  //           `sync_resource.${targetTypeName.toLowerCase()}_target.table[0]`
-  //         ),
-  //       },
-  //     })
-  //   }
-  // }, [confData, sourceTypeName, targetTypeName, setDb])
 
-  // console.log(db, fields)
   const handleEditorWillMount = (monaco: any) => {
     // editorRef.current = null
     monaco.editor.defineTheme('my-theme', {

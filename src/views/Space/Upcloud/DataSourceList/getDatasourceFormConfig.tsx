@@ -420,7 +420,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
         user,
         password,
         {
-          name: 'hadoop_config',
+          name: 'config',
           label: 'Hadoop 高级配置',
           component: TextAreaWrapper,
           placeholder:
@@ -953,7 +953,7 @@ export const sourceStrategy = [
       return type === SourceType.Hive && name === 'hiveAuth'
     },
     value: (sourceInfo: Record<string, any>) => {
-      if (get(sourceInfo, 'url.hive.hadoop_config')) {
+      if (get(sourceInfo, 'url.hive.config')) {
         return 2
       }
       return 1

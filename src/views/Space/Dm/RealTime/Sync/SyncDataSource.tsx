@@ -1,44 +1,50 @@
 import {
-  useRef,
-  useState,
+  useEffect,
   useImperativeHandle,
   useMemo,
-  useEffect,
+  useRef,
+  useState,
 } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import {
+  camelCase,
   findKey,
   get,
-  pick,
   isEmpty,
   isEqual,
-  trim,
-  camelCase,
   keys,
+  pick,
+  trim,
 } from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
-  FlexBox,
-  Center,
   ArrowLine,
-  SelectWithRefresh,
-  ConditionParameterField,
   ButtonWithClearField,
+  Center,
+  ConditionParameterField,
+  FlexBox,
   HelpCenterLink,
+  PopConfirm,
+  SelectWithRefresh,
   SqlGroupField,
   TConditionParameterVal,
-  PopConfirm,
 } from 'components'
 import {
-  useStore,
   useQuerySourceTables,
   useQuerySourceTableSchema,
+  useStore,
 } from 'hooks'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { dataSourceTypes, DataSourceType, SyncJobType } from '../Job/JobUtils'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import {
+  DataSourceType,
+  dataSourceTypes,
+  getDataSourceTypes,
+  SyncJobType,
+} from '../Job/JobUtils'
 
 const { TextField, SelectField, TextAreaField } = Form
 
@@ -110,6 +116,20 @@ enum WriteMode {
   Insert = 1,
   Replace = 2,
   Update = 3,
+}
+
+const getWriteMode = (type?: SourceType) => {
+  switch (type) {
+    case SourceType.Mysql:
+    case SourceType.PostgreSQL:
+      return [WriteMode.Insert, WriteMode.Replace, WriteMode.Update]
+    case SourceType.ClickHouse:
+      return [WriteMode.Insert]
+    case SourceType.SqlServer:
+      return [WriteMode.Insert, WriteMode.Update]
+    default:
+      return []
+  }
 }
 
 enum Semantic {
@@ -187,10 +207,7 @@ const SyncDataSource = observer(
     const [sourceTypeName, targetTypeName] = useMemo(() => {
       const sourceType = curJob?.source_type
       const targetType = curJob?.target_type
-      return [
-        findKey(dataSourceTypes, (v) => v === sourceType),
-        findKey(dataSourceTypes, (v) => v === targetType),
-      ]
+      return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
     }, [curJob])
 
     const sourceTablesRet = useQuerySourceTables(
@@ -677,7 +694,9 @@ const SyncDataSource = observer(
                     label: 'update 更新插入',
                     value: WriteMode.Update,
                   },
-                ]}
+                ].filter((i) =>
+                  getWriteMode(curJob?.target_type).includes(i.value)
+                )}
                 value={dbInfo.writeMode}
                 schemas={[
                   {
