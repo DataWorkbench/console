@@ -242,7 +242,7 @@ export const hiveAnonymousFilters = new Set([
   'defaultFS',
   '__dbUrl',
   'hiveAuth',
-  'hadoop_config',
+  'config',
 ])
 
 export const esPwdFilters = new Set([
