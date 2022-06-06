@@ -33,7 +33,7 @@ const CollapseWrapper = styled('div')(() => [
         ${tw`h-11 border-none hover:bg-neut-16`}
       }
       .collapse-item-content {
-        ${tw`bg-neut-17`}
+        ${tw`bg-neut-17 p-3!`}
       }
     }
     li:last-child {
