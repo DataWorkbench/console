@@ -12,7 +12,7 @@ import {
 import { AffixLabel } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { isNaN as isNAN, isNumber, pickBy } from 'lodash-es'
+import { isNaN as isNAN, isNumber } from 'lodash-es'
 
 const { NumberField } = Form
 const Root = styled('div')(() => [
@@ -51,14 +51,16 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
   const { channelControl } = props
   const [channel, setChannel] = useImmer<ChannelControl>(() => {
     if (channelControl) {
-      return pickBy(channelControl, (v) => v !== -1)
+      return channelControl
+      // return pickBy(channelControl, (v) => v !== -1)
     }
     return { rate: 2 }
   })
 
   useLayoutEffect(() => {
     if (channelControl) {
-      setChannel(pickBy(channelControl, (v) => v !== -1))
+      setChannel(channelControl)
+      // setChannel(pickBy(channelControl, (v) => v !== -1))
     }
   }, [channelControl, setChannel])
 

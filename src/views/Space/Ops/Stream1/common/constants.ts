@@ -67,21 +67,21 @@ export enum StreamDevMode {
 }
 
 export const streamDevModeType = {
-  1: {
+  2: {
     label: 'SQL 模式',
-    value: 1,
+    value: 2,
     type: StreamDevMode.SQL,
     icon: 'sql',
   },
-  2: {
+  3: {
     label: '代码开发-Jar 模式',
-    value: 2,
+    value: 3,
     type: StreamDevMode.JAR,
     icon: 'q-javaFill',
   },
-  3: {
+  4: {
     label: '代码开发-python 模式',
-    value: 3,
+    value: 4,
     type: StreamDevMode.PYTHON,
     icon: 'q-pythonFill',
   },
@@ -101,7 +101,7 @@ export const streamReleaseScheduleTypes = {
     type: StreamReleaseScheduleType.ACTIVE,
   },
   2: {
-    label: '已暂停',
+    label: '已下线',
     value: 2,
     type: StreamReleaseScheduleType.SUSPENDED,
   },
