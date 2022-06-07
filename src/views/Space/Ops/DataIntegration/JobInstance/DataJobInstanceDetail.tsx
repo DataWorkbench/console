@@ -233,7 +233,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
-            <Circle>
+            <Circle tw="w-10! h-10!">
               <Icon
                 name="q-mergeFillDuotone"
                 type="light"
@@ -479,8 +479,13 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
       </Card>
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent"
+        tw="bg-transparent"
         activeName={activeName}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
         }}
