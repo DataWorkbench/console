@@ -4,7 +4,8 @@ import tw, { styled } from 'twin.macro'
 import { isFunction } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { ArrowLine, HelpCenterLink } from 'components'
-import { datasourceTypeKey, dataSourceTypes } from '../Job/JobUtils'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { datasourceTypeObjs } from '../Job/JobUtils'
 
 type SyncType = 'full' | 'incr'
 type SyncSourceType = 'fullSource' | 'fullSink' | 'incrSource' | 'incrSink'
@@ -32,20 +33,11 @@ const SyncItem = styled('div')(({ selected = true }: { selected: boolean }) => [
   selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`,
 ])
 
-const sources = datasourceTypeKey
-const filterfullSources = ['TiDB', 'Hive', 'Redis', 'Kafka']
-const filterIncrSources = [
-  'TiDB',
-  'Hive',
-  'HBase',
-  'HDFS',
-  'FTP',
-  'Redis',
-  'ElasticSearch',
-  'Kafka',
-]
-const fullSources = sources.filter((s) => !filterfullSources.includes(s))
-const incrSources = sources.filter((s) => !filterIncrSources.includes(s))
+const sources = datasourceTypeObjs
+const filterfullSources: SourceType[] = []
+const filterIncrSources: SourceType[] = []
+const fullSources = sources.filter((s) => !filterfullSources.includes(s.type))
+const incrSources = sources.filter((s) => !filterIncrSources.includes(s.type))
 
 const SyncTypeRadioGroup = forwardRef<
   React.ReactElement,
@@ -104,8 +96,11 @@ const SyncTypeRadioGroup = forwardRef<
     }, [value, setParams])
 
     const geneOpts = useCallback(
-      (data: string[]) =>
-        data.map((v) => ({ label: v, value: dataSourceTypes[v] })),
+      (data) =>
+        data.map((v: Record<string, any>) => ({
+          label: v.label,
+          value: v.type,
+        })),
       []
     )
 
