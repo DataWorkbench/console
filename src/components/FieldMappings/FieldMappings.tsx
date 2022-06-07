@@ -579,19 +579,29 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 </Tooltip>
               )
             }
-            <PopConfirm
-              type="warning"
-              okText="确认"
-              content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
-              onOk={handleRowMapping}
-            >
+            {mappings.length ? (
+              <PopConfirm
+                type="warning"
+                okText="确认"
+                content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
+                onOk={handleRowMapping}
+              >
+                <OutlinedGreenButton
+                  type="outlined"
+                  disabled={!(leftFields.length && rightFields.length)}
+                >
+                  同行映射
+                </OutlinedGreenButton>
+              </PopConfirm>
+            ) : (
               <OutlinedGreenButton
                 type="outlined"
+                onClick={handleRowMapping}
                 disabled={!(leftFields.length && rightFields.length)}
               >
                 同行映射
               </OutlinedGreenButton>
-            </PopConfirm>
+            )}
             <PopConfirm
               content="取消映射会去除所有现有映射，确定取消映射么？"
               type="warning"
