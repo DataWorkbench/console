@@ -53,6 +53,7 @@ interface IScheSettingModal {
   origin?: string
   onCancel?: () => void
   onSuccess?: () => void
+  defaultschedulePolicy?: number
 }
 
 type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -62,6 +63,7 @@ const ScheSettingModal = ({
   origin = '',
   onCancel,
   onSuccess,
+  defaultschedulePolicy = 3,
 }: IScheSettingModal) => {
   const queryClient = useQueryClient()
   const [disabled, setDisabled] = useState(Boolean(origin === 'ops'))
@@ -124,7 +126,7 @@ const ScheSettingModal = ({
     retryPolicy: 1,
     timeout: 0,
     periodType: 'minute',
-    schedulePolicy: 3,
+    schedulePolicy: defaultschedulePolicy,
     executed: null,
     parameters: null,
     parametersStr: '',
@@ -159,7 +161,7 @@ const ScheSettingModal = ({
           draft.retryPolicy = data.retry_policy
           draft.periodType = periodType || 'minute'
           draft.timeout = data.timeout
-          draft.schedulePolicy = data.schedule_policy || 3
+          draft.schedulePolicy = data.schedule_policy || defaultschedulePolicy
           draft.executed = data.executed
           draft.parameters = data.parameters
           draft.parametersStr = data.parameters
