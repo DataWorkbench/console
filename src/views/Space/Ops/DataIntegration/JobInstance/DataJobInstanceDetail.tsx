@@ -301,9 +301,20 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
                     hasPadding
                     content={`发布描述：${get(data, 'sync_job.desc', '')}`}
                   >
-                    <div>
+                    <div
+                      onClick={() => {
+                        window.open(
+                          `../data-release/${get(
+                            data,
+                            'job_id',
+                            ''
+                          )}?version=${get(data, 'version')}`,
+                          '_blank'
+                        )
+                      }}
+                    >
                       <div>
-                        <span tw="text-white font-semibold mr-1">
+                        <span tw="text-white font-semibold hover:text-green-11 mr-1 hover:cursor-pointer">
                           {get(data, 'sync_job.name')}
                         </span>
                         <span tw="text-neut-8">({data?.job_id})</span>
