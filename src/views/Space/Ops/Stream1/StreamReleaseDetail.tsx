@@ -301,7 +301,7 @@ const StreamReleaseDetail = observer(
             {/* <Monitor /> */}
           </TabPanel>
           <TabPanel label="开发内容" name="dev">
-            <StreamDevContent data={code} />
+            <StreamDevContent data={code} language="sql" />
           </TabPanel>
           <TabPanel label="计算集群" name="cluster">
             <Cluster clusterId={args?.cluster_id} />

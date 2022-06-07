@@ -30,12 +30,17 @@ const Line = () => {
 const DevContentJSON = (props: {
   data?: { job_content?: string }
   showStep?: boolean
+  language?: string
 }) => {
-  const { data: { job_content: codeStr = defaultCode } = {}, showStep = true } =
-    props
+  const {
+    data: { job_content: codeStr = defaultCode } = {},
+    showStep = true,
+    language = codeName,
+  } = props
   const editorRef = useRef(null)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
 
+  console.log(props)
   const handleEditorWillMount = (monaco: any) => {
     monaco.editor.defineTheme('my-theme', {
       base: 'vs-dark',
@@ -76,7 +81,7 @@ const DevContentJSON = (props: {
         />
 
         <Editor
-          language={codeName}
+          language={language}
           defaultValue={codeStr}
           theme="my-theme"
           tw="overflow-hidden"
