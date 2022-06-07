@@ -44,7 +44,7 @@ const LinkInstance = ({
     window.open(`../data-job/${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
   }
   return (
-    <div tw="w-full">
+    <div tw="w-full py-5">
       <FlexBox tw="gap-9 whitespace-nowrap ml-6">
         <Center tw="gap-1 ">
           <div tw="text-white w-auto">实例状态</div>

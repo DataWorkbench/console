@@ -395,6 +395,11 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
         }}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
       >
         <TabPanel label="关联实例" name="link">
           <LinkInstance jobId={id} version={version} />
