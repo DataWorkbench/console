@@ -34,7 +34,7 @@ const CollapseWrapper = styled('div')(() => [
       }
 
       .collapse-item-content {
-        ${tw`bg-neut-17`}
+        ${tw`bg-neut-17 p-3!`}
       }
     }
 
