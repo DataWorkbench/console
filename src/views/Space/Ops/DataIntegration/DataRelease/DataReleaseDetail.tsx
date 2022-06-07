@@ -389,7 +389,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent flex-auto"
+        tw="bg-transparent"
         // @ts-ignore
         activeName={activeName}
         onChange={(activeName1: string) => {
