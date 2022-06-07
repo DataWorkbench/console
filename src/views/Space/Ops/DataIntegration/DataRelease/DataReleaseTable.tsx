@@ -256,7 +256,7 @@ const DataRelease = observer(() => {
         return value
       }
       if (arr.length === 0) {
-        return [{ key: Math.random().toString(32), hasNone: true }]
+        return [{ key: `${key}-none`, uuid: `${key}-none`, hasNone: true }]
       }
       return arr
     })
