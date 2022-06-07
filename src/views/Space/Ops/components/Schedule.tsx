@@ -82,12 +82,20 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
             <span>调度参数信息</span>
           </Title>
           <div tw="mt-3">
-            {data?.parameters?.map(({ key, value }: Record<string, string>) => (
-              <FlexBox tw="not-last:mb-2 gap-2 text-white pl-6">
-                <Param tw="bg-[#2193d34d]">{key}</Param>=
-                <Param tw="bg-line-dark">{value}</Param>
+            {data?.parameters?.length > 0 ? (
+              data?.parameters?.map(
+                ({ key, value }: Record<string, string>) => (
+                  <FlexBox tw="not-last:mb-2 gap-2 text-white pl-6">
+                    <Param tw="bg-[#2193d34d]">{key}</Param>=
+                    <Param tw="bg-line-dark">{value}</Param>
+                  </FlexBox>
+                )
+              )
+            ) : (
+              <FlexBox tw="not-last:mb-2 gap-2  pl-6">
+                <span> 未设置 </span>
               </FlexBox>
-            ))}
+            )}
           </div>
         </div>
         <div tw="mt-4">
