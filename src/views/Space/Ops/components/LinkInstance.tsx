@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
-import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { Button, InputSearch, Select } from '@QCFE/lego-ui'
+import { Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
+import { Button, Select } from '@QCFE/lego-ui'
+
 import { Center, FlexBox } from 'components/index'
 // import useFilter from 'hooks/useHooks/useFilter'
 import {
@@ -44,7 +45,7 @@ const LinkInstance = ({
   }
   return (
     <div tw="w-full">
-      <FlexBox tw="gap-9 whitespace-nowrap">
+      <FlexBox tw="gap-9 whitespace-nowrap ml-6">
         <Center tw="gap-1 ">
           <div tw="text-white w-auto">实例状态</div>
           <Select
@@ -88,7 +89,8 @@ const LinkInstance = ({
         <Center tw="gap-1">
           <div tw="text-white w-auto ">实例 ID</div>
           <InputSearch
-            tw="w-[200px]"
+            tw="w-[200px] flex-none border rounded border-line-dark"
+            border
             placeholder="搜索实例 ID"
             onPressEnter={(e: React.SyntheticEvent) => {
               setFilter((draft) => {

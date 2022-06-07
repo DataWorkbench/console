@@ -237,7 +237,7 @@ export const dataReleaseTabs: ITab[] = [
     title: '数据集成-已发布作业',
     description:
       '数据集成任务提交和发布后，即可在周期任务列表中对任务进行运维操作。包括查看任务运行详情、暂停任务、下线任务等。',
-    icon: 'equalizer',
+    icon: 'q-iot2Duotone',
     helpLink: getHelpCenterLink('data-job-release'),
   },
 ]
