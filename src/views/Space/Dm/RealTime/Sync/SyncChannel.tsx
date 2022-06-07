@@ -36,6 +36,19 @@ const Root = styled('div')(() => [
   `,
 ])
 
+const styles = {
+  form: css`
+    &.form.is-horizon-layout {
+      .label {
+        ${tw`w-[124px]! mr-4`}
+      }
+      .help {
+        ${tw`ml-[140px]! w-full`}
+      }
+    }
+  `,
+}
+
 interface ChannelControl {
   parallelism?: number | string
   record_num?: number | string
@@ -80,7 +93,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
 
   return (
     <Root>
-      <Form ref={formRef}>
+      <Form ref={formRef} css={styles.form}>
         <NumberField
           name="bytes"
           showButton={false}
@@ -175,7 +188,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
             <span>条，任务自动结束</span>
           </Control>
           <div className="help">
-            <span tw="ml-5">
+            <span>
               允许的脏数据条数，（写入一致性语义为 exactly-once 时无效）
             </span>
           </div>

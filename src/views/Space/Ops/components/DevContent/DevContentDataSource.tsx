@@ -169,7 +169,7 @@ const DevContentDataSource = (props: Record<string, any>) => {
             高级配置
           </Center>
         </Divider>
-        <CollapsePanel tw="bg-transparent" visible={visible}>
+        <CollapsePanel tw="bg-transparent px-0" visible={visible}>
           <Grid>
             <div>写入前SQL语句组</div>
             <div>

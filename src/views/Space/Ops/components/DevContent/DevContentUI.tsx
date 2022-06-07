@@ -26,7 +26,7 @@ const Grid = styled('div')(() => [
   `,
 ])
 const CollapseWrapper = styled('div')(() => [
-  tw`flex-1 px-2 py-2 bg-neut-18`,
+  tw`flex-1 p-5 bg-neut-16`,
   css`
     li.collapse-item {
       ${tw`mt-2 rounded-[3px] overflow-hidden`}
@@ -35,7 +35,7 @@ const CollapseWrapper = styled('div')(() => [
       }
 
       .collapse-item-label {
-        ${tw`h-11 border-none hover:bg-neut-16`}
+        ${tw`h-11 border-none `}
       }
 
       .collapse-item-content {

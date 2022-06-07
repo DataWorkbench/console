@@ -74,7 +74,7 @@ const schedulePolicy = {
 
 const Schedule = ({ data }: { data: Record<string, any> }) => {
   return (
-    <div tw="w-full">
+    <div tw="w-full py-5">
       <Context>
         <div>
           <Title>
