@@ -287,15 +287,15 @@ const StreamRelease = observer(() => {
           }))
         if (arr.length >= 11) {
           const value = arr.slice(0, 10).concat({
-            key: Math.random().toString(32),
-            uuid: Math.random().toString(32),
+            key: `${key}-more`,
+            uuid: `${key}-more`,
             id: key,
             hasMore: true,
           })
           return value
         }
         if (arr.length === 0) {
-          return [{ key: Math.random().toString(32), hasNone: true }]
+          return [{ key: `${key}-none`, uuid: `${key}-none`, hasNone: true }]
         }
         return arr
       })
