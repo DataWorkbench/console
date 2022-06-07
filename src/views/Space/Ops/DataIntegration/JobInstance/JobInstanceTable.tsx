@@ -64,6 +64,43 @@ const instanceNameStyle = css`
   }
 `
 
+const tableStyle = css`
+  ${tw`w-full text-white mt-3`}
+  .grid-table-header {
+    ${tw`bg-[#1E2F41]! border-b border-neut-13 rounded-none`}
+    .table-thead {
+      ${tw`text-white`}
+    }
+  }
+  .table-row {
+    ${tw`bg-neut-17! border-b border-neut-13`}
+    .column-action {
+      ${tw`text-white`}
+    }
+    &:hover {
+      ${tw`bg-[#1E2F41]!`}
+      .column-name, .column-action {
+        ${tw`text-green-11 font-medium`}
+      }
+    }
+  }
+  .grid-table-footer {
+    ${tw`bg-neut-17! rounded-none`}
+    > .portal-pagination {
+      ${tw`text-white`}
+      .pagination-number {
+        ${tw`text-white`}
+        a {
+          ${tw` text-white`}
+        }
+        svg {
+          ${tw`text-white`}
+        }
+      }
+    }
+  }
+`
+
 const actionsType = tuple('info', 'stop')
 type ActionsType = typeof actionsType[number]
 
@@ -429,6 +466,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         <TableHeader columnsSetting={columnsSetting} columns={columns} />
       )}
       <Table
+        css={!showHeader ? tableStyle : null}
         columns={columns}
         dataSource={infos}
         loading={!!isFetching}
