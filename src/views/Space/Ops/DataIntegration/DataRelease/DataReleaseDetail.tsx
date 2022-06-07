@@ -230,13 +230,13 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
-            <Circle>
+            <Circle tw="w-10! h-10!">
               <Icon
                 name="q-downloadBoxFill"
                 type="light"
                 css={css`
                   & .qicon {
-                    ${tw`text-white! fill-[#fff]!`}
+                    ${tw`text-white! fill-[#fff]! `}
                   }
                 `}
               />
