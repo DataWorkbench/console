@@ -101,7 +101,7 @@ export const streamReleaseScheduleTypes = {
     type: StreamReleaseScheduleType.ACTIVE,
   },
   2: {
-    label: '已暂停',
+    label: '已下线',
     value: 2,
     type: StreamReleaseScheduleType.SUSPENDED,
   },
