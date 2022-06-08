@@ -11,16 +11,25 @@ interface DataSourceSelectModalProps {
   sourceType: number
   onCancel?: () => void
   onOk?: (source: any) => void
+  selected?: (string | undefined)[]
 }
 
 const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
-  const { title, onCancel, onOk = noop, visible: show, sourceType } = props
+  const {
+    title,
+    onCancel,
+    onOk = noop,
+    visible: show,
+    sourceType,
+    selected: selectedProp,
+  } = props
   const [visible, setVisible] = useState(show)
-  const [source, setSource] = useState(null)
-
+  const [source, setSource] = useState<Record<string, any>>()
+  const [selected, setSelected] = useState<string[]>([])
   useEffect(() => {
     setVisible(show)
-  }, [show])
+    setSelected(selectedProp?.filter(Boolean) || [])
+  }, [selectedProp, show])
   return (
     <>
       {visible && (
@@ -34,6 +43,7 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
           onOk={() => {
             onOk(source)
           }}
+          okType={source ? 'primary' : 'hidden'}
         >
           <Alert
             type="info"
@@ -52,10 +62,13 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
             }
           />
           <DataSourceList
-            selected={source}
+            selected={selected}
             selectMode
             sourceType={sourceType}
-            onCheck={setSource}
+            onCheck={(s: Record<string, any>) => {
+              setSource(s)
+              setSelected([s.id])
+            }}
           />
         </PortalModal>
       )}

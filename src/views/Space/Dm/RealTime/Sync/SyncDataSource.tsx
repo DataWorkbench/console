@@ -876,6 +876,7 @@ const SyncDataSource = observer(
           {renderTarget()}
         </FlexBox>
         <DataSourceSelectModal
+          selected={op.current === 'source' ? [db.source.id] : [db.target.id]}
           title={`选择${
             op.current === 'source' ? '来源' : '目的'
           }数据源（已选类型为 ${findKey(
