@@ -121,6 +121,7 @@ const VersionsModal = (props: IProps) => {
 
   const jobNameColumn = {
     ...dataReleaseColumns[0],
+    dataIndex: 'name',
     title: '作业名称',
     // width: 250,
     render: (text: string, record: Record<string, any>) => {
