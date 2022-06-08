@@ -191,10 +191,10 @@ const DataSourceForm = ({
       return ftpFilters
     }
     if (urlType === 'hive') {
-      if (get(sourceInfo, 'url.hive.config')) {
-        return hiveAnonymousFilters
+      if (get(sourceInfo, 'url.hive.user')) {
+        return hivePwdFilters
       }
-      return hivePwdFilters
+      return hiveAnonymousFilters
     }
     if (urlType === 'elastic_search') {
       if (
@@ -510,7 +510,9 @@ const DataSourceForm = ({
                 return (
                   <Field key={field.name} tw="mb-0!">
                     <label htmlFor="__" className="label">
-                      <AffixLabel required>{field.label}</AffixLabel>
+                      <AffixLabel required help={field.labelHelp}>
+                        {field.label}
+                      </AffixLabel>
                     </label>
                     <MultiFieldWrapper>
                       {field.items.reduce(

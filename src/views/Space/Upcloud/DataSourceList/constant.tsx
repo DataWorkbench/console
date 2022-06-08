@@ -236,6 +236,7 @@ export const hivePwdFilters = new Set([
   'hiveAuth',
   'user',
   'password',
+  'config',
 ])
 
 export const hiveAnonymousFilters = new Set([
