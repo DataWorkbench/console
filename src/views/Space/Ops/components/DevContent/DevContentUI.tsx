@@ -29,7 +29,7 @@ const CollapseWrapper = styled('div')(() => [
   tw`flex-1 p-5 bg-neut-16`,
   css`
     li.collapse-item {
-      ${tw`mt-2 rounded-[3px] overflow-hidden`}
+      ${tw`mb-2 rounded-[3px] overflow-hidden`}
       .collapse-transition {
         ${tw`transition-none`}
       }
@@ -40,6 +40,9 @@ const CollapseWrapper = styled('div')(() => [
 
       .collapse-item-content {
         ${tw`bg-neut-17`}
+      }
+      &:last-child {
+        ${tw`mb-0`}
       }
     }
   `,
