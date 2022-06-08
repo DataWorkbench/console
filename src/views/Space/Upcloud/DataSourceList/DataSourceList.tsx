@@ -145,6 +145,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     spaceId,
     search: '',
     reverse: true,
+    sort_by: 'created',
     offset: 0,
     limit: 10,
     verbose: 2,
@@ -644,7 +645,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               }}
               onSort={(sortKey: string, sortOrder: string) => {
                 setFilter((draft) => {
-                  draft.order_by = sortKey
+                  draft.sort_by = sortKey
                   draft.reverse = sortOrder === 'desc'
                 })
               }}
