@@ -5,9 +5,8 @@ import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { get, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import { Input, Menu } from '@QCFE/lego-ui'
+import { Input, Menu, Button } from '@QCFE/lego-ui'
 import {
-  Button,
   Icon,
   InputSearch,
   Loading,
@@ -408,7 +407,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
         if (selectMode) {
           return (
             <span
-              tw="cursor-pointer dark:text-blue-10 dark:hover:text-blue-12"
+              tw="cursor-pointer dark:text-white dark:hover:text-blue-12"
               onClick={() => {
                 handlePing(info)
               }}
@@ -592,10 +591,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                   }
                 }}
               />
-              <Button loading={isReFetching} tw="px-[5px]">
+              <Button
+                loading={isReFetching}
+                tw="px-[5px] dark:bg-neut-16! dark:hover:bg-neut-13!"
+              >
                 <Icon
                   name="if-refresh"
-                  tw="text-xl"
+                  tw="text-xl text-white"
+                  type="light"
                   onClick={() => {
                     setIsReFetching(true)
                     refetch().then(() => {
