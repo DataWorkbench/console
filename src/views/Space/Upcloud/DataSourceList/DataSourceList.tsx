@@ -102,7 +102,7 @@ export interface DataSourceListProps {
   selectMode?: boolean
   sourceType?: number
   onCheck?: (source: any) => void
-  selected?: Record<string, any> | null
+  selected?: string[]
 }
 
 const DataSourceList = observer((props: DataSourceListProps) => {
@@ -635,7 +635,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                       .map((i: Record<string, any>) => i.id)
                   : []
               }
-              selectedRowKeys={selectMode ? [selected?.id] : selectedRowKeys}
+              selectedRowKeys={selectMode ? selected : selectedRowKeys}
               onSelect={(rowKeys: string[]) => {
                 if (selectMode && rowKeys.length) {
                   onCheck(sourceList.find((v: any) => v.id === rowKeys[0]))
