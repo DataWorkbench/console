@@ -44,7 +44,12 @@ const EmptyFieldWrapper = styled(Center)(() => [
   tw`self-stretch text-neut-8`,
 ])
 
-const OutlinedGreenButton = styled(Button)(() => tw`text-green-11!`)
+const OutlinedGreenButton = styled(Button)(
+  () =>
+    tw`
+    text-green-12! border-green-12! hover:bg-[rgba(19,150,106,0.1)]! active:bg-[rgba(17,134,95,0.2)]! active:border-green-13! active:text-green-13!
+  `
+)
 
 const Container = styled.div`
   ${tw`relative`}

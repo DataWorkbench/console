@@ -49,7 +49,7 @@ const initTreeData = [
     key: 'rt-root',
     pid: 'rt-root',
     jobMode: 'RT',
-    title: '实时-流式开发',
+    title: '数据开发',
     isLeaf: false,
     children: [],
   },

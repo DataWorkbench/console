@@ -336,6 +336,8 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           fieldType: 'dbUrl',
           label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
           labelClassName: 'label-required',
+          labelHelp:
+            '基于 http 方式连接（http 默认端口是 8123，tcp 连接是 9000 端口）',
           name: '__dbUrl',
           space: [':', '/'],
           items: [
@@ -953,10 +955,10 @@ export const sourceStrategy = [
       return type === SourceType.Hive && name === 'hiveAuth'
     },
     value: (sourceInfo: Record<string, any>) => {
-      if (get(sourceInfo, 'url.hive.config')) {
-        return 2
+      if (get(sourceInfo, 'url.hive.user')) {
+        return 1
       }
-      return 1
+      return 2
     },
   },
   {
