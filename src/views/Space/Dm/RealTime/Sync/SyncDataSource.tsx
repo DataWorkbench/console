@@ -38,7 +38,11 @@ import {
   useStore,
 } from 'hooks'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import {
+  DbType,
+  sourceKinds,
+  SourceType,
+} from 'views/Space/Upcloud/DataSourceList/constant'
 import {
   DataSourceType,
   dataSourceTypes,
@@ -135,6 +139,16 @@ const getWriteMode = (type?: SourceType) => {
 enum Semantic {
   'AtLeastOnce' = 1,
   'ExactlyOnce' = 2,
+}
+
+const getExactly = (types?: SourceType[]) => {
+  const sql = new Set(
+    sourceKinds.filter((i) => i.type === DbType.Sql).map((i) => i.source_type)
+  )
+  if (types?.every((i) => sql.has(i))) {
+    return [Semantic.ExactlyOnce, Semantic.AtLeastOnce]
+  }
+  return [Semantic.AtLeastOnce]
 }
 
 interface Column {
@@ -745,7 +759,12 @@ const SyncDataSource = observer(
                     label: 'at-least-once 至少一次',
                     value: Semantic.AtLeastOnce,
                   },
-                ]}
+                ].filter((i) =>
+                  getExactly([
+                    curJob?.source_type,
+                    curJob?.target_type,
+                  ]).includes(i.value)
+                )}
                 onChange={(v: Semantic) => {
                   setDB((draft) => {
                     draft[from].semantic = +v
