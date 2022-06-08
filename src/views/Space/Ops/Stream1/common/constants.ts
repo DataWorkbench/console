@@ -10,7 +10,7 @@ import {
   alarmStatus,
   jobInstanceStatus,
 } from 'views/Space/Ops/DataIntegration/constants'
-import { autoIncrementKey } from 'utils'
+import { autoIncrementKey, getHelpCenterLink } from 'utils'
 
 export {
   DataReleaseSchedule,
@@ -37,7 +37,7 @@ export const streamReleaseTabs: ITab[] = [
     description:
       '计算任务提交和发布后，即可在周期任务列表中对任务进行运维操作。包括查看任务运行详情、暂停任务、下线任务等。',
     icon: 'q-eventDuotone',
-    helpLink: '###',
+    helpLink: getHelpCenterLink('/manual/operation_center/flink/released_job/'),
   },
 ]
 
@@ -46,8 +46,8 @@ export const streamInstanceTabs: ITab[] = [
     title: '流式计算-作业实例',
     description:
       '作业实例是任务达到启用调度所配置的周期性运行时间时，被自动调度的实例快照。',
-    icon: 'q-eventDuotone',
-    helpLink: '###',
+    icon: 'q-dotLine2Duotone',
+    helpLink: getHelpCenterLink('/manual/operation_center/flink/job_instance/'),
   },
 ]
 

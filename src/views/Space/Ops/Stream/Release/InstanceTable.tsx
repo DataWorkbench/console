@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Button, Menu } from '@QCFE/lego-ui'
 import {
   Modal,
@@ -8,7 +8,14 @@ import {
   Divider,
   localstorage,
 } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, TextLink, Icons, Tooltip } from 'components'
+import {
+  FlexBox,
+  Center,
+  TextLink,
+  Icons,
+  Tooltip,
+  FilterInput,
+} from 'components'
 import dayjs from 'dayjs'
 import tw, { css } from 'twin.macro'
 import {
@@ -20,9 +27,9 @@ import {
 import { omitBy, get } from 'lodash-es'
 import { observer } from 'mobx-react-lite'
 import { useQueryClient } from 'react-query'
-import { useImmer } from 'use-immer'
 import { useHistory, useParams } from 'react-router-dom'
-import { InstanceState } from '../constants'
+import useFilter from 'hooks/useHooks/useFilter'
+import { InstanceState, JobInstanceTabletSuggestions } from '../constants'
 import MessageModal from './MessageModal'
 
 interface IFilter {
@@ -36,15 +43,14 @@ interface IFilter {
   reverse: boolean
 }
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
+const { ColumnsSetting } = ToolBar as any
 
 const columnSettingsKey = 'ASSOIATE_INSTANCE_COLUMN_SETTINGS'
 
 export const InstanceTable = observer(
   ({
     type = 'page',
-    query = {},
-    modalData = {},
   }: {
     type?: 'page' | 'modal'
     query?: any
@@ -60,16 +66,21 @@ export const InstanceTable = observer(
     const [columnSettings, setColumnSettings] = useState(
       localstorage.getItem(columnSettingsKey) || []
     )
-    const [filter, setFilter] = useImmer<IFilter>({
-      state: 0,
-      instance_id: '',
-      job_id: '',
-      version: '',
-      sort_by: 'created',
-      reverse: true,
-      offset: 0,
-      limit: 10,
-    })
+
+    const { filter, setFilter, pagination, sort } = useFilter<
+      IFilter,
+      { pagination: true; sort: true }
+    >(
+      {
+        sort_by: 'created',
+        state: 8,
+        reverse: true,
+        offset: 0,
+        limit: 10,
+      },
+      { pagination: true, sort: true },
+      columnSettingsKey
+    )
 
     const queryClient = useQueryClient()
     const mutation = useMutationInstance()
@@ -114,6 +125,7 @@ export const InstanceTable = observer(
     }
 
     const handleTerminate = (row: any) => {
+      //  @ts-ignore
       Modal.warning({
         title: `终止作业实例: ${row.id}`,
         content: (
@@ -170,6 +182,12 @@ export const InstanceTable = observer(
       {
         title: '状态',
         dataIndex: 'state',
+        filteredValue: filter.state,
+        filters: Object.keys(InstanceState).map((el) => ({
+          value: Number(el),
+          text: InstanceState[el].name,
+        })),
+        hasAll: false,
         width: 120,
         render: (value: number) => {
           return (
@@ -287,81 +305,66 @@ export const InstanceTable = observer(
       },
     ]
 
+    const handleFilterChange = useCallback(
+      (filters: { state: number }) => {
+        setFilter((draft: any) => {
+          return {
+            ...draft,
+            state: Number(filters.state),
+          }
+        })
+      },
+      [setFilter]
+    )
+
     const filterColumn = columnSettings
       .map((o: { key: string; checked: boolean }) => {
         return o.checked && columns.find((col) => col.dataIndex === o.key)
       })
-      .filter((o) => o)
-
-    useEffect(() => {
-      setFilter((draft) => {
-        draft.state = query.state || 0
-        draft.instance_id = query.instanceId || ''
-        draft.job_id = query.jobId || modalData.id || ''
-        draft.version = query.version || modalData.version || ''
-        draft.offset = 0
-      })
-    }, [
-      query.state,
-      query.instanceId,
-      query.jobId,
-      modalData.id,
-      query.version,
-      modalData.version,
-      setFilter,
-    ])
+      .filter((o: any) => o)
 
     return (
       <FlexBox orient="column">
-        <FlexBox tw="justify-end pt-6 pb-3">
-          <Center tw="space-x-3">
-            <Button
-              type="black"
-              loading={isRefetching}
-              tw="px-[5px] border-line-dark!"
-            >
-              <Icon
-                name="if-refresh"
-                tw="text-xl text-white"
-                type="light"
-                onClick={() => {
-                  refetchData()
-                }}
-              />
-            </Button>
-            <ToolBar.ColumnsSetting
-              defaultColumns={columns}
-              onSave={setColumnSettings}
-              storageKey={columnSettingsKey}
+        <FlexBox tw="gap-3 pt-5 pb-3 bg-neut-16">
+          <FilterInput
+            filterLinkKey={columnSettingsKey}
+            suggestions={JobInstanceTabletSuggestions}
+            tw="border-line-dark!"
+            searchKey="job_name"
+            placeholder="搜索关键字或输入过滤条件"
+            // isMultiKeyword
+            defaultKeywordLabel="实例ID"
+          />
+          <Button
+            type="black"
+            loading={isRefetching}
+            tw="px-[5px] border-line-dark!"
+          >
+            <Icon
+              name="if-refresh"
+              tw="text-xl text-white"
+              type="light"
+              onClick={() => {
+                refetchData()
+              }}
             />
-          </Center>
+          </Button>
+          <ColumnsSetting
+            defaultColumns={columns}
+            onSave={setColumnSettings}
+            storageKey={columnSettingsKey}
+          />
         </FlexBox>
         <Table
           rowKey="id"
           loading={isFetching || mutation.isLoading}
           dataSource={infos || []}
           columns={filterColumn.length > 0 ? filterColumn : columns}
-          onSort={(sortKey: any, order: string) => {
-            setFilter((draft) => {
-              draft.sort_by = sortKey
-              draft.reverse = order === 'asc'
-            })
-          }}
+          onSort={sort}
+          onFilterChange={handleFilterChange}
           pagination={{
-            total: data?.total || 0,
-            current: filter.offset / filter.limit + 1,
-            pageSize: filter.limit,
-            onPageChange: (current: number) => {
-              setFilter((draft) => {
-                draft.offset = (current - 1) * filter.limit
-              })
-            },
-            onShowSizeChange: (size: number) => {
-              setFilter((draft) => {
-                draft.offset = 0
-                draft.limit = size
-              })
-            },
+            total: get(data, 'total', 0),
+            ...pagination,
           }}
         />
 

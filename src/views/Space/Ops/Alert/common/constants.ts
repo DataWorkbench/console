@@ -1,4 +1,5 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
+import { getHelpCenterLink } from 'utils'
 import { ITab } from 'utils/types'
 import {
   historyFiledMapping,
@@ -13,7 +14,9 @@ export const alertHistoryTabs: ITab[] = [
     description:
       '告警记录的说明告警策略的说明告警策略的说明告警策略的说明告警策略的说明告警策略的说明告警策略的说明告警策略的说明告警策略的说明告警策略的说明告警策略的说明',
     icon: 'q-bellLightningDuotone',
-    helpLink: '###',
+    helpLink: getHelpCenterLink(
+      '/manual/operation_center/monitor/view_alerts/'
+    ),
   },
 ]
 
@@ -22,7 +25,9 @@ export const alertPolicyTabs: ITab[] = [
     title: '告警策略',
     description: '告警策略说明',
     icon: 'q-bellGearDuotone',
-    helpLink: '###',
+    helpLink: getHelpCenterLink(
+      '/manual/operation_center/monitor/alert_rules/'
+    ),
   },
 ]
 

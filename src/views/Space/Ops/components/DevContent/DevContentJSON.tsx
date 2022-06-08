@@ -64,7 +64,7 @@ const DevContentJSON = (props: {
 
   // TODO: 脚本模式判断
   return (
-    <div tw="h-full w-full grid">
+    <div tw="h-full w-full grid py-5 bg-neut-18">
       {showStep !== false && (
         <Center tw="bg-neut-18 h-14">
           <Item>来源: mysql</Item>
@@ -79,7 +79,6 @@ const DevContentJSON = (props: {
           css={[!showPlaceholder && tw`hidden`]}
           tw="absolute inset-0 z-50 bg-neut-18 bg-opacity-40 cursor-text"
         />
-
         <Editor
           language={language}
           defaultValue={codeStr}
