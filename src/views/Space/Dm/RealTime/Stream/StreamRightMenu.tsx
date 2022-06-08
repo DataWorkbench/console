@@ -52,7 +52,7 @@ const StreamRightMenu = observer(() => {
             workFlowStore.set({ showScheSetting: false })
           }}
           defaultschedulePolicy={
-            curJob?.jobMode === JobMode.DI && curJob.type === 1 ? 1 : 2
+            curJob?.jobMode === JobMode.DI && curJob.type === 2 ? 1 : 2
           }
           visible
         />

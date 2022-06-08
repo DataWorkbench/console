@@ -104,6 +104,18 @@ interface DbInfo {
   fields?: TMappingField[]
 }
 
+const intTypes = new Set([
+  'TINYINT',
+  'SMALLINT',
+  'INT',
+  'BIGINT',
+  'INTEGER',
+  'INT2',
+  'INT4',
+  'INT8',
+  'INT IDENTITY',
+])
+
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
@@ -296,7 +308,6 @@ const SyncJob = () => {
     set(filterResouce, 'job_mode', mode)
     set(filterResouce, 'cluster_id', cluster?.id)
 
-    // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
         if (isSubmit) {
@@ -332,14 +343,27 @@ const SyncJob = () => {
               return
             }
 
-            // 如果并发数大于1  则切分键不能为空
-            const parallelism = get(resource, 'channel_control.parallelism', 0)
             const splitKey = get(
               Object.entries(resource.sync_resource ?? ({} as any)).find(
                 ([k]) => k.endsWith('_source')
               )?.[1] ?? {},
               'split_pk'
             )
+            if (
+              splitKey &&
+              !db?.source?.fields?.some(
+                (f) =>
+                  f.name === splitKey &&
+                  intTypes.has(f.type) &&
+                  f.is_primary_key
+              )
+            ) {
+              showConfWarn('切分键必须为主键且为整型')
+              return
+            }
+
+            // 如果并发数大于1  则切分键不能为空
+            const parallelism = get(resource, 'channel_control.parallelism', 0)
             if (parallelism > 1 && !splitKey) {
               showConfWarn('并发数大于1时，切分键不能为空')
               return

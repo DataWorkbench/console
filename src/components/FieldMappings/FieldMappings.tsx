@@ -668,7 +668,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                 />
               ))}
-              {!readonly && (
+              {false && !readonly && (
                 <Center
                   tw="bg-neut-16 cursor-pointer h-8"
                   onClick={addCustomField}
