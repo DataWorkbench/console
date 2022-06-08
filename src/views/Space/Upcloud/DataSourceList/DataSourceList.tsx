@@ -102,10 +102,11 @@ export interface DataSourceListProps {
   selectMode?: boolean
   sourceType?: number
   onCheck?: (source: any) => void
+  selected?: Record<string, any> | null
 }
 
 const DataSourceList = observer((props: DataSourceListProps) => {
-  const { selectMode = false, sourceType, onCheck = () => {} } = props
+  const { selectMode = false, sourceType, onCheck = () => {}, selected } = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
@@ -634,7 +635,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                       .map((i: Record<string, any>) => i.id)
                   : []
               }
-              selectedRowKeys={selectedRowKeys}
+              selectedRowKeys={selectMode ? [selected?.id] : selectedRowKeys}
               onSelect={(rowKeys: string[]) => {
                 if (selectMode && rowKeys.length) {
                   onCheck(sourceList.find((v: any) => v.id === rowKeys[0]))

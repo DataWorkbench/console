@@ -52,6 +52,7 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
             }
           />
           <DataSourceList
+            selected={source}
             selectMode
             sourceType={sourceType}
             onCheck={setSource}
