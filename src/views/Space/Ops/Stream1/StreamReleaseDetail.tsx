@@ -190,7 +190,7 @@ const StreamReleaseDetail = observer(
                 <Icon
                   name={streamDevModeType[(data?.type as 2) ?? 2]?.icon}
                   type="light"
-                  size={21}
+                  size={28}
                   css={css`
                     & .qicon {
                       ${tw`text-white! fill-[#fff]!`}
