@@ -183,7 +183,7 @@ const DataSourceForm = ({
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
     if (urlType === 'ftp') {
       if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
-        if (get(sourceInfo, 'url.ftp.auth_mode') === 2) {
+        if (get(sourceInfo, 'url.ftp.auth_mode') !== 2) {
           return sftpFiltersWithPwd
         }
         return sftpFiltersWithKey
