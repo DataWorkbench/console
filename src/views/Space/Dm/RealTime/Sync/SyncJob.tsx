@@ -117,7 +117,20 @@ const stepsData = [
   {
     key: 'p3',
     title: '通道控制',
-    desc: <>您可以配置作业的传输速率和错误记录来控制整个数据同步过程</>,
+    desc: (
+      <>
+        您可以配置作业的传输速率和错误记录来控制整个数据同步过程
+        <HelpCenterLink
+          hasIcon
+          tw="ml-1.5"
+          isIframe={false}
+          href="/manual/integration_job/create_job_offline_1/#通道控制"
+          onClick={(e) => e.stopPropagation()}
+        >
+          数据同步文档
+        </HelpCenterLink>
+      </>
+    ),
   },
 ]
 
