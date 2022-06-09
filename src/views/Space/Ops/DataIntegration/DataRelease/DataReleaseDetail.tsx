@@ -26,12 +26,7 @@ import {
 } from 'hooks/useJobVersion'
 import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
 import { useMutationJobRelease } from 'hooks'
-import {
-  AlarmStatusCmp,
-  Circle,
-  DbTypeCmp,
-  JobTypeCmp,
-} from '../../styledComponents'
+import { Circle, DbTypeCmp, JobTypeCmp } from '../../styledComponents'
 import {
   dataReleaseDetailActions,
   DataReleaseDevMode,
@@ -288,10 +283,6 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>告警状态:</span>
-              <span>
-                <AlarmStatusCmp type={data?.alert_status} />
-              </span>
               <span>版本 ID:</span>
               <span>{data?.version}</span>
               <span>作业模式:</span>

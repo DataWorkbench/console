@@ -87,6 +87,7 @@ const DataRelease = observer(() => {
   )
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    // 详情文件位置 views/Space/Ops/DataIntegration/DataRelease/DataReleaseDetail.tsx
     window.open(
       `./data-release/${record.id}?version=${record.version}${
         tab ? `&tab=${tab}` : ''
