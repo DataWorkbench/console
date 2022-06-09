@@ -167,7 +167,7 @@ export const jobModeData = [
     mode: JobMode.DI,
     title: '数据集成',
     desc: '提供异构数据源之间的数据搬运和数据同步的能力。',
-    icon: 'EqualizerFill',
+    icon: 'IotFill',
     selTitle: '同步方式',
     items: [
       {
