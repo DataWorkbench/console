@@ -348,15 +348,25 @@ const SyncDataSource = observer(
           conf,
           `sync_resource.${targetTypeName!.toLowerCase()}_target`
         )
-        const visualization = get<Record<string, string>>(
-          dbSource,
-          'visualization',
-          {}
-        )
-        const condition: any = {}
-        keys(visualization).forEach((v) => {
-          condition[camelCase(v)] = visualization[v]
-        })
+        let condition: any = {}
+
+        if (get(dbSource, 'condition_type') === 2) {
+          condition = {
+            type: 2,
+            expression: get(dbSource, 'express'),
+          }
+        } else {
+          const visualization = get<Record<string, string>>(
+            dbSource,
+            'visualization',
+            {}
+          )
+          keys(visualization).forEach((v) => {
+            condition[camelCase(v)] = visualization[v]
+          })
+          condition.type = 1
+        }
+
         const newDB = {
           source: {
             id: conf.source_id,
@@ -592,6 +602,29 @@ const SyncDataSource = observer(
                 !isEqual(dbInfo.condition, { type: 2 })
               }
               schemas={[
+                {
+                  rule: (re: TConditionParameterVal) => {
+                    if (re.type === 1) {
+                      return true
+                    }
+                    const v = re.expression
+                    if (!v) {
+                      return true
+                    }
+                    if (v?.includes('where ')) {
+                      return false
+                    }
+                    if (
+                      v.trim() &&
+                      v.trim().split(';').filter(Boolean).length > 1
+                    ) {
+                      return false
+                    }
+                    return true
+                  },
+                  help: '条件参数不能包含 where, 且只能包含一个 SQL 命令',
+                  status: 'error',
+                },
                 {
                   help: '条件参数未配置',
                   status: 'error',
@@ -837,6 +870,26 @@ const SyncDataSource = observer(
                     }}
                     value={dbInfo.preSql}
                     placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                    schemas={[
+                      {
+                        rule: (arr: string[]) => {
+                          return (arr || []).every((v) => {
+                            if (!v) {
+                              return true
+                            }
+                            if (
+                              v.trim() &&
+                              v.trim().split(';').filter(Boolean).length > 1
+                            ) {
+                              return false
+                            }
+                            return true
+                          })
+                        },
+                        help: '单条语句只能包含一个 SQL 命令',
+                        status: 'error',
+                      },
+                    ]}
                   />
                   <StyledSqlGroupField
                     className="sql-group-field"
@@ -849,6 +902,26 @@ const SyncDataSource = observer(
                         draft[from].postSql = v
                       })
                     }}
+                    schemas={[
+                      {
+                        rule: (arr: string[]) => {
+                          return (arr || []).every((v) => {
+                            if (!v) {
+                              return true
+                            }
+                            if (
+                              v.trim() &&
+                              v.trim().split(';').filter(Boolean).length > 1
+                            ) {
+                              return false
+                            }
+                            return true
+                          })
+                        },
+                        help: '单条语句只能包含一个 SQL 命令',
+                        status: 'error',
+                      },
+                    ]}
                     placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
                   />
                 </>
