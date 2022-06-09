@@ -181,7 +181,7 @@ export const jobModeData = [
         title: '实时同步作业',
         desc: '通过实时同步的方式进行数据同步开发作业',
         value: JobType.REALTIME,
-        disabled: true,
+        // disabled: true,
       },
     ],
   },

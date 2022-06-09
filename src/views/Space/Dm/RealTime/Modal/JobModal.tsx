@@ -1,34 +1,34 @@
-import { useRef, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useImmer } from 'use-immer'
 import {
-  Modal,
-  ModalStep,
-  ModalContent,
   AffixLabel,
+  Modal,
+  ModalContent,
+  ModalStep,
   SelectTreeField,
 } from 'components'
-import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
-import { get, cloneDeep } from 'lodash-es'
+import { Button, Form, Icon } from '@QCFE/qingcloud-portal-ui'
+import { cloneDeep, get } from 'lodash-es'
 import { useWindowSize } from 'react-use'
 import tw, { css, styled } from 'twin.macro'
 import { TreeNodeProps } from 'rc-tree'
 import { observer } from 'mobx-react-lite'
-import { useStore, useMutationStreamJob, useFetchJob } from 'hooks'
+import { useFetchJob, useMutationStreamJob, useStore } from 'hooks'
 import { Control, Field, Label } from '@QCFE/lego-ui'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { nameMatchRegex, strlen } from 'utils/convert'
 import { JobModeItem } from './JobModeItem'
 import {
-  JobMode,
-  JobType,
-  jobModeData,
-  renderIcon,
-  getJobMode,
-  renderSwitcherIcon,
-  isRootNode,
-  getNewTreeData,
   filterFolderOfTreeData,
   getDiJobType,
+  getJobMode,
+  getNewTreeData,
+  isRootNode,
+  JobMode,
+  jobModeData,
+  JobType,
+  renderIcon,
+  renderSwitcherIcon,
   SyncJobType,
 } from '../Job/JobUtils'
 import {
@@ -323,7 +323,18 @@ export const JobModal = observer((props: JobModalProps) => {
                             )}
                           </Control>
                         </Field>
-                        {!isEdit && (
+                        {!isEdit && params.jobType === JobType.REALTIME && (
+                          <Field>
+                            <Label>
+                              <AffixLabel>开发模式</AffixLabel>
+                            </Label>
+                            <Control>
+                              <span>实时同步</span>
+                            </Control>
+                          </Field>
+                        )}
+
+                        {!isEdit && params.jobType === JobType.OFFLINE && (
                           <SyncTypeRadioGroupField
                             css={css`
                               .label {
