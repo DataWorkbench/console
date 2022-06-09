@@ -539,7 +539,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                     新增数据源
                   </Button>
                   <Button
-                    type="default"
+                    type="danger"
                     disabled={
                       // .filter(
                       // ({
@@ -561,7 +561,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                       )
                     }
                   >
-                    <Icon name="trash" />
+                    <Icon name="trash-fill" />
                     删除
                   </Button>
                 </>

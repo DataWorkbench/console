@@ -160,7 +160,7 @@ const StreamJAR = () => {
             </Tooltip>
           </JobToolBar>
         )}
-        <div tw="flex-1 pl-5">
+        <div tw="flex-1 p-5">
           <Form tw="w-[600px]! max-w-[600px]!" ref={form} layout="vertical">
             <SelectWithRefresh
               name="file_id"
