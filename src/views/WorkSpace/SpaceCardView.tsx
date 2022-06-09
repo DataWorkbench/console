@@ -16,8 +16,17 @@ const colorVars = {
 }
 
 const Content = styled('div')(() => [
-  tw`grid grid-cols-2 flex-wrap 2xl:grid-cols-workspace gap-x-4`,
+  tw`grid flex-wrap  2xl:grid-cols-workspace   gap-x-4`,
   css`
+    @media screen and (max-width: 1535px) and (min-width: 1525px) {
+      grid-template-columns: repeat(3, minmax(400px, 1fr));
+    }
+    @media screen and (max-width: 1525px) and (min-width: 1400px) {
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    }
+    @media screen and (max-width: 1400px) {
+      grid-template-columns: repeat(2, minmax(400px, 1fr));
+    }
     & > div {
       ${tw`mb-4`}
     }
@@ -42,7 +51,7 @@ const SpaceCardView = observer(() => {
     curRegionId: regionId,
     queryKeyWord,
     scrollElem,
-    isModal,
+    isModal = false,
   } = stateStore
   const [filter, setFilter] = useImmer({
     regionId,

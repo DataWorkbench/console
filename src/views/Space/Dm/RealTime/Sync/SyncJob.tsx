@@ -61,6 +61,15 @@ const SyncJobWrapper = styled('div')(() => [
     input {
       ${tw`h-7!`}
     }
+    .radio-wrapper {
+      ${tw`h-7! flex items-center`}
+      &::before {
+        ${tw` top-[6px]`}
+      }
+    }
+    label.radio.checked::after {
+      ${tw` top-[10px]`}
+    }
     .radio-button {
       ${tw`h-7!`}
     }
