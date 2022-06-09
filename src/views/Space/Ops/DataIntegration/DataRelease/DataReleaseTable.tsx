@@ -73,12 +73,14 @@ const DataRelease = observer(() => {
       status?: number
       offset: number
       limit: number
+      verbose?: number
     },
     { pagination: true; sort: true }
   >(
     {
       sort_by: 'updated',
       reverse: true,
+      verbose: 1,
     },
     { pagination: true, sort: true },
     dataReleaseSettingKey
@@ -159,7 +161,7 @@ const DataRelease = observer(() => {
             onClick={() => {
               set({
                 showVersion: true,
-                selectedData: record,
+                selectedData: { id: record?.key },
               })
             }}
           >
@@ -222,7 +224,10 @@ const DataRelease = observer(() => {
     [setColumnSettings]
   )
 
-  const { data, isFetching } = useQuerySyncJobRelease(filter)
+  const { data, isFetching } = useQuerySyncJobRelease(filter, {
+    enabled: true,
+    refetchInterval: 1000 * 60,
+  })
 
   const infos = get(data, 'infos', []) || []
 
@@ -251,7 +256,7 @@ const DataRelease = observer(() => {
         return value
       }
       if (arr.length === 0) {
-        return [{ key: Math.random().toString(32), hasNone: true }]
+        return [{ key: `${key}-none`, uuid: `${key}-none`, hasNone: true }]
       }
       return arr
     })
@@ -263,7 +268,7 @@ const DataRelease = observer(() => {
         <TabsWrapper>
           <PageTab tabs={dataReleaseTabs} />
         </TabsWrapper>
-        <FlexBox orient="column" tw="gap-3">
+        <FlexBox orient="column" tw="gap-3 p-5 bg-bgColor-light">
           <TableHeader columnsSetting={columnsSetting} />
           <SelectTreeTable
             openLevel={1}

@@ -224,7 +224,7 @@ const StreamRelease = observer(() => {
             theme="dark"
             icon={
               streamDevModeType[
-                get(record, getName('devMode') as string, 1) as 1
+                get(record, getName('devMode') as string, 2) as 2
               ]?.icon
             }
             name={record.name}
@@ -254,7 +254,9 @@ const StreamRelease = observer(() => {
   // const mutation = useMutationUdfReleaseJobs()
 
   const isFetching = useIsFetching()
-  const { data } = useQueryReleaseJobs(omitBy(filter, isNil))
+  const { data } = useQueryReleaseJobs(omitBy(filter, isNil), {
+    refetchInterval: 1000 * 60,
+  })
 
   const infos = get(data, 'infos', []) || []
 
@@ -285,15 +287,15 @@ const StreamRelease = observer(() => {
           }))
         if (arr.length >= 11) {
           const value = arr.slice(0, 10).concat({
-            key: Math.random().toString(32),
-            uuid: Math.random().toString(32),
+            key: `${key}-more`,
+            uuid: `${key}-more`,
             id: key,
             hasMore: true,
           })
           return value
         }
         if (arr.length === 0) {
-          return [{ key: Math.random().toString(32), hasNone: true }]
+          return [{ key: `${key}-none`, uuid: `${key}-none`, hasNone: true }]
         }
         return arr
       })

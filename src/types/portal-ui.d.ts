@@ -46,7 +46,7 @@ declare module '@QCFE/qingcloud-portal-ui' {
   export function ToolBarRight(props: any): JSX.Element
 
   export interface ModalProps {
-    css?: Record<string, Record<string, unknown>>
+    css?: any
     width?: number
     height?: number
     onCancel?: () => void

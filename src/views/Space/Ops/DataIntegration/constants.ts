@@ -15,7 +15,8 @@ export const dataJobReleaseTab: ITab[] = [
 export const dataJobInstanceTab: ITab[] = [
   {
     title: '数据集成-作业实例',
-    description: 'Instance data job',
+    description:
+      '作业实例是任务达到启用调度所配置的周期性运行时间时，被自动调度的实例快照。',
     icon: 'q-mergeFillDuotone',
     helpLink: getHelpCenterLink('data-job-instance'),
   },
@@ -76,21 +77,21 @@ export const dataJobInstanceSuggestions: ISuggestion[] = [
       key: value,
     })),
   },
+  // {
+  //   label: '告警状态',
+  //   key: 'alarm_status',
+  //   options: Object.values(alarmStatus).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
+  // {
+  //   label: '作业名称',
+  //   key: 'job_name',
+  // },
   {
-    label: '告警状态',
-    key: 'alarm_status',
-    options: Object.values(alarmStatus).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
-  {
-    label: '作业名称',
-    key: 'job_name',
-  },
-  {
-    label: '作业 ID',
-    key: 'job_id',
+    label: '实例 ID',
+    key: 'instance_id',
   },
 ]
 
@@ -105,11 +106,11 @@ export const dataJobInstanceColumns: IColumn[] = [
     dataIndex: 'state',
     key: 'state',
   },
-  {
-    title: '告警状态',
-    dataIndex: 'alarm_status',
-    key: 'alarm_status',
-  },
+  // {
+  //   title: '告警状态',
+  //   dataIndex: 'alarm_status',
+  //   key: 'alarm_status',
+  // },
   {
     title: '所属作业',
     dataIndex: 'job_id',
@@ -180,7 +181,7 @@ export const dataReleaseSuggestions: ISuggestion[] = [
   },
   {
     label: '作业 ID',
-    key: 'ID',
+    key: 'job_id',
   },
   {
     label: '调度状态',
@@ -190,52 +191,53 @@ export const dataReleaseSuggestions: ISuggestion[] = [
       key: value,
     })),
   },
-  {
-    label: '告警状态',
-    key: 'alert_status',
-    options: Object.values(alarmStatus).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
-  {
-    label: '开发模式',
-    key: 'job_mode',
-    options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
-  {
-    label: '作业类型',
-    key: 'type',
-    options: Object.values(jobType).map(({ label, value }) => ({
-      label,
-      key: value,
-    })),
-  },
-  {
-    label: '来源',
-    key: 'source',
-    options: Object.entries(sourceTypes).map(([key, value]) => ({
-      label: value,
-      key,
-    })),
-  },
-  {
-    label: '目的',
-    key: 'target',
-    options: Object.entries(sourceTypes).map(([key, value]) => ({
-      label: value,
-      key,
-    })),
-  },
+  // {
+  //   label: '告警状态',
+  //   key: 'alert_status',
+  //   options: Object.values(alarmStatus).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
+  // {
+  //   label: '开发模式',
+  //   key: 'job_mode',
+  //   options: Object.values(dataReleaseDevModeType).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
+  // {
+  //   label: '作业类型',
+  //   key: 'type',
+  //   options: Object.values(jobType).map(({ label, value }) => ({
+  //     label,
+  //     key: value,
+  //   })),
+  // },
+  // {
+  //   label: '来源',
+  //   key: 'source',
+  //   options: Object.entries(sourceTypes).map(([key, value]) => ({
+  //     label: value,
+  //     key,
+  //   })),
+  // },
+  // {
+  //   label: '目的',
+  //   key: 'target',
+  //   options: Object.entries(sourceTypes).map(([key, value]) => ({
+  //     label: value,
+  //     key,
+  //   })),
+  // },
 ]
 export const dataReleaseTabs: ITab[] = [
   {
     title: '数据集成-已发布作业',
-    description: 'Release data job',
-    icon: 'equalizer',
+    description:
+      '数据集成任务提交和发布后，即可在周期任务列表中对任务进行运维操作。包括查看任务运行详情、暂停任务、下线任务等。',
+    icon: 'q-iot2Duotone',
     helpLink: getHelpCenterLink('data-job-release'),
   },
 ]
@@ -252,12 +254,12 @@ export const dataReleaseColumns: IColumn[] = [
     key: 'status',
     width: 120,
   },
-  {
-    title: '告警状态',
-    dataIndex: 'alert_status',
-    key: 'alert_status',
-    width: 100,
-  },
+  // {
+  //   title: '告警状态',
+  //   dataIndex: 'alert_status',
+  //   key: 'alert_status',
+  //   width: 100,
+  // },
   {
     title: '版本 ID',
     dataIndex: 'version',
@@ -293,7 +295,7 @@ export const dataReleaseColumns: IColumn[] = [
 
 const versionSet = new Set([
   'id',
-  'status',
+  // 'status',
   'alert_status',
   'version',
   'updated',
@@ -367,7 +369,7 @@ export type DataReleaseActionType = typeof dataReleaseActions[number]['key']
 
 export const dataJobActions = [
   {
-    text: '中止',
+    text: '终止',
     icon: 'q-closeCircleFill',
     key: 'stop',
   },

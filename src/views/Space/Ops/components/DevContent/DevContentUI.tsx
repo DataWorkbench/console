@@ -2,11 +2,11 @@ import tw, { css, styled } from 'twin.macro'
 import { Collapse } from '@QCFE/lego-ui'
 import DevContentDataSource from 'views/Space/Ops/components/DevContent/DevContentDataSource'
 import { AffixLabel, FieldMappings } from 'components/index'
-import { findKey, get } from 'lodash-es'
+import { get } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
 import { useMemo } from 'react'
-import { dataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { getDataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import SyncDataSource from 'views/Space/Dm/RealTime/Sync/SyncDataSource'
 import { nanoid } from 'nanoid'
 
@@ -26,20 +26,23 @@ const Grid = styled('div')(() => [
   `,
 ])
 const CollapseWrapper = styled('div')(() => [
-  tw`flex-1 px-2 py-2 bg-neut-18`,
+  tw`flex-1 p-5 bg-neut-16`,
   css`
     li.collapse-item {
-      ${tw`mt-2 rounded-[3px] overflow-hidden`}
+      ${tw`mb-2 rounded-[3px] overflow-hidden`}
       .collapse-transition {
         ${tw`transition-none`}
       }
 
       .collapse-item-label {
-        ${tw`h-11 border-none hover:bg-neut-16`}
+        ${tw`h-11 border-none `}
       }
 
       .collapse-item-content {
         ${tw`bg-neut-17`}
+      }
+      &:last-child {
+        ${tw`mb-0`}
       }
     }
   `,
@@ -88,10 +91,7 @@ const DevContentUI = (props: IProps) => {
   const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
-    return [
-      findKey(dataSourceTypes, (v) => v === sourceType),
-      findKey(dataSourceTypes, (v) => v === targetType),
-    ]
+    return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
   }, [curJob])
 
   const sourceColumn = useMemo(() => {
@@ -140,6 +140,7 @@ const DevContentUI = (props: IProps) => {
             {index === 0 && (
               <DevContentDataSource
                 dbData={db}
+                curJob={curJob}
                 sourceTypeName={sourceTypeName}
                 targetTypeName={targetTypeName}
               />
@@ -149,15 +150,16 @@ const DevContentUI = (props: IProps) => {
                 <div tw="absolute invisible">
                   <SyncDataSource
                     curJob={curJob}
-                    onSelectTable={(tp, tableName, data) => {
+                    onSelectTable={(tp, tableName, data, table) => {
                       const fieldData = data.map((field) => ({
                         ...field,
                         uuid: nanoid(),
                       })) as TMappingField[]
                       setDb((draft) => {
-                        const soruceInfo = draft[tp]
-                        soruceInfo.tableName = tableName
-                        soruceInfo.fields = fieldData
+                        const sourceInfo = draft[tp]
+                        sourceInfo.tableName = tableName
+                        sourceInfo.fields = fieldData
+                        sourceInfo.tableConfig = table
                       })
                     }}
                     onDbChange={(tp: 'source' | 'target', data) => {
@@ -184,40 +186,28 @@ const DevContentUI = (props: IProps) => {
               <div>
                 <Grid>
                   <div>
-                    <AffixLabel
-                      theme="green"
-                      required={false}
-                      help="作业期望最大并行数"
-                    >
+                    <AffixLabel theme="green" required={false}>
                       作业期望最大并行数
                     </AffixLabel>
                   </div>
                   <div>{channel.parallelism || ''}</div>
                   <div>
-                    <AffixLabel theme="green" required={false} help="同步速率">
+                    <AffixLabel theme="green" required={false}>
                       同步速率
                     </AffixLabel>
                   </div>
-                  <div>{{ 1: '限流', 2: '不限流' }[channel.rate as 1]}</div>
-                  {channel.rat === 1 && (
-                    <>
-                      <div>
-                        <AffixLabel
-                          theme="light"
-                          required={false}
-                          help="错误记录数超过"
-                        >
-                          错误记录数超过
-                        </AffixLabel>
-                      </div>
+                  <div>
+                    {(channel.rate as 1) === 1
+                      ? `限流 ${channel.bytes} Byte/s`
+                      : '不限流'}
+                  </div>
+                  <div>
+                    <AffixLabel theme="light" required={false}>
+                      错误记录数超过
+                    </AffixLabel>
+                  </div>
 
-                      <div>
-                        {channel.record_num ?? ''} 条或{' '}
-                        {channel.percentage ?? ''}
-                        %比例，达到任一条件时，任务自动结束
-                      </div>
-                    </>
-                  )}
+                  <div>{channel.record_num ?? ''} 条，任务自动结束</div>
                 </Grid>
               </div>
             )}

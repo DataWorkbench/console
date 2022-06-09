@@ -230,13 +230,14 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
-            <Circle>
+            <Circle tw="w-10! h-10!">
               <Icon
                 name="q-downloadBoxFill"
                 type="light"
+                size={28}
                 css={css`
                   & .qicon {
-                    ${tw`text-white! fill-[#fff]!`}
+                    ${tw`text-white! fill-[#fff]! `}
                   }
                 `}
               />
@@ -389,12 +390,17 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent flex-auto"
+        tw="bg-transparent"
         // @ts-ignore
         activeName={activeName}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
         }}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
       >
         <TabPanel label="关联实例" name="link">
           <LinkInstance jobId={id} version={version} />

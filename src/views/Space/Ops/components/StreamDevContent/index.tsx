@@ -21,15 +21,21 @@ const GridItem = styled.div(({ labelWidth = 188 }: { labelWidth?: number }) => [
 ])
 export default function StreamDevContent({
   data,
+  language,
 }: {
   data?: Record<string, any>
+  language?: string
 }) {
   if (!data) {
     return <Loading size="large" />
   }
   if (data.type === 2) {
     return (
-      <DevContentJSON data={{ job_content: data.sql.code }} showStep={false} />
+      <DevContentJSON
+        data={{ job_content: data.sql.code }}
+        showStep={false}
+        language={language}
+      />
     )
   }
   if (data.type === 4) {

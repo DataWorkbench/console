@@ -51,6 +51,9 @@ const StreamRightMenu = observer(() => {
           onCancel={() => {
             workFlowStore.set({ showScheSetting: false })
           }}
+          defaultschedulePolicy={
+            curJob?.jobMode === JobMode.DI && curJob.type === 2 ? 1 : 2
+          }
           visible
         />
       )}

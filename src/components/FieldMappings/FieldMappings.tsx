@@ -18,12 +18,15 @@ import { followCursor } from 'tippy.js'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
+import useIcon from 'hooks/useHooks/useIcon'
+import { Tooltip } from 'components/Tooltip'
 import MappingItem, { TMappingField, FieldRow } from './MappingItem'
+import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
 
 /* @refresh reset */
 const styles = {
-  wrapper: tw`border flex-1 border-neut-13`,
+  wrapper: tw`border flex-1 border-neut-13 w-[40%] min-w-[540px]`,
   fieldType: tw`w-44 pl-5 xl:pl-12`,
   row: tw`flex border-b border-neut-13 last:border-b-0 p-1.5`,
   // row: tw`grid grid-template-columns[1fr 1.5fr 48px] text-left border-b border-neut-13 last:border-b-0 p-1.5`,
@@ -41,7 +44,12 @@ const EmptyFieldWrapper = styled(Center)(() => [
   tw`self-stretch text-neut-8`,
 ])
 
-const OutlinedGreenButton = styled(Button)(() => tw`text-green-11!`)
+const OutlinedGreenButton = styled(Button)(
+  () =>
+    tw`
+    text-green-12! border-green-12! hover:bg-[rgba(19,150,106,0.1)]! active:bg-[rgba(17,134,95,0.2)]! active:border-green-13! active:text-green-13!
+  `
+)
 
 const Container = styled.div`
   ${tw`relative`}
@@ -105,6 +113,7 @@ export interface IFieldMappingsProps {
   columns?: [Column[], Column[]]
   readonly?: boolean
   hasHeader?: boolean
+  onReInit: () => void
 }
 
 export interface IFieldMappingsRecord {
@@ -115,6 +124,7 @@ export interface IFieldMappingsRecord {
 
 export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const {
+    onReInit,
     leftFields: leftFieldsProp,
     rightFields: rightFieldsProp,
     leftTypeName,
@@ -125,6 +135,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     hasHeader = true,
   } = props
 
+  useIcon(icons)
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
   const jsPlumbInstRef = useRef<jsPlumbInstance>()
@@ -154,7 +165,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   useEffect(() => {
     const [leftColumns, rightColumns] = columns || [[], []]
-    if (leftColumns.length > 0 && rightColumns.length > 0) {
+    if (leftColumns?.length > 0 && rightColumns?.length > 0) {
       const mappingArr = leftColumns.map<[string, string]>((column, i) => [
         column.name,
         rightColumns[i].name,
@@ -168,13 +179,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           const field = fields.find((f) => f.name === c.name)
           const uuid = nanoid()
           if (field) {
-            return { ...field, uuid }
+            return { ...field, uuid: field.uuid || uuid }
           }
           return {
             type: c.type,
             name: c.name,
             default: c.value,
             formatter: c.format,
+            custom: true,
             uuid,
           }
         })
@@ -185,7 +197,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       })
       setRightFields((fields) => {
         const filedNames: string[] = []
-        const mappingFields = rightColumns.map((c) => {
+        const mappingFields = rightColumns?.map((c) => {
           filedNames.push(c.name)
           const field = fields.find((f) => f.name === c.name)
           const uuid = nanoid()
@@ -197,6 +209,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             name: c.name,
             default: c.value,
             formatter: c.format,
+            custom: true,
             uuid,
           }
         })
@@ -417,8 +430,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   const handleReset = () => {
     handleClearMapping()
-    setLeftFields(leftFieldsProp)
-    setRightFields(rightFieldsProp)
+    onReInit()
+    // setLeftFields(leftFieldsProp)
+    // setRightFields(rightFieldsProp)
   }
 
   const handleDeleteConnection = () => {
@@ -513,7 +527,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           message="提示：选择来源端与目的端的数据源与表，才会显示字段映射。"
           type="info"
           linkBtn={
-            <HelpCenterLink href="/xxx" isIframe={false} hasIcon={false}>
+            <HelpCenterLink
+              href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+              isIframe={false}
+              hasIcon={false}
+            >
               查看详情 →
             </HelpCenterLink>
           }
@@ -528,30 +546,67 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         {topHelp && <Center tw="absolute left-0 bottom-0">{topHelp}</Center>}
         {hasHeader && (
           <Center tw="gap-4">
-            <OutlinedGreenButton type="outlined" onClick={handleParallel}>
+            <OutlinedGreenButton
+              type="outlined"
+              onClick={handleParallel}
+              disabled={!(leftFields.length && rightFields.length)}
+            >
               全部平行
             </OutlinedGreenButton>
-            <PopConfirm
-              type="warning"
-              okType="danger"
-              okText="确认"
-              content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
-              onOk={handleNameMapping}
-            >
-              <OutlinedGreenButton type="outlined">
-                同名映射
-              </OutlinedGreenButton>
-            </PopConfirm>
-            <PopConfirm
-              type="warning"
-              okText="确认"
-              content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
-              onOk={handleRowMapping}
-            >
-              <OutlinedGreenButton type="outlined">
+            {
+              // eslint-disable-next-line no-nested-ternary
+              intersectionBy(leftFields, rightFields, 'name').length ? (
+                mappings.length ? (
+                  <PopConfirm
+                    type="warning"
+                    okType="danger"
+                    okText="确认"
+                    content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
+                    onOk={handleNameMapping}
+                  >
+                    <OutlinedGreenButton type="outlined">
+                      同名映射
+                    </OutlinedGreenButton>
+                  </PopConfirm>
+                ) : (
+                  <OutlinedGreenButton
+                    type="outlined"
+                    onClick={handleNameMapping}
+                  >
+                    同名映射
+                  </OutlinedGreenButton>
+                )
+              ) : (
+                <Tooltip content="暂无同名字段" theme="light" hasPadding>
+                  <OutlinedGreenButton type="outlined" disabled>
+                    同名映射
+                  </OutlinedGreenButton>
+                </Tooltip>
+              )
+            }
+            {mappings.length ? (
+              <PopConfirm
+                type="warning"
+                okText="确认"
+                content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
+                onOk={handleRowMapping}
+              >
+                <OutlinedGreenButton
+                  type="outlined"
+                  disabled={!(leftFields.length && rightFields.length)}
+                >
+                  同行映射
+                </OutlinedGreenButton>
+              </PopConfirm>
+            ) : (
+              <OutlinedGreenButton
+                type="outlined"
+                onClick={handleRowMapping}
+                disabled={!(leftFields.length && rightFields.length)}
+              >
                 同行映射
               </OutlinedGreenButton>
-            </PopConfirm>
+            )}
             <PopConfirm
               content="取消映射会去除所有现有映射，确定取消映射么？"
               type="warning"
@@ -559,7 +614,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               okType="danger"
               onOk={handleClearMapping}
             >
-              <Button type="black">解除全部映射</Button>
+              <Button type="black" disabled={!mappings.length}>
+                解除全部映射
+              </Button>
             </PopConfirm>
             <PopConfirm
               content="置为初始状态会重新将表结构恢复到获取时的状态且去掉已有的映射和新增字段，确认置为初始状态么？"
@@ -574,7 +631,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         )}
       </div>
       <Container ref={containerRef}>
-        <FlexBox tw="flex items-start transition-all duration-500">
+        <FlexBox tw="flex items-start transition-all duration-500 overflow-x-auto">
           {leftFields.length ? (
             <div css={styles.wrapper}>
               <FieldRow isHeader>
@@ -587,7 +644,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   item={item}
                   key={item.name}
                   index={i}
-                  hasConnection={!!mappings.find(([l]) => l === item.name)}
+                  hasConnection={!!mappings.find(([l]) => l === item?.name)}
                   anchor="Right"
                   typeName={leftTypeName}
                   moveItem={moveItem}
@@ -616,7 +673,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                 />
               ))}
-              {!readonly && (
+              {false && !readonly && (
                 <Center
                   tw="bg-neut-16 cursor-pointer h-8"
                   onClick={addCustomField}
@@ -654,7 +711,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             appendTo={() => document.body}
           >
             <div
-              tw="w-1/12 self-stretch"
+              tw="w-1/12 self-stretch min-w-[32px]"
               onContextMenu={(e) => e.preventDefault()}
             />
           </Tippy>

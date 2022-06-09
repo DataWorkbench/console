@@ -5,9 +5,8 @@ import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { get, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import { Input, Menu } from '@QCFE/lego-ui'
+import { Input, Menu, Button } from '@QCFE/lego-ui'
 import {
-  Button,
   Icon,
   InputSearch,
   Loading,
@@ -29,7 +28,6 @@ import {
   Icons,
   TextEllipsis,
   TextLink,
-  RouterLink,
   Tooltip,
 } from 'components'
 import { NetworkModal } from 'views/Space/Dm/Network'
@@ -44,6 +42,7 @@ import { usePingEvent } from './DataSourcePing/hooks'
 import {
   confirmMsgInfo,
   CONNECTION_STATUS,
+  DATASOURCE_PING_STAGE,
   DATASOURCE_STATUS,
   getUrl,
   sourceKinds,
@@ -102,10 +101,11 @@ export interface DataSourceListProps {
   selectMode?: boolean
   sourceType?: number
   onCheck?: (source: any) => void
+  selected?: string[]
 }
 
 const DataSourceList = observer((props: DataSourceListProps) => {
-  const { selectMode = false, sourceType, onCheck = () => {} } = props
+  const { selectMode = false, sourceType, onCheck = () => {}, selected } = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
@@ -137,15 +137,18 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     reverse: boolean
     search?: string
     verbose?: 1 | 2
+    status?: number
     [k: string]: any
   }>({
     regionId,
     spaceId,
     search: '',
     reverse: true,
+    sort_by: 'created',
     offset: 0,
     limit: 10,
     verbose: 2,
+    status: selectMode ? DATASOURCE_STATUS.ENABLED : 0,
   })
   const { isLoading, refetch, data } = useQuerySource(
     merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})
@@ -207,12 +210,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     const item = {
       uuid: Math.random().toString(32),
       sourceId: id,
+      stage: DATASOURCE_PING_STAGE.UPDATE,
     }
     addPing(item)
     mutation
       .mutateAsync({
         op: 'ping',
         source_id: id,
+        stage: DATASOURCE_PING_STAGE.UPDATE,
       })
       .finally(() => {
         updatePing(item)
@@ -279,7 +284,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     {
       title: '数据源类型',
       dataIndex: 'type',
-      width: 92,
+      width: 110,
       render: (v: number) => {
         return sourceKinds.find((kind) => kind.source_type === v)?.name
       },
@@ -404,7 +409,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
         if (selectMode) {
           return (
             <span
-              tw="cursor-pointer"
+              tw="cursor-pointer dark:text-white dark:hover:text-blue-12"
               onClick={() => {
                 handlePing(info)
               }}
@@ -534,7 +539,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                     新增数据源
                   </Button>
                   <Button
-                    type="default"
+                    type="danger"
                     disabled={
                       // .filter(
                       // ({
@@ -556,24 +561,28 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                       )
                     }
                   >
-                    <Icon name="trash" />
+                    <Icon name="trash-fill" />
                     删除
                   </Button>
                 </>
               ) : (
                 <div tw="text-neut-8">
                   如需选择新的数据源，您可以前往
-                  <RouterLink
-                    to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                  <TextLink
+                    tw="ml-2 text-green-11!"
+                    href={`./${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                    target="_blank"
+                    hasIcon={false}
                   >
-                    新建 MySQL 数据源
-                  </RouterLink>
+                    新建数据源
+                  </TextLink>
                 </div>
               )}
             </ToolBarLeft>
             <ToolBarRight>
               <InputSearch
                 placeholder="请输入关键词进行搜索"
+                tw="dark:border-2 dark:rounded-sm dark:border-separator-light"
                 value={searchName}
                 onChange={(e, v) => setSearchName(String(v))}
                 onPressEnter={() => handleQuery(searchName)}
@@ -584,10 +593,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                   }
                 }}
               />
-              <Button loading={isReFetching} tw="px-[5px]">
+              <Button
+                loading={isReFetching}
+                tw="px-[5px] dark:bg-neut-16! dark:hover:bg-neut-13!"
+              >
                 <Icon
                   name="if-refresh"
                   tw="text-xl"
+                  type="light"
                   onClick={() => {
                     setIsReFetching(true)
                     refetch().then(() => {
@@ -610,14 +623,23 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             tw="flex-1 pb-5 dark:bg-neut-16"
             css={[!selectMode && tw`px-5`]}
           >
-            {/* TODO: radio disabled 连通性过滤 */}
             <Table
               selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
               columns={columns}
               rowKey="id"
               tw="pb-4 "
-              selectedRowKeys={selectedRowKeys}
+              disabledRowKeys={
+                selectMode
+                  ? sourceList
+                      .filter(
+                        (i: Record<string, any>) =>
+                          !i.last_connection || i.last_connection.result !== 1
+                      )
+                      .map((i: Record<string, any>) => i.id)
+                  : []
+              }
+              selectedRowKeys={selectMode ? selected : selectedRowKeys}
               onSelect={(rowKeys: string[]) => {
                 if (selectMode && rowKeys.length) {
                   onCheck(sourceList.find((v: any) => v.id === rowKeys[0]))
@@ -626,7 +648,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               }}
               onSort={(sortKey: string, sortOrder: string) => {
                 setFilter((draft) => {
-                  draft.order_by = sortKey
+                  draft.sort_by = sortKey
                   draft.reverse = sortOrder === 'desc'
                 })
               }}

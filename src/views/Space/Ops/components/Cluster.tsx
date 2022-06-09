@@ -73,7 +73,7 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
   }
 
   return (
-    <div tw="w-full border border-line-dark">
+    <div tw="w-full border border-line-dark my-5">
       <Header>
         <Icon name="pod" size={40} type="light" />
         <div tw="ml-3">

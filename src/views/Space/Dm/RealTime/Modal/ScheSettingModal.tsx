@@ -53,6 +53,7 @@ interface IScheSettingModal {
   origin?: string
   onCancel?: () => void
   onSuccess?: () => void
+  defaultschedulePolicy?: number
 }
 
 type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -62,6 +63,7 @@ const ScheSettingModal = ({
   origin = '',
   onCancel,
   onSuccess,
+  defaultschedulePolicy = 3,
 }: IScheSettingModal) => {
   const queryClient = useQueryClient()
   const [disabled, setDisabled] = useState(Boolean(origin === 'ops'))
@@ -124,7 +126,7 @@ const ScheSettingModal = ({
     retryPolicy: 1,
     timeout: 0,
     periodType: 'minute',
-    schedulePolicy: 3,
+    schedulePolicy: defaultschedulePolicy,
     executed: null,
     parameters: null,
     parametersStr: '',
@@ -159,7 +161,7 @@ const ScheSettingModal = ({
           draft.retryPolicy = data.retry_policy
           draft.periodType = periodType || 'minute'
           draft.timeout = data.timeout
-          draft.schedulePolicy = data.schedule_policy || 3
+          draft.schedulePolicy = data.schedule_policy || defaultschedulePolicy
           draft.executed = data.executed
           draft.parameters = data.parameters
           draft.parametersStr = data.parameters
@@ -472,24 +474,24 @@ var2=\${yyyy-mm-dd HH-1H}`}
                     }}
                     validateOnChange
                     schemas={[
-                      {
-                        // eslint-disable-next-line no-template-curly-in-string
-                        help: '参数值不合法, 请参考格式: ${yyyy-mm-dd HH:MM:SS}',
-                        status: 'error',
-                        rule: (v: string) => {
-                          return v
-                            .split(/[\r\n]/)
-                            .filter((str) => !isEmpty(str))
-                            .every((str) => {
-                              const [, val] = str.split('=')
-                              if (val === undefined || !/^\${\w+}$/.test(val)) {
-                                return false
-                              }
-                              return true
-                            })
-                          return true
-                        },
-                      },
+                      // {
+                      //   // eslint-disable-next-line no-template-curly-in-string
+                      //   help: '参数值不合法, 请参考格式: ${yyyy-mm-dd HH:MM:SS}',
+                      //   status: 'error',
+                      //   rule: (v: string) => {
+                      //     return v
+                      //       .split(/[\r\n]/)
+                      //       .filter((str) => !isEmpty(str))
+                      //       .every((str) => {
+                      //         const [, val] = str.split('=')
+                      //         if (val === undefined) {
+                      //           return false
+                      //         }
+                      //         return true
+                      //       })
+                      //     return true
+                      //   },
+                      // },
                       {
                         help: '不能为空，且变量名必须唯一',
                         status: 'error',
@@ -500,7 +502,11 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             .filter((str) => !isEmpty(str))
                             .every((str) => {
                               const [key, val] = str.split('=')
-                              if (val === undefined || isEmpty(val)) {
+                              if (
+                                isEmpty(key) ||
+                                val === undefined ||
+                                isEmpty(val)
+                              ) {
                                 return false
                               }
                               if (keys.includes(key)) {

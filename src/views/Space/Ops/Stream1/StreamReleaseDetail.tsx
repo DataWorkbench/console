@@ -9,7 +9,7 @@ import { Center } from 'components/Center'
 import {
   AlarmStatusCmp,
   Circle,
-  JobInstanceStatusCmp,
+  StreamReleaseStatusCmp,
 } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
 import LinkInstance from 'views/Space/Ops/components/LinkInstance'
@@ -186,24 +186,22 @@ const StreamReleaseDetail = observer(
           )}
           <div tw="flex justify-between items-center px-4 h-[72px]">
             <Center tw="flex-auto">
-              <Circle>
+              <Circle tw="w-10! h-10!">
                 <Icon
-                  name="q-downloadBoxFill"
+                  name={streamDevModeType[(data?.type as 2) ?? 2]?.icon}
                   type="light"
-                  css={
-                    // TODO icon
-                    css`
-                      & .qicon {
-                        ${tw`text-white! fill-[#fff]!`}
-                      }
-                    `
-                  }
+                  size={28}
+                  css={css`
+                    & .qicon {
+                      ${tw`text-white! fill-[#fff]!`}
+                    }
+                  `}
                 />
               </Circle>
               <div tw="flex-auto">
                 <div tw="text-white">
                   <span tw="mr-3">{data?.name}</span>
-                  <JobInstanceStatusCmp
+                  <StreamReleaseStatusCmp
                     type={data?.status as 1}
                     tw="inline-flex"
                   />
@@ -247,7 +245,7 @@ const StreamReleaseDetail = observer(
               <GridItem>
                 <span>状态</span>
                 <span>
-                  <JobInstanceStatusCmp
+                  <StreamReleaseStatusCmp
                     type={data?.status as 1}
                     tw="inline-flex"
                   />
@@ -266,7 +264,7 @@ const StreamReleaseDetail = observer(
                       transform: scaleX(0.8);
                     `}
                   >
-                    {streamDevModeType[data?.type as 1]?.label}
+                    {streamDevModeType[data?.type as 2]?.label}
                   </span>
                 </span>
                 <span>作业版本:</span>
@@ -287,9 +285,14 @@ const StreamReleaseDetail = observer(
 
         <HorizonTabs
           defaultActiveName=""
-          tw="overflow-hidden bg-transparent flex-auto"
+          tw="bg-transparent"
           // @ts-ignore
           activeName={activeName}
+          css={css`
+            .tab-content {
+              ${tw`p-0`}
+            }
+          `}
           onChange={(activeName1: string) => {
             setActiveName(activeName1)
           }}
@@ -301,7 +304,7 @@ const StreamReleaseDetail = observer(
             {/* <Monitor /> */}
           </TabPanel>
           <TabPanel label="开发内容" name="dev">
-            <StreamDevContent data={code} />
+            <StreamDevContent data={code} language="sql" />
           </TabPanel>
           <TabPanel label="计算集群" name="cluster">
             <Cluster clusterId={args?.cluster_id} />

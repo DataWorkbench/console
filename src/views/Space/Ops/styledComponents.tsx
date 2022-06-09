@@ -38,6 +38,8 @@ export const statusStyle = (
       centerBorder = tw`border-[#F1E4FE]`
       bg = tw`bg-[#A855F7]`
       break
+    // 蓝色
+    case DataReleaseSchedule.RUNNING:
     case StreamReleaseScheduleType.ACTIVE:
     case JobInstanceStatusType.RUNNING:
       wrapperBg = tw`bg-[#F0F9FF]`
@@ -49,6 +51,8 @@ export const statusStyle = (
       centerBorder = tw`border-[#FFE278]`
       bg = tw`bg-[#FFD127]`
       break
+    // 红色
+    case DataReleaseSchedule.DOWNED:
     case StreamReleaseScheduleType.SUSPENDED:
     case JobInstanceStatusType.FAILED:
       wrapperBg = tw`bg-[#F6DBDA]`
@@ -60,6 +64,8 @@ export const statusStyle = (
       centerBorder = tw`border-[#FDEFD8]`
       bg = tw`bg-[#F97316]`
       break
+    // 绿色
+    case DataReleaseSchedule.FINISHED:
     case StreamReleaseScheduleType.FINISHED:
     case JobInstanceStatusType.SUCCEEDED:
       wrapperBg = tw`bg-[#C6F4E4]`
@@ -68,9 +74,6 @@ export const statusStyle = (
       break
 
     case JobInstanceStatusType.FINISHED:
-    case DataReleaseSchedule.RUNNING:
-    case DataReleaseSchedule.FINISHED:
-    case DataReleaseSchedule.DOWNED:
       wrapperBg = tw`bg-[#DEE7F1]`
       centerBorder = tw`border-[#B7C8D8]`
       bg = tw`bg-neut-8`

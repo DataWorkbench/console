@@ -35,7 +35,7 @@ const HelpCenterLink = (
         ...rest,
       }
     : {
-        href: href ? getHelpCenterLink(href, true) : '###',
+        href: href ? getHelpCenterLink(href) : '###',
         target: '_blank',
         hasIcon: true,
         ...rest,

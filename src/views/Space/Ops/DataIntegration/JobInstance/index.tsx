@@ -17,11 +17,12 @@ const DataJobInstance = () => {
   return (
     <FlexBox orient="column" tw="p-5 h-full">
       <PageTab tabs={dataJobInstanceTab} />
-      <FlexBox orient="column" tw="gap-3">
+      <FlexBox orient="column" tw="gap-3 p-5 bg-bgColor-light">
         <JobInstanceTable
           settingKey={settingKey}
           defaultColumns={dataJobInstanceColumns}
           showHeader
+          filter={{}}
           jumpDetail={jumpDetail}
         />
       </FlexBox>

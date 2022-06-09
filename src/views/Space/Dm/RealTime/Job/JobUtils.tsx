@@ -3,6 +3,7 @@ import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { get, cloneDeep, findKey } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
 import { Icons, Center } from 'components'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 export enum JobMode {
   /** 数据集成 */
@@ -75,24 +76,87 @@ export type DataSourceType =
   | 'Redis'
   | 'ElasticSearch'
 
-export const dataSourceTypes: { [key in DataSourceType]?: number } = {
-  MySQL: 1,
+export const datasourceTypeKey = [
+  'MySQL',
+  // 'TIDB',
+  // 'Kafka',
+  // 'S3',
+  'ClickHouse',
+  // 'HBase',
+  // 'FTP',
+  // 'HDFS',
+  'SQLServer',
+  // 'Oracle',
+  'PostgreSQL',
+  // 'DB2',
+  // 'SAP HANA',
+  // 'Hive',
+  // 'MongoDB',
+  // 'Redis',
+  // 'ElasticSearch',
+]
+
+export const dataSourceTypes: { [key in string]?: number } = {
+  mysql: 1,
   // TIDB: 2,
   // Kafka: 3,
   // S3: 4,
-  ClickHouse: 5,
+  click_house: 5,
   // HBase: 6,
   // FTP: 7,
   // HDFS: 8,
-  SQLServer: 9,
+  sqlserver: 9,
   // Oracle: 10,
-  PostgreSQL: 2,
+  postgresql: 2,
   // DB2: 11,
   // 'SAP HANA': 12,
   // Hive: 13,
   // MongoDB: 15,
   // Redis: 16,
   // ElasticSearch: 14,
+}
+
+export const datasourceTypeObjs = [
+  {
+    type: SourceType.Mysql,
+    name: 'mysql',
+    label: 'MySQL',
+  },
+  {
+    type: SourceType.ClickHouse,
+    name: 'click_house',
+    label: 'ClickHouse',
+  },
+  {
+    type: SourceType.SqlServer,
+    name: 'sqlserver',
+    label: 'SQLServer',
+  },
+  {
+    type: SourceType.PostgreSQL,
+    name: 'postgresql',
+    label: 'PostgreSQL',
+  },
+]
+
+export const getDataSourceTypes = (type?: SourceType): string | undefined => {
+  if (!type) {
+    return ''
+  }
+  const item = datasourceTypeObjs.find((i) => i.type === type!)!
+  return new Proxy(
+    { value: item?.label },
+    {
+      get(target: { value: string | undefined }, p: string | symbol): any {
+        if (p === 'toLowerCase') {
+          return () => item?.name
+        }
+        const prim = Reflect.get(target, 'value')
+        const value = prim[p]
+        return typeof value === 'function' ? value.bind(prim) : value
+      },
+    }
+  ) as unknown as string
 }
 
 export const getSourceNameByType = (type: DataSourceType) =>
@@ -102,20 +166,20 @@ export const jobModeData = [
   {
     mode: JobMode.DI,
     title: '数据集成',
-    desc: '提供异构数据源之间的数据搬运和数据同步的能力',
-    icon: 'EqualizerFill',
+    desc: '提供异构数据源之间的数据搬运和数据同步的能力。',
+    icon: 'IotFill',
     selTitle: '同步方式',
     items: [
       {
         icon: 'DownloadBoxFill',
-        title: '离线-批量同步作业',
-        desc: '离线批量同步的描述文案，尽量简短，一句话内',
+        title: '离线同步作业',
+        desc: '通过定时、批量的方式进行数据同步开发作业',
         value: JobType.OFFLINE,
       },
       {
         icon: 'LayerFill',
-        title: '实时-流式同步作业',
-        desc: '实时-流式的描述文案，尽量简短，一句话内',
+        title: '实时同步作业',
+        desc: '通过实时同步的方式进行数据同步开发作业',
         value: JobType.REALTIME,
         disabled: true,
       },
@@ -123,50 +187,50 @@ export const jobModeData = [
   },
   {
     mode: JobMode.RT,
-    title: '实时-流式开发',
-    desc: '实时开发说明占位文字实时开发说明占位文字实时开发说明占位文字。占位文字',
+    title: '数据开发',
+    desc: '使用流批一体 Flink 分布式实时计算引擎进行数据开发。',
     icon: 'EventFill',
     selTitle: '实时开发模式',
     items: [
       {
         icon: 'sql',
         title: 'SQL 模式',
-        desc: 'SQL 模式的描述文案，尽量简短，一句话内',
+        desc: '通过 Flink SQL 模式进行数据作业开发',
         value: JobType.SQL,
       },
       {
         icon: 'JavaFill',
-        title: '代码开发-Jar 包模式',
-        desc: 'Jar 模式的描述文案，尽量简短，一句话内',
+        title: 'Jar 包模式',
+        desc: '通过 Jar 包的方式提交用户 Java、Scala 语言开发的 Flink 作业',
         value: JobType.JAR,
       },
       {
         icon: 'PythonFill',
-        title: '代码开发-Python 模式',
-        desc: 'Python 模式的描述文案，尽量简短，一句话内',
+        title: 'Python 模式',
+        desc: '通过 Flink Python 语言进行数据作业开发',
         value: JobType.PYTHON,
         disabled: true,
       },
-      {
-        icon: 'scala',
-        title: '代码开发-Scala 模式 ',
-        desc: 'scala 模式的描述文案，尽量简短，一句话内',
-        value: JobType.SCALA,
-        disabled: true,
-      },
-      {
-        icon: 'Branch2Fill',
-        title: '算子编排模式',
-        desc: '算子编排模式描述文案，尽量简短，一句话内',
-        value: JobType.OPERATOR,
-        disabled: true,
-      },
+      // {
+      //   icon: 'scala',
+      //   title: 'Scala 模式 ',
+      //   desc: '通过 Scala 语言进行数据作业开发',
+      //   value: JobType.SCALA,
+      //   disabled: true,
+      // },
+      // {
+      //   icon: 'Branch2Fill',
+      //   title: '算子编排模式',
+      //   desc: '通过拖拽编排的方式进行数据开发',
+      //   value: JobType.OPERATOR,
+      //   disabled: true,
+      // },
     ],
   },
   {
     mode: JobMode.OLE,
-    title: '离线-批量开发（敬请期待）',
-    desc: '离线开发说明占位文字离线开发说明占位文字离线开发说明占位文字。占位文字',
+    title: '数据挖掘（敬请期待）',
+    desc: '使用基于内存计算的 Spark 大数据计算引擎进行数据挖掘和机器学习。',
     icon: 'DownloadBox2Fill',
     items: [],
   },

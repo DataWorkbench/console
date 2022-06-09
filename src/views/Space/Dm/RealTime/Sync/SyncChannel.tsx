@@ -4,6 +4,7 @@ import {
   Field,
   Form,
   Input,
+  InputNumber,
   Label,
   Radio,
   RadioGroup,
@@ -11,7 +12,7 @@ import {
 import { AffixLabel } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { isNaN as isNAN, isNumber, pickBy } from 'lodash-es'
+import { isNaN as isNAN, isNumber } from 'lodash-es'
 
 const { NumberField } = Form
 const Root = styled('div')(() => [
@@ -20,7 +21,7 @@ const Root = styled('div')(() => [
       ${tw`pl-0! w-full`}
       .field {
         .label {
-          ${tw`w-[162px]!`}
+          ${tw`w-[140px]!`}
         }
 
         .help {
@@ -34,6 +35,19 @@ const Root = styled('div')(() => [
     }
   `,
 ])
+
+const styles = {
+  form: css`
+    &.form.is-horizon-layout {
+      .label {
+        ${tw`w-[124px]! mr-4`}
+      }
+      .help {
+        ${tw`ml-[140px]! w-full`}
+      }
+    }
+  `,
+}
 
 interface ChannelControl {
   parallelism?: number | string
@@ -50,14 +64,16 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
   const { channelControl } = props
   const [channel, setChannel] = useImmer<ChannelControl>(() => {
     if (channelControl) {
-      return pickBy(channelControl, (v) => v !== -1)
+      return channelControl
+      // return pickBy(channelControl, (v) => v !== -1)
     }
     return { rate: 2 }
   })
 
   useLayoutEffect(() => {
     if (channelControl) {
-      setChannel(pickBy(channelControl, (v) => v !== -1))
+      setChannel(channelControl)
+      // setChannel(pickBy(channelControl, (v) => v !== -1))
     }
   }, [channelControl, setChannel])
 
@@ -77,20 +93,16 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
 
   return (
     <Root>
-      <Form ref={formRef}>
+      <Form ref={formRef} css={styles.form}>
         <NumberField
           name="bytes"
           showButton={false}
           placeholder="请输入并行数"
-          label={
-            <AffixLabel help="xxx" theme="green">
-              作业期望最大并行数
-            </AffixLabel>
-          }
+          label={<AffixLabel>作业期望最大并行数</AffixLabel>}
           validateOnChange
           value={channel.parallelism || ''}
           min={1}
-          max={300}
+          max={100}
           onChange={(value: number) =>
             setChannel((draft) => {
               draft.parallelism = value
@@ -103,13 +115,11 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               rule: { required: true },
             },
           ]}
-          help="范围：1~300"
+          help="范围：1~100"
         />
         <Field>
           <Label>
-            <AffixLabel help="xxx" theme="green">
-              同步速率
-            </AffixLabel>
+            <AffixLabel>同步速率</AffixLabel>
           </Label>
           <Control
             css={[
@@ -157,15 +167,15 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
         </Field>
         <Field>
           <Label>
-            <AffixLabel help="xxx" required={false}>
-              错误记录数超过
-            </AffixLabel>
+            <AffixLabel required={false}>错误记录数超过</AffixLabel>
           </Label>
           <Control tw="max-w-full! items-center space-x-1">
-            <Input
-              type="text"
-              value={channel.record_num || ''}
-              onChange={(e, v) => {
+            <InputNumber
+              showButton={false}
+              step={1}
+              min={-1}
+              value={(channel.record_num as number) || undefined}
+              onChange={(v) => {
                 const num = +v
                 if (!isNAN(num)) {
                   setChannel((draft) => {
@@ -175,25 +185,12 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               }}
               placeholder="请输入条数"
             />
-            <span>条，或者</span>
-            <Input
-              type="text"
-              value={channel.percentage || ''}
-              onChange={(e, v) => {
-                const num = +v
-                if (!isNAN(num)) {
-                  setChannel((draft) => {
-                    draft.percentage = num
-                  })
-                }
-              }}
-              placeholder="请输入比例"
-            />
-            <span>% 比例，达到任一条件时，任务自动结束</span>
+            <span>条，任务自动结束</span>
           </Control>
           <div className="help">
-            <span>脏数据条数，默认允许脏数据</span>
-            <span tw="ml-5">脏数据比例，默认允许脏数据</span>
+            <span>
+              允许的脏数据条数，（写入一致性语义为 exactly-once 时无效）
+            </span>
           </div>
         </Field>
       </Form>

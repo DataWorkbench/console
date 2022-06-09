@@ -178,6 +178,17 @@ export const ftpProtocol = {
   },
 }
 
+export const ftpAuthMode = {
+  PWD: {
+    label: '密码',
+    value: 1,
+  },
+  key: {
+    label: '私钥',
+    value: 2,
+  },
+}
+
 export const ftpConnectionMode = {
   FTP: {
     label: '被动模式',
@@ -199,14 +210,24 @@ export const ftpFilters = new Set([
   'user',
 ])
 
-export const sftpFilters = new Set([
-  'private_key',
+export const sftpFiltersWithPwd = new Set([
   'host',
   'password',
   '__dbUrl',
   'port',
   'protocol',
   'user',
+  'auth_mode',
+])
+
+export const sftpFiltersWithKey = new Set([
+  'private_key',
+  'host',
+  '__dbUrl',
+  'port',
+  'protocol',
+  'user',
+  'auth_mode',
 ])
 
 export const hivePwdFilters = new Set([
@@ -215,13 +236,14 @@ export const hivePwdFilters = new Set([
   'hiveAuth',
   'user',
   'password',
+  'config',
 ])
 
 export const hiveAnonymousFilters = new Set([
   'defaultFS',
   '__dbUrl',
   'hiveAuth',
-  'hadoop_config',
+  'config',
 ])
 
 export const esPwdFilters = new Set([
@@ -428,12 +450,12 @@ export const getUrl = (
         return `jdbc:db2://${urlObj.host}:${urlObj.port}/${urlObj.database}`
       // ClickHouse default
       case 'mongo_db':
-        return `mongodb://${urlObj.mongodb_brokers
+        return `mongodb://${urlObj.hosts
           .map(
             ({ host, port }: { host: string; port: number }) =>
               `${host}:${port}`
           )
-          .join(',')}`
+          .join(',')}/${urlObj.database}`
       case 'sap_hana':
         return `jdbc:sap://${urlObj.host}:${urlObj.port}?currentschema=${urlObj.database}`
       case 'elastic_search':
@@ -445,7 +467,7 @@ export const getUrl = (
       case 'hdfs':
         return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
       case 'redis':
-        return `redis://${urlObj.port
+        return `redis://${urlObj.hosts
           .map(
             ({ host, port }: { host: string; port: number }) =>
               `${host}:${port}`
