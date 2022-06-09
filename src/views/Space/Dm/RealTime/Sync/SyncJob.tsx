@@ -517,7 +517,7 @@ const SyncJob = () => {
     const step = stepsData[2]
     return (
       <div tw="h-full">
-        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 64px)] overflow-y-auto ">
+        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 156px)] overflow-y-auto ">
           <Editor
             language="json"
             defaultValue={JSON.stringify(
@@ -538,7 +538,7 @@ const SyncJob = () => {
           />
         </div>
         <CollapseWrapper tw="flex-none absolute bottom-0 left-0 w-full">
-          <Collapse>
+          <Collapse defaultActiveKey={['p2']}>
             <CollapseItem
               key={step.key}
               label={
