@@ -358,10 +358,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                   }}
                   tw="inline-block"
                 >
-                  <OptButton
-                    disabled={disableStatus}
-                    tw="px-6 xl:px-9 2xl:px-7 py-1"
-                  >
+                  <OptButton disabled={disableStatus} tw="py-1">
                     {title}
                   </OptButton>
                 </Link>
