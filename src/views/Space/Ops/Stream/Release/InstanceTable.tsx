@@ -73,7 +73,6 @@ export const InstanceTable = observer(
     >(
       {
         sort_by: 'created',
-        state: 8,
         reverse: true,
         offset: 0,
         limit: 10,
