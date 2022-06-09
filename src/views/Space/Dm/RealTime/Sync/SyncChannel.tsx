@@ -40,7 +40,7 @@ const styles = {
   form: css`
     &.form.is-horizon-layout {
       .label {
-        ${tw`w-[124px]! mr-4`}
+        ${tw`w-[140px]!`}
       }
       .help {
         ${tw`ml-[140px]! w-full`}
