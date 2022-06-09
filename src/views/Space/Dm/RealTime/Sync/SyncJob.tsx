@@ -333,7 +333,6 @@ const SyncJob = () => {
 
     set(filterResouce, 'job_mode', mode)
     set(filterResouce, 'cluster_id', cluster?.id)
-
     mutation.mutate(filterResouce, {
       onSuccess: () => {
         if (isSubmit) {
