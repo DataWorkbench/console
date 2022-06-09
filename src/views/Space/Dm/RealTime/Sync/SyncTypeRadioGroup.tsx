@@ -1,10 +1,11 @@
 import React, { forwardRef, useCallback, useEffect } from 'react'
 import { Control, Form, Select } from '@QCFE/lego-ui'
 import tw, { styled } from 'twin.macro'
-import { isFunction, keys } from 'lodash-es'
+import { isFunction } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { ArrowLine, HelpCenterLink } from 'components'
-import { dataSourceTypes } from '../Job/JobUtils'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { datasourceTypeObjs } from '../Job/JobUtils'
 
 type SyncType = 'full' | 'incr'
 type SyncSourceType = 'fullSource' | 'fullSink' | 'incrSource' | 'incrSink'
@@ -29,28 +30,16 @@ export interface SyncTypeRadioGroupProps {
 
 const SyncItem = styled('div')(({ selected = true }: { selected: boolean }) => [
   tw`px-3 py-1.5 border rounded-sm mb-2 cursor-pointer`,
-  selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`,
+  selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`
 ])
 
-const sources = keys(dataSourceTypes)
-const filterfullSources = ['TiDB', 'Hive', 'Redis', 'Kafka']
-const filterIncrSources = [
-  'TiDB',
-  'Hive',
-  'HBase',
-  'HDFS',
-  'FTP',
-  'Redis',
-  'ElasticSearch',
-  'Kafka',
-]
-const fullSources = sources.filter((s) => !filterfullSources.includes(s))
-const incrSources = sources.filter((s) => !filterIncrSources.includes(s))
+const sources = datasourceTypeObjs
+const filterfullSources: SourceType[] = []
+const filterIncrSources: SourceType[] = []
+const fullSources = sources.filter((s) => !filterfullSources.includes(s.type))
+const incrSources = sources.filter((s) => !filterIncrSources.includes(s.type))
 
-const SyncTypeRadioGroup = forwardRef<
-  React.ReactElement,
-  SyncTypeRadioGroupProps
->(
+const SyncTypeRadioGroup = forwardRef<React.ReactElement, SyncTypeRadioGroupProps>(
   (
     {
       value,
@@ -58,7 +47,7 @@ const SyncTypeRadioGroup = forwardRef<
       fullSinkData = sources,
       incrSourceData = incrSources,
       incrSinkData = sources,
-      onChange,
+      onChange
     },
     ref
   ) => {
@@ -68,13 +57,10 @@ const SyncTypeRadioGroup = forwardRef<
         fullSource: '',
         fullSink: '',
         incrSource: '',
-        incrSink: '',
+        incrSink: ''
       }
     )
-    const handleChange = (
-      v: SyncType | SyncSourceType,
-      valueType: 'type' | SyncSourceType
-    ) => {
+    const handleChange = (v: SyncType | SyncSourceType, valueType: 'type' | SyncSourceType) => {
       if (valueType === 'type' && v === params.type) {
         return
       }
@@ -104,31 +90,25 @@ const SyncTypeRadioGroup = forwardRef<
     }, [value, setParams])
 
     const geneOpts = useCallback(
-      (data: string[]) =>
-        data.map((v) => ({ label: v, value: dataSourceTypes[v] })),
+      (data) =>
+        data.map((v: Record<string, any>) => ({
+          label: v.label,
+          value: v.type
+        })),
       []
     )
 
     return (
       <Control tw="flex-col w-[556px]! max-w-[556px]!" ref={ref}>
-        <SyncItem
-          selected={params.type === 'full'}
-          onClick={() => handleChange('full', 'type')}
-        >
+        <SyncItem selected={params.type === 'full'} onClick={() => handleChange('full', 'type')}>
           <div tw="font-medium mb-1">全量同步</div>
           <div tw="text-neut-8 mb-1">
             周期性或一次性将来源数据源中全量数据同步到目标数据源中。
-            <HelpCenterLink
-              href="/manual/integration_job/sync_type/#全量同步"
-              isIframe={false}
-            >
+            <HelpCenterLink href="/manual/integration_job/sync_type/#全量同步" isIframe={false}>
               了解更多
             </HelpCenterLink>
           </div>
-          <div
-            tw="flex py-4 items-center space-x-2"
-            css={params.type !== 'full' && tw`hidden`}
-          >
+          <div tw="flex py-4 items-center space-x-2" css={params.type !== 'full' && tw`hidden`}>
             <Select
               placeholder="请选择来源端数据源类型"
               options={geneOpts(fullSourceData)}
@@ -146,24 +126,15 @@ const SyncTypeRadioGroup = forwardRef<
             />
           </div>
         </SyncItem>
-        <SyncItem
-          selected={params.type === 'incr'}
-          onClick={() => handleChange('incr', 'type')}
-        >
+        <SyncItem selected={params.type === 'incr'} onClick={() => handleChange('incr', 'type')}>
           <div tw="font-medium mb-1">增量同步</div>
           <div tw="text-neut-8 mb-1">
             增量的基础是全量，先将数据全量同步，再周期性将来源数据源中新增及变化的数据同步到目标数据源中。
-            <HelpCenterLink
-              href="/manual/integration_job/sync_type/#增量同步"
-              isIframe={false}
-            >
+            <HelpCenterLink href="/manual/integration_job/sync_type/#增量同步" isIframe={false}>
               了解更多
             </HelpCenterLink>
           </div>
-          <div
-            tw="flex py-4 items-center space-x-2"
-            css={params.type !== 'incr' && tw`hidden`}
-          >
+          <div tw="flex py-4 items-center space-x-2" css={params.type !== 'incr' && tw`hidden`}>
             <Select
               placeholder="请选择来源端数据源类型"
               options={geneOpts(incrSourceData)}
@@ -186,6 +157,6 @@ const SyncTypeRadioGroup = forwardRef<
 
 export default SyncTypeRadioGroup
 
-export const SyncTypeRadioGroupField: (props: any) => any = (
-  Form as any
-).getFormField(SyncTypeRadioGroup)
+export const SyncTypeRadioGroupField: (props: any) => any = (Form as any).getFormField(
+  SyncTypeRadioGroup
+)

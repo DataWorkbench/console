@@ -1,45 +1,80 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { HelpCenterLink, FieldMappings, PopConfirm, Modal } from 'components'
+import { FieldMappings, HelpCenterLink, Modal, PopConfirm } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
-import { findKey, get, isArray, isObject, isUndefined, set } from 'lodash-es'
+import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
   useMutationSyncJobConf,
   useMutationSyncJobConvert,
-  useQueryGenerateJobJson,
   useQueryJobSchedule,
   useQuerySyncJobConf,
   useStore
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
-import { useParams } from 'react-router-dom'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
 import ReleaseModal from '../Modal/ReleaseModal'
-import { dataSourceTypes } from '../Job/JobUtils'
+import { getDataSourceTypes } from '../Job/JobUtils'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
   tw`flex-1 px-2 py-2 bg-neut-18`,
   css`
     li.collapse-item {
-      ${tw`mt-2 rounded-[3px] overflow-hidden`}
+      ${tw`mb-2 rounded-[3px] overflow-hidden`}
       .collapse-item-label {
         ${tw`h-11 border-none hover:bg-neut-16`}
       }
+
       .collapse-item-content {
-        ${tw`bg-neut-17`}
+        ${tw`bg-neut-17 p-3!`}
       }
     }
+
     li:last-child {
       ${tw`mb-1`}
+    }
+  `
+])
+const SyncJobWrapper = styled('div')(() => [
+  tw`flex flex-col flex-1 relative`,
+  css`
+    button {
+      ${tw`h-7!`}
+    }
+    .refresh-button {
+      ${tw`h-7! w-7!`}
+    }
+    .select-control {
+      ${tw`h-7! flex relative`}
+      .select-multi-value-wrapper {
+        ${tw`flex-1`}
+      }
+    }
+    input {
+      ${tw`h-7!`}
+    }
+    .radio-wrapper {
+      ${tw`h-7! flex items-center`}
+      &::before {
+        ${tw` top-[6px]`}
+      }
+    }
+    label.radio.checked::after {
+      ${tw` top-[10px]`}
+    }
+    .radio-button {
+      ${tw`h-7!`}
+    }
+    .clear-button {
+      ${tw`h-7! w-7!`}
     }
   `
 ])
@@ -104,6 +139,18 @@ interface DbInfo {
   fields?: TMappingField[]
 }
 
+const intTypes = new Set([
+  'TINYINT',
+  'SMALLINT',
+  'INT',
+  'BIGINT',
+  'INTEGER',
+  'INT2',
+  'INT4',
+  'INT8',
+  'INT IDENTITY'
+])
+
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
@@ -122,15 +169,15 @@ const SyncJob = () => {
     target: { id: get(confData, 'target_id') }
   })
 
-  const [mode, setMode] = useState<1 | 2>(1)
+  const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
-  // const [mappings, setMappings] = useState([])
 
   const dbRef =
     useRef<{
       getResource: () => Record<string, string>
       getTypeNames: () => string[]
       refetchColumns: () => void
+      validate: () => boolean
     }>(null)
   const mappingRef =
     useRef<{
@@ -150,10 +197,7 @@ const SyncJob = () => {
   const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
-    return [
-      findKey(dataSourceTypes, (v) => v === sourceType),
-      findKey(dataSourceTypes, (v) => v === targetType)
-    ]
+    return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
   }, [curJob])
 
   const sourceColumn = useMemo(() => {
@@ -179,29 +223,21 @@ const SyncJob = () => {
   }, [confData, targetTypeName, db.target.tableName])
 
   const editorRef = useRef<any>(null)
-  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
-  const { data: defaultJobContent, isFetching } = useQueryGenerateJobJson(
-    {
-      uri: {
-        job_id: curJob?.id!,
-        space_id: spaceId
-      },
-      regionId
-    } as any,
-    { enabled: !!curJob?.id && mode === 2 }
-  )
-  const loadingWord = '代码加载中......'
+
+  const [defaultJobContent, setDefaultJobContent] = useState(get(confData, 'job_content'))
 
   useEffect(() => {
+    if (confData?.job_mode && confData?.job_mode !== mode) {
+      setMode(confData?.job_mode)
+      setDefaultJobContent(get(confData, 'job_content'))
+    }
+  }, [confData, mode])
+  useEffect(() => {
     if (editorRef.current) {
-      editorRef.current?.setValue(
-        isFetching
-          ? loadingWord
-          : JSON.stringify(JSON.parse(defaultJobContent?.sync_job_script || '{}'), null, 4)
-      )
+      editorRef.current?.setValue(JSON.stringify(JSON.parse(defaultJobContent || '{}'), null, 4))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultJobContent, isFetching, editorRef.current])
+  }, [defaultJobContent, editorRef.current])
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
@@ -211,39 +247,7 @@ const SyncJob = () => {
       draft.target.id = get(confData, 'target_id')
     })
   }, [confData, setDb])
-  // useEffect(() => {
-  //   if (confData && sourceTypeName && targetTypeName) {
-  //     // const sourceColumn =
-  //     //   get(
-  //     //     confData,
-  //     //     `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
-  //     //   ) || []
-  //     // const targetColumn =
-  //     //   get(
-  //     //     confData,
-  //     //     `sync_resource.${targetTypeName.toLowerCase()}_target.column`
-  //     //   ) || []
-  //     // setMappings(sourceColumn.map((v, i) => [v.name, targetColumn[i].name]))
-  //     setDb({
-  //       source: {
-  //         id: get(confData, 'source_id'),
-  //         tableName: get(
-  //           confData,
-  //           `sync_resource.${sourceTypeName.toLowerCase()}_source.table[0]`
-  //         ),
-  //       },
-  //       target: {
-  //         id: get(confData, 'target_id'),
-  //         tableName: get(
-  //           confData,
-  //           `sync_resource.${targetTypeName.toLowerCase()}_target.table[0]`
-  //         ),
-  //       },
-  //     })
-  //   }
-  // }, [confData, sourceTypeName, targetTypeName, setDb])
 
-  // console.log(db, fields)
   const handleEditorWillMount = (monaco: any) => {
     // editorRef.current = null
     monaco.editor.defineTheme('my-theme', {
@@ -313,8 +317,6 @@ const SyncJob = () => {
 
     set(filterResouce, 'job_mode', mode)
     set(filterResouce, 'cluster_id', cluster?.id)
-
-    // console.log('filterResouce', filterResouce)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
         if (isSubmit) {
@@ -323,6 +325,10 @@ const SyncJob = () => {
             return
           }
           if (mode === 1) {
+            if (!dbRef.current?.validate()) {
+              showConfWarn('未正确配置数据源信息')
+              return
+            }
             if (!resource) {
               showConfWarn('未配置数据源信息')
               return
@@ -346,14 +352,24 @@ const SyncJob = () => {
               return
             }
 
-            // 如果并发数大于1  则切分键不能为空
-            const parallelism = get(resource, 'channel_control.parallelism', 0)
             const splitKey = get(
               Object.entries(resource.sync_resource ?? ({} as any)).find(([k]) =>
                 k.endsWith('_source')
               )?.[1] ?? {},
               'split_pk'
             )
+            if (
+              splitKey &&
+              !db?.source?.fields?.some(
+                (f) => f.name === splitKey && intTypes.has(f.type) && f.is_primary_key
+              )
+            ) {
+              showConfWarn('切分键必须为主键且为整型')
+              return
+            }
+
+            // 如果并发数大于1  则切分键不能为空
+            const parallelism = get(resource, 'channel_control.parallelism', 0)
             if (parallelism > 1 && !splitKey) {
               showConfWarn('并发数大于1时，切分键不能为空')
               return
@@ -462,6 +478,7 @@ const SyncJob = () => {
                 targetId={db.target?.id}
                 ref={clusterRef}
                 clusterId={get(confData, 'cluster_id')}
+                defaultClusterName={get(confData, 'cluster_info.name')}
               />
             )}
             {index === 3 && (
@@ -477,14 +494,10 @@ const SyncJob = () => {
     const step = stepsData[2]
     return (
       <div tw="h-full">
-        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 64px)] overflow-y-auto ">
+        <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 156px)] overflow-y-auto ">
           <Editor
             language="json"
-            defaultValue={
-              isFetching
-                ? loadingWord
-                : JSON.stringify(JSON.parse(defaultJobContent?.sync_job_script || '{}'), null, 4)
-            }
+            defaultValue={JSON.stringify(JSON.parse(defaultJobContent || '{}'), null, 4)}
             theme="my-theme"
             options={{
               minimap: { enabled: false },
@@ -498,7 +511,7 @@ const SyncJob = () => {
           />
         </div>
         <CollapseWrapper tw="flex-none absolute bottom-0 left-0 w-full">
-          <Collapse>
+          <Collapse defaultActiveKey={['p2']}>
             <CollapseItem
               key={step.key}
               label={
@@ -530,10 +543,10 @@ const SyncJob = () => {
     const channel = channelRef.current!.getChannel()
 
     try {
-      set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping[0])
-      set(resource, `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`, mapping[1])
+      set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping?.[0])
+      set(resource, `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`, mapping?.[1])
 
-      set(resource, 'cluster_id', cluster.id)
+      set(resource, 'cluster_id', cluster?.id)
       set(resource, 'job_mode', 1)
       set(resource, 'job_content', '')
       set(resource, 'channel_control', channel)
@@ -545,7 +558,8 @@ const SyncJob = () => {
     mutationConvert.mutate(
       { data: { conf: filterResouce }, uri: { job_id: curJob?.id! } },
       {
-        onSuccess: () => {
+        onSuccess: (resp) => {
+          setDefaultJobContent(resp.job)
           setMode(2)
         }
       }
@@ -553,7 +567,7 @@ const SyncJob = () => {
   }
 
   return (
-    <div tw="flex flex-col flex-1 relative">
+    <SyncJobWrapper>
       <JobToolBar>
         {mode === 1 ? (
           <PopConfirm
@@ -649,7 +663,7 @@ const SyncJob = () => {
           </div>
         </Modal>
       )}
-    </div>
+    </SyncJobWrapper>
   )
 }
 

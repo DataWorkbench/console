@@ -1,11 +1,12 @@
 /* eslint-disable no-bitwise */
-import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { Button, InputSearch, Select } from '@QCFE/lego-ui'
+import { Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
+import { Button, Select } from '@QCFE/lego-ui'
+
 import { Center, FlexBox } from 'components/index'
 // import useFilter from 'hooks/useHooks/useFilter'
 import {
   dataJobInstanceColumns,
-  jobInstanceStatus,
+  jobInstanceStatus
 } from 'views/Space/Ops/DataIntegration/constants'
 import React from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -19,7 +20,7 @@ const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 const LinkInstance = ({
   jobId,
   version,
-  type = JobMode.DI,
+  type = JobMode.DI
 }: {
   jobId: string
   version: string
@@ -43,8 +44,8 @@ const LinkInstance = ({
     window.open(`../data-job/${record.id}${tab ? `?tab=${tab}` : ''}`, '_blank')
   }
   return (
-    <div tw="w-full">
-      <FlexBox tw="gap-9 whitespace-nowrap">
+    <div tw="w-full py-5">
+      <FlexBox tw="gap-9 whitespace-nowrap ml-6">
         <Center tw="gap-1 ">
           <div tw="text-white w-auto">实例状态</div>
           <Select
@@ -54,8 +55,8 @@ const LinkInstance = ({
               { value: '', label: '全部' },
               ...Object.values(jobInstanceStatus).map((v) => ({
                 value: v.value,
-                label: v.label,
-              })),
+                label: v.label
+              }))
             ]}
             onChange={(value: number) => {
               setFilter((draft) => {
@@ -88,7 +89,8 @@ const LinkInstance = ({
         <Center tw="gap-1">
           <div tw="text-white w-auto ">实例 ID</div>
           <InputSearch
-            tw="w-[200px]"
+            tw="w-[200px] flex-none border rounded border-line-dark"
+            border
             placeholder="搜索实例 ID"
             onPressEnter={(e: React.SyntheticEvent) => {
               setFilter((draft) => {
@@ -103,11 +105,7 @@ const LinkInstance = ({
           />
         </Center>
         <div tw="text-right flex-auto">
-          <Button
-            type="black"
-            loading={!!isFetching}
-            tw="w-auto px-[5px] border-line-dark!"
-          >
+          <Button type="black" loading={!!isFetching} tw="w-auto px-[5px] border-line-dark!">
             <Icon
               name="if-refresh"
               tw="text-xl text-white"

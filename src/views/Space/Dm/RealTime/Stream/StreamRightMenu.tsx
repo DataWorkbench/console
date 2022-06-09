@@ -14,13 +14,13 @@ const MenuRoot = styled('div')(() => [
     span {
       ${tw`cursor-pointer font-semibold text-xs text-neut-5 leading-9 hover:text-white active:text-green-13`}
     }
-  `,
+  `
 ])
 
 const StreamRightMenu = observer(() => {
   const {
     workFlowStore,
-    workFlowStore: { curJob, showScheSetting, showArgsSetting },
+    workFlowStore: { curJob, showScheSetting, showArgsSetting }
   } = useStore()
   const drStore = useDataReleaseStore()
   return (
@@ -28,17 +28,13 @@ const StreamRightMenu = observer(() => {
       <MenuRoot>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">操 作 记 录</span> */}
         {curJob?.jobMode === 'RT' && (
-          <span onClick={() => workFlowStore.set({ showArgsSetting: true })}>
-            运 行 参 数
-          </span>
+          <span onClick={() => workFlowStore.set({ showArgsSetting: true })}>运 行 参 数</span>
         )}
-        <span onClick={() => workFlowStore.set({ showScheSetting: true })}>
-          调 度 设 置
-        </span>
+        <span onClick={() => workFlowStore.set({ showScheSetting: true })}>调 度 设 置</span>
         <span
           onClick={() =>
             drStore.set({
-              showVersion: true,
+              showVersion: true
             })
           }
         >
@@ -51,6 +47,7 @@ const StreamRightMenu = observer(() => {
           onCancel={() => {
             workFlowStore.set({ showScheSetting: false })
           }}
+          defaultschedulePolicy={curJob?.jobMode === JobMode.DI && curJob.type === 2 ? 1 : 2}
           visible
         />
       )}

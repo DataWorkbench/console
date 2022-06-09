@@ -22,6 +22,7 @@ const DataJobInstance = () => {
           settingKey={settingKey}
           defaultColumns={dataJobInstanceColumns}
           showHeader
+          filter={{}}
           jumpDetail={jumpDetail}
         />
       </FlexBox>

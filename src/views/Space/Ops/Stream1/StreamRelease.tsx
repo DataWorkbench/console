@@ -5,14 +5,11 @@ import {
   streamReleaseColumns,
   streamReleaseScheduleTypes,
   streamReleaseSuggestions,
-  streamReleaseTabs,
+  streamReleaseTabs
 } from 'views/Space/Ops/Stream1/common/constants'
 import { Icon, PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
-import {
-  alarmStatus,
-  DataReleaseActionType,
-} from 'views/Space/Ops/DataIntegration/constants'
+import { alarmStatus, DataReleaseActionType } from 'views/Space/Ops/DataIntegration/constants'
 import { get, isNil, omitBy } from 'lodash-es'
 import React, { useCallback } from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -27,13 +24,10 @@ import {
   SelectTreeTable,
   TextEllipsis,
   Tooltip,
-  FlexBox,
+  FlexBox
 } from 'components'
 import { getOperations } from 'views/Space/Ops/DataIntegration/DataRelease/utils'
-import {
-  AlarmStatusCmp,
-  StreamReleaseStatusCmp,
-} from 'views/Space/Ops/styledComponents'
+import { AlarmStatusCmp, StreamReleaseStatusCmp } from 'views/Space/Ops/styledComponents'
 import { getReleaseJobsKey, useQueryReleaseJobs } from 'hooks'
 import tw, { css } from 'twin.macro'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
@@ -71,14 +65,14 @@ const StreamRelease = observer(() => {
     pagination,
     sort,
     getColumnFilter: getFilter,
-    getColumnSort: getSort,
+    getColumnSort: getSort
   } = useFilter<
     Record<ReturnType<typeof getName>, string | number | boolean>,
     { pagination: true; sort: true }
   >(
     {
       reverse: true,
-      sort_by: getName('lastPublishTime'),
+      sort_by: getName('lastPublishTime')
     },
     { pagination: true, sort: true },
     streamReleaseSettingKey
@@ -87,17 +81,13 @@ const StreamRelease = observer(() => {
   const { set, selectedData } = useDataReleaseStore()
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     window.open(
-      `./release/${record.id}?version=${record[getName('versionId')]}${
-        tab ? `&tab=${tab}` : ''
-      }`,
+      `./release/${record.id}?version=${record[getName('versionId')]}${tab ? `&tab=${tab}` : ''}`,
       '_blank'
     )
   }
   const columnsRender = {
     [getName('versionId')]: {
-      render: (text: string) => {
-        return <span tw="text-neut-8">{text}</span>
-      },
+      render: (text: string) => <span tw="text-neut-8">{text}</span>
     },
     [getName('status')]: {
       ...getFilter(getName('status'), streamReleaseScheduleTypes),
@@ -106,16 +96,13 @@ const StreamRelease = observer(() => {
           return null
         }
         return <StreamReleaseStatusCmp type={type as 1} />
-      },
+      }
     },
     [getName('alarmStatus')]: {
       ...getFilter(getName('alarmStatus'), alarmStatus),
       render: (type: number, record: Record<string, any>) => (
-        <AlarmStatusCmp
-          type={type as any}
-          onClick={() => jumpDetail('alert')(record)}
-        />
-      ),
+        <AlarmStatusCmp type={type as any} onClick={() => jumpDetail('alert')(record)} />
+      )
     },
     [getName('devMode')]: {
       ...getFilter(getName('devMode'), streamDevModeType),
@@ -129,26 +116,15 @@ const StreamRelease = observer(() => {
           >
             {streamDevModeType[type]?.label}
           </span>
-        ),
+        )
     },
     [getName('lastPublishTime')]: {
       ...getSort(getName('lastPublishTime')),
-      render: (d: number) => {
-        return (
-          d && (
-            <span tw="text-neut-8">
-              {dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          )
-        )
-      },
-    },
+      render: (d: number) => d && <span tw="text-neut-8">{dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+    }
   }
 
-  const handleMenuClick = (
-    record: Record<string, any>,
-    key: DataReleaseActionType
-  ) => {
+  const handleMenuClick = (record: Record<string, any>, key: DataReleaseActionType) => {
     switch (key) {
       case 'link':
       case 'dev':
@@ -160,19 +136,19 @@ const StreamRelease = observer(() => {
       case 'offline':
         set({
           selectedData: record,
-          showOffline: true,
+          showOffline: true
         })
         break
       case 'resume':
         set({
           selectedData: record,
-          showResume: true,
+          showResume: true
         })
         break
       case 'suspend':
         set({
           selectedData: record,
-          showSuspend: true,
+          showSuspend: true
         })
         break
       default:
@@ -193,7 +169,7 @@ const StreamRelease = observer(() => {
             onClick={() => {
               set({
                 selectedData: record,
-                showVersion: true,
+                showVersion: true
               })
             }}
           >
@@ -222,11 +198,7 @@ const StreamRelease = observer(() => {
         <Center tw="truncate" css={jobNameStyle}>
           <InstanceName
             theme="dark"
-            icon={
-              streamDevModeType[
-                get(record, getName('devMode') as string, 1) as 1
-              ]?.icon
-            }
+            icon={streamDevModeType[get(record, getName('devMode') as string, 2) as 2]?.icon}
             name={record.name}
             desc={record.id}
             onClick={() => jumpDetail()(record)}
@@ -241,7 +213,7 @@ const StreamRelease = observer(() => {
         )
       }
       return child
-    },
+    }
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -255,7 +227,7 @@ const StreamRelease = observer(() => {
 
   const isFetching = useIsFetching()
   const { data } = useQueryReleaseJobs(omitBy(filter, isNil), {
-    refetchInterval: 1000 * 60,
+    refetchInterval: 1000 * 60
   })
 
   const infos = get(data, 'infos', []) || []
@@ -265,8 +237,7 @@ const StreamRelease = observer(() => {
     queryClient.invalidateQueries(getReleaseJobsKey())
   }, [queryClient])
 
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
 
   const getChildren = async (uuid: string) => {
     const [key, version] = uuid.split('=-=')
@@ -276,26 +247,26 @@ const StreamRelease = observer(() => {
         space_id: spaceId,
         job_id: key,
         limit: 11,
-        offset: 0,
+        offset: 0
       })
       .then((res) => {
         const arr = res.infos
           ?.filter((item: Record<string, any>) => item.version !== version)
           ?.map((i: any) => ({
             ...i,
-            uuid: `${i.id}=-=${i.version}`,
+            uuid: `${i.id}=-=${i.version}`
           }))
         if (arr.length >= 11) {
           const value = arr.slice(0, 10).concat({
-            key: Math.random().toString(32),
-            uuid: Math.random().toString(32),
+            key: `${key}-more`,
+            uuid: `${key}-more`,
             id: key,
-            hasMore: true,
+            hasMore: true
           })
           return value
         }
         if (arr.length === 0) {
-          return [{ key: Math.random().toString(32), hasNone: true }]
+          return [{ key: `${key}-none`, uuid: `${key}-none`, hasNone: true }]
         }
         return arr
       })
@@ -339,18 +310,16 @@ const StreamRelease = observer(() => {
             selectedLevel={-1}
             getChildren={getChildren}
             columns={columns}
-            dataSource={infos.map((i: any) => {
-              return {
+            dataSource={infos.map((i: any) => ({
                 ...i,
-                uuid: `${i.id}=-=${i.version}`,
-              }
-            })}
+                uuid: `${i.id}=-=${i.version}`
+              }))}
             loading={!!isFetching}
             onSort={sort}
             rowKey="uuid"
             pagination={{
               total: get(data, 'total', 0),
-              ...pagination,
+              ...pagination
             }}
           />
         </FlexBox>

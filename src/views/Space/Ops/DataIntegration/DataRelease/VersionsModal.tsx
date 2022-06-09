@@ -1,18 +1,11 @@
-import {
-  FlexBox,
-  Modal,
-  ModalContent,
-  TableHeader,
-  TextEllipsis,
-  Tooltip,
-} from 'components'
+import { FlexBox, Modal, ModalContent, TableHeader, TextEllipsis, Tooltip } from 'components'
 import { observer } from 'mobx-react-lite'
 import useFilter from 'hooks/useHooks/useFilter'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
   dataReleaseSuggestions,
-  versionColumns,
+  versionColumns
 } from 'views/Space/Ops/DataIntegration/constants'
 import React, { useMemo, useRef } from 'react'
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
@@ -27,7 +20,7 @@ import {
   getJobReleaseKey,
   getJobVersionKey,
   useMutationJobRelease,
-  useQuerySyncJobVersions,
+  useQuerySyncJobVersions
 } from 'hooks'
 import { useQueryClient } from 'react-query'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
@@ -46,15 +39,15 @@ export const getPathConfig = (type: JobMode) => {
   switch (type) {
     case JobMode.RT:
       return {
-        type: 'release',
+        type: 'release'
       }
     case JobMode.OLE:
       return {
-        type: 'ole-release',
+        type: 'ole-release'
       }
     case JobMode.DI:
       return {
-        type: 'data-release',
+        type: 'data-release'
       }
     default:
       return {}
@@ -75,7 +68,7 @@ const ModalWrapper = styled(Modal)(() => [
       border-top: 0;
       ${tw`pb-4!`}
     }
-  `,
+  `
 ])
 
 export const getJumpDetail = (config: Record<string, any>, tab?: string) => {
@@ -103,6 +96,7 @@ const VersionsModal = (props: IProps) => {
       offset: number
       limit: number
       job_id: string
+      search?: string
     },
     { pagination: true; sort: true }
   >(
@@ -115,19 +109,18 @@ const VersionsModal = (props: IProps) => {
     'alert_status',
     // 'status',
     'version',
-    'updated',
+    'updated'
   ])
 
   const jobNameColumn = {
     ...dataReleaseColumns[0],
+    dataIndex: 'name',
+    title: '作业名称',
     // width: 250,
     render: (text: string, record: Record<string, any>) => {
       const child = (
         <TextEllipsis>
-          <span
-            tw="hover:text-green-11 hover:cursor-pointer"
-            onClick={() => jumpDetail()(record)}
-          >
+          <span tw="hover:text-green-11 hover:cursor-pointer" onClick={() => jumpDetail()(record)}>
             {text}
           </span>
         </TextEllipsis>
@@ -140,7 +133,7 @@ const VersionsModal = (props: IProps) => {
         )
       }
       return child
-    },
+    }
   }
   const { columns, setColumnSettings } = useColumns(
     dataReleaseVersionSettingKey,
@@ -162,12 +155,12 @@ const VersionsModal = (props: IProps) => {
             },
             filterAble: true,
             filtersNew: Object.values(streamReleaseScheduleTypes) as any,
-            render: () => null,
+            render: () => null
             // render: (status: keyof typeof streamReleaseScheduleTypes) => {
             //   return <StreamReleaseStatusCmp type={status} />
             // },
           }
-        : undefined) as any,
+        : undefined) as any
     },
     operations
   )
@@ -175,7 +168,7 @@ const VersionsModal = (props: IProps) => {
     () => ({
       columns: versionColumns,
       onSave: setColumnSettings as any,
-      storageKey: dataReleaseVersionSettingKey,
+      storageKey: dataReleaseVersionSettingKey
     }),
     [dataReleaseVersionSettingKey, setColumnSettings]
   )
@@ -195,11 +188,9 @@ const VersionsModal = (props: IProps) => {
           <TableHeader
             columnsSetting={columnsSetting}
             queryKey={() => getJobVersionKey('list')}
-            suggestions={dataReleaseSuggestions.filter((i) =>
-              ['alert_status', 'status'].includes(i.key as string)
-            )}
+            suggestions={dataReleaseSuggestions.filter((i) => ['search'].includes(i.key as string))}
             filterInputConfig={{
-              defaultKeywordLabel: '作业名称',
+              defaultKeywordLabel: '作业名称'
             }}
           />
           <Table
@@ -209,7 +200,7 @@ const VersionsModal = (props: IProps) => {
             rowKey="version"
             pagination={{
               total: data?.total ?? 0,
-              ...pagination,
+              ...pagination
             }}
           />
         </FlexBox>
@@ -218,10 +209,7 @@ const VersionsModal = (props: IProps) => {
   )
 }
 
-const getHelp = (
-  title: string,
-  type: false | 'offline' | 'resume' | 'suspend'
-) => {
+const getHelp = (title: string, type: false | 'offline' | 'resume' | 'suspend') => {
   switch (type) {
     case 'offline':
       return {
@@ -230,7 +218,7 @@ const getHelp = (
         desc: '作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?',
         button: '下线',
         showKey: 'showOffline',
-        buttonType: 'danger',
+        buttonType: 'danger'
       }
     case 'resume':
       return {
@@ -239,7 +227,7 @@ const getHelp = (
         desc: `确认重新发布调度作业 ${title}`,
         button: '重新发布',
         showKey: 'showResume',
-        buttonType: 'primary',
+        buttonType: 'primary'
       }
     case 'suspend':
       return {
@@ -248,7 +236,7 @@ const getHelp = (
         desc: '暂停后，相关实例需要手动恢复执行，确认暂停么?',
         button: '暂停',
         showKey: 'showSuspend',
-        buttonType: 'danger',
+        buttonType: 'danger'
       }
     default:
       return undefined
@@ -259,38 +247,28 @@ export const VersionsModalContainer = observer(
   ({
     type = JobMode.DI,
     refetchDataKey: refetchDataProp,
-    jobId,
+    jobId
   }: {
     type: JobMode
     refetchDataKey?: string
     jobId: string
   }) => {
-    const {
-      set,
-      selectedData,
-      showVersion,
-      showOffline,
-      showResume,
-      showSuspend,
-    } = useDataReleaseStore()
+    const { set, selectedData, showVersion, showOffline, showResume, showSuspend } =
+      useDataReleaseStore()
     const onCancel = () => {
       set({
-        showVersion: false,
+        showVersion: false
       })
     }
 
-    const { regionId, spaceId } =
-      useParams<{ regionId: string; spaceId: string }>()
+    const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
 
     const detail = { ...getPathConfig(type), regionId, spaceId }
 
     const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
       getJumpDetail({ ...record, ...detail }, tab)
     }
-    const handleMenuClick = (
-      record: Record<string, any>,
-      key: DataReleaseActionType
-    ) => {
+    const handleMenuClick = (record: Record<string, any>, key: DataReleaseActionType) => {
       switch (key) {
         case 'link':
         case 'dev':
@@ -302,19 +280,19 @@ export const VersionsModalContainer = observer(
         case 'offline':
           set({
             showOffline: true,
-            selectedData: record,
+            selectedData: record
           })
           break
         case 'resume':
           set({
             showResume: true,
-            selectedData: record,
+            selectedData: record
           })
           break
         case 'suspend':
           set({
             showSuspend: true,
-            selectedData: record,
+            selectedData: record
           })
           break
         default:
@@ -327,10 +305,7 @@ export const VersionsModalContainer = observer(
     const checkRef = useRef(false)
 
     const mutation = useMutationJobRelease(undefined, type)
-    const op =
-      (showOffline && 'offline') ||
-      (showResume && 'resume') ||
-      (showSuspend && 'suspend')
+    const op = (showOffline && 'offline') || (showResume && 'resume') || (showSuspend && 'suspend')
     const help = getHelp(selectedData?.name, op)
     const refetchData = () => {
       queryClient.invalidateQueries(refetchDataProp ?? getJobReleaseKey())
@@ -353,7 +328,7 @@ export const VersionsModalContainer = observer(
             appendToBody
             onCancel={() => {
               set({
-                [help!.showKey]: false,
+                [help!.showKey]: false
               })
               checkRef.current = false
             }}
@@ -364,11 +339,11 @@ export const VersionsModalContainer = observer(
                 .mutateAsync({
                   op,
                   job_id: selectedData?.id,
-                  stop_running: checkRef.current,
+                  stop_running: checkRef.current
                 })
                 .then(() => {
                   set({
-                    [help!.showKey]: false,
+                    [help!.showKey]: false
                   })
                   checkRef.current = false
                   refetchData()
@@ -377,11 +352,7 @@ export const VersionsModalContainer = observer(
           >
             <div>
               <FlexBox tw="gap-3">
-                <Icon
-                  name={help!.icon}
-                  size={24}
-                  tw="text-[24px] text-[#FFD127] leading-6"
-                />
+                <Icon name={help!.icon} size={24} tw="text-[24px] text-[#FFD127] leading-6" />
                 <div tw="grid gap-2">
                   <div tw="text-white text-[16px] leading-6">{help!.title}</div>
                   <div tw="text-neut-8 leading-5">{help!.desc}</div>

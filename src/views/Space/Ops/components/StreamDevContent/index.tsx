@@ -17,28 +17,25 @@ const GridItem = styled.div(({ labelWidth = 188 }: { labelWidth?: number }) => [
         ${tw`text-white!`}
       }
     }
-  `,
+  `
 ])
 export default function StreamDevContent({
   data,
+  language
 }: {
   data?: Record<string, any>
+  language?: string
 }) {
   if (!data) {
     return <Loading size="large" />
   }
   if (data.type === 2) {
     return (
-      <DevContentJSON data={{ job_content: data.sql.code }} showStep={false} />
+      <DevContentJSON data={{ job_content: data.sql.code }} showStep={false} language={language} />
     )
   }
   if (data.type === 4) {
-    return (
-      <DevContentJSON
-        data={{ job_content: data.python.code }}
-        showStep={false}
-      />
-    )
+    return <DevContentJSON data={{ job_content: data.python.code }} showStep={false} />
   }
   if (data.type === 3) {
     return (
@@ -52,7 +49,7 @@ export default function StreamDevContent({
               type="light"
               color={{
                 primary: '#219861',
-                secondary: '#8EDABD',
+                secondary: '#8EDABD'
               }}
             />
             <span>{`(ID:${data?.jar?.file_id})`}</span>

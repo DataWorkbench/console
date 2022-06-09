@@ -10,7 +10,7 @@ import {
   Icon,
   Button,
   InputSearch,
-  localstorage,
+  localstorage
 } from '@QCFE/qingcloud-portal-ui'
 import { Control } from '@QCFE/lego-ui'
 import { Card, Tabs, TabPanel } from 'components'
@@ -19,6 +19,8 @@ import { useQueryDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
 import { getHelpCenterLink } from 'utils'
 import { collect, map } from 'utils/functions'
 
+import useIcon from 'hooks/useHooks/useIcon'
+import icons from 'views/Space/Header/icons'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
 import BestPractice from './BestPractice'
@@ -30,18 +32,18 @@ const tabs = [
       '工作空间是在大数据工作台内管理任务、成员，分配角色和权限的基本单元。工作空间管理员可以加入成员至工作空间，并赋予工作空间管理员、开发、运维、部署、安全管理员或访客角色，以实现多角色协同工作。',
     icon: 'project',
     key: 'workspace',
-    helpLink: getHelpCenterLink('/manual/workspace_list/'),
-  },
+    helpLink: getHelpCenterLink('/manual/workspace_list/')
+  }
 ]
 
 const Wrapper = styled('div')<{ isModal?: boolean }>(({ isModal }) => [
   tw`h-full overflow-auto flex flex-col`,
-  !isModal && tw`p-5`,
+  !isModal && tw`p-5`
 ])
 
 const Content = styled(Card)(({ isModal }: { isModal?: boolean }) => [
   tw`pt-5 flex-1 relative`,
-  isModal && tw`shadow-none mb-0`,
+  isModal && tw`shadow-none mb-0`
 ])
 
 type RouteListType = { name: string; subFuncList: { name: string }[] }
@@ -59,7 +61,7 @@ const getMapPlatformRoute =
     }
     return {
       ...item,
-      subFuncList: lodashFilter(item.subFuncList, (i) => i.name !== 'network'),
+      subFuncList: lodashFilter(item.subFuncList, (i) => i.name !== 'network')
     }
   }
 
@@ -91,7 +93,7 @@ const WorkSpace = observer(
         // { title: '成员数', dataIndex: 'name' },
         { title: '描述', dataIndex: 'desc' },
         { title: '创建时间', dataIndex: 'created' },
-        { title: '操作', dataIndex: 'updated' },
+        { title: '操作', dataIndex: 'updated' }
       ],
       columnSettingsKey,
       // columnSettings: get(columnSettingsObj, 'value', []),
@@ -116,31 +118,29 @@ const WorkSpace = observer(
       },
       ifNoData: false,
       queryRefetch: false,
-      queryKeyWord: '',
+      queryKeyWord: ''
     }))
+
+    useIcon(icons)
 
     const { data: platform } = useQueryDescribePlatformConfig(
       {
-        regionId: stateStore.curRegionId,
+        regionId: stateStore.curRegionId
       },
       { enabled: !!stateStore.curRegionId, staleTime: 12 * 60 * 60 * 1000 }
     )
 
     useEffect(() => {
       stateStore.set({
-        platformConfig: platform,
+        platformConfig: platform
       })
-      lodashSet(
-        window,
-        'GLOBAL_CONFIG.new_docs_url',
-        platform?.documents_address
-      )
+      lodashSet(window, 'GLOBAL_CONFIG.new_docs_url', platform?.documents_address)
       const { defaultFuncList } = workSpaceStore
       workSpaceStore.set({
         funcList: collect(
           map(getMapPlatformRoute(platform!))
           // filter(filterEmpty)
-        )(defaultFuncList!),
+        )(defaultFuncList!)
       })
     }, [platform, stateStore, workSpaceStore])
 
@@ -150,7 +150,7 @@ const WorkSpace = observer(
         const curRegionInfo = defaultRegion || get(regionInfos, '[0]')
         if (curRegionInfo) {
           stateStore.set({
-            curRegionId: curRegionInfo.id,
+            curRegionId: curRegionInfo.id
           })
           globalStore.set({ curRegionInfo })
         }
@@ -160,7 +160,7 @@ const WorkSpace = observer(
     useEffect(() => {
       if (showCreate) {
         stateStore.set({
-          curSpaceOpt: 'create',
+          curSpaceOpt: 'create'
         })
       }
     }, [showCreate, stateStore])
@@ -168,7 +168,7 @@ const WorkSpace = observer(
     const handleTabClick = (tabName: string) => {
       stateStore.set({ curRegionId: tabName })
       globalStore.set({
-        curRegionInfo: regionInfos?.find((region) => region.id === tabName),
+        curRegionInfo: regionInfos?.find((region) => region.id === tabName)
       })
     }
 
@@ -194,10 +194,7 @@ const WorkSpace = observer(
     )
 
     return (
-      <Wrapper
-        isModal={isModal}
-        ref={(ref) => stateStore.set({ scrollElem: ref })}
-      >
+      <Wrapper isModal={isModal} ref={(ref) => stateStore.set({ scrollElem: ref })}>
         {!isModal && <PageTab tabs={tabs} />}
         {status !== 'success' ? (
           <div tw="h-80">{renderNoSuccess(status)}</div>
@@ -220,9 +217,7 @@ const WorkSpace = observer(
                       type="text"
                       placeholder="工作空间、ID、角色"
                       name="search"
-                      onPressEnter={(e) =>
-                        handleQuery((e.target as HTMLInputElement).value)
-                      }
+                      onPressEnter={(e) => handleQuery((e.target as HTMLInputElement).value)}
                       tw="w-52 rounded-2xl"
                       onClear={() => handleQuery('')}
                     />
@@ -231,16 +226,9 @@ const WorkSpace = observer(
               )}
 
               {regionInfos && regionInfos?.length > 0 && (
-                <Tabs
-                  tabClick={handleTabClick}
-                  activeName={stateStore.curRegionId}
-                >
+                <Tabs tabClick={handleTabClick} activeName={stateStore.curRegionId}>
                   {regionInfos?.map((regionInfo) => (
-                    <TabPanel
-                      key={regionInfo.id}
-                      label={regionInfo.name}
-                      name={regionInfo.id}
-                    >
+                    <TabPanel key={regionInfo.id} label={regionInfo.name} name={regionInfo.id}>
                       {stateStore.curRegionId === regionInfo.id && (
                         <SpaceLists region={regionInfo} />
                       )}
@@ -253,9 +241,7 @@ const WorkSpace = observer(
             {!isModal && stateStore.ifNoData && <BestPractice />}
             {stateStore.curSpaceOpt !== '' && (
               <SpaceModal
-                region={regionInfos?.find(
-                  (info) => info.id === stateStore.curRegionId
-                )}
+                region={regionInfos?.find((info) => info.id === stateStore.curRegionId)}
                 onHide={onHide}
               />
             )}

@@ -5,7 +5,7 @@ import { FlexBox } from 'components'
 const itemStyle = (isDelete: boolean) => [
   tw`flex items-center px-2 gap-1 leading-6 mb-2`,
   !isDelete && tw`bg-neut-13`,
-  isDelete && tw`bg-[rgba(207, 59, 55, 0.1)] border border-red-10`,
+  isDelete && tw`bg-[rgba(207, 59, 55, 0.1)] border border-red-10`
 ]
 
 const Empty = styled.div`
@@ -36,7 +36,8 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
   //   files: ['asdfas', 'adfasf', 'adfasd'],
   //   delete_files: ['dfad', 'adfasdf', 'dsafasdf'],
   // }
-  const isEmpty = data?.files?.length === 0 && data?.delete_files?.length === 0
+  const isEmpty = !data?.files?.length && !data?.delete_files?.length
+
   if (isEmpty) {
     return (
       <FlexBox tw="w-full flex-col items-center gap-3 pt-14">
@@ -64,7 +65,7 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
               type="light"
               color={{
                 primary: '#219861',
-                secondary: '#8EDABD',
+                secondary: '#8EDABD'
               }}
             />
             <span tw="text-white">{file}</span>
@@ -80,7 +81,7 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
                 type="light"
                 color={{
                   primary: '#219861',
-                  secondary: '#8EDABD',
+                  secondary: '#8EDABD'
                 }}
               />
               <span tw="text-white">{file}</span>

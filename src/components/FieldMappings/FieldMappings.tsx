@@ -5,7 +5,7 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
-  useState,
+  useState
 } from 'react'
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
 import { useMount, useUnmount, useMeasure } from 'react-use'
@@ -33,18 +33,20 @@ const styles = {
   header: tw`bg-neut-16`,
   rowbody: tw`hover:bg-[#1E2F41]`,
   // column: tw`w-44`,
-  add: tw`bg-neut-16 text-white`,
+  add: tw`bg-neut-16 text-white`
 }
 
 const Root = styled.div`
   ${tw`text-white space-y-2`}
 `
-const EmptyFieldWrapper = styled(Center)(() => [
-  styles.wrapper,
-  tw`self-stretch text-neut-8`,
-])
+const EmptyFieldWrapper = styled(Center)(() => [styles.wrapper, tw`self-stretch text-neut-8`])
 
-const OutlinedGreenButton = styled(Button)(() => tw`text-green-11!`)
+const OutlinedGreenButton = styled(Button)(
+  () =>
+    tw`
+    text-green-12! border-green-12! hover:bg-[rgba(19,150,106,0.1)]! active:bg-[rgba(17,134,95,0.2)]! active:border-green-13! active:text-green-13!
+  `
+)
 
 const Container = styled.div`
   ${tw`relative`}
@@ -127,16 +129,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     mappings: mappingsProp,
     columns,
     readonly = false,
-    hasHeader = true,
+    hasHeader = true
   } = props
 
   useIcon(icons)
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
   const jsPlumbInstRef = useRef<jsPlumbInstance>()
-  const [mappings, setMappings] = useState<[string, string][]>(
-    mappingsProp || []
-  )
+  const [mappings, setMappings] = useState<[string, string][]>(mappingsProp || [])
   const [visible, setVisible] = useState<boolean>(false)
   const selectedConnection = useRef<Connection>()
 
@@ -163,7 +163,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     if (leftColumns?.length > 0 && rightColumns?.length > 0) {
       const mappingArr = leftColumns.map<[string, string]>((column, i) => [
         column.name,
-        rightColumns[i].name,
+        rightColumns[i].name
       ])
       setMappings(mappingArr)
       setLeftFields((fields) => {
@@ -182,12 +182,10 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             default: c.value,
             formatter: c.format,
             custom: true,
-            uuid,
+            uuid
           }
         })
-        const filterFields = fields.filter(
-          (field) => !filedNames.includes(field.name)
-        )
+        const filterFields = fields.filter((field) => !filedNames.includes(field.name))
         return [...mappingFields, ...filterFields]
       })
       setRightFields((fields) => {
@@ -205,12 +203,10 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             default: c.value,
             formatter: c.format,
             custom: true,
-            uuid,
+            uuid
           }
         })
-        const filterFields = fields.filter(
-          (field) => !filedNames.includes(field.name)
-        )
+        const filterFields = fields.filter((field) => !filedNames.includes(field.name))
         return [...mappingFields, ...filterFields]
       })
     } else {
@@ -238,7 +234,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           is_part: false,
           name: leftField.name,
           type: leftField.type,
-          value: leftField.default,
+          value: leftField.default
         })
         rightColumns.push({
           format: rightField.formatter,
@@ -246,14 +242,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           is_part: false,
           name: rightField.name,
           type: rightField.type,
-          value: rightField.default,
+          value: rightField.default
         })
       })
       if (leftColumns.length === 0 && rightColumns.length === 0) {
         return null
       }
       return [leftColumns, rightColumns]
-    },
+    }
   }))
 
   // console.log(mappings)
@@ -295,7 +291,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         const rightField = rightFields.find((f) => f.name === right)
         if (leftField && rightField) {
           jsPlumbInst.connect({
-            uuids: [leftField.uuid, rightField.uuid],
+            uuids: [leftField.uuid, rightField.uuid]
           })
         }
       })
@@ -316,19 +312,18 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             length: 10,
             paintStyle: {
               fill: '#15a675',
-              stroke: '#15a675',
-            },
-          },
-        ],
-      ],
+              stroke: '#15a675'
+            }
+          }
+        ]
+      ]
     })
     jsPlumbInstRef.current = instance
 
     instance.bind('connection', (info, event) => {
       if (event) {
         const { connection } = info
-        const { Left: leftAnchor, Right: rightAnchor } =
-          connection.getParameters()
+        const { Left: leftAnchor, Right: rightAnchor } = connection.getParameters()
 
         setMappings((items) => {
           const filterItems = items.filter(
@@ -340,12 +335,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     })
     instance.bind('connectionDetached', ({ connection }, event) => {
       if (event) {
-        const { Left: leftAnchor, Right: rightAnchor } =
-          connection.getParameters()
+        const { Left: leftAnchor, Right: rightAnchor } = connection.getParameters()
         setMappings((items) =>
-          items.filter(
-            ([l, r]) => l !== rightAnchor.name && r !== leftAnchor.name
-          )
+          items.filter(([l, r]) => l !== rightAnchor.name && r !== leftAnchor.name)
         )
       }
     })
@@ -374,23 +366,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     if (mappings.length > 0) {
       setLeftFields((fields) => {
         const leftMappings = mappings.map(([left]) => left)
-        const mappingFields = leftMappings.map(
-          (v) => fields.find((field) => field.name === v)!
-        )
-        const filterFields = fields.filter(
-          (field) => !leftMappings.includes(field.name)
-        )
+        const mappingFields = leftMappings.map((v) => fields.find((field) => field.name === v)!)
+        const filterFields = fields.filter((field) => !leftMappings.includes(field.name))
         return [...mappingFields, ...filterFields]
       })
 
       setRightFields((fields) => {
         const rightMappings = mappings.map(([, right]) => right)
-        const mappingFields = rightMappings.map(
-          (v) => fields.find((field) => field.name === v)!
-        )
-        const filterFields = fields.filter(
-          (field) => !rightMappings.includes(field.name)
-        )
+        const mappingFields = rightMappings.map((v) => fields.find((field) => field.name === v)!)
+        const filterFields = fields.filter((field) => !rightMappings.includes(field.name))
         return [...mappingFields, ...filterFields]
       })
     }
@@ -410,11 +394,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     jsPlumbInst?.deleteEveryConnection()
     const len = Math.min(leftFields.length, rightFields.length)
 
-    setMappings(
-      leftFields
-        .filter((_, i) => i < len)
-        .map((v, i) => [v.name, rightFields[i].name])
-    )
+    setMappings(leftFields.filter((_, i) => i < len).map((v, i) => [v.name, rightFields[i].name]))
   }
 
   const handleClearMapping = () => {
@@ -434,42 +414,30 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     const connection = selectedConnection.current
     if (connection) {
       const jsPlumbInst = jsPlumbInstRef.current
-      const { Left: leftAnchor, Right: rightAnchor } =
-        connection.getParameters()
+      const { Left: leftAnchor, Right: rightAnchor } = connection.getParameters()
       setMappings((items) =>
-        items.filter(
-          ([l, r]) => l !== rightAnchor.name && r !== leftAnchor.name
-        )
+        items.filter(([l, r]) => l !== rightAnchor.name && r !== leftAnchor.name)
       )
       jsPlumbInst?.deleteConnection(connection)
       setVisible(false)
     }
   }
 
-  const moveItem = useCallback(
-    (dragId: string, hoverId: string, isTop = false) => {
-      setLeftFields((fields) => {
-        const dragFieldIndex = fields.findIndex(
-          (field) => field.uuid === dragId
-        )!
-        const dragField = fields[dragFieldIndex]
-        const newFields = [...fields]
+  const moveItem = useCallback((dragId: string, hoverId: string, isTop = false) => {
+    setLeftFields((fields) => {
+      const dragFieldIndex = fields.findIndex((field) => field.uuid === dragId)!
+      const dragField = fields[dragFieldIndex]
+      const newFields = [...fields]
 
-        newFields.splice(dragFieldIndex, 1)
-        const hoverFieldIndex = newFields.findIndex(
-          (field) => field.uuid === hoverId
-        )!
-        newFields.splice(isTop ? 0 : hoverFieldIndex + 1, 0, dragField)
-        return newFields
-      })
-    },
-    []
-  )
+      newFields.splice(dragFieldIndex, 1)
+      const hoverFieldIndex = newFields.findIndex((field) => field.uuid === hoverId)!
+      newFields.splice(isTop ? 0 : hoverFieldIndex + 1, 0, dragField)
+      return newFields
+    })
+  }, [])
 
   const addCustomField = () => {
-    const hasUnFinish = leftFields.find(
-      (field) => field.custom && field.default === ''
-    )
+    const hasUnFinish = leftFields.find((field) => field.custom && field.default === '')
     if (!hasUnFinish) {
       setLeftFields((fields) => [
         ...fields,
@@ -479,8 +447,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           custom: true,
           default: '',
           isEditing: true,
-          uuid: nanoid(),
-        },
+          uuid: nanoid()
+        }
       ])
     }
   }
@@ -495,7 +463,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       newFields[itemIndex] = omit(
         {
           ...newFields[itemIndex],
-          ...field,
+          ...field
         },
         field.custom ? ['isEditing'] : ['isEditing', 'custom', 'default']
       )
@@ -559,15 +527,10 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                     content="同名映射可能会覆盖之前自定义映射，确定同名映射么？"
                     onOk={handleNameMapping}
                   >
-                    <OutlinedGreenButton type="outlined">
-                      同名映射
-                    </OutlinedGreenButton>
+                    <OutlinedGreenButton type="outlined">同名映射</OutlinedGreenButton>
                   </PopConfirm>
                 ) : (
-                  <OutlinedGreenButton
-                    type="outlined"
-                    onClick={handleNameMapping}
-                  >
+                  <OutlinedGreenButton type="outlined" onClick={handleNameMapping}>
                     同名映射
                   </OutlinedGreenButton>
                 )
@@ -579,19 +542,29 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 </Tooltip>
               )
             }
-            <PopConfirm
-              type="warning"
-              okText="确认"
-              content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
-              onOk={handleRowMapping}
-            >
+            {mappings.length ? (
+              <PopConfirm
+                type="warning"
+                okText="确认"
+                content="同行映射可能会覆盖之前自定义映射，确定同行映射么？"
+                onOk={handleRowMapping}
+              >
+                <OutlinedGreenButton
+                  type="outlined"
+                  disabled={!(leftFields.length && rightFields.length)}
+                >
+                  同行映射
+                </OutlinedGreenButton>
+              </PopConfirm>
+            ) : (
               <OutlinedGreenButton
                 type="outlined"
+                onClick={handleRowMapping}
                 disabled={!(leftFields.length && rightFields.length)}
               >
                 同行映射
               </OutlinedGreenButton>
-            </PopConfirm>
+            )}
             <PopConfirm
               content="取消映射会去除所有现有映射，确定取消映射么？"
               type="warning"
@@ -638,16 +611,10 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                   onCancel={cancelAddCustomField}
                   deleteItem={(field) => {
-                    setLeftFields((fields) =>
-                      fields.filter((f) => f.uuid !== field.uuid)
-                    )
-                    setMappings((prevMappings) =>
-                      prevMappings.filter(([l]) => l !== field.name)
-                    )
+                    setLeftFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
+                    setMappings((prevMappings) => prevMappings.filter(([l]) => l !== field.name))
                   }}
-                  exist={(name: string) =>
-                    !!leftFields.find((f) => f.name === name)
-                  }
+                  exist={(name: string) => !!leftFields.find((f) => f.name === name)}
                   getDeleteField={(name: string) => {
                     const delItem = leftFieldsProp.find((f) => f.name === name)
                     const existItem = leftFields.find((f) => f.name === name)
@@ -658,20 +625,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                 />
               ))}
-              {!readonly && (
-                <Center
-                  tw="bg-neut-16 cursor-pointer h-8"
-                  onClick={addCustomField}
-                >
+              {false && !readonly && (
+                <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomField}>
                   <Icon name="add" type="light" />
                   添加字段
                 </Center>
               )}
             </div>
           ) : (
-            <EmptyFieldWrapper>
-              选择来源端数据源表（可获取表结构）后显示字段
-            </EmptyFieldWrapper>
+            <EmptyFieldWrapper>选择来源端数据源表（可获取表结构）后显示字段</EmptyFieldWrapper>
           )}
           <Tippy
             followCursor="initial"
@@ -695,10 +657,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             offset={[5, 5]}
             appendTo={() => document.body}
           >
-            <div
-              tw="w-1/12 self-stretch min-w-[32px]"
-              onContextMenu={(e) => e.preventDefault()}
-            />
+            <div tw="w-1/12 self-stretch min-w-[32px]" onContextMenu={(e) => e.preventDefault()} />
           </Tippy>
           {rightFields.length ? (
             <div css={styles.wrapper}>
@@ -706,8 +665,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <div>类型</div>
                 <div>目标表字段</div>
               </FieldRow>
-              {rightFields.map((item, i) => {
-                return (
+              {rightFields.map((item, i) => (
                   <MappingItem
                     jsplumb={jsPlumbInstRef.current}
                     key={item.name}
@@ -715,13 +673,10 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                     item={item}
                     index={i}
                   />
-                )
-              })}
+                ))}
             </div>
           ) : (
-            <EmptyFieldWrapper>
-              选择目的端数据源表（可获取表结构）后显示字段
-            </EmptyFieldWrapper>
+            <EmptyFieldWrapper>选择目的端数据源表（可获取表结构）后显示字段</EmptyFieldWrapper>
           )}
         </FlexBox>
       </Container>

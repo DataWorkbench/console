@@ -34,7 +34,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
         fill: #dff7ed;
       }
     `,
-  status !== 1 && tw`w-24`,
+  status !== 1 && tw`w-24`
 ])
 
 // const Disp = tw.div`pt-0.5 pr-6 h-7 truncate`
@@ -48,25 +48,20 @@ interface IProps {
   className?: string
 }
 
-const isNetworkInit = (
-  platform: Record<string, any>,
-  space: Record<string, any>
-) => {
-  return (
+const isNetworkInit = (platform: Record<string, any>, space: Record<string, any>) => (
     platform &&
     platform.work_in_iaas &&
     platform.enable_network &&
     space.status !== 2 &&
     !space.network_is_init
   )
-}
 
 const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const stateStore = useWorkSpaceContext()
   const { isModal, curSpaceId, onItemCheck, platformConfig } = stateStore
   const history = useHistory()
   const {
-    workSpaceStore: { funcList },
+    workSpaceStore: { funcList }
   } = useStore()
 
   const handleCardClick = () => {
@@ -97,9 +92,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           </Box> */}
           <Box>
             创建时间：
-            <span tw="text-neut-16">
-              {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
-            </span>
+            <span tw="text-neut-16">{formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}</span>
           </Box>
         </FlexBox>
       )
@@ -138,9 +131,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           <div>
             <span>
               创建时间：
-              <span tw="text-neut-16">
-                {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
-              </span>
+              <span tw="text-neut-16">{formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}</span>
             </span>
           </div>
         </FlexBox>
@@ -163,11 +154,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           tw="absolute inset-0 z-50"
           title="请单击以绑定网络信息"
           onClick={(e) => {
-            handleSpaceOpt(
-              e as unknown as MouseEvent,
-              undefined as never,
-              'network'
-            )
+            handleSpaceOpt(e as unknown as MouseEvent, undefined as never, 'network')
           }}
         />
       )}
@@ -176,11 +163,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
         css={space.status !== 1 && tw`cursor-default`}
       >
         {isModal && (
-          <Radio
-            tw="absolute top-2 right-3"
-            value={space.id}
-            checked={space.id === curSpaceId}
-          />
+          <Radio tw="absolute top-2 right-3" value={space.id} checked={space.id === curSpaceId} />
         )}
         <FlexBox tw="mb-7 items-center">
           <FlexBox tw="space-x-3 w-full items-center">
@@ -207,9 +190,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 </StateTag>
               </FlexBox>
               <div tw="pt-0.5 h-7 truncate" title={space.desc || ''}>
-                <TextEllipsis twStyle={tw`text-neut-8`}>
-                  {space.desc || '暂无描述'}
-                </TextEllipsis>
+                <TextEllipsis twStyle={tw`text-neut-8`}>{space.desc || '暂无描述'}</TextEllipsis>
               </div>
             </Box>
             {!isModal && (
@@ -235,10 +216,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                       </MenuItem>
                       {!disableStatus && (
                         <MenuItem value="disable" disabled={disableStatus}>
-                          <i
-                            className="if if-minus-square"
-                            tw="text-base mr-2"
-                          />
+                          <i className="if if-minus-square" tw="text-base mr-2" />
                           禁用工作空间
                         </MenuItem>
                       )}
@@ -332,11 +310,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                                 to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
                                 tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
                               >
-                                <Icon
-                                  name={subFunc.icon}
-                                  type="dark"
-                                  tw="mr-1"
-                                />
+                                <Icon name={subFunc.icon} type="dark" tw="mr-1" />
                                 {subFunc.title}
                               </Link>
                             </MenuItem>
@@ -358,10 +332,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                   }}
                   tw="inline-block"
                 >
-                  <OptButton
-                    disabled={disableStatus}
-                    tw="px-6 xl:px-9 2xl:px-7 py-1"
-                  >
+                  <OptButton disabled={disableStatus} tw="py-1">
                     {title}
                   </OptButton>
                 </Link>

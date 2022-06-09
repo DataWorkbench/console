@@ -22,22 +22,17 @@ import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease
 import {
   useQuerySyncJobVersionConf,
   useQuerySyncJobVersionDetail,
-  useQuerySyncJobVersionSchedule,
+  useQuerySyncJobVersionSchedule
 } from 'hooks/useJobVersion'
 import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
 import { useMutationJobRelease } from 'hooks'
-import {
-  AlarmStatusCmp,
-  Circle,
-  DbTypeCmp,
-  JobTypeCmp,
-} from '../../styledComponents'
+import { AlarmStatusCmp, Circle, DbTypeCmp, JobTypeCmp } from '../../styledComponents'
 import {
   dataReleaseDetailActions,
   DataReleaseDevMode,
   dataReleaseDevModeType,
   DataReleaseSchedule,
-  dataReleaseScheduleType,
+  dataReleaseScheduleType
 } from '../constants'
 
 interface IDataJobInstanceDetailProps {
@@ -62,7 +57,7 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
         ${tw`text-white!`}
       }
     }
-  `,
+  `
 ])
 
 const Root = styled.div`
@@ -112,8 +107,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
   // const { regionId, spaceId } = useParams<IRouteParams>()
 
-  const { showDataSource, set, datasourceId, datasourceType } =
-    useDataReleaseStore()
+  const { showDataSource, set, datasourceId, datasourceType } = useDataReleaseStore()
 
   const history = useHistory()
   const { search } = useLocation()
@@ -125,21 +119,19 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
     history.push('../data-release')
   }
 
-  const { data, isFetching, refetch } = useQuerySyncJobVersionDetail<
-    Record<string, any>
-  >({
+  const { data, isFetching, refetch } = useQuerySyncJobVersionDetail<Record<string, any>>({
     jobId: id,
-    versionId: version,
+    versionId: version
   })
 
   const { data: scheduleData } = useQuerySyncJobVersionSchedule({
     jobId: id,
-    versionId: version,
+    versionId: version
   })
 
   const { data: config } = useQuerySyncJobVersionConf({
     jobId: id,
-    versionId: version,
+    versionId: version
   })
 
   const mutation = useMutationJobRelease()
@@ -149,14 +141,14 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
       case 'offline':
         set({
           showOffline: true,
-          selectedData: data,
+          selectedData: data
         })
         break
       case 're-publish':
         mutation
           .mutateAsync({
             op: 'release',
-            jobId: id,
+            jobId: id
           })
           .then(() => {
             refetch()
@@ -171,10 +163,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
   const filterActionFn = (item: { key: string }) => {
     let filterActionKey = ''
 
-    if (
-      dataReleaseScheduleType[data?.status as 2]?.type ===
-      DataReleaseSchedule.DOWNED
-    ) {
+    if (dataReleaseScheduleType[data?.status as 2]?.type === DataReleaseSchedule.DOWNED) {
       filterActionKey = 'offline'
     } else {
       filterActionKey = 're-publish'
@@ -216,10 +205,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             />
           </div>
         </Tooltip>
-        <CopyTextWrapper
-          text={`${data?.name ?? ''}(ID: ${id})`}
-          theme="light"
-        />
+        <CopyTextWrapper text={`${data?.name ?? ''}(ID: ${id})`} theme="light" />
       </FlexBox>
 
       <Card hasBoxShadow tw="bg-neut-16 relative">
@@ -230,13 +216,14 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
-            <Circle>
+            <Circle tw="w-10! h-10!">
               <Icon
                 name="q-downloadBoxFill"
                 type="light"
+                size={28}
                 css={css`
                   & .qicon {
-                    ${tw`text-white! fill-[#fff]!`}
+                    ${tw`text-white! fill-[#fff]! `}
                   }
                 `}
               />
@@ -255,12 +242,10 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           </Center>
           <FlexBox tw="gap-4">
             <MoreAction
-              items={dataReleaseDetailActions
-                .filter(filterActionFn)
-                .map((i) => ({
-                  ...i,
-                  value: data,
-                }))}
+              items={dataReleaseDetailActions.filter(filterActionFn).map((i) => ({
+                ...i,
+                value: data
+              }))}
               type="button"
               buttonText="更多操作"
               placement="bottom-start"
@@ -294,9 +279,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <span>版本 ID:</span>
               <span>{data?.version}</span>
               <span>作业模式:</span>
-              <span>
-                {dataReleaseDevModeType[config?.job_mode as 1]?.label}
-              </span>
+              <span>{dataReleaseDevModeType[config?.job_mode as 1]?.label}</span>
               <span>作业类型:</span>
               <span>
                 <JobTypeCmp type={data?.type} />
@@ -306,13 +289,9 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             <GridItem>
               <span>数据来源:</span>
               <span tw="inline-block">
-                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
-                  DataReleaseDevMode.UI &&
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type === DataReleaseDevMode.UI &&
                   config?.source_id && (
-                    <div
-                      tw="align-middle"
-                      css={[tw`cursor-pointer  hover:text-green-11`]}
-                    >
+                    <div tw="align-middle" css={[tw`cursor-pointer  hover:text-green-11`]}>
                       <DbTypeCmp
                         devMode={config?.job_type}
                         type={data?.source_type}
@@ -320,7 +299,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
                           set({
                             showDataSource: true,
                             datasourceType: data?.source_type,
-                            datasourceId: config?.source_id,
+                            datasourceId: config?.source_id
                           })
                         }
                       />
@@ -329,23 +308,16 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
                   )}
                 {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
                   DataReleaseDevMode.SCRIPT && (
-                  <DbTypeCmp
-                    devMode={config?.job_type}
-                    type={data?.source_type}
-                  />
+                  <DbTypeCmp devMode={config?.job_type} type={data?.source_type} />
                 )}
                 <div tw="text-neut-8">{config?.source_id}</div>
               </span>
               <span>数据目的:</span>
 
               <span tw="inline-block">
-                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
-                  DataReleaseDevMode.UI &&
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type === DataReleaseDevMode.UI &&
                   config?.target_id && (
-                    <div
-                      tw="align-middle"
-                      css={[tw`cursor-pointer  hover:text-green-11`]}
-                    >
+                    <div tw="align-middle" css={[tw`cursor-pointer  hover:text-green-11`]}>
                       <DbTypeCmp
                         devMode={config?.job_type}
                         type={data?.target_type}
@@ -353,7 +325,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
                           set({
                             showDataSource: true,
                             datasourceType: data?.target_type,
-                            datasourceId: config?.target_id,
+                            datasourceId: config?.target_id
                           })
                         }
                       />
@@ -362,10 +334,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
                   )}
                 {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
                   DataReleaseDevMode.SCRIPT && (
-                  <DbTypeCmp
-                    devMode={config?.job_type}
-                    type={data?.target_type}
-                  />
+                  <DbTypeCmp devMode={config?.job_type} type={data?.target_type} />
                 )}
                 <div tw="text-neut-8">{config?.target_id}</div>
               </span>
@@ -373,13 +342,9 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
             <GridItem labelWidth={84}>
               <span>生效时间:</span>
-              <span>
-                {dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
-              </span>
+              <span>{dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
               <span>最近发布时间:</span>
-              <span>
-                {dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
-              </span>
+              <span>{dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
               <span>发布描述:</span>
               <span>{data?.desc}</span>
             </GridItem>
@@ -389,12 +354,17 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent flex-auto"
+        tw="bg-transparent"
         // @ts-ignore
         activeName={activeName}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
         }}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
       >
         <TabPanel label="关联实例" name="link">
           <LinkInstance jobId={id} version={version} />

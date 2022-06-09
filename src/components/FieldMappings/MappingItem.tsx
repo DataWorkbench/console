@@ -404,7 +404,9 @@ const MappingItem = (props: MappingItemProps) => {
               }
             ]}
             options={
-              typeName ? fieldTypeMapper.get(typeName)?.map((v) => ({ label: v, value: v })) : []
+              typeName
+                ? fieldTypeMapper.get(typeName.toString())?.map((v) => ({ label: v, value: v }))
+                : []
             }
             onChange={(v: string) =>
               setItem((draft) => {

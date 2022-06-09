@@ -1,44 +1,26 @@
-import {
-  useRef,
-  useState,
-  useImperativeHandle,
-  useMemo,
-  useEffect,
-} from 'react'
+import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import {
-  findKey,
-  get,
-  pick,
-  isEmpty,
-  isEqual,
-  trim,
-  camelCase,
-  keys,
-} from 'lodash-es'
+import { camelCase, findKey, get, isEmpty, isEqual, keys, pick, trim } from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
-  FlexBox,
-  Center,
   ArrowLine,
-  SelectWithRefresh,
-  ConditionParameterField,
   ButtonWithClearField,
+  Center,
+  ConditionParameterField,
+  FlexBox,
   HelpCenterLink,
-  SqlGroupField,
-  TConditionParameterVal,
   PopConfirm,
+  SelectWithRefresh,
+  SqlGroupField,
+  TConditionParameterVal
 } from 'components'
-import {
-  useStore,
-  useQuerySourceTables,
-  useQuerySourceTableSchema,
-} from 'hooks'
+import { useQuerySourceTables, useQuerySourceTableSchema, useStore } from 'hooks'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { dataSourceTypes, DataSourceType, SyncJobType } from '../Job/JobUtils'
+import { DbType, sourceKinds, SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { DataSourceType, dataSourceTypes, getDataSourceTypes, SyncJobType } from '../Job/JobUtils'
 
 const { TextField, SelectField, TextAreaField } = Form
 
@@ -76,18 +58,14 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
-const Label = styled('div')(() => [
-  tw`border border-white px-2 py-1 leading-none rounded-[3px]`,
-])
+const Label = styled('div')(() => [tw`border border-white px-2 py-1 leading-none rounded-[3px]`])
 
-const DashedLine = styled('div')(() => [
-  tw`border-neut-13 border-l border-dashed my-1`,
-])
+const DashedLine = styled('div')(() => [tw`border-neut-13 border-l border-dashed my-1`])
 
 const StyledSqlGroupField = styled(SqlGroupField)(() => [
   css`
@@ -99,7 +77,7 @@ const StyledSqlGroupField = styled(SqlGroupField)(() => [
         ${tw`w-[378px]!`}
       }
     }
-  `,
+  `
 ])
 
 type OpType = 'source' | 'target'
@@ -109,12 +87,34 @@ type JobType = 1 | 2 | 3
 enum WriteMode {
   Insert = 1,
   Replace = 2,
-  Update = 3,
+  Update = 3
+}
+
+const getWriteMode = (type?: SourceType) => {
+  switch (type) {
+    case SourceType.Mysql:
+    case SourceType.PostgreSQL:
+      return [WriteMode.Insert, WriteMode.Replace, WriteMode.Update]
+    case SourceType.ClickHouse:
+      return [WriteMode.Insert]
+    case SourceType.SqlServer:
+      return [WriteMode.Insert, WriteMode.Update]
+    default:
+      return []
+  }
 }
 
 enum Semantic {
   'AtLeastOnce' = 1,
-  'ExactlyOnce' = 2,
+  'ExactlyOnce' = 2
+}
+
+const getExactly = (types?: SourceType[]) => {
+  const sql = new Set(sourceKinds.filter((i) => i.type === DbType.Sql).map((i) => i.source_type))
+  if (types?.every((i) => sql.has(i))) {
+    return [Semantic.ExactlyOnce, Semantic.AtLeastOnce]
+  }
+  return [Semantic.AtLeastOnce]
 }
 
 interface Column {
@@ -170,7 +170,7 @@ const SyncDataSource = observer(
   (props: SyncDataSourceProps, ref) => {
     const { onSelectTable, onDbChange, conf, curJob: curJobProp } = props
     const {
-      workFlowStore: { curJob: curJobStore },
+      workFlowStore: { curJob: curJobStore }
     } = useStore()
     const curJob = curJobProp ?? curJobStore
     const [visible, setVisible] = useState<boolean | null>(null)
@@ -181,16 +181,13 @@ const SyncDataSource = observer(
     const op = useRef<OpType>('source')
     const [db, setDB] = useImmer<ResInfo>({
       source: {},
-      target: {},
+      target: {}
     })
 
     const [sourceTypeName, targetTypeName] = useMemo(() => {
       const sourceType = curJob?.source_type
       const targetType = curJob?.target_type
-      return [
-        findKey(dataSourceTypes, (v) => v === sourceType),
-        findKey(dataSourceTypes, (v) => v === targetType),
-      ]
+      return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
     }, [curJob])
 
     const sourceTablesRet = useQuerySourceTables(
@@ -206,7 +203,7 @@ const SyncDataSource = observer(
     const sourceColumnRet = useQuerySourceTableSchema(
       {
         sourceId: db.source.id!,
-        tableName: db.source.tableName!,
+        tableName: db.source.tableName!
       },
       {
         enabled: !!(db.source.id && db.source.tableName),
@@ -218,7 +215,7 @@ const SyncDataSource = observer(
           if (onSelectTable) {
             onSelectTable('source', db.source.tableName!, columns, db.source)
           }
-        },
+        }
       },
       'source'
     )
@@ -226,7 +223,7 @@ const SyncDataSource = observer(
     const { refetch: targetRefetch } = useQuerySourceTableSchema(
       {
         sourceId: db.target.id!,
-        tableName: db.target.tableName!,
+        tableName: db.target.tableName!
       },
       {
         enabled: !!(db.target.id && db.target.tableName),
@@ -238,7 +235,7 @@ const SyncDataSource = observer(
           if (onSelectTable) {
             onSelectTable('target', db.target.tableName!, columns, db.target)
           }
-        },
+        }
       },
       'source'
     )
@@ -252,11 +249,18 @@ const SyncDataSource = observer(
           targetRefetch()
         }
       },
-      getResource: () => {
+      validate: () => {
         const srcform = sourceForm.current as any
         const tgtform = targetForm.current as any
+        return srcform?.validateForm() && tgtform?.validateForm()
+      },
+      // eslint-disable-next-line consistent-return
+      getResource: () => {
+        // const srcform = sourceForm.current as any
+        // const tgtform = targetForm.current as any
 
-        if (srcform?.validateForm() && tgtform?.validateForm()) {
+        // if (srcform?.validateForm() && tgtform?.validateForm()) {
+        if (true) {
           const sourceKey = `${sourceTypeName!.toLowerCase()}_source`
           const targetKey = `${targetTypeName!.toLowerCase()}_target`
           const { condition } = db.source
@@ -264,66 +268,68 @@ const SyncDataSource = observer(
             source_id: db.source.id,
             target_id: db.target.id,
             sync_resource: {
-              [sourceKey]: {
-                table: [db.source.tableName],
-                schema: '',
-                where: db.source.where,
-                split_pk: db.source.splitPk,
-                condition_type: condition?.type,
-                visualization: {
-                  column: condition?.column,
-                  start_condition: condition?.startCondition,
-                  start_value: condition?.startValue,
-                  end_condition: condition?.endCondition,
-                  end_value: condition?.endValue,
-                },
-                express: condition?.expression,
-              },
-              [targetKey]: {
-                table: [db.target.tableName],
-                write_mode: db.target.writeMode,
-                semantic: db.target.semantic,
-                batch_size: db.target.batchSize,
-                pre_sql: db.target.preSql?.filter((v) => v !== ''),
-                post_sql: db.target.postSql?.filter((v) => v !== ''),
-              },
-            },
+              [sourceKey]: db.source.tableName
+                ? {
+                    table: [db.source.tableName],
+                    schema: '',
+                    where: db.source.where,
+                    split_pk: db.source.splitPk,
+                    condition_type: condition?.type,
+                    visualization: {
+                      column: condition?.column,
+                      start_condition: condition?.startCondition,
+                      start_value: condition?.startValue,
+                      end_condition: condition?.endCondition,
+                      end_value: condition?.endValue
+                    },
+                    express: condition?.expression
+                  }
+                : undefined,
+              [targetKey]: db.target.tableName
+                ? {
+                    table: [db.target.tableName],
+                    write_mode: db.target.writeMode,
+                    semantic: db.target.semantic,
+                    batch_size: db.target.batchSize,
+                    pre_sql: db.target.preSql?.filter((v) => v !== ''),
+                    post_sql: db.target.postSql?.filter((v) => v !== '')
+                  }
+                : undefined
+            }
           }
 
           return config
         }
-
-        return null
       },
-      getTypeNames: () => [sourceTypeName, targetTypeName],
+      getTypeNames: () => [sourceTypeName, targetTypeName]
     }))
 
     useEffect(() => {
       if (conf && conf.source_id) {
-        const dbSource = get(
-          conf,
-          `sync_resource.${sourceTypeName!.toLowerCase()}_source`
-        )
-        const dbTarget = get(
-          conf,
-          `sync_resource.${targetTypeName!.toLowerCase()}_target`
-        )
-        const visualization = get<Record<string, string>>(
-          dbSource,
-          'visualization',
-          {}
-        )
-        const condition: any = {}
-        keys(visualization).forEach((v) => {
-          condition[camelCase(v)] = visualization[v]
-        })
+        const dbSource = get(conf, `sync_resource.${sourceTypeName!.toLowerCase()}_source`)
+        const dbTarget = get(conf, `sync_resource.${targetTypeName!.toLowerCase()}_target`)
+        let condition: any = {}
+
+        if (get(dbSource, 'condition_type') === 2) {
+          condition = {
+            type: 2,
+            expression: get(dbSource, 'express')
+          }
+        } else {
+          const visualization = get<Record<string, string>>(dbSource, 'visualization', {})
+          keys(visualization).forEach((v) => {
+            condition[camelCase(v)] = visualization[v]
+          })
+          condition.type = 1
+        }
+
         const newDB = {
           source: {
             id: conf.source_id,
             tableName: get(dbSource, 'table[0]', ''),
             condition,
             where: trim(get(dbSource, 'where', '')),
-            splitPk: get(dbSource, 'split_pk', ''),
+            splitPk: get(dbSource, 'split_pk', '')
           },
           target: {
             id: conf.target_id,
@@ -332,14 +338,11 @@ const SyncDataSource = observer(
             semantic: get(dbTarget, 'semantic', ''),
             batchSize: get(dbTarget, 'batch_size', ''),
             postSql: get(dbTarget, 'post_sql', []),
-            preSql: get(dbTarget, 'pre_sql', []),
-          },
+            preSql: get(dbTarget, 'pre_sql', [])
+          }
         }
         setDB(newDB)
-        if (
-          newDB.target.postSql?.length > 0 ||
-          newDB.target.preSql?.length > 0
-        ) {
+        if (newDB.target.postSql?.length > 0 || newDB.target.preSql?.length > 0) {
           setShowTargetAdvanced(true)
         }
         if (newDB.source.where) {
@@ -389,7 +392,7 @@ const SyncDataSource = observer(
       const typeNameMap = new Map([
         [1, '离线 - 全量'],
         [2, '离线 - 增量'],
-        [3, '实时'],
+        [3, '实时']
       ])
       return typeNameMap.get(type)
     }
@@ -411,10 +414,7 @@ const SyncDataSource = observer(
             `}
             label={<AffixLabel>数据源</AffixLabel>}
             help={
-              isSelected &&
-              dbInfo.networkId && (
-                <div>网络配置名称（ID：{dbInfo.networkId}）</div>
-              )
+              isSelected && dbInfo.networkId && <div>网络配置名称（ID：{dbInfo.networkId}）</div>
             }
             popConfirm={
               <PopConfirm
@@ -423,11 +423,7 @@ const SyncDataSource = observer(
               />
             }
             icon={
-              <Icon
-                name="blockchain"
-                size={16}
-                color={{ secondary: 'rgba(255,255,255,0.4)' }}
-              />
+              <Icon name="blockchain" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />
             }
             value={dbInfo.id}
             validateOnChange
@@ -438,8 +434,8 @@ const SyncDataSource = observer(
               {
                 help: '请选择数据来源',
                 status: 'error',
-                rule: (v?: string) => !!v,
-              },
+                rule: (v?: string) => !!v
+              }
             ]}
           >
             <Center tw="space-x-1">
@@ -454,7 +450,7 @@ const SyncDataSource = observer(
               label={<AffixLabel>数据源表</AffixLabel>}
               options={tables.map((tabName) => ({
                 label: tabName,
-                value: tabName,
+                value: tabName
               }))}
               isLoading={tablesRet.isFetching && op.current === from}
               clearable={false}
@@ -467,8 +463,7 @@ const SyncDataSource = observer(
               }}
               validateOnChange
               value={dbInfo.tableName}
-              {...(!tables.length &&
-              !(tablesRet.isFetching && op.current === from)
+              {...(!tables.length && !(tablesRet.isFetching && op.current === from)
                 ? {
                     validateStatus: 'error',
                     validateHelp: (
@@ -483,15 +478,15 @@ const SyncDataSource = observer(
                         </HelpCenterLink>{' '}
                         页面配置
                       </div>
-                    ) as any,
+                    ) as any
                   }
                 : {})}
               schemas={[
                 {
                   help: '请选择数据源表',
                   status: 'error',
-                  rule: (v?: string) => !!v,
-                },
+                  rule: (v?: string) => !!v
+                }
                 // todo:当前数据源不可用，请前往 [数据源管理] 页面配置
               ]}
               help={
@@ -502,9 +497,7 @@ const SyncDataSource = observer(
                   hasIcon
                   isIframe
                 >
-                  {from === 'source'
-                    ? `${sourceTypeName} Source `
-                    : `${targetTypeName} Sink `}
+                  {from === 'source' ? `${sourceTypeName} Source ` : `${targetTypeName} Sink `}
                   配置文档
                 </HelpCenterLink>
               }
@@ -519,8 +512,7 @@ const SyncDataSource = observer(
       const dbInfo = db[from]
       const hasTable = !isEmpty(dbInfo.tableName)
       const isOffLineFull = get(curJob, 'type') === SyncJobType.OFFLINEFULL
-      const isOfflineIncrement =
-        get(curJob, 'type') === SyncJobType.OFFLINEINCREMENT
+      const isOfflineIncrement = get(curJob, 'type') === SyncJobType.OFFLINEINCREMENT
       const schemaRet = sourceColumnRet
       return (
         <Form css={styles.form} ref={sourceForm}>
@@ -553,6 +545,26 @@ const SyncDataSource = observer(
               }
               schemas={[
                 {
+                  rule: (re: TConditionParameterVal) => {
+                    if (re.type === 1) {
+                      return true
+                    }
+                    const v = re.expression
+                    if (!v) {
+                      return true
+                    }
+                    if (v?.includes('where ')) {
+                      return false
+                    }
+                    if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
+                      return false
+                    }
+                    return true
+                  },
+                  help: '条件参数不能包含 where, 且只能包含一个 SQL 命令',
+                  status: 'error'
+                },
+                {
                   help: '条件参数未配置',
                   status: 'error',
                   rule: (v: TConditionParameterVal) => {
@@ -569,8 +581,8 @@ const SyncDataSource = observer(
                     }
 
                     return valid
-                  },
-                },
+                  }
+                }
               ]}
             />
           )}
@@ -596,10 +608,7 @@ const SyncDataSource = observer(
                   tw="px-1 cursor-pointer"
                   onClick={() => setShowSourceAdvance((prev) => !prev)}
                 >
-                  <Icon
-                    name={`chevron-${showSourceAdvance ? 'up' : 'down'}`}
-                    type="light"
-                  />
+                  <Icon name={`chevron-${showSourceAdvance ? 'up' : 'down'}`} type="light" />
                   高级配置
                 </Center>
                 <div css={styles.line} />
@@ -623,21 +632,18 @@ const SyncDataSource = observer(
                           return false
                         }
                         return true
-                      },
+                      }
                     },
                     {
                       help: '不能存在多条过滤条件',
                       status: 'error',
                       rule: (v: string) => {
-                        if (
-                          v.trim() &&
-                          v.trim().split(';').filter(Boolean).length > 1
-                        ) {
+                        if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
                           return false
                         }
                         return true
-                      },
-                    },
+                      }
+                    }
                   ]}
                   label="过滤条件"
                   placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"
@@ -666,16 +672,16 @@ const SyncDataSource = observer(
                   { label: 'replace 替换', value: WriteMode.Replace },
                   {
                     label: 'update 更新插入',
-                    value: WriteMode.Update,
-                  },
-                ]}
+                    value: WriteMode.Update
+                  }
+                ].filter((i) => getWriteMode(curJob?.target_type).includes(i.value))}
                 value={dbInfo.writeMode}
                 schemas={[
                   {
                     help: '请选择写入模式',
                     status: 'error',
-                    rule: { required: true },
-                  },
+                    rule: { required: true }
+                  }
                 ]}
                 validateOnChange
                 onChange={(v: WriteMode) => {
@@ -687,16 +693,15 @@ const SyncDataSource = observer(
                   let helpStr = ''
                   switch (dbInfo.writeMode) {
                     case WriteMode.Insert:
-                      helpStr =
-                        '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
+                      helpStr = '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
                       break
                     case WriteMode.Replace:
                       helpStr =
-                        '没有遇到主键/唯一性索引冲突时，冲突时会用新行替换已经指定的字段的语句。'
+                        '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会用新行替换已经指定的字段的语句。'
                       break
                     case WriteMode.Update:
                       helpStr =
-                        '没有遇到主键/唯一性索引冲突时，冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
+                        '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
                       break
                     default:
                       break
@@ -711,13 +716,15 @@ const SyncDataSource = observer(
                 options={[
                   {
                     label: 'exactly-once 正好一次',
-                    value: Semantic.ExactlyOnce,
+                    value: Semantic.ExactlyOnce
                   },
                   {
                     label: 'at-least-once 至少一次',
-                    value: Semantic.AtLeastOnce,
-                  },
-                ]}
+                    value: Semantic.AtLeastOnce
+                  }
+                ].filter((i) =>
+                  getExactly([curJob?.source_type, curJob?.target_type]).includes(i.value)
+                )}
                 onChange={(v: Semantic) => {
                   setDB((draft) => {
                     draft[from].semantic = +v
@@ -728,8 +735,8 @@ const SyncDataSource = observer(
                   {
                     help: '请选择写入模式',
                     status: 'error',
-                    rule: { required: true },
-                  },
+                    rule: { required: true }
+                  }
                 ]}
               />
               <TextField
@@ -752,14 +759,13 @@ const SyncDataSource = observer(
                   {
                     help: '批量写入条数不能为空',
                     status: 'error',
-                    rule: { required: true },
+                    rule: { required: true }
                   },
                   {
                     help: '范围: 1~65535, 批量写入条数不能小于 1',
                     status: 'error',
-                    rule: (v: any) =>
-                      /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535,
-                  },
+                    rule: (v: any) => /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535
+                  }
                 ]}
               />
               <FlexBox>
@@ -768,10 +774,7 @@ const SyncDataSource = observer(
                   tw="px-1 cursor-pointer"
                   onClick={() => setShowTargetAdvanced((prev) => !prev)}
                 >
-                  <Icon
-                    name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`}
-                    type="light"
-                  />
+                  <Icon name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`} type="light" />
                   高级配置
                 </Center>
                 <div css={styles.line} />
@@ -790,6 +793,21 @@ const SyncDataSource = observer(
                     }}
                     value={dbInfo.preSql}
                     placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                    schemas={[
+                      {
+                        rule: (arr: string[]) => (arr || []).every((v) => {
+                            if (!v) {
+                              return true
+                            }
+                            if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
+                              return false
+                            }
+                            return true
+                          }),
+                        help: '单条语句只能包含一个 SQL 命令',
+                        status: 'error'
+                      }
+                    ]}
                   />
                   <StyledSqlGroupField
                     className="sql-group-field"
@@ -802,6 +820,21 @@ const SyncDataSource = observer(
                         draft[from].postSql = v
                       })
                     }}
+                    schemas={[
+                      {
+                        rule: (arr: string[]) => (arr || []).every((v) => {
+                            if (!v) {
+                              return true
+                            }
+                            if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
+                              return false
+                            }
+                            return true
+                          }),
+                        help: '单条语句只能包含一个 SQL 命令',
+                        status: 'error'
+                      }
+                    ]}
                     placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
                   />
                 </>
@@ -829,9 +862,8 @@ const SyncDataSource = observer(
           {renderTarget()}
         </FlexBox>
         <DataSourceSelectModal
-          title={`选择${
-            op.current === 'source' ? '来源' : '目的'
-          }数据源（已选类型为 ${findKey(
+          selected={op.current === 'source' ? [db.source.id] : [db.target.id]}
+          title={`选择${op.current === 'source' ? '来源' : '目的'}数据源（已选类型为 ${findKey(
             dataSourceTypes,
             (v) => v === get(curJob, `${op.current}_type`)
           )})`}
@@ -843,7 +875,7 @@ const SyncDataSource = observer(
             if (v) {
               handleSelectDb({
                 ...pick(v, ['id', 'name']),
-                networkId: get(v, 'last_connection.network_id', ''),
+                networkId: get(v, 'last_connection.network_id', '')
               })
             }
           }}

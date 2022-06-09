@@ -6,11 +6,7 @@ import { Button, CopyText, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { Collapse, Tabs } from '@QCFE/lego-ui'
 import { Card } from 'components/Card'
 import { Center } from 'components/Center'
-import {
-  AlarmStatusCmp,
-  Circle,
-  JobInstanceStatusCmp,
-} from 'views/Space/Ops/styledComponents'
+import { AlarmStatusCmp, Circle, StreamReleaseStatusCmp } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
 import LinkInstance from 'views/Space/Ops/components/LinkInstance'
 import Cluster from 'views/Space/Ops/components/Cluster'
@@ -27,7 +23,7 @@ import {
   useQuerySteamJobVersionArgs,
   useQuerySteamJobVersionCode,
   useQueryStreamJobVersionDetail,
-  useQueryStreamJobVersionSchedule,
+  useQueryStreamJobVersionSchedule
 } from 'hooks'
 import { streamDevModeType } from 'views/Space/Ops/Stream1/common/constants'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
@@ -54,7 +50,7 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
         ${tw`text-white!`}
       }
     }
-  `,
+  `
 ])
 
 const Root = styled.div`
@@ -101,224 +97,212 @@ const CopyTextWrapper = styled(CopyText)`
   }
 `
 
-const StreamReleaseDetail = observer(
-  ({ id, version }: { id: string; version: string }) => {
-    const { data, isFetching } = useQueryStreamJobVersionDetail<
-      Record<string, any>
-    >({
-      jobId: id,
-      versionId: version,
-    })
+const StreamReleaseDetail = observer(({ id, version }: { id: string; version: string }) => {
+  const { data, isFetching } = useQueryStreamJobVersionDetail<Record<string, any>>({
+    jobId: id,
+    versionId: version
+  })
 
-    const { data: args } = useQuerySteamJobVersionArgs({
-      jobId: id,
-      versionId: version,
-    })
+  const { data: args } = useQuerySteamJobVersionArgs({
+    jobId: id,
+    versionId: version
+  })
 
-    const { data: schedule } = useQueryStreamJobVersionSchedule({
-      jobId: id,
-      versionId: version,
-    })
+  const { data: schedule } = useQueryStreamJobVersionSchedule({
+    jobId: id,
+    versionId: version
+  })
 
-    const { data: code } = useQuerySteamJobVersionCode({
-      jobId: id,
-      versionId: version,
-    })
+  const { data: code } = useQuerySteamJobVersionCode({
+    jobId: id,
+    versionId: version
+  })
 
-    const history = useHistory()
-    const { search } = useLocation()
-    const { tab = 'link' } = qs.parse(search.slice(1))
+  const history = useHistory()
+  const { search } = useLocation()
+  const { tab = 'link' } = qs.parse(search.slice(1))
 
-    const [isOpen, setOpen] = useState(true)
+  const [isOpen, setOpen] = useState(true)
 
-    // const config = {} as any
+  // const config = {} as any
 
-    const [activeName, setActiveName] = useState(tab)
-    const toList = () => {
-      history.push('../release')
-    }
+  const [activeName, setActiveName] = useState(tab)
+  const toList = () => {
+    history.push('../release')
+  }
 
-    return (
-      <Root tw="relative">
-        <FlexBox tw="items-center gap-2">
-          <Tooltip
-            theme="light"
-            content="返回"
-            hasPadding
-            placement="bottom"
-            twChild={tw`inline-flex`}
-          >
-            <div
-              tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
-              onClick={() => toList()}
-              css={css`
+  return (
+    <Root tw="relative">
+      <FlexBox tw="items-center gap-2">
+        <Tooltip
+          theme="light"
+          content="返回"
+          hasPadding
+          placement="bottom"
+          twChild={tw`inline-flex`}
+        >
+          <div
+            tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
+            onClick={() => toList()}
+            css={css`
                 &:hover {
                   ${tw`bg-white cursor-pointer`}
                   .icon svg.qicon {
                     ${tw`text-neut-15!`}
                   }
               `}
-            >
+          >
+            <Icon
+              name="previous"
+              size={20}
+              // clickable
+              type="light"
+              css={css`
+                svg.qicon {
+                  ${tw`text-[#939EA9]! fill-[#939EA9]!`}
+                }
+              `}
+            />
+          </div>
+        </Tooltip>
+        <CopyTextWrapper text={`${data?.name ?? ''}(ID: ${id})`} theme="light" />
+      </FlexBox>
+
+      <Card hasBoxShadow tw="bg-neut-16 relative">
+        {isFetching && (
+          <div tw="absolute inset-0 z-50">
+            <Loading size="large" />
+          </div>
+        )}
+        <div tw="flex justify-between items-center px-4 h-[72px]">
+          <Center tw="flex-auto">
+            <Circle tw="w-10! h-10!">
               <Icon
-                name="previous"
-                size={20}
-                // clickable
+                name={streamDevModeType[(data?.type as 2) ?? 2]?.icon}
                 type="light"
+                size={28}
                 css={css`
-                  svg.qicon {
-                    ${tw`text-[#939EA9]! fill-[#939EA9]!`}
+                  & .qicon {
+                    ${tw`text-white! fill-[#fff]!`}
                   }
                 `}
               />
-            </div>
-          </Tooltip>
-          <CopyTextWrapper
-            text={`${data?.name ?? ''}(ID: ${id})`}
-            theme="light"
-          />
-        </FlexBox>
-
-        <Card hasBoxShadow tw="bg-neut-16 relative">
-          {isFetching && (
-            <div tw="absolute inset-0 z-50">
-              <Loading size="large" />
-            </div>
-          )}
-          <div tw="flex justify-between items-center px-4 h-[72px]">
-            <Center tw="flex-auto">
-              <Circle>
-                <Icon
-                  name="q-downloadBoxFill"
-                  type="light"
-                  css={
-                    // TODO icon
-                    css`
-                      & .qicon {
-                        ${tw`text-white! fill-[#fff]!`}
-                      }
-                    `
-                  }
-                />
-              </Circle>
-              <div tw="flex-auto">
-                <div tw="text-white">
-                  <span tw="mr-3">{data?.name}</span>
-                  <JobInstanceStatusCmp
-                    type={data?.status as 1}
-                    tw="inline-flex"
-                  />
-                </div>
-                <div tw="text-neut-8">{data?.id}</div>
+            </Circle>
+            <div tw="flex-auto">
+              <div tw="text-white">
+                <span tw="mr-3">{data?.name}</span>
+                <StreamReleaseStatusCmp type={data?.status as 1} tw="inline-flex" />
               </div>
-            </Center>
-            <FlexBox tw="gap-4">
-              {/* <MoreAction */}
-              {/*   items={dataReleaseDetailActions */}
-              {/*     .filter(filterActionFn) */}
-              {/*     .map((i) => ({ */}
-              {/*       ...i, */}
-              {/*       value: data, */}
-              {/*     }))} */}
-              {/*   type="button" */}
-              {/*   buttonText="更多操作" */}
-              {/*   placement="bottom-start" */}
-              {/*   onMenuClick={handleAction} */}
-              {/* > */}
-
-              <Button
-                onClick={() => {
-                  setOpen(!isOpen)
-                }}
-                type="icon"
-                tw="bg-transparent border dark:border-line-dark! focus:bg-line-dark! active:bg-line-dark! hover:bg-line-dark!"
-              >
-                <Icon
-                  name={!isOpen ? 'chevron-down' : 'chevron-up'}
-                  type="light"
-                  tw="bg-transparent! hover:bg-transparent!"
-                  size={16}
-                />
-              </Button>
-            </FlexBox>
-          </div>
-
-          <CollapsePanel visible={isOpen} tw="bg-transparent">
-            <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
-              <GridItem>
-                <span>状态</span>
-                <span>
-                  <JobInstanceStatusCmp
-                    type={data?.status as 1}
-                    tw="inline-flex"
-                  />
-                </span>
-                <span>告警状态:</span>
-                <span>
-                  <AlarmStatusCmp type={data?.alert_status} />
-                </span>
-              </GridItem>
-              <GridItem>
-                <span>作业模式:</span>
-                <span>
-                  <span
-                    tw="inline-block border px-1.5 text-white border-white rounded-sm"
-                    css={css`
-                      transform: scaleX(0.8);
-                    `}
-                  >
-                    {streamDevModeType[data?.type as 1]?.label}
-                  </span>
-                </span>
-                <span>作业版本:</span>
-                <span>{version}</span>
-              </GridItem>
-
-              <GridItem labelWidth={84}>
-                <span>最近发布时间:</span>
-                <span>
-                  {dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                </span>
-                <span>发布描述:</span>
-                <span>{data?.desc}</span>
-              </GridItem>
+              <div tw="text-neut-8">{data?.id}</div>
             </div>
-          </CollapsePanel>
-        </Card>
+          </Center>
+          <FlexBox tw="gap-4">
+            {/* <MoreAction */}
+            {/*   items={dataReleaseDetailActions */}
+            {/*     .filter(filterActionFn) */}
+            {/*     .map((i) => ({ */}
+            {/*       ...i, */}
+            {/*       value: data, */}
+            {/*     }))} */}
+            {/*   type="button" */}
+            {/*   buttonText="更多操作" */}
+            {/*   placement="bottom-start" */}
+            {/*   onMenuClick={handleAction} */}
+            {/* > */}
 
-        <HorizonTabs
-          defaultActiveName=""
-          tw="overflow-hidden bg-transparent flex-auto"
-          // @ts-ignore
-          activeName={activeName}
-          onChange={(activeName1: string) => {
-            setActiveName(activeName1)
-          }}
-        >
-          <TabPanel label="关联实例" name="link">
-            <LinkInstance jobId={id} version={version} type={JobMode.RT} />
-          </TabPanel>
-          <TabPanel label="监控告警" name="alarm">
-            {/* <Monitor /> */}
-          </TabPanel>
-          <TabPanel label="开发内容" name="dev">
-            <StreamDevContent data={code} />
-          </TabPanel>
-          <TabPanel label="计算集群" name="cluster">
-            <Cluster clusterId={args?.cluster_id} />
-          </TabPanel>
-          <TabPanel label="调度信息" name="schedule">
-            <Schedule data={schedule} />
-          </TabPanel>
-          <TabPanel label="依赖资源" name="depend">
-            <Depends data={args} />
-          </TabPanel>
-        </HorizonTabs>
-        <AlertModal />
-        <OfflineModal />
-      </Root>
-    )
-  }
-)
+            <Button
+              onClick={() => {
+                setOpen(!isOpen)
+              }}
+              type="icon"
+              tw="bg-transparent border dark:border-line-dark! focus:bg-line-dark! active:bg-line-dark! hover:bg-line-dark!"
+            >
+              <Icon
+                name={!isOpen ? 'chevron-down' : 'chevron-up'}
+                type="light"
+                tw="bg-transparent! hover:bg-transparent!"
+                size={16}
+              />
+            </Button>
+          </FlexBox>
+        </div>
+
+        <CollapsePanel visible={isOpen} tw="bg-transparent">
+          <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
+            <GridItem>
+              <span>状态</span>
+              <span>
+                <StreamReleaseStatusCmp type={data?.status as 1} tw="inline-flex" />
+              </span>
+              <span>告警状态:</span>
+              <span>
+                <AlarmStatusCmp type={data?.alert_status} />
+              </span>
+            </GridItem>
+            <GridItem>
+              <span>作业模式:</span>
+              <span>
+                <span
+                  tw="inline-block border px-1.5 text-white border-white rounded-sm"
+                  css={css`
+                    transform: scaleX(0.8);
+                  `}
+                >
+                  {streamDevModeType[data?.type as 2]?.label}
+                </span>
+              </span>
+              <span>作业版本:</span>
+              <span>{version}</span>
+            </GridItem>
+
+            <GridItem labelWidth={84}>
+              <span>最近发布时间:</span>
+              <span>{dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>发布描述:</span>
+              <span>{data?.desc}</span>
+            </GridItem>
+          </div>
+        </CollapsePanel>
+      </Card>
+
+      <HorizonTabs
+        defaultActiveName=""
+        tw="bg-transparent"
+        // @ts-ignore
+        activeName={activeName}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
+        onChange={(activeName1: string) => {
+          setActiveName(activeName1)
+        }}
+      >
+        <TabPanel label="关联实例" name="link">
+          <LinkInstance jobId={id} version={version} type={JobMode.RT} />
+        </TabPanel>
+        <TabPanel label="监控告警" name="alarm">
+          {/* <Monitor /> */}
+        </TabPanel>
+        <TabPanel label="开发内容" name="dev">
+          <StreamDevContent data={code} language="sql" />
+        </TabPanel>
+        <TabPanel label="计算集群" name="cluster">
+          <Cluster clusterId={args?.cluster_id} />
+        </TabPanel>
+        <TabPanel label="调度信息" name="schedule">
+          <Schedule data={schedule} />
+        </TabPanel>
+        <TabPanel label="依赖资源" name="depend">
+          <Depends data={args} />
+        </TabPanel>
+      </HorizonTabs>
+      <AlertModal />
+      <OfflineModal />
+    </Root>
+  )
+})
 
 const StreamReleaseDetailPage = (props: { id: string }) => {
   const { id } = props
@@ -327,7 +311,7 @@ const StreamReleaseDetailPage = (props: { id: string }) => {
   const { version } = qs.parse(search.slice(1))
   if (!version) {
     emitter.emit('error', {
-      title: `请选择具体版本的已发布作业`,
+      title: `请选择具体版本的已发布作业`
     })
     setTimeout(() => {
       history.goBack()

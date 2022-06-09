@@ -37,16 +37,16 @@ const Grid = styled.div`
 const restartStrategy = [
   {
     label: 'NoRestart:  不重启',
-    value: 'none',
+    value: 'none'
   },
   {
     label: 'FixedDelay:  固定延迟',
-    value: 'fixed-delay',
+    value: 'fixed-delay'
   },
   {
     label: 'FailureRate: 故障率',
-    value: 'failure-rate',
-  },
+    value: 'failure-rate'
+  }
 ]
 
 const logs = [
@@ -54,15 +54,12 @@ const logs = [
   { label: 'DEBUG：调试级别', value: 'DEBUG' },
   { label: 'INFO：信息级别', value: 'INFO' },
   { label: 'WARN：警告级别', value: 'WARN' },
-  { label: 'ERROR：错误级别', value: 'ERROR' },
+  { label: 'ERROR：错误级别', value: 'ERROR' }
 ]
 
 const Cluster = ({ clusterId }: { clusterId?: string }) => {
   // const { regionId } = useParams<{ regionId: string }>()
-  const { data, isFetching } = useQueryDescribeFlinkCluster(
-    { clusterId },
-    { enabled: !!clusterId }
-  )
+  const { data, isFetching } = useQueryDescribeFlinkCluster({ clusterId }, { enabled: !!clusterId })
 
   if (!clusterId || isFetching) {
     return (
@@ -73,7 +70,7 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
   }
 
   return (
-    <div tw="w-full border border-line-dark">
+    <div tw="w-full border border-line-dark my-5">
       <Header>
         <Icon name="pod" size={40} type="light" />
         <div tw="ml-3">
@@ -100,8 +97,7 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
             <div>
               {
                 restartStrategy.find(
-                  (i) =>
-                    i.value === data?.config?.restart_strategy?.restart_strategy
+                  (i) => i.value === data?.config?.restart_strategy?.restart_strategy
                 )?.label
               }
             </div>
@@ -109,9 +105,7 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
             <div>{data?.config?.fixed_delay_attempts}</div>
             <div>重启时间间隔</div>
             <div>
-              {data?.config?.failure_rate_delay
-                ? `${data?.config?.failure_rate_delay} s`
-                : ''}
+              {data?.config?.failure_rate_delay ? `${data?.config?.failure_rate_delay} s` : ''}
             </div>
           </Grid>
         </div>
@@ -122,11 +116,7 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
           </Title>
           <Grid>
             <div>
-              <AffixLabel
-                help="Flink 的 TaskManager 的数量"
-                required={false}
-                theme="light"
-              >
+              <AffixLabel help="Flink 的 TaskManager 的数量" required={false} theme="light">
                 TM 数量
               </AffixLabel>
             </div>
@@ -158,13 +148,7 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
           </Title>
           <Grid>
             <div>日志级别</div>
-            <div>
-              {
-                logs.find(
-                  (i) => i.value === data?.config?.logger?.root_log_level
-                )?.label
-              }
-            </div>
+            <div>{logs.find((i) => i.value === data?.config?.logger?.root_log_level)?.label}</div>
           </Grid>
         </div>
 
@@ -203,11 +187,9 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
               </AffixLabel>
             </div>
             <div>
-              {data?.config?.custom?.map(
-                (i: { key: string; value: string }) => (
-                  <div key={i.key}>{`${i.key}:${i.value}`}</div>
-                )
-              )}
+              {data?.config?.custom?.map((i: { key: string; value: string }) => (
+                <div key={i.key}>{`${i.key}:${i.value}`}</div>
+              ))}
             </div>
           </Grid>
         </div>
@@ -220,9 +202,7 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
             <div>计费方式</div>
             <div>按需计费</div>
             <div>开始计费时间</div>
-            <div>
-              {dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </div>
+            <div>{dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')}</div>
             <div>停止计费时间</div>
             <div>使用中</div>
             <div>价格</div>

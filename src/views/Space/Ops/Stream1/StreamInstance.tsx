@@ -153,7 +153,7 @@ const StreamInstance = () => {
     const result = []
     if (status & stopAble) {
       result.push({
-        text: '中止',
+        text: '终止',
         icon: 'q-closeCircleFill',
         key: 'stop',
         value: record

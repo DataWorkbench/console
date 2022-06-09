@@ -27,7 +27,7 @@ const SideMenuWrapper = styled('div')(() => [
         .level-row {
           ${tw`pl-0 text-xs h-10 font-semibold text-neut-15 dark:(text-white)`}
           .icon-title {
-            ${tw`pl-3 border-l-2 border-neut-2 dark:(border-neut-17)`}
+            ${tw`border-l-2 border-neut-2 dark:(border-neut-17)`}
             svg.qicon {
               ${tw`dark:text-white text-neut-16 fill-[#b6c2cd] dark:fill-[#fff6]`}
 
@@ -35,11 +35,17 @@ const SideMenuWrapper = styled('div')(() => [
                 ${tw`dark:text-[#fff6] dark:fill-[#fff]`}
               }
             }
+            .icon {
+              ${tw`ml-2`}
+            }
           }
         }
         .level-expand {
           .icon-title {
-            ${tw`border-0`}
+            ${tw`border-0 px-0`}
+            .m-l-8 {
+              ${tw`px-0!`}
+            }
           }
           .level-row {
             ${tw`border-0`}
@@ -60,12 +66,7 @@ const SideMenuWrapper = styled('div')(() => [
           }
         }
       }
-      .side-menu-collapse
-        .side-menu-pickup
-        .side-content
-        .icon-li
-        span.icon
-        > svg {
+      .side-menu-collapse .side-menu-pickup .side-content .icon-li span.icon > svg {
         ${tw`text-green-11 fill-[#9ddfc9]`}
       }
       .side-menu-pickup {
@@ -100,15 +101,14 @@ const SideMenuWrapper = styled('div')(() => [
         ${tw`border-t border-r bg-neut-2 dark:(bg-neut-17 border-neut-15) border-neut-3`}
       }
     }
-  `,
+  `
 ])
 
 export const Sider = ({ funcMod }: { funcMod: string }) => {
-  const { regionId, spaceId, mod } =
-    useParams<{ regionId: string; spaceId: string; mod: string }>()
+  const { regionId, spaceId, mod } = useParams<{ regionId: string; spaceId: string; mod: string }>()
   const {
     globalStore: { darkMode },
-    workSpaceStore: { funcList },
+    workSpaceStore: { funcList }
   } = useStore()
 
   const [key, setSiderKey] = useReducer((v) => v + 1, 0)
@@ -124,8 +124,7 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
   if (!func) {
     return <div>empty</div>
   }
-  const curFunc =
-    func.subFuncList.find((fn: any) => fn.name === mod) || func.subFuncList[0]
+  const curFunc = func.subFuncList.find((fn: any) => fn.name === mod) || func.subFuncList[0]
 
   const navMenu = func?.subFuncList.map((fn: any) => {
     let items = []
@@ -133,27 +132,22 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
     if (fn.items) {
       items = fn.items.map((subFn: any) => ({
         ...subFn,
-        link: `/${regionId}/workspace/${spaceId}/${funcMod}/${subFn.name}`,
+        link: `/${regionId}/workspace/${spaceId}/${funcMod}/${subFn.name}`
       }))
       return {
         ...fn,
-        items,
+        items
       }
     }
     return {
       ...fn,
-      link: `/${regionId}/workspace/${spaceId}/${funcMod}/${fn.name}`,
+      link: `/${regionId}/workspace/${spaceId}/${funcMod}/${fn.name}`
     }
   })
 
   return (
     <SideMenuWrapper>
-      <SideMenu
-        key={key}
-        darkMode={darkMode}
-        menus={navMenu}
-        defaultSelectedMenu={curFunc.name}
-      />
+      <SideMenu key={key} darkMode={darkMode} menus={navMenu} defaultSelectedMenu={curFunc.name} />
     </SideMenuWrapper>
   )
 }

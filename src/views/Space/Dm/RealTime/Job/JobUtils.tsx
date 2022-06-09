@@ -3,6 +3,7 @@ import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { get, cloneDeep, findKey } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
 import { Icons, Center } from 'components'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 export enum JobMode {
   /** 数据集成 */
@@ -10,7 +11,7 @@ export enum JobMode {
   /**  实时流式开发 */
   RT = 'RT',
   /** 离线批量开发 */
-  OLE = 'OLE',
+  OLE = 'OLE'
 }
 /**  作业类型 */
 export enum JobType {
@@ -27,7 +28,7 @@ export enum JobType {
   /** python模式 */
   PYTHON = 4,
   /** scala模式 */
-  SCALA = 5,
+  SCALA = 5
 }
 /** 数据集成作业类型 */
 export enum SyncJobType {
@@ -36,7 +37,7 @@ export enum SyncJobType {
   /**  2 => "OfflineIncrement"(离线增量)  */
   OFFLINEINCREMENT = 2,
   /** 3 => "RealTime"(实时)  */
-  REALTIME = 3,
+  REALTIME = 3
 }
 
 /** 作业树icon主题 */
@@ -44,7 +45,7 @@ export enum TreeIconTheme {
   BLUE = 'blue',
   GREEN = 'green',
   GREY = 'grey',
-  YELLOW = 'yellow',
+  YELLOW = 'yellow'
 }
 
 export enum RootKey {
@@ -53,7 +54,7 @@ export enum RootKey {
   /** 实时流式开发 */
   RT = 'rt-root',
   /** 离线批量开发 */
-  OLE = 'ole-root',
+  OLE = 'ole-root'
 }
 
 export type DataSourceType =
@@ -75,24 +76,87 @@ export type DataSourceType =
   | 'Redis'
   | 'ElasticSearch'
 
-export const dataSourceTypes: { [key in DataSourceType]?: number } = {
-  MySQL: 1,
+export const datasourceTypeKey = [
+  'MySQL',
+  // 'TIDB',
+  // 'Kafka',
+  // 'S3',
+  'ClickHouse',
+  // 'HBase',
+  // 'FTP',
+  // 'HDFS',
+  'SQLServer',
+  // 'Oracle',
+  'PostgreSQL'
+  // 'DB2',
+  // 'SAP HANA',
+  // 'Hive',
+  // 'MongoDB',
+  // 'Redis',
+  // 'ElasticSearch',
+]
+
+export const dataSourceTypes: { [key in string]?: number } = {
+  mysql: 1,
   // TIDB: 2,
   // Kafka: 3,
   // S3: 4,
-  ClickHouse: 5,
+  click_house: 5,
   // HBase: 6,
   // FTP: 7,
   // HDFS: 8,
-  SQLServer: 9,
+  sqlserver: 9,
   // Oracle: 10,
-  PostgreSQL: 2,
+  postgresql: 2
   // DB2: 11,
   // 'SAP HANA': 12,
   // Hive: 13,
   // MongoDB: 15,
   // Redis: 16,
   // ElasticSearch: 14,
+}
+
+export const datasourceTypeObjs = [
+  {
+    type: SourceType.Mysql,
+    name: 'mysql',
+    label: 'MySQL'
+  },
+  {
+    type: SourceType.ClickHouse,
+    name: 'click_house',
+    label: 'ClickHouse'
+  },
+  {
+    type: SourceType.SqlServer,
+    name: 'sqlserver',
+    label: 'SQLServer'
+  },
+  {
+    type: SourceType.PostgreSQL,
+    name: 'postgresql',
+    label: 'PostgreSQL'
+  }
+]
+
+export const getDataSourceTypes = (type?: SourceType): string | undefined => {
+  if (!type) {
+    return ''
+  }
+  const item = datasourceTypeObjs.find((i) => i.type === type!)!
+  return new Proxy(
+    { value: item?.label },
+    {
+      get(target: { value: string | undefined }, p: string | symbol): any {
+        if (p === 'toLowerCase') {
+          return () => item?.name
+        }
+        const prim = Reflect.get(target, 'value')
+        const value = prim[p]
+        return typeof value === 'function' ? value.bind(prim) : value
+      }
+    }
+  ) as unknown as string
 }
 
 export const getSourceNameByType = (type: DataSourceType) =>
@@ -103,23 +167,23 @@ export const jobModeData = [
     mode: JobMode.DI,
     title: '数据集成',
     desc: '提供异构数据源之间的数据搬运和数据同步的能力。',
-    icon: 'EqualizerFill',
+    icon: 'IotFill',
     selTitle: '同步方式',
     items: [
       {
         icon: 'DownloadBoxFill',
         title: '离线同步作业',
         desc: '通过定时、批量的方式进行数据同步开发作业',
-        value: JobType.OFFLINE,
+        value: JobType.OFFLINE
       },
       {
         icon: 'LayerFill',
         title: '实时同步作业',
         desc: '通过实时同步的方式进行数据同步开发作业',
         value: JobType.REALTIME,
-        disabled: true,
-      },
-    ],
+        disabled: true
+      }
+    ]
   },
   {
     mode: JobMode.RT,
@@ -132,21 +196,21 @@ export const jobModeData = [
         icon: 'sql',
         title: 'SQL 模式',
         desc: '通过 Flink SQL 模式进行数据作业开发',
-        value: JobType.SQL,
+        value: JobType.SQL
       },
       {
         icon: 'JavaFill',
         title: 'Jar 包模式',
         desc: '通过 Jar 包的方式提交用户 Java、Scala 语言开发的 Flink 作业',
-        value: JobType.JAR,
+        value: JobType.JAR
       },
       {
         icon: 'PythonFill',
         title: 'Python 模式',
         desc: '通过 Flink Python 语言进行数据作业开发',
         value: JobType.PYTHON,
-        disabled: true,
-      },
+        disabled: true
+      }
       // {
       //   icon: 'scala',
       //   title: 'Scala 模式 ',
@@ -161,15 +225,15 @@ export const jobModeData = [
       //   value: JobType.OPERATOR,
       //   disabled: true,
       // },
-    ],
+    ]
   },
   {
     mode: JobMode.OLE,
     title: '数据挖掘（敬请期待）',
     desc: '使用基于内存计算的 Spark 大数据计算引擎进行数据挖掘和机器学习。',
     icon: 'DownloadBox2Fill',
-    items: [],
-  },
+    items: []
+  }
 ]
 // 1 => "OfflineFull" 2 => "OfflineIncrement" 3 => "RealTimeFull" 3 => "RealTimeIncrement"
 type DiType = 1 | 2 | 3
@@ -217,10 +281,7 @@ export const findTreeNode: any = (treeData: any[], nodeKey: string) => {
   return find
 }
 
-export const filterFolderOfTreeData = (
-  treeNodeData: any[],
-  excludeKey: string | number = ''
-) => {
+export const filterFolderOfTreeData = (treeNodeData: any[], excludeKey: string | number = '') => {
   const newTreeData = treeNodeData.filter((node) => {
     if (node.key === excludeKey) {
       return false
@@ -262,7 +323,7 @@ export const getNewTreeData = (
         rootKey: isRootNode(node.key) ? node.key : node.rootKey,
         title: job.name,
         isLeaf: !job.is_directory,
-        job,
+        job
       }
     })
     pNode.children = children
@@ -280,15 +341,13 @@ export const removeTreeNode = (treeData: any[], node: any) => {
   return newTreeData
 }
 
-export const IconWrapper = styled(Center)(
-  ({ theme }: { theme: TreeIconTheme }) => [
-    tw`w-4 h-4 rounded-sm`,
-    theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
-    theme === TreeIconTheme.GREEN && tw`bg-green-11`,
-    theme === TreeIconTheme.GREY && tw`bg-white bg-opacity-20 `,
-    theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`,
-  ]
-)
+export const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
+  tw`w-4 h-4 rounded-sm`,
+  theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
+  theme === TreeIconTheme.GREEN && tw`bg-green-11`,
+  theme === TreeIconTheme.GREY && tw`bg-white bg-opacity-20 `,
+  theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`
+])
 
 export const renderSwitcherIcon = (props) => {
   const { expanded, isLeaf } = props

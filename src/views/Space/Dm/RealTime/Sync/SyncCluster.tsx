@@ -11,14 +11,15 @@ interface SyncClusterProps {
   sourceId?: string
   targetId?: string
   clusterId?: string
+  defaultClusterName?: string
 }
 
 const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
-  const { onChange, sourceId, targetId, clusterId: clusterIdProps } = props
+  const { onChange, sourceId, targetId, clusterId: clusterIdProps, defaultClusterName = '' } = props
   const [visible, setVisible] = useState(false)
   const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
-  const clusterName = get(cluster, 'name', '')
+  const clusterName = get(cluster, 'name', defaultClusterName)
   const enablePing = !!(sourceId && targetId && clusterId)
   const mutation = useMutationPingSyncJobConnection()
   useEffect(() => {
@@ -29,7 +30,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
 
   useImperativeHandle(ref, () => ({
     getCluster: () => cluster,
-    checkPingSuccess: () => mutation.isSuccess,
+    checkPingSuccess: () => mutation.isSuccess
   }))
 
   const handlePingConnection = () => {
@@ -39,7 +40,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
     mutation.mutate({
       clusterId,
       sourceId,
-      targetId,
+      targetId
     })
   }
 
@@ -56,13 +57,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         <ButtonWithClearField
           clearable={!!cluster}
           name="cluster"
-          icon={
-            <Icon
-              name="pod"
-              size={16}
-              color={{ secondary: 'rgba(255,255,255,0.4)' }}
-            />
-          }
+          icon={<Icon name="pod" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />}
           value={clusterId}
           placeholder="选择集群"
           onClick={() => setVisible(true)}
@@ -94,10 +89,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
                 <Button
                   type="outlined"
                   loading={mutation.isLoading}
-                  css={[
-                    tw`text-green-11!`,
-                    !enablePing && tw`cursor-not-allowed opacity-50`,
-                  ]}
+                  css={[tw`text-green-11!`, !enablePing && tw`cursor-not-allowed opacity-50`]}
                   onClick={() => {
                     if (enablePing) {
                       handlePingConnection()
@@ -118,7 +110,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
                   size={16}
                   color={{
                     primary: theme('colors.transparent'),
-                    secondary: theme('colors.green.11'),
+                    secondary: theme('colors.green.11')
                   }}
                 />
                 <span>测试通过</span>
