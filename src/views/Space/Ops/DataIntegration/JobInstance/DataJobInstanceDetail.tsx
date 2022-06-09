@@ -26,13 +26,7 @@ import {
   useMutationJobInstance
 } from 'hooks'
 import DevContent from 'views/Space/Ops/components/DevContent'
-import {
-  AlarmStatusCmp,
-  Circle,
-  DbTypeCmp,
-  JobInstanceStatusCmp,
-  JobTypeCmp
-} from '../../styledComponents'
+import { Circle, DbTypeCmp, JobInstanceStatusCmp, JobTypeCmp } from '../../styledComponents'
 import AlertModal from '../../Alert/Modal'
 import Schedule from '../../components/Schedule'
 import Cluster from '../../components/Cluster'
@@ -265,10 +259,6 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>告警状态:</span>
-              <span>
-                <AlarmStatusCmp type={data?.alarm_status} />
-              </span>
               <span>所属作业:</span>
               <span tw="inline-block">
                 {get(data, 'sync_job.desc') ? (

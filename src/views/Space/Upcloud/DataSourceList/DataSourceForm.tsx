@@ -171,7 +171,7 @@ const DataSourceForm = ({
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
     if (urlType === 'ftp') {
       if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
-        if (get(sourceInfo, 'url.ftp.auth_mode') === 2) {
+        if (get(sourceInfo, 'url.ftp.auth_mode') !== 2) {
           return sftpFiltersWithPwd
         }
         return sftpFiltersWithKey
@@ -215,7 +215,9 @@ const DataSourceForm = ({
   }, [op, opSourceList])
 
   const [showPing, setShowPing] = useState(false)
-  const [ftpProtocolType, setFtpProtocol] = useState(() => get(opSourceList, 'url.ftp.protocol', ftpProtocolValue))
+  const [ftpProtocolType, setFtpProtocol] = useState(() =>
+    get(opSourceList, 'url.ftp.protocol', ftpProtocolValue)
+  )
   const [ftpPortConfig, setFtpPortConfig] = useImmer({
     key: ftpProtocolType,
     changed: false

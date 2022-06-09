@@ -45,7 +45,14 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
           <div>
             <div>
               <p>
-                <Icon name="coding" size={40} />
+                <Icon
+                  name="coding"
+                  color={{
+                    primary: '#fff',
+                    secondary: '##949ea9'
+                  }}
+                  size={40}
+                />
               </p>
             </div>
           </div>

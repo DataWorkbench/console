@@ -80,6 +80,7 @@ const DataRelease = observer(() => {
   )
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    // 详情文件位置 views/Space/Ops/DataIntegration/DataRelease/DataReleaseDetail.tsx
     window.open(
       `./data-release/${record.id}?version=${record.version}${tab ? `&tab=${tab}` : ''}`,
       '_blank'
@@ -262,9 +263,9 @@ const DataRelease = observer(() => {
             getChildren={getChildren}
             columns={columns}
             dataSource={infos.map((i: any) => ({
-                ...i,
-                uuid: `${i.id}=-=${i.version}`
-              }))}
+              ...i,
+              uuid: `${i.id}=-=${i.version}`
+            }))}
             loading={!!isFetching}
             onSort={sort}
             rowKey="uuid"

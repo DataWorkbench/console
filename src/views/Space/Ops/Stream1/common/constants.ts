@@ -6,7 +6,7 @@ import {
   streamReleaseFieldMapping
 } from 'views/Space/Ops/Stream1/common/mappings'
 import { ISuggestion } from 'views/Space/Ops/DataIntegration/interfaces'
-import { alarmStatus, jobInstanceStatus } from 'views/Space/Ops/DataIntegration/constants'
+import { jobInstanceStatus } from 'views/Space/Ops/DataIntegration/constants'
 import { autoIncrementKey, getHelpCenterLink } from 'utils'
 
 export {
@@ -126,11 +126,11 @@ export const streamReleaseSuggestions: ISuggestion[] = [
     key: streamReleaseFieldMapping.get('status')!.apiField,
     options: getSuggestionOptions(streamReleaseScheduleTypes)
   },
-  {
-    label: streamReleaseFieldMapping.get('alarmStatus')!.label,
-    key: streamReleaseFieldMapping.get('alarmStatus')!.apiField,
-    options: getSuggestionOptions(alarmStatus)
-  },
+  // {
+  //   label: streamReleaseFieldMapping.get('alarmStatus')!.label,
+  //   key: streamReleaseFieldMapping.get('alarmStatus')!.apiField,
+  //   options: getSuggestionOptions(alarmStatus),
+  // },
   {
     label: streamReleaseFieldMapping.get('devMode')!.label,
     key: streamReleaseFieldMapping.get('devMode')!.apiField,
@@ -148,11 +148,11 @@ export const streamInstanceSuggestions: ISuggestion[] = [
     key: streamInstanceFieldMapping.get('status')!.apiField,
     options: getSuggestionOptions(jobInstanceStatus)
   },
-  {
-    label: streamInstanceFieldMapping.get('alarmStatus')!.label,
-    key: streamInstanceFieldMapping.get('alarmStatus')!.apiField,
-    options: getSuggestionOptions(alarmStatus)
-  },
+  // {
+  //   label: streamInstanceFieldMapping.get('alarmStatus')!.label,
+  //   key: streamInstanceFieldMapping.get('alarmStatus')!.apiField,
+  //   options: getSuggestionOptions(alarmStatus),
+  // },
   {
     label: streamInstanceFieldMapping.get('devMode')!.label,
     key: streamInstanceFieldMapping.get('devMode')!.apiField,

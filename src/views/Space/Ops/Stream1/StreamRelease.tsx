@@ -9,7 +9,7 @@ import {
 } from 'views/Space/Ops/Stream1/common/constants'
 import { Icon, PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
-import { alarmStatus, DataReleaseActionType } from 'views/Space/Ops/DataIntegration/constants'
+import { DataReleaseActionType } from 'views/Space/Ops/DataIntegration/constants'
 import { get, isNil, omitBy } from 'lodash-es'
 import React, { useCallback } from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -27,7 +27,7 @@ import {
   FlexBox
 } from 'components'
 import { getOperations } from 'views/Space/Ops/DataIntegration/DataRelease/utils'
-import { AlarmStatusCmp, StreamReleaseStatusCmp } from 'views/Space/Ops/styledComponents'
+import { StreamReleaseStatusCmp } from 'views/Space/Ops/styledComponents'
 import { getReleaseJobsKey, useQueryReleaseJobs } from 'hooks'
 import tw, { css } from 'twin.macro'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
@@ -98,12 +98,15 @@ const StreamRelease = observer(() => {
         return <StreamReleaseStatusCmp type={type as 1} />
       }
     },
-    [getName('alarmStatus')]: {
-      ...getFilter(getName('alarmStatus'), alarmStatus),
-      render: (type: number, record: Record<string, any>) => (
-        <AlarmStatusCmp type={type as any} onClick={() => jumpDetail('alert')(record)} />
-      )
-    },
+    // [getName('alarmStatus')]: {
+    //   ...getFilter(getName('alarmStatus'), alarmStatus),
+    //   render: (type: number, record: Record<string, any>) => (
+    //     <AlarmStatusCmp
+    //       type={type as any}
+    //       onClick={() => jumpDetail('alert')(record)}
+    //     />
+    //   ),
+    // },
     [getName('devMode')]: {
       ...getFilter(getName('devMode'), streamDevModeType),
       render: (type?: keyof typeof streamDevModeType) =>
@@ -120,7 +123,8 @@ const StreamRelease = observer(() => {
     },
     [getName('lastPublishTime')]: {
       ...getSort(getName('lastPublishTime')),
-      render: (d: number) => d && <span tw="text-neut-8">{dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+      render: (d: number) =>
+        d && <span tw="text-neut-8">{dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
     }
   }
 
@@ -311,9 +315,9 @@ const StreamRelease = observer(() => {
             getChildren={getChildren}
             columns={columns}
             dataSource={infos.map((i: any) => ({
-                ...i,
-                uuid: `${i.id}=-=${i.version}`
-              }))}
+              ...i,
+              uuid: `${i.id}=-=${i.version}`
+            }))}
             loading={!!isFetching}
             onSort={sort}
             rowKey="uuid"

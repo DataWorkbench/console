@@ -366,10 +366,10 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       title: '数据源描述',
       dataIndex: 'desc',
       render: (v: string) => (
-          <Tooltip content={v} theme="instead" hasPadding>
-            <span>{getEllipsisText(v, 20)}</span>
-          </Tooltip>
-        )
+        <Tooltip content={v} theme="instead" hasPadding>
+          <span>{getEllipsisText(v, 20)}</span>
+        </Tooltip>
+      )
     },
     {
       title: '创建时间',
@@ -386,7 +386,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
         if (selectMode) {
           return (
             <span
-              tw="cursor-pointer dark:text-white dark:hover:text-blue-12"
+              tw="cursor-pointer dark:text-white dark:hover:text-green-11"
               onClick={() => {
                 handlePing(info)
               }}
