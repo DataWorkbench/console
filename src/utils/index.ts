@@ -10,8 +10,8 @@ export const getHelpCenterLink = (path: string) => {
   return `${prefix}/bigdata/dataomnis${path}`
 }
 
-export const getHelpCenterLinkWithHost = (path: string) =>
-  getHelpCenterLink(path)
+export const getHelpCenterLinkWithNullHost = (path: string) =>
+  `/bigdata/dataomnis${path}`
 
 export const getIsFormalEnv = () => false
 // /console\d*\.qingcloud\.com$/.test(window.location.hostname)
