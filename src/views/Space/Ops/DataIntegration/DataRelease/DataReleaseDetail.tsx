@@ -26,7 +26,12 @@ import {
 } from 'hooks/useJobVersion'
 import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
 import { useMutationJobRelease } from 'hooks'
-import { Circle, DbTypeCmp, JobTypeCmp } from '../../styledComponents'
+import {
+  Circle,
+  DbTypeCmp,
+  JobTypeCmp,
+  JobInstanceStatusCmp,
+} from '../../styledComponents'
 import {
   dataReleaseDetailActions,
   DataReleaseDevMode,
@@ -241,10 +246,10 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <div tw="text-white">
                 <span tw="mr-3">{data?.name}</span>
                 {/* // NOTE: 历史版本没有调度信息 */}
-                {/* <JobInstanceStatusCmp */}
-                {/*   type={data?.status as 1} */}
-                {/*   tw="inline-flex" */}
-                {/* /> */}
+                <JobInstanceStatusCmp
+                  type={data?.status as 1}
+                  tw="inline-flex"
+                />
               </div>
               <div tw="text-neut-8">{data?.id}</div>
             </div>
