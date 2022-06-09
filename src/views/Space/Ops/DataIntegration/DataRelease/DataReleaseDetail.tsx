@@ -234,6 +234,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <Icon
                 name="q-downloadBoxFill"
                 type="light"
+                size={21}
                 css={css`
                   & .qicon {
                     ${tw`text-white! fill-[#fff]! `}
