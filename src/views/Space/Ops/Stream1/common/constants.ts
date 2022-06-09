@@ -71,7 +71,7 @@ export const streamDevModeType = {
     label: 'SQL 模式',
     value: 2,
     type: StreamDevMode.SQL,
-    icon: 'sql',
+    icon: 'q-sql',
   },
   3: {
     label: '代码开发-Jar 模式',

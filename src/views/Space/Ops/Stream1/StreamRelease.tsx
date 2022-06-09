@@ -224,7 +224,7 @@ const StreamRelease = observer(() => {
             theme="dark"
             icon={
               streamDevModeType[
-                get(record, getName('devMode') as string, 1) as 1
+                get(record, getName('devMode') as string, 2) as 2
               ]?.icon
             }
             name={record.name}

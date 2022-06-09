@@ -188,16 +188,14 @@ const StreamReleaseDetail = observer(
             <Center tw="flex-auto">
               <Circle tw="w-10! h-10!">
                 <Icon
-                  name="q-downloadBoxFill"
+                  name={streamDevModeType[(data?.type as 2) ?? 2]?.icon}
                   type="light"
-                  css={
-                    // TODO icon
-                    css`
-                      & .qicon {
-                        ${tw`text-white! fill-[#fff]!`}
-                      }
-                    `
-                  }
+                  size={21}
+                  css={css`
+                    & .qicon {
+                      ${tw`text-white! fill-[#fff]!`}
+                    }
+                  `}
                 />
               </Circle>
               <div tw="flex-auto">
