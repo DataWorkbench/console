@@ -409,7 +409,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
         if (selectMode) {
           return (
             <span
-              tw="cursor-pointer dark:text-white dark:hover:text-blue-12"
+              tw="cursor-pointer dark:text-white dark:hover:text-green-11"
               onClick={() => {
                 handlePing(info)
               }}
