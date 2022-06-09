@@ -258,12 +258,7 @@ const StreamReleaseDetail = observer(
               <GridItem>
                 <span>作业模式:</span>
                 <span>
-                  <span
-                    tw="inline-block border px-1.5 text-white border-white rounded-sm"
-                    css={css`
-                      transform: scaleX(0.8);
-                    `}
-                  >
+                  <span tw="inline-block border px-1.5 text-white border-white rounded-sm leading-4 py-[1px]">
                     {streamDevModeType[data?.type as 2]?.label}
                   </span>
                 </span>
