@@ -237,6 +237,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
               <Icon
                 name="q-mergeFillDuotone"
                 type="light"
+                size={28}
                 css={css`
                   & .qicon {
                     ${tw`text-white! fill-[#fff]!`}
