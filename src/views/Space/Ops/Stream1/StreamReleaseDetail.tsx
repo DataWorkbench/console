@@ -7,7 +7,6 @@ import { Collapse, Tabs } from '@QCFE/lego-ui'
 import { Card } from 'components/Card'
 import { Center } from 'components/Center'
 import {
-  AlarmStatusCmp,
   Circle,
   StreamReleaseStatusCmp,
 } from 'views/Space/Ops/styledComponents'
@@ -243,27 +242,9 @@ const StreamReleaseDetail = observer(
           <CollapsePanel visible={isOpen} tw="bg-transparent">
             <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
               <GridItem>
-                <span>状态</span>
-                <span>
-                  <StreamReleaseStatusCmp
-                    type={data?.status as 1}
-                    tw="inline-flex"
-                  />
-                </span>
-                <span>告警状态:</span>
-                <span>
-                  <AlarmStatusCmp type={data?.alert_status} />
-                </span>
-              </GridItem>
-              <GridItem>
                 <span>作业模式:</span>
                 <span>
-                  <span
-                    tw="inline-block border px-1.5 text-white border-white rounded-sm"
-                    css={css`
-                      transform: scaleX(0.8);
-                    `}
-                  >
+                  <span tw="inline-block border px-1.5 text-white border-white rounded-sm leading-4 py-[1px]">
                     {streamDevModeType[data?.type as 2]?.label}
                   </span>
                 </span>

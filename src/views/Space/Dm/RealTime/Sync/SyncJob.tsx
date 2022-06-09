@@ -76,6 +76,15 @@ const SyncJobWrapper = styled('div')(() => [
     .clear-button {
       ${tw`h-7! w-7!`}
     }
+    .label {
+      ${tw`h-7!`}
+      .control {
+        ${tw`h-7!`}
+        .input-number {
+          ${tw`h-7!`}
+        }
+      }
+    }
   `,
 ])
 

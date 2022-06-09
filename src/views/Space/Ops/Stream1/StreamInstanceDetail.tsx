@@ -4,11 +4,7 @@ import tw, { css, styled } from 'twin.macro'
 import { Button, Collapse, Icon, Loading, Tabs } from '@QCFE/lego-ui'
 import { Card } from 'components/Card'
 import { Center } from 'components/Center'
-import {
-  AlarmStatusCmp,
-  Circle,
-  JobInstanceStatusCmp,
-} from 'views/Space/Ops/styledComponents'
+import { Circle, JobInstanceStatusCmp } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
 import DevContent from 'views/Space/Ops/components/DevContent'
 import Cluster from 'views/Space/Ops/components/Cluster'
@@ -210,10 +206,6 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>告警状态:</span>
-              <span>
-                <AlarmStatusCmp type={data?.alert_status} />
-              </span>
               <span>所属作业:</span>
               <span tw="inline-block">
                 {data?.desc ? (
