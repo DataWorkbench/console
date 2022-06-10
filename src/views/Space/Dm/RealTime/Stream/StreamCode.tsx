@@ -204,7 +204,9 @@ def main(args: Array[String]): Unit = {
           setSyntaxState((draft) => {
             draft.errMsg = ''
           })
-          queryClient.invalidateQueries(getFlowKey('streamJobCode'))
+          if (isSaveOp) {
+            queryClient.invalidateQueries(getFlowKey('streamJobCode'))
+          }
           setEnableRelease(true)
           setShowPlaceholder(false)
           if (!hideNotify) {
