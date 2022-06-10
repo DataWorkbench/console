@@ -27,9 +27,18 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => {
     <ContentBox tw="py-20 rounded-sm bg-white dark:bg-neut-16">
       <FlexBox tw="flex-col items-center">
         <div tw="mb-5 relative w-[72px] ">
-          <SexangleImg />
+          <SexangleImg tw="bg-neut-16" />
           <div tw="absolute w-16 left-1.5 top-3">
-            <Icon name="blockchain" size={60} tw="mb-3 inline-block" />
+            <Icon
+              name="blockchain"
+              color={{
+                primary: '#fff',
+                secondary: '#949ea9',
+              }}
+              type="dark"
+              size={60}
+              tw="mb-3 inline-block"
+            />
           </div>
         </div>
         <div tw="mb-5 font-medium text-xl text-[#19121A] dark:text-white leading-5">

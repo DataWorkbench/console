@@ -43,6 +43,7 @@ import {
   sourceKinds,
   SourceType,
 } from 'views/Space/Upcloud/DataSourceList/constant'
+import { FormH7Wrapper } from 'views/Space/Dm/RealTime/styled'
 import {
   DataSourceType,
   dataSourceTypes,
@@ -933,43 +934,45 @@ const SyncDataSource = observer(
     }
 
     return (
-      <FlexBox tw="flex-col">
-        <Center tw="mb-[-15px]">
-          <Center css={styles.arrowBox}>
-            <Label>来源: {sourceTypeName}</Label>
-            <ArrowLine />
-            <Label>{curJob && getJobTypeName(curJob.type)}</Label>
-            <ArrowLine />
-            <Label>目的: {targetTypeName}</Label>
+      <FormH7Wrapper>
+        <FlexBox tw="flex-col">
+          <Center tw="mb-[-15px]">
+            <Center css={styles.arrowBox}>
+              <Label>来源: {sourceTypeName}</Label>
+              <ArrowLine />
+              <Label>{curJob && getJobTypeName(curJob.type)}</Label>
+              <ArrowLine />
+              <Label>目的: {targetTypeName}</Label>
+            </Center>
           </Center>
-        </Center>
-        <FlexBox css={styles.dashedBox}>
-          {renderSource()}
-          <DashedLine />
-          {renderTarget()}
+          <FlexBox css={styles.dashedBox}>
+            {renderSource()}
+            <DashedLine />
+            {renderTarget()}
+          </FlexBox>
+          <DataSourceSelectModal
+            selected={op.current === 'source' ? [db.source.id] : [db.target.id]}
+            title={`选择${
+              op.current === 'source' ? '来源' : '目的'
+            }数据源（已选类型为 ${findKey(
+              dataSourceTypes,
+              (v) => v === get(curJob, `${op.current}_type`)
+            )})`}
+            visible={visible}
+            sourceType={get(curJob, `${op.current}_type`)!}
+            onCancel={() => setVisible(false)}
+            onOk={(v: any) => {
+              setVisible(false)
+              if (v) {
+                handleSelectDb({
+                  ...pick(v, ['id', 'name']),
+                  networkId: get(v, 'last_connection.network_id', ''),
+                })
+              }
+            }}
+          />
         </FlexBox>
-        <DataSourceSelectModal
-          selected={op.current === 'source' ? [db.source.id] : [db.target.id]}
-          title={`选择${
-            op.current === 'source' ? '来源' : '目的'
-          }数据源（已选类型为 ${findKey(
-            dataSourceTypes,
-            (v) => v === get(curJob, `${op.current}_type`)
-          )})`}
-          visible={visible}
-          sourceType={get(curJob, `${op.current}_type`)!}
-          onCancel={() => setVisible(false)}
-          onOk={(v: any) => {
-            setVisible(false)
-            if (v) {
-              handleSelectDb({
-                ...pick(v, ['id', 'name']),
-                networkId: get(v, 'last_connection.network_id', ''),
-              })
-            }
-          }}
-        />
-      </FlexBox>
+      </FormH7Wrapper>
     )
   },
   { forwardRef: true }

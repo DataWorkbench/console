@@ -43,50 +43,6 @@ const CollapseWrapper = styled('div')(() => [
     }
   `,
 ])
-const SyncJobWrapper = styled('div')(() => [
-  tw`flex flex-col flex-1 relative`,
-  css`
-    button {
-      ${tw`h-7!`}
-    }
-    .refresh-button {
-      ${tw`h-7! w-7!`}
-    }
-    .select-control {
-      ${tw`h-7! flex relative`}
-      .select-multi-value-wrapper {
-        ${tw`flex-1`}
-      }
-    }
-    input {
-      ${tw`h-7!`}
-    }
-    .radio-wrapper {
-      ${tw`h-7! flex items-center`}
-      &::before {
-        ${tw` top-[6px]`}
-      }
-    }
-    label.radio.checked::after {
-      ${tw` top-[10px]`}
-    }
-    .radio-button {
-      ${tw`h-7!`}
-    }
-    .clear-button {
-      ${tw`h-7! w-7!`}
-    }
-    .label {
-      ${tw`h-7!`}
-      .control {
-        ${tw`h-7!`}
-        .input-number {
-          ${tw`h-7!`}
-        }
-      }
-    }
-  `,
-])
 
 const styles = {
   stepTag: tw`flex items-center text-left border border-green-11 rounded-r-2xl pr-4 mr-3 h-7 leading-5`,
@@ -641,7 +597,7 @@ const SyncJob = () => {
   }
 
   return (
-    <SyncJobWrapper>
+    <div tw="flex flex-col flex-1 relative">
       <JobToolBar>
         {mode === 1 ? (
           <PopConfirm
@@ -743,7 +699,7 @@ const SyncJob = () => {
           </div>
         </Modal>
       )}
-    </SyncJobWrapper>
+    </div>
   )
 }
 

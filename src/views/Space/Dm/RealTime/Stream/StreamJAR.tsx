@@ -132,7 +132,7 @@ const StreamJAR = () => {
         {readOnly ? (
           <VersionHeader />
         ) : (
-          <JobToolBar tw="pl-0">
+          <JobToolBar tw="px-2 pt-2">
             <Button
               tw="w-[68px] px-0"
               onClick={handleSave}
