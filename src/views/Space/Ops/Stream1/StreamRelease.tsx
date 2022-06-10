@@ -96,8 +96,11 @@ const StreamRelease = observer(() => {
     [getName('status')]: {
       ...getFilter(getName('status'), streamReleaseScheduleTypes),
       render: (type: number, record: Record<string, any>) => {
+        if (record.hasMore || record.hasNone) {
+          return null
+        }
         if (record.__level !== 1) {
-          return 'N/A'
+          return <span tw="text-font-secondary">N/A</span>
         }
         return <StreamReleaseStatusCmp type={type as 1} />
       },
@@ -269,8 +272,10 @@ const StreamRelease = observer(() => {
         regionId,
         space_id: spaceId,
         job_id: key,
-        limit: 11,
+        limit: 12,
         offset: 0,
+        reverse: true,
+        sort_by: 'updated',
       })
       .then((res) => {
         const arr = res.infos
