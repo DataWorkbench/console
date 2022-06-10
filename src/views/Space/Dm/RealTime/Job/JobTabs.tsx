@@ -9,15 +9,15 @@ import { DndProvider } from 'react-dnd'
 import tw, { theme, css, styled } from 'twin.macro'
 
 import { useStore } from 'stores'
-import { RouterLink, Icons } from 'components'
+import { RouterLink } from 'components'
 
 import StreamOperator from '../Stream/StreamOperator'
 import StreamCode from '../Stream/StreamCode'
 import StreamJAR from '../Stream/StreamJAR'
 import SyncJob from '../Sync/SyncJob'
-import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
+import { JobMode, getTag } from './JobUtils'
 
-const { TabPanel } = Tabs
+const { TabPanel } = Tabs as any
 
 const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full flex flex-col`,
@@ -105,34 +105,6 @@ const JobTabs = observer(() => {
   useUnmount(() => {
     workFlowStore.set({ panels: [], curJob: null, curViewJobId: null })
   })
-
-  const getTag = (job) => {
-    const { jobMode } = job
-    if (jobMode === JobMode.RT) {
-      return get(
-        {
-          1: '算子',
-          2: 'Sql',
-          3: 'Jar',
-          4: 'Python',
-          5: 'Scala',
-        },
-        job.type
-      )
-    }
-    if (jobMode === JobMode.DI) {
-      const tp = getDiJobType(job.type)
-      return (
-        <IconWrapper theme="grey">
-          <Icons
-            name={tp === JobType.OFFLINE ? 'DownloadBoxFill' : 'LayerFill'}
-            size={16}
-          />
-        </IconWrapper>
-      )
-    }
-    return null
-  }
 
   return (
     <div tw="flex-1 w-full overflow-x-hidden">
