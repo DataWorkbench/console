@@ -506,6 +506,11 @@ export const JobTree = observer(
                 }
               }}
               onSelect={(keys: (string | number)[], { selected, node }) => {
+                if (visible) {
+                  setTimeout(() => {
+                    setVisible(false)
+                  })
+                }
                 const job = get(node, 'job')
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
