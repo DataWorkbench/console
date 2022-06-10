@@ -183,3 +183,7 @@ export const HourFiledsWrapper = styled('div')(() => [
     }
   `
 ])
+
+export const OrderText = styled('div')(() => [
+  tw`h-4 w-4 text-green-11 border-green-11 border-[1px] text-center leading-[15px] rounded-[50%]`
+])

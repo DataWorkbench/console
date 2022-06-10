@@ -45,7 +45,15 @@ class WorkFlowStore {
 
   showJobModal = false
 
-  panels: IJob[] = []
+  panels: IJob[] = [
+    {
+      id: '22',
+      name: 'api',
+      type: 1,
+      desc: '',
+      version: '2'
+    }
+  ]
 
   showNotify = false
 

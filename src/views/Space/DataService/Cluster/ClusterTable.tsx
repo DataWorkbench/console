@@ -18,15 +18,6 @@ import NewClusterModal from './ClusterModal'
 import { ClusterColumns, StatusMap, streamDevModeType } from './common/constants'
 import { ClusterFieldMapping } from './common/mappings'
 
-// interface IFilter {
-//   name?: string
-//   offset: number
-//   limit: number
-//   reverse: boolean
-//   search: string
-//   sort_by: string
-// }
-
 const { ColumnsSetting } = ToolBar as any
 
 const columnSettingsKey = 'DATAOMNIS_NETWORK_COLUMN_SETTINGS'

@@ -9,7 +9,7 @@ import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
 import ReleaseModal from '../Modal/ReleaseModal'
 import SyncDataSource from './SyncDataSource'
-import MappingsTable from './MappingsTable'
+import FieldOrder from './FieldOrder'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -26,6 +26,42 @@ const CollapseWrapper = styled('div')(() => [
     }
     li:last-child {
       ${tw`mb-1`}
+    }
+  `
+])
+
+const SyncJobWrapper = styled('div')(() => [
+  tw`flex flex-col flex-1 relative`,
+  css`
+    button {
+      ${tw`h-7!`}
+    }
+    .refresh-button {
+      ${tw`h-7! w-7!`}
+    }
+    .select-control {
+      ${tw`h-7! flex relative`}
+      .select-multi-value-wrapper {
+        ${tw`flex-1`}
+      }
+    }
+    input {
+      ${tw`h-7!`}
+    }
+    .radio-wrapper {
+      ${tw`h-7! flex items-center`}
+      &::before {
+        ${tw` top-[6px]`}
+      }
+    }
+    label.radio.checked::after {
+      ${tw` top-[10px]`}
+    }
+    .radio-button {
+      ${tw`h-7!`}
+    }
+    .clear-button {
+      ${tw`h-7! w-7!`}
     }
   `
 ])
@@ -280,7 +316,7 @@ const SyncJob = () => {
             }
           >
             {index === 0 && <SyncDataSource />}
-            {index === 1 && <MappingsTable />}
+            {index === 1 && <FieldOrder />}
           </CollapseItem>
         ))}
       </Collapse>
@@ -288,7 +324,7 @@ const SyncJob = () => {
   )
 
   return (
-    <div tw="flex flex-col flex-1 relative">
+    <SyncJobWrapper>
       <JobToolBar>
         <Button onClick={save} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
@@ -319,7 +355,7 @@ const SyncJob = () => {
           onCancel={() => setShowRelaseModal(false)}
         />
       )}
-    </div>
+    </SyncJobWrapper>
   )
 }
 
