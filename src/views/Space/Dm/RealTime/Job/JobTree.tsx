@@ -596,7 +596,7 @@ export const JobTree = observer(
                           <AffixLabel>{curOpWord}名称</AffixLabel>
                         </Label>
                         <Control>
-                          <Label>{curOpNode.title}</Label>
+                          <span>{curOpNode.title}</span>
                         </Control>
                       </Field>
                       <SelectTreeField
