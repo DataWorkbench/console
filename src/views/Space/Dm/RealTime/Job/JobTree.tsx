@@ -519,6 +519,10 @@ export const JobTree = observer(
                   workFlowStore.curJob?.id !== job?.id &&
                   workFlowStore.isDirty
                 ) {
+                  workFlowStore.addPanel({
+                    ...job,
+                    jobMode: get(node, 'jobMode'),
+                  })
                   workFlowStore.set({ nextJob: job })
                   workFlowStore.showSaveConfirm(job.id, 'switch')
                   return
