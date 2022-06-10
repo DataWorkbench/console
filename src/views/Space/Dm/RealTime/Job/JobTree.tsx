@@ -187,7 +187,7 @@ export const JobTree = observer(
           })
         } else if (val === 'argsSetting') {
           workFlowStore.set({
-            curJob: get(curOpNode, 'job'),
+            curJob: { ...get(curOpNode, 'job'), jobMode: curOpNode.jobMode },
             showArgsSetting: true,
           })
         }
