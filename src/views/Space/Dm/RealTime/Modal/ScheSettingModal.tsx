@@ -474,24 +474,23 @@ var2=\${yyyy-mm-dd HH-1H}`}
                     }}
                     validateOnChange
                     schemas={[
-                      // {
-                      //   // eslint-disable-next-line no-template-curly-in-string
-                      //   help: '参数值不合法, 请参考格式: ${yyyy-mm-dd HH:MM:SS}',
-                      //   status: 'error',
-                      //   rule: (v: string) => {
-                      //     return v
-                      //       .split(/[\r\n]/)
-                      //       .filter((str) => !isEmpty(str))
-                      //       .every((str) => {
-                      //         const [, val] = str.split('=')
-                      //         if (val === undefined) {
-                      //           return false
-                      //         }
-                      //         return true
-                      //       })
-                      //     return true
-                      //   },
-                      // },
+                      {
+                        help: '变量名长度不能超过 64 个字符',
+                        status: 'error',
+                        rule: (v: string) => {
+                          return v
+                            .split(/[\r\n]/)
+                            .filter((str) => !isEmpty(str))
+                            .every((str) => {
+                              const [key] = str.split('=')
+                              if (key && key.length > 64) {
+                                return false
+                              }
+                              return true
+                            })
+                          return true
+                        },
+                      },
                       {
                         help: '不能为空，且变量名必须唯一',
                         status: 'error',
