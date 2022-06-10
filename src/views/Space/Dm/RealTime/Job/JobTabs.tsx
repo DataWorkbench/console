@@ -195,7 +195,7 @@ const JobTabs = observer(() => {
             label={
               <div tw="inline-flex items-center justify-center">
                 <div
-                  tw="scale-75"
+                  tw="scale-75 h-4! w-4! mr-1"
                   className={job.jobMode === JobMode.RT ? 'tag' : ''}
                 >
                   {getTag(job)}
