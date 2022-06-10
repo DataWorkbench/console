@@ -97,7 +97,7 @@ const StreamRelease = observer(() => {
       ...getFilter(getName('status'), streamReleaseScheduleTypes),
       render: (type: number, record: Record<string, any>) => {
         if (record.__level !== 1) {
-          return null
+          return 'N/A'
         }
         return <StreamReleaseStatusCmp type={type as 1} />
       },

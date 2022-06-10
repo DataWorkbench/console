@@ -218,7 +218,9 @@ const SyncJob = () => {
       setMode(confData?.job_mode)
       setDefaultJobContent(get(confData, 'job_content'))
     }
-  }, [confData, mode])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confData])
+
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current?.setValue(
@@ -293,9 +295,14 @@ const SyncJob = () => {
           return
         }
         set(resource, 'job_content', JSON.stringify(JSON.parse(syncJobScript)))
-      } else {
+      }
+    } catch (e) {
+      showConfWarn('脚本格式不正确')
+      return
+    }
+    try {
+      if (mode === 1) {
         set(resource, 'job_content', '')
-
         if (!resource && isValidateSource) {
           showConfWarn('未配置数据源信息')
           return
@@ -622,12 +629,7 @@ const SyncJob = () => {
               脚本模式
             </Button>
           </PopConfirm>
-        ) : (
-          <Button>
-            <Icon name="remark" type="dark" />
-            语法检查
-          </Button>
-        )}
+        ) : null}
         <Button onClick={() => save()} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存
@@ -642,7 +644,7 @@ const SyncJob = () => {
           <Icon name="export" />
           发布
         </Button>
-        {confData?.updated && (
+        {!!confData?.updated && (
           <span tw="flex-auto text-right text-font">
             最后更新时间：{timeFormat(confData.updated * 1000)}
           </span>

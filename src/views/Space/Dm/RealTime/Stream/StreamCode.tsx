@@ -407,7 +407,7 @@ def main(args: Array[String]): Unit = {
               <Icon name="export" />
               发布
             </Button>
-            {get(data, 'updated') && (
+            {!!get(data, 'updated') && (
               <span tw="flex-auto text-right text-font">
                 最后更新时间：{timeFormat(get(data, 'updated') * 1000)}
               </span>

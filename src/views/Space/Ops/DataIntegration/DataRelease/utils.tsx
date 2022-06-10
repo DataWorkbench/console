@@ -49,7 +49,7 @@ export const getColumnsRender = (
         record: Record<string, any>
       ) => {
         if (record.__level !== 1) {
-          return null
+          return 'N/A'
         }
         return <DataReleaseStatusCmp type={status} />
       },
@@ -102,10 +102,10 @@ export const getColumnsRender = (
       render: (text: string) => <span tw="text-neut-8">{text}</span>,
     },
     type: {
-      render: (text: keyof typeof jobType, record: Record<string, any>) => {
-        if (record.__level > 1) {
-          return null
-        }
+      render: (text: keyof typeof jobType) => {
+        // if (record.__level > 1) {
+        //   return null
+        // }
         return <JobTypeCmp type={text} />
       },
     },
@@ -122,13 +122,16 @@ export const getColumnsRender = (
       //   label,
       //   value,
       // })),
-      render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
-        record.__level === 1 ? (
-          <DbTypeCmp
-            type={get(record, 'sync_job.source_type', '')}
-            onClick={() => actions?.source(record)}
-          />
-        ) : null,
+      render: (text: keyof typeof sourceTypes, record: Record<string, any>) => (
+        <DbTypeCmp
+          type={get(
+            record,
+            record.__level === 1 ? 'sync_job.source_type' : 'source_type',
+            ''
+          )}
+          onClick={() => actions?.source(record)}
+        />
+      ),
     },
     target: {
       // filter: filter.target,
@@ -143,13 +146,16 @@ export const getColumnsRender = (
       //   label,
       //   value,
       // })),
-      render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
-        record.__level === 1 ? (
-          <DbTypeCmp
-            type={get(record, 'sync_job.target_type', '')}
-            onClick={() => actions?.target(record)}
-          />
-        ) : null,
+      render: (text: keyof typeof sourceTypes, record: Record<string, any>) => (
+        <DbTypeCmp
+          type={get(
+            record,
+            record.__level === 1 ? 'sync_job.target_type' : 'target_type',
+            ''
+          )}
+          onClick={() => actions?.target(record)}
+        />
+      ),
     },
     updated: {
       sortable: true,

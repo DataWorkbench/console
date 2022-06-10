@@ -242,6 +242,7 @@ const DataRelease = observer(() => {
       jobId: key,
       limit: 12,
       offset: 0,
+      verbose: 1,
     }).then((res) => {
       const arr = res.infos
         ?.filter((item: Record<string, any>) => item.version !== version)
