@@ -16,6 +16,7 @@ import {
   useStore,
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { timeFormat } from 'utils/convert'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -685,6 +686,11 @@ const SyncJob = () => {
           <Icon name="export" />
           发布
         </Button>
+        {confData?.updated && (
+          <span tw="flex-auto text-right text-font">
+            最后更新时间：{timeFormat(confData.updated * 1000)}
+          </span>
+        )}
       </JobToolBar>
       <div tw="flex-1 overflow-hidden">
         <SimpleBar

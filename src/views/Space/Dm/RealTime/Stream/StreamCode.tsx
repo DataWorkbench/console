@@ -29,6 +29,7 @@ import {
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
+import { timeFormat } from 'utils/convert'
 import { JobToolBar } from '../styled'
 import ReleaseModal from '../Modal/ReleaseModal'
 import VersionHeader from '../Version/VersionHeader'
@@ -406,6 +407,11 @@ def main(args: Array[String]): Unit = {
               <Icon name="export" />
               发布
             </Button>
+            {get(data, 'updated') && (
+              <span tw="flex-auto text-right text-font">
+                最后更新时间：{timeFormat(get(data, 'updated') * 1000)}
+              </span>
+            )}
           </JobToolBar>
         )}
         <div tw="flex-1 relative overflow-hidden flex flex-col">
