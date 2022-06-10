@@ -157,12 +157,11 @@ export const getColumnsRender = (
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
-      render: (v: number, record: Record<string, any>) =>
-        record.__level === undefined || record.__level === 1 ? (
-          <span tw="text-neut-8">
-            {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
-          </span>
-        ) : null,
+      render: (v: number) => (
+        <span tw="text-neut-8">
+          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
+        </span>
+      ),
     },
   }
   return (pickByKeys ? pick(columnsRender, pickByKeys) : columnsRender) as any
