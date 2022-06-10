@@ -76,14 +76,21 @@ export const SqlGroup = forwardRef((props: SqlGroupProps, ref) => {
               })
             }}
           />
-          {index !== 0 && (
+          {statements.length > 1 && (
             <PopConfirm
               content="确认删除该条语句？"
-              onOk={() =>
+              onOk={() => {
                 setValue((draft) => {
                   draft.splice(index, 1)
                 })
-              }
+                if (onChange) {
+                  onChange(
+                    statements
+                      .filter((st, i) => i !== index)
+                      .map((st) => st.value)
+                  )
+                }
+              }}
               appendTo="parent"
               twChild={css`
                 &[aria-expanded='true'] .icon {
