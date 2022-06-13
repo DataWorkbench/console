@@ -31,6 +31,8 @@ const LinkInstance = ({
     version: string
     instance_id?: string
     state?: number
+    offset?: number
+    limit?: number
   }>({ job_id: jobId, version })
 
   const queryClient = useQueryClient()
@@ -61,6 +63,7 @@ const LinkInstance = ({
             onChange={(value: number) => {
               setFilter((draft) => {
                 draft.state = value
+                draft.offset = 0
               })
             }}
             value={filter.state}
@@ -95,11 +98,13 @@ const LinkInstance = ({
             onPressEnter={(e: React.SyntheticEvent) => {
               setFilter((draft) => {
                 draft.instance_id = (e.currentTarget as HTMLInputElement).value
+                draft.offset = 0
               })
             }}
             onClear={() => {
               setFilter((draft) => {
                 draft.instance_id = ''
+                draft.offset = 0
               })
             }}
           />
