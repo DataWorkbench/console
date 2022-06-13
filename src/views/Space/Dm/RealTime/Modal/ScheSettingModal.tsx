@@ -482,8 +482,11 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             .split(/[\r\n]/)
                             .filter((str) => !isEmpty(str))
                             .every((str) => {
-                              const [key] = str.split('=')
+                              const [key, vv] = str.split('=')
                               if (key && key.length > 64) {
+                                return false
+                              }
+                              if (vv && vv.length > 64) {
                                 return false
                               }
                               return true
