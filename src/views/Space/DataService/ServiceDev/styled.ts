@@ -1,5 +1,6 @@
 import tw, { styled, css } from 'twin.macro'
 import { Form, DatePicker, Alert } from '@QCFE/lego-ui'
+import { Table as LegoTable } from '@QCFE/qingcloud-portal-ui'
 
 const { DatePickerField } = Form
 
@@ -186,4 +187,21 @@ export const HourFiledsWrapper = styled('div')(() => [
 
 export const OrderText = styled('div')(() => [
   tw`h-4 w-4 text-green-11 border-green-11 border-[1px] text-center leading-[15px] rounded-[50%]`
+])
+
+export const Table = styled(LegoTable)(() => [
+  css`
+    .grid-table-content {
+      ${tw` border-[1px] border-neut-13 border-solid border-b-0`}
+    }
+    .grid-table-header {
+      ${tw`h-11 bg-neut-16!`}
+    }
+    .table-row {
+      ${tw`hover:bg-neut-16! bg-neut-17!`}
+    }
+    .table-col {
+      ${tw`h-11`}
+    }
+  `
 ])

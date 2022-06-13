@@ -1,11 +1,16 @@
-import { Select, Button, Icon } from '@QCFE/lego-ui'
-import DargTable from 'components/DargTable'
+import { Select, Button, Alert } from '@QCFE/lego-ui'
+import { DargTable, HelpCenterLink } from 'components'
 import React, { useCallback } from 'react'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { OrderText } from 'views/Space/DataService/ServiceDev/styled'
 import { useImmer } from 'use-immer'
 import update from 'immutability-helper'
 import { FlexBox } from 'components/Box'
-import tw from 'twin.macro'
+import tw, { styled } from 'twin.macro'
+
+const Root = styled.div`
+  ${tw`text-white space-y-2`}
+`
 
 const options = [
   {
@@ -113,9 +118,11 @@ const FieldOrder = () => {
               index >= 2 && tw`block group-hover:opacity-100`
             ]}
           >
+            {/* <Tooltip content="删除" theme="dark"> */}
             <Button type="text" onClick={() => delRow(index)}>
               <Icon name="trash" clickable type="dark" />
             </Button>
+            {/* </Tooltip> */}
           </div>
         </>
       )
@@ -161,6 +168,22 @@ const FieldOrder = () => {
       </Button>
     </FlexBox>
   ))
+
+  if (dataSource.length === 0) {
+    return (
+      <Root>
+        <Alert
+          message="提示：排序字段非必须，如你需要排序字段，请在下方添加并选择需要排序的字段。"
+          type="info"
+          linkBtn={
+            <HelpCenterLink href="###" isIframe={false} hasIcon={false}>
+              查看详情 →
+            </HelpCenterLink>
+          }
+        />
+      </Root>
+    )
+  }
 
   return (
     <DargTable

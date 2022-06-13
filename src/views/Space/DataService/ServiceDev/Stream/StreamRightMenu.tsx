@@ -1,10 +1,8 @@
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
-import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
-import ScheSettingModal from '../Modal/ScheSettingModal'
-import ScheArgsModal from '../Modal/ScheArgsModal'
+import BaseSettingModal from '../Modal/BaseSettingModal'
+import ClusterSettingModal from '../Modal/ClusterSettingModal'
 import VersionsModal from '../Modal/VersionsModal'
 
 const MenuRoot = styled('div')(() => [
@@ -20,44 +18,29 @@ const MenuRoot = styled('div')(() => [
 const StreamRightMenu = observer(() => {
   const {
     dtsDevStore,
-    dtsDevStore: { curJob, showScheSetting, showArgsSetting }
+    dtsDevStore: {
+      showBaseSetting,
+      showClusterSetting,
+      showRequestSetting,
+      showResponseSetting,
+      showVersions
+    }
   } = useStore()
-  const drStore = useDataReleaseStore()
   return (
     <>
       <MenuRoot>
-        {/* <span tw="cursor-not-allowed! hover:text-neut-5!">操 作 记 录</span> */}
-        {curJob?.jobMode === 'RT' && (
-          <span onClick={() => dtsDevStore.set({ showArgsSetting: true })}>运 行 参 数</span>
-        )}
-        <span onClick={() => dtsDevStore.set({ showScheSetting: true })}>调 度 设 置</span>
-        <span
-          onClick={() =>
-            drStore.set({
-              showVersion: true
-            })
-          }
-        >
-          历 史 版 本
-        </span>
-        {/* <span tw="cursor-not-allowed! hover:text-neut-5!">历 史 版 本</span> */}
+        <span onClick={() => dtsDevStore.set({ showBaseSetting: true })}>属 性</span>
+        <span onClick={() => dtsDevStore.set({ showClusterSetting: true })}>服 务 集 群</span>
+        <span onClick={() => dtsDevStore.set({ showRequestSetting: true })}>请 求 参 数</span>
+        <span onClick={() => dtsDevStore.set({ showResponseSetting: true })}>返 回 参 数</span>
+        <span onClick={() => dtsDevStore.set({ showVersions: true })}>历 史 版 本</span>
       </MenuRoot>
-      {showScheSetting && (
-        <ScheSettingModal
-          onCancel={() => {
-            dtsDevStore.set({ showScheSetting: false })
-          }}
-          visible
-        />
-      )}
-      {showArgsSetting && (
-        <ScheArgsModal
-          onCancel={() => {
-            dtsDevStore.set({ showArgsSetting: false })
-          }}
-        />
-      )}
-      <VersionsModal jobId={curJob?.id!} type={JobMode[curJob?.jobMode!]} />
+
+      {showBaseSetting && <BaseSettingModal />}
+      {showClusterSetting && <ClusterSettingModal />}
+      {showVersions && <VersionsModal />}
+      {showRequestSetting && <VersionsModal />}
+      {showResponseSetting && <VersionsModal />}
     </>
   )
 })

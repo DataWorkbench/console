@@ -10,6 +10,7 @@ import { JobToolBar } from '../styled'
 import ReleaseModal from '../Modal/ReleaseModal'
 import SyncDataSource from './SyncDataSource'
 import FieldOrder from './FieldOrder'
+import FieldSetting from './FieldSetting'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -316,7 +317,8 @@ const SyncJob = () => {
             }
           >
             {index === 0 && <SyncDataSource />}
-            {index === 1 && <FieldOrder />}
+            {index === 1 && <FieldSetting />}
+            {index === 2 && <FieldOrder />}
           </CollapseItem>
         ))}
       </Collapse>
