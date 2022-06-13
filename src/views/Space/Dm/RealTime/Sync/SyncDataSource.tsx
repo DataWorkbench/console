@@ -870,6 +870,7 @@ const SyncDataSource = observer(
                       })
                     }}
                     value={dbInfo.preSql}
+                    validateOnChange
                     placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
                     schemas={[
                       {
@@ -898,6 +899,7 @@ const SyncDataSource = observer(
                     value={dbInfo.postSql}
                     label="写入后SQL语句组"
                     size={1}
+                    validateOnChange
                     onChange={(v: string[]) => {
                       setDB((draft) => {
                         draft[from].postSql = v
