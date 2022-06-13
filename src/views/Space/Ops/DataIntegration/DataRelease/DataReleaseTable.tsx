@@ -244,7 +244,7 @@ const DataRelease = observer(() => {
       offset: 0,
       verbose: 1,
       sort_by: 'updated',
-      reverse: true,
+      reverse: filter.reverse,
     }).then((res) => {
       const arr = res.infos
         ?.filter((item: Record<string, any>) => item.version !== version)

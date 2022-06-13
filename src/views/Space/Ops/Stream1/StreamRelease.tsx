@@ -274,7 +274,7 @@ const StreamRelease = observer(() => {
         job_id: key,
         limit: 12,
         offset: 0,
-        reverse: true,
+        reverse: filter.reverse,
         sort_by: 'updated',
       })
       .then((res) => {
