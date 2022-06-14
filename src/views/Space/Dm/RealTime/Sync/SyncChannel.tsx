@@ -21,6 +21,7 @@ const Root = styled('div')(() => [
     form {
       ${tw`pl-0! w-full`}
       .field {
+        ${tw` mb-2!`}
         .label {
           ${tw`w-[140px]!`}
         }
