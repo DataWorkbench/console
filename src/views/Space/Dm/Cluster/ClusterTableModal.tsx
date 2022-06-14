@@ -26,6 +26,9 @@ const ClusterTableModal = ({
   visible?: boolean
 }) => {
   const [cluster, setCluster] = useState(null)
+  if (!visible) {
+    return null
+  }
   return (
     <PortalModal
       visible
