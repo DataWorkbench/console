@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from 'react'
 import { set } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
-import { get, filter as lodashFilter } from 'lodash-es'
+import { get, filter as lodashFilter, set as lodashSet } from 'lodash-es'
 import { useCookie } from 'react-use'
 import tw, { styled } from 'twin.macro'
 import {
@@ -19,6 +19,8 @@ import { useQueryDescribePlatformConfig, useQueryRegion, useStore } from 'hooks'
 import { getHelpCenterLink } from 'utils'
 import { collect, map } from 'utils/functions'
 
+import useIcon from 'hooks/useHooks/useIcon'
+import icons from 'views/Space/Header/icons'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
 import BestPractice from './BestPractice'
@@ -119,17 +121,26 @@ const WorkSpace = observer(
       queryKeyWord: '',
     }))
 
+    useIcon(icons)
+
     const { data: platform } = useQueryDescribePlatformConfig(
       {
         regionId: stateStore.curRegionId,
       },
-      { enabled: !!stateStore.curRegionId, staleTime: 12 * 60 * 60 * 1000 }
+      { enabled: !!stateStore.curRegionId },
+      1000 * 60 * 60 * 24 * 30
     )
 
     useEffect(() => {
       stateStore.set({
         platformConfig: platform,
       })
+      let url = platform?.documents_address ?? ''
+      if (!url.includes('//')) {
+        url = `//${url}`
+      }
+      lodashSet(window, 'GLOBAL_CONFIG.new_docs_url', url)
+      lodashSet(window, 'GLOBAL_CONFIG.docs_center_url', url)
       const { defaultFuncList } = workSpaceStore
       workSpaceStore.set({
         funcList: collect(

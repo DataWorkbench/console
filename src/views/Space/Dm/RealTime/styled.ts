@@ -15,7 +15,7 @@ export const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
 ])
 
 export const JobToolBar = styled('div')(
-  () => [tw`flex px-2 pt-4 space-x-2`],
+  () => [tw`flex px-2 pt-2 space-x-2`],
   css`
     button.button {
       ${tw`h-7`}
@@ -178,6 +178,51 @@ export const HourFiledsWrapper = styled('div')(() => [
           .select {
             ${tw`w-24`}
           }
+        }
+      }
+    }
+  `,
+])
+
+export const FormH7Wrapper = styled('div')(() => [
+  tw`flex flex-col flex-1 relative`,
+  css`
+    button {
+      ${tw`h-7!`}
+    }
+    .refresh-button {
+      ${tw`h-7! w-7!`}
+    }
+    .select-control {
+      ${tw`h-7! flex relative`}
+      .select-multi-value-wrapper {
+        ${tw`flex-1`}
+      }
+    }
+    input {
+      ${tw`h-7!`}
+    }
+    .radio-wrapper {
+      ${tw`h-7! flex items-center`}
+      &::before {
+        ${tw` top-[6px]`}
+      }
+    }
+    label.radio.checked::after {
+      ${tw` top-[10px]`}
+    }
+    .radio-button {
+      ${tw`h-7!`}
+    }
+    .clear-button {
+      ${tw`h-7! w-7!`}
+    }
+    .label {
+      ${tw`h-7!`}
+      .control {
+        ${tw`h-7!`}
+        .input-number {
+          ${tw`h-7!`}
         }
       }
     }

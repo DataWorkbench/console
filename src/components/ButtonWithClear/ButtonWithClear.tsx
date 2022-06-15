@@ -35,7 +35,7 @@ export const ButtonWithClear = React.forwardRef(
     }, [value, onChange])
 
     let clearButton: React.ReactNode | null = (
-      <Button type="black" tw="ml-2 h-8 px-[7px]">
+      <Button type="black" tw="ml-2 h-8 px-[7px]" className="clear-button">
         <Icon name="close" type="light" size={16} />
       </Button>
     )

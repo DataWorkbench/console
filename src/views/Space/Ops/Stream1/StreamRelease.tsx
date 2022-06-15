@@ -9,10 +9,7 @@ import {
 } from 'views/Space/Ops/Stream1/common/constants'
 import { Icon, PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
-import {
-  alarmStatus,
-  DataReleaseActionType,
-} from 'views/Space/Ops/DataIntegration/constants'
+import { DataReleaseActionType } from 'views/Space/Ops/DataIntegration/constants'
 import { get, isNil, omitBy } from 'lodash-es'
 import React, { useCallback } from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -30,10 +27,7 @@ import {
   FlexBox,
 } from 'components'
 import { getOperations } from 'views/Space/Ops/DataIntegration/DataRelease/utils'
-import {
-  AlarmStatusCmp,
-  StreamReleaseStatusCmp,
-} from 'views/Space/Ops/styledComponents'
+import { StreamReleaseStatusCmp } from 'views/Space/Ops/styledComponents'
 import { getReleaseJobsKey, useQueryReleaseJobs } from 'hooks'
 import tw, { css } from 'twin.macro'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
@@ -102,21 +96,24 @@ const StreamRelease = observer(() => {
     [getName('status')]: {
       ...getFilter(getName('status'), streamReleaseScheduleTypes),
       render: (type: number, record: Record<string, any>) => {
-        if (record.__level !== 1) {
+        if (record.hasMore || record.hasNone) {
           return null
+        }
+        if (record.__level !== 1) {
+          return <span tw="text-font-secondary">N/A</span>
         }
         return <StreamReleaseStatusCmp type={type as 1} />
       },
     },
-    [getName('alarmStatus')]: {
-      ...getFilter(getName('alarmStatus'), alarmStatus),
-      render: (type: number, record: Record<string, any>) => (
-        <AlarmStatusCmp
-          type={type as any}
-          onClick={() => jumpDetail('alert')(record)}
-        />
-      ),
-    },
+    // [getName('alarmStatus')]: {
+    //   ...getFilter(getName('alarmStatus'), alarmStatus),
+    //   render: (type: number, record: Record<string, any>) => (
+    //     <AlarmStatusCmp
+    //       type={type as any}
+    //       onClick={() => jumpDetail('alert')(record)}
+    //     />
+    //   ),
+    // },
     [getName('devMode')]: {
       ...getFilter(getName('devMode'), streamDevModeType),
       render: (type?: keyof typeof streamDevModeType) =>
@@ -224,7 +221,7 @@ const StreamRelease = observer(() => {
             theme="dark"
             icon={
               streamDevModeType[
-                get(record, getName('devMode') as string, 1) as 1
+                get(record, getName('devMode') as string, 2) as 2
               ]?.icon
             }
             name={record.name}
@@ -254,7 +251,9 @@ const StreamRelease = observer(() => {
   // const mutation = useMutationUdfReleaseJobs()
 
   const isFetching = useIsFetching()
-  const { data } = useQueryReleaseJobs(omitBy(filter, isNil))
+  const { data } = useQueryReleaseJobs(omitBy(filter, isNil), {
+    refetchInterval: 1000 * 60,
+  })
 
   const infos = get(data, 'infos', []) || []
 
@@ -273,8 +272,10 @@ const StreamRelease = observer(() => {
         regionId,
         space_id: spaceId,
         job_id: key,
-        limit: 11,
+        limit: 12,
         offset: 0,
+        reverse: filter.reverse,
+        sort_by: 'updated',
       })
       .then((res) => {
         const arr = res.infos
@@ -285,15 +286,15 @@ const StreamRelease = observer(() => {
           }))
         if (arr.length >= 11) {
           const value = arr.slice(0, 10).concat({
-            key: Math.random().toString(32),
-            uuid: Math.random().toString(32),
+            key: `${key}-more`,
+            uuid: `${key}-more`,
             id: key,
             hasMore: true,
           })
           return value
         }
         if (arr.length === 0) {
-          return [{ key: Math.random().toString(32), hasNone: true }]
+          return [{ key: `${key}-none`, uuid: `${key}-none`, hasNone: true }]
         }
         return arr
       })

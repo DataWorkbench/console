@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useHistory } from 'react-router-dom'
-import { Modal, Button } from '@QCFE/qingcloud-portal-ui'
+import { Button } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import { useStore } from 'stores'
-import { FlexBox } from 'components'
+import { FlexBox, PortalModal } from 'components'
 import WorkSpace from 'views/WorkSpace'
 
 const SpaceListModal = observer(() => {
@@ -33,7 +33,7 @@ const SpaceListModal = observer(() => {
   }
 
   return (
-    <Modal
+    <PortalModal
       title="选择要进入的工作空间"
       visible={showSpaceModal}
       appendToBody
@@ -75,7 +75,7 @@ const SpaceListModal = observer(() => {
           setShowCreate(false)
         }}
       />
-    </Modal>
+    </PortalModal>
   )
 })
 

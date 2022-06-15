@@ -1,5 +1,5 @@
 import tw, { styled, css } from 'twin.macro'
-import { Modal } from '@QCFE/qingcloud-portal-ui'
+import PortalModal from './PortalModal'
 
 interface IDarkModal {
   orient?: 'fullright' | 'center'
@@ -7,7 +7,7 @@ interface IDarkModal {
   noBorder?: boolean
 }
 
-export const ModalWrapper = styled(Modal)(
+export const ModalWrapper = styled(PortalModal)(
   ({ orient, noBorder = false }: IDarkModal) => [
     orient === 'fullright' &&
       css`

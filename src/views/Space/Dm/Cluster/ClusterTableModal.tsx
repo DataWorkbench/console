@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Modal, Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
-import { HelpCenterLink } from 'components'
+import { HelpCenterLink, PortalModal } from 'components'
 import tw, { styled, css } from 'twin.macro'
 import ClusterTable from './ClusterTable'
 
@@ -26,8 +26,11 @@ const ClusterTableModal = ({
   visible?: boolean
 }) => {
   const [cluster, setCluster] = useState(null)
+  if (!visible) {
+    return null
+  }
   return (
-    <Modal
+    <PortalModal
       visible
       draggable
       width={1200}
@@ -44,7 +47,7 @@ const ClusterTableModal = ({
       <Alert>
         <Icon name="information" size={20} tw="mr-1.5" />
         请选择运行当前作业的计算集群，请注意保证网络连通性，具体可参考：
-        <HelpCenterLink isIframe={false} href="/manual/data_up_cloud/connect/">
+        <HelpCenterLink href="/manual/data_up_cloud/connect/" isIframe={false}>
           网络连通文档
         </HelpCenterLink>
       </Alert>
@@ -55,7 +58,7 @@ const ClusterTableModal = ({
           setCluster(get(clusters, '[0]'))
         }}
       />
-    </Modal>
+    </PortalModal>
   )
 }
 

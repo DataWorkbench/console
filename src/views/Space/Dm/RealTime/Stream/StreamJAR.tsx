@@ -21,7 +21,7 @@ import {
   getResourceKey,
   useStore,
 } from 'hooks'
-import { strlen } from 'utils/convert'
+import { strlen, timeFormat } from 'utils/convert'
 import { get, flatten } from 'lodash-es'
 import { css } from 'twin.macro'
 import ReleaseModal from '../Modal/ReleaseModal'
@@ -132,7 +132,7 @@ const StreamJAR = () => {
         {readOnly ? (
           <VersionHeader />
         ) : (
-          <JobToolBar tw="pl-0">
+          <JobToolBar tw="px-2 pt-2">
             <Button
               tw="w-[68px] px-0"
               onClick={handleSave}
@@ -157,10 +157,15 @@ const StreamJAR = () => {
                 <Icon name="export" />
                 发布
               </Button>
+              {!!get(data, 'updated') && (
+                <span tw="flex-auto text-right text-font">
+                  最后更新时间：{timeFormat(get(data, 'updated') * 1000)}
+                </span>
+              )}
             </Tooltip>
           </JobToolBar>
         )}
-        <div tw="flex-1 pl-5">
+        <div tw="flex-1 p-5">
           <Form tw="w-[600px]! max-w-[600px]!" ref={form} layout="vertical">
             <SelectWithRefresh
               name="file_id"

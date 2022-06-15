@@ -26,7 +26,8 @@ import {
   ftpProtocolValue,
   hiveAnonymousFilters,
   hivePwdFilters,
-  sftpFilters,
+  sftpFiltersWithKey,
+  sftpFiltersWithPwd,
   sFtpProtocolValue,
   SourceType,
 } from './constant'
@@ -134,6 +135,7 @@ const getInitValue = (path: string) => {
       },
       elastic_search: {
         version: '7',
+        port: 9200,
       },
     },
   }
@@ -152,7 +154,7 @@ interface IFormProps {
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
   op: string
   opSourceList: Record<string, any>[]
-  theme: 'dark' | 'light'
+  theme?: 'dark' | 'light'
   className?: string
 }
 
@@ -181,15 +183,18 @@ const DataSourceForm = ({
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
     if (urlType === 'ftp') {
       if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
-        return sftpFilters
+        if (get(sourceInfo, 'url.ftp.auth_mode') !== 2) {
+          return sftpFiltersWithPwd
+        }
+        return sftpFiltersWithKey
       }
       return ftpFilters
     }
     if (urlType === 'hive') {
-      if (get(sourceInfo, 'url.hive.hadoop_config')) {
-        return hiveAnonymousFilters
+      if (get(sourceInfo, 'url.hive.user')) {
+        return hivePwdFilters
       }
-      return hivePwdFilters
+      return hiveAnonymousFilters
     }
     if (urlType === 'elastic_search') {
       if (
@@ -237,7 +242,7 @@ const DataSourceForm = ({
 
   const handleChange = {
     ftp_protocol: (onChange?: Function) => (type: number) => {
-      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFilters)
+      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFiltersWithPwd)
       setFtpProtocol(type)
       if (!ftpPortConfig.changed) {
         setFtpPortConfig((_) => {
@@ -245,6 +250,13 @@ const DataSourceForm = ({
         })
       }
       onChange?.(type)
+    },
+    ftp_auth_mode: () => (type: number) => {
+      if (type === 2) {
+        setFilters(sftpFiltersWithKey)
+      } else {
+        setFilters(sftpFiltersWithPwd)
+      }
     },
     ftp_port: (onChange?: Function) => (v: number) => {
       setFtpPortConfig((_) => {
@@ -498,7 +510,9 @@ const DataSourceForm = ({
                 return (
                   <Field key={field.name} tw="mb-0!">
                     <label htmlFor="__" className="label">
-                      <AffixLabel required>{field.label}</AffixLabel>
+                      <AffixLabel required help={field.labelHelp}>
+                        {field.label}
+                      </AffixLabel>
                     </label>
                     <MultiFieldWrapper>
                       {field.items.reduce(

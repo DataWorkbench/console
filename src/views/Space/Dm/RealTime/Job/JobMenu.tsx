@@ -60,8 +60,9 @@ const JobMenu = observer((props: JobMenuProps) => {
         </div>
       </div>
       <div tw="border-b dark:border-neut-15">
-        <div tw="mt-3 px-2 flex items-center">
+        <div tw="mt-3 px-2 flex items-center ">
           <InputSearch
+            tw="border-2 rounded-sm  dark:border-neut-15"
             placeholder="搜索作业名称"
             onPressEnter={(evt) => {
               handleSearch((evt.target as HTMLInputElement).value)

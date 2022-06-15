@@ -3,6 +3,9 @@ import tw, { css } from 'twin.macro'
 const menuStyles = css`
   .menu {
     ${tw`text-xs`}
+    .if {
+      ${tw`mr-2 text-[16px] `}
+    }
   }
   .dark {
     .menu {

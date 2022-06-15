@@ -73,18 +73,21 @@ const DataRelease = observer(() => {
       status?: number
       offset: number
       limit: number
+      verbose?: number
     },
     { pagination: true; sort: true }
   >(
     {
       sort_by: 'updated',
       reverse: true,
+      verbose: 1,
     },
     { pagination: true, sort: true },
     dataReleaseSettingKey
   )
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    // 详情文件位置 views/Space/Ops/DataIntegration/DataRelease/DataReleaseDetail.tsx
     window.open(
       `./data-release/${record.id}?version=${record.version}${
         tab ? `&tab=${tab}` : ''
@@ -239,6 +242,9 @@ const DataRelease = observer(() => {
       jobId: key,
       limit: 12,
       offset: 0,
+      verbose: 1,
+      sort_by: 'updated',
+      reverse: filter.reverse,
     }).then((res) => {
       const arr = res.infos
         ?.filter((item: Record<string, any>) => item.version !== version)
@@ -254,7 +260,7 @@ const DataRelease = observer(() => {
         return value
       }
       if (arr.length === 0) {
-        return [{ key: Math.random().toString(32), hasNone: true }]
+        return [{ key: `${key}-none`, uuid: `${key}-none`, hasNone: true }]
       }
       return arr
     })
@@ -266,7 +272,7 @@ const DataRelease = observer(() => {
         <TabsWrapper>
           <PageTab tabs={dataReleaseTabs} />
         </TabsWrapper>
-        <FlexBox orient="column" tw="gap-3">
+        <FlexBox orient="column" tw="gap-3 p-5 bg-bgColor-light">
           <TableHeader columnsSetting={columnsSetting} />
           <SelectTreeTable
             openLevel={1}

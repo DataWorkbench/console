@@ -3,6 +3,8 @@ import { forwardRef, useLayoutEffect, useImperativeHandle } from 'react'
 import { useImmer } from 'use-immer'
 import { FlexBox } from 'components/Box'
 import { nanoid } from 'nanoid'
+import { PopConfirm } from 'components/PopConfirm'
+import tw, { css } from 'twin.macro'
 
 export interface SqlGroupProps {
   name: string
@@ -74,19 +76,36 @@ export const SqlGroup = forwardRef((props: SqlGroupProps, ref) => {
               })
             }}
           />
-          {index !== 0 && (
-            <Icon
-              name="trash-fill"
-              type="light"
-              size={16}
-              clickable
-              onClick={() => {
+          {statements.length > 1 && (
+            <PopConfirm
+              content="确认删除该条语句？"
+              onOk={() => {
                 setValue((draft) => {
                   draft.splice(index, 1)
                 })
+                if (onChange) {
+                  onChange(
+                    statements
+                      .filter((st, i) => i !== index)
+                      .map((st) => st.value)
+                  )
+                }
               }}
-              tw="mx-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-200"
-            />
+              appendTo="parent"
+              twChild={css`
+                &[aria-expanded='true'] .icon {
+                  ${tw`opacity-100`}
+                }
+              `}
+            >
+              <Icon
+                name="trash-fill"
+                type="light"
+                size={16}
+                clickable
+                tw="mx-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-200"
+              />
+            </PopConfirm>
           )}
         </FlexBox>
       ))}

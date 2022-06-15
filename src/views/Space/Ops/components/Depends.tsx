@@ -36,7 +36,8 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
   //   files: ['asdfas', 'adfasf', 'adfasd'],
   //   delete_files: ['dfad', 'adfasdf', 'dsafasdf'],
   // }
-  const isEmpty = data?.files?.length === 0 && data?.delete_files?.length === 0
+  const isEmpty = !data?.files?.length && !data?.delete_files?.length
+
   if (isEmpty) {
     return (
       <FlexBox tw="w-full flex-col items-center gap-3 pt-14">
@@ -44,7 +45,14 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
           <div>
             <div>
               <p>
-                <Icon name="coding" size={40} />
+                <Icon
+                  name="coding"
+                  color={{
+                    primary: '#fff',
+                    secondary: '##949ea9',
+                  }}
+                  size={40}
+                />
               </p>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { getKvTextAreaFieldByMap } from 'components/KVTextArea'
 import { ReactElement } from 'react'
 import {
   compInfo,
+  ftpAuthMode,
   ftpConnectionMode,
   ftpProtocol,
   hadoopLink,
@@ -335,6 +336,8 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           fieldType: 'dbUrl',
           label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
           labelClassName: 'label-required',
+          labelHelp:
+            '基于 http 方式连接（http 默认端口是 8123，tcp 连接是 9000 端口）',
           name: '__dbUrl',
           space: [':', '/'],
           items: [
@@ -419,7 +422,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
         user,
         password,
         {
-          name: 'hadoop_config',
+          name: 'config',
           label: 'Hadoop 高级配置',
           component: TextAreaWrapper,
           placeholder:
@@ -428,7 +431,13 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           help: (
             <div>
               <span tw="mr-0.5">可参考</span>
-              <HelpCenterLink hasIcon>网络配置选择说明文档</HelpCenterLink>
+              <HelpCenterLink
+                href="/manual/network/create_network/"
+                hasIcon
+                isIframe={false}
+              >
+                网络配置选择说明文档
+              </HelpCenterLink>
             </div>
           ),
           css: css`
@@ -458,6 +467,25 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             },
           ],
         },
+
+        {
+          fieldType: 'dbUrl',
+          label: '主机别名和端口（Host : Port）',
+          name: '__dbUrl',
+          space: [':'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：ftp://127.0.0.1:21',
+              placeholder: '请输入 FTP 的主机别名（Host）',
+            },
+            {
+              ...port,
+              label: null,
+            },
+          ],
+        },
         {
           name: 'connection_mode',
           label: '连接模式 （Connection Mode）',
@@ -469,6 +497,21 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                 required: true,
               },
               help: '请选择连接模式',
+              status: 'error',
+            },
+          ],
+        },
+        {
+          name: 'auth_mode',
+          label: '认证方式',
+          component: RadioGroupField,
+          options: Object.values(ftpAuthMode),
+          schemas: [
+            {
+              rule: {
+                required: true,
+              },
+              help: '请选择认证方式',
               status: 'error',
             },
           ],
@@ -498,24 +541,6 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
               },
               help: '最大长度: 2048, 最小长度: 1',
               status: 'error',
-            },
-          ],
-        },
-        {
-          fieldType: 'dbUrl',
-          label: '主机别名和端口（Host : Port）',
-          name: '__dbUrl',
-          space: [':'],
-          items: [
-            {
-              ...host,
-              label: null,
-              help: '例：ftp://127.0.0.1:21',
-              placeholder: '请输入 FTP 的主机别名（Host）',
-            },
-            {
-              ...port,
-              label: null,
             },
           ],
         },
@@ -789,7 +814,7 @@ localhost:6379
             },
           ],
         },
-        { ...database, required: false, schemas: [] },
+        { ...database },
         user,
         { ...password, placeholder: '请输入访问密码（Password）' },
       ]
@@ -852,17 +877,8 @@ localhost:6379
               status: 'error',
             },
             {
-              rule: (value: { host: string; port: number }[]) => {
+              rule: () => {
                 return true
-                // const l = strlen(value)
-                // return l >= 1 && l <= 1024
-                if (!Array.isArray(value) || !value.length) {
-                  return false
-                }
-                return !value.find(({ host: h, port: p }) => {
-                  const l = strlen(h)
-                  return l < 1 || l > 64 || !h || !p
-                })
               },
               help: 'IP 不能为空且长度为 1 ～ 64，Port 不能为空且为整数，kafka_brokers 个数在 1 ～ 128 之内',
               status: 'error',
@@ -922,15 +938,27 @@ export const source2DBStrategy = [
 
 export const sourceStrategy = [
   {
+    key: 'sftp.auth_mode',
+    check: (type: SourceType, name: string) => {
+      return type === SourceType.Ftp && name === 'auth_mode'
+    },
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.ftp.private_key')) {
+        return 2
+      }
+      return 1
+    },
+  },
+  {
     key: 'hive.hiveAuth',
     check: (type: SourceType, name: string) => {
       return type === SourceType.Hive && name === 'hiveAuth'
     },
     value: (sourceInfo: Record<string, any>) => {
-      if (get(sourceInfo, 'url.hive.hadoop_config')) {
-        return 2
+      if (get(sourceInfo, 'url.hive.user')) {
+        return 1
       }
-      return 1
+      return 2
     },
   },
   {

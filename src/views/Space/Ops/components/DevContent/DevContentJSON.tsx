@@ -30,12 +30,17 @@ const Line = () => {
 const DevContentJSON = (props: {
   data?: { job_content?: string }
   showStep?: boolean
+  language?: string
 }) => {
-  const { data: { job_content: codeStr = defaultCode } = {}, showStep = true } =
-    props
+  const {
+    data: { job_content: codeStr = defaultCode } = {},
+    showStep = true,
+    language = codeName,
+  } = props
   const editorRef = useRef(null)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
 
+  console.log(props)
   const handleEditorWillMount = (monaco: any) => {
     monaco.editor.defineTheme('my-theme', {
       base: 'vs-dark',
@@ -57,8 +62,9 @@ const DevContentJSON = (props: {
     }
   }
 
+  // TODO: 脚本模式判断
   return (
-    <div tw="h-full w-full grid">
+    <div tw="h-full w-full grid py-5 bg-neut-18">
       {showStep !== false && (
         <Center tw="bg-neut-18 h-14">
           <Item>来源: mysql</Item>
@@ -73,9 +79,8 @@ const DevContentJSON = (props: {
           css={[!showPlaceholder && tw`hidden`]}
           tw="absolute inset-0 z-50 bg-neut-18 bg-opacity-40 cursor-text"
         />
-
         <Editor
-          language={codeName}
+          language={language}
           defaultValue={codeStr}
           theme="my-theme"
           tw="overflow-hidden"

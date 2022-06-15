@@ -25,7 +25,7 @@ export const getSyncJobInstanceKey = (key: keyof typeof queryKey = 'list') =>
 
 export const useQuerySyncJobInstances = (
   filter: any,
-  { enabled = true }: Record<string, any> = { enabled: true },
+  { enabled = true, ...config }: Record<string, any> = { enabled: true },
   type: JobMode = JobMode.DI
 ) => {
   let typePath = 'sync'
@@ -59,6 +59,7 @@ export const useQuerySyncJobInstances = (
     async ({ pageParam = params }) => listSyncInstances(pageParam),
     {
       enabled,
+      ...config,
       getNextPageParam: (lastPage, allPages) => {
         if (lastPage.has_more) {
           const nextOffset = allPages.reduce(

@@ -75,3 +75,15 @@ export const disableWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
     body: { space_ids: spaceIds },
     method: 'POST',
   })
+
+export const attachWorkSpacesNetwork = ({
+  regionId,
+  spaceId,
+  ...rest
+}: IWorkSpaceParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/config/networks/vpc/attach`,
+    body: rest,
+    method: 'POST',
+  })

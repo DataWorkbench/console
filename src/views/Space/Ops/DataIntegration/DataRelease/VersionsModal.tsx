@@ -11,7 +11,6 @@ import useFilter from 'hooks/useHooks/useFilter'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
-  dataReleaseSuggestions,
   versionColumns,
 } from 'views/Space/Ops/DataIntegration/constants'
 import React, { useMemo, useRef } from 'react'
@@ -103,23 +102,26 @@ const VersionsModal = (props: IProps) => {
       offset: number
       limit: number
       job_id: string
+      search?: string
     },
     { pagination: true; sort: true }
   >(
-    { limit: 15, job_id: jobId, reverse: true, sort_by: 'updated' },
+    { limit: 10, job_id: jobId, reverse: true, sort_by: 'updated' },
     { pagination: true, sort: true },
     dataReleaseVersionSettingKey
   )
 
   const columnsRender = getColumnsRender(filter, setFilter, [
     'alert_status',
-    'status',
+    // 'status',
     'version',
     'updated',
   ])
 
   const jobNameColumn = {
     ...dataReleaseColumns[0],
+    dataIndex: 'name',
+    title: '作业名称',
     // width: 250,
     render: (text: string, record: Record<string, any>) => {
       const child = (
@@ -195,11 +197,15 @@ const VersionsModal = (props: IProps) => {
           <TableHeader
             columnsSetting={columnsSetting}
             queryKey={() => getJobVersionKey('list')}
-            suggestions={dataReleaseSuggestions.filter((i) =>
-              ['alert_status', 'status'].includes(i.key as string)
-            )}
+            suggestions={[
+              {
+                label: '版本 ID',
+                key: 'version',
+              },
+            ]}
             filterInputConfig={{
-              defaultKeywordLabel: '作业名称',
+              defaultKeywordLabel: '版本 ID',
+              searchKey: 'version',
             }}
           />
           <Table

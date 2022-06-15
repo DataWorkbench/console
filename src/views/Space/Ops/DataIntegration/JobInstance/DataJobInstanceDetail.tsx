@@ -35,7 +35,6 @@ import {
 } from 'hooks'
 import DevContent from 'views/Space/Ops/components/DevContent'
 import {
-  AlarmStatusCmp,
   Circle,
   DbTypeCmp,
   JobInstanceStatusCmp,
@@ -143,7 +142,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
     const result = []
     if (status & stopAble) {
       result.push({
-        text: '中止',
+        text: '终止',
         icon: 'q-closeCircleFill',
         key: 'stop',
         value: record,
@@ -158,6 +157,16 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
   }
 
   const mutation = useMutationJobInstance()
+
+  const jumpDataReleaseDetail = ({
+    jobId,
+    version,
+  }: {
+    jobId: string
+    version: string
+  }) => {
+    window.open(`../data-release/${jobId}?version=${version}`, '_blank')
+  }
 
   const handleMenuClick = (record: Record<string, any>, key: any) => {
     switch (key) {
@@ -223,10 +232,11 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
-            <Circle>
+            <Circle tw="w-10! h-10!">
               <Icon
                 name="q-mergeFillDuotone"
                 type="light"
+                size={28}
                 css={css`
                   & .qicon {
                     ${tw`text-white! fill-[#fff]!`}
@@ -279,27 +289,54 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>告警状态:</span>
-              <span>
-                <AlarmStatusCmp type={data?.alarm_status} />
-              </span>
               <span>所属作业:</span>
               <span tw="inline-block">
-                <Tooltip
-                  theme="light"
-                  hasPadding
-                  content={`发布描述：${get(data, 'sync_job.desc', '')}`}
-                >
+                {get(data, 'sync_job.desc') ? (
+                  <Tooltip
+                    theme="light"
+                    hasPadding
+                    content={`发布描述：${get(data, 'sync_job.desc', '')}`}
+                  >
+                    <div
+                      onClick={() => {
+                        window.open(
+                          `../data-release/${get(
+                            data,
+                            'job_id',
+                            ''
+                          )}?version=${get(data, 'version')}`,
+                          '_blank'
+                        )
+                      }}
+                    >
+                      <div>
+                        <span tw="text-white font-semibold hover:text-green-11 mr-1 hover:cursor-pointer">
+                          {get(data, 'sync_job.name')}
+                        </span>
+                        <span tw="text-neut-8">({data?.job_id})</span>
+                      </div>
+                      <div tw="text-neut-8">版本 ID: {data?.version}</div>
+                    </div>
+                  </Tooltip>
+                ) : (
                   <div>
                     <div>
-                      <span tw="text-white font-semibold mr-1">
+                      <span
+                        tw="text-white font-semibold mr-1 cursor-pointer"
+                        onClick={() =>
+                          jumpDataReleaseDetail({
+                            jobId: data?.job_id,
+                            version: data?.version,
+                          })
+                        }
+                      >
                         {get(data, 'sync_job.name')}
                       </span>
                       <span tw="text-neut-8">({data?.job_id})</span>
                     </div>
                     <div tw="text-neut-8">版本 ID: {data?.version}</div>
                   </div>
-                </Tooltip>
+                )}
               </span>
               <span>作业模式:</span>
               <span>
@@ -449,8 +486,13 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
       </Card>
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent"
+        tw="bg-transparent"
         activeName={activeName}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
         }}

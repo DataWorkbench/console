@@ -36,7 +36,7 @@ const SelectWithRefreshCmp = forwardRef<
     getControlRef: () => selectRef?.current!,
   }))
   return (
-    <SelectWithRefreshBox className="select-with-refresh">
+    <SelectWithRefreshBox className="select-with-refresh h-7!">
       <>
         <Select
           clearable
@@ -44,9 +44,11 @@ const SelectWithRefreshCmp = forwardRef<
           id={domId}
           onChange={onChange}
           ref={selectRef}
+          type="small"
         />
         <Button
           tw="w-8 ml-3 p-0 dark:bg-neut-16!"
+          className="refresh-button"
           disabled={disabled}
           onClick={() => onRefresh && onRefresh()}
         >

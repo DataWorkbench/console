@@ -74,7 +74,6 @@ const useFilter = <T extends Object, P extends ITableConfig>(
 
   useEffect(() => {
     if (tableLinkKey) {
-      console.log(2222222222, filter)
       emitter.emit(`${tableLinkKey}-set`, filter)
     }
   }, [filter, tableLinkKey])

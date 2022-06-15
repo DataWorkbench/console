@@ -3,6 +3,25 @@ import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
 import type RootStore from './RootStore'
 
+enum SourceType {
+  Mysql = 1,
+  PostgreSQL = 2,
+  Kafka = 3,
+  ClickHouse = 5,
+  HBase = 6,
+  Ftp = 7,
+  HDFS = 8,
+  SqlServer = 9,
+  Oracle = 10,
+  DB2 = 11,
+  SapHana = 12,
+  Hive = 13,
+  ElasticSearch = 14,
+  MongoDB = 15,
+  Redis = 16,
+  TiDB = 1000000000000,
+}
+
 interface IJob {
   id: string
   name: string
@@ -12,8 +31,8 @@ interface IJob {
   type: 1 | 2 | 3
   desc: string
   version: string
-  source_type?: number
-  target_type?: number
+  source_type?: SourceType
+  target_type?: SourceType
   jobMode?: 'DI' | 'RT' | 'OLE'
 }
 
@@ -30,7 +49,7 @@ const initTreeData = [
     key: 'rt-root',
     pid: 'rt-root',
     jobMode: 'RT',
-    title: '实时-流式开发',
+    title: '数据开发',
     isLeaf: false,
     children: [],
   },

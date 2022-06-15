@@ -10,14 +10,20 @@ import {
   Icon,
   Menu,
   Form,
-  Modal,
   Control,
   Field,
   Label,
   Input,
   Button,
 } from '@QCFE/lego-ui'
-import { Icons, AffixLabel, Confirm, Tree, SelectTreeField } from 'components'
+import {
+  Icons,
+  AffixLabel,
+  Confirm,
+  Tree,
+  SelectTreeField,
+  PortalModal,
+} from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useMutationStreamJob, useFetchJob } from 'hooks'
@@ -181,7 +187,7 @@ export const JobTree = observer(
           })
         } else if (val === 'argsSetting') {
           workFlowStore.set({
-            curJob: get(curOpNode, 'job'),
+            curJob: { ...get(curOpNode, 'job'), jobMode: curOpNode.jobMode },
             showArgsSetting: true,
           })
         }
@@ -230,7 +236,7 @@ export const JobTree = observer(
                 <span>调度设置</span>
               </MenuItem>
               {isRt && (
-                <MenuItem value="scheSetting">
+                <MenuItem value="argsSetting">
                   <Icons name="Topology3Fill" size={14} tw="mr-2" />
                   <span>运行参数配置</span>
                 </MenuItem>
@@ -421,6 +427,11 @@ export const JobTree = observer(
             }
             if (op === 'delete') {
               setDelBtnEnable(false)
+              if (workFlowStore.curJob?.id === data.job_ids[0]) {
+                workFlowStore.set({
+                  curJob: null,
+                })
+              }
             }
           }
         },
@@ -495,6 +506,11 @@ export const JobTree = observer(
                 }
               }}
               onSelect={(keys: (string | number)[], { selected, node }) => {
+                if (visible) {
+                  setTimeout(() => {
+                    setVisible(false)
+                  })
+                }
                 const job = get(node, 'job')
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
@@ -503,6 +519,10 @@ export const JobTree = observer(
                   workFlowStore.curJob?.id !== job?.id &&
                   workFlowStore.isDirty
                 ) {
+                  workFlowStore.addPanel({
+                    ...job,
+                    jobMode: get(node, 'jobMode'),
+                  })
                   workFlowStore.set({ nextJob: job })
                   workFlowStore.showSaveConfirm(job.id, 'switch')
                   return
@@ -540,7 +560,7 @@ export const JobTree = observer(
               move: '移动',
             }[curOp]
             return (
-              <Modal
+              <PortalModal
                 title={opTxt}
                 visible
                 appendToBody
@@ -585,7 +605,7 @@ export const JobTree = observer(
                           <AffixLabel>{curOpWord}名称</AffixLabel>
                         </Label>
                         <Control>
-                          <Label>{curOpNode.title}</Label>
+                          <span>{curOpNode.title}</span>
                         </Control>
                       </Field>
                       <SelectTreeField
@@ -632,7 +652,7 @@ export const JobTree = observer(
                     </>
                   )}
                 </Form>
-              </Modal>
+              </PortalModal>
             )
           })()}
         {showConfirm &&

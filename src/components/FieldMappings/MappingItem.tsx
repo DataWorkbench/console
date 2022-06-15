@@ -4,17 +4,20 @@ import { noop, isEmpty } from 'lodash-es'
 import { useDrag, useDrop, XYCoord } from 'react-dnd'
 import { useUnmount } from 'react-use'
 import tw, { styled, css } from 'twin.macro'
-import { Button, Form, Icon, Input, Menu } from '@QCFE/lego-ui'
+import { Button, Form, Input, Menu } from '@QCFE/lego-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { Tooltip } from 'components/Tooltip'
 import { nameMatchRegex } from 'utils/convert'
 import Tippy from '@tippyjs/react'
 import { useImmer } from 'use-immer'
+import { TextEllipsis } from 'components/TextEllipsis'
+import { isDarkTheme } from 'utils/theme'
 import { fieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
 export type TMappingField = {
   type: string
@@ -48,6 +51,7 @@ export const FieldRow = styled('div')(
     isReverse?: boolean
   }) => [
     tw`flex flex-wrap border-b border-neut-13 last:border-b-0 p-1.5`,
+    !isEditing && tw`flex-nowrap`,
     isReverse && tw`flex-row-reverse`,
     isHeader ? tw`bg-neut-16` : tw`hover:bg-[#1E2F41] `,
     isDragging && tw`bg-green-4/10!`,
@@ -271,24 +275,24 @@ const MappingItem = (props: MappingItemProps) => {
       menuItems = [
         {
           key: 'edit',
-          icon: 'pen',
+          icon: 'if-pen',
           text: '编辑',
         },
         {
           key: 'constant',
-          icon: 'pen',
+          icon: 'q-counterFill',
           text: '设置常量',
         },
         {
           key: 'parse',
-          icon: 'pen',
+          icon: 'q-textFill',
           text: '时间转换',
         },
       ]
     }
     menuItems.push({
       key: 'delete',
-      icon: 'trash',
+      icon: 'if-trash',
       text: '删除',
     })
     return (
@@ -300,7 +304,7 @@ const MappingItem = (props: MappingItemProps) => {
           >
             {menuItems.map((i) => (
               <MenuItem key={i.key}>
-                <Icon icon={i.icon} />
+                <Icon name={i.icon} type="light" />
                 {i.text}
               </MenuItem>
             ))}
@@ -368,7 +372,7 @@ const MappingItem = (props: MappingItemProps) => {
             />
             <div tw="text-neut-8">
               {popuState === 'constant'
-                ? '常量字段值'
+                ? '当字段值为 null 时，会返回此 value 值'
                 : '将字段类型转为日期格式返回'}
             </div>
           </>
@@ -420,7 +424,7 @@ const MappingItem = (props: MappingItemProps) => {
               options={
                 typeName
                   ? fieldTypeMapper
-                      .get(typeName)
+                      .get(typeName.toString())
                       ?.map((v) => ({ label: v, value: v }))
                   : []
               }
@@ -447,7 +451,7 @@ const MappingItem = (props: MappingItemProps) => {
                 },
                 {
                   rule: (v: string) => {
-                    if (exist) {
+                    if (v !== item.name && exist) {
                       return !exist(v)
                     }
                     return true
@@ -535,7 +539,11 @@ const MappingItem = (props: MappingItemProps) => {
     return (
       <>
         <div>{item.type}</div>
-        <div>{item.name}</div>
+        <div tw="truncate">
+          <TextEllipsis theme={isDarkTheme() ? 'light' : 'dark'}>
+            {item.name}
+          </TextEllipsis>
+        </div>
         {itemProps.formatter && (
           <Tooltip
             hasPadding

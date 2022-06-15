@@ -18,11 +18,18 @@ export interface IInstanceNameProps {
 }
 
 const Circle = styled(Center)(
-  ({ theme = 'dark' }: { theme: 'dark' | 'light' }) => {
+  ({
+    theme = 'dark',
+    iconHasBorder = true,
+  }: {
+    theme: 'dark' | 'light'
+    iconHasBorder: boolean
+  }) => {
     return [
       tw`box-content rounded-full w-6 h-6`,
       theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
       theme === 'light' && tw`bg-neut-2 border-white`,
+      iconHasBorder && tw`border`,
     ]
   }
 )
@@ -53,6 +60,7 @@ export const InstanceName: FC<IInstanceNameProps> = (props) => {
     iconClassName,
     onClick,
     iconSize = 'medium',
+    iconHasBorder = true,
   } = props
   return (
     <FlexBox
@@ -67,6 +75,7 @@ export const InstanceName: FC<IInstanceNameProps> = (props) => {
           css={getIconSize({ size: iconSize! })?.container}
           theme={theme}
           className="instance-name-icon"
+          iconHasBorder={iconHasBorder}
         >
           <Icon
             name={icon}
