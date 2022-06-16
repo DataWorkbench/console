@@ -84,7 +84,7 @@ module.exports = {
       },
       gridTemplateColumns: {
         // Simple 8 row grid
-        'workspace': 'repeat(auto-fit, minmax(400px, 1fr))',
+        'workspace': 'repeat(auto-fill, minmax(400px, 1fr))',
       },
     },
   },
