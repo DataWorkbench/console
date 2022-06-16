@@ -6,7 +6,7 @@ import { Button, CopyText, Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { Collapse, Tabs } from '@QCFE/lego-ui'
 import { Card } from 'components/Card'
 import { Center } from 'components/Center'
-import { Circle, StreamReleaseStatusCmp } from 'views/Space/Ops/styledComponents'
+import { Circle } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
 import LinkInstance from 'views/Space/Ops/components/LinkInstance'
 import Cluster from 'views/Space/Ops/components/Cluster'
@@ -191,7 +191,10 @@ const StreamReleaseDetail = observer(({ id, version }: { id: string; version: st
             <div tw="flex-auto">
               <div tw="text-white">
                 <span tw="mr-3">{data?.name}</span>
-                <StreamReleaseStatusCmp type={data?.status as 1} tw="inline-flex" />
+                {/* <StreamReleaseStatusCmp */}
+                {/*   type={data?.status as 1} */}
+                {/*   tw="inline-flex" */}
+                {/* /> */}
               </div>
               <div tw="text-neut-8">{data?.id}</div>
             </div>
@@ -241,9 +244,9 @@ const StreamReleaseDetail = observer(({ id, version }: { id: string; version: st
             </GridItem>
 
             <GridItem labelWidth={84}>
-              <span>最近发布时间:</span>
+              <span>发布时间:</span>
               <span>{dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
-              <span>发布描述:</span>
+              <span>作业描述:</span>
               <span>{data?.desc}</span>
             </GridItem>
           </div>

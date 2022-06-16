@@ -64,12 +64,13 @@ export const formatBytes = (bytes: number, decimals: number) => {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-export const timeFormat = (_time: number) => {
-  if (_time < 1000) {
-    return `${_time}毫秒`
-  }
-  const time = _time / 1000
-  const minute = Math.floor(time / 60)
-  const second = Math.floor(_time % 6000) / 1000
-  return minute ? `${minute} 分 ${second} 秒` : `${second} 秒`
-}
+export const timeFormat = (_time: number) => 
+  // if (_time < 1000) {
+  //   return `${_time}毫秒`
+  // }
+  // const time = _time / 1000
+  // const minute = Math.floor(time / 60)
+  // const second = Math.floor(_time % 6000) / 1000
+  // return minute ? `${minute} 分 ${second} 秒` : `${second} 秒`
+   dayjs(_time).fromNow()
+

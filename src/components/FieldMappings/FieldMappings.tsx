@@ -26,7 +26,7 @@ import { PopConfirm } from '../PopConfirm'
 
 /* @refresh reset */
 const styles = {
-  wrapper: tw`border flex-1 border-neut-13 w-[40%] min-w-[540px]`,
+  wrapper: tw`border flex-1 border-neut-13 w-[40%]`,
   fieldType: tw`w-44 pl-5 xl:pl-12`,
   row: tw`flex border-b border-neut-13 last:border-b-0 p-1.5`,
   // row: tw`grid grid-template-columns[1fr 1.5fr 48px] text-left border-b border-neut-13 last:border-b-0 p-1.5`,
@@ -666,14 +666,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <div>目标表字段</div>
               </FieldRow>
               {rightFields.map((item, i) => (
-                  <MappingItem
-                    jsplumb={jsPlumbInstRef.current}
-                    key={item.name}
-                    anchor="Left"
-                    item={item}
-                    index={i}
-                  />
-                ))}
+                <MappingItem
+                  jsplumb={jsPlumbInstRef.current}
+                  key={item.name}
+                  anchor="Left"
+                  item={item}
+                  index={i}
+                />
+              ))}
             </div>
           ) : (
             <EmptyFieldWrapper>选择目的端数据源表（可获取表结构）后显示字段</EmptyFieldWrapper>

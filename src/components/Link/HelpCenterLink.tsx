@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 import { Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
-import { getHelpCenterLink } from 'utils'
+import { getHelpCenterLink, getHelpCenterLinkWithNullHost } from 'utils'
 import { TextLink } from './TextLink'
 
 interface LinkInterface {
@@ -13,10 +13,7 @@ const HelpCenterLink = (
   props: PropsWithChildren<
     Partial<
       LinkInterface &
-        React.DetailedHTMLProps<
-          React.AnchorHTMLAttributes<HTMLAnchorElement>,
-          HTMLAnchorElement
-        >
+        React.DetailedHTMLProps<React.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>
     >
   >
 ) => {
@@ -24,21 +21,21 @@ const HelpCenterLink = (
 
   const handleOpenHelpCenter = (link: string) => {
     const openModal = Modal.open(HelpCenterModal, {
-      link: getHelpCenterLink(link),
-      onCancel: () => Modal.close(openModal),
+      link: getHelpCenterLinkWithNullHost(link),
+      onCancel: () => Modal.close(openModal)
     })
   }
   const linkProps: any = isIframe
     ? {
         onClick: () => href && handleOpenHelpCenter(href),
         hasIcon: false,
-        ...rest,
+        ...rest
       }
     : {
         href: href ? getHelpCenterLink(href) : '###',
         target: '_blank',
         hasIcon: true,
-        ...rest,
+        ...rest
       }
   return <TextLink linkType={isIframe ? 'button' : 'a'} {...linkProps} />
 }

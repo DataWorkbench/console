@@ -1,12 +1,7 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Center, FlexBox, Modal } from 'components'
-import {
-  Icon,
-  Notification as Notify,
-  Button,
-  Loading,
-} from '@QCFE/qingcloud-portal-ui'
+import { Icon, Notification as Notify, Button, Loading } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
 import { Prompt, useHistory } from 'react-router-dom'
 import tw, { styled, theme, css } from 'twin.macro'
@@ -24,11 +19,12 @@ import {
   useMutationStreamJobCodeSyntax,
   useMutationStreamJobCodeRun,
   getFlowKey,
-  useStore,
+  useStore
 } from 'hooks'
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
+import { timeFormat } from 'utils/convert'
 import { JobToolBar } from '../styled'
 import ReleaseModal from '../Modal/ReleaseModal'
 import VersionHeader from '../Version/VersionHeader'
@@ -36,23 +32,21 @@ import VersionHeader from '../Version/VersionHeader'
 const CODETYPE = {
   2: 'sql',
   4: 'python',
-  5: 'scala',
+  5: 'scala'
 }
 
-const SyntaxBox = styled(Center)(
-  ({ isBigger = false }: { isBigger?: boolean }) => [
-    tw`fixed-center backdrop-blur-sm text-center bg-neut-20 bg-opacity-60  rounded-md text-neut-8 transition-all`,
-    isBigger ? tw`w-[600px] h-[386px]` : tw`w-96 h-60`,
-    css`
-      .simplebar-scrollbar:before {
-        ${tw`bg-neut-8`}
-      }
-      .portal-loading .circle span {
-        ${tw`bg-white`}
-      }
-    `,
-  ]
-)
+const SyntaxBox = styled(Center)(({ isBigger = false }: { isBigger?: boolean }) => [
+  tw`fixed-center backdrop-blur-sm text-center bg-neut-20 bg-opacity-60  rounded-md text-neut-8 transition-all`,
+  isBigger ? tw`w-[600px] h-[386px]` : tw`w-96 h-60`,
+  css`
+    .simplebar-scrollbar:before {
+      ${tw`bg-neut-8`}
+    }
+    .portal-loading .circle span {
+      ${tw`bg-white`}
+    }
+  `
+])
 
 interface IProp {
   /** 2: SQL 4: Python 5: Scala */
@@ -62,7 +56,7 @@ interface IProp {
 const StreamCode = observer(({ tp }: IProp) => {
   const {
     workFlowStore,
-    workFlowStore: { curJob, curVersion, showSaveJobConfirm },
+    workFlowStore: { curJob, curVersion, showSaveJobConfirm }
   } = useStore()
   const readOnly = !!curVersion
 
@@ -141,7 +135,7 @@ def main(args: Array[String]): Unit = {
     Notify.warning({
       title: '操作提示',
       content: '请先填写代码',
-      placement: 'bottomRight',
+      placement: 'bottomRight'
     })
   }
 
@@ -154,16 +148,12 @@ def main(args: Array[String]): Unit = {
         },
         onError: () => {
           setShowRunLog(true)
-        },
+        }
       }
     )
   }
 
-  const mutateCodeData = (
-    op: 'codeSave' | 'codeSyntax',
-    cb?: () => void,
-    hideNotify = false
-  ) => {
+  const mutateCodeData = (op: 'codeSave' | 'codeSyntax', cb?: () => void, hideNotify = false) => {
     const code = trim(editorRef.current?.getValue())
     if (code === '') {
       showWarn()
@@ -183,9 +173,9 @@ def main(args: Array[String]): Unit = {
     opMutation.mutate(
       {
         [codeName]: {
-          code,
+          code
         },
-        type: tp,
+        type: tp
       },
       {
         onSuccess: (ret: any) => {
@@ -203,14 +193,16 @@ def main(args: Array[String]): Unit = {
           setSyntaxState((draft) => {
             draft.errMsg = ''
           })
-          queryClient.invalidateQueries(getFlowKey('streamJobCode'))
+          if (isSaveOp) {
+            queryClient.invalidateQueries(getFlowKey('streamJobCode'))
+          }
           setEnableRelease(true)
           setShowPlaceholder(false)
           if (!hideNotify) {
             Notify.success({
               title: '操作提示',
               content: isSaveOp ? '代码保存成功' : '语法检查成功',
-              placement: 'bottomRight',
+              placement: 'bottomRight'
             })
           }
           if (cb) {
@@ -223,7 +215,7 @@ def main(args: Array[String]): Unit = {
             draft.showBox = false
             draft.errMsg = ''
           })
-        },
+        }
       }
     )
   }
@@ -248,8 +240,8 @@ def main(args: Array[String]): Unit = {
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': theme('colors.neut.18'),
-      },
+        'editor.background': theme('colors.neut.18')
+      }
     })
     let mod: any = null
     if (tp === 2) {
@@ -265,16 +257,13 @@ def main(args: Array[String]): Unit = {
       monaco.languages.setLanguageConfiguration(codeName, conf)
       monaco.languages.registerCompletionItemProvider(codeName, {
         provideCompletionItems: () => ({
-          suggestions: keywords.map((value: string) => {
-            return {
+          suggestions: keywords.map((value: string) => ({
               label: value,
               kind: monaco.languages.CompletionItemKind.Keyword,
               insertText: value,
-              insertTextRules:
-                monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            }
-          }),
-        }),
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+            }))
+        })
       })
     }
   }
@@ -295,9 +284,7 @@ def main(args: Array[String]): Unit = {
       }
     })
     // eslint-disable-next-line no-bitwise
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
-      mutateCodeData('codeSave')
-    )
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => mutateCodeData('codeSave'))
   }
 
   const handleEditorChange = (v: string) => {
@@ -306,7 +293,7 @@ def main(args: Array[String]): Unit = {
       isDirty = false
     }
     workFlowStore.set({
-      isDirty,
+      isDirty
     })
   }
 
@@ -346,7 +333,7 @@ def main(args: Array[String]): Unit = {
 
   useUnmount(() => {
     workFlowStore.set({
-      showNotify: false,
+      showNotify: false
     })
     workFlowStore.resetNeedSave()
   })
@@ -356,7 +343,7 @@ def main(args: Array[String]): Unit = {
   const handleReleaseSuccess = () => {
     toggleShow(false)
     workFlowStore.set({
-      showNotify: true,
+      showNotify: true
     })
   }
 
@@ -381,19 +368,12 @@ def main(args: Array[String]): Unit = {
               语法检查
             </Button>
             {false && (
-              <Button
-                type="black"
-                onClick={handleRun}
-                loading={runMutation.isLoading}
-              >
+              <Button type="black" onClick={handleRun} loading={runMutation.isLoading}>
                 <Icon name="triangle-right" type="light" />
                 运行
               </Button>
             )}
-            <Button
-              onClick={() => mutateCodeData('codeSave')}
-              loading={mutation.isLoading}
-            >
+            <Button onClick={() => mutateCodeData('codeSave')} loading={mutation.isLoading}>
               <Icon name="data" />
               保存
             </Button>
@@ -406,6 +386,11 @@ def main(args: Array[String]): Unit = {
               <Icon name="export" />
               发布
             </Button>
+            {!!get(data, 'updated') && (
+              <span tw="flex-auto text-right text-font">
+                最后更新时间：{timeFormat(get(data, 'updated') * 1000)}
+              </span>
+            )}
           </JobToolBar>
         )}
         <div tw="flex-1 relative overflow-hidden flex flex-col">
@@ -423,7 +408,7 @@ def main(args: Array[String]): Unit = {
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               automaticLayout: true,
-              readOnly,
+              readOnly
             }}
             editorWillMount={handleEditorWillMount}
             editorDidMount={handleEditorDidMount}
@@ -446,33 +431,22 @@ def main(args: Array[String]): Unit = {
           okText="调度配置"
           onOk={() => {
             workFlowStore.set({
-              showScheSetting: true,
+              showScheSetting: true
             })
             // setShowScheSettingModal(true)
             toggleScheModal(false)
           }}
         >
           <div tw="flex">
-            <Icon
-              name="exclamation"
-              color={{ secondary: '#F5C414' }}
-              size={20}
-            />
+            <Icon name="exclamation" color={{ secondary: '#F5C414' }} size={20} />
             <div tw="ml-3">
               <div tw="text-base">尚未配置调度任务</div>
-              <div tw="mt-2 text-neut-8">
-                发布调度任务前，请先完成调度配置，否则无法发布
-              </div>
+              <div tw="mt-2 text-neut-8">发布调度任务前，请先完成调度配置，否则无法发布</div>
             </div>
           </div>
         </Modal>
       )}
-      {show && (
-        <ReleaseModal
-          onSuccess={handleReleaseSuccess}
-          onCancel={() => toggleShow(false)}
-        />
-      )}
+      {show && <ReleaseModal onSuccess={handleReleaseSuccess} onCancel={() => toggleShow(false)} />}
       {showRunLog && boxDimensions.height && (
         <Rnd
           tw="z-[999] bg-neut-20 text-white border border-neut-15 rounded-t-sm"
@@ -482,7 +456,7 @@ def main(args: Array[String]): Unit = {
             width: '100%',
             height: 384,
             x: 0,
-            y: boxDimensions.height - 384,
+            y: boxDimensions.height - 384
           }}
           dragHandleClassName="runlog-toolbar"
         >
@@ -491,10 +465,7 @@ def main(args: Array[String]): Unit = {
               运行日志
             </div>
             <div>
-              <Center
-                tw="select-text cursor-pointer"
-                onClick={() => setShowRunLog(false)}
-              >
+              <Center tw="select-text cursor-pointer" onClick={() => setShowRunLog(false)}>
                 <Icon name="close" type="light" />
                 关闭面板
               </Center>
@@ -528,9 +499,7 @@ def main(args: Array[String]): Unit = {
                 不保存
               </Button>
               <div>
-                <Button onClick={() => workFlowStore.hideSaveConfirm()}>
-                  取消
-                </Button>
+                <Button onClick={() => workFlowStore.hideSaveConfirm()}>取消</Button>
                 <Button
                   type="primary"
                   loading={mutation.isLoading}
@@ -552,31 +521,23 @@ def main(args: Array[String]): Unit = {
           }
         >
           <div tw="flex">
-            <Icon
-              name="exclamation"
-              color={{ secondary: '#F5C414' }}
-              size={20}
-            />
+            <Icon name="exclamation" color={{ secondary: '#F5C414' }} size={20} />
             <div tw="ml-3">
               <div tw="text-base">尚未保存</div>
-              <div tw="mt-2 text-neut-8">
-                未保存时刷新、离开，将丢失已输入内容
-              </div>
+              <div tw="mt-2 text-neut-8">未保存时刷新、离开，将丢失已输入内容</div>
             </div>
           </div>
         </Modal>
       )}
       <Prompt when={workFlowStore.isDirty} message={handlePrompt} />
       {syntaxState.showBox && (
-        <SyntaxBox
-          isBigger={syntaxMutation.isSuccess && syntaxState.errMsg !== ''}
-        >
+        <SyntaxBox isBigger={syntaxMutation.isSuccess && syntaxState.errMsg !== ''}>
           <div tw="absolute right-2 top-2">
             <Icon
               name="close"
               type="dark"
               color={{
-                primary: theme('colors.white'),
+                primary: theme('colors.white')
               }}
               tw="cursor-pointer"
               onClick={() => {
@@ -602,7 +563,7 @@ def main(args: Array[String]): Unit = {
                     size={40}
                     color={{
                       primary: theme('colors.green.11'),
-                      secondary: '#9DDFC9',
+                      secondary: '#9DDFC9'
                     }}
                   />
                   <div>检查完毕，未发现语法错误</div>
@@ -614,7 +575,7 @@ def main(args: Array[String]): Unit = {
                     size={30}
                     color={{
                       primary: theme('colors.white'),
-                      secondary: theme('colors.blue.10'),
+                      secondary: theme('colors.blue.10')
                     }}
                   />
                   <SimpleBar

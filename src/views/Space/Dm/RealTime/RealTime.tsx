@@ -1,10 +1,5 @@
 import { useMemo } from 'react'
-import {
-  useMount,
-  useUnmount,
-  useLocalStorage,
-  useUpdateEffect,
-} from 'react-use'
+import { useMount, useUnmount, useLocalStorage, useUpdateEffect } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import tw, { css, theme } from 'twin.macro'
 import { useStore } from 'stores'
@@ -22,12 +17,9 @@ const RealTime = observer(() => {
   const { spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const {
     workFlowStore,
-    workFlowStore: { curJob, curVersion },
+    workFlowStore: { curJob, curVersion }
   } = useStore()
-  const [sideCollapsed, setSideCollapsed] = useLocalStorage(
-    'NAV_SIDER_COLLAPSED',
-    false
-  )
+  const [sideCollapsed, setSideCollapsed] = useLocalStorage('NAV_SIDER_COLLAPSED', false)
 
   useUpdateEffect(() => {
     workFlowStore.set({ panels: [], curJob: null, curVersion: null })
@@ -38,7 +30,7 @@ const RealTime = observer(() => {
       panels: [],
       curJob: null,
       curViewJobId: null,
-      curVersion: null,
+      curVersion: null
     })
   })
   useMount(() => {
@@ -49,23 +41,11 @@ const RealTime = observer(() => {
   })
 
   const steps = useMemo(
-    () => [
-      '创建作业',
-      '编辑 SQL',
-      '测试运行',
-      '提交、发布',
-      '查看任务以及运维',
-    ],
+    () => ['创建作业', '编辑作业', '调度设置', '提交、发布', '查看任务以及运维'],
     []
   )
 
-  const renderStep = (
-    step: string,
-    i: number,
-    hasArrow = true,
-    reverse = false
-  ) => {
-    return (
+  const renderStep = (step: string, i: number, hasArrow = true, reverse = false) => (
       <Center key={step} css={[reverse && tw`flex-row-reverse`]}>
         <Center>
           <div tw="inline-flex justify-center items-center bg-neut-16  rounded-full w-4 h-4 mr-2">
@@ -82,17 +62,14 @@ const RealTime = observer(() => {
                 css`
                   border-top: 4px solid transparent;
                   border-bottom: 4px solid transparent;
-                  border-${reverse ? 'right' : 'left'}: 4px solid ${theme(
-                  'colors.line.dark'
-                )};
-                `,
+                  border-${reverse ? 'right' : 'left'}: 4px solid ${theme('colors.line.dark')};
+                `
               ]}
             />
           </Center>
         )}
       </Center>
     )
-  }
   const showVersion = curVersion && curJob?.id === curVersion.id
   if (showVersion) {
     return (
@@ -122,9 +99,7 @@ const RealTime = observer(() => {
               <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
                 <div tw="space-y-2">
                   <FlexBox tw="space-x-1">
-                    {steps
-                      .slice(0, 3)
-                      .map((step, i) => renderStep(step, i, i !== 2))}
+                    {steps.slice(0, 3).map((step, i) => renderStep(step, i, i !== 2))}
                   </FlexBox>
                   <FlexBox tw="justify-end">
                     <div tw="flex flex-col items-center pr-5">
@@ -140,11 +115,7 @@ const RealTime = observer(() => {
                     </div>
                   </FlexBox>
                   <FlexBox tw="space-x-1 flex-row-reverse">
-                    {steps
-                      .slice(3)
-                      .map((step, i) =>
-                        renderStep(step, i + 3, i + 3 !== 4, true)
-                      )}
+                    {steps.slice(3).map((step, i) => renderStep(step, i + 3, i + 3 !== 4, true))}
                   </FlexBox>
                 </div>
               </Center>

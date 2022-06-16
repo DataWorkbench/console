@@ -401,3 +401,29 @@ export const renderIcon = (props) => {
     </IconWrapper>
   )
 }
+
+export const getTag = (job) => {
+  const { jobMode } = job
+
+  const type = get(job, 'type')
+  let iconName = 'FolderFill'
+
+  if (jobMode === JobMode.DI) {
+    if (getDiJobType(type) === JobType.OFFLINE) {
+      iconName = 'DownloadBoxFill'
+    } else {
+      iconName = 'LayerFill'
+    }
+  } else if (type === JobType.JAR) {
+    iconName = 'JavaFill'
+  } else if (type === JobType.PYTHON) {
+    iconName = 'PythonFill'
+  } else if (type === JobType.SQL) {
+    iconName = 'sql'
+  }
+  return (
+    <IconWrapper theme="grey">
+      <Icons name={iconName} size={16} />
+    </IconWrapper>
+  )
+}

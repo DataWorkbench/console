@@ -127,14 +127,20 @@ const WorkSpace = observer(
       {
         regionId: stateStore.curRegionId
       },
-      { enabled: !!stateStore.curRegionId, staleTime: 12 * 60 * 60 * 1000 }
+      { enabled: !!stateStore.curRegionId },
+      1000 * 60 * 60 * 24 * 30
     )
 
     useEffect(() => {
       stateStore.set({
         platformConfig: platform
       })
-      lodashSet(window, 'GLOBAL_CONFIG.new_docs_url', platform?.documents_address)
+      let url = platform?.documents_address ?? ''
+      if (!url.includes('//')) {
+        url = `//${url}`
+      }
+      lodashSet(window, 'GLOBAL_CONFIG.new_docs_url', url)
+      lodashSet(window, 'GLOBAL_CONFIG.docs_center_url', url)
       const { defaultFuncList } = workSpaceStore
       workSpaceStore.set({
         funcList: collect(

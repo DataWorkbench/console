@@ -29,9 +29,7 @@ const addKey = (items: string[] | Record<'value' | 'key', string>[]) =>
 
 export const SqlGroup = forwardRef((props: SqlGroupProps, ref) => {
   const { value: valueProps, placeholder, size = 1, onChange } = props
-  const [value, setValue] = useImmer(
-    addKey(valueProps || new Array(size).fill(''))
-  )
+  const [value, setValue] = useImmer(addKey(valueProps || new Array(size).fill('')))
 
   useImperativeHandle(ref, () => ({}))
 
@@ -76,14 +74,17 @@ export const SqlGroup = forwardRef((props: SqlGroupProps, ref) => {
               })
             }}
           />
-          {index !== 0 && (
+          {statements.length > 1 && (
             <PopConfirm
               content="确认删除该条语句？"
-              onOk={() =>
+              onOk={() => {
                 setValue((draft) => {
                   draft.splice(index, 1)
                 })
-              }
+                if (onChange) {
+                  onChange(statements.filter((st, i) => i !== index).map((st) => st.value))
+                }
+              }}
               appendTo="parent"
               twChild={css`
                 &[aria-expanded='true'] .icon {

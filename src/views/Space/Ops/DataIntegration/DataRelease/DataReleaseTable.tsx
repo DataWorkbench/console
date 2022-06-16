@@ -226,7 +226,10 @@ const DataRelease = observer(() => {
       spaceId,
       jobId: key,
       limit: 12,
-      offset: 0
+      offset: 0,
+      verbose: 1,
+      sort_by: 'updated',
+      reverse: filter.reverse
     }).then((res) => {
       const arr = res.infos
         ?.filter((item: Record<string, any>) => item.version !== version)

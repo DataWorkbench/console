@@ -238,16 +238,18 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            <MoreAction
-              items={dataReleaseDetailActions.filter(filterActionFn).map((i) => ({
-                ...i,
-                value: data
-              }))}
-              type="button"
-              buttonText="更多操作"
-              placement="bottom-start"
-              onMenuClick={handleAction}
-            />
+            {false && (
+              <MoreAction
+                items={dataReleaseDetailActions.filter(filterActionFn).map((i) => ({
+                  ...i,
+                  value: data
+                }))}
+                type="button"
+                buttonText="更多操作"
+                placement="bottom-start"
+                onMenuClick={handleAction}
+              />
+            )}
 
             <Button
               onClick={() => {
@@ -334,11 +336,13 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             </GridItem>
 
             <GridItem labelWidth={84}>
-              <span>生效时间:</span>
-              <span>{dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
-              <span>最近发布时间:</span>
+              {/* <span>生效时间:</span> */}
+              {/* <span> */}
+              {/*   {dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')} */}
+              {/* </span> */}
+              <span>发布时间:</span>
               <span>{dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
-              <span>发布描述:</span>
+              <span>作业描述:</span>
               <span>{data?.desc}</span>
             </GridItem>
           </div>

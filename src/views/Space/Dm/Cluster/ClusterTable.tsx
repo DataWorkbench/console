@@ -497,7 +497,7 @@ const ClusterTable = observer(
             {selectMode ? (
               <div tw="text-neut-8">
                 如需选择新的计算集群，您可以到
-                <RouterLink to={`/${regionId}/workspace/${spaceId}/dm/cluster`}>
+                <RouterLink to={`/${regionId}/workspace/${spaceId}/dm/cluster`} tw="px-1">
                   计算集群列表
                 </RouterLink>
                 进行创建
