@@ -1,25 +1,56 @@
+import { Checkbox, Label } from '@QCFE/lego-ui'
+import { useCallback } from 'react'
 import tw, { css, styled } from 'twin.macro'
-import '@QCFE/lego-ui/lib/scss/lego-ui.min.css'
 
-import DraggableRow from './DraggableRow'
+import DraggableRow, { Row } from './DraggableRow'
 
-interface Columns<T> {
-  title: string
-  key?: keyof T
-  render?: (text: any, record: T, index: number) => React.ReactNode
-  width?: number
-  dataIndex?: string
-  align?: string | undefined
-  headRender?: (val?: T) => React.ReactNode
-}
+const CheckBoxLabel = styled(Label)(() => [
+  css`
+    ${tw`flex items-center`}
+    .checkbox::before {
+      top: 9px;
+    }
+    .checkbox.checked::after {
+      top: 12px !important;
+    }
+    .checkbox.indeterminate::after {
+      top: 12px !important;
+    }
+  `
+])
 
-export interface DargTableProps<T> {
-  columns: Columns<T>[]
-  dataSource: T[]
-  moveRow: (dragIndex: number, hoverIndex: number) => void
-  type?: string
-  renderFooter?: () => React.ReactNode
-}
+const CheckboxSpan = styled.span`
+  ${tw`ml-2 leading-4`}
+`
+const TableHeader = styled('div')(() => [
+  css`
+    ${tw`bg-neut-16! h-11 flex`}
+    div {
+      ${tw`flex items-center ml-6`}
+    }
+  `
+])
+export const TableBody = styled('div')(() => [
+  css`
+    .group {
+      & > div {
+        ${tw`flex items-center ml-6`}
+      }
+    }
+    .table-row {
+      ${tw`bg-neut-17 flex border-neut-13 p-0`}
+      &:hover {
+        ${tw`dark:bg-[#1E2F41] border-b-0!`}
+      }
+      & > div {
+        ${tw`flex items-center ml-6`}
+      }
+      &:last-child {
+        ${tw`border-b-0`}
+      }
+    }
+  `
+])
 
 export const DragTable = styled('div')(() => [
   tw`border-neut-13! border-solid border-[1px]`,
@@ -36,66 +67,133 @@ export const DragTable = styled('div')(() => [
   `
 ])
 
-const TableHeader = styled('div')(() => [
-  css`
-    ${tw`bg-neut-16! h-11 flex`}
-    div {
-      ${tw`flex items-center ml-6`}
-    }
-  `
-])
-export const TableBody = styled('div')(() => [
-  css`
-    .table-row {
-      ${tw`bg-neut-17 flex border-neut-13 p-0`}
-      &:hover {
-        ${tw`dark:bg-[#1E2F41] border-b-0`}
-      }
-      & > div {
-        ${tw`flex items-center ml-6`}
-      }
-    }
-  `
-])
-
-export function getData(item: any, key: any) {
-  const data = item[key]
-  return data === undefined || data === null || data === '' ? '-' : data
+interface Columns<T = any> {
+  title: string | React.ReactNode // 标题
+  key?: keyof T // 对应的字段名
+  render?: (text: any, record: T, index: number) => React.ReactNode // 渲染函数
+  width?: number // 宽度
+  dataIndex?: string // 对应的字段名
+  checkbox?: boolean // 是否显示checkbox
+  checkboxText?: string // checkbox显示文字
+  onSelect?: (selected: boolean, record: T, index: number) => void // 选中行回调
+  onAllSelect?: (selected: boolean, record: T, index: number) => void // 选中列回调
 }
 
-export const DargTable = (props: DargTableProps<any>) => {
-  const { columns, dataSource, type = 'DraggableBodyRow', moveRow, renderFooter } = props
+export interface DargTableProps<T = any> {
+  columns: Columns<T>[] // 列配置
+  dataSource: T[] // 数据源
+  moveRow?: (dragIndex: number, hoverIndex: number) => void // 拖拽回调
+  runDarg?: boolean // 是否可拖拽
+  type?: string // 拖拽类型
+  renderFooter?: () => React.ReactNode // 脚部渲染函数
+  rowKey: string // 行key
+}
+
+export const DargTable = (props: DargTableProps) => {
+  const {
+    columns,
+    dataSource,
+    type = 'DraggableBodyRow',
+    moveRow,
+    renderFooter,
+    runDarg = true
+  } = props
+
+  const getData = useCallback((item: any, key: any, column: Columns<any>, idx: number) => {
+    const data = item[key]
+
+    //  如果行内是复选框
+    if (column.checkbox) {
+      return (
+        <CheckBoxLabel>
+          <Checkbox
+            checked={!!data}
+            onChange={(_, checked) => {
+              if (column?.onSelect) {
+                column?.onSelect(checked, item, idx)
+              }
+            }}
+          />
+          <CheckboxSpan>{column.checkboxText}</CheckboxSpan>
+        </CheckBoxLabel>
+      )
+    }
+    return data === undefined || data === null || data === '' ? '-' : data
+  }, [])
+
+  const indeterminate = useCallback(
+    (key) => {
+      const mapData = dataSource.map((data) => data[key])
+      return mapData.filter((i) => i).length !== 0
+    },
+    [dataSource]
+  )
+
+  const allChecked = useCallback(
+    (key) => {
+      const mapData = dataSource.map((data) => data[key])
+      return mapData.filter((i) => i).length === dataSource.length
+    },
+    [dataSource]
+  )
 
   return (
     <DragTable className="darg-table" tw="border-neut-13!">
       <TableHeader className="darg-table-header">
-        {columns.map((item) => {
-          if (item.headRender) {
+        {columns.map((item, index) => (
+          <div key={item.key as string} style={item?.width ? { width: item.width } : { flex: 1 }}>
+            {item?.checkbox ? (
+              <CheckBoxLabel>
+                <Checkbox
+                  onChange={(_, checked) => {
+                    if (item?.onAllSelect) {
+                      item?.onAllSelect(checked, item, index)
+                    }
+                  }}
+                  checked={allChecked(item.key)}
+                  indeterminate={indeterminate(item.key)}
+                />
+                <CheckboxSpan>{item.title}</CheckboxSpan>
+              </CheckBoxLabel>
+            ) : (
+              item.title
+            )}
+          </div>
+        ))}
+      </TableHeader>
+      <TableBody className="darg-table-body">
+        {dataSource.map((item: any, i) => {
+          if (runDarg && moveRow) {
             return (
-              <div key={item.key as string} style={item?.width ? { width: item.width } : {}}>
-                {item.headRender()}
-              </div>
+              <DraggableRow
+                type={type}
+                index={i}
+                moveRow={moveRow}
+                key={String(i)}
+                className="group"
+              >
+                {columns.map((k, j) => (
+                  <div style={k?.width ? { width: k.width } : { flex: 1 }} key={j as number}>
+                    {k.render
+                      ? k.render && k.render(getData(item, k.key, k, i), item, i)
+                      : getData(item, k.key, k, i)}
+                  </div>
+                ))}
+              </DraggableRow>
             )
           }
           return (
-            <div key={item.key as string} style={item?.width ? { width: item.width } : {}}>
-              {item.title}
-            </div>
+            <Row key={String(i)} className="group">
+              {columns.map((k, j) => (
+                <div style={k?.width ? { width: k.width } : { flex: 1 }} key={j as number}>
+                  {k.render
+                    ? k.render && k.render(getData(item, k.key, k, i), item, i)
+                    : getData(item, k.key, k, i)}
+                </div>
+              ))}
+            </Row>
           )
         })}
-      </TableHeader>
-      <TableBody className="darg-table-body">
-        {dataSource.map((item: any, i) => (
-          <DraggableRow type={type} index={i} moveRow={moveRow} key={String(i)} className="group">
-            {columns.map((k, j) => (
-              <div style={k?.width ? { width: k.width } : {}} key={j as number}>
-                {k.render
-                  ? k.render && k.render(getData(item, k.key), item, i)
-                  : getData(item, k.key)}
-              </div>
-            ))}
-          </DraggableRow>
-        ))}
       </TableBody>
       {renderFooter?.()}
     </DragTable>

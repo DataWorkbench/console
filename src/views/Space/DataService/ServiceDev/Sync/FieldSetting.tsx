@@ -1,85 +1,22 @@
-import { Alert, Checkbox, Label } from '@QCFE/lego-ui'
-import { HelpCenterLink } from 'components'
-import { Table } from 'views/Space/DataService/ServiceDev/styled'
+import { Alert } from '@QCFE/lego-ui'
+import { HelpCenterLink, DargTable } from 'components'
+
 import { useImmer } from 'use-immer'
 import { FlexBox } from 'components/Box'
 import tw, { styled } from 'twin.macro'
 
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
-import { css } from '@emotion/react'
 
 const Root = styled.div`
   ${tw`text-white space-y-2`}
 `
 
-const CheckBoxLabel = styled(Label)(() => [
-  css`
-    ${tw`flex items-start`}
-  `
-])
-
-const HeaderCheckLabel = styled(CheckBoxLabel)(() => [
-  css`
-    ${tw`flex items-center`}
-    .checkbox::before {
-      top: 9px;
-    }
-    .checkbox.checked::after {
-      top: 12px !important;
-    }
-    .checkbox.indeterminate::after {
-      top: 12px !important;
-    }
-  `
-])
-
 const dataServciecDataSettingKey = 'DATA_SERVICE_DATA__SETTING'
-
-const CheckboxSpan = styled.span`
-  ${tw`ml-2 leading-4`}
-`
-
-const defaultColumns: IColumn[] = [
-  {
-    title: '字段名',
-    key: 'field',
-    dataIndex: 'field'
-  },
-  {
-    title: (
-      <HeaderCheckLabel>
-        <Checkbox indeterminate />
-        <CheckboxSpan>设为请求参数</CheckboxSpan>
-      </HeaderCheckLabel>
-    ),
-    key: 'isRequest',
-    dataIndex: 'isRequest'
-  },
-  {
-    title: (
-      <HeaderCheckLabel>
-        <Checkbox indeterminate={false} />
-        <CheckboxSpan>设为返回参数</CheckboxSpan>
-      </HeaderCheckLabel>
-    ),
-    key: 'isResponse',
-    dataIndex: 'isResponse'
-  },
-  {
-    title: '字段类型',
-    key: 'type',
-    dataIndex: 'type'
-  },
-  {
-    title: '描述',
-    key: 'des',
-    dataIndex: 'des'
-  }
-]
 
 const FieldOrder = () => {
   const [dataSource, setDataSource] = useImmer([
     {
+      id: 1,
       key: '1',
       field: 'sql',
       isRequest: true,
@@ -88,52 +25,77 @@ const FieldOrder = () => {
       des: ''
     },
     {
+      id: 2,
       key: '2',
       field: 'sql',
-      isRequest: true,
+      isRequest: false,
       isResponse: true,
       type: 'VARCHAR',
       des: ''
     }
   ])
 
+  const defaultColumns: IColumn[] = [
+    {
+      title: '字段名',
+      width: 100,
+      key: 'field',
+      dataIndex: 'field'
+    },
+    {
+      title: '设为请求参数',
+      key: 'isRequest',
+      dataIndex: 'isRequest',
+      checkbox: true,
+      checkboxText: '请求',
+      selectedKeys: [1, 2, 4],
+      onSelect: (checked: boolean, record: any, index: number) => {
+        setDataSource((draft) => {
+          draft[index].isRequest = checked
+        })
+      },
+      onAllSelect: (checked: boolean) => {
+        setDataSource((draft) => {
+          draft.forEach((item) => {
+            item.isRequest = checked
+          })
+        })
+      }
+    },
+    {
+      title: '设为返回参数',
+      key: 'isResponse',
+      dataIndex: 'isResponse',
+      checkbox: true,
+      checkboxText: '响应',
+      onSelect: (checked: boolean, record: any, index: number) => {
+        setDataSource((draft) => {
+          draft[index].isResponse = checked
+        })
+      },
+      onAllSelect: (checked: boolean) => {
+        setDataSource((draft) => {
+          draft.forEach((item) => {
+            item.isResponse = checked
+          })
+        })
+      }
+    },
+    {
+      title: '字段类型',
+      key: 'type',
+      dataIndex: 'type'
+    },
+    {
+      title: '描述',
+      key: 'des',
+      dataIndex: 'des'
+    }
+  ]
+
   const renderColumns = {
     field: {
       render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
-    },
-    isRequest: {
-      render: (text: boolean) => (
-        <FlexBox>
-          <CheckBoxLabel>
-            <Checkbox
-              checked={text}
-              onChange={(_, value: boolean) => {
-                setDataSource((draft) => {
-                  draft[0].isRequest = value
-                })
-              }}
-            />
-            <CheckboxSpan>请求</CheckboxSpan>
-          </CheckBoxLabel>
-        </FlexBox>
-      )
-    },
-    isResponse: {
-      render: (text: boolean) => (
-        <FlexBox>
-          <CheckBoxLabel>
-            <Checkbox
-              checked={text}
-              onChange={(_, value: boolean) => {
-                setDataSource((draft) => {
-                  draft[0].isResponse = value
-                })
-              }}
-            />
-            <CheckboxSpan>返回</CheckboxSpan>
-          </CheckBoxLabel>
-        </FlexBox>
-      )
     },
     type: {
       render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
@@ -161,7 +123,14 @@ const FieldOrder = () => {
     )
   }
 
-  return <Table columns={columns} dataSource={dataSource} rowKey="key" />
+  return (
+    <DargTable
+      columns={columns as unknown as any}
+      runDarg={false}
+      dataSource={dataSource}
+      rowKey="key"
+    />
+  )
 }
 
 export default FieldOrder

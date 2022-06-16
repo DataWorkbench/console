@@ -82,9 +82,7 @@ export default function VersionHeader() {
                   return 'Sql'
                 case 3:
                   return 'Jar'
-                case 4:
                   return 'Python'
-                case 5:
                   return 'Scala'
                 default:
                   return ''

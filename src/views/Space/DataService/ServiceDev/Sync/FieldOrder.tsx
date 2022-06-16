@@ -70,7 +70,7 @@ const FieldOrder = () => {
 
   const columns = [
     {
-      title: 'index',
+      title: '',
       dataIndex: 'index',
       key: 'index',
       width: 100,
@@ -187,7 +187,9 @@ const FieldOrder = () => {
 
   return (
     <DargTable
+      rowKey="key"
       moveRow={moveRow}
+      runDarg
       dataSource={dataSource}
       columns={columns}
       renderFooter={() => <Footer />}

@@ -9,7 +9,7 @@ export default function DeleteModal(props: any) {
     toggle,
     mutation,
     deleteData: { value: selectedList = [] },
-    success,
+    success
   } = props
 
   const [page, setPage] = useState(1)
@@ -19,12 +19,12 @@ export default function DeleteModal(props: any) {
     mutation.mutate(
       {
         op: 'delete',
-        resourceIds: Array.from(selectedList, (el: any) => el.id),
+        resourceIds: Array.from(selectedList, (el: any) => el.id)
       },
       {
         onSuccess: async () => {
           success()
-        },
+        }
       }
     )
   }
@@ -33,46 +33,42 @@ export default function DeleteModal(props: any) {
     {
       title: '程序包名称',
       dataIndex: 'name',
-      render: (_: string, row: Record<string, any>) => {
-        return (
-          <FlexBox tw="items-center space-x-1">
-            <Icon
-              tw="w-5! h-5!"
-              name="coding"
-              type="light"
-              color={{
-                primary: '#219861',
-                secondary: '#8EDABD',
-              }}
-            />
-            <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
-              <div tw="max-w-[130px] truncate">{row.name}</div>
-            </Tooltip>
-          </FlexBox>
-        )
-      },
+      render: (_: string, row: Record<string, any>) => (
+        <FlexBox tw="items-center space-x-1">
+          <Icon
+            tw="w-5! h-5!"
+            name="coding"
+            type="light"
+            color={{
+              primary: '#219861',
+              secondary: '#8EDABD'
+            }}
+          />
+          <Tooltip content={<Center tw="p-3">{row.name}</Center>}>
+            <div tw="max-w-[130px] truncate">{row.name}</div>
+          </Tooltip>
+        </FlexBox>
+      )
     },
     {
       title: 'ID',
       dataIndex: 'id',
-      render: (value: string) => <div tw="text-neut-8">{value}</div>,
+      render: (value: string) => <div tw="text-neut-8">{value}</div>
     },
     {
       title: '文件大小',
       dataIndex: 'size',
-      render: (value: number) => <>{Math.round(value / 1024)}kb</>,
+      render: (value: number) => <>{Math.round(value / 1024)}kb</>
     },
     {
       title: '描述',
       dataIndex: 'desc',
-      render: (value: string) => {
-        return (
-          <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
-            <div tw="max-w-[150px] truncate text-neut-8">{value}</div>
-          </Tooltip>
-        )
-      },
-    },
+      render: (value: string) => (
+        <Tooltip content={<Center tw="p-3 break-all">{value}</Center>}>
+          <div tw="max-w-[150px] truncate text-neut-8">{value}</div>
+        </Tooltip>
+      )
+    }
   ]
 
   return (
@@ -86,11 +82,7 @@ export default function DeleteModal(props: any) {
       footer={
         <FlexBox tw="justify-end">
           <Button onClick={toggle}>取消</Button>
-          <Button
-            type="danger"
-            loading={mutation.isLoading}
-            onClick={handleDelete}
-          >
+          <Button type="danger" loading={mutation.isLoading} onClick={handleDelete}>
             删除
           </Button>
         </FlexBox>
@@ -132,10 +124,7 @@ export default function DeleteModal(props: any) {
       <>
         {selectedList?.length > 1 && (
           <Table
-            dataSource={selectedList.slice(
-              (page - 1) * pageSize,
-              page * pageSize
-            )}
+            dataSource={selectedList.slice((page - 1) * pageSize, page * pageSize)}
             rowKey="id"
             columns={columns}
             pagination={{
@@ -147,7 +136,7 @@ export default function DeleteModal(props: any) {
               },
               onShowSizeChange: (size: number) => {
                 setPageSize(size)
-              },
+              }
             }}
           />
         )}
