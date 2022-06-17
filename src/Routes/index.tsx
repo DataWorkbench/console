@@ -40,6 +40,10 @@ const Upcloud = lazy(
   () => import(/* webpackChunkName: "space" */ 'views/Space/Upcloud')
 )
 
+const Setting = lazy(
+  () => import(/* webpackChunkName: "space" */ 'views/Space/Setting')
+)
+
 const Routes = () => {
   const { globalStore } = useStore()
 
@@ -91,6 +95,10 @@ const Routes = () => {
             <Route
               path="/:regionId/workspace/:spaceId/manage/:mod?"
               component={Manage}
+            />
+            <Route
+              path="/:regionId/workspace/:spaceId/settings/:mod?"
+              component={Setting}
             />
             <Route component={Upcloud} />
           </Switch>

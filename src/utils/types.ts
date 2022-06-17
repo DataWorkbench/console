@@ -36,4 +36,6 @@ export type WithConfig<T, R> = R extends {
 
 export type Mapping<T> = Map<T, { label: string; apiField: string }>
 
+export type Mapping1<T, K> = Map<T, { label: string; apiField: string | K }>
+
 export type MappingKey<T> = T extends Mapping<infer U> ? U : never

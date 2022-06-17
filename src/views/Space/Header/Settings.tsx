@@ -1,9 +1,45 @@
-import { Icon } from '@QCFE/lego-ui'
+import { Menu } from '@QCFE/lego-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
 import tw, { styled, css } from 'twin.macro'
 
-import { Center, Tooltip, HelpCenterLink } from 'components'
+import { Center, Tooltip, HelpCenterLink, FlexBox } from 'components'
 
+const menuList = [
+  {
+    label: '账户设置',
+    icon: 'if-default-system',
+    key: 'account',
+  },
+  {
+    label: 'api 密钥',
+    icon: 'if-key',
+    key: 'api',
+  },
+  {
+    label: '通知列表',
+    icon: 'q-listViewFill',
+    key: 'notification',
+  },
+  {
+    label: '账户安全',
+    icon: 'if-shield',
+    key: 'security',
+  },
+  {
+    label: null,
+    key: 'divider',
+  },
+  {
+    label: '退出',
+    icon: 'q-shutdownFill',
+    key: 'logout',
+  },
+]
+
+// const platformAdminMenuKeys = new Set([''])
+
+const { MenuItem } = Menu as any
 const IconBox = styled(Center)(() => {
   return [
     css`
@@ -38,7 +74,25 @@ const IconBoxWithTootip = styled(Center)(() => {
     `,
   ]
 })
-export const Settings = ({ darkMode }) => {
+
+const UserInfoWrapper = styled.div(() => [
+  css`
+    .space-user-icon {
+      ${tw`w-10 h-10 rounded-full bg-[#E2E8F0] dark:bg-[#4C5E70]`}
+    }
+    & {
+      [aria-expanded='true'],
+      &:hover {
+        .space-user-icon {
+          ${tw`bg-[#D5DEE7] dark:bg-[#1D2B3A]`}
+        }
+      }
+    }
+  `,
+])
+const UserInfo = styled(FlexBox)(() => [tw`gap-2 text-font leading-5 pr-10`])
+
+export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   // const handleOpenHelpCenter = (link: string) => {
   //   const openModal = Modal.open(HelpCenterModal, {
   //     link,
@@ -82,16 +136,64 @@ export const Settings = ({ darkMode }) => {
                 name="documentation"
                 type={darkMode ? 'light' : 'dark'}
                 changeable
-                size={20}
+                size={40}
                 tw="cursor-pointer"
               />
             </IconBox>
           </HelpCenterLink>
         </Tooltip>
       </IconBoxWithTootip>
-      <span tw="leading-5 mr-5 inline-block bg-neut-2 dark:bg-neut-13 dark:text-white px-2 py-0.5 rounded-[20px]">
-        空间创建者：{get(window, 'USER.user_name', '')}
-      </span>
+
+      <UserInfoWrapper>
+        <Tooltip
+          theme="auto"
+          trigger="click"
+          content={
+            <Menu>
+              {menuList.map((item) => {
+                if (item.key === 'divider') {
+                  return (
+                    <li
+                      key="divider"
+                      tw="h-[1px] my-1 bg-separator pointer-events-none"
+                    />
+                  )
+                }
+                return (
+                  <MenuItem key={item.key}>
+                    <>
+                      <Icon
+                        name={item.icon}
+                        type={darkMode ? 'light' : 'dark'}
+                      />
+                      {item.label}
+                    </>
+                  </MenuItem>
+                )
+              })}
+            </Menu>
+          }
+        >
+          <UserInfo>
+            <Center className="space-user-icon">
+              <Icon
+                name="q-idCardDuotone"
+                theme={darkMode ? 'dark' : 'light'}
+                size={20}
+              />
+            </Center>
+            <div>
+              <div>{get(window, 'USER.user_name', '')}</div>
+              <div>
+                {
+                  // TODO 角色
+                  '超级管理员'
+                }
+              </div>
+            </div>
+          </UserInfo>
+        </Tooltip>
+      </UserInfoWrapper>
     </Center>
   )
 }
