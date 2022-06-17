@@ -7,11 +7,6 @@ export default {
 
   notifierManage: {
     listNotifications: ['GET', '/v1/workspace/{space_id}/op/notice'],
-
-    listNotifications_copy: [
-      'GET',
-      '/v1/workspace/{space_id}/op/notice_1654143439204',
-    ],
   },
 
   iaaSProxy: {
@@ -20,26 +15,160 @@ export default {
     listIaaSRouters: ['GET', '/v1/proxy/iaas/routers'],
   },
 
-  resourceManage: {
-    deleteFiles: ['POST', '/v1/workspace/{space_id}/resource/deletes'],
+  dataServiceManage: {
+    listApiGroups: ['GET', '/v1/workspace/{space_id}/dataservice/group'],
 
-    describeFileMeta: [
-      'GET',
-      '/v1/workspace/{space_id}/resource/{resource_id}/describe',
+    abolishDataServiceApis: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/abolish',
     ],
 
-    downloadFile: [
-      'GET',
-      '/v1/workspace/{space_id}/resource/{resource_id}/download',
+    createApiGroup: ['POST', '/v1/workspace/{space_id}/dataservice/group'],
+
+    createDataServiceCluster: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/cluster',
     ],
 
-    listFileMetas: ['GET', '/v1/workspace/{space_id}/resource'],
+    deleteApiConfigs: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/config/deletes',
+    ],
 
-    reUploadFile: ['POST', '/v1/workspace/{space_id}/resource/{resource_id}'],
+    deleteApiGroups: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/group/deletes',
+    ],
 
-    updateFileMeta: ['PUT', '/v1/workspace/{space_id}/resource/{resource_id}'],
+    deleteDataServiceClusters: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/cluster/deletes',
+    ],
 
-    uploadFile: ['POST', '/v1/workspace/{space_id}/resource'],
+    describeApiConfig: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/config/{api_id}',
+    ],
+
+    describeDataServiceApiVersion: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/cluster/{ver_id}',
+    ],
+
+    describeDataServiceApiVersion: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}',
+    ],
+
+    describeDataServiceCluster: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}',
+    ],
+
+    listApiConfigs: ['GET', '/v1/workspace/{space_id}/dataservice/config'],
+
+    createApiConfig: ['POST', '/v1/workspace/{space_id}/dataservice/config'],
+
+    listDataServiceApiVersions: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/release/list/{api_id}',
+    ],
+
+    listDataServiceApiVersions: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/version/{api_id}',
+    ],
+
+    listDataServiceApis: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/group/{group_id}',
+    ],
+
+    listDataServiceClusters: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/cluster',
+    ],
+
+    publishDataServiceApi: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/release/{api_id}',
+    ],
+
+    republishDataServiceApi: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/release/{ver_id}',
+    ],
+
+    republishDataServiceApi: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}/reopen',
+    ],
+
+    testDataServiceApi: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/test/{api_id}',
+    ],
+
+    testDataServiceApi: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/config/{api_id}/test',
+    ],
+
+    updateApiConfig: [
+      'PUT',
+      '/v1/workspace/{space_id}/dataservice/config/{api_id}',
+    ],
+
+    updateDataServiceCluster: [
+      'PUT',
+      '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}',
+    ],
+  },
+
+  serviceGateway: {
+    listAuthKeys: ['POST', '/v1/workspace/{space_id}/gateway/auth/list'],
+
+    bindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/bind'],
+
+    createAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/create'],
+
+    createAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth'],
+
+    deleteAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/delete'],
+
+    deleteAuthKey: [
+      'DELETE',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
+    ],
+
+    listApiServices: ['POST', '/v1/workspace/{space_id}/gateway/service/list'],
+
+    listApiServices: ['GET', '/v1/workspace/{space_id}/gateway/service'],
+
+    bindAuthKey: [
+      'POST',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/bind',
+    ],
+
+    listAuthKeys: ['GET', '/v1/workspace/{space_id}/gateway/auth'],
+
+    listRoutes: ['POST', '/v1/workspace/{space_id}/gateway/route/list'],
+
+    listRoutes: ['GET', '/v1/workspace/{space_id}/gateway/route'],
+
+    unbindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/unbind'],
+
+    unbindAuthKey: [
+      'POST',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/unbind',
+    ],
+
+    updateAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/update'],
+
+    updateAuthKey: [
+      'PUT',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
+    ],
   },
 
   fileManage: {
