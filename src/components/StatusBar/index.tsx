@@ -71,7 +71,15 @@ const statusStyles = [
   }
 ]
 
-export const StatusBar = ({ type, label }: { type: StatusBarEnum; label: string }) => {
+export const StatusBar = ({
+  type,
+  label,
+  isWrapper = true
+}: {
+  type: StatusBarEnum
+  label: string
+  isWrapper?: boolean
+}) => {
   const styles = statusStyles.find((s) => s.type === type)
   if (!styles) {
     return null
@@ -79,7 +87,10 @@ export const StatusBar = ({ type, label }: { type: StatusBarEnum; label: string 
 
   const { wrapper, text: textStyle, out, border, bg } = styles.style
   return (
-    <div css={wrapper} tw="inline-flex gap-2 leading-5 items-center rounded-full px-1">
+    <div
+      css={isWrapper ? wrapper : ''}
+      tw="inline-flex gap-2 leading-5 items-center rounded-full px-1"
+    >
       <div css={[out]} tw="w-3 h-3 rounded-full p-0.5 inline-flex items-center">
         <div css={[border, bg]} tw="inline-block w-2 h-2 rounded-full border" />
       </div>

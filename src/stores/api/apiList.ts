@@ -360,5 +360,66 @@ export default {
     listNetworks: ['GET', '/v1/workspace/{space_id}/network'],
 
     updateNetwork: ['PUT', '/v1/workspace/{space_id}/network/{network_id}']
+  },
+  dataServiceManage: {
+    listApiGroups: ['GET', '/v1/workspace/{space_id}/dataservice/group'],
+
+    abolishDataServiceApis: ['POST', '/v1/workspace/{space_id}/dataservice/abolish'],
+
+    createApiGroup: ['POST', '/v1/workspace/{space_id}/dataservice/group'],
+
+    createDataServiceCluster: ['POST', '/v1/workspace/{space_id}/dataservice/cluster'],
+
+    deleteApiConfigs: ['POST', '/v1/workspace/{space_id}/dataservice/config/deletes'],
+
+    deleteApiGroups: ['POST', '/v1/workspace/{space_id}/dataservice/group/deletes'],
+
+    deleteDataServiceClusters: ['POST', '/v1/workspace/{space_id}/dataservice/cluster/deletes'],
+
+    describeApiConfig: ['GET', '/v1/workspace/{space_id}/dataservice/config/{api_id}'],
+
+    describeDataServiceApiVersion: ['GET', '/v1/workspace/{space_id}/dataservice/cluster/{ver_id}'],
+
+    describeDataServiceApiVersion2: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}'
+    ],
+
+    describeDataServiceCluster: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}'
+    ],
+
+    listApiConfigs: ['GET', '/v1/workspace/{space_id}/dataservice/config'],
+
+    createApiConfig: ['POST', '/v1/workspace/{space_id}/dataservice/config'],
+
+    listDataServiceApiVersions: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/release/list/{api_id}'
+    ],
+
+    listDataServiceApiVersions2: ['GET', '/v1/workspace/{space_id}/dataservice/version/{api_id}'],
+
+    listDataServiceApis: ['GET', '/v1/workspace/{space_id}/dataservice/group/{group_id}'],
+
+    listDataServiceClusters: ['GET', '/v1/workspace/{space_id}/dataservice/cluster'],
+
+    publishDataServiceApi: ['POST', '/v1/workspace/{space_id}/dataservice/release/{api_id}'],
+
+    republishDataServiceApi: ['POST', '/v1/workspace/{space_id}/dataservice/release/{ver_id}'],
+
+    republishDataServiceApi2: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}/reopen'
+    ],
+
+    testDataServiceApi: ['POST', '/v1/workspace/{space_id}/dataservice/test/{api_id}'],
+
+    testDataServiceApi2: ['POST', '/v1/workspace/{space_id}/dataservice/config/{api_id}/test'],
+
+    updateApiConfig: ['PUT', '/v1/workspace/{space_id}/dataservice/config/{api_id}'],
+
+    updateDataServiceCluster: ['PUT', '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}']
   }
 }

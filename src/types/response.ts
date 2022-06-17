@@ -9719,6 +9719,25 @@ export type PlatformManageDescribePlatformConfigType = {
   work_in_iaas: boolean
   documents_address: string
 }
+// path: GET /v1/workspace/{space_id}/dataservice/cluster
+export type DataServiceManageListDataServiceClustersType =
+  // ref: #/definitions/pbresponse.ListDataServiceClusters
+  {
+    has_more: boolean
+    infos: // ref: #/definitions/pbmodel.DataServiceCluster
+    {
+      space_id: string
+      created_by: string
+      status: number
+      created: number
+      updated: number
+      id: string
+      name: string
+      resource_spec: number
+    }[]
+    total: number
+  }
+
 export type SpaceManageDescribeWorkspaceQuotaType = {
   space_id: string
   quota_set: {

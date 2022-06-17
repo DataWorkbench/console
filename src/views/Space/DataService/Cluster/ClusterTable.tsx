@@ -2,94 +2,160 @@ import React, { useState, useEffect } from 'react'
 import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { MoreAction, FlexBox, Center, Modal, TextEllipsis, StatusBar } from 'components'
 
-import { useParams } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
-import { omitBy } from 'lodash-es'
+import { get, omitBy } from 'lodash-es'
 import dayjs from 'dayjs'
 import tw, { css } from 'twin.macro'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
 
-import { useStore, useQueryNetworks, getNetworkKey, useMutationNetwork } from 'hooks'
+import { useStore, useMutationDataServiceCluster } from 'hooks'
 import useFilter from 'hooks/useHooks/useFilter'
 
+import {
+  useQueryListDataServiceClusters,
+  ClusterListInfo,
+  getQueryKeyListDataServiceClusters
+} from 'hooks/useDataService'
 import NewClusterModal from './ClusterModal'
-import { ClusterColumns, StatusMap, streamDevModeType } from './common/constants'
+import { ClusterColumns, StatusMap, getStatusNumber, streamDevModeType } from './common/constants'
 import { ClusterFieldMapping } from './common/mappings'
 
 const { ColumnsSetting } = ToolBar as any
 
-const columnSettingsKey = 'DATAOMNIS_NETWORK_COLUMN_SETTINGS'
+const getName = (name: MappingKey<typeof ClusterFieldMapping>) =>
+  ClusterFieldMapping.get(name)!.apiField
+
+const getOptionText = (option: OP, id: string | undefined) => {
+  let text = '删除'
+  let desc = ''
+  switch (option) {
+    case 'start':
+      text = '启动'
+      desc = `确认启用服务集群名称（ID: ${id}）`
+      break
+    case 'stop':
+      text = '停用'
+      desc = `确认停用服务集群名称（ID: ${id}）`
+      break
+    case 'reload':
+      text = '重启'
+      desc = `重启过程中相关 API 不可访问，确认重启服务集群名称（ID :${id}）`
+      break
+    default:
+      text = '删除'
+      desc = `删除后无法恢复，确认删除服务集群名称（ID :${id}）`
+      break
+  }
+  return { text, desc }
+}
+
+const columnSettingsKey = 'DATA_SERVICE_CLUSTER_TABLE'
 
 const ClusterTable = observer(() => {
+  const queryClient = useQueryClient()
+
   const {
     dtsStore: { setDataServiceOp, dataServiceOp }
   } = useStore()
-
-  const [opNetworkList, setOpNetworkList] = useState<any[]>([])
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-  const { regionId } = useParams<{ regionId: string }>()
+  const [opClusterList, setOpCluster] = useState<ClusterListInfo | null>()
   const {
     filter,
     setFilter,
     pagination,
     sort,
-    getColumnFilter: getFilter
+    getColumnFilter: getFilter,
+    getColumnSort: getSort
   } = useFilter<
-    Record<ReturnType<typeof getName>, number | string>,
+    Record<ReturnType<typeof getName>, number | string | boolean>,
     { pagination: true; sort: true }
-  >({}, { pagination: true, sort: true }, columnSettingsKey)
+  >(
+    { sort_by: getName('last_updated'), reverse: true },
+    { pagination: true, sort: true },
+    columnSettingsKey
+  )
 
-  const { isFetching, isRefetching, data } = useQueryNetworks(omitBy(filter, (v) => v === ''))
+  const { isRefetching, data } = useQueryListDataServiceClusters(
+    omitBy(filter, (v) => v === '') as any
+  )
 
-  console.log(regionId, isFetching, data)
-
-  const queryClient = useQueryClient()
-  const mutation = useMutationNetwork()
+  const mutation = useMutationDataServiceCluster()
 
   useEffect(() => {
     if (dataServiceOp === '') {
-      setOpNetworkList([])
+      setOpCluster(null)
     }
   }, [dataServiceOp])
 
+  // 刷新
   const refetchData = () => {
-    queryClient.invalidateQueries(getNetworkKey())
+    queryClient.invalidateQueries(getQueryKeyListDataServiceClusters())
   }
 
   const mutateData = () => {
-    const networkIds = opNetworkList.map((o) => o.id)
-    mutation.mutate(
-      {
-        op: dataServiceOp,
-        networkIds
-      },
-      {
-        onSuccess: () => {
-          setDataServiceOp('')
-          refetchData()
-          if (dataServiceOp === 'delete') {
-            setSelectedRowKeys(selectedRowKeys.filter((k) => !networkIds.includes(k)))
-          }
-        }
+    const params = {
+      op: dataServiceOp,
+      clusterId: opClusterList?.id
+    }
+    if (dataServiceOp === 'delete') {
+      // TODO: 查服务集群对应的已发布api， 并弹出弹框
+    }
+    mutation.mutate(params, {
+      onSuccess: () => {
+        setDataServiceOp('')
+        refetchData()
       }
-    )
+    })
   }
 
-  const getName = (name: MappingKey<typeof ClusterFieldMapping>) =>
-    ClusterFieldMapping.get(name)!.apiField
-
-  const dataSource = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => ({
-    id: i,
-    name: 'item01',
-    name2: 'pod-g0ljvp7ed1r1dmxg',
-    status: 'error',
-    cu: '基础版本',
-    mode: '按需',
-    term_validity: '永久',
-    last_updated: 1579490172 + i * 10
-  }))
+  const handleMenuClick = (record: ClusterListInfo, key: string) => {
+    if (key === 'update') {
+      setOpCluster(record)
+      setDataServiceOp('update')
+    } else {
+      setOpCluster(record)
+      setDataServiceOp(key as OP)
+    }
+  }
+  const getActions = (row: ClusterListInfo) => {
+    const result = [
+      {
+        text: '恢复',
+        icon: 'restart',
+        key: 'reload',
+        value: row
+      },
+      {
+        text: '启动',
+        icon: 'start',
+        key: 'start',
+        value: row
+      },
+      {
+        text: '停用',
+        icon: 'stop',
+        key: 'stop',
+        value: row
+      },
+      {
+        text: '修改',
+        icon: 'edit',
+        key: 'update',
+        value: row,
+        help: '如需修改，请先停用服务集群'
+      },
+      {
+        text: '删除',
+        icon: 'if-trash',
+        disabled: row.status === 1,
+        key: 'delete',
+        value: row,
+        help: '如需删除，请先停用服务集群'
+      }
+    ]
+    return result
+  }
 
   const columnsRender = {
     [getName('name')]: {
@@ -99,21 +165,22 @@ const ClusterTable = observer(() => {
             className="clusterIcon"
             tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
           >
-            <Icon name="earth" type="light" />
+            <Icon name="q-dockerHubDuotone" type="light" />
           </Center>
           <div tw="truncate">
             <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>
-            <div tw="dark:text-neut-8">{row.name2}</div>
+            <div tw="dark:text-neut-8">{row.id}</div>
           </div>
         </FlexBox>
       )
     },
     [getName('status')]: {
       ...getFilter(getName('name'), streamDevModeType),
-      render: () => (
+      render: (v: number) => (
         <StatusBar
-          type={StatusMap.get('suspended')?.style}
-          label={StatusMap.get('suspended')?.label}
+          type={StatusMap.get(getStatusNumber.get(v))?.style}
+          label={StatusMap.get(getStatusNumber.get(v))?.label}
+          isWrapper={false}
         />
       )
     },
@@ -124,117 +191,26 @@ const ClusterTable = observer(() => {
       ...getFilter(getName('name'), streamDevModeType),
       render: (v: any, row: any) => <span tw="dark:text-neut-0">{row.mode}</span>
     },
-    [getName('term_validity')]: {
-      render: (v: any, row: any) => <span tw="dark:text-neut-0">{row.term_validity}</span>
+    [getName('created_time')]: {
+      render: (v: number, row: any) => (
+        <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+      )
     },
     [getName('last_updated')]: {
-      sortable: true,
-      // eslint-disable-next-line no-nested-ternary
-      sortOrder: filter.sort_by === 'last_updated' ? (filter.reverse ? 'asc' : 'desc') : '',
+      ...getSort(getName('last_updated')),
       render: (v: number, row: any) => (
         <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
       )
     }
   }
 
-  const handleMenuClick = (record: Record<string, any>, key: string) => {
-    console.log(record, key)
-  }
-  const getActions = (row: any) => {
-    const result = [
-      {
-        text: '恢复',
-        icon: 'q-rmbCircleFill',
-        key: 'recovery',
-        value: row
-      },
-      {
-        text: '启动',
-        icon: 'q-closeCircleFill',
-        key: 'start',
-        value: row
-      },
-      {
-        text: '停用',
-        icon: 'q-closeCircleFill',
-        key: 'stop',
-        value: row
-      },
-      {
-        text: '修改',
-        icon: 'q-closeCircleFill',
-        key: 'edit',
-        value: row,
-        help: '如需修改，请先停用服务集群'
-      },
-      {
-        text: '删除',
-        icon: 'q-closeCircleFill',
-        key: 'delete',
-        value: row,
-        help: '如需删除，请先停用服务集群'
-      }
-    ]
-    return result
-  }
-
   const operation = {
     title: '操作',
     dataIndex: 'operation',
     key: 'operation',
-    render: (_: never, record: Record<string, any>) => (
+    render: (_: never, record: any) => (
       <MoreAction theme="darker" items={getActions(record)} onMenuClick={handleMenuClick} />
     )
-    // render: (v: any, row: any) => (
-    //   <FlexBox tw="items-center">
-    //     <Center>
-    //       <Tooltip
-    //         trigger="click"
-    //         placement="bottom"
-    //         arrow={false}
-    //         twChild={
-    //           css`
-    //             &[aria-expanded='true'] {
-    //               ${tw`bg-line-dark`}
-    //             }
-    //             svg {
-    //               ${tw`text-white! bg-transparent! fill-[transparent]!`}
-    //             }
-    //           ` as any
-    //         }
-    //         content={
-    //           <Menu>
-    //             {(row.status === 2 || row.status === 4) && <MenuItem key="stop">停用</MenuItem>}
-    //             {row.status === 3 && <MenuItem key="start">启动</MenuItem>}
-    //             <MenuItem key="update" disabled={[2, 4].includes(row.status)}>
-    //               <AffixLabel
-    //                 required={false}
-    //                 // help="如需修改，请先停用计算集群"
-    //                 help={[2, 4].includes(row.status) && '如需修改，请先停用服务集群'}
-    //                 theme="light"
-    //               >
-    //                 修改
-    //               </AffixLabel>
-    //             </MenuItem>
-    //             <MenuItem key="delete" disabled={[2, 4].includes(row.status)}>
-    //               <AffixLabel
-    //                 required={false}
-    //                 help={[2, 4].includes(row.status) && '如需删除，请先停用服务集群'}
-    //                 theme="light"
-    //               >
-    //                 删除
-    //               </AffixLabel>
-    //             </MenuItem>
-    //           </Menu>
-    //         }
-    //       >
-    //         <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
-    //           <Icon name="more" clickable changeable type="light" size={20} />
-    //         </div>
-    //       </Tooltip>
-    //     </Center>
-    //   </FlexBox>
-    // )
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -256,7 +232,7 @@ const ClusterTable = observer(() => {
           </Center>
           <Center tw="space-x-3">
             <InputSearch
-              tw="w-64"
+              tw="w-64 border-2 rounded-sm  dark:border-neut-15"
               placeholder="请输入关键词进行搜索"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
@@ -293,54 +269,28 @@ const ClusterTable = observer(() => {
       </div>
 
       <Table
-        dataSource={dataSource}
+        dataSource={get(data, 'infos', [])}
         loading={false}
         columns={columns}
         rowKey="id"
         pagination={{
-          // total: get(data, 'total', 0),
-          total: dataSource.length,
+          total: get(data, 'total', 0),
           ...pagination
         }}
         onSort={sort}
-
-        // pagination={{
-        //   total: data?.total || 0,
-        //   current: filter.offset / filter.limit + 1,
-        //   pageSize: filter.limit,
-        //   onPageChange: (current: number) => {
-        //     setFilter((draft) => {
-        //       draft.offset = (current - 1) * filter.limit
-        //     })
-        //   },
-        //   onShowSizeChange: (size: number) => {
-        //     setFilter((draft) => {
-        //       draft.offset = 0
-        //       draft.limit = size
-        //     })
-        //   }
-        // }}
-        // selectedRowKeys={selectedRowKeys}
-        // onSelect={(keys: string[]) => {
-        //   setSelectedRowKeys(keys)
-        // }}
-        // onSort={(sortKey: any, order: string) => {
-        //   setFilter((draft) => {
-        //     draft.sort_by = sortKey
-        //     draft.reverse = order === 'asc'
-        //   })
-        // }}
       />
       {(dataServiceOp === 'create' || dataServiceOp === 'update') && (
-        <NewClusterModal opNetwork={opNetworkList[0]} />
+        <NewClusterModal opWork={opClusterList as any} />
       )}
-      {(dataServiceOp === 'start' || dataServiceOp === 'stop' || dataServiceOp === 'delete') && (
+      {(dataServiceOp === 'start' ||
+        dataServiceOp === 'stop' ||
+        dataServiceOp === 'delete' ||
+        dataServiceOp === 'reload') && (
         <Modal
           noBorder
           visible
-          width={opNetworkList.length > 1 ? 800 : 400}
+          width={400}
           onCancel={() => setDataServiceOp('')}
-          okText="删除"
           onOk={mutateData}
           footer={
             <FlexBox tw="justify-end">
@@ -350,7 +300,7 @@ const ClusterTable = observer(() => {
                 loading={mutation.isLoading}
                 onClick={mutateData}
               >
-                删除
+                {getOptionText(dataServiceOp, opClusterList?.id).text}
               </Button>
             </FlexBox>
           }
@@ -366,41 +316,18 @@ const ClusterTable = observer(() => {
             />
 
             <section tw="flex-1">
-              {(() => {
-                const opText = '删除'
-                const opNetworkLen = opNetworkList.length
-
-                const networkText =
-                  opNetworkLen === 1 ? (
-                    <>
-                      确认{opText}网络配置{opNetworkList[0].name}
-                      <span tw="text-neut-8 break-all">({opNetworkList[0].id})</span>
-                    </>
-                  ) : (
-                    <>
-                      {opText}以下{opNetworkList.length}个网络配置
-                    </>
-                  )
-                return (
-                  <>
-                    <div tw="font-medium mb-2 text-base">{networkText}注意事项</div>
-                    <div className="modal-content-message">
-                      删除网络配置后，关联该资源的内网数据源将无法正常访问，且该操作无法撤回，确认删除吗？
-                    </div>
-                  </>
-                )
-              })()}
+              {(() => (
+                <>
+                  <div tw="font-medium mb-2 text-base">{`${
+                    getOptionText(dataServiceOp, opClusterList?.id).text
+                  }服务集群${opClusterList?.id}(ID)`}</div>
+                  <div className="modal-content-message" tw="text-neut-9">
+                    {getOptionText(dataServiceOp, opClusterList?.id).desc}
+                  </div>
+                </>
+              ))()}
             </section>
           </FlexBox>
-          <>
-            {/* {opNetworkList.length > 1 && (
-                <Table
-                  dataSource={[{ name: 1 }, { name: 1 }]}
-                  rowKey="id"
-                  columns={columns}
-                />
-              )} */}
-          </>
         </Modal>
       )}
     </FlexBox>

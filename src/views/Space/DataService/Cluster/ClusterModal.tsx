@@ -1,34 +1,13 @@
-import { useCallback, useRef } from 'react'
-import {
-  Checkbox,
-  Control,
-  Field,
-  Form,
-  Icon,
-  Label,
-  Radio,
-  RadioButton,
-  RadioGroup,
-  Select
-} from '@QCFE/lego-ui'
-import { Badge } from '@QCFE/qingcloud-portal-ui'
+import { useRef } from 'react'
+import { Form, RadioButton } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import { assign } from 'lodash-es'
-import { useParams } from 'react-router-dom'
-import { Modal, FlexBox, AffixLabel, RouterLink, HelpCenterLink, TextLink } from 'components'
+import { Modal, FlexBox, AffixLabel, TextLink } from 'components'
 
-import {
-  useStore,
-  useMutationNetwork,
-  getNetworkKey,
-  // useQueryDescribeRouters,
-  // useQueryDescribeRoutersVxnets,
-  getRoutersKey,
-  getVxnetsKey
-} from 'hooks'
+import { useStore, useMutationDataServiceCluster, getQueryKeyListDataServiceClusters } from 'hooks'
 
 import { nameMatchRegex } from 'utils/convert'
 
@@ -74,7 +53,7 @@ const formStyle = {
       ${tw`w-[164px]! h-[125px]! mr-2 rounded-sm`}
       .radioBox {
         .title {
-          ${tw`text-lg w-[164px] h-[53px]  text-neut-0 mb-0 text-xs text-left border-neut-13 border-b leading-[53px] mb-[8px]`}
+          ${tw`text-lg w-[164px] h-[53px]  text-neut-0 mb-0 text-left border-neut-13 border-b leading-[53px] mb-[8px]`}
         }
         div {
           ${tw`text-left pl-3 text-neut-8`}
@@ -115,47 +94,26 @@ const formStyle = {
 
 const defaultParams = {
   name: '',
-  router_id: '',
-  vxnet_id: '',
-  optionValue: 1,
-  CU: 'base',
-  optionValue2: false,
-  optionValue3: 1,
-  optionValue4: ''
+  resource_spec: 1
 }
 
 const ClusterModal = observer(
   ({
-    opNetwork,
+    opWork,
     appendToBody = false
   }: {
-    opNetwork?: typeof defaultParams & { id?: string }
+    opWork?: typeof defaultParams & { id?: string }
     appendToBody?: boolean
   }) => {
     const {
       dtsStore: { setDataServiceOp, dataServiceOp }
-      // globalStore: { curRegionInfo }
     } = useStore()
 
-    const [params, setParams] = useImmer(opNetwork || defaultParams)
-
-    const { regionId } = useParams<{ regionId: string }>()
-    console.log(regionId)
+    const [params, setParams] = useImmer(opWork || defaultParams)
 
     const formRef = useRef<Form>(null)
     const queryClient = useQueryClient()
-    // const routersRet = useQueryDescribeRouters({
-    //   offset: 0,
-    //   limit: 10
-    // })
-    // const vxnetsRet = useQueryDescribeRoutersVxnets({
-    //   offset: 0,
-    //   limit: 200,
-    //   router: params.router_id || ''
-    // })
-    const mutation = useMutationNetwork()
-    // const routers = flatten(routersRet.data?.pages.map((page) => page.router_set || []))
-    // const vxnets = flatten(vxnetsRet.data?.pages.map((page) => page.router_vxnet_set || []))
+    const mutation = useMutationDataServiceCluster()
 
     const handleOk = () => {
       const form = formRef.current
@@ -165,33 +123,16 @@ const ClusterModal = observer(
             op: dataServiceOp,
             ...params
           },
-          opNetwork && { network_id: opNetwork.id }
+          opWork && { clusterId: opWork.id }
         )
         mutation.mutate(paramsData, {
           onSuccess: () => {
             setDataServiceOp('')
-            queryClient.invalidateQueries(getNetworkKey())
+            queryClient.invalidateQueries(getQueryKeyListDataServiceClusters())
           }
         })
       }
     }
-
-    const refetctNetwork = useCallback(
-      (getKey: () => any) => {
-        queryClient.invalidateQueries(getKey())
-      },
-      [queryClient]
-    )
-
-    const refectRouters = useCallback(() => {
-      refetctNetwork(getRoutersKey)
-    }, [refetctNetwork])
-
-    const refectVxnets = useCallback(() => {
-      refetctNetwork(getVxnetsKey)
-    }, [refetctNetwork])
-
-    console.log(refectRouters, refectVxnets)
 
     return (
       <ModalWrapper
@@ -237,10 +178,10 @@ const ClusterModal = observer(
               <RadioGroupField
                 name="schedulePolicy"
                 label={<AffixLabel>CU 规格</AffixLabel>}
-                value={params.CU}
+                value={params.resource_spec}
                 onChange={(v: string) => {
                   setParams((draft) => {
-                    draft.CU = v
+                    draft.resource_spec = Number(v)
                   })
                 }}
                 css={[formStyle.CURadioGroup]}
@@ -260,7 +201,7 @@ const ClusterModal = observer(
                   </>
                 }
               >
-                <RadioButton size="" value="base">
+                <RadioButton size="" value={1}>
                   <div className="radioBox">
                     <div className="title">入门版</div>
                     <div className="maximumRequest">
@@ -274,7 +215,7 @@ const ClusterModal = observer(
                     </div>
                   </div>
                 </RadioButton>
-                <RadioButton value="base1">
+                <RadioButton value={2}>
                   <div className="radioBox">
                     <div className="title">基础版</div>
                     <div className="maximumRequest">
@@ -288,7 +229,7 @@ const ClusterModal = observer(
                     </div>
                   </div>
                 </RadioButton>
-                <RadioButton value="vip">
+                <RadioButton value={3}>
                   <div className="radioBox">
                     <div className="title">专业版</div>
                     <div className="maximumRequest">
@@ -303,7 +244,7 @@ const ClusterModal = observer(
                   </div>
                 </RadioButton>
               </RadioGroupField>
-              <RadioGroupField
+              {/* <RadioGroupField
                 name="schedulePolicy"
                 label={<AffixLabel>计费方式</AffixLabel>}
                 value={params.optionValue === 1 ? 1 : 2}
@@ -322,8 +263,8 @@ const ClusterModal = observer(
               >
                 <Radio value={2}>包年包月</Radio>
                 <Radio value={1}>按需(小时)</Radio>
-              </RadioGroupField>
-              {params.optionValue === 2 && (
+              </RadioGroupField> */}
+              {/* {params.optionValue === 2 && (
                 <RadioGroupField
                   name="schedulePolicy"
                   label={<AffixLabel>购买有效期</AffixLabel>}
@@ -348,8 +289,8 @@ const ClusterModal = observer(
                     </Badge>
                   ))}
                 </RadioGroupField>
-              )}
-              {params.optionValue === 2 && (
+              )} */}
+              {/* {params.optionValue === 2 && (
                 <Field>
                   <Label>自动续约</Label>
                   <div tw="w-[300px] relative">
@@ -408,10 +349,10 @@ const ClusterModal = observer(
                     )}
                   </div>
                 </Field>
-              )}
+              )} */}
             </Form>
           </FormWrapper>
-          <div tw="w-80 pl-5 pt-5  border-neut-13 border-l">
+          {/* <div tw="w-80 pl-5 pt-5  border-neut-13 border-l">
             <div tw="text-base font-semibold mb-4">费用预览</div>
             <div>
               <RadioGroup
@@ -451,7 +392,7 @@ const ClusterModal = observer(
                 ¥2000.21，余额可持续使用）
               </div>
             </div>
-          </div>
+          </div> */}
         </FlexBox>
       </ModalWrapper>
     )

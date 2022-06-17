@@ -2417,6 +2417,26 @@ export type UpdateAlertPolicyRequestType = {
   }
 }
 export type DescribePlatformConfigRequestType = {}
+export type ListDataServiceClustersRequestType = {
+  uri: {
+    space_id: string
+  }
+  params?: {
+    limit?: string
+    name?: string
+    offset?: string
+    reverse?: string
+    sort_by?: string
+  }
+  data?: {
+    sort_by: string
+    name: string
+    limit: number
+    reverse: boolean
+    offset: number
+  }
+}
+
 export type DescribeWorkspaceQuotaRequestType = {
   uri: {
     space_id: string
