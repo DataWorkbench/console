@@ -46,6 +46,7 @@ const Notify = observer(() => {
       <Center>
         <Button
           type="text"
+          tw="font-semibold text-brand-primary! hover:text-brand-hover!"
           onClick={() => {
             store.set({
               op: 'update',
@@ -57,6 +58,7 @@ const Notify = observer(() => {
         </Button>
         <Button
           type="text"
+          tw="font-semibold text-brand-primary! hover:text-brand-hover!"
           onClick={() => {
             store.set({
               op: 'delete',
