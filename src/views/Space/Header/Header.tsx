@@ -1,6 +1,6 @@
-import { useParams, useLocation, useHistory } from 'react-router-dom'
+import { useHistory, useLocation, useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
-import { flatten } from 'lodash-es'
+import { flatten, pick } from 'lodash-es'
 import { getShortSpaceName } from 'utils/convert'
 import { useStore } from 'stores'
 import { Center } from 'components'
@@ -26,6 +26,7 @@ export const Header = observer(() => {
   const history = useHistory()
   const {
     globalStore: { darkMode },
+    workSpaceStore: { set, space: space1 },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
@@ -55,6 +56,17 @@ export const Header = observer(() => {
   if (status === 'success' && hasNextPage) {
     fetchNextPage()
   }
+
+  useEffect(() => {
+    if (space) {
+      set({
+        space: pick(space, ['id', 'name', 'owner']),
+        spaceIndex,
+      })
+    }
+  }, [set, space, spaceIndex])
+
+  console.log(111, space1)
 
   return (
     <Root tw="z-[100]">
@@ -87,7 +99,14 @@ export const Header = observer(() => {
             value: id,
             label: name,
           }))}
-          onChange={(v) => {
+          onChange={(v, option) => {
+            set({
+              space: {
+                name: (option as Record<string, any>).label,
+                id: (option as Record<string, any>)?.value,
+              },
+            })
+
             // history.push(pathname.replace(/(?<=workspace\/)[^/]*/, String(v)))
             history.push(
               pathname.replace(/\/workspace\/[^/]*/, `/workspace/${v}`)

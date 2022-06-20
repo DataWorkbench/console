@@ -33,6 +33,9 @@ const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
 const Manage = lazy(
   () => import(/* webpackChunkName: "space" */ 'views/Space/Manage')
 )
+const Member = lazy(
+  () => import(/* webpackChunkName: "space" */ 'views/Space/Manage/Member') // 成员管理
+)
 const Ops = lazy(
   () => import(/* webpackChunkName: "space" */ 'views/Space/Ops')
 )
@@ -91,7 +94,6 @@ const Routes = () => {
               path="/:regionId/workspace/:spaceId/ops/:mod?/:detail?"
               component={Ops}
             />
-
             <Route
               path="/:regionId/workspace/:spaceId/manage/:mod?"
               component={Manage}
@@ -99,6 +101,10 @@ const Routes = () => {
             <Route
               path="/:regionId/workspace/:spaceId/settings/:mod?"
               component={Setting}
+            />
+            <Route
+              path="/:regionId/workspace/:spaceId/member"
+              component={Member}
             />
             <Route component={Upcloud} />
           </Switch>
