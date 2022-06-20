@@ -387,6 +387,7 @@ const SyncDataSource = observer(
           },
         }
         setDB(newDB)
+        sourceColumnRet.refetch()
         if (
           newDB.target.postSql?.length > 0 ||
           newDB.target.preSql?.length > 0
@@ -397,6 +398,7 @@ const SyncDataSource = observer(
           setShowSourceAdvance(true)
         }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conf, setDB, sourceTypeName, targetTypeName])
 
     // console.log(db)
