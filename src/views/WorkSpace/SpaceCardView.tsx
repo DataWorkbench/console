@@ -7,6 +7,8 @@ import { useEvent } from 'react-use'
 import { useImmer } from 'use-immer'
 import { useWorkSpaceContext } from 'contexts'
 import { useQueryWorkSpace } from 'hooks'
+import MemberModal from 'views/Space/Manage/Member/MemberModal'
+import { useMemberStore } from 'views/Space/Manage/Member/store'
 import SpaceItem from './SpaceItem'
 import SpaceListsEmpty from './SpaceListsEmpty'
 
@@ -70,8 +72,12 @@ const SpaceCardView = observer(() => {
     isFetchingNextPage,
   } = useQueryWorkSpace(filter)
 
-  const workspaces = flatten(data?.pages.map((page) => page.infos || []))
+  const memberStore = useMemberStore()
 
+  const workspaces = flatten(data?.pages.map((page) => page.infos || []))
+  const reloadWorkSpace = () => {
+    stateStore.set({ queryRefetch: true })
+  }
   const ifNoData =
     status === 'success' &&
     filter.offset === 0 &&
@@ -136,6 +142,7 @@ const SpaceCardView = observer(() => {
       <div css={[tw`h-40`, !isFetchingNextPage && tw`hidden`]}>
         <Loading size="medium" />
       </div>
+      {memberStore.op === 'create' && <MemberModal cb={reloadWorkSpace} />}
     </>
   )
 })

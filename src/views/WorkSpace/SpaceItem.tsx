@@ -1,15 +1,106 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import { Icon, Menu, Radio } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import { Box, Card, Center, FlexBox, TextEllipsis, Tooltip } from 'components'
+import {
+  Box,
+  Card,
+  Center,
+  FlexBox,
+  TextEllipsis,
+  Tooltip,
+  TextLink,
+} from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
-import { OptButton } from './styled'
+
+import { useMemberStore } from 'views/Space/Manage/Member/store'
+
+import { OptButton, roleIcon, RoleNameWrapper } from './styled'
 
 const { MenuItem, SubMenu } = Menu as any
 
+const roleList = [
+  {
+    id: 1,
+    name: '管理员',
+    // icon: 'admin',
+    icon: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    color: '#00aa72',
+    email: 'ramones@yunify.com',
+  },
+  {
+    id: 2,
+    name: '普通用户',
+    // icon: 'user',
+    color: '#a16207',
+    email: 'ramones@yunify.com',
+  },
+  {
+    id: 3,
+    name: '访客',
+    // icon: 'guest',
+    color: '#a48a19',
+    email: 'ramones@yunify.com',
+  },
+  {
+    id: 4,
+    name: '禁用',
+    // icon: 'disable',
+    color: '#a48a19',
+    email: 'ramones@yunify.com',
+  },
+]
+
+const RoleIcons = ({ list }: { list: Record<string, any>[] }) => {
+  const [hoverIndex, setHoverIndex] = useState(0)
+
+  return (
+    <div tw="flex" onMouseLeave={() => setHoverIndex(0)}>
+      {list.slice(0, 3).map((item, idx) => {
+        return (
+          <div
+            key={item.id}
+            css={roleIcon.item({
+              zIndex: list.length - Math.abs(hoverIndex - idx),
+              index: idx,
+            })}
+            onMouseMove={() => setHoverIndex(idx)}
+          >
+            <Tooltip
+              content={item.email}
+              hasPadding
+              theme="darker"
+              twChild={tw`flex`}
+            >
+              <Center tw="h-6 w-6">
+                {item.icon ? (
+                  <img src={item.icon} alt="" width={24} />
+                ) : (
+                  <Icon name="human" size={14} />
+                )}
+              </Center>
+            </Tooltip>
+          </div>
+        )
+      })}
+      {list.length > 3 && (
+        <div
+          key="others"
+          css={roleIcon.item({
+            zIndex: list.length - Math.abs(hoverIndex - 3),
+            index: 3,
+          })}
+          onMouseMove={() => setHoverIndex(3)}
+        >
+          {`+${list.length - 3}`}
+        </div>
+      )}
+    </div>
+  )
+}
 // const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
 // const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
 // const RoleIconWrapper = tw.div`w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1`
@@ -69,6 +160,8 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     workSpaceStore: { funcList },
   } = useStore()
 
+  const memberStore = useMemberStore()
+
   const handleCardClick = () => {
     if (space.status !== 1) {
       return
@@ -106,7 +199,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     }
     return (
       <>
-        {/*         
+        {/*
         <RowWrapper>
           <Box tw="space-x-1">
             <span>我的角色：</span>
@@ -142,6 +235,37 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
               </span>
             </span>
+          </div>
+        </FlexBox>
+
+        <FlexBox tw="justify-between mt-3">
+          <div>
+            <div tw="inline">我的角色：</div>
+            <RoleNameWrapper>空间所有者</RoleNameWrapper>
+          </div>
+          <div tw="flex items-center w-[180px] justify-end">
+            <div tw="inline">空间成员：</div>
+            {/* <RoleNameWrapper>空间所有者</RoleNameWrapper> */}
+            {space.roles ? (
+              <RoleIcons list={space.roles ?? roleList} />
+            ) : (
+              <TextLink
+                hasIcon={false}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  memberStore.set({
+                    op: 'create',
+                    spaceItem: {
+                      id: space.id,
+                      name: space.name,
+                      regionId,
+                    },
+                  })
+                }}
+              >
+                添加成员
+              </TextLink>
+            )}
           </div>
         </FlexBox>
       </>
