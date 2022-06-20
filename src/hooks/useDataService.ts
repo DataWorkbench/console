@@ -59,10 +59,26 @@ export const DeleteDataServiceCluster = async ({
   ...rest
 }: IParams) => {
   const params = merge(
-    { regionId, uri: { space_id: spaceId, cluster_id: clusterId } },
-    { data: rest }
+    { regionId, uri: { space_id: spaceId } },
+    { data: rest, cluster_id: [clusterId] }
   )
   return apiRequest('dataServiceManage', 'deleteDataServiceClusters')(params)
+}
+
+export const StartDataServiceCluster = async ({ regionId, spaceId, clusterId }: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId } },
+    { data: { cluster_ids: [clusterId] } }
+  )
+  return apiRequest('dataServiceManage', 'startDataServiceClusters')(params)
+}
+
+export const StopDataServiceCluster = async ({ regionId, spaceId, clusterId }: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId } },
+    { data: { cluster_ids: [clusterId] } }
+  )
+  return apiRequest('dataServiceManage', 'stopDataServiceClusters')(params)
 }
 
 export const useMutationDataServiceCluster = () => {
@@ -80,6 +96,10 @@ export const useMutationDataServiceCluster = () => {
       ret = await UpdateDataServiceCluster(params)
     } else if (op === 'delete') {
       ret = await DeleteDataServiceCluster(params)
+    } else if (op === 'start' || op === 'reload') {
+      ret = await StartDataServiceCluster(params)
+    } else if (op === 'stop') {
+      ret = await StopDataServiceCluster(params)
     }
     return ret
   })
