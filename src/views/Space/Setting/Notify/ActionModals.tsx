@@ -128,19 +128,32 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
         okType="danger"
         onOk={handleDelete}
       >
-        <FlexBox>
-          <Icon name="if-error-info" />
+        <FlexBox tw="gap-3">
+          <Icon
+            name="if-exclamation"
+            css={css`
+              color: #ffd127;
+              font-size: 22px;
+              line-height: 24px;
+            `}
+          />
           {selected.length > 1 && (
             <div>
-              <div>确定要将以下消息接收人删除吗？</div>
-              <div>消息接收人删除后将无法收到告警通知消息，请谨慎操作。</div>
+              <div tw="text-[16px] leading-6 font-semibold">
+                确定要将以下消息接收人删除吗？
+              </div>
+              <div tw="text-font-secondary">
+                消息接收人删除后将无法收到告警通知消息，请谨慎操作。
+              </div>
               <Table columns={columns} dataSource={selected} />
             </div>
           )}
           {selected.length === 1 && (
             <div>
-              <div>{`确定要将消息接收人 ${selected[0]?.receiver} 移除吗？`}</div>
-              <div>消息接收人删除后将无法收到告警通知消息，请谨慎操作。</div>
+              <div tw="text-[16px] leading-6 font-semibold">{`确定要将消息接收人 ${selected[0]?.receiver} 移除吗？`}</div>
+              <div tw="text-font-secondary">
+                消息接收人删除后将无法收到告警通知消息，请谨慎操作。
+              </div>
             </div>
           )}
         </FlexBox>

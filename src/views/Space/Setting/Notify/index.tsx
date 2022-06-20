@@ -24,6 +24,7 @@ import ActionModals from './ActionModals'
 interface INotifyStore {
   op: 'list' | 'update' | 'delete' | 'create'
   selected: Record<string, any>[]
+  selectedRowKeys: string[]
   set: (params: Record<string, any>) => void
 }
 
@@ -34,6 +35,7 @@ const Notify = observer(() => {
   const store: INotifyStore = useLocalObservable(() => ({
     op: 'list',
     selected: [],
+    selectedRowKeys: [],
     set(params: any) {
       set(this, { ...params })
     },
@@ -100,18 +102,35 @@ const Notify = observer(() => {
       <PageTab tabs={pageTabsData} />
       <Card tw="mt-5 p-5">
         <FlexBox tw="justify-between mb-5">
-          <Button
-            type="primary"
-            onClick={() => {
-              store.set({
-                op: 'create',
-                selected: [],
-              })
-            }}
-          >
-            <Icon name="add" type="light" />
-            创建
-          </Button>
+          {!store.selectedRowKeys.length ? (
+            <Button
+              type="primary"
+              onClick={() => {
+                store.set({
+                  op: 'create',
+                  selected: [],
+                })
+              }}
+            >
+              <Icon name="add" type="light" />
+              创建
+            </Button>
+          ) : (
+            <Button
+              type="danger"
+              onClick={() => {
+                store.set({
+                  selected: infos.filter((i) =>
+                    store.selectedRowKeys.includes(i.id)
+                  ),
+                  op: 'delete',
+                })
+              }}
+            >
+              <Icon name="if-trash" type="light" />
+              删除
+            </Button>
+          )}
           <FlexBox tw="gap-2">
             <InputSearch
               placeholder="请输入关键词进行搜索"
@@ -147,6 +166,13 @@ const Notify = observer(() => {
           </FlexBox>
         </FlexBox>
         <Table
+          selectType="checkbox"
+          selectedRowKeys={store.selectedRowKeys}
+          onSelect={(keys: string[]) => {
+            store.set({
+              selectedRowKeys: keys,
+            })
+          }}
           columns={columns}
           dataSource={infos}
           pagination={{
