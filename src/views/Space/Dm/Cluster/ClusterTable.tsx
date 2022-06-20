@@ -35,9 +35,25 @@ import { get, omitBy, pick, concat } from 'lodash-es'
 import dayjs from 'dayjs'
 import tw, { styled, css, theme } from 'twin.macro'
 import { useWindowSize } from 'react-use'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import ClusterModal from './ClusterModal'
 
 const { MenuItem } = Menu as any
+
+const jobType = Symbol('jobType')
+const setStreamJob = (record: object) => {
+  return {
+    ...record,
+    [jobType]: JobMode.RT,
+  }
+}
+
+const setSyncJob = (record: object) => {
+  return {
+    ...record,
+    [jobType]: JobMode.DI,
+  }
+}
 
 const TableWrapper = styled(Table)(() => [
   css`
@@ -505,6 +521,7 @@ const ClusterTable = observer(
               op: 'stop',
               jobId: job.id,
               stopRunning: get(offLineRef.current, 'stopRunning') || false,
+              type: job[jobType],
             },
             {
               onSuccess: () => {
@@ -526,8 +543,12 @@ const ClusterTable = observer(
     const { data: bindResData } = bindResourceRet
 
     const bindResDataJobs = useMemo(() => {
-      const streamJob = get(bindResData, 'infos[0].stream_job_release') || []
-      const syncJob = get(bindResData, 'infos[0].sync_job_release') || []
+      const streamJob = (
+        get(bindResData, 'infos[0].stream_job_release') || []
+      ).map(setStreamJob)
+      const syncJob = (get(bindResData, 'infos[0].sync_job_release') || []).map(
+        setSyncJob
+      )
       return concat(streamJob, syncJob)
     }, [bindResData])
     const hasBindRes = bindResDataJobs.length > 0
