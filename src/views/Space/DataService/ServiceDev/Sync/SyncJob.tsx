@@ -118,10 +118,10 @@ const SyncJob = () => {
   // const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
 
   const {
-    dtsDevStore: { curJob }
+    dtsDevStore: { curApi }
   } = useStore()
 
-  console.log(curJob)
+  console.log(curApi)
 
   // const [db, setDb] = useImmer<{
   //   source: DbInfo
@@ -154,13 +154,13 @@ const SyncJob = () => {
   // const enableRelease = get(scheData, 'schedule_policy') !== 0
 
   // const [sourceTypeName, targetTypeName] = useMemo(() => {
-  //   const sourceType = curJob?.source_type
-  //   const targetType = curJob?.target_type
+  //   const sourceType = curApi?.source_type
+  //   const targetType = curApi?.target_type
   //   return [
   //     findKey(dataSourceTypes, (v) => v === sourceType),
   //     findKey(dataSourceTypes, (v) => v === targetType)
   //   ]
-  // }, [curJob])
+  // }, [curApi])
 
   // const sourceColumn = useMemo(() => {
   //   if (confData && db.source.tableName && sourceTypeName) {

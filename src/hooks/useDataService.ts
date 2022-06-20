@@ -1,10 +1,16 @@
 import { useParams } from 'react-router-dom'
-import { useMutation } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 import { apiRequest } from 'utils/api'
 import { merge } from 'lodash-es'
+import { useCallback } from 'react'
 import { apiHooks, queryKeyObj } from './apiHooks'
-import { ListDataServiceClustersRequestType } from '../types/request'
-import { DataServiceManageListDataServiceClustersType } from '../types/response'
+import { ListApiGroupsRequestType, ListDataServiceClustersRequestType } from '../types/request'
+import {
+  DataServiceManageListDataServiceClustersType,
+  DataServiceManageListApiGroupsType
+} from '../types/response'
+
+import { PbmodelApiGroup } from '../types/types'
 
 interface IParams {
   regionId: string
@@ -56,8 +62,6 @@ export const DeleteDataServiceCluster = async ({
     { regionId, uri: { space_id: spaceId, cluster_id: clusterId } },
     { data: rest }
   )
-  console.log(params)
-
   return apiRequest('dataServiceManage', 'deleteDataServiceClusters')(params)
 }
 
@@ -79,4 +83,40 @@ export const useMutationDataServiceCluster = () => {
     }
     return ret
   })
+}
+
+/**
+ *  服务开发
+ */
+
+export const useQueryListApiGroups = apiHooks<
+  'dataServiceManage',
+  ListApiGroupsRequestType,
+  DataServiceManageListApiGroupsType
+>('dataServiceManage', 'listApiGroups')
+
+export type ListApiGroupInfo = PbmodelApiGroup
+
+export const getListApiConfigs = async ({ regionId, spaceId, clusterId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'listApiConfigs')(params)
+}
+
+export const useFetchApi = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const queryClient = useQueryClient()
+  return useCallback(
+    (filter = {}, options = {}) => {
+      const params = {
+        regionId,
+        spaceId,
+        search: '',
+        ...filter
+      }
+      return queryClient.fetchQuery(['api', params], async () => getListApiConfigs(params), {
+        ...options
+      })
+    },
+    [queryClient, regionId, spaceId]
+  )
 }

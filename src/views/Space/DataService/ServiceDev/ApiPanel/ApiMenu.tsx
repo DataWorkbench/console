@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { Menu } from '@QCFE/lego-ui'
@@ -9,7 +9,10 @@ import { Rnd } from 'react-rnd'
 import { HelpCenterLink } from 'components'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
-import { JobTree } from './JobTree'
+import { useQueryListApiGroups, useStore } from 'hooks'
+import { get } from 'lodash-es'
+import { useParams } from 'react-router-dom'
+import { ApiTree } from './ApiTree'
 import ApiGroupModal from '../Modal/ApiGroupModal'
 import ApiModal from '../Modal/ApiModal'
 
@@ -19,8 +22,8 @@ interface JobMenuProps {
 
 const { MenuItem } = Menu as any
 
-const JobMenu = observer((props: JobMenuProps) => {
-  const jobTree = useRef<{ reset: () => void; search: (v: string) => void }>(null)
+const ApiMenu = observer((props: JobMenuProps) => {
+  const apiTree = useRef<{ reset: () => void; search: (v: string) => void }>(null)
   const [isOpenHelp, setIsOpenHelp] = useState(true)
   const [visible, setVisible] = useState<boolean>()
   const [showApiGroupModal, setShowApiGroupModal] = useState<boolean>()
@@ -28,13 +31,34 @@ const JobMenu = observer((props: JobMenuProps) => {
   const showCreateModal = () => {
     setVisible(true)
   }
+  const { spaceId } = useParams<{ spaceId: string }>()
+
+  const {
+    dtsDevStore: { setTreeData }
+  } = useStore()
+
+  const { data } = useQueryListApiGroups({ uri: { space_id: spaceId } })
+
+  useEffect(() => {
+    if (data) {
+      const tree = get(data, 'infos', []).map((item) => ({
+        ...item,
+        key: item.id,
+        pid: item.id,
+        title: item.name,
+        isLeaf: false
+      }))
+      setTreeData(tree as any)
+    }
+  }, [data, setTreeData])
+
   const hideCreateModal = () => {
     setVisible(false)
   }
 
   const handleSearch = (v: string) => {
-    if (jobTree) {
-      jobTree.current?.search(v)
+    if (apiTree) {
+      apiTree.current?.search(v)
     }
   }
 
@@ -173,7 +197,7 @@ const JobMenu = observer((props: JobMenuProps) => {
           </div>
           <div tw="pt-4 flex-1 h-full overflow-y-auto">
             <SimpleBar tw="h-full">
-              <JobTree ref={jobTree} />
+              <ApiTree ref={apiTree} />
             </SimpleBar>
           </div>
         </>
@@ -183,4 +207,4 @@ const JobMenu = observer((props: JobMenuProps) => {
     </Rnd>
   )
 })
-export default JobMenu
+export default ApiMenu

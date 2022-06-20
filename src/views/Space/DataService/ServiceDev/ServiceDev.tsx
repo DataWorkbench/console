@@ -8,8 +8,8 @@ import emitter from 'utils/emitter'
 import { useParams } from 'react-router-dom'
 import { AlertStoreProvider } from 'views/Space/Ops/Alert/AlertStore'
 import { DataReleaseStoreProvider } from 'views/Space/Ops/DataIntegration/DataRelease/store'
-import JobMenu from './Job/JobMenu'
-import JobTabs from './Job/JobTabs'
+import ApiMenu from './ApiPanel/ApiMenu'
+import ApiTabs from './ApiPanel/ApiTabs'
 import StreamRightMenu from './Stream/StreamRightMenu'
 import VersionDisplay from './Version/VersionDisplay'
 
@@ -17,18 +17,18 @@ const RealTime = observer(() => {
   const { spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const {
     dtsDevStore,
-    dtsDevStore: { curJob, curVersion }
+    dtsDevStore: { curApi, curVersion }
   } = useStore()
   const [sideCollapsed, setSideCollapsed] = useLocalStorage('NAV_SIDER_COLLAPSED', false)
 
   useUpdateEffect(() => {
-    dtsDevStore.set({ panels: [], curJob: null, curVersion: null })
+    dtsDevStore.set({ panels: [], curApi: null, curVersion: null })
   }, [spaceId, dtsDevStore])
 
   useUnmount(() => {
     dtsDevStore.set({
       panels: [],
-      curJob: null,
+      curApi: null,
       curViewJobId: null,
       curVersion: null
     })
@@ -40,10 +40,7 @@ const RealTime = observer(() => {
     }
   })
 
-  const steps = useMemo(
-    () => ['创建作业', '编辑 SQL', '测试运行', '提交、发布', '查看任务以及运维'],
-    []
-  )
+  const steps = useMemo(() => ['创建 API', '编辑 API', '测试 API', '发布 API', '查看已发布API'], [])
 
   const renderStep = (step: string, i: number, hasArrow = true, reverse = false) => (
     <Center key={step} css={[reverse && tw`flex-row-reverse`]}>
@@ -62,15 +59,14 @@ const RealTime = observer(() => {
               css`
                   border-top: 4px solid transparent;
                   border-bottom: 4px solid transparent;
-                  border-${reverse ? 'right' : 'left'}: 4px solid ${theme('colors.line.dark')};
-                `
+                  border-${reverse ? 'right' : 'left'}: 4px solid ${theme('colors.line.dark')};`
             ]}
           />
         </Center>
       )}
     </Center>
   )
-  const showVersion = curVersion && curJob?.id === curVersion.id
+  const showVersion = curVersion && curApi?.id === curVersion.id
   if (showVersion) {
     return (
       <div tw="flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
@@ -84,16 +80,11 @@ const RealTime = observer(() => {
       <DataReleaseStoreProvider>
         <div tw="flex min-h-[600px] w-full h-full overflow-auto p-2 pr-0 ">
           <div tw="flex w-full">
-            <JobMenu tw="mr-2" />
-            {curJob ? (
+            <ApiMenu tw="mr-2" />
+            {curApi ? (
               <>
-                <JobTabs />
-                <StreamRightMenu
-                // showScheSetting={showScheSettingModal}
-                // onScheSettingClose={() => {
-                //   setShowScheSettingModal(false)
-                // }}
-                />
+                <ApiTabs />
+                <StreamRightMenu />
               </>
             ) : (
               <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">

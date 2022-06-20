@@ -3,49 +3,29 @@ import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
 import type RootStore from './RootStore'
 
-interface IJob {
-  id: string
-  name: string
-  /**
-   * 1 => "OfflineFull" 2 => "OfflineIncrement" 3 => "RealTime"
-   *  */
-  type: 1 | 2 | 3
-  desc: string
-  version: string
-  source_type?: number
-  target_type?: number
-  jobMode?: 'DI' | 'RT' | 'OLE'
+interface ApiProps {
+  key: string
+  api_id: string
+  api_name: string
+  api_mode: number
+  api_path: string
+  space_id: string
+  status?: number
+  [key: string]: any
 }
-
-const initTreeData = [
-  {
-    key: 'di-root',
-    pid: 'di-root',
-    title: 'API组',
-    isLeaf: false,
-    children: [
-      {
-        key: 'di-root2',
-        pid: 'di-root',
-        title: 'API',
-        isLeaf: true
-      }
-    ]
-  }
-]
 
 class WorkFlowStore {
   rootStore
 
   curViewJobId: null | string = null
 
-  curJob: null | IJob = null
+  curApi: null | ApiProps = null
 
-  curVersion: null | IJob = null
+  curVersion: null | ApiProps = null
 
   showJobModal = false
 
-  panels: IJob[] = []
+  panels: ApiProps[] = []
 
   showNotify = false
 
@@ -71,13 +51,13 @@ class WorkFlowStore {
 
   tabOp: '' | 'switch' | 'close' | 'leave' = ''
 
-  opTabName = ''
+  opTabName = '' // api_id: string
 
-  nextJob: null | IJob = null
+  nextApi: null | ApiProps = null
 
   showSaveJobConfirm = false
 
-  treeData = initTreeData
+  treeData: ApiProps[] = []
 
   loadedKeys: (string | number)[] = []
 
@@ -90,21 +70,30 @@ class WorkFlowStore {
     this.rootStore = rootStore
   }
 
-  addPanel = (panel: IJob) => {
-    const idx = findIndex(this.panels, (p) => p.id === panel.id)
+  setTreeData = (data: ApiProps[]) => {
+    this.treeData = data
+  }
+
+  addPanel = (panel: ApiProps) => {
+    const idx = findIndex(this.panels, (p) => p.api_id === panel.api_id)
     if (idx === -1) {
       this.panels.push(panel)
+    } else if (this.panels.length === 0) {
+      this.panels.push(panel)
+      this.curApi = panel
+    } else {
+      this.panels[idx] = panel
     }
   }
 
-  removePanel = (panelId: string) => {
-    const filterPanels = this.panels.filter((p) => p.id !== panelId)
+  removePanel = (apiId: string) => {
+    const filterPanels = this.panels.filter((p) => p.api_id !== apiId)
     this.panels = filterPanels
     const len = filterPanels.length
     if (len === 0) {
-      this.curJob = null
-    } else if (this.curJob?.id === panelId) {
-      this.curJob = filterPanels[len - 1]
+      this.curApi = null
+    } else if (this.curApi?.api_id === apiId) {
+      this.curApi = filterPanels[len - 1]
     }
   }
 
@@ -114,9 +103,9 @@ class WorkFlowStore {
     if (this.tabOp === 'close') {
       this.removePanel(this.opTabName)
     } else if (this.tabOp === 'switch') {
-      const job = this.panels.find((p) => p.id === this.opTabName) || this.nextJob
-      if (job) {
-        this.curJob = job
+      const api = this.panels.find((p) => p.api_id === this.opTabName) || this.nextApi
+      if (api) {
+        this.curApi = api
       }
     }
     this.resetNeedSave()
@@ -127,7 +116,7 @@ class WorkFlowStore {
     this.tabOp = ''
     this.opTabName = ''
     this.showSaveJobConfirm = false
-    this.nextJob = null
+    this.nextApi = null
   }
 
   showSaveConfirm = (opTabName: string, op: 'switch' | 'close' | 'leave' = 'switch') => {
@@ -148,7 +137,6 @@ class WorkFlowStore {
   }
 
   resetTreeData = () => {
-    this.treeData = initTreeData
     this.loadedKeys = []
   }
 

@@ -311,6 +311,8 @@ export const JobTree = observer(
         .then((data) => {
           const jobs = get(data, 'infos') || []
           const newTreeData = getNewTreeData(workFlowStore.treeData, node, jobs, movingNode)
+          console.log('newTreeData', newTreeData)
+
           workFlowStore.set({
             treeData: newTreeData
           })

@@ -4,7 +4,7 @@ import { Icon, Menu } from '@QCFE/lego-ui'
 import { Tree } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { useMutationStreamJob, useFetchJob } from 'hooks'
+import { useFetchApi } from 'hooks'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { useUnmount } from 'react-use'
@@ -12,14 +12,7 @@ import { cloneDeep, get } from 'lodash-es'
 import { useStore } from 'stores'
 import { TreeNodeProps } from 'rc-tree'
 import { useParams } from 'react-router-dom'
-import {
-  JobType,
-  RootKey,
-  getNewTreeData,
-  getJobIdByKey,
-  renderIcon,
-  renderSwitcherIcon
-} from './JobUtils'
+import { JobType, getNewTreeData, renderIcon, renderSwitcherIcon } from './ApiUtils'
 import ApiModal from '../Modal/ApiModal'
 import DelModal from '../Modal/DelModal'
 
@@ -48,11 +41,11 @@ interface JobTreeProps {
   expandedKeys?: string[]
 }
 
-export const JobTree = observer(
+export const ApiTree = observer(
   (props: JobTreeProps, ref) => {
     const { expandedKeys: expandedKeysProp } = props
     const { spaceId } = useParams<{ spaceId: string }>()
-    const fetchJob = useFetchJob()
+    const fetchApi = useFetchApi()
 
     const {
       dtsDevStore,
@@ -80,9 +73,9 @@ export const JobTree = observer(
       node: undefined
     })
 
-    const mutation = useMutationStreamJob()
+    // const mutation = useMutationStreamJob()
 
-    console.log(mutation, curOpNode, jobInfo)
+    console.log(curOpNode, jobInfo)
 
     useUnmount((): void => {
       dtsDevStore.resetTreeData()
@@ -93,10 +86,10 @@ export const JobTree = observer(
     }, [expandedKeysProp])
 
     // useEffect(() => {
-    //   if (dtsStore.curJob) {
-    //     setSelectedKeys([dtsStore.curJob.id])
+    //   if (dtsStore.curApi) {
+    //     setSelectedKeys([dtsStore.curApi.id])
     //   }
-    // }, [dtsStore.curJob])
+    // }, [dtsStore.curApi])
 
     useImperativeHandle(ref, () => ({
       reset: () => {
@@ -134,18 +127,15 @@ export const JobTree = observer(
     }, [])
 
     const fetchJobTreeData = (node: any, movingNode = null) => {
-      const pid = getJobIdByKey(node.key)
       const rootKey = node.key === node.pid ? node.key : node.rootKey
-      return fetchJob(rootKey === RootKey.DI ? 'sync' : 'stream', {
-        pid,
+      return fetchApi({
+        group_id: rootKey,
         search
       })
         .then((data) => {
-          const jobs = get(data, 'infos') || []
-          const newTreeData = getNewTreeData(dtsDevStore.APItreeData, node, jobs, movingNode)
-          dtsDevStore.set({
-            APItreeData: newTreeData
-          })
+          const apis = get(data, 'infos', [])
+          const newTreeData = getNewTreeData(dtsDevStore.treeData, node, apis, movingNode)
+          dtsDevStore.setTreeData(newTreeData)
           setExpandedKeys([...expandedKeys, node.key])
         })
         .catch((e) => {
@@ -235,13 +225,6 @@ export const JobTree = observer(
               icon={renderIcon}
               switcherIcon={renderSwitcherIcon}
               onRightClick={onRightClick}
-              // draggable={(dragNode) => {
-              //   const { key } = dragNode
-              //   if (isRootNode(String(key))) {
-              //     return false
-              //   }
-              //   return true
-              // }}
               dropIndicatorRender={({ dropLevelOffset }) => (
                 <div
                   tw="absolute bg-red-10 h-0.5 bottom-0 right-0 pointer-events-none"
@@ -257,24 +240,24 @@ export const JobTree = observer(
                 }
               }}
               onSelect={(keys: (string | number)[], { selected, node }) => {
-                const job = {
-                  id: '111',
-                  name: 'api',
-                  type: 1,
-                  desc: 'dddd',
-                  version: '1.2'
+                if (visible) {
+                  setTimeout(() => {
+                    setVisible(false)
+                  })
                 }
+                const api = get(node, 'api', null)
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
                 }
-                if (dtsDevStore.curJob?.id !== job?.id && dtsDevStore.isDirty) {
-                  dtsDevStore.set({ nextJob: job })
-                  dtsDevStore.showSaveConfirm(job.id, 'switch')
+                if (dtsDevStore.curApi?.api_id !== api?.api_id && node.isLeaf) {
+                  dtsDevStore.addPanel({ ...api })
+                  dtsDevStore.set({ curApi: api })
+                  dtsDevStore.showSaveConfirm(api.api_id, 'switch')
                   return
                 }
                 if (node.isLeaf) {
                   dtsDevStore.set({
-                    curJob: cloneDeep(job)
+                    curApi: cloneDeep(api)
                   })
                 } else if (node.expanded) {
                   setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
@@ -301,4 +284,4 @@ export const JobTree = observer(
   },
   { forwardRef: true }
 )
-export default JobTree
+export default ApiTree

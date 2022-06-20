@@ -2,15 +2,15 @@ import { useEffect, useRef } from 'react'
 import { useUpdateEffect, useUnmount } from 'react-use'
 import { Tabs, Icon } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { findIndex, get } from 'lodash-es'
+import { findIndex } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import tw, { theme, css, styled } from 'twin.macro'
 
 import { useStore } from 'stores'
-import { RouterLink, Icons } from 'components'
+import { RouterLink } from 'components'
 
 import SyncJob from '../Sync/SyncJob'
-import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
+import { IconWrapper } from './ApiUtils'
 
 const { TabPanel } = Tabs as any
 
@@ -63,21 +63,21 @@ const TabWrapper = styled(Tabs)(() => [
   `
 ])
 
-const JobTabs = observer(() => {
+const ApiTabs = observer(() => {
   const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const notifyTmRef = useRef<any>(null)
   const {
     dtsDevStore,
-    dtsDevStore: { curJob, panels, addPanel, removePanel, showNotify }
+    dtsDevStore: { curApi, panels, addPanel, removePanel, showNotify }
   } = useStore()
 
-  const added = curJob && findIndex(panels, (p) => p.id === curJob.id) > -1
+  const added = curApi && findIndex(panels, (p) => p.api_id === curApi.api_id) > -1
 
   useEffect(() => {
-    if (!added && curJob) {
-      addPanel(curJob)
+    if (!added && curApi) {
+      addPanel(curApi)
     }
-  }, [curJob, added, addPanel])
+  }, [curApi, added, addPanel])
 
   useEffect(() => {
     if (showNotify) {
@@ -100,31 +100,6 @@ const JobTabs = observer(() => {
     dtsDevStore.set({ panels: [], curJob: null, curViewJobId: null })
   })
 
-  const getTag = (job) => {
-    const { jobMode } = job
-    if (jobMode === JobMode.RT) {
-      return get(
-        {
-          1: '算子',
-          2: 'Sql',
-          3: 'Jar',
-          4: 'Python',
-          5: 'Scala'
-        },
-        job.type
-      )
-    }
-    if (jobMode === JobMode.DI) {
-      const tp = getDiJobType(job.type)
-      return (
-        <IconWrapper theme="grey">
-          <Icons name={tp === JobType.OFFLINE ? 'DownloadBoxFill' : 'LayerFill'} size={16} />
-        </IconWrapper>
-      )
-    }
-    return null
-  }
-
   return (
     <div tw="flex-1 w-full overflow-x-hidden">
       {showNotify && (
@@ -146,7 +121,7 @@ const JobTabs = observer(() => {
                   <RouterLink
                     color="blue"
                     to={`/${regionId}/workspace/${spaceId}/ops/${
-                      curJob?.jobMode === 'DI' ? 'data-' : ''
+                      curApi?.jobMode === 'DI' ? 'data-' : ''
                     }release`}
                   >
                     运维中心-已发布作业
@@ -160,13 +135,13 @@ const JobTabs = observer(() => {
       )}
       <TabWrapper
         type="card"
-        activeName={curJob?.id}
+        activeName={curApi?.api_id}
         onChange={(name) => {
           if (dtsDevStore.isDirty) {
             dtsDevStore.showSaveConfirm(name, 'switch')
           } else {
             dtsDevStore.set({
-              curJob: panels.find((p) => p.id === name)
+              curApi: panels.find((p) => p.api_id === name)
             })
           }
         }}
@@ -178,26 +153,23 @@ const JobTabs = observer(() => {
           }
         }}
       >
-        {panels.map((job) => (
+        {panels.map((api) => (
           <TabPanel
-            key={job.id}
-            name={job.id}
+            key={api.api_id}
+            name={api.api_id}
             closable
             label={
               <div tw="inline-flex items-center justify-center">
-                <div tw="scale-75" className={job.jobMode === JobMode.RT ? 'tag' : ''}>
-                  {getTag(job)}
-                </div>
-                <div>{job.name}</div>
+                <IconWrapper tw="mr-2">
+                  <Icon name="q-apiFill" color={{ secondary: '#ffd0275d', primary: '#fff' }} />
+                </IconWrapper>
+                <div>{api.api_name}</div>
               </div>
             }
           >
-            {(() => {
-              const jobMode = get(job, 'jobMode') as JobMode
-              console.log(jobMode)
-
-              return <SyncJob />
-            })()}
+            {(() => (
+              <SyncJob />
+            ))()}
           </TabPanel>
         ))}
       </TabWrapper>
@@ -205,4 +177,4 @@ const JobTabs = observer(() => {
   )
 })
 
-export default JobTabs
+export default ApiTabs

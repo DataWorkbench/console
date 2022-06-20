@@ -2,7 +2,7 @@ import { Icon } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { get, cloneDeep, findKey } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
-import { Icons, Center } from 'components'
+import { Center } from 'components'
 
 export enum JobMode {
   /** 数据集成 */
@@ -198,10 +198,6 @@ export const getJobMode = (jobType?: JobType) => {
   return null
 }
 
-export const isRootNode = (key: any) => [RootKey.DI, RootKey.RT].includes(key)
-
-export const getJobIdByKey = (key: string) => (isRootNode(key) ? '' : key)
-
 export const findTreeNode: any = (treeData: any[], nodeKey: string) => {
   let find = null
   treeData.forEach((node) => {
@@ -241,25 +237,25 @@ export const getNewTreeData = (
   const newTreeData = cloneDeep(treeData)
   const pNode = findTreeNode(newTreeData, node.key)
   if (pNode) {
-    const children = jobs.map((job) => {
-      const childNode = pNode.children?.find((c: any) => c.key === job.id)
+    const children = jobs.map((api) => {
+      const childNode = pNode.children?.find((c: any) => c.key === api.id)
       if (childNode) {
-        if (get(childNode, 'job.updated') !== job.updated) {
-          return { ...childNode, title: job.name, job }
+        if (get(childNode, 'api.api_id') !== api.api_id) {
+          return { ...childNode, title: api.api_name, api }
         }
         return childNode
       }
-      if (movingNode && movingNode.key === job.id) {
+      if (movingNode && movingNode.key === api.api_id) {
         return { ...movingNode, pid: node.key }
       }
       return {
-        key: job.id,
+        key: api.api_id,
+        id: api.api_id,
         pid: node.key,
         jobMode: pNode.jobMode,
-        rootKey: isRootNode(node.key) ? node.key : node.rootKey,
-        title: job.name,
-        isLeaf: !job.is_directory,
-        job
+        title: api.api_name,
+        isLeaf: true,
+        api
       }
     })
     pNode.children = children
@@ -277,13 +273,7 @@ export const removeTreeNode = (treeData: any[], node: any) => {
   return newTreeData
 }
 
-export const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) => [
-  tw`w-4 h-4 rounded-sm`,
-  theme === TreeIconTheme.BLUE && tw`bg-blue-10`,
-  theme === TreeIconTheme.GREEN && tw`bg-green-11`,
-  theme === TreeIconTheme.GREY && tw`bg-white bg-opacity-20 `,
-  theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`
-])
+export const IconWrapper = styled(Center)(() => [tw`w-4 h-4 rounded-sm bg-white bg-opacity-20 `])
 
 export const renderSwitcherIcon = (props: { expanded: any; isLeaf: any }) => {
   const { expanded, isLeaf } = props
@@ -299,14 +289,15 @@ export const renderIcon = (props: any) => {
   if (loading) {
     return <Loading size={16} />
   }
-  const iconName = 'EqualizerFill'
-  const theme: TreeIconTheme = TreeIconTheme.YELLOW
+  let iconName = 'q-apps3Fill'
   if (data) {
-    const { key } = data
-    console.log(key, '2222222')
+    const { isLeaf } = data
+    if (isLeaf) {
+      iconName = 'q-apiFill'
+    }
     return (
-      <IconWrapper theme={theme}>
-        <Icons name={iconName} size={12} />
+      <IconWrapper>
+        <Icon name={iconName} color={{ secondary: '#ffd0275d', primary: '#FFD127' }} size={12} />
       </IconWrapper>
     )
   }

@@ -6,32 +6,6 @@ type TUdf = 'UDF' | 'UDTF' | 'UDTTF'
 
 type ColumnSettingsType = { key: string; checked: boolean }
 
-const initTreeData = [
-  {
-    key: 'di-root',
-    pid: 'di-root',
-    jobMode: 'DI',
-    title: 'API组',
-    isLeaf: false,
-    children: [
-      {
-        key: 'di-root1',
-        pid: 'di-root1',
-        jobMode: 'DI2',
-        title: 'API',
-        isLeaf: true
-      },
-      {
-        key: 'di-root2',
-        pid: 'di-root3',
-        jobMode: 'DI2',
-        title: 'API',
-        isLeaf: true
-      }
-    ]
-  }
-]
-
 class DmStore {
   rootStore
 
@@ -39,7 +13,6 @@ class DmStore {
     this.rootStore = rootStore
     makeAutoObservable(this, {
       rootStore: false,
-      APItreeData: observable.ref,
       loadedKeys: observable.ref
     })
   }
@@ -48,8 +21,6 @@ class DmStore {
   op: OP = ''
 
   dataServiceOp: OP = ''
-
-  APItreeData = initTreeData
 
   loadedKeys: (string | number)[] = []
 
@@ -100,7 +71,6 @@ class DmStore {
   }
 
   resetTreeData = () => {
-    this.APItreeData = initTreeData
     this.loadedKeys = []
   }
 }
