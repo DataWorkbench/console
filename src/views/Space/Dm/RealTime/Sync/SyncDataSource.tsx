@@ -16,6 +16,7 @@ import {
   isEqual,
   keys,
   pick,
+  set,
   trim,
 } from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
@@ -386,7 +387,16 @@ const SyncDataSource = observer(
             preSql: get(dbTarget, 'pre_sql', []),
           },
         }
+
+        if (
+          newDB.source.id === db?.source?.id &&
+          newDB.source.tableName === db?.source?.tableName &&
+          db.source?.columns
+        ) {
+          set(newDB, 'source.columns', db.source.columns)
+        }
         setDB(newDB)
+
         if (
           newDB.target.postSql?.length > 0 ||
           newDB.target.preSql?.length > 0
@@ -397,6 +407,7 @@ const SyncDataSource = observer(
           setShowSourceAdvance(true)
         }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conf, setDB, sourceTypeName, targetTypeName])
 
     // console.log(db)
