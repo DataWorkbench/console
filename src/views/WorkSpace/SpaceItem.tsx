@@ -152,6 +152,19 @@ const isNetworkInit = (
   )
 }
 
+function getSubName(
+  funcName: string,
+  subFuncList: Record<string, any>[]
+): string {
+  if (!Array.isArray(subFuncList) || subFuncList.length === 0) {
+    return funcName
+  }
+  return getSubName(
+    subFuncList[0].name,
+    subFuncList[0].subFuncList || subFuncList[0].items
+  )
+}
+
 const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const stateStore = useWorkSpaceContext()
   const { isModal, curSpaceId, onItemCheck, platformConfig } = stateStore
@@ -424,7 +437,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                     ) : (
                       <Menu
                         mode="inline"
-                        defaultExpandKeys={['stream']}
+                        defaultExpandKeys={['stream', 'sync', 'alert']}
                         onClick={(e: React.SyntheticEvent) => {
                           e.stopPropagation()
                         }}
@@ -478,9 +491,9 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 }
               >
                 <Link
-                  to={`/${regionId}/workspace/${space.id}/${
-                    funcName === 'ops' ? 'ops/release' : funcName
-                  }`}
+                  to={`/${regionId}/workspace/${
+                    space.id
+                  }/${funcName}/${getSubName(funcName, subFuncList)}`}
                   onClick={(e) => {
                     if (disableStatus) {
                       e.preventDefault()

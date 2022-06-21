@@ -26,7 +26,7 @@ export const Header = observer(() => {
   const history = useHistory()
   const {
     globalStore: { darkMode },
-    workSpaceStore: { set, space: space1 },
+    workSpaceStore: { set },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
@@ -65,8 +65,6 @@ export const Header = observer(() => {
       })
     }
   }, [set, space, spaceIndex])
-
-  console.log(111, space1)
 
   return (
     <Root tw="z-[100]">
