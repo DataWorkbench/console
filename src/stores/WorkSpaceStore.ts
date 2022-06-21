@@ -39,7 +39,7 @@ const defaultFuncList = [
         ],
       },
       {
-        name: 'data-integration',
+        name: 'sync',
         title: '数据集成运维',
         icon: 'q-iot2Duotone',
         items: [
@@ -93,6 +93,10 @@ class WorkSpaceStore {
 
   funcList = defaultFuncList
 
+  space?: { name?: string; id?: string; owner?: string } = {}
+
+  spaceIndex = 0
+
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       rootStore: false,
@@ -100,7 +104,7 @@ class WorkSpaceStore {
     this.rootStore = rootStore
   }
 
-  set(params: { [key: string]: any }) {
+  set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }
 }
