@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { DargTable, DarkModal, FlexBox } from 'components'
+import { DargTable, ResizeModal, FlexBox } from 'components'
 import { observer } from 'mobx-react-lite'
 import { DataServiceManageDescribeApiConfig, useMutationUpdateApiConfig, useStore } from 'hooks'
 import { Button, Collapse, Icon, Input, Toggle } from '@QCFE/lego-ui'
@@ -90,11 +90,13 @@ export const JobModal = observer(() => {
   )
 
   return (
-    <DarkModal
+    <ResizeModal
+      minWidth={800}
+      maxWidth={1200}
+      enableResizing={{ left: true }}
       orient="fullright"
       visible
       title="返回参数设置"
-      width={1200}
       onCancel={onClose}
       footer={
         <div tw="flex justify-end space-x-2">
@@ -137,7 +139,7 @@ export const JobModal = observer(() => {
           <span tw="ml-2">返回结果分页</span>
         </CollapseItem>
       </Collapse>
-    </DarkModal>
+    </ResizeModal>
   )
 })
 

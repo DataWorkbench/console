@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import { DargTable, DarkModal, ModalContent } from 'components'
+import { DargTable, ResizeModal, ModalContent } from 'components'
 import { observer } from 'mobx-react-lite'
 import { useStore, DataServiceManageDescribeApiConfig, useMutationUpdateApiConfig } from 'hooks'
 import { Button, Input, Select } from '@QCFE/lego-ui'
@@ -118,10 +118,12 @@ export const JobModal = observer(() => {
   )
 
   return (
-    <DarkModal
+    <ResizeModal
       orient="fullright"
       ref={modal}
       visible
+      maxWidth={1500}
+      enableResizing={{ left: true }}
       title="请求参数设置"
       width={1200}
       onCancel={onClose}
@@ -142,7 +144,7 @@ export const JobModal = observer(() => {
           rowKey="key"
         />
       </ModalContent>
-    </DarkModal>
+    </ResizeModal>
   )
 })
 
