@@ -12,6 +12,7 @@ import { cloneDeep, get } from 'lodash-es'
 import { useStore } from 'stores'
 import { TreeNodeProps } from 'rc-tree'
 import { useParams } from 'react-router-dom'
+import { ApiProps } from 'stores/DtsDevStore'
 import { JobType, getNewTreeData, renderIcon, renderSwitcherIcon } from './ApiUtils'
 import ApiModal from '../Modal/ApiModal'
 import DelModal from '../Modal/DelModal'
@@ -37,6 +38,15 @@ const TreeWrapper = styled('div')(() => [
   `
 ])
 
+type CurOpProps =
+  | 'createAPI'
+  | 'deleteApiGroup'
+  | 'deleteApi'
+  | 'editAPI'
+  | 'showCluster'
+  | 'showRequest'
+  | 'showResponse'
+  | 'showVersions'
 interface JobTreeProps {
   expandedKeys?: string[]
 }
@@ -59,6 +69,7 @@ export const ApiTree = observer(
     const treeEl = useRef(null)
     const [visible, setVisible] = useState<any>(null)
     const [curOp, setCurOp] = useState<string>('')
+    const [currentApi, setCurrentApi] = useState<ApiProps>()
     const [showApiModal, setShowApiModal] = useState<boolean>()
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>()
 
@@ -73,11 +84,8 @@ export const ApiTree = observer(
       node: undefined
     })
 
-    // const mutation = useMutationStreamJob()
-
-    console.log(curOpNode, jobInfo)
-
     useUnmount((): void => {
+      console.log(jobInfo)
       dtsDevStore.resetTreeData()
     })
 
@@ -114,17 +122,31 @@ export const ApiTree = observer(
       }, 200)
     }, [])
 
-    const onRightMenuClick = useCallback((e, key: string, val: string | number) => {
-      setCurOp(val)
-      if (val === 'createAPI') {
-        setShowApiModal(true)
-      } else if (val === 'deleteApiGroup') {
-        setShowDeleteModal(true)
-      } else if (val === 'deleteApi') {
-        setShowDeleteModal(true)
-      }
-      setVisible(false)
-    }, [])
+    const onRightMenuClick = useCallback(
+      (e, key: string, val: CurOpProps, api?: ApiProps) => {
+        if (api) setCurrentApi(api)
+        setCurOp(val)
+        if (val === 'createAPI') {
+          setShowApiModal(true)
+        } else if (val === 'deleteApiGroup') {
+          setShowDeleteModal(true)
+        } else if (val === 'deleteApi') {
+          setShowDeleteModal(true)
+        } else if (val === 'editAPI') {
+          setShowApiModal(true)
+        } else if (val === 'showCluster') {
+          dtsDevStore.set({ showClusterSetting: true })
+        } else if (val === 'showRequest') {
+          dtsDevStore.set({ showRequestSetting: true })
+        } else if (val === 'showResponse') {
+          dtsDevStore.set({ showResponseSetting: true })
+        } else if (val === 'showVersions') {
+          dtsDevStore.set({ showVersions: true })
+        }
+        setVisible(false)
+      },
+      [dtsDevStore]
+    )
 
     const fetchJobTreeData = (node: any, movingNode = null) => {
       const rootKey = node.key === node.pid ? node.key : node.rootKey
@@ -164,25 +186,29 @@ export const ApiTree = observer(
           )
         }
         return (
-          <Menu onClick={onRightMenuClick}>
-            <MenuItem value="createAPI">
+          <Menu
+            onClick={(e, key: string, val: string | number) =>
+              onRightMenuClick(e, key, val as CurOpProps, get(node, 'api', ''))
+            }
+          >
+            <MenuItem value="editAPI">
               <Icon name="edit" size={14} type="light" />
               <span>编辑信息</span>
             </MenuItem>
-            <MenuItem value="delete">
-              <Icon name="delete" size={14} type="light" />
+            <MenuItem value="showCluster">
+              <Icon name="q-dockerHubFill" size={14} type="light" />
               <span>服务集群</span>
             </MenuItem>
-            <MenuItem value="delete">
-              <Icon name="delete" size={14} type="light" />
+            <MenuItem value="showRequest">
+              <Icon name="q-functionPencilFill" size={14} type="light" />
               <span>请求参数</span>
             </MenuItem>
-            <MenuItem value="delete">
-              <Icon name="delete" size={14} type="light" />
+            <MenuItem value="showResponse">
+              <Icon name="q-functionPlayFill" size={14} type="light" />
               <span>返回参数</span>
             </MenuItem>
-            <MenuItem value="delete">
-              <Icon name="delete" size={14} type="light" />
+            <MenuItem value="showVersions">
+              <Icon name="q-book3Fill" size={14} type="light" />
               <span>历史版本</span>
             </MenuItem>
             <MenuItem value="deleteApi">
@@ -272,7 +298,13 @@ export const ApiTree = observer(
             />
           </TreeWrapper>
         </Tippy>
-        {showApiModal && <ApiModal onClose={() => setShowApiModal(false)} />}
+        {showApiModal && (
+          <ApiModal
+            isEdit={curOp === 'editAPI'}
+            currentApi={currentApi}
+            onClose={() => setShowApiModal(false)}
+          />
+        )}
         {showDeleteModal && (
           <DelModal
             onClose={() => setShowDeleteModal(false)}

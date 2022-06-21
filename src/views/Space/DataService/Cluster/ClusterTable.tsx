@@ -19,7 +19,7 @@ import {
   getQueryKeyListDataServiceClusters
 } from 'hooks/useDataService'
 import NewClusterModal from './ClusterModal'
-import { ClusterColumns, StatusMap, getStatusNumber, streamDevModeType } from './common/constants'
+import { ClusterColumns, StatusMap, getStatusNumber } from './common/constants'
 import { ClusterFieldMapping } from './common/mappings'
 
 const { ColumnsSetting } = ToolBar as any
@@ -65,7 +65,6 @@ const ClusterTable = observer(() => {
     setFilter,
     pagination,
     sort,
-    getColumnFilter: getFilter,
     getColumnSort: getSort
   } = useFilter<
     Record<ReturnType<typeof getName>, number | string | boolean>,
@@ -175,25 +174,12 @@ const ClusterTable = observer(() => {
       )
     },
     [getName('status')]: {
-      ...getFilter(getName('name'), streamDevModeType),
       render: (v: number) => (
         <StatusBar
           type={StatusMap.get(getStatusNumber.get(v))?.style}
           label={StatusMap.get(getStatusNumber.get(v))?.label}
           isWrapper={false}
         />
-      )
-    },
-    [getName('cu')]: {
-      render: (v: any, row: any) => <span tw="dark:text-neut-0">{row.cu}</span>
-    },
-    [getName('mode')]: {
-      ...getFilter(getName('name'), streamDevModeType),
-      render: (v: any, row: any) => <span tw="dark:text-neut-0">{row.mode}</span>
-    },
-    [getName('created_time')]: {
-      render: (v: number, row: any) => (
-        <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
       )
     },
     [getName('last_updated')]: {

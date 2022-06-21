@@ -10,10 +10,10 @@ interface DraggableBodyRowProps extends React.HTMLAttributes<HTMLTableRowElement
 }
 
 export const Row = styled(FlexBox)(() => [
-  tw`items-center h-11 border-b-[1px]! border-neut-13! border-solid!`,
+  tw`items-center h-11 border-t-[1px]! border-neut-13! border-solid!`,
   css`
     &:hover {
-      ${tw`dark:bg-[#1E2F41] border-b-[1px]! border-neut-13! border-solid!`}
+      ${tw`dark:bg-[#1E2F41] border-t-[1px]! border-neut-13! border-solid!`}
     }
     .icon svg {
       ${tw`dark:text-white dark:fill-[#fff6]`}

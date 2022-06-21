@@ -4,14 +4,19 @@ import { HelpCenterLink, DargTable } from 'components'
 import { useImmer } from 'use-immer'
 import { FlexBox } from 'components/Box'
 import tw, { styled } from 'twin.macro'
+import { MappingKey } from 'utils/types'
 
-import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
+import { useColumns } from 'hooks/useHooks/useColumns'
+import { FieldSettingColumns, serviceDevVersionFieldSettingMapping } from '../constants'
 
 const Root = styled.div`
   ${tw`text-white space-y-2`}
 `
 
-const dataServciecDataSettingKey = 'DATA_SERVICE_DATA__SETTING'
+const getName = (name: MappingKey<typeof serviceDevVersionFieldSettingMapping>) =>
+  serviceDevVersionFieldSettingMapping.get(name)!.apiField
+
+const dataServiceDataSettingKey = 'DATA_SERVICE_DATA__SETTING'
 
 const FieldOrder = () => {
   const [dataSource, setDataSource] = useImmer([
@@ -35,20 +40,14 @@ const FieldOrder = () => {
     }
   ])
 
-  const defaultColumns: IColumn[] = [
-    {
-      title: '字段名',
+  const renderColumns = {
+    [getName('field')]: {
       width: 100,
-      key: 'field',
-      dataIndex: 'field'
+      render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
     },
-    {
-      title: '设为请求参数',
-      key: 'isRequest',
-      dataIndex: 'isRequest',
+    [getName('isRequest')]: {
       checkbox: true,
       checkboxText: '请求',
-      selectedKeys: [1, 2, 4],
       onSelect: (checked: boolean, record: any, index: number) => {
         setDataSource((draft) => {
           draft[index].isRequest = checked
@@ -60,12 +59,10 @@ const FieldOrder = () => {
             item.isRequest = checked
           })
         })
-      }
+      },
+      render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
     },
-    {
-      title: '设为返回参数',
-      key: 'isResponse',
-      dataIndex: 'isResponse',
+    [getName('isResponse')]: {
       checkbox: true,
       checkboxText: '响应',
       onSelect: (checked: boolean, record: any, index: number) => {
@@ -79,33 +76,19 @@ const FieldOrder = () => {
             item.isResponse = checked
           })
         })
-      }
-    },
-    {
-      title: '字段类型',
-      key: 'type',
-      dataIndex: 'type'
-    },
-    {
-      title: '描述',
-      key: 'des',
-      dataIndex: 'des'
-    }
-  ]
-
-  const renderColumns = {
-    field: {
+      },
       render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
     },
-    type: {
-      render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
-    },
-    des: {
+    [getName('type')]: {
       render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
     }
   }
 
-  const { columns } = useColumns(dataServciecDataSettingKey, defaultColumns, renderColumns as any)
+  const { columns } = useColumns(
+    dataServiceDataSettingKey,
+    FieldSettingColumns,
+    renderColumns as any
+  )
 
   if (dataSource.length === 0) {
     return (

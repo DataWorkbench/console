@@ -2,12 +2,11 @@ import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { HelpCenterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
-import { useRef, useState } from 'react'
-import { isArray, isObject, isUndefined, set } from 'lodash-es'
-import { useMutationSyncJobConf, useStore } from 'hooks'
+import { useEffect, useRef } from 'react'
+import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
+import { useMutationSyncJobConf, useStore, useFetchApiConfig } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
-import ReleaseModal from '../Modal/ReleaseModal'
 import SyncDataSource from './SyncDataSource'
 import FieldOrder from './FieldOrder'
 import FieldSetting from './FieldSetting'
@@ -113,25 +112,22 @@ const removeUndefined = (obj: any) => {
 
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
-  // const { data: scheData } = useQueryJobSchedule()
-  const { dtsDevStore } = useStore()
-  // const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
+  const fetchApi = useFetchApiConfig()
 
   const {
-    dtsDevStore: { curApi }
+    dtsDevStore: { curApi },
+    dtsDevStore
   } = useStore()
 
-  console.log(curApi)
-
-  // const [db, setDb] = useImmer<{
-  //   source: DbInfo
-  //   target: DbInfo
-  // }>({
-  //   source: { id: '' },
-  //   target: { id: '' }
-  // })
-  const [showRelaseModal, setShowRelaseModal] = useState(false)
-  // const [mappings, setMappings] = useState([])
+  useEffect(() => {
+    if (curApi) {
+      fetchApi({ apiId: get(curApi, 'api_id') }).then((res) => {
+        dtsDevStore.set({
+          apiConfigData: res
+        })
+      })
+    }
+  }, [curApi, fetchApi, dtsDevStore])
 
   const dbRef =
     useRef<{
@@ -151,81 +147,6 @@ const SyncJob = () => {
     useRef<{
       getChannel: () => Record<string, string>
     }>(null)
-  // const enableRelease = get(scheData, 'schedule_policy') !== 0
-
-  // const [sourceTypeName, targetTypeName] = useMemo(() => {
-  //   const sourceType = curApi?.source_type
-  //   const targetType = curApi?.target_type
-  //   return [
-  //     findKey(dataSourceTypes, (v) => v === sourceType),
-  //     findKey(dataSourceTypes, (v) => v === targetType)
-  //   ]
-  // }, [curApi])
-
-  // const sourceColumn = useMemo(() => {
-  //   if (confData && db.source.tableName && sourceTypeName) {
-  //     const source = get(confData, `sync_resource.${sourceTypeName?.toLowerCase()}_source`)
-  //     const table = get(source, 'table[0]')
-  //     if (source && table === db.source.tableName) {
-  //       return get(source, 'column')
-  //     }
-  //   }
-  //   return []
-  // }, [confData, sourceTypeName, db.source.tableName])
-
-  // const targetColumn = useMemo(() => {
-  //   if (confData && db.target.tableName && targetTypeName) {
-  //     const source = get(confData, `sync_resource.${targetTypeName?.toLowerCase()}_target`)
-  //     const table = get(source, 'table[0]')
-  //     if (source && table === db.target.tableName) {
-  //       return get(source, 'column')
-  //     }
-  //   }
-  //   return []
-  // }, [confData, targetTypeName, db.target.tableName])
-
-  // console.log(db)
-
-  // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
-  // useEffect(() => {
-  //   setDb((draft) => {
-  //     draft.source.id = get(confData, 'source_id')
-  //     draft.target.id = get(confData, 'target_id')
-  //   })
-  // }, [confData, setDb])
-  // useEffect(() => {
-  //   if (confData && sourceTypeName && targetTypeName) {
-  //     // const sourceColumn =
-  //     //   get(
-  //     //     confData,
-  //     //     `sync_resource.${sourceTypeName.toLowerCase()}_source.column`
-  //     //   ) || []
-  //     // const targetColumn =
-  //     //   get(
-  //     //     confData,
-  //     //     `sync_resource.${targetTypeName.toLowerCase()}_target.column`
-  //     //   ) || []
-  //     // setMappings(sourceColumn.map((v, i) => [v.name, targetColumn[i].name]))
-  //     setDb({
-  //       source: {
-  //         id: get(confData, 'source_id'),
-  //         tableName: get(
-  //           confData,
-  //           `sync_resource.${sourceTypeName.toLowerCase()}_source.table[0]`
-  //         ),
-  //       },
-  //       target: {
-  //         id: get(confData, 'target_id'),
-  //         tableName: get(
-  //           confData,
-  //           `sync_resource.${targetTypeName.toLowerCase()}_target.table[0]`
-  //         ),
-  //       },
-  //     })
-  //   }
-  // }, [confData, sourceTypeName, targetTypeName, setDb])
-
-  // console.log(db, fields)
 
   const showConfWarn = (content: string) => {
     Notify.warning({
@@ -346,17 +267,6 @@ const SyncJob = () => {
       <div tw="flex-1 overflow-hidden">
         <SimpleBar tw="h-full">{renderGuideMode()}</SimpleBar>
       </div>
-      {showRelaseModal && (
-        <ReleaseModal
-          onSuccess={() => {
-            setShowRelaseModal(false)
-            dtsDevStore.set({
-              showNotify: true
-            })
-          }}
-          onCancel={() => setShowRelaseModal(false)}
-        />
-      )}
     </SyncJobWrapper>
   )
 }

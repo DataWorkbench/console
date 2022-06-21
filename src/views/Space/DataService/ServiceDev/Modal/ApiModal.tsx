@@ -4,10 +4,12 @@ import { AffixLabel, Modal, ModalContent, TextLink } from 'components'
 import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useMutationStreamJob } from 'hooks'
+import { useMutationApiService, useQueryListApiGroups } from 'hooks'
 import { strlen } from 'utils'
 import { Checkbox, Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
+import { useParams } from 'react-router-dom'
+import { ApiProps } from 'stores/DtsDevStore'
 import ModelItem from './ModeItem'
 
 const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
@@ -47,62 +49,89 @@ export interface JobModalData {
 
 interface JobModalProps {
   isEdit?: boolean
+  currentApi?: ApiProps
   onClose?: (data?: JobModalData) => void
 }
 
+const modelSource = [
+  {
+    value: 1,
+    title: '向导模式',
+    desc: (
+      <div className="des">
+        即可视化配置，快速将结构化数据和半结构化数据表生成数据API。您无需具备编码能力，即可快速配置一个数据API。
+        <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
+          查看详情
+        </TextLink>
+      </div>
+    )
+  },
+  {
+    value: 2,
+    title: '脚本模式(敬请期待)',
+    disabled: true,
+    desc: (
+      <div className="des">
+        为满足高阶用户的个性化查询需求，为您提供自定义 SQL 的脚本，您可以自行编写 API 的查询 SQL
+        。支持多表关联、复杂查询和聚合函数等功能。
+        <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
+          查看详情
+        </TextLink>
+      </div>
+    )
+  }
+]
+
 export const JobModal = observer((props: JobModalProps) => {
-  const { isEdit = false, onClose } = props
+  const { isEdit = false, onClose, currentApi } = props
+  const { spaceId } = useParams<{ spaceId: string }>()
 
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
-    apiMode: '',
-    apiGroupName: '',
-    apiName: '',
-    apiPath: '/',
+    api_mode: 1,
+    group_id: '',
+    api_name: '',
+    api_path: '/',
     apiAgreement: '',
-    isCross: false,
-    methods: '',
-    responseType: 'json',
-    Desc: ''
+    cross_domain: false,
+    request_method: '',
+    response_type: 'json',
+    api_description: ''
   }))
 
-  const mutation = useMutationStreamJob()
+  const mutation = useMutationApiService()
+  const { data } = useQueryListApiGroups({ uri: { space_id: spaceId } })
+  const apiGroupList = get(data, 'infos', [])
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      console.log(params)
-      onClose?.()
+      const paramsData = {
+        option: 'createApi' as const,
+        ...params
+      }
+      mutation.mutate(paramsData, {
+        onSuccess: () => {
+          onClose?.()
+        }
+      })
     }
   }
 
-  const modelSource = [
-    {
-      value: 'base',
-      title: '向导模式',
-      desc: (
-        <div className="des">
-          即可视化配置，快速将结构化数据和半结构化数据表生成数据API。您无需具备编码能力，即可快速配置一个数据API。
-          <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
-            查看详情
-          </TextLink>
-        </div>
-      )
-    },
-    {
-      value: 'base2',
-      title: '脚本模式(敬请期待)',
-      disabled: true,
-      desc: (
-        <div className="des">
-          为满足高阶用户的个性化查询需求，为您提供自定义 SQL 的脚本，您可以自行编写 API 的查询 SQL
-          。支持多表关联、复杂查询和聚合函数等功能。
-          <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
-            查看详情
-          </TextLink>
-        </div>
-      )
-    }
-  ]
+  if (isEdit && !!currentApi) {
+    console.log(currentApi)
+
+    // setParams(date => {
+    //   date.api_mode = currentApi.api_mode
+    //   date.group_id = currentApi.group_id
+    //   date.api_name = currentApi.api_name
+    //   date.api_path = currentApi.api_path
+    //   date.apiAgreement = currentApi.apiAgreement
+    //   date.cross_domain = currentApi.cross_domain
+    //   date.request_method = currentApi.request_method
+    //   date.response_type = currentApi.response_type
+    //   date.api_description = currentApi.api_description
+    // })
+  }
 
   return (
     <Modal
@@ -125,18 +154,29 @@ export const JobModal = observer((props: JobModalProps) => {
       <ModalContent>
         <FormWrapper>
           <Form layout="horizon" ref={form}>
-            <Field>
+            <Field
+              values={params.api_mode}
+              schemas={[
+                {
+                  rule: {
+                    required: true
+                  },
+                  status: 'error',
+                  help: '不能为空'
+                }
+              ]}
+            >
               <Label tw="items-start!">
                 <AffixLabel required>API配置模式</AffixLabel>
               </Label>
               <Control tw="max-w-full! items-center space-x-1 block!">
                 {modelSource.map((item) => (
                   <ModelItem
-                    selected={params.apiMode === item.value}
+                    selected={params.api_mode === item.value}
                     key={item.value}
                     onClick={() =>
                       setParams((draft) => {
-                        draft.apiMode = item.value
+                        draft.api_mode = item.value
                       })
                     }
                     modeData={item}
@@ -149,20 +189,14 @@ export const JobModal = observer((props: JobModalProps) => {
               name="version"
               validateOnChange
               placeholder="请选择API服务组"
-              options={[
-                {
-                  label: '测试组',
-                  value: 'test'
-                },
-                {
-                  label: '测试组2',
-                  value: 'test2'
-                }
-              ]}
-              value={params.apiGroupName}
+              options={apiGroupList.map((item) => ({
+                label: item.name,
+                value: item.id
+              }))}
+              value={params.group_id}
               onChange={(v: string) => {
                 setParams((draft) => {
-                  draft.apiGroupName = v
+                  draft.group_id = v
                 })
               }}
               schemas={[
@@ -184,12 +218,12 @@ export const JobModal = observer((props: JobModalProps) => {
               ]}
             />
             <TextField
-              name="apiName"
+              name="api_name"
               label={<AffixLabel>API名称</AffixLabel>}
-              value={get(params, 'apiName', '')}
+              value={get(params, 'api_name', '')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.apiName = String(v)
+                  draft.api_name = String(v)
                 })
               }
               validateOnChange
@@ -218,17 +252,17 @@ export const JobModal = observer((props: JobModalProps) => {
               </Label>
               <Control tw="items-center">
                 <Input
-                  name="apiGroupName"
-                  value={get(params, 'apiGroupName', '')}
+                  name="group_id"
+                  value={get(params, 'group_id', '')}
                   disabled
                   tw="w-[150px]! block! items-center! space-x-1 mr-2"
                 />
                 <Input
-                  name="apiPath"
-                  value={get(params, 'apiPath', '')}
+                  name="api_path"
+                  value={get(params, 'api_path', '')}
                   onChange={(_, v: string | number) =>
                     setParams((draft) => {
-                      draft.apiPath = String(v)
+                      draft.api_path = String(v)
                     })
                   }
                   validateOnChange
@@ -289,10 +323,10 @@ export const JobModal = observer((props: JobModalProps) => {
               </Label>
               <Control tw="items-center">
                 <Toggle
-                  checked={params.isCross}
+                  checked={params.cross_domain}
                   onChange={(checked: boolean) => {
                     setParams((draft) => {
-                      draft.isCross = checked
+                      draft.cross_domain = checked
                     })
                   }}
                 />
@@ -305,11 +339,11 @@ export const JobModal = observer((props: JobModalProps) => {
             </Field>
             <RadioGroupField
               label={<AffixLabel required>请求方式</AffixLabel>}
-              value={params.methods}
+              value={params.request_method}
               name="immediately"
               onChange={(v: string) => {
                 setParams((draft) => {
-                  draft.methods = v
+                  draft.request_method = v
                 })
               }}
             >
@@ -324,14 +358,13 @@ export const JobModal = observer((props: JobModalProps) => {
             </Field>
 
             <TextAreaField
-              isLength
-              name="Desc"
+              name="api_description"
               label="描述"
               rows={3}
-              value={get(params, 'Desc', '')}
+              value={get(params, 'api_description', '')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.Desc = String(v)
+                  draft.api_description = String(v)
                 })
               }
               validateOnChange

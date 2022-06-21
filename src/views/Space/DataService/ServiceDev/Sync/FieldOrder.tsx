@@ -7,10 +7,16 @@ import { useImmer } from 'use-immer'
 import update from 'immutability-helper'
 import { FlexBox } from 'components/Box'
 import tw, { styled } from 'twin.macro'
+import { useColumns } from 'hooks/useHooks/useColumns'
+import { MappingKey } from 'utils/types'
+import { FieldOrderColumns, serviceDevVersionFieldOrderMapping } from '../constants'
 
 const Root = styled.div`
-  ${tw`text-white space-y-2`}
+  ${tw`text-white space-y-2 mb-2`}
 `
+
+const getName = (name: MappingKey<typeof serviceDevVersionFieldOrderMapping>) =>
+  serviceDevVersionFieldOrderMapping.get(name)!.apiField
 
 const options = [
   {
@@ -42,24 +48,10 @@ const options2 = [
   }
 ]
 
+const columnSettingsKey = 'DATA_SERVICE_FIELDORDER'
+
 const FieldOrder = () => {
-  const [dataSource, setDataSource] = useImmer([
-    {
-      key: '1',
-      name: 'sql',
-      order: ''
-    },
-    {
-      key: '2',
-      name: '2',
-      order: ''
-    },
-    {
-      key: '3',
-      name: '3',
-      order: 'descOrder'
-    }
-  ])
+  const [dataSource, setDataSource] = useImmer([])
 
   const delRow = useCallback(
     (index: number) => {
@@ -67,67 +59,6 @@ const FieldOrder = () => {
     },
     [setDataSource, dataSource]
   )
-
-  const columns = [
-    {
-      title: '',
-      dataIndex: 'index',
-      key: 'index',
-      width: 100,
-      headRender: () => <span>序号</span>,
-      render: (_: string, record: any, index: number) => <OrderText>{index}</OrderText>
-    },
-    {
-      title: '字段名',
-      dataIndex: 'name',
-      width: 400,
-      key: 'name',
-      render: (text: string, record: any, index: number) => (
-        <Select
-          placeholder="请选择需要添加的字段"
-          options={options}
-          value={text}
-          onChange={(v) => {
-            setDataSource((draft) => {
-              draft[index].name = v
-            })
-          }}
-        />
-      )
-    },
-    {
-      title: '排序方式',
-      dataIndex: 'order',
-      key: 'order',
-      width: 300,
-      render: (text: string, record: any, index: number) => (
-        <>
-          <Select
-            tw="w-24"
-            options={options2}
-            value={text}
-            onChange={(v) => {
-              setDataSource((draft) => {
-                draft[index].order = v
-              })
-            }}
-          />
-          <div
-            css={[
-              tw`px-2 hidden opacity-0  ml-24`,
-              index >= 2 && tw`block group-hover:opacity-100`
-            ]}
-          >
-            {/* <Tooltip content="删除" theme="dark"> */}
-            <Button type="text" onClick={() => delRow(index)}>
-              <Icon name="trash" clickable type="dark" />
-            </Button>
-            {/* </Tooltip> */}
-          </div>
-        </>
-      )
-    }
-  ]
 
   const moveRow = useCallback(
     (dragIndex: number, hoverIndex: number) => {
@@ -160,8 +91,55 @@ const FieldOrder = () => {
     )
   }, [dataSource, setDataSource])
 
+  const columnsRender = {
+    [getName('index')]: {
+      title: <span>序号</span>,
+      width: 100,
+      render: (_: any, record: any, index: number) => <OrderText>{index}</OrderText>
+    },
+    [getName('name')]: {
+      width: 400,
+      render: (text: any, record: any, index: number) => (
+        <Select
+          placeholder="请选择需要添加的字段"
+          options={options}
+          value={text}
+          onChange={(v) => {
+            setDataSource((draft) => {
+              draft[index].name = v
+            })
+          }}
+        />
+      )
+    },
+    [getName('order')]: {
+      width: 300,
+      render: (text: any, record: any, index: number) => (
+        <>
+          <Select
+            tw="w-24"
+            options={options2}
+            value={text}
+            onChange={(v) => {
+              setDataSource((draft) => {
+                draft[index].order = v
+              })
+            }}
+          />
+          <div css={[tw`px-2 hidden opacity-0  ml-24`, tw`block group-hover:opacity-100`]}>
+            <Button type="text" onClick={() => delRow(index)}>
+              <Icon name="trash" clickable type="dark" />
+            </Button>
+          </div>
+        </>
+      )
+    }
+  }
+
+  const { columns } = useColumns(columnSettingsKey, FieldOrderColumns, columnsRender as any)
+
   const Footer = React.memo(() => (
-    <FlexBox tw="h-11 items-center justify-center">
+    <FlexBox tw="h-11 items-center justify-center border-t-[1px]! border-neut-13!">
       <Button type="text" onClick={addRow}>
         <Icon name="add" type="light" />
         添加
@@ -169,31 +147,30 @@ const FieldOrder = () => {
     </FlexBox>
   ))
 
-  if (dataSource.length === 0) {
-    return (
-      <Root>
-        <Alert
-          message="提示：排序字段非必须，如你需要排序字段，请在下方添加并选择需要排序的字段。"
-          type="info"
-          linkBtn={
-            <HelpCenterLink href="###" isIframe={false} hasIcon={false}>
-              查看详情 →
-            </HelpCenterLink>
-          }
-        />
-      </Root>
-    )
-  }
-
   return (
-    <DargTable
-      rowKey="key"
-      moveRow={moveRow}
-      runDarg
-      dataSource={dataSource}
-      columns={columns}
-      renderFooter={() => <Footer />}
-    />
+    <>
+      {dataSource.length === 0 && (
+        <Root>
+          <Alert
+            message="提示：排序字段非必须，如你需要排序字段，请在下方添加并选择需要排序的字段。"
+            type="info"
+            linkBtn={
+              <HelpCenterLink href="###" isIframe={false} hasIcon={false}>
+                查看详情 →
+              </HelpCenterLink>
+            }
+          />
+        </Root>
+      )}
+      <DargTable
+        rowKey="key"
+        moveRow={moveRow}
+        runDarg
+        dataSource={dataSource}
+        columns={columns as any}
+        renderFooter={() => <Footer />}
+      />
+    </>
   )
 }
 

@@ -7,11 +7,13 @@ import { apiHooks, queryKeyObj } from './apiHooks'
 import { ListApiGroupsRequestType, ListDataServiceClustersRequestType } from '../types/request'
 import {
   DataServiceManageListDataServiceClustersType,
-  DataServiceManageListApiGroupsType
+  DataServiceManageListApiGroupsType,
+  DataServiceManageDescribeApiConfigType
 } from '../types/response'
 
 import { PbmodelApiGroup } from '../types/types'
 
+type Options = 'createApiGroup' | 'createApi'
 interface IParams {
   regionId: string
   spaceId?: string
@@ -139,4 +141,94 @@ export const useFetchApi = () => {
     },
     [queryClient, regionId, spaceId]
   )
+}
+
+export const CreateApiGroup = async ({ regionId, spaceId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'createApiGroup')(params)
+}
+
+export const CreateApiConfig = async ({ regionId, spaceId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'createApiConfig')(params)
+}
+
+export const useMutationApiService = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ option, ...rest }: { option: Options; clusterId?: string }) => {
+    let ret = null
+    const params = {
+      ...rest,
+      regionId,
+      spaceId
+    }
+
+    if (option === 'createApiGroup') {
+      ret = await CreateApiGroup(params)
+    } else if (option === 'createApi') {
+      ret = await CreateApiConfig(params)
+    }
+    return ret
+  })
+}
+
+export const useMutationListApiConfigs = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ group_id }: { group_id: string }) => {
+    let ret = null
+    const params = {
+      group_id,
+      regionId,
+      spaceId
+    }
+    ret = await getListApiConfigs(params)
+    return ret
+  })
+}
+
+export const DescribeApiConfig = async ({ regionId, spaceId, apiId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, api_id: apiId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'describeApiConfig')(params)
+}
+
+export type DataServiceManageDescribeApiConfig = DataServiceManageDescribeApiConfigType
+export const useFetchApiConfig = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const queryClient = useQueryClient()
+  return useCallback(
+    (filter = {}, options = {}) => {
+      const params = {
+        regionId,
+        spaceId,
+        ...filter
+      }
+      return queryClient.fetchQuery(['apiConfig', params], async () => DescribeApiConfig(params), {
+        ...options
+      })
+    },
+    [queryClient, regionId, spaceId]
+  )
+}
+
+export const UpdateApiConfig = async ({ regionId, spaceId, apiId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, api_id: apiId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'updateApiConfig')(params)
+}
+
+export const useMutationUpdateApiConfig = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      apiId,
+      regionId,
+      spaceId,
+      ...rest
+    }
+    ret = await UpdateApiConfig(params)
+    return ret
+  })
 }

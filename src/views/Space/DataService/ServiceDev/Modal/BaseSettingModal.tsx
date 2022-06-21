@@ -243,7 +243,6 @@ export const JobModal = observer(() => {
             </Field>
 
             <TextAreaField
-              isLength
               name="Desc"
               label="描述"
               rows={3}

@@ -1,9 +1,10 @@
 import { makeAutoObservable, observable, set } from 'mobx'
 import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
+import { DataServiceManageDescribeApiConfigType } from 'types/response'
 import type RootStore from './RootStore'
 
-interface ApiProps {
+export interface ApiProps {
   key: string
   api_id: string
   api_name: string
@@ -20,6 +21,8 @@ class WorkFlowStore {
   curViewJobId: null | string = null
 
   curApi: null | ApiProps = null
+
+  apiConfigData: DataServiceManageDescribeApiConfigType | null = null
 
   curVersion: null | ApiProps = null
 

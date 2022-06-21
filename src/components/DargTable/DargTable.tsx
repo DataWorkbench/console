@@ -6,27 +6,24 @@ import DraggableRow, { Row } from './DraggableRow'
 
 const CheckBoxLabel = styled(Label)(() => [
   css`
-    ${tw`flex items-center`}
-    .checkbox::before {
-      top: 9px;
-    }
-    .checkbox.checked::after {
-      top: 12px !important;
-    }
-    .checkbox.indeterminate::after {
-      top: 12px !important;
+    ${tw`flex! items-center! h-11!`}
+    .checkbox {
+      ${tw`h-[16px]! w-[13px]!`}
     }
   `
 ])
 
 const CheckboxSpan = styled.span`
-  ${tw`ml-2 leading-4`}
+  ${tw`ml-2! leading-4!`}
 `
 const TableHeader = styled('div')(() => [
   css`
-    ${tw`bg-neut-16! h-11 flex`}
+    ${tw`bg-neut-16! h-11! flex! border-neut-13!`}
     div {
-      ${tw`flex items-center ml-6`}
+      ${tw`flex! items-center! ml-6!`}
+    }
+    div:last-child {
+      ${tw`mr-6!`}
     }
   `
 ])
@@ -34,19 +31,22 @@ export const TableBody = styled('div')(() => [
   css`
     .group {
       & > div {
-        ${tw`flex items-center ml-6`}
+        ${tw`flex items-center ml-6!`}
+      }
+      & > div:last-child {
+        ${tw`mr-6!`}
       }
     }
     .table-row {
-      ${tw`bg-neut-17 flex border-neut-13 p-0`}
+      ${tw`bg-neut-17! flex border-neut-13! p-0!`}
       &:hover {
         ${tw`dark:bg-[#1E2F41] border-b-0!`}
       }
       & > div {
-        ${tw`flex items-center ml-6`}
+        ${tw`flex items-center ml-6!`}
       }
       &:last-child {
-        ${tw`border-b-0`}
+        ${tw`border-b-0!`}
       }
     }
   `
@@ -89,7 +89,7 @@ export interface DargTableProps<T = any> {
   rowKey: string // 行key
 }
 
-export const DargTable = (props: DargTableProps) => {
+export const DargTable = (props: DargTableProps<any>) => {
   const {
     columns,
     dataSource,

@@ -37,30 +37,3 @@ export const StatusMap = new Map()
     label: '欠费',
     style: StatusBarEnum.purple
   })
-
-export enum StreamDevMode {
-  SQL = 2,
-  JAR = 4,
-  PYTHON = 8
-}
-
-export const streamDevModeType = {
-  1: {
-    label: 'SQL 模式',
-    value: 1,
-    type: StreamDevMode.SQL,
-    icon: 'sql'
-  },
-  2: {
-    label: '代码开发-Jar 模式',
-    value: 2,
-    type: StreamDevMode.JAR,
-    icon: 'q-javaFill'
-  },
-  3: {
-    label: '代码开发-python 模式',
-    value: 3,
-    type: StreamDevMode.PYTHON,
-    icon: 'q-pythonFill'
-  }
-}

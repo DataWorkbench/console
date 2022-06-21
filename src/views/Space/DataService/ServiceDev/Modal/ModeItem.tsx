@@ -2,7 +2,7 @@ import React from 'react'
 import tw, { css, styled } from 'twin.macro'
 
 interface ModeDataProps {
-  value: string
+  value: number
   title: string
   desc: React.ReactNode
   disabled?: boolean
@@ -16,11 +16,11 @@ interface JobModeItemProps {
 
 const Root = styled('div')(
   ({ selected = false, disabled = false }: { selected?: boolean; disabled?: boolean }) => [
-    tw`rounded border border-neut-13 transition-colors ease-in-out duration-300 w-[556px] mb-2 ml-0! `,
+    tw`rounded-sm! border border-neut-13 transition-colors ease-in-out duration-300 w-[556px] mb-2 ml-0!`,
     disabled ? tw`cursor-not-allowed` : tw`cursor-pointer`,
     selected &&
       css`
-        ${tw`border-green-11`}
+        ${tw`border-green-11 rounded-sm!`}
       `
   ]
 )

@@ -5,9 +5,9 @@ import ClusterTable from './ClusterTable'
 
 const pageTabsData = [
   {
-    title: '网络配置',
+    title: '服务集群',
     description:
-      '提供 VPC（专属私有网络 ） 与 VxNet（私有网络） 的绑定服务，统一管理您的网络配置。为了保障您的数据安全，建议您在内网中访问数据源。',
+      '服务资源说明文案服务资源说明文案服务资源说明文案服务资源说明文案服务资源说明文案服务资源说明文案服务资源说明文案服务资源说明文案服务资源说明文案。',
     icon: 'earth',
     helpLink: getHelpCenterLink('/manual/data_development/network/create_network/')
   }

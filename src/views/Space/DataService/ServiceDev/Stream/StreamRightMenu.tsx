@@ -3,6 +3,8 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import BaseSettingModal from '../Modal/BaseSettingModal'
 import ClusterSettingModal from '../Modal/ClusterSettingModal'
+import RequestSettingModal from '../Modal/RequestSettingModal'
+import ResponseSettingModal from '../Modal/ResponseSettingModal'
 import VersionsModal from '../Modal/VersionsModal'
 
 const MenuRoot = styled('div')(() => [
@@ -38,9 +40,9 @@ const StreamRightMenu = observer(() => {
 
       {showBaseSetting && <BaseSettingModal />}
       {showClusterSetting && <ClusterSettingModal />}
+      {showRequestSetting && <RequestSettingModal />}
+      {showResponseSetting && <ResponseSettingModal />}
       {showVersions && <VersionsModal />}
-      {showRequestSetting && <VersionsModal />}
-      {showResponseSetting && <VersionsModal />}
     </>
   )
 })

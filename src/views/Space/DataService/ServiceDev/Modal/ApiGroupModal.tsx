@@ -5,7 +5,7 @@ import { Form, Button } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useMutationStreamJob } from 'hooks'
+import { useMutationApiService } from 'hooks'
 import { strlen } from 'utils'
 
 const { TextField, TextAreaField } = Form
@@ -54,17 +54,24 @@ export const JobModal = observer((props: JobModalProps) => {
 
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
-    apiGroupName: '',
-    apiGroupPath: '/',
-    apiGroupDesc: ''
+    name: '',
+    path: '/',
+    desc: ''
   }))
 
-  const mutation = useMutationStreamJob()
+  const mutation = useMutationApiService()
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      console.log(params)
-      onClose?.()
+      const paramsData = {
+        option: 'createApiGroup' as const,
+        ...params
+      }
+      mutation.mutate(paramsData, {
+        onSuccess: () => {
+          onClose?.()
+        }
+      })
     }
   }
 
@@ -90,12 +97,12 @@ export const JobModal = observer((props: JobModalProps) => {
         <FormWrapper>
           <Form layout="horizon" ref={form}>
             <TextField
-              name="apiGroupName"
+              name="name"
               label={<AffixLabel>API服务组名称</AffixLabel>}
-              value={get(params, 'apiGroupName', '')}
+              value={get(params, 'name', '')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.apiGroupName = String(v)
+                  draft.name = String(v)
                 })
               }
               validateOnChange
@@ -119,12 +126,12 @@ export const JobModal = observer((props: JobModalProps) => {
               }
             />
             <TextField
-              name="apiGroupPath"
+              name="path"
               label={<AffixLabel>API服务组路径</AffixLabel>}
-              value={get(params, 'apiGroupPath', '/')}
+              value={get(params, 'path', '/')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.apiGroupPath = String(v)
+                  draft.path = String(v)
                 })
               }
               validateOnChange
@@ -148,14 +155,13 @@ export const JobModal = observer((props: JobModalProps) => {
               }
             />
             <TextAreaField
-              isLength
-              name="apiGroupDesc"
+              name="desc"
               label="描述"
               rows={3}
-              value={get(params, 'apiGroupDesc', '')}
+              value={get(params, 'desc', '')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.apiGroupDesc = String(v)
+                  draft.desc = String(v)
                 })
               }
               validateOnChange
