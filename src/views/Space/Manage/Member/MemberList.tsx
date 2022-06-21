@@ -42,10 +42,10 @@ const columns = [
             <Icon name="human" type="dark" size={16} />
           </Center>
           <div tw="flex-1 break-all truncate">
-            <div tw="truncate table-instance-name">
+            <div tw="truncate ">
               <TextEllipsis>{userId ? userName : '用户不存在'}</TextEllipsis>
             </div>
-            <div tw="truncate table-instance-id">
+            <div tw="truncate ">
               <TextEllipsis>{userId}</TextEllipsis>
             </div>
           </div>

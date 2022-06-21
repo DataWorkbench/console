@@ -54,6 +54,7 @@ const SpaceCardView = observer(() => {
     queryKeyWord,
     scrollElem,
     isModal = false,
+    isAdmin,
   } = stateStore
   const [filter, setFilter] = useImmer({
     regionId,
@@ -61,6 +62,7 @@ const SpaceCardView = observer(() => {
     reverse: true,
     limit: 10,
     search: '',
+    isAdmin,
   })
 
   const {
@@ -70,7 +72,7 @@ const SpaceCardView = observer(() => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useQueryWorkSpace(filter)
+  } = useQueryWorkSpace({ ...filter, isAdmin })
 
   const memberStore = useMemberStore()
 

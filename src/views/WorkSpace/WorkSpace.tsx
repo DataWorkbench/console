@@ -86,6 +86,7 @@ const WorkSpace = observer(
       onItemCheck,
       scrollElem: null,
       cardView: true,
+      isAdmin: true,
       defaultColumns: [
         { title: '空间名称/ID', dataIndex: 'id', fixedInSetting: true },
         { title: '空间状态', dataIndex: 'status' },
