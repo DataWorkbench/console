@@ -238,7 +238,10 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           </div>
         </FlexBox>
 
-        <FlexBox tw="justify-between mt-3">
+        <FlexBox
+          tw="justify-between mt-3 cursor-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div>
             <div tw="inline">我的角色：</div>
             <RoleNameWrapper>空间所有者</RoleNameWrapper>
@@ -249,22 +252,25 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             {space.roles ? (
               <RoleIcons list={space.roles ?? roleList} />
             ) : (
-              <TextLink
-                hasIcon={false}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  memberStore.set({
-                    op: 'create',
-                    spaceItem: {
-                      id: space.id,
-                      name: space.name,
-                      regionId,
-                    },
-                  })
-                }}
-              >
-                添加成员
-              </TextLink>
+              <FlexBox tw="gap-1">
+                <span>无成员</span>
+                <TextLink
+                  hasIcon={false}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    memberStore.set({
+                      op: 'create',
+                      spaceItem: {
+                        id: space.id,
+                        name: space.name,
+                        regionId,
+                      },
+                    })
+                  }}
+                >
+                  添加
+                </TextLink>
+              </FlexBox>
             )}
           </div>
         </FlexBox>

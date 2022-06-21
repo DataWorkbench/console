@@ -21,6 +21,7 @@ import { collect, map } from 'utils/functions'
 
 import useIcon from 'hooks/useHooks/useIcon'
 import icons from 'views/Space/Header/icons'
+import { useImmer } from 'use-immer'
 import SpaceLists from './SpaceLists'
 import SpaceModal from './SpaceModal'
 import BestPractice from './BestPractice'
@@ -46,7 +47,11 @@ const Content = styled(Card)(({ isModal }: { isModal?: boolean }) => [
   isModal && tw`shadow-none mb-0`,
 ])
 
-type RouteListType = { name: string; subFuncList: { name: string }[] }
+type RouteListType = {
+  name: string
+  title: string
+  subFuncList: { name: string }[]
+}
 
 // const filterEmpty = (item: RouteListType) => item.subFuncList.length > 0
 
@@ -65,6 +70,23 @@ const getMapPlatformRoute =
     }
   }
 
+// const adminRoutes = ['network', 'members', 'permissions']
+const unAdminRoutes = ['network', 'permissions']
+const getMapAdminRoute =
+  (isAdmin: boolean) =>
+  (item: RouteListType): RouteListType => {
+    if (isAdmin || item.name !== 'manage') {
+      return item
+    }
+    return {
+      ...item,
+      title: '空间详情',
+      subFuncList: lodashFilter(item.subFuncList, (i) =>
+        unAdminRoutes.includes(i.name)
+      ),
+    }
+  }
+
 interface IWrokSpaceProps {
   isModal?: boolean
   onItemCheck?: (regionId: string, spaceId: string) => void
@@ -78,6 +100,10 @@ const WorkSpace = observer(
   ({ isModal, onItemCheck, onHide, showCreate = false }: IWrokSpaceProps) => {
     const [zone] = useCookie('zone')
     const { status, refetch, data: regionInfos } = useQueryRegion()
+    const [routeFn, setRouteFn] = useImmer<{
+      platform?: Function
+      isAdmin?: Function
+    }>({})
 
     const { globalStore, workSpaceStore } = useStore()
     // const [columnSettingsObj] = useLocalStorage(columnSettingsKey, [])
@@ -142,14 +168,24 @@ const WorkSpace = observer(
       }
       lodashSet(window, 'GLOBAL_CONFIG.new_docs_url', url)
       lodashSet(window, 'GLOBAL_CONFIG.docs_center_url', url)
+
+      setRouteFn((draft) => {
+        draft.platform = map(getMapPlatformRoute(platform!))
+      })
+    }, [platform, stateStore, setRouteFn])
+
+    useEffect(() => {
+      setRouteFn((draft) => {
+        draft.isAdmin = map(getMapAdminRoute(stateStore.isAdmin))
+      })
+    }, [setRouteFn, stateStore.isAdmin])
+
+    useEffect(() => {
       const { defaultFuncList } = workSpaceStore
       workSpaceStore.set({
-        funcList: collect(
-          map(getMapPlatformRoute(platform!))
-          // filter(filterEmpty)
-        )(defaultFuncList!),
+        funcList: collect(...(Object.values(routeFn) as any))(defaultFuncList!),
       })
-    }, [platform, stateStore, workSpaceStore])
+    }, [workSpaceStore, routeFn])
 
     useEffect(() => {
       if (regionInfos?.length) {

@@ -81,8 +81,8 @@ const defaultFuncList = [
       { name: 'network', title: '网络管理', icon: 'earth' },
       // { name: 'setting', title: '空间配置', icon: 'blockchain' },
       // { name: 'engine', title: '引擎管理', icon: 'blockchain' },
-      // { name: 'users', title: '成员管理', icon: 'blockchain' },
-      // { name: 'permissions', title: '列表权限', icon: 'blockchain' },
+      { name: 'members', title: '成员管理', icon: 'blockchain' },
+      { name: 'permissions', title: '列表权限', icon: 'blockchain' },
     ],
   },
 ]
