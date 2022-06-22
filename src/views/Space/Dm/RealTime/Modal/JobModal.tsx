@@ -405,6 +405,7 @@ export const JobModal = observer((props: JobModalProps) => {
                         )}
                         {!isEdit && params.jobType === JobType.REALTIME && (
                           <RealTimeRadioGroupField
+                            name="realTimeInfo"
                             label={<AffixLabel>数据源类型</AffixLabel>}
                             value={params.realTimeInfo}
                             onChange={(v: RealTimeSyncTypeVal) => {
