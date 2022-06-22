@@ -17,6 +17,11 @@ import { useFetchJob, useMutationStreamJob, useStore } from 'hooks'
 import { Control, Field, Label } from '@QCFE/lego-ui'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { nameMatchRegex, strlen } from 'utils/convert'
+import {
+  RealTimeRadioGroupField,
+  RealTimeSyncTypeVal,
+} from 'views/Space/Dm/RealTime/Sync/RealTimeRadioGroup'
+// import { sourceTypes } from 'views/Space/Ops/DataIntegration/constants'
 import { JobModeItem } from './JobModeItem'
 import {
   filterFolderOfTreeData,
@@ -104,6 +109,10 @@ export const JobModal = observer((props: JobModalProps) => {
       jobType: type,
       pid: jobNode ? get(jobNode, isEdit ? 'pid' : 'key') : '',
       job: isEdit ? get(jobNode, 'job') : null,
+      realTimeInfo: {
+        targetType: '',
+        sourceType: '',
+      },
       syncTypeInfo: {
         type: 'full',
         fullSource: '',
@@ -167,7 +176,12 @@ export const JobModal = observer((props: JobModalProps) => {
       })
     } else if (form.current?.validateForm()) {
       const fields = form.current.getFieldsValue()
-      const { syncTypeInfo, ...rest }: { syncTypeInfo: SyncTypeVal } = fields
+      const {
+        syncTypeInfo,
+        realTimeInfo,
+        ...rest
+      }: { syncTypeInfo: SyncTypeVal; realTimeInfo: RealTimeSyncTypeVal } =
+        fields
       const data: any = {
         op: isEdit ? 'edit' : 'create',
         jobMode: params.jobMode,
@@ -184,19 +198,15 @@ export const JobModal = observer((props: JobModalProps) => {
         }
         if (params.jobMode === JobMode.RT) {
           data.type = params.jobType
-        } else if (params.jobMode === JobMode.DI) {
-          if (params.jobType === JobType.OFFLINE) {
-            data.type =
-              syncTypeInfo.type === 'full'
-                ? SyncJobType.OFFLINEFULL
-                : SyncJobType.OFFLINEINCREMENT
-          }
-          if (params.jobType === JobType.REALTIME) {
-            data.type =
-              syncTypeInfo.type === 'full'
-                ? SyncJobType.REALTIME
-                : SyncJobType.REALTIME
-          }
+        } else if (
+          params.jobMode === JobMode.DI &&
+          params.jobType === JobType.OFFLINE
+        ) {
+          data.type =
+            syncTypeInfo.type === 'full'
+              ? SyncJobType.OFFLINEFULL
+              : SyncJobType.OFFLINEINCREMENT
+
           if (syncTypeInfo.type === 'full') {
             data.source_type = syncTypeInfo.fullSource
             data.target_type = syncTypeInfo.fullSink
@@ -204,6 +214,13 @@ export const JobModal = observer((props: JobModalProps) => {
             data.source_type = syncTypeInfo.incrSource
             data.target_type = syncTypeInfo.incrSink
           }
+        } else if (
+          params.jobMode === JobMode.DI &&
+          params.jobType === JobType.REALTIME
+        ) {
+          data.type = SyncJobType.REALTIME
+          data.source_type = realTimeInfo.sourceType
+          data.target_type = realTimeInfo.targetType
         }
       }
       mutation.mutate(data, {
@@ -326,7 +343,7 @@ export const JobModal = observer((props: JobModalProps) => {
                         {!isEdit && params.jobType === JobType.REALTIME && (
                           <Field>
                             <Label>
-                              <AffixLabel>开发模式</AffixLabel>
+                              <AffixLabel>同步类型</AffixLabel>
                             </Label>
                             <Control>
                               <span>实时同步</span>
@@ -344,7 +361,7 @@ export const JobModal = observer((props: JobModalProps) => {
                             label={<AffixLabel>同步类型</AffixLabel>}
                             name="syncTypeInfo"
                             value={params.syncTypeInfo}
-                            onChange={(v) => {
+                            onChange={(v: SyncTypeVal) => {
                               setParams((draft) => {
                                 draft.syncTypeInfo = v
                               })
@@ -371,8 +388,39 @@ export const JobModal = observer((props: JobModalProps) => {
                             ]}
                           />
                         )}
+                        {!isEdit && params.jobType === JobType.REALTIME && (
+                          <RealTimeRadioGroupField
+                            label={<AffixLabel>数据源类型</AffixLabel>}
+                            value={params.realTimeInfo}
+                            onChange={(v: RealTimeSyncTypeVal) => {
+                              setParams((draft) => {
+                                draft.realTimeInfo = v
+                              })
+                            }}
+                            validateOnChange
+                            schemas={[
+                              {
+                                rule: ({
+                                  sourceType,
+                                  targetType,
+                                }: {
+                                  sourceType?: string
+                                  targetType?: string
+                                } = {}) => {
+                                  if (!sourceType || !targetType) {
+                                    return false
+                                  }
+                                  return true
+                                },
+                                help: '请选择同步数据源信息',
+                                status: 'error',
+                              },
+                            ]}
+                          />
+                        )}
                       </>
                     )}
+
                     <TextField
                       autoComplete="off"
                       name="name"
