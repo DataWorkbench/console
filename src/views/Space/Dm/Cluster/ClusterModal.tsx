@@ -53,6 +53,9 @@ const { CollapseItem } = Collapse
 const { TextField, SelectField, NumberField } = Form
 const splitReg = /\s*[=:]\s*|\s+/
 
+const UNIT_PRICE = 0.36
+const MONTH_PRICE = 176
+
 const FormWrapper = styled('div')(() => [
   css`
     ${tw`w-[686px] overflow-auto `}
@@ -1008,7 +1011,7 @@ key02:value02`}
                     <div tw="text-sm">总价</div>
                     <div tw="text-neut-8">
                       <span tw="text-xl text-green-11">¥ 0</span>{' '}
-                      <del tw="">8.1245/小时</del>
+                      <del tw="">{(totalCU * UNIT_PRICE).toFixed(2)} /小时</del>
                     </div>
                   </FlexBox>
                   <FlexBox tw="justify-between">
@@ -1022,8 +1025,8 @@ key02:value02`}
                     </div>
 
                     <div tw="text-neut-8">
-                      (合 <span tw="text-green-11">¥0</span> <del>2718</del>{' '}
-                      每月 )
+                      (合 <span tw="text-green-11">¥0</span>{' '}
+                      <del>{(totalCU * MONTH_PRICE).toFixed(2)}</del> 每月 )
                     </div>
                   </FlexBox>
                 </div>
