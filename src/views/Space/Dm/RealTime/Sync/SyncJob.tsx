@@ -16,6 +16,7 @@ import {
   useStore,
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { timeFormat } from 'utils/convert'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -40,41 +41,6 @@ const CollapseWrapper = styled('div')(() => [
 
     li:last-child {
       ${tw`mb-1`}
-    }
-  `,
-])
-const SyncJobWrapper = styled('div')(() => [
-  tw`flex flex-col flex-1 relative`,
-  css`
-    button {
-      ${tw`h-7!`}
-    }
-    .refresh-button {
-      ${tw`h-7! w-7!`}
-    }
-    .select-control {
-      ${tw`h-7! flex relative`}
-      .select-multi-value-wrapper {
-        ${tw`flex-1`}
-      }
-    }
-    input {
-      ${tw`h-7!`}
-    }
-    .radio-wrapper {
-      ${tw`h-7! flex items-center`}
-      &::before {
-        ${tw` top-[6px]`}
-      }
-    }
-    label.radio.checked::after {
-      ${tw` top-[10px]`}
-    }
-    .radio-button {
-      ${tw`h-7!`}
-    }
-    .clear-button {
-      ${tw`h-7! w-7!`}
     }
   `,
 ])
@@ -117,7 +83,20 @@ const stepsData = [
   {
     key: 'p3',
     title: '通道控制',
-    desc: <>您可以配置作业的传输速率和错误记录来控制整个数据同步过程</>,
+    desc: (
+      <>
+        您可以配置作业的传输速率和错误记录来控制整个数据同步过程
+        <HelpCenterLink
+          hasIcon
+          tw="ml-1.5"
+          isIframe={false}
+          href="/manual/integration_job/create_job_offline_1/#通道控制"
+          onClick={(e) => e.stopPropagation()}
+        >
+          数据同步文档
+        </HelpCenterLink>
+      </>
+    ),
   },
 ]
 
@@ -239,7 +218,9 @@ const SyncJob = () => {
       setMode(confData?.job_mode)
       setDefaultJobContent(get(confData, 'job_content'))
     }
-  }, [confData, mode])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [confData])
+
   useEffect(() => {
     if (editorRef.current) {
       editorRef.current?.setValue(
@@ -314,9 +295,14 @@ const SyncJob = () => {
           return
         }
         set(resource, 'job_content', JSON.stringify(JSON.parse(syncJobScript)))
-      } else {
+      }
+    } catch (e) {
+      showConfWarn('脚本格式不正确')
+      return
+    }
+    try {
+      if (mode === 1) {
         set(resource, 'job_content', '')
-
         if (!resource && isValidateSource) {
           showConfWarn('未配置数据源信息')
           return
@@ -619,36 +605,8 @@ const SyncJob = () => {
   }
 
   return (
-    <SyncJobWrapper>
+    <div tw="flex flex-col flex-1 relative">
       <JobToolBar>
-        {mode === 1 ? (
-          <PopConfirm
-            type="warning"
-            content={
-              <>
-                <div tw="text-base font-medium">确认转变为脚本模式？</div>
-                <div tw="text-neut-8 mt-2">
-                  一旦数据集成过程由向导转变为脚本模式，不可逆转，且来源、目的数据源需要和向导模式保持一致，确认转变为脚本模式么？
-                </div>
-              </>
-            }
-            okText="转变"
-            onOk={handleConvert}
-            // onOk={() => {
-            //   save(false, () => setMode(2), false)
-            // }}
-          >
-            <Button type="black">
-              <Icon name="coding" type="light" />
-              脚本模式
-            </Button>
-          </PopConfirm>
-        ) : (
-          <Button>
-            <Icon name="remark" type="dark" />
-            语法检查
-          </Button>
-        )}
         <Button onClick={() => save()} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存
@@ -663,6 +621,11 @@ const SyncJob = () => {
           <Icon name="export" />
           发布
         </Button>
+        {!!confData?.updated && (
+          <span tw="flex-auto text-right text-font">
+            最后更新时间：{timeFormat(confData.updated * 1000)}
+          </span>
+        )}
       </JobToolBar>
       <div tw="flex-1 overflow-hidden">
         <SimpleBar
@@ -721,7 +684,7 @@ const SyncJob = () => {
           </div>
         </Modal>
       )}
-    </SyncJobWrapper>
+    </div>
   )
 }
 

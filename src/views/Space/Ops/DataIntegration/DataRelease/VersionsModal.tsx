@@ -11,7 +11,6 @@ import useFilter from 'hooks/useHooks/useFilter'
 import {
   DataReleaseActionType,
   dataReleaseColumns,
-  dataReleaseSuggestions,
   versionColumns,
 } from 'views/Space/Ops/DataIntegration/constants'
 import React, { useMemo, useRef } from 'react'
@@ -198,11 +197,15 @@ const VersionsModal = (props: IProps) => {
           <TableHeader
             columnsSetting={columnsSetting}
             queryKey={() => getJobVersionKey('list')}
-            suggestions={dataReleaseSuggestions.filter((i) =>
-              ['search'].includes(i.key as string)
-            )}
+            suggestions={[
+              {
+                label: '版本 ID',
+                key: 'version',
+              },
+            ]}
             filterInputConfig={{
-              defaultKeywordLabel: '作业名称',
+              defaultKeywordLabel: '版本 ID',
+              searchKey: 'version',
             }}
           />
           <Table

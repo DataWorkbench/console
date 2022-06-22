@@ -28,7 +28,8 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
   const [selected, setSelected] = useState<string[]>([])
   useEffect(() => {
     setVisible(show)
-    setSelected(selectedProp?.filter(Boolean) || [])
+    setSelected(((selectedProp || [])?.filter(Boolean) as any) || [])
+    setSource(undefined)
   }, [selectedProp, show])
   return (
     <>

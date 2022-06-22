@@ -51,8 +51,8 @@ const RealTime = observer(() => {
   const steps = useMemo(
     () => [
       '创建作业',
-      '编辑 SQL',
-      '测试运行',
+      '编辑作业',
+      '调度设置',
       '提交、发布',
       '查看任务以及运维',
     ],

@@ -4,6 +4,7 @@ import { get, isEmpty } from 'lodash-es'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import tw, { css, theme } from 'twin.macro'
 import { useMutationPingSyncJobConnection } from 'hooks'
+import { FormH7Wrapper } from 'views/Space/Dm/RealTime/styled'
 import ClusterTableModal from '../../Cluster/ClusterTableModal'
 
 interface SyncClusterProps {
@@ -51,7 +52,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
   }
 
   return (
-    <>
+    <FormH7Wrapper>
       <Form
         tw="pl-0!"
         css={css`
@@ -147,7 +148,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         selectedIds={isEmpty(clusterId) ? [] : [clusterId]}
         onCancel={() => setVisible(false)}
       />
-    </>
+    </FormH7Wrapper>
   )
 })
 

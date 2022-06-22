@@ -6,6 +6,8 @@ import {
   ModalContent,
   ModalStep,
   SelectTreeField,
+  HelpCenterLink,
+  Center,
 } from 'components'
 import { Button, Form, Icon } from '@QCFE/qingcloud-portal-ui'
 import { cloneDeep, get } from 'lodash-es'
@@ -382,7 +384,20 @@ export const JobModal = observer((props: JobModalProps) => {
                                   }
                                   return true
                                 },
-                                help: '请选择同步数据源信息',
+                                help: (
+                                  <Center>
+                                    <div tw="mr-1.5 pt-[1px]">
+                                      请选择同步数据源信息
+                                    </div>
+                                    <HelpCenterLink
+                                      hasIcon
+                                      isIframe={false}
+                                      href="/manual/integration_job/sync_type/#全量同步与增量同步支持的数据源类型"
+                                    >
+                                      支持数据源
+                                    </HelpCenterLink>
+                                  </Center>
+                                ),
                                 status: 'error',
                               },
                             ]}

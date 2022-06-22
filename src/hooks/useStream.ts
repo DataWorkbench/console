@@ -3,14 +3,16 @@ import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
 import {
   describeFlinkUI,
-  listReleaseStreamJobs,
   listReleaseJobVersions,
+  listReleaseStreamJobs,
   listStreamJobInstances,
   offlineReleaseJob,
   resumeReleaseJob,
   suspendReleaseJob,
   terminateInstances,
 } from 'stores/api'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { apiRequest } from 'utils/api'
 
 interface IRouteParams {
   regionId: string
@@ -142,6 +144,7 @@ export const useMutationReleaseJobs = () => {
       op: OP
       jobId: String
       stopRunning: Boolean
+      type?: JobMode
     }) => {
       const params = {
         spaceId,
@@ -154,7 +157,20 @@ export const useMutationReleaseJobs = () => {
       } else if (op === 'disable') {
         ret = await suspendReleaseJob(params)
       } else if (op === 'stop') {
-        ret = await offlineReleaseJob(params)
+        if (rest.type === JobMode.DI) {
+          ret = await apiRequest(
+            'syncJobReleaseManage',
+            'offlineReleaseSyncJob'
+          )({
+            regionId,
+            uri: { space_id: spaceId, job_id: rest.jobId },
+            data: {
+              stop_running: rest.stopRunning,
+            },
+          })
+        } else {
+          ret = await offlineReleaseJob(params)
+        }
       }
       return ret
     }
