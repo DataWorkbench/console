@@ -607,29 +607,6 @@ const SyncJob = () => {
   return (
     <div tw="flex flex-col flex-1 relative">
       <JobToolBar>
-        {mode === 1 ? (
-          <PopConfirm
-            type="warning"
-            content={
-              <>
-                <div tw="text-base font-medium">确认转变为脚本模式？</div>
-                <div tw="text-neut-8 mt-2">
-                  一旦数据集成过程由向导转变为脚本模式，不可逆转，且来源、目的数据源需要和向导模式保持一致，确认转变为脚本模式么？
-                </div>
-              </>
-            }
-            okText="转变"
-            onOk={handleConvert}
-            // onOk={() => {
-            //   save(false, () => setMode(2), false)
-            // }}
-          >
-            <Button type="black">
-              <Icon name="coding" type="light" />
-              脚本模式
-            </Button>
-          </PopConfirm>
-        ) : null}
         <Button onClick={() => save()} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存
