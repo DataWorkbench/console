@@ -9,10 +9,12 @@ import { useQueryWorkSpace } from 'hooks'
 import { css } from 'twin.macro'
 import { useEffect, useReducer } from 'react'
 import emitter from 'utils/emitter'
+import useIcon from 'hooks/useHooks/useIcon'
 import { Settings } from './Settings'
 import { Navs } from './Navs'
 import { BackMenu } from './BackMenu'
 import { Root, SelectWrapper } from './styled'
+import icons from './icons'
 
 const colorVars = {
   backColors: ['#D9F4F1', '#FDEFD8', '#F1E4FE', '#E0EBFE', '#FEE9DA'],
@@ -20,13 +22,14 @@ const colorVars = {
 }
 
 export const Header = observer(() => {
+  useIcon(icons)
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
   const { pathname } = useLocation()
   const history = useHistory()
   const {
     globalStore: { darkMode },
-    workSpaceStore: { set },
+    workSpaceStore: { set, showHeaderNav },
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
@@ -112,7 +115,7 @@ export const Header = observer(() => {
           }}
         />
       </Center>
-      <Navs mod={mod} />
+      {showHeaderNav && <Navs mod={mod} />}
       <Settings darkMode={darkMode} />
     </Root>
   )

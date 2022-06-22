@@ -1,14 +1,16 @@
-import { useMutation, useQuery } from 'react-query'
+import { useInfiniteQuery, useMutation, useQuery } from 'react-query'
 import { useParams } from 'react-router-dom'
 import { omit } from 'lodash-es'
 import {
   addMember,
   deleteMember,
+  loadAllMemberList,
   loadMemberList,
   loadRoleList,
   loadRolePermissionList,
   updateMember,
 } from 'stores/api'
+import { getNextPageParam } from './apiHooks'
 
 interface IRouteParams {
   regionId: string
@@ -87,4 +89,22 @@ export const useMutationMember = () => {
     }
     return ret
   })
+}
+
+export const useQueryInfiniteMember = (
+  params: Record<string, any>,
+  config: Record<string, any> = {}
+) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const queryKey = ['member', { regionId, spaceId, ...params }]
+  return useInfiniteQuery(
+    queryKey,
+    async ({ pageParam = params }) => {
+      return loadAllMemberList({ regionId, spaceId, ...pageParam })
+    },
+    {
+      ...config,
+      getNextPageParam,
+    }
+  )
 }

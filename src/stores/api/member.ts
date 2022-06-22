@@ -20,6 +20,26 @@ export const loadMemberList = ({
   })
 }
 
+export const loadAllMemberList = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        hasMore: false,
+        infos: [
+          {
+            id: 'usr-fkc8HdBQ',
+            name: 'test-1',
+          },
+          {
+            id: 'usr-MMizzuys',
+            name: 'test-02',
+          },
+        ],
+      })
+    }, 1000)
+  })
+}
+
 export const deleteMember = ({
   regionId,
   spaceId,

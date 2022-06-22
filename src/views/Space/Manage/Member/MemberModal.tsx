@@ -1,5 +1,4 @@
 import {
-  ArrayInputField,
   Divider,
   HelpCenterLink,
   Modal,
@@ -7,12 +6,12 @@ import {
   PopConfirm,
 } from 'components'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { Button, Field, Label } from '@QCFE/lego-ui'
-import tw, { css } from 'twin.macro'
+import { Button, Field, Form, Label } from '@QCFE/lego-ui'
+// import tw, { css } from 'twin.macro'
 import { useStore } from 'stores/index'
 import { useMemberStore } from 'views/Space/Manage/Member/store'
 import { observer } from 'mobx-react-lite'
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useImmer } from 'use-immer'
 import {
   checkboxButtonStyles,
@@ -22,10 +21,18 @@ import {
 } from 'views/Space/Manage/Member/styled'
 import { RoleType } from 'views/Space/Manage/Member/constants'
 import { useQueryClient } from 'react-query'
-import { getMemberKeys, useMutationMember, useQueryRoleList } from 'hooks'
-import { get } from 'lodash-es'
+import {
+  getMemberKeys,
+  useMutationMember,
+  useQueryInfiniteMember,
+  useQueryRoleList,
+} from 'hooks'
+import { flatten, get, omit } from 'lodash-es'
+import { useDebounce } from 'react-use'
 
 const memberDescPlaceHolder = '请输入成员描述'
+
+const { SelectField } = Form
 
 interface Role {
   id: string
@@ -51,7 +58,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
   const { roleList: roleListProp, data, cb } = props
   const ref = useRef()
   const [value, setValue] = useImmer({
-    user_ids: data ? [data.user_id] : [''],
+    user_ids: data ? [data.user_id] : [],
     system_role_ids: data ? data.system_roles.map((i) => i.id) : [],
     desc: data ? data.desc : '',
     user_id: data ? data.user_id : '',
@@ -78,7 +85,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
     mutation.mutate(
       {
         op,
-        ...value,
+        ...omit(value, op === 'create' ? 'user_id' : 'user_ids'),
         spaceId: space.id,
         regionId: (space as any)?.regionId || undefined,
       },
@@ -108,7 +115,37 @@ const MemberModal = observer((props: IMemberModalProps) => {
     }
   }
 
-  console.log(111, roleList)
+  const [filter, setFilter] = useImmer({
+    search: '',
+  })
+  const [search, setSearch] = useState('')
+
+  useDebounce(
+    () => {
+      setFilter((draft) => {
+        draft.search = search
+      })
+    },
+    300,
+    [search]
+  )
+
+  const {
+    status,
+    data: memberList,
+    fetchNextPage,
+    hasNextPage,
+  } = useQueryInfiniteMember(filter)
+  const options = flatten(
+    memberList?.pages?.map((page: Record<string, any>) => page.infos || [])
+  ).map((i) => ({ label: i.name, value: i.id }))
+
+  const loadData = () => {
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }
+
   const footer = (
     <div>
       <Button
@@ -185,23 +222,43 @@ const MemberModal = observer((props: IMemberModalProps) => {
               </DisableTextField>
             </Field>
           ) : (
-            <ArrayInputField
+            <SelectField
               label="成员"
-              css={css`
-                &.field .control .input {
-                  ${tw`w-[330px]`}
-                }
-              `}
-              disabled={op === 'update'}
-              value={value.user_ids}
+              name="user_ids"
+              placeholder="请选择或搜索账户名称、邮箱"
+              multi
+              searchable
+              options={options}
+              closeOnSelect={false}
+              openOnClick
+              isLoading={status === 'loading'}
+              isLoadingAtBottom
+              onMenuScrollToBottom={loadData}
+              onInputChange={setSearch}
+              bottomTextVisible
               onChange={(arr: string[]) => {
                 setValue((draft) => {
                   draft.user_ids = arr
                 })
               }}
-              name="userId"
-              placeholder="请输入成员"
             />
+            // <ArrayInputField
+            //   label="成员"
+            //   css={css`
+            //     &.field .control .input {
+            //       ${tw`w-[330px]`}
+            //     }
+            //   `}
+            //   disabled={op === 'update'}
+            //   value={value.user_ids}
+            //   onChange={(arr: string[]) => {
+            //     setValue((draft) => {
+            //       draft.user_ids = arr
+            //     })
+            //   }}
+            //   name="userId"
+            //   placeholder="请输入成员"
+            // />
           )}
 
           <TextAreaFieldWrapper
