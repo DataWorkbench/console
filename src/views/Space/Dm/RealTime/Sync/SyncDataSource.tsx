@@ -127,8 +127,9 @@ enum WriteMode {
 const getWriteMode = (type?: SourceType) => {
   switch (type) {
     case SourceType.Mysql:
-    case SourceType.PostgreSQL:
       return [WriteMode.Insert, WriteMode.Replace, WriteMode.Update]
+    case SourceType.PostgreSQL:
+      return [WriteMode.Insert, WriteMode.Update]
     case SourceType.ClickHouse:
       return [WriteMode.Insert]
     case SourceType.SqlServer:
