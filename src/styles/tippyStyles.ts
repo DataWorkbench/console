@@ -6,6 +6,22 @@ const tippyStyles = css`
       padding: 0;
       ${tw`break-all`}
     }
+    &[data-placement^='top'] > .tippy-arrow::before {
+      ${tw`border-t-white dark:border-t-white`}
+      bottom: -8px;
+    }
+    &[data-placement^='bottom'] > .tippy-arrow::before {
+      ${tw`border-b-neut-3 dark:border-b-white`}
+      top: -8px;
+    }
+    &[data-placement^='left'] > .tippy-arrow::before {
+      ${tw`border-l-neut-3 dark:border-l-white`}
+      right: -8px;
+    }
+    &[data-placement^='right'] > .tippy-arrow::before {
+      ${tw`border-r-neut-3 dark:border-r-white`}
+      left: -8px;
+    }
   }
   .tippy-box[data-theme~='light'] {
     font-size: 12px;
@@ -14,6 +30,9 @@ const tippyStyles = css`
     box-shadow: 0px 1px 6px rgba(50, 69, 88, 0.2);
     ${tw`bg-white border border-solid border-neut-3 dark:border-none`}
 
+    //&[data-placement^='top'] {
+    //  box-shadow: 0px 8px 16px rgba(11, 18, 25, 0.1);
+    //}
     &[data-placement^='top'] > .tippy-arrow::before {
       ${tw`border-t-neut-3 dark:border-t-white`}
     }
@@ -113,6 +132,19 @@ const tippyStyles = css`
       ${tw`fill-current text-green-11`}
     }
   }
+
+  .tippy-box[data-theme~='popconfirm'] {
+    font-size: 12px;
+    line-height: 1.25;
+    ${tw`bg-neut-16 text-white border rounded-[3px] border-neut-13`}
+    > .tippy-backdrop {
+      ${tw`bg-neut-16`}
+    }
+    > .tippy-arrow {
+      ${tw`fill-current text-neut-14`}
+    }
+  }
+
   .tippy-box.popconfirm-box {
     ${tw`bg-neut-16 text-white leading-5`}
   }

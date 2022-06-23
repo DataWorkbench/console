@@ -3,6 +3,8 @@ import { useStore } from 'stores'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import tw, { styled, css, theme } from 'twin.macro'
 import { useDarkMode } from 'hooks'
+import useIcon from 'hooks/useHooks/useIcon'
+import icons from './icons'
 
 interface NavsProps {
   mod?: string
@@ -31,6 +33,7 @@ const FuncWrapper = styled('div')(({ current }: { current: boolean }) => [
 export const Navs = ({ mod }: NavsProps) => {
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
+  useIcon(icons)
   const location = useLocation()
   const {
     workSpaceStore: { funcList },
@@ -47,21 +50,22 @@ export const Navs = ({ mod }: NavsProps) => {
       }
     }
   }, [location, globalStore, setDarkMode])
-
   return (
     <div tw="flex gap-6">
-      {funcList.map(({ title, name }) => (
-        <FuncWrapper key={name} current={mod === name}>
-          <Link
-            tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
-            to={`/${regionId}/workspace/${spaceId}/${
-              name === 'ops' ? 'ops/release' : name
-            }`}
-          >
-            {title}
-          </Link>
-        </FuncWrapper>
-      ))}
+      {funcList
+        .filter((i) => !i.hideInHeader)
+        .map(({ title, name }) => (
+          <FuncWrapper key={name} current={mod === name}>
+            <Link
+              tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
+              to={`/${regionId}/workspace/${spaceId}/${
+                name === 'ops' ? 'ops/release' : name
+              }`}
+            >
+              {title}
+            </Link>
+          </FuncWrapper>
+        ))}
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { useWindowSize } from 'react-use'
+// import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get, omitBy } from 'lodash-es'
 import { useImmer } from 'use-immer'
@@ -13,7 +13,20 @@ import { Tooltip, FlexBox, TextEllipsis } from 'components'
 import { useHistory } from 'react-router-dom'
 import TableRowOpt from './TableRowOpt'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
+
+const isNetworkInit = (
+  platform: Record<string, any>,
+  space: Record<string, any>
+) => {
+  return (
+    platform &&
+    platform.work_in_iaas &&
+    platform.enable_network &&
+    space.status !== 2 &&
+    !space.network_is_init
+  )
+}
 
 const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
@@ -26,7 +39,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   } = stateStore
   // const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const selectedRowKeys = selectedSpaces.map((i: Record<string, any>) => i.id)
-  const { width: winW } = useWindowSize()
+  // const { width: winW } = useWindowSize()
   const [sort, setSort] = useImmer<{
     name: string
     created: string
@@ -58,8 +71,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     sort_by: '',
     status: '',
   })
-
-  const ifExceedMaxWidth = winW > 1535
+  // const ifExceedMaxWidth = winW > 1535
 
   const columns = useMemo(() => {
     return defaultColumns.map(
@@ -70,7 +82,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             dataIndex,
             sortable: true,
             sortKey: 'name',
-            width: 200,
+            // width: 200,
             sortOrder: sort.name,
             render: (field: string, row: any) => (
               <div tw="flex items-center w-full">
@@ -83,7 +95,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                 <div tw="ml-2 flex-1 overflow-hidden">
                   <TextEllipsis>
                     <span
-                      className={row.status === 1 && 'row-name'}
+                      className={row.status === 1 ? 'row-name' : ''}
                       css={[
                         tw`font-semibold`,
                         row.status === 1 && tw`cursor-pointer`,
@@ -110,6 +122,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             { value: 2, text: '已禁用' },
           ]
           return {
+            width: 130,
             title: (
               <FlexBox tw="items-center">
                 <span>{title}</span>
@@ -223,6 +236,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             title,
             dataIndex,
             sortable: true,
+            width: 200,
             sortKey: 'created',
             sortOrder: sort.created,
             render: (filed: number) => formatDate(filed),
@@ -232,8 +246,9 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
           return {
             title,
             dataIndex,
+            width: 400,
             // width: ifExceedMaxWidth ? 380 : 330,
-            width: ifExceedMaxWidth ? 320 : 280,
+            // width: ifExceedMaxWidth ? 320 : 280,
             render: (filed: any, row: any) => (
               <TableRowOpt space={row} regionId={regionId} />
             ),
@@ -247,7 +262,6 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     sort.name,
     sort.created,
     filter.status,
-    ifExceedMaxWidth,
     history,
     regionId,
     setFilter,
@@ -301,17 +315,51 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     })
   }
 
-  const handleSelect = (keys, rows) => {
+  const handleSelect = (_: string[], rows: Record<string, any>[]) => {
     stateStore.set({ selectedSpaces: rows })
     // setSelectedRowKeys(keys)
   }
 
+  const columnsWithNetwork = useMemo(() => {
+    const defaultColumns1: Record<string, any>[] =
+      filterColumn.length > 0 ? filterColumn : columns
+    return defaultColumns1.map((column) => {
+      return {
+        ...column,
+        render: (i: any, record: Record<string, any>) => {
+          const child = column.render ? column.render(i, record) : i
+          if (isNetworkInit(stateStore.platformConfig, record)) {
+            return (
+              <div tw="relative w-full h-full flex items-center">
+                <div
+                  tw="absolute inset-0 z-50"
+                  title="请单击以绑定网络信息"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    stateStore.set({
+                      curSpaceOpt: 'network',
+                      optSpaces: [record],
+                    })
+                  }}
+                />
+                {child}
+              </div>
+            )
+          }
+          return child
+        },
+      }
+    })
+  }, [filterColumn, columns, stateStore])
   return (
     <Table
       rowKey="id"
       loading={isFetching}
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
+      disabledRowKeys={(data?.infos || [])
+        .filter((i) => isNetworkInit(stateStore.platformConfig, i))
+        .map((i) => i.id)}
       onSelect={handleSelect}
       css={[
         tw`table-auto`,
@@ -331,7 +379,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
         `,
       ]}
       dataSource={data?.infos || []}
-      columns={filterColumn.length > 0 ? filterColumn : columns}
+      columns={columnsWithNetwork}
       onSort={handleSort}
       pagination={{
         total: get(data, 'total', 0),

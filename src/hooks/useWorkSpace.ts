@@ -8,7 +8,17 @@ import {
   deleteWorkSpaces,
   createWorkSpace,
   updateWorkSpace,
+  attachWorkSpacesNetwork,
 } from 'stores/api'
+import { apiHooks, queryKeyObj } from './apiHooks'
+import {
+  DescribePlatformConfigRequestType,
+  DescribeNetworkConfigRequestType,
+} from '../types/request'
+import {
+  PlatformManageDescribePlatformConfigType,
+  SpaceManageDescribeNetworkConfigType,
+} from '../types/response'
 
 const keys: {
   infinite: any
@@ -56,9 +66,9 @@ export const useQueryPageWorkSpace = (filter: any) => {
   })
 }
 // {IWorkSpaceParams, 'disable' | 'enable' | 'delete' | 'create'}
-interface MutationWorkSpaceParams {
+export interface MutationWorkSpaceParams {
   regionId: string
-  op: 'disable' | 'enable' | 'delete' | 'create' | 'update'
+  op: 'disable' | 'enable' | 'delete' | 'create' | 'update' | 'network'
   spaceIds?: string[]
   space?: {
     id: string
@@ -68,7 +78,11 @@ interface MutationWorkSpaceParams {
 
 export const useMutationWorkSpace = (options?: {}) => {
   return useMutation(async ({ op, ...rest }: MutationWorkSpaceParams) => {
-    if (['disable', 'enable', 'delete', 'create', 'update'].includes(op)) {
+    if (
+      ['disable', 'enable', 'delete', 'create', 'update', 'network'].includes(
+        op
+      )
+    ) {
       let ret
       if (op === 'create') {
         ret = await createWorkSpace(rest)
@@ -80,11 +94,31 @@ export const useMutationWorkSpace = (options?: {}) => {
         ret = await enableWorkSpaces(rest)
       } else if (op === 'delete') {
         ret = await deleteWorkSpaces(rest)
+      } else if (op === 'network') {
+        ret = await attachWorkSpacesNetwork(rest)
       }
       return ret
     }
     return undefined
   }, options)
 }
+
+export const useQueryDescribePlatformConfig = apiHooks<
+  'platformManage',
+  DescribePlatformConfigRequestType,
+  PlatformManageDescribePlatformConfigType
+>('platformManage', 'describePlatformConfig')
+
+export const getQueryKeyDescribePlatformConfig = () =>
+  queryKeyObj.describePlatformConfig
+
+export const useQueryDescribeNetworkConfig = apiHooks<
+  'spaceManage',
+  DescribeNetworkConfigRequestType,
+  SpaceManageDescribeNetworkConfigType
+>('spaceManage', 'describeNetworkConfig')
+
+export const getQueryKeyDescribeNetworkConfig = () =>
+  queryKeyObj.describeNetworkConfig
 
 export default useQueryWorkSpace

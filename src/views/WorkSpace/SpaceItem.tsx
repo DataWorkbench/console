@@ -1,14 +1,14 @@
 import { observer } from 'mobx-react-lite'
 import { Link, useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
-import { Radio, Menu, Icon } from '@QCFE/lego-ui'
+import { Icon, Menu, Radio } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import { FlexBox, Center, Box, Card, Tooltip, TextEllipsis } from 'components'
+import { Box, Card, Center, FlexBox, TextEllipsis, Tooltip } from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
 import { OptButton } from './styled'
 
-const { MenuItem, SubMenu } = Menu
+const { MenuItem, SubMenu } = Menu as any
 
 // const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
 // const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
@@ -21,6 +21,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
     : css`
         color: #a16207;
         background: #fffded;
+
         svg {
           color: #a48a19;
           fill: rgba(255, 209, 39, 0.2);
@@ -47,9 +48,22 @@ interface IProps {
   className?: string
 }
 
+const isNetworkInit = (
+  platform: Record<string, any>,
+  space: Record<string, any>
+) => {
+  return (
+    platform &&
+    platform.work_in_iaas &&
+    platform.enable_network &&
+    space.status !== 2 &&
+    !space.network_is_init
+  )
+}
+
 const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const stateStore = useWorkSpaceContext()
-  const { isModal, curSpaceId, onItemCheck } = stateStore
+  const { isModal, curSpaceId, onItemCheck, platformConfig } = stateStore
   const history = useHistory()
   const {
     workSpaceStore: { funcList },
@@ -67,7 +81,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     }
   }
 
-  const handleSpaceOpt = (e, k, v) => {
+  const handleSpaceOpt = (e: MouseEvent, _: never, v: any) => {
     e.stopPropagation()
     stateStore.set({ curSpaceOpt: v, optSpaces: [space] })
   }
@@ -138,12 +152,25 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   return (
     <Card
       className={`${className} group`}
-      tw="rounded border border-t-4 text-neut-8 border-neut-2"
+      tw="rounded border border-t-4 text-neut-8 border-neut-2 relative"
       css={css`
         box-shadow: 0px 5px 15px rgba(3, 5, 7, 0.08);
       `}
       onClick={handleCardClick}
     >
+      {isNetworkInit(stateStore.platformConfig, space) && (
+        <div
+          tw="absolute inset-0 z-50"
+          title="请单击以绑定网络信息"
+          onClick={(e) => {
+            handleSpaceOpt(
+              e as unknown as MouseEvent,
+              undefined as never,
+              'network'
+            )
+          }}
+        />
+      )}
       <div
         tw="px-5 pt-4 pb-5 relative cursor-pointer"
         css={space.status !== 1 && tw`cursor-default`}
@@ -244,89 +271,100 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             e.stopPropagation()
           }}
         >
-          {funcList.map(({ name: funcName, title, subFuncList }) => (
-            <Tooltip
-              key={funcName}
-              theme={disableStatus ? 'darker' : 'light'}
-              placement={disableStatus ? 'top' : 'bottom'}
-              content={
-                <>
-                  {disableStatus ? (
-                    <div tw="px-3 py-2">
-                      该工作空间已被禁用，暂时无法操作其工作项
-                    </div>
-                  ) : (
-                    <Menu
-                      mode="inline"
-                      defaultExpandKeys={['stream']}
-                      onClick={(e: React.SyntheticEvent) => {
-                        e.stopPropagation()
-                      }}
-                    >
-                      {subFuncList.map((subFunc: any) => {
-                        const subItems = subFunc.items || []
-                        return subItems.length ? (
-                          <SubMenu
-                            key={subFunc.name}
-                            onClick={(e: React.SyntheticEvent) => {
-                              e.stopPropagation()
-                            }}
-                            title={
-                              <span>
-                                <Icon name={subFunc.icon} />
-                                <span>{subFunc.title}</span>
-                              </span>
-                            }
-                            overlayClassName="sub"
-                          >
-                            {subItems.map((secondMenu: any) => (
-                              <MenuItem key={secondMenu.name}>
-                                <Link
-                                  to={`/${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
-                                  tw="flex items-center py-2 pl-6! cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
-                                >
-                                  {secondMenu.title}
-                                </Link>
-                              </MenuItem>
-                            ))}
-                          </SubMenu>
-                        ) : (
-                          <MenuItem key={subFunc.name}>
-                            <Link
-                              to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                              tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+          {funcList.map(({ name: funcName, title, subFuncList }) => {
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const disableStatus = space.status === 2 || subFuncList.length === 0
+            const disableMsg =
+              // eslint-disable-next-line no-nested-ternary
+              space.status === 2
+                ? '该工作空间已被禁用，暂时无法操作其工作项'
+                : !platformConfig?.work_in_iaas
+                ? '敬请期待'
+                : ''
+
+            return (
+              <Tooltip
+                key={funcName}
+                theme={disableStatus ? 'darker' : 'light'}
+                placement={disableStatus ? 'top' : 'bottom'}
+                content={
+                  <>
+                    {disableStatus ? (
+                      <div tw="px-3 py-2">{disableMsg}</div>
+                    ) : (
+                      <Menu
+                        mode="inline"
+                        defaultExpandKeys={['stream']}
+                        onClick={(e: React.SyntheticEvent) => {
+                          e.stopPropagation()
+                        }}
+                      >
+                        {subFuncList.map((subFunc: any) => {
+                          const subItems = subFunc.items || []
+                          return subItems.length ? (
+                            <SubMenu
+                              key={subFunc.name}
+                              onClick={(e: React.SyntheticEvent) => {
+                                e.stopPropagation()
+                              }}
+                              title={
+                                <span>
+                                  <Icon name={subFunc.icon} />
+                                  <span>{subFunc.title}</span>
+                                </span>
+                              }
+                              overlayClassName="sub"
                             >
-                              <Icon name={subFunc.icon} type="dark" tw="mr-1" />
-                              {subFunc.title}
-                            </Link>
-                          </MenuItem>
-                        )
-                      })}
-                    </Menu>
-                  )}
-                </>
-              }
-            >
-              <Link
-                to={`/${regionId}/workspace/${space.id}/${
-                  funcName === 'ops' ? 'ops/release' : funcName
-                }`}
-                onClick={(e) => {
-                  if (disableStatus) {
-                    e.preventDefault()
-                  }
-                }}
-                tw="inline-block"
+                              {subItems.map((secondMenu: any) => (
+                                <MenuItem key={secondMenu.name}>
+                                  <Link
+                                    to={`/${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
+                                    tw="flex items-center py-2 pl-6! cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                                  >
+                                    {secondMenu.title}
+                                  </Link>
+                                </MenuItem>
+                              ))}
+                            </SubMenu>
+                          ) : (
+                            <MenuItem key={subFunc.name}>
+                              <Link
+                                to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                                tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                              >
+                                <Icon
+                                  name={subFunc.icon}
+                                  type="dark"
+                                  tw="mr-1"
+                                />
+                                {subFunc.title}
+                              </Link>
+                            </MenuItem>
+                          )
+                        })}
+                      </Menu>
+                    )}
+                  </>
+                }
               >
-                <OptButton
-                  disabled={disableStatus}
-                  tw="px-6 xl:px-9 2xl:px-7 py-1"
+                <Link
+                  to={`/${regionId}/workspace/${space.id}/${
+                    funcName === 'ops' ? 'ops/release' : funcName
+                  }`}
+                  onClick={(e) => {
+                    if (disableStatus) {
+                      e.preventDefault()
+                    }
+                  }}
+                  tw="inline-block"
                 >
-                  {title}
-                </OptButton>
-              </Link>
-            </Tooltip>
-          ))}
+                  <OptButton disabled={disableStatus} tw="py-1">
+                    {title}
+                  </OptButton>
+                </Link>
+              </Tooltip>
+            )
+          })}
         </div>
       )}
     </Card>

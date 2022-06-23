@@ -126,8 +126,8 @@ declare module '@QCFE/lego-ui' {
     size?: 'small' | 'medium' | 'large' | number
     color?:
       | {
-          primary: string
-          secondary: string
+          primary?: string
+          secondary?: string
         }
       | string
     changeable?: boolean
@@ -281,6 +281,7 @@ declare module '@QCFE/lego-ui' {
     getFieldsValue: () => any
     getFieldValue: (name: string) => any
     validateFields: () => boolean
+    getFormField: (c: React.ComponentElement) => React.ReactComponentElement
   }
 
   export const Form: Form
@@ -304,6 +305,7 @@ declare module '@QCFE/lego-ui' {
     error: (message?: string) => void
     open: (o: Record<string, unknown>) => void
     success: (o: Record<string, unknown>) => void
+    warning: (o: Record<string, unknown>) => void
   }
 
   export interface Locale {

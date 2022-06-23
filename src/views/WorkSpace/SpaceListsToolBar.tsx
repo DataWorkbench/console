@@ -4,8 +4,11 @@ import { Button, Icon, ToolBar, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { RadioButton, RadioGroup, Dropdown, Menu } from '@QCFE/lego-ui'
 import { useWorkSpaceContext } from 'contexts'
 import { FlexBox, Center } from 'components'
+import { useIsFetching } from 'react-query'
+import { getQueryKeyDescribePlatformConfig } from 'hooks'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
+const { ColumnsSetting } = ToolBar as any
 
 const SpaceListsToolBar = observer(() => {
   const stateStore = useWorkSpaceContext()
@@ -25,7 +28,7 @@ const SpaceListsToolBar = observer(() => {
     stateStore.set({ queryRefetch: true })
   }
 
-  const toggleViewMode = (v) => {
+  const toggleViewMode = (v: string) => {
     const isCardView = v === 'card'
     stateStore.set({ cardView: isCardView })
   }
@@ -41,9 +44,11 @@ const SpaceListsToolBar = observer(() => {
     stateStore.set({ queryKeyWord: searchName })
   }
 
-  const handleMenuClick = (e, key, value) => {
+  const handleMenuClick = (_: never, __: never, value: string) => {
     stateStore.set({ curSpaceOpt: value, optSpaces: selectedSpaces })
   }
+
+  const isPlatformLoading = useIsFetching(getQueryKeyDescribePlatformConfig())
 
   return (
     <FlexBox tw="justify-between mb-5">
@@ -53,6 +58,7 @@ const SpaceListsToolBar = observer(() => {
             type="primary"
             tw="font-medium px-5 mr-2"
             onClick={toggleShowModal}
+            loading={!!isPlatformLoading}
           >
             创建工作空间
           </Button>
@@ -75,7 +81,9 @@ const SpaceListsToolBar = observer(() => {
                   disabled={
                     curSpacesLen === 0 ||
                     curSpacesLen ===
-                      selectedSpaces.filter((o) => o.status === 2).length
+                      selectedSpaces.filter(
+                        (o: Record<string, any>) => o.status === 2
+                      ).length
                   }
                 >
                   <i className="if if-minus-square" tw="text-base mr-2" />
@@ -86,7 +94,9 @@ const SpaceListsToolBar = observer(() => {
                   disabled={
                     curSpacesLen === 0 ||
                     curSpacesLen ===
-                      selectedSpaces.filter((o) => o.status === 1).length
+                      selectedSpaces.filter(
+                        (o: Record<string, any>) => o.status === 1
+                      ).length
                   }
                 >
                   <Icon name="start" />
@@ -142,7 +152,7 @@ const SpaceListsToolBar = observer(() => {
             />
           </Button>
           {!cardView && (
-            <ToolBar.ColumnsSetting
+            <ColumnsSetting
               defaultColumns={defaultColumns}
               onSave={handleSaveColumns}
               storageKey={columnSettingsKey}

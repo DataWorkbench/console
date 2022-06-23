@@ -14,6 +14,7 @@ import { omit } from 'lodash-es'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
 
+import { SerializedStyles } from '@emotion/react'
 import { FlexBox } from '../Box'
 
 const iconConfig = {
@@ -70,7 +71,7 @@ interface IPopConfirmProps {
   trigger?: 'hover' | 'click'
   type?: 'info' | 'warning' | 'error'
   content: ReactNode
-  twChild?: TwStyle
+  twChild?: TwStyle | SerializedStyles
   placement?: PlacementType
   showOk?: boolean
   showCancel?: boolean
@@ -171,16 +172,20 @@ export const PopConfirm = (
       //     },
       //   })
       //   break
-      default:
+      default: {
+        const click = (e: MouseEvent) => {
+          if (typeof children.props?.onClick === 'function') {
+            children.props?.onClick(e)
+          }
+          show()
+        }
+
         Object.assign(newProps, {
-          onClick: (e: MouseEvent) => {
-            if (typeof children.props?.onClick === 'function') {
-              newProps.onClick(e)
-            }
-            show()
-          },
+          onClick: newProps?.datadone ? newProps.onClick : click,
+          datadone: 'done',
         })
         break
+      }
     }
     return cloneElement(children, { ...newProps })
   }
@@ -208,7 +213,7 @@ export const PopConfirm = (
             <section tw="flex-1">{content}</section>
           </FlexBox>
           {(showCancel || showOk) && (
-            <div tw="pt-5 text-right">
+            <div tw="pt-1 text-right">
               <>
                 {showCancel && (
                   <Button tw="mr-2 px-4" onClick={handleCancel}>
