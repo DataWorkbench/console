@@ -1,6 +1,12 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { FieldMappings, HelpCenterLink, Modal, TextLink } from 'components'
+import {
+  FieldMappings,
+  HelpCenterLink,
+  Modal,
+  RouterLink,
+  // TextLink,
+} from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
@@ -59,13 +65,13 @@ const getStepsData = (regionId: string, spaceId: string) => [
     desc: (
       <>
         在这里配置数据的来源端和目的端；仅支持在
-        <TextLink
-          hasIcon
-          href={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+        <RouterLink
+          to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
           target="_blank"
+          color="blue"
         >
           数据源管理
-        </TextLink>
+        </RouterLink>
         创建的数据源。
       </>
     ),
