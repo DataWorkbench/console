@@ -41,7 +41,7 @@ export const apiRequest =
     const [method, url] = apiList[manage][item] as unknown as ['GET' | 'POST' | 'PUT', string]
     const [uri] = compilePath(url, { ...params.uri })
     // TODO:
-    if (uri.match(/dataservice/g)) {
+    if (uri.match(/(service|gateway)/g)) {
       return fetchData(uri, {
         method,
         query: params.params,

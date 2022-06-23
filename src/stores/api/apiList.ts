@@ -412,5 +412,22 @@ export default {
     updateApiConfig: ['PUT', '/v1/workspace/{space_id}/dataservice/config/{api_id}'],
 
     updateDataServiceCluster: ['PUT', '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}']
+  },
+  serviceGateway: {
+    bindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/bind'],
+
+    createAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth'],
+
+    deleteAuthKey: ['DELETE', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}'],
+
+    listApiServices: ['GET', '/v1/workspace/{space_id}/gateway/service'],
+
+    listAuthKeys: ['GET', '/v1/workspace/{space_id}/gateway/auth'],
+
+    listRoutes: ['GET', '/v1/workspace/{space_id}/gateway/route'],
+
+    unbindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/unbind'],
+
+    updateAuthKey: ['PUT', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}']
   }
 }

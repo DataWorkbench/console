@@ -4,16 +4,24 @@ import { apiRequest } from 'utils/api'
 import { merge } from 'lodash-es'
 import { useCallback } from 'react'
 import { apiHooks, queryKeyObj } from './apiHooks'
-import { ListApiGroupsRequestType, ListDataServiceClustersRequestType } from '../types/request'
+import {
+  ListApiGroupsRequestType,
+  ListDataServiceClustersRequestType,
+  ListApiServicesRequestType,
+  ListRoutesRequestType
+} from '../types/request'
 import {
   DataServiceManageListDataServiceClustersType,
   DataServiceManageListApiGroupsType,
-  DataServiceManageDescribeApiConfigType
+  DataServiceManageDescribeApiConfigType,
+  ServiceGatewayListApiServicesType,
+  ServiceGatewayListRoutesType
 } from '../types/response'
 
 import { PbmodelApiGroup } from '../types/types'
 
 type Options = 'createApiGroup' | 'createApi'
+type AuthKeyOp = 'create' | 'update' | 'delete' | 'bind' | 'unbind'
 interface IParams {
   regionId: string
   spaceId?: string
@@ -229,6 +237,125 @@ export const useMutationUpdateApiConfig = () => {
       ...rest
     }
     ret = await UpdateApiConfig(params)
+    return ret
+  })
+}
+
+/**
+ *  API 管理
+ */
+
+// api服务列表
+export const useQueryListApiServices = apiHooks<
+  'serviceGateway',
+  ListApiServicesRequestType,
+  ServiceGatewayListApiServicesType
+>('serviceGateway', 'listApiServices')
+
+export const getQueryKeyListApiServices = () => queryKeyObj.listApiServices
+
+// 已发布api列表
+export const useQueryListRoutes = apiHooks<
+  'serviceGateway',
+  ListRoutesRequestType,
+  ServiceGatewayListRoutesType
+>('serviceGateway', 'listRoutes')
+
+export const getQueryKeyListRoutes = () => queryKeyObj.listRoutes
+
+// 下线api
+export const AbolishDataServiceApis = async ({ regionId, spaceId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'abolishDataServiceApis')(params)
+}
+export const useMutationAbolishDataServiceApis = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async (apiIds: string[]) => {
+    let ret = null
+    const params = {
+      regionId,
+      spaceId,
+      api_ids: apiIds
+    }
+    ret = await AbolishDataServiceApis(params)
+    return ret
+  })
+}
+
+// 密钥列表
+export const useQueryListAuthKeys = apiHooks<
+  'serviceGateway',
+  ListRoutesRequestType,
+  ServiceGatewayListRoutesType
+>('serviceGateway', 'listAuthKeys')
+export const getQueryKeyListAuthKeys = () => queryKeyObj.listAuthKeys
+
+// 密钥 创建 更新 删除 绑定 解绑
+
+export const CreateAuthKey = async ({ regionId, spaceId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  return apiRequest('serviceGateway', 'createAuthKey')(params)
+}
+export const UpdateAuthKey = async ({ regionId, spaceId, auth_key_id, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, auth_key_id } }, { data: rest })
+  return apiRequest('serviceGateway', 'updateAuthKey')(params)
+}
+export const DeleteAuthKey = async ({ regionId, spaceId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  return apiRequest('serviceGateway', 'deleteAuthKey')(params)
+}
+export const BindAuthKey = async ({ regionId, spaceId, auth_key_id, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, auth_key_id } }, { data: rest })
+  return apiRequest('serviceGateway', 'bindAuthKey')(params)
+}
+export const UnbindAuthKey = async ({ regionId, spaceId, auth_key_id, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, auth_key_id } }, { data: rest })
+  return apiRequest('serviceGateway', 'unbindAuthKey')(params)
+}
+
+export const useMutationAuthKey = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ option, ...rest }: { option: AuthKeyOp; [key: string]: any }) => {
+    let ret = null
+    const params = {
+      ...rest,
+      regionId,
+      spaceId
+    }
+    if (option === 'create') {
+      ret = await CreateAuthKey(params)
+    } else if (option === 'update') {
+      ret = await UpdateAuthKey(params)
+    } else if (option === 'delete') {
+      ret = await DeleteAuthKey(params)
+    } else if (option === 'bind') {
+      ret = await BindAuthKey(params)
+    } else if (option === 'unbind') {
+      ret = await UnbindAuthKey(params)
+    }
+    return ret
+  })
+}
+
+// api服务列表
+export const ListApiServices = async ({ regionId, spaceId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  return apiRequest('serviceGateway', 'listApiServices')(params)
+}
+
+export const useMutationListApiServices = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ ...rest }: { [key: string]: any }) => {
+    let ret = null
+    const params = {
+      ...rest,
+      regionId,
+      spaceId
+    }
+    ret = await ListApiServices(params)
     return ret
   })
 }

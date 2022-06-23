@@ -1,16 +1,15 @@
 import { useParams } from 'react-router-dom'
 import useIcon from 'hooks/useHooks/useIcon'
 import ServiceDev from './ServiceDev'
-// import Network from './Network'
-// import Resource from './Resource'
+import { ApiService, ApiRouters, AuthKey, ApiServiceDetail, AuthKeyDetail } from './ApiSuper'
 import Cluster from './Cluster/index'
-// import Udf from './Udf'
 import { Sider } from '../Sider'
 import icons from './icons'
 
 function Dts() {
-  const { mod } = useParams<{ mod: string }>()
+  const par = useParams<{ mod: string; detail?: string }>()
   useIcon(icons)
+  const { mod, detail } = par
 
   return (
     <div tw="flex-1 flex h-full w-full">
@@ -18,9 +17,11 @@ function Dts() {
       <div tw="flex-1 h-full">
         {(mod === 'cluster' || !mod) && <Cluster />}
         {mod === 'serviceDev' && <ServiceDev />}
-        {/*  {mod === 'network' && <Network />}
-        {mod === 'resource' && <Resource />}
-        {mod === 'udf' && <Udf />} */}
+        {mod === 'apiService' && !detail && <ApiService />}
+        {mod === 'apiService' && detail && <ApiServiceDetail id={detail} />}
+        {mod === 'routers' && <ApiRouters />}
+        {mod === 'authKey' && !detail && <AuthKey />}
+        {mod === 'authKey' && detail && <AuthKeyDetail id={detail} />}
       </div>
     </div>
   )

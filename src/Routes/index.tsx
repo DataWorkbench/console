@@ -79,7 +79,10 @@ const Routes = () => {
           <Switch>
             <Route path="/:regionId/workspace/:spaceId/upcloud/:mod?" component={Upcloud} />
             <Route path="/:regionId/workspace/:spaceId/dm/:mod?" component={Dm} />
-            <Route path="/:regionId/workspace/:spaceId/dts/:mod?" component={DataService} />
+            <Route
+              path="/:regionId/workspace/:spaceId/dts/:mod?/:detail?"
+              component={DataService}
+            />
             <Route path="/:regionId/workspace/:spaceId/ops/:mod?/:detail?" component={Ops} />
 
             <Route path="/:regionId/workspace/:spaceId/manage/:mod?" component={Manage} />

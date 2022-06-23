@@ -29,8 +29,17 @@ const defaultFuncList = [
     title: '数据服务',
     subFuncList: [
       { name: 'cluster', title: '服务集群', icon: 'cogwheel' },
-      { name: 'serviceDev', title: '服务开发', icon: 'pod' }
-      // { name: 'network', title: '网络配置', icon: 'earth' },
+      { name: 'serviceDev', title: '服务开发', icon: 'pod' },
+      {
+        name: 'serviceGateWay',
+        title: 'API 管理',
+        icon: 'earth',
+        items: [
+          { name: 'apiService', title: 'API 服务组' },
+          { name: 'routers', title: '已发布 API' },
+          { name: 'authKey', title: '秘钥管理' }
+        ]
+      }
       // { name: 'cluster', title: '计算集群', icon: 'pod' },
       // { name: 'table', title: '表管理', icon: 'listview' },
       // { name: 'resource', title: '资源管理', icon: 'resource' },
