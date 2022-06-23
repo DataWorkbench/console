@@ -570,7 +570,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                   如需选择新的数据源，您可以前往
                   <TextLink
                     tw="ml-2 text-green-11!"
-                    href={`./${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                    href={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
                     target="_blank"
                     hasIcon={false}
                   >
