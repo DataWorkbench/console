@@ -13,7 +13,6 @@ function getField<T>(mapping: Mapping<T>): IColumn[] {
   })
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export const networkColumns: IColumn[] = getField(networkFieldMapping)
 
 export const networkStatusMap = new Map()
