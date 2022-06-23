@@ -37,7 +37,7 @@ const HelpCenterLink = (
       }
     : {
         href: href
-          ? `//${get(
+          ? `${get(
               window,
               'GLOBAL_CONFIG.new_docs_url',
               ''
