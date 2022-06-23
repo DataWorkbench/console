@@ -53,6 +53,9 @@ const { CollapseItem } = Collapse
 const { TextField, SelectField, NumberField } = Form
 const splitReg = /\s*[=:]\s*|\s+/
 
+const UNIT_PRICE = 0.36
+const MONTH_PRICE = 176
+
 const FormWrapper = styled('div')(() => [
   css`
     ${tw`w-[686px] overflow-auto `}
@@ -176,7 +179,7 @@ const ClusterModal = observer(
     const handleOk = () => {
       const baseForm = baseFormRef.current
       const optForm = optFormRef.current
-      const networkForm = networkFormRef.current
+      // const networkForm = networkFormRef.current
       if (viewMode) {
         setOp('')
         return
@@ -184,7 +187,7 @@ const ClusterModal = observer(
       if (
         baseForm?.validateFields() &&
         optForm?.validateFields() &&
-        networkForm?.validateFields() &&
+        // networkForm?.validateFields() &&
         totalCU <= 12
       ) {
         const paramsData = assign(
@@ -690,83 +693,87 @@ const ClusterModal = observer(
                   </Field>
                 </Form>
               </CollapseItem>
-              <CollapseItem
-                key="p3"
-                label={
-                  <FlexBox tw="items-center space-x-1">
-                    <Icon
-                      name="record"
-                      tw="(relative top-0 left-0)!"
-                      type="light"
-                    />
-                    <span>网络配置</span>
-                  </FlexBox>
-                }
-              >
-                <Form ref={networkFormRef} layout="column">
-                  <SelectWithRefresh
-                    label={
-                      <AffixLabel tw="font-medium text-sm">网络配置</AffixLabel>
-                    }
-                    name="network_id"
-                    value={params.network_id}
-                    validateOnChange
-                    disabled={viewMode}
-                    onChange={(v: string) => {
-                      setParams((draft) => {
-                        draft.network_id = v
-                      })
-                    }}
-                    onRefresh={() => {
-                      queryClient.invalidateQueries(getNetworkKey())
-                    }}
-                    schemas={[
-                      {
-                        rule: {
-                          required: true,
-                          isExisty: false,
-                        },
-                        status: 'error',
-                        help: (
-                          <>
-                            请选择网络,如需选择新的 VPC，您可以
-                            <span
-                              tw="text-green-11 cursor-pointer"
-                              onClick={() => dmStore.setNetWorkOp('create')}
-                            >
-                              绑定 VPC
-                            </span>
-                          </>
-                        ),
-                      },
-                    ]}
-                    options={networks.map(({ name, id }) => ({
-                      label: name,
-                      value: id,
-                    }))}
-                    isLoading={networksRet.isFetching}
-                    isLoadingAtBottom
-                    searchable={false}
-                    onMenuScrollToBottom={() => {
-                      if (networksRet.hasNextPage) {
-                        networksRet.fetchNextPage()
+              {false && (
+                <CollapseItem
+                  key="p3"
+                  label={
+                    <FlexBox tw="items-center space-x-1">
+                      <Icon
+                        name="record"
+                        tw="(relative top-0 left-0)!"
+                        type="light"
+                      />
+                      <span>网络配置</span>
+                    </FlexBox>
+                  }
+                >
+                  <Form ref={networkFormRef} layout="column">
+                    <SelectWithRefresh
+                      label={
+                        <AffixLabel tw="font-medium text-sm">
+                          网络配置
+                        </AffixLabel>
                       }
-                    }}
-                    bottomTextVisible
-                    help={
-                      <div>
-                        如需选择新的 VPC，您可以
-                        <span
-                          tw="text-green-11 cursor-pointer"
-                          onClick={() => dmStore.setNetWorkOp('create')}
-                        >
-                          绑定 VPC
-                        </span>
-                      </div>
-                    }
-                  />
-                </Form>
-              </CollapseItem>
+                      name="network_id"
+                      value={params.network_id}
+                      validateOnChange
+                      disabled={viewMode}
+                      onChange={(v: string) => {
+                        setParams((draft) => {
+                          draft.network_id = v
+                        })
+                      }}
+                      onRefresh={() => {
+                        queryClient.invalidateQueries(getNetworkKey())
+                      }}
+                      schemas={[
+                        {
+                          rule: {
+                            required: true,
+                            isExisty: false,
+                          },
+                          status: 'error',
+                          help: (
+                            <>
+                              请选择网络,如需选择新的 VPC，您可以
+                              <span
+                                tw="text-green-11 cursor-pointer"
+                                onClick={() => dmStore.setNetWorkOp('create')}
+                              >
+                                绑定 VPC
+                              </span>
+                            </>
+                          ),
+                        },
+                      ]}
+                      options={networks.map(({ name, id }) => ({
+                        label: name,
+                        value: id,
+                      }))}
+                      isLoading={networksRet.isFetching}
+                      isLoadingAtBottom
+                      searchable={false}
+                      onMenuScrollToBottom={() => {
+                        if (networksRet.hasNextPage) {
+                          networksRet.fetchNextPage()
+                        }
+                      }}
+                      bottomTextVisible
+                      help={
+                        <div>
+                          如需选择新的 VPC，您可以
+                          <span
+                            tw="text-green-11 cursor-pointer"
+                            onClick={() => dmStore.setNetWorkOp('create')}
+                          >
+                            绑定 VPC
+                          </span>
+                        </div>
+                      }
+                    />
+                  </Form>
+                </CollapseItem>
+              )}
               <CollapseItem
                 key="p4"
                 label={
@@ -1004,7 +1011,7 @@ key02:value02`}
                     <div tw="text-sm">总价</div>
                     <div tw="text-neut-8">
                       <span tw="text-xl text-green-11">¥ 0</span>{' '}
-                      <del tw="">8.1245/小时</del>
+                      <del tw="">{(totalCU * UNIT_PRICE).toFixed(2)} /小时</del>
                     </div>
                   </FlexBox>
                   <FlexBox tw="justify-between">
@@ -1018,8 +1025,8 @@ key02:value02`}
                     </div>
 
                     <div tw="text-neut-8">
-                      (合 <span tw="text-green-11">¥0</span> <del>2718</del>{' '}
-                      每月 )
+                      (合 <span tw="text-green-11">¥0</span>{' '}
+                      <del>{(totalCU * MONTH_PRICE).toFixed(2)}</del> 每月 )
                     </div>
                   </FlexBox>
                 </div>

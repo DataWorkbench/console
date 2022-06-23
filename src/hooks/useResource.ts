@@ -20,29 +20,15 @@ interface IRouteParams {
 const keys: {
   infinite: any
   page: any
+  detail: any
 } = {
   infinite: '',
   page: '',
+  detail: '',
 }
 
-export const getResourceKey = (kind: 'infinite' | 'page' = 'page') => keys[kind]
-
-export const useQueryResourceList = (
-  filter: Record<string, any>,
-  options = {}
-) => {
-  const { regionId, spaceId } = useParams<IRouteParams>()
-
-  const params = {
-    regionId,
-    spaceId,
-    ...filter,
-  }
-
-  const queryKey = ['udf', params]
-  keys.page = queryKey
-  return useQuery(queryKey, async () => loadResourceList(params), options)
-}
+export const getResourceKey = (kind: 'infinite' | 'page' | 'detail' = 'page') =>
+  keys[kind]
 
 export const useQueryResource = (filter: Record<string, any>, options = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()

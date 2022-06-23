@@ -1,5 +1,6 @@
 const colors = require('tailwindcss/colors')
 const plugin = require('tailwindcss/plugin')
+const themes = require("./themes");
 
 const neut = {
   20: '#020508',
@@ -74,10 +75,16 @@ module.exports = {
       line: {
         dark: '#4C5E70',
       },
+      ...themes,
     },
     extend: {
       fontSize: {
         xs: ['12px', '20px'],
+        '2xs': ['14px', '24px'],
+      },
+      gridTemplateColumns: {
+        // Simple 8 row grid
+        'workspace': 'repeat(auto-fill, minmax(440px, 1fr))',
       },
     },
   },

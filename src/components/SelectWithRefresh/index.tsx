@@ -15,6 +15,9 @@ const SelectWithRefreshBox = styled('div')(() => [
     .qicon {
       ${tw`text-neut-18 dark:text-white`}
     }
+    .is-disabled .select-control {
+      ${tw`opacity-100 bg-neut-13! hover:border-neut-13`}
+    }
   `,
 ])
 interface ISelectWithRefreshProps {
@@ -33,7 +36,7 @@ const SelectWithRefreshCmp = forwardRef<
     getControlRef: () => selectRef?.current!,
   }))
   return (
-    <SelectWithRefreshBox>
+    <SelectWithRefreshBox className="select-with-refresh h-7!">
       <>
         <Select
           clearable
@@ -41,9 +44,11 @@ const SelectWithRefreshCmp = forwardRef<
           id={domId}
           onChange={onChange}
           ref={selectRef}
+          type="small"
         />
         <Button
           tw="w-8 ml-3 p-0 dark:bg-neut-16!"
+          className="refresh-button"
           disabled={disabled}
           onClick={() => onRefresh && onRefresh()}
         >

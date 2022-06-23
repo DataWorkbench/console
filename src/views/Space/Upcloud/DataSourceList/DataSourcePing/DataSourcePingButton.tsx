@@ -5,7 +5,7 @@ import { merge, now, pick } from 'lodash-es'
 
 import emitter from 'utils/emitter'
 import { useMutationSource, useStore } from 'hooks'
-import { TextLink, Tooltip } from 'components'
+import { AffixLabel, HelpCenterLink, TextLink } from 'components'
 import {
   DATASOURCE_PING_STAGE,
   SOURCE_PING_RESULT,
@@ -19,16 +19,11 @@ interface IDataSourcePingButtonProps {
     message?: string
   }
   sourceId?: string
-  network?: {
-    id: string
-    name: string
-    network_info: Record<string, any>
-  }
   hasPing?: boolean
 }
 
 export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
-  const { getValue, defaultStatus, sourceId, network, hasPing = false } = props
+  const { getValue, defaultStatus, sourceId, hasPing = false } = props
   const mutation = useMutationSource()
   const {
     dataSourceStore: { setShowPingHistories },
@@ -43,7 +38,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
 
   useEffect(() => {
     setStatus(defaultStatus)
-  }, [defaultStatus, network])
+  }, [defaultStatus])
 
   const [hasPingStatus, setHasPingStatus] = useState(hasPing)
 
@@ -55,9 +50,6 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       let msg = ''
       const item = {
         uuid: Math.random().toString(32).substring(2),
-        name: network?.name,
-        network_id: network?.id,
-        network_info: network?.network_info,
         created: now() / 1000,
         sourceId,
         stage: sourceId
@@ -70,7 +62,6 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         const ret = await mutation.mutateAsync({
           op: 'ping',
           ...pick(formData, 'type', 'url'),
-          network_id: network?.id,
           source_id: sourceId,
           stage: sourceId
             ? DATASOURCE_PING_STAGE.UPDATE
@@ -100,14 +91,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         message: msg,
       })
     }
-  }, [
-    getValue,
-    mutation,
-    network?.id,
-    network?.network_info,
-    network?.name,
-    sourceId,
-  ])
+  }, [getValue, mutation, sourceId])
 
   const pingHistory = useMemo(() => {
     return (
@@ -119,26 +103,36 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
 
   const actionButton = useMemo(() => {
     const tempButton = (
-      <Button type="outlined" onClick={handlePing} disabled={!network?.id}>
+      <Button
+        type="outlined"
+        onClick={() => {
+          handlePing()
+        }}
+      >
         {status ? '重新测试' : '开始测试'}
       </Button>
     )
-    if (!network?.id) {
-      return (
-        <Tooltip
-          theme="darker"
-          content="完成数据源连接信息且选择网络配置后，可以点击“开始测试”测试数据源可用性"
-          hasPadding
-        >
-          {tempButton}
-        </Tooltip>
-      )
-    }
+
     return tempButton
-  }, [network, handlePing, status])
+  }, [status, handlePing])
 
   return (
     <>
+      <div>
+        <AffixLabel
+          theme="darker"
+          help={
+            <div>
+              <span tw="mr-1">详情请查看</span>
+              <HelpCenterLink href="/manual/connect/" isIframe={false} hasIcon>
+                网络连通方案
+              </HelpCenterLink>
+            </div>
+          }
+        >
+          数据源可用性测试
+        </AffixLabel>
+      </div>
       <Control>
         {mutation.isLoading ? (
           <Button type="outlined">
@@ -150,7 +144,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
       </Control>
       {mutation.isLoading && (
         <div className="help">
-          <span tw="text-neut-15">
+          <span tw="text-neut-15 dark:text-neut-8">
             正在测试数据源在当前网络配置下的可用性，如需查看更多可点击
           </span>
           {pingHistory}
@@ -167,9 +161,19 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           `}
         >
           <Icon name="error" />
-          <span tw="text-neut-15">
-            不可用，{status.message ? `${status.message}，` : ''}
-            如需查看更多可点击
+          <span tw="text-neut-15 dark:text-neut-8">
+            <span tw="mr-1">
+              不可用，{status.message ? `${status.message}，` : ''}
+              如需查看更多可点击
+            </span>
+            <HelpCenterLink
+              tw="mr-1"
+              hasIcon
+              href="/manual/connect/"
+              isIframe={false}
+            >
+              网络连通方案
+            </HelpCenterLink>
             {pingHistory}
           </span>
         </div>
@@ -185,13 +189,17 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           `}
         >
           <Icon name="success" size={16} />
-          <span tw="ml-1 text-neut-15">测试通过，如需查看更多可点击</span>
+          <span tw="ml-1 text-neut-15 dark:text-neut-8">
+            测试通过，如需查看更多可点击
+          </span>
           {pingHistory}
         </div>
       )}
       {!mutation.isLoading && !status && hasPingStatus && (
         <div className="help">
-          <span tw="ml-1 text-neut-15">已有测试记录，如需查看可点击</span>
+          <span tw="ml-1 text-neut-15 dark:text-neut-8">
+            已有测试记录，如需查看可点击
+          </span>
           {pingHistory}
         </div>
       )}

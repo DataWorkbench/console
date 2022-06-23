@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import Setting from './Setting'
 import { Sider } from '../Sider'
+import Network from './Network/index'
 
 function Manage() {
   const { mod } = useParams<{ mod: string }>()
@@ -8,7 +9,8 @@ function Manage() {
     <div tw="flex-1 flex h-full">
       <Sider funcMod="manage" />
       <div tw="flex-1 overflow-y-auto">
-        {(mod === 'setting' || !mod) && <Setting />}
+        {mod === 'setting' && <Setting />}
+        {(mod === 'network' || !mod) && <Network />}
       </div>
     </div>
   )

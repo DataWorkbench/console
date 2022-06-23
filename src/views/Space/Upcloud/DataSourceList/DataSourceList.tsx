@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import dayjs from 'dayjs'
-import { get, lowerCase, pick } from 'lodash-es'
+import { get, pick, merge } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import { Input, Menu } from '@QCFE/lego-ui'
+import { Input, Menu, Button } from '@QCFE/lego-ui'
 import {
-  Button,
   Icon,
   InputSearch,
   Loading,
@@ -17,6 +16,7 @@ import {
   ToolBar,
   ToolBarLeft,
   ToolBarRight,
+  // @ts-ignore
   utils,
 } from '@QCFE/qingcloud-portal-ui'
 import { useMutationSource, useQuerySource, useStore } from 'hooks'
@@ -26,22 +26,29 @@ import {
   ContentBox,
   FlexBox,
   Icons,
+  RouterLink,
   TextEllipsis,
   TextLink,
   Tooltip,
 } from 'components'
-import { getHelpCenterLink } from 'utils'
 import { NetworkModal } from 'views/Space/Dm/Network'
 
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
 import {
-  DataSourcePingHistoriesModal,
-  DataSourcePingModal,
   getPingConnection,
+  DataSourcePingHistoriesModal,
 } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
-import { CONNECTION_STATUS, DATASOURCE_STATUS, ftpProtocol } from './constant'
+import {
+  confirmMsgInfo,
+  CONNECTION_STATUS,
+  DATASOURCE_PING_STAGE,
+  DATASOURCE_STATUS,
+  getUrl,
+  sourceKinds,
+  tabs,
+} from './constant'
 import { SourceKindImg } from './styled'
 
 const { MenuItem } = Menu as any
@@ -62,31 +69,6 @@ const getEllipsisText = (text: string, lenght: number) => {
     index += 1
   }
   return text
-}
-
-const tabs = [
-  {
-    title: '数据源',
-    description:
-      '数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。',
-    icon: 'blockchain',
-    helpLink: getHelpCenterLink('/manual/data_up_cloud/data_summary/'),
-  },
-]
-
-const confirmMsgInfo: any = {
-  disable: {
-    name: '停用',
-    desc: '已发布调度未运行的任务将不会再使用该数据源内的所有表数据，是否确认进行停用操作？',
-  },
-  enable: {
-    name: '启动',
-    desc: '启用该数据源，已发布调度未运行的任务将使用该数据源内的所有表数据，是否确认进行启用操作？',
-  },
-  delete: {
-    name: '删除',
-    desc: '数据源删除后新建作业将无法引用，该操作无法撤回，请谨慎操作。',
-  },
 }
 
 const Root = styled('div')(() => [
@@ -116,53 +98,27 @@ const ModalWrapper = styled(Modal)(() => [
 
 const columnSettingsKey = 'DATAOMNIS_SOURCELISTS_COLUMN_SETTINGS'
 
-const getUrl = (
-  urlObj: Record<string, any>,
-  type:
-    | 'hbase'
-    | 'kafka'
-    | 'ftp'
-    | 'hdfs'
-    | 'mysql'
-    | 'clickhouse'
-    | 'postgresql'
-) => {
-  switch (type) {
-    case 'hbase': {
-      try {
-        return `${JSON.parse(urlObj?.config ?? '{}')['hbase.zookeeper.quorum']}`
-      } catch (e) {
-        return ''
-      }
-    }
-    case 'kafka':
-      return urlObj.kafka_brokers
-        .map(
-          ({ host, port }: { host: string; port: number }) => `${host}:${port}`
-        )
-        .join(',')
-    case 'ftp':
-      return `${lowerCase(get(ftpProtocol, `${urlObj?.protocol}.label`))}://${
-        urlObj?.host
-      }:${urlObj?.port}`
-    case 'hdfs':
-      return `hdfs://${urlObj?.name_node}:${urlObj?.port}`
-    default:
-      return `jdbc:${type}://${urlObj.host}:${urlObj.port}/${urlObj.database}`
-  }
+export interface DataSourceListProps {
+  selectMode?: boolean
+  sourceType?: number
+  onCheck?: (source: any) => void
+  selected?: string[]
 }
-const DataSourceList = observer(() => {
+
+const DataSourceList = observer((props: DataSourceListProps) => {
+  const { selectMode = false, sourceType, onCheck = () => {}, selected } = props
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [columnSettings, setColumnSettings] = useState([])
   const [searchName, setSearchName] = useState('')
   const [isReFetching, setIsReFetching] = useState(false)
   const [delText, setDelText] = useState('')
+  const history = useHistory()
   const {
     dataSourceStore: {
       op,
       opSourceList,
       mutateOperation,
-      sourceKinds,
+      // sourceKinds,
       showPingHistories,
       addEmptyHistories,
       addItemHistories,
@@ -174,7 +130,6 @@ const DataSourceList = observer(() => {
   } = useStore()
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
-
   const [filter, setFilter] = useImmer<{
     regionId: string
     spaceId: string
@@ -183,17 +138,22 @@ const DataSourceList = observer(() => {
     reverse: boolean
     search?: string
     verbose?: 1 | 2
+    status?: number
     [k: string]: any
   }>({
     regionId,
     spaceId,
     search: '',
     reverse: true,
+    sort_by: 'created',
     offset: 0,
     limit: 10,
     verbose: 2,
+    status: selectMode ? DATASOURCE_STATUS.ENABLED : 0,
   })
-  const { isLoading, refetch, data } = useQuerySource(filter)
+  const { isLoading, refetch, data } = useQuerySource(
+    merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})
+  )
   const mutation = useMutationSource()
 
   const shouldRefetch = useRef<string>()
@@ -215,7 +175,7 @@ const DataSourceList = observer(() => {
     }
   }, [op, refetch])
 
-  usePingEvent({
+  const { add: addPing, update: updatePing } = usePingEvent({
     addEmpty: addEmptyHistories,
     addItem: addItemHistories,
     updateEmpty: addEmptyHistories,
@@ -246,6 +206,25 @@ const DataSourceList = observer(() => {
     })
   }
 
+  const handlePing = (record: Record<string, any>) => {
+    const { id } = record
+    const item = {
+      uuid: Math.random().toString(32),
+      sourceId: id,
+      stage: DATASOURCE_PING_STAGE.UPDATE,
+    }
+    addPing(item)
+    mutation
+      .mutateAsync({
+        op: 'ping',
+        source_id: id,
+        stage: DATASOURCE_PING_STAGE.UPDATE,
+      })
+      .finally(() => {
+        updatePing(item)
+        refetch()
+      })
+  }
   const handleOk = () => {
     if (op === '') {
       return
@@ -285,6 +264,7 @@ const DataSourceList = observer(() => {
     {
       title: '状态',
       dataIndex: 'status',
+      width: 86,
       render: (v: number) => {
         if (v === DATASOURCE_STATUS.ENABLED) {
           return (
@@ -305,6 +285,7 @@ const DataSourceList = observer(() => {
     {
       title: '数据源类型',
       dataIndex: 'type',
+      width: 110,
       render: (v: number) => {
         return sourceKinds.find((kind) => kind.source_type === v)?.name
       },
@@ -314,12 +295,11 @@ const DataSourceList = observer(() => {
       dataIndex: 'url',
       width: 250,
       render: (v: any, row: any) => {
-        const kindName = sourceKinds.find(
-          (kind) => kind.source_type === row.type
-        )?.name
+        const item = sourceKinds.find((kind) => kind.source_type === row.type)
+        const kindName = item?.urlType ?? item?.name
 
         if (kindName) {
-          const key = kindName.toLowerCase()
+          const key = kindName
           const urlObj = get(v, key)
           // const networkId = get(urlObj, 'network.vpc_network.network_id')
           return (
@@ -337,7 +317,7 @@ const DataSourceList = observer(() => {
                       </TextEllipsis>
                     ) : (
                       <Tooltip
-                        theme="darker"
+                        theme="instead"
                         content={getUrl(urlObj, key as 'mysql')}
                         hasPadding
                       >
@@ -360,11 +340,7 @@ const DataSourceList = observer(() => {
       title: '数据源可用性',
       dataIndex: 'last_connection',
       render: (v?: Record<string, any>, row?: Record<string, any>) => {
-        const {
-          result = CONNECTION_STATUS.UNDO,
-          network_info: networkInfo,
-          network_id: networkId,
-        } = v ?? { result: 0 }
+        const { result = CONNECTION_STATUS.UNDO } = v ?? { result: 0 }
         const isItemLoading = itemLoadingHistories?.[row?.id]?.size
         return (
           <>
@@ -378,7 +354,7 @@ const DataSourceList = observer(() => {
                 }
 
                 .ping-connection-status {
-                  ${tw`text-neut-15`}
+                  ${tw`text-font`}
                 }
 
                 .${connectionListCls} {
@@ -404,24 +380,6 @@ const DataSourceList = observer(() => {
                 </TextLink>
               )}
             </Center>
-            {v && (
-              <Tooltip
-                hasPadding
-                theme="darker"
-                content={
-                  <div>
-                    <div>VPC: {networkInfo?.space_id}</div>
-                    <div>vxnet: {networkInfo?.vxnet_id}</div>
-                  </div>
-                }
-                twChild={tw`truncate`}
-              >
-                <span title={`${networkInfo?.name} (${networkId})`}>
-                  <span>{networkInfo?.name} </span>
-                  <span>({networkId})</span>
-                </span>
-              </Tooltip>
-            )}
           </>
         )
       },
@@ -431,7 +389,7 @@ const DataSourceList = observer(() => {
       dataIndex: 'desc',
       render: (v: string) => {
         return (
-          <Tooltip content={v} theme="darker" hasPadding>
+          <Tooltip content={v} theme="instead" hasPadding>
             <span>{getEllipsisText(v, 20)}</span>
           </Tooltip>
         )
@@ -447,75 +405,94 @@ const DataSourceList = observer(() => {
     {
       title: '操作',
       key: 'table_actions',
-      width: 150,
-      render: (v: string, info: any) => (
-        <>
-          <Button
-            type="text"
-            tw="text-green-11! font-semibold"
-            onClick={() => {
-              mutateOperation('view', [info])
-            }}
-          >
-            查看详情
-          </Button>
-          <Tooltip
-            theme="light"
-            trigger="click"
-            arrow={false}
-            twChild={
-              css`
-                &[aria-expanded='true'],
-                &:hover {
-                  ${tw`bg-neut-2 rounded-sm`}
-                }
+      width: 124,
+      render: (v: string, info: any) => {
+        if (selectMode) {
+          return (
+            <span
+              tw="cursor-pointer dark:text-white dark:hover:text-green-11"
+              onClick={() => {
+                handlePing(info)
+              }}
+            >
+              可用性测试
+            </span>
+          )
+        }
+        return (
+          <>
+            <Button
+              type="text"
+              tw="text-green-11! font-semibold"
+              onClick={() => {
+                mutateOperation('view', [info])
+              }}
+            >
+              查看详情
+            </Button>
+            <Tooltip
+              theme="auto"
+              trigger="click"
+              placement="bottom-end"
+              arrow={false}
+              twChild={
+                css`
+                  &[aria-expanded='true'],
+                  &:hover {
+                    ${tw`bg-neut-2 rounded-sm`}
+                  }
 
-                svg {
-                  ${tw`text-black! bg-transparent! fill-[transparent]!`}
-                }
-              ` as any
-            }
-            content={
-              <Menu
-                onClick={(e: React.SyntheticEvent, key: any) => {
-                  mutateOperation(key, [info])
-                }}
-              >
-                <MenuItem key="ping">
-                  <Icon name="if-doublecheck" tw="mr-2" />
-                  可用性测试
-                </MenuItem>
-                <MenuItem
-                  key="update"
-                  disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                  svg {
+                    ${tw`text-black! bg-transparent! fill-[transparent]!`}
+                  }
+                ` as any
+              }
+              content={
+                <Menu
+                  onClick={(e: React.SyntheticEvent, key: any) => {
+                    if (key !== 'ping') {
+                      mutateOperation(key, [info])
+                    } else {
+                      handlePing(info)
+                    }
+                  }}
                 >
-                  <Icon name="pen" tw="mr-2" />
-                  编辑
-                </MenuItem>
-                {info.status === DATASOURCE_STATUS.DISABLED ? (
-                  <MenuItem key="enable">
-                    <Icon name="start" tw="mr-2" />
-                    启用
+                  <MenuItem key="ping">
+                    <Icon name="if-doublecheck" tw="mr-2" />
+                    可用性测试
                   </MenuItem>
-                ) : (
-                  <MenuItem key="disable">
-                    <Icon name="stop" tw="mr-2" />
-                    停用
+                  <MenuItem
+                    key="update"
+                    disabled={info.status === DATASOURCE_STATUS.DISABLED}
+                  >
+                    <Icon name="pen" tw="mr-2" />
+                    编辑
                   </MenuItem>
-                )}
-                <MenuItem key="delete">
-                  <Icon name="trash" tw="mr-2" />
-                  删除
-                </MenuItem>
-              </Menu>
-            }
-          >
-            <Center tw="w-6 h-6">
-              <Icon name="more" size={20} clickable />
-            </Center>
-          </Tooltip>
-        </>
-      ),
+                  {info.status === DATASOURCE_STATUS.DISABLED ? (
+                    <MenuItem key="enable">
+                      <Icon name="start" tw="mr-2" />
+                      启用
+                    </MenuItem>
+                  ) : (
+                    <MenuItem key="disable">
+                      <Icon name="stop" tw="mr-2" />
+                      停用
+                    </MenuItem>
+                  )}
+                  <MenuItem key="delete">
+                    <Icon name="trash" tw="mr-2" />
+                    删除
+                  </MenuItem>
+                </Menu>
+              }
+            >
+              <Center tw="w-6 h-6">
+                <Icon name="more" size={20} clickable />
+              </Center>
+            </Tooltip>
+          </>
+        )
+      },
     },
   ]
 
@@ -536,8 +513,8 @@ const DataSourceList = observer(() => {
   if (isLoading) {
     return (
       <Root>
-        <PageTab tabs={tabs} />
-        <ContentBox tw="bg-white h-80">
+        {!selectMode && <PageTab tabs={tabs} />}
+        <ContentBox tw="bg-white dark:bg-neut-16 h-80">
           <Loading />
         </ContentBox>
       </Root>
@@ -550,43 +527,63 @@ const DataSourceList = observer(() => {
     <>
       {sourceList?.length || filter.search !== '' ? (
         <Root>
-          <PageTab tabs={tabs} />
-          <ToolBar tw="bg-white">
+          {!selectMode && <PageTab tabs={tabs} />}
+          <ToolBar tw="bg-white dark:bg-neut-16">
             <ToolBarLeft>
-              <Button type="primary" onClick={() => mutateOperation('create')}>
-                <Icon name="add" />
-                新增数据源
-              </Button>
-              <Button
-                type="default"
-                disabled={
-                  // .filter(
-                  // ({
-                  // source_id,
-                  // status,
-                  // }: {
-                  // source_id: string
-                  // status: number
-                  // }) => selectedRowKeys.includes(source_id) && status !== 2
-                  // ).
-                  selectedRowKeys.length === 0
-                }
-                onClick={() =>
-                  mutateOperation(
-                    'delete',
-                    sourceList.filter(({ id }: Record<string, any>) =>
-                      selectedRowKeys.includes(id)
-                    )
-                  )
-                }
-              >
-                <Icon name="trash" />
-                删除
-              </Button>
+              {!selectMode ? (
+                <>
+                  <Button
+                    type="primary"
+                    onClick={() => mutateOperation('create')}
+                  >
+                    <Icon name="add" />
+                    新增数据源
+                  </Button>
+                  <Button
+                    type="danger"
+                    disabled={
+                      // .filter(
+                      // ({
+                      // source_id,
+                      // status,
+                      // }: {
+                      // source_id: string
+                      // status: number
+                      // }) => selectedRowKeys.includes(source_id) && status !== 2
+                      // ).
+                      selectedRowKeys.length === 0
+                    }
+                    onClick={() =>
+                      mutateOperation(
+                        'delete',
+                        sourceList.filter(({ id }: Record<string, any>) =>
+                          selectedRowKeys.includes(id)
+                        )
+                      )
+                    }
+                  >
+                    <Icon name="trash-fill" />
+                    删除
+                  </Button>
+                </>
+              ) : (
+                <div tw="text-neut-8">
+                  如需选择新的数据源，您可以前往
+                  <RouterLink
+                    tw="ml-2 text-green-11!"
+                    to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                    target="_blank"
+                    color="blue"
+                  >
+                    新建数据源
+                  </RouterLink>
+                </div>
+              )}
             </ToolBarLeft>
             <ToolBarRight>
               <InputSearch
                 placeholder="请输入关键词进行搜索"
+                tw="dark:border-2 dark:rounded-sm dark:border-separator-light"
                 value={searchName}
                 onChange={(e, v) => setSearchName(String(v))}
                 onPressEnter={() => handleQuery(searchName)}
@@ -597,10 +594,14 @@ const DataSourceList = observer(() => {
                   }
                 }}
               />
-              <Button loading={isReFetching} tw="px-[5px]">
+              <Button
+                loading={isReFetching}
+                tw="px-[5px] dark:bg-neut-16! dark:hover:bg-neut-13!"
+              >
                 <Icon
                   name="if-refresh"
                   tw="text-xl"
+                  type="light"
                   onClick={() => {
                     setIsReFetching(true)
                     refetch().then(() => {
@@ -619,18 +620,36 @@ const DataSourceList = observer(() => {
               />
             </ToolBarRight>
           </ToolBar>
-          <Card tw="flex-1 pb-5 px-5">
+          <Card
+            tw="flex-1 pb-5 dark:bg-neut-16"
+            css={[!selectMode && tw`px-5`]}
+          >
             <Table
-              selectType="checkbox"
+              selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
               columns={columns}
               rowKey="id"
               tw="pb-4 "
-              selectedRowKeys={selectedRowKeys}
-              onSelect={(rowKeys: []) => setSelectedRowKeys(rowKeys)}
+              disabledRowKeys={
+                selectMode
+                  ? sourceList
+                      .filter(
+                        (i: Record<string, any>) =>
+                          !i.last_connection || i.last_connection.result !== 1
+                      )
+                      .map((i: Record<string, any>) => i.id)
+                  : []
+              }
+              selectedRowKeys={selectMode ? selected : selectedRowKeys}
+              onSelect={(rowKeys: string[]) => {
+                if (selectMode && rowKeys.length) {
+                  onCheck(sourceList.find((v: any) => v.id === rowKeys[0]))
+                }
+                setSelectedRowKeys(rowKeys)
+              }}
               onSort={(sortKey: string, sortOrder: string) => {
                 setFilter((draft) => {
-                  draft.order_by = sortKey
+                  draft.sort_by = sortKey
                   draft.reverse = sortOrder === 'desc'
                 })
               }}
@@ -654,7 +673,15 @@ const DataSourceList = observer(() => {
           </Card>
         </Root>
       ) : (
-        <DataEmpty onAddClick={() => mutateOperation('create')} />
+        <DataEmpty
+          onAddClick={() => {
+            if (selectMode) {
+              history.push(`/${regionId}/workspace/${spaceId}/upload/dsl`)
+            } else {
+              mutateOperation('create')
+            }
+          }}
+        />
       )}
       {(() => {
         if (['create', 'update', 'view'].includes(op)) {
@@ -745,7 +772,7 @@ const DataSourceList = observer(() => {
         }
         return null
       })()}
-      {op === 'ping' && <DataSourcePingModal />}
+      {/* {op === 'ping' && <DataSourcePingModal />} */}
       {showPingHistories && <DataSourcePingHistoriesModal />}
       {networkOp === 'create' && <NetworkModal appendToBody />}
     </>

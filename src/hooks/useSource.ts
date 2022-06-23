@@ -11,6 +11,9 @@ import {
   pingDataSource,
   pingDataSourceList,
   updateDataSource,
+  describeDataSourceTables,
+  describeDataSourceTableSchema,
+  dataSourceManage,
 } from 'stores/api'
 import { get } from 'lodash-es'
 import { getIsFormalEnv } from 'utils/index'
@@ -118,6 +121,42 @@ export const useQuerySourceHistories = (
   )
 }
 
+export const useQuerySourceTables = (
+  { sourceId }: { sourceId: string },
+  options = {}
+) => {
+  const { regionId, spaceId } = useParams<IUseParams>()
+  const params = {
+    regionId,
+    spaceId,
+    sourceId,
+  }
+  return useQuery(
+    ['tables', params],
+    async () => describeDataSourceTables(params),
+    options
+  )
+}
+
+export const useQuerySourceTableSchema = (
+  { sourceId, tableName }: { sourceId: string; tableName: string },
+  options = {},
+  type: 'source' | 'target' = 'source'
+) => {
+  const { regionId, spaceId } = useParams<IUseParams>()
+  const params = {
+    regionId,
+    spaceId,
+    sourceId,
+    tableName,
+  }
+  return useQuery(
+    [`${type}_tableSchema`, params],
+    async () => describeDataSourceTableSchema(params),
+    options
+  )
+}
+
 interface MutationSourceParams {
   op: 'disable' | 'enable' | 'delete' | 'create' | 'update' | 'ping' | 'view'
   source_type?: number
@@ -154,4 +193,17 @@ export const useMutationSource = () => {
     }
     return ret
   })
+}
+
+export const useDescribeDataSource = (sourceId: string) => {
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const params = {
+    space_id: spaceId,
+    regionId,
+    source_id: sourceId,
+  }
+
+  const key: any = ['datasourceDetail', params]
+  return useQuery(key, async () => dataSourceManage.describeDataSource(params))
 }

@@ -15,6 +15,15 @@ const { NODE_ENV } = process.env
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
+const getTheme = () => {
+  // const themeStr = process.argv.find(arg => arg.startsWith('theme='))
+  // if (!themeStr) {
+  //   return {theme: 'default'}
+  // }
+  return {theme: process.env.THEME || 'default'}
+}
+
+
 let config = {
   mode: NODE_ENV,
   target: 'web',
@@ -46,6 +55,15 @@ let config = {
             },
           },
         ],
+      },
+      {
+        test: /\.tpl$/,
+        use: [
+          {loader: 'babel-loader'},
+          {loader: resolve('./loaders/tpl-loader.js'), options: {
+               tplValue: getTheme(),
+            }},
+        ]
       },
       {
         test: /\.svg$/i,
@@ -124,8 +142,8 @@ let config = {
   },
   optimization: {},
   devServer: {
-    host: 'localhost',
-    allowedHosts: ['local.testing.com'],
+    host: '0.0.0.0',
+    allowedHosts: ['local.testing.com', 'local.qacloud.com'],
     compress: true,
     hot: true,
     historyApiFallback: {
@@ -172,7 +190,7 @@ let config = {
       profile: !isDev,
     }),
     new MonacoWebpackPlugin({
-      languages: ['sql', 'python', 'scala'],
+      languages: ['json', 'sql', 'python', 'scala'],
       filename: 'static/js/[name].worker.js',
     }),
   ].filter(Boolean),
