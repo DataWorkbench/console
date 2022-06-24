@@ -1,7 +1,6 @@
 import tw, { styled, css } from 'twin.macro'
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, useState } from 'react'
 import { useMount, useUnmount } from 'react-use'
-import { useImmer } from 'use-immer'
 import { DarkModal } from './Modal'
 
 interface ResizeModalProps {
@@ -33,7 +32,7 @@ const ResizeModal = (props: ResizeModalProps) => {
   const { maxWidth, minWidth = 800, children, enableResizing, width = 1000, ...rest } = props
   const isResize = useRef(false)
   const clientX = useRef(0)
-  const [modalWidth, setModalWidth] = useImmer(width)
+  const [modalWidth, setModalWidth] = useState<number>(width)
 
   const mouseUp = useCallback((e: MouseEvent) => {
     e.preventDefault()

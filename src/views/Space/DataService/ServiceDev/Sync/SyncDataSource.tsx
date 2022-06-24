@@ -1,47 +1,107 @@
 import { observer } from 'mobx-react-lite'
-// import tw, { css } from 'twin.macro'
 import { useImmer } from 'use-immer'
-
+import { useQueryDescribeDataSourceTables, useQueryDescribeDataSourceTableSchema } from 'hooks'
 import { Form, Icon } from '@QCFE/lego-ui'
-import { AffixLabel, FlexBox, Center, ButtonWithClearField, PopConfirm } from 'components'
-import { useState } from 'react'
+import {
+  AffixLabel,
+  FlexBox,
+  Center,
+  ButtonWithClearField,
+  PopConfirm,
+  SelectWithRefresh,
+  HelpCenterLink
+} from 'components'
+import { useState, useMemo, useEffect } from 'react'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { get, isEmpty, pick } from 'lodash-es'
+import { findKey, get, isEmpty, pick } from 'lodash-es'
+import { useParams } from 'react-router-dom'
+import { useStore } from 'stores'
+import { dataSourceTypes } from '../constants'
+import { tableSelectStyled } from '../styled'
 
 type SourceDataType = { id: string; name: string; networkId: string } | null
+interface IRouteParams {
+  regionId: string
+  spaceId: string
+}
+
+const dataSourceOption = [
+  { label: 'MySQL', value: 1 },
+  { label: 'ClickHouse', value: 5 },
+  { label: 'PostgreSQL', value: 2 }
+]
 
 const { SelectField } = Form
 
 const SyncDataSource = observer(
   (props, ref) => {
     const [visible, setVisible] = useState<boolean | null>(null)
-
+    const { spaceId } = useParams<IRouteParams>()
     const [sourceData, setSourceData] = useImmer<{
-      sourceType: string
+      type: string
+      tableName: string
       source: SourceDataType
     }>({
-      sourceType: '',
-      source: null
+      type: '',
+      source: null,
+      tableName: ''
     })
+
+    const {
+      dtsDevStore: { setSchemaColumns }
+    } = useStore()
+
+    const paramsTable = { uri: { space_id: spaceId, source_id: sourceData.source?.id || '' } }
+    const tablesRet = useQueryDescribeDataSourceTables(paramsTable, {
+      enabled: !!sourceData.source?.id
+    })
+
+    const paramsTableSchema = {
+      uri: {
+        space_id: spaceId,
+        source_id: sourceData.source?.id || '',
+        table_name: sourceData.tableName
+      }
+    }
+    const TableSchema = useQueryDescribeDataSourceTableSchema(paramsTableSchema, {
+      enabled: !!sourceData.source?.id && !!sourceData.tableName
+    })
+    const tables = useMemo(() => {
+      const da = get(tablesRet.data, 'items', [])
+      const option = da.map((tabName) => ({
+        label: tabName,
+        value: tabName
+      }))
+      return option
+    }, [tablesRet.data])
+
+    useEffect(() => {
+      const columns = get(TableSchema.data, 'schema.columns', [])
+      if (!columns) return
+      setSchemaColumns(columns)
+    }, [TableSchema.data, setSchemaColumns])
 
     const handleClick = () => {
       setVisible(true)
     }
 
+    const clearSchemaColumns = () => {
+      setSchemaColumns([])
+    }
+
     const handleClear = () => {
       setSourceData((draft) => {
         draft.source = null
+        draft.tableName = ''
       })
+      clearSchemaColumns()
     }
 
     const handleSelectDb = (data: SourceDataType) => {
-      console.log(data, 'data')
-
       setSourceData((draft) => {
         draft.source = data
       })
     }
-    console.log(sourceData)
 
     return (
       <FlexBox tw="flex-col">
@@ -51,11 +111,8 @@ const SyncDataSource = observer(
             name="sourceType"
             placeHolder="请选择数据源类型"
             backspaceRemoves={false}
-            value={sourceData.sourceType}
-            options={[
-              { value: 'mysql', label: 'MySQL' },
-              { value: 'mysql2', label: 'MySQL2' }
-            ]}
+            value={sourceData.type}
+            options={dataSourceOption}
             schemas={[
               {
                 help: '请选择数据源类型',
@@ -66,11 +123,14 @@ const SyncDataSource = observer(
             validateOnChange
             onChange={(v: string) => {
               setSourceData((draft) => {
-                draft.sourceType = v
+                draft.type = v
+                draft.source = null
+                draft.tableName = ''
               })
+              clearSchemaColumns()
             }}
           />
-          {!isEmpty(sourceData.sourceType) && (
+          {sourceData.type !== '' && (
             <ButtonWithClearField
               name="source"
               placeholder="选择数据来源"
@@ -88,13 +148,6 @@ const SyncDataSource = observer(
               onClear={() => handleClear()}
               value={sourceData.source?.id}
               clearable={!isEmpty(sourceData.source)}
-              schemas={[
-                {
-                  help: '请选择数据来源',
-                  status: 'error',
-                  rule: (v?: string) => !!v
-                }
-              ]}
             >
               <Center tw="space-x-1">
                 <span tw="ml-1">{sourceData.source?.name}</span>
@@ -102,11 +155,60 @@ const SyncDataSource = observer(
               </Center>
             </ButtonWithClearField>
           )}
+          {!isEmpty(sourceData.source) && (
+            <SelectWithRefresh
+              name="table"
+              label={<AffixLabel>数据源表</AffixLabel>}
+              options={tables}
+              isLoading={tablesRet.isFetching}
+              clearable={false}
+              onRefresh={() => {
+                tablesRet.refetch()
+              }}
+              onChange={(v: string) => {
+                setSourceData((draft) => {
+                  draft.tableName = v
+                })
+              }}
+              css={tableSelectStyled}
+              validateOnChange
+              value={sourceData.tableName}
+              {...(!!tables.length && !!tablesRet.isFetching
+                ? {
+                    validateStatus: 'error',
+                    validateHelp: (
+                      <div>
+                        当前数据源不可用，请前往{' '}
+                        <HelpCenterLink
+                          hasIcon
+                          isIframe={false}
+                          href="/manual/source_data/add_data/"
+                        >
+                          数据源管理
+                        </HelpCenterLink>{' '}
+                        页面配置
+                      </div>
+                    ) as any
+                  }
+                : {})}
+              schemas={[
+                {
+                  help: '请选择数据源表',
+                  status: 'error',
+                  rule: (v?: string) => !!v
+                }
+              ]}
+            />
+          )}
         </Form>
         <DataSourceSelectModal
-          title="选择数据源"
+          selected={[sourceData.source?.id]}
+          title={`选择数据源（已选类型为 ${findKey(
+            dataSourceTypes,
+            (v) => v === +get(sourceData, 'type')
+          )})`}
           visible={visible}
-          sourceType={1} // TODO: sourceType
+          sourceType={Number(sourceData.type)}
           onCancel={() => setVisible(false)}
           onOk={(v: any) => {
             setVisible(false)

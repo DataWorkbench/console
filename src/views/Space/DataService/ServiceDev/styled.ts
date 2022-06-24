@@ -205,3 +205,12 @@ export const Table = styled(LegoTable)(() => [
     }
   `
 ])
+
+export const tableSelectStyled = [
+  tw`w-full flex-1`,
+  css`
+    .help {
+      ${tw`w-full`}
+    }
+  `
+]

@@ -1,6 +1,6 @@
 import { Select, Button, Alert } from '@QCFE/lego-ui'
 import { DargTable, HelpCenterLink } from 'components'
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { OrderText } from 'views/Space/DataService/ServiceDev/styled'
 import { useImmer } from 'use-immer'
@@ -9,6 +9,10 @@ import { FlexBox } from 'components/Box'
 import tw, { styled } from 'twin.macro'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
+
+import { observer } from 'mobx-react-lite'
+import { useStore } from 'stores'
+import { assign, filter, includes, map } from 'lodash-es'
 import { FieldOrderColumns, serviceDevVersionFieldOrderMapping } from '../constants'
 
 const Root = styled.div`
@@ -17,25 +21,6 @@ const Root = styled.div`
 
 const getName = (name: MappingKey<typeof serviceDevVersionFieldOrderMapping>) =>
   serviceDevVersionFieldOrderMapping.get(name)!.apiField
-
-const options = [
-  {
-    label: 'sql',
-    value: 'sql'
-  },
-  {
-    label: 'javaScript',
-    value: 'javaScript'
-  },
-  {
-    label: 'python',
-    value: 'python'
-  },
-  {
-    label: 'golang',
-    value: 'golang'
-  }
-]
 
 const options2 = [
   {
@@ -50,8 +35,34 @@ const options2 = [
 
 const columnSettingsKey = 'DATA_SERVICE_FIELDORDER'
 
-const FieldOrder = () => {
-  const [dataSource, setDataSource] = useImmer([])
+const FieldOrder = observer(() => {
+  const [dataSource, setDataSource] = useImmer<{ name: string; order: string }[]>([])
+  const {
+    dtsDevStore: { fieldSettingData }
+  } = useStore()
+
+  const FieldOptions = useMemo(
+    () =>
+      map(
+        filter(fieldSettingData, (column) => column.isResponse),
+        (column) => ({ label: column.key, value: column.key })
+      ),
+    [fieldSettingData]
+  )
+
+  const FileOptionsDisable = useMemo(
+    () =>
+      map(FieldOptions, (option) =>
+        assign(
+          { ...option },
+          includes(
+            map(dataSource, (i) => i.name),
+            option.value
+          ) && { disabled: true }
+        )
+      ),
+    [FieldOptions, dataSource]
+  )
 
   const delRow = useCallback(
     (index: number) => {
@@ -82,7 +93,6 @@ const FieldOrder = () => {
       update(dataSource, {
         $push: [
           {
-            key: '1',
             name: '',
             order: ''
           }
@@ -102,7 +112,7 @@ const FieldOrder = () => {
       render: (text: any, record: any, index: number) => (
         <Select
           placeholder="请选择需要添加的字段"
-          options={options}
+          options={FileOptionsDisable}
           value={text}
           onChange={(v) => {
             setDataSource((draft) => {
@@ -172,6 +182,6 @@ const FieldOrder = () => {
       />
     </>
   )
-}
+})
 
 export default FieldOrder

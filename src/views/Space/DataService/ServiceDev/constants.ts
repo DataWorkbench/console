@@ -1,6 +1,21 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { Mapping } from 'utils/types'
 
+export interface Schema {
+  type: string
+  name: string
+  is_primary: boolean
+}
+
+export interface FieldSettingData {
+  key: string
+  field: string
+  isRequest: boolean
+  isResponse: boolean
+  type: string
+  isPrimary: boolean
+}
+
 function getField<T>(mapping: Mapping<T>): IColumn[] {
   return Array.from(mapping.values()).map((i) => ({
     title: i.label,
@@ -70,3 +85,35 @@ export const serviceDevResponseSettingMapping: Mapping<
   .set('param_description', { label: '描述', apiField: 'param_description' })
 
 export const ResponseSettingColumns: IColumn[] = getField(serviceDevResponseSettingMapping)
+
+export const dataSourceTypes: { [key in string]?: number } = {
+  mysql: 1,
+  // TIDB: 2,
+  // Kafka: 3,
+  // S3: 4,
+  click_house: 5,
+  // HBase: 6,
+  // FTP: 7,
+  // HDFS: 8,
+  // sqlserver: 9,
+  // Oracle: 10,
+  postgresql: 2
+  // DB2: 11,
+  // 'SAP HANA': 12,
+  // Hive: 13,
+  // MongoDB: 15,
+  // Redis: 16,
+  // ElasticSearch: 14,
+}
+
+export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[] = (
+  schema: Schema[]
+) =>
+  schema.map((column) => ({
+    key: column.name,
+    field: column.name,
+    isRequest: false,
+    isResponse: false,
+    type: column.type,
+    isPrimary: column.is_primary
+  }))

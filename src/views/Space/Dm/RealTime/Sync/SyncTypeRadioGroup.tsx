@@ -98,6 +98,8 @@ const SyncTypeRadioGroup = forwardRef<React.ReactElement, SyncTypeRadioGroupProp
       []
     )
 
+    console.log('geneOpts(incrSourceData)', geneOpts(incrSourceData))
+
     return (
       <Control tw="flex-col w-[556px]! max-w-[556px]!" ref={ref}>
         <SyncItem selected={params.type === 'full'} onClick={() => handleChange('full', 'type')}>

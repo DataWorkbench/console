@@ -6,6 +6,9 @@ import { useCallback } from 'react'
 import { apiHooks, queryKeyObj } from './apiHooks'
 import {
   ListApiGroupsRequestType,
+  ListDataSourcesRequestType,
+  DescribeDataSourceRequestType,
+  DescribeDataSourceTableSchemaRequestType,
   ListDataServiceClustersRequestType,
   ListApiServicesRequestType,
   ListRoutesRequestType
@@ -13,6 +16,9 @@ import {
 import {
   DataServiceManageListDataServiceClustersType,
   DataServiceManageListApiGroupsType,
+  DataSourceManageCreateDataSourceType,
+  DataSourceManageDescribeDataSourceTablesType,
+  DataSourceManageDescribeDataSourceTableSchemaType,
   DataServiceManageDescribeApiConfigType,
   ServiceGatewayListApiServicesType,
   ServiceGatewayListRoutesType
@@ -240,6 +246,25 @@ export const useMutationUpdateApiConfig = () => {
     return ret
   })
 }
+
+export const useQueryListDataSources = apiHooks<
+  'dataSourceManage',
+  ListDataSourcesRequestType,
+  DataSourceManageCreateDataSourceType
+>('dataSourceManage', 'listDataSources')
+
+export const useQueryDescribeDataSourceTables = apiHooks<
+  'dataSourceManage',
+  DescribeDataSourceRequestType,
+  DataSourceManageDescribeDataSourceTablesType
+>('dataSourceManage', 'describeDataSourceTables')
+
+// 更具数据库和表查字段
+export const useQueryDescribeDataSourceTableSchema = apiHooks<
+  'dataSourceManage',
+  DescribeDataSourceTableSchemaRequestType,
+  DataSourceManageDescribeDataSourceTableSchemaType
+>('dataSourceManage', 'describeDataSourceTableSchema')
 
 /**
  *  API 管理

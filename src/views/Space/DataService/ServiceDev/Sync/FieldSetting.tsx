@@ -1,13 +1,19 @@
 import { Alert } from '@QCFE/lego-ui'
 import { HelpCenterLink, DargTable } from 'components'
+import { observer } from 'mobx-react-lite'
+import { useStore } from 'stores'
 
-import { useImmer } from 'use-immer'
 import { FlexBox } from 'components/Box'
 import tw, { styled } from 'twin.macro'
 import { MappingKey } from 'utils/types'
 
 import { useColumns } from 'hooks/useHooks/useColumns'
-import { FieldSettingColumns, serviceDevVersionFieldSettingMapping } from '../constants'
+import { cloneDeep } from 'lodash-es'
+import {
+  FieldSettingColumns,
+  serviceDevVersionFieldSettingMapping,
+  FieldSettingData
+} from '../constants'
 
 const Root = styled.div`
   ${tw`text-white space-y-2`}
@@ -17,28 +23,19 @@ const getName = (name: MappingKey<typeof serviceDevVersionFieldSettingMapping>) 
   serviceDevVersionFieldSettingMapping.get(name)!.apiField
 
 const dataServiceDataSettingKey = 'DATA_SERVICE_DATA__SETTING'
+const FieldOrder = observer(() => {
+  const {
+    dtsDevStore: { fieldSettingData },
+    dtsDevStore
+  } = useStore()
 
-const FieldOrder = () => {
-  const [dataSource, setDataSource] = useImmer([
-    {
-      id: 1,
-      key: '1',
-      field: 'sql',
-      isRequest: true,
-      isResponse: true,
-      type: 'VARCHAR',
-      des: ''
-    },
-    {
-      id: 2,
-      key: '2',
-      field: 'sql',
-      isRequest: false,
-      isResponse: true,
-      type: 'VARCHAR',
-      des: ''
-    }
-  ])
+  const setFieldSettingData = (fn: (fieldData: FieldSettingData[]) => void) => {
+    const data = cloneDeep(fieldSettingData)
+    fn(data)
+    dtsDevStore.set({
+      fieldSettingData: data
+    })
+  }
 
   const renderColumns = {
     [getName('field')]: {
@@ -49,12 +46,12 @@ const FieldOrder = () => {
       checkbox: true,
       checkboxText: '请求',
       onSelect: (checked: boolean, record: any, index: number) => {
-        setDataSource((draft) => {
+        setFieldSettingData((draft) => {
           draft[index].isRequest = checked
         })
       },
       onAllSelect: (checked: boolean) => {
-        setDataSource((draft) => {
+        setFieldSettingData((draft) => {
           draft.forEach((item) => {
             item.isRequest = checked
           })
@@ -66,12 +63,12 @@ const FieldOrder = () => {
       checkbox: true,
       checkboxText: '响应',
       onSelect: (checked: boolean, record: any, index: number) => {
-        setDataSource((draft) => {
+        setFieldSettingData((draft) => {
           draft[index].isResponse = checked
         })
       },
       onAllSelect: (checked: boolean) => {
-        setDataSource((draft) => {
+        setFieldSettingData((draft) => {
           draft.forEach((item) => {
             item.isResponse = checked
           })
@@ -90,7 +87,7 @@ const FieldOrder = () => {
     renderColumns as any
   )
 
-  if (dataSource.length === 0) {
+  if (fieldSettingData.length === 0) {
     return (
       <Root>
         <Alert
@@ -110,10 +107,10 @@ const FieldOrder = () => {
     <DargTable
       columns={columns as unknown as any}
       runDarg={false}
-      dataSource={dataSource}
+      dataSource={fieldSettingData}
       rowKey="key"
     />
   )
-}
+})
 
 export default FieldOrder

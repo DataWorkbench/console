@@ -59,7 +59,7 @@ export const ApiTree = observer(
 
     const {
       dtsDevStore,
-      dtsDevStore: { treeData, loadedKeys }
+      dtsDevStore: { treeData, loadedKeys, curApi }
     } = useStore()
 
     const [expandedKeys, setExpandedKeys] = useState<string[]>(expandedKeysProp || [])
@@ -93,11 +93,11 @@ export const ApiTree = observer(
       setExpandedKeys(expandedKeysProp || [])
     }, [expandedKeysProp])
 
-    // useEffect(() => {
-    //   if (dtsStore.curApi) {
-    //     setSelectedKeys([dtsStore.curApi.id])
-    //   }
-    // }, [dtsStore.curApi])
+    useEffect(() => {
+      if (curApi) {
+        setSelectedKeys([curApi.api_id])
+      }
+    }, [curApi])
 
     useImperativeHandle(ref, () => ({
       reset: () => {
