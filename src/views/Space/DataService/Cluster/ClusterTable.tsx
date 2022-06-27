@@ -19,8 +19,9 @@ import {
   getQueryKeyListDataServiceClusters
 } from 'hooks/useDataService'
 import NewClusterModal from './ClusterModal'
-import { ClusterColumns, StatusMap, getStatusNumber } from './common/constants'
-import { ClusterFieldMapping } from './common/mappings'
+import { ClusterColumns, StatusMap, getStatusNumber, ClusterFieldMapping } from './constants'
+
+import StopClusterModal from './StopClusterModal'
 
 const { ColumnsSetting } = ToolBar as any
 
@@ -269,10 +270,7 @@ const ClusterTable = observer(() => {
       {(dataServiceOp === 'create' || dataServiceOp === 'update') && (
         <NewClusterModal opWork={opClusterList as any} />
       )}
-      {(dataServiceOp === 'start' ||
-        dataServiceOp === 'stop' ||
-        dataServiceOp === 'delete' ||
-        dataServiceOp === 'reload') && (
+      {(dataServiceOp === 'start' || dataServiceOp === 'delete' || dataServiceOp === 'reload') && (
         <Modal
           noBorder
           visible
@@ -316,6 +314,9 @@ const ClusterTable = observer(() => {
             </section>
           </FlexBox>
         </Modal>
+      )}
+      {dataServiceOp === 'stop' && (
+        <StopClusterModal selectKey={opClusterList} onCancel={() => setDataServiceOp('')} />
       )}
     </FlexBox>
   )
