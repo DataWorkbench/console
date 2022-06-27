@@ -340,7 +340,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               {/* <span> */}
               {/*   {dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')} */}
               {/* </span> */}
-              <span>发布时间:</span>
+              <span>更新时间:</span>
               <span>{dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
               <span>作业描述:</span>
               <span>{data?.desc}</span>

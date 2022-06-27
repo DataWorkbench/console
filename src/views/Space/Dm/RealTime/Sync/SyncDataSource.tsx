@@ -2,7 +2,7 @@ import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { camelCase, findKey, get, isEmpty, isEqual, keys, pick, trim } from 'lodash-es'
+import { camelCase, findKey, get, isEmpty, isEqual, keys, pick, set, trim } from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
@@ -94,8 +94,9 @@ enum WriteMode {
 const getWriteMode = (type?: SourceType) => {
   switch (type) {
     case SourceType.Mysql:
-    case SourceType.PostgreSQL:
       return [WriteMode.Insert, WriteMode.Replace, WriteMode.Update]
+    case SourceType.PostgreSQL:
+      return [WriteMode.Insert, WriteMode.Update]
     case SourceType.ClickHouse:
       return [WriteMode.Insert]
     case SourceType.SqlServer:
@@ -342,7 +343,16 @@ const SyncDataSource = observer(
             preSql: get(dbTarget, 'pre_sql', [])
           }
         }
+
+        if (
+          newDB.source.id === db?.source?.id &&
+          newDB.source.tableName === db?.source?.tableName &&
+          db.source?.columns
+        ) {
+          set(newDB, 'source.columns', db.source.columns)
+        }
         setDB(newDB)
+
         if (newDB.target.postSql?.length > 0 || newDB.target.preSql?.length > 0) {
           setShowTargetAdvanced(true)
         }
@@ -350,6 +360,7 @@ const SyncDataSource = observer(
           setShowSourceAdvance(true)
         }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conf, setDB, sourceTypeName, targetTypeName])
 
     // console.log(db)

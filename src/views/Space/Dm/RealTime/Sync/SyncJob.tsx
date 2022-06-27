@@ -1,6 +1,12 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { FieldMappings, HelpCenterLink, Modal, PopConfirm } from 'components'
+import {
+  FieldMappings,
+  HelpCenterLink,
+  Modal,
+  RouterLink
+  // TextLink,
+} from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { nanoid } from 'nanoid'
@@ -17,6 +23,7 @@ import {
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { timeFormat } from 'utils/convert'
+import { useParams } from 'react-router-dom'
 import { JobToolBar } from '../styled'
 import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
@@ -51,21 +58,20 @@ const styles = {
   stepText: tw`ml-2 inline-block border-green-11 text-green-11`
 }
 
-const stepsData = [
+const getStepsData = (regionId: string, spaceId: string) => [
   {
     key: 'p0',
     title: '选择数据源',
     desc: (
       <>
         在这里配置数据的来源端和目的端；仅支持在
-        <HelpCenterLink
-          hasIcon
-          isIframe={false}
-          href="/manual/source_data/add_data/"
-          onClick={(e) => e.stopPropagation()}
+        <RouterLink
+          to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+          target="_blank"
+          color="blue"
         >
           数据源管理
-        </HelpCenterLink>
+        </RouterLink>
         创建的数据源。
       </>
     )
@@ -136,9 +142,13 @@ const SyncJob = () => {
   const { workFlowStore } = useStore()
   const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
 
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
+
   const {
     workFlowStore: { curJob }
   } = useStore()
+
+  const stepsData = useMemo(() => getStepsData(regionId, spaceId), [regionId, spaceId])
 
   const [db, setDb] = useImmer<{
     source: DbInfo
@@ -517,6 +527,8 @@ const SyncJob = () => {
     )
   }
   const mutationConvert = useMutationSyncJobConvert()
+
+  // eslint-disable-next-line
   const handleConvert = () => {
     if (!dbRef.current || !mappingRef.current || !clusterRef.current || !channelRef.current) {
       return
@@ -555,29 +567,6 @@ const SyncJob = () => {
   return (
     <div tw="flex flex-col flex-1 relative">
       <JobToolBar>
-        {mode === 1 ? (
-          <PopConfirm
-            type="warning"
-            content={
-              <>
-                <div tw="text-base font-medium">确认转变为脚本模式？</div>
-                <div tw="text-neut-8 mt-2">
-                  一旦数据集成过程由向导转变为脚本模式，不可逆转，且来源、目的数据源需要和向导模式保持一致，确认转变为脚本模式么？
-                </div>
-              </>
-            }
-            okText="转变"
-            onOk={handleConvert}
-            // onOk={() => {
-            //   save(false, () => setMode(2), false)
-            // }}
-          >
-            <Button type="black">
-              <Icon name="coding" type="light" />
-              脚本模式
-            </Button>
-          </PopConfirm>
-        ) : null}
         <Button onClick={() => save()} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存

@@ -6,6 +6,8 @@ import dayjs from 'dayjs'
 // import { useParams } from 'react-router-dom'
 import { useQueryDescribeFlinkCluster } from 'hooks'
 
+const UNIT_PRICE = 0.36
+
 const Header = styled(FlexBox)`
   ${tw`rounded-[2px] bg-neut-16 px-6 py-3`}
 `
@@ -208,7 +210,9 @@ const Cluster = ({ clusterId }: { clusterId?: string }) => {
             <div>价格</div>
             <div tw="flex gap-1">
               <span tw="text-green-11">￥0</span>
-              <del>¥0 0.281</del>
+              <del>
+                ¥{((data?.task_cu * data?.task_num + data?.job_cu) * UNIT_PRICE).toFixed(2)}
+              </del>
               <span>每小时</span>
               <span tw="ml-1 text-[#B24B06]">限时免费</span>
             </div>

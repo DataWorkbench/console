@@ -1,4 +1,4 @@
-import { get } from 'lodash-es'
+// import { get } from 'lodash-es'
 import request from './request'
 import customRequest from './customRequest'
 import emitter from './emitter'
@@ -6,7 +6,7 @@ import emitter from './emitter'
 export * from './convert'
 
 export const getHelpCenterLink = (path: string) => {
-  const prefix = get(window, 'GLOBAL_CONFIG.new_docs_url', '')
+  const prefix = ''
   return `${prefix}/bigdata/dataomnis${path}`
 }
 

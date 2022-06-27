@@ -1,7 +1,10 @@
 import { Table } from '@QCFE/qingcloud-portal-ui'
-import { networkColumns, networkStatusMap } from 'views/Space/Manage/Network/common/constants'
+import {
+  networkColumns
+  // networkStatusMap,
+} from 'views/Space/Manage/Network/common/constants'
 import tw, { css, styled } from 'twin.macro'
-import { Tooltip, Center, InstanceName, StatusBar } from 'components'
+import { Tooltip, Center, InstanceName } from 'components'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { useIsFetching } from 'react-query'
 import { MappingKey } from 'utils/types'
@@ -85,14 +88,16 @@ export default function NetworkList(props: INetworkProps) {
         />
       )
     },
-    [getName('status')]: {
-      render: (_: never, record: Record<string, any>) => (
-        <StatusBar
-          type={networkStatusMap.get(record?.router?.status)?.style}
-          label={networkStatusMap.get(record?.router?.status)?.label}
-        />
-      )
-    },
+    // [getName('status')]: {
+    //   render: (_: never, record: Record<string, any>) => {
+    //     return (
+    //       <StatusBar
+    //         type={networkStatusMap.get(record?.router?.status)?.style}
+    //         label={networkStatusMap.get(record?.router?.status)?.label}
+    //       />
+    //     )
+    //   },
+    // },
     [getName('network_address')]: {
       render: (_: never, record: Record<string, any>) => record.router?.ip_network
     },
