@@ -11,11 +11,11 @@ const menuList = [
     icon: 'if-default-system',
     key: 'account',
   },
-  {
-    label: 'api 密钥',
-    icon: 'if-key',
-    key: 'api',
-  },
+  // {
+  //   label: 'api 密钥',
+  //   icon: 'if-key',
+  //   key: 'api',
+  // },
   {
     label: '通知列表',
     icon: 'q-listViewFill',
@@ -38,6 +38,10 @@ const menuList = [
 ]
 
 // const platformAdminMenuKeys = new Set([''])
+// const issaKeys = new Set(Set['account', 'security', 'api', 'notification'])
+// const privateKeys = new Set(['account', 'api', 'notification'])
+
+// let isPrivate = (process.env.IS_PRIVATE)
 
 const { MenuItem } = Menu as any
 const IconBox = styled(Center)(() => {
@@ -90,7 +94,9 @@ const UserInfoWrapper = styled.div(() => [
     }
   `,
 ])
-const UserInfo = styled(FlexBox)(() => [tw`gap-2 text-font leading-5 pr-10`])
+const UserInfo = styled(FlexBox)(() => [
+  tw`gap-2 text-font leading-5 pr-10 cursor-pointer`,
+])
 
 export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   // const handleOpenHelpCenter = (link: string) => {
@@ -99,6 +105,10 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   //     onCancel: () => Modal.close(openModal),
   //   })
   // }
+
+  const handleMenu = (_: never, key: string) => {
+    console.log(111, key)
+  }
 
   return (
     <Center>
@@ -149,7 +159,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
           theme="auto"
           trigger="click"
           content={
-            <Menu>
+            <Menu onClick={handleMenu}>
               {menuList.map((item) => {
                 if (item.key === 'divider') {
                   return (
@@ -183,13 +193,8 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
               />
             </Center>
             <div>
+              <div>租户管理员</div>
               <div>{get(window, 'USER.user_name', '')}</div>
-              <div>
-                {
-                  // TODO 角色
-                  '超级管理员'
-                }
-              </div>
             </div>
           </UserInfo>
         </Tooltip>

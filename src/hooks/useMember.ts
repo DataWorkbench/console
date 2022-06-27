@@ -15,7 +15,7 @@ import { getNextPageParam } from './apiHooks'
 interface IRouteParams {
   regionId: string
   spaceId: string
-  mod?: string
+  // mod?: string
 }
 
 const keys: {

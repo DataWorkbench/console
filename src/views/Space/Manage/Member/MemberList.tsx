@@ -118,10 +118,9 @@ const Member = observer(
       useParams<IRouteParams>()
 
     const space: any = spaceFromProps ?? workSpaceStore.space
-    const regionId = regionIdFromProps || regionIdFromParams
+    const regionId = regionIdFromProps ?? regionIdFromParams
     const spaceId = space?.id || spaceIdFromParams
 
-    console.log(111, space)
     const isOwner =
       !!space?.owner && get(window, 'USER.user_id') === space?.owner
 
@@ -164,8 +163,6 @@ const Member = observer(
               tw="text-green-11! font-semibold"
               disabled={!isOwner}
               onClick={() => {
-                // setOp('update')
-                console.log(222, toJS(space))
                 set({
                   op: 'update',
                   spaceItem: { ...toJS(space), regionId },

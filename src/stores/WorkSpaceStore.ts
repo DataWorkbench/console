@@ -93,7 +93,7 @@ class WorkSpaceStore {
 
   funcList = defaultFuncList
 
-  space?: { name?: string; id?: string; owner?: string } = {}
+  space?: { name?: string; id?: string; owner?: string; regionId?: string } = {}
 
   spaceIndex = 0
 

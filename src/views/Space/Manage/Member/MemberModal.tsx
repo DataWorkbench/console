@@ -52,7 +52,7 @@ interface IMemberModalProps {
 
 const MemberModal = observer((props: IMemberModalProps) => {
   const {
-    workSpaceStore: { space: spaceStore },
+    workSpaceStore: { space },
   } = useStore()
   const { op, setOp, spaceItem } = useMemberStore()
   const { roleList: roleListProp, data, cb } = props
@@ -65,16 +65,13 @@ const MemberModal = observer((props: IMemberModalProps) => {
   })
 
   const { data: roles } = useQueryRoleList(
-    spaceStore
-      ? undefined
-      : { spaceId: spaceItem.id, regionId: spaceItem.regionId },
+    { spaceId: spaceItem.id, regionId: spaceItem.regionId },
     {
       enabled: !roleListProp,
     }
   )
 
   const roleList = roleListProp ?? roles?.infos
-  const space = spaceStore?.id ? spaceStore : spaceItem
   const mutation = useMutationMember()
   const queryClient = useQueryClient()
 
@@ -86,8 +83,8 @@ const MemberModal = observer((props: IMemberModalProps) => {
       {
         op,
         ...omit(value, op === 'create' ? 'user_id' : 'user_ids'),
-        spaceId: space.id,
-        regionId: (space as any)?.regionId || undefined,
+        spaceId: spaceItem.id,
+        regionId: (spaceItem as any)?.regionId || undefined,
       },
       {
         onSuccess: () => {
@@ -100,7 +97,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
         },
       }
     )
-  }, [mutation, op, value, space, cb, refetch, setOp])
+  }, [mutation, op, value, spaceItem, cb, refetch, setOp])
   const handleClickRole = (roleId: string) => {
     if (value.system_role_ids.includes(roleId)) {
       setValue((draft) => {

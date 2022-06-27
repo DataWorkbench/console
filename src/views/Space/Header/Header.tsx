@@ -30,6 +30,7 @@ export const Header = observer(() => {
   const {
     globalStore: { darkMode },
     workSpaceStore: { set, showHeaderNav },
+    workSpaceStore,
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
@@ -61,13 +62,13 @@ export const Header = observer(() => {
   }
 
   useEffect(() => {
-    if (space) {
+    if (space && space.id !== workSpaceStore?.space?.id) {
       set({
-        space: pick(space, ['id', 'name', 'owner']),
+        space: { ...pick(space, ['id', 'name', 'owner']), regionId },
         spaceIndex,
       })
     }
-  }, [set, space, spaceIndex])
+  }, [regionId, set, space, spaceIndex, workSpaceStore?.space?.id])
 
   return (
     <Root tw="z-[100]">
@@ -100,12 +101,15 @@ export const Header = observer(() => {
             value: id,
             label: name,
           }))}
-          onChange={(v, option) => {
+          onChange={(v) => {
+            const space1 = workspaces?.find(({ id }) => id === v)
+            const spaceIndex1: number = workspaces?.findIndex(
+              ({ id }) => id === v
+            )
+
             set({
-              space: {
-                name: (option as Record<string, any>).label,
-                id: (option as Record<string, any>)?.value,
-              },
+              space: { ...pick(space1, ['id', 'name', 'owner']), regionId },
+              spaceIndex: spaceIndex1,
             })
 
             // history.push(pathname.replace(/(?<=workspace\/)[^/]*/, String(v)))
