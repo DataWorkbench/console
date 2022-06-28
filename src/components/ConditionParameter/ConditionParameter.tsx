@@ -115,7 +115,7 @@ export const ConditionParameter = React.forwardRef(
     useEffect(() => {
       const v = defaultValue || { type: ConditionType.Visualization }
       if (!isEqual(v, prevValue.current)) {
-        // setValue(() => v)
+        setValue(() => v)
         prevValue.current = v
       }
     }, [defaultValue, setValue])
@@ -136,7 +136,7 @@ export const ConditionParameter = React.forwardRef(
         //       ])
         //     : (pick(value, ['type', 'column', 'expression']) as any)
         prevValue.current = value
-        // onChange(value)
+        onChange(value)
       }
     }, [onChange, value])
 
