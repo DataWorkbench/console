@@ -22,6 +22,7 @@ import {
   SourceType,
 } from 'views/Space/Upcloud/DataSourceList/constant'
 import { useQuerySourceTableSchema } from 'hooks'
+import BaseTableComponent from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTableComponent'
 
 const { TextField, SelectField } = Form
 
@@ -192,9 +193,26 @@ const BaseTargetConfig = forwardRef((props: any, ref) => {
     }
   })
 
+  const renderBaseTable = () => {
+    return (
+      <BaseTableComponent
+        from="target"
+        sourceType={sourceType?.label}
+        sourceId={dbInfo?.id}
+        tableName={dbInfo?.tableName}
+        onChange={(v) => {
+          setDbInfo((draft) => {
+            draft.tableName = v
+          })
+        }}
+      />
+    )
+  }
+
   return (
     <Form css={styles.form} ref={targetForm}>
       {renderCommon()}
+      {renderBaseTable()}
       {hasTable && (
         <>
           <SelectField

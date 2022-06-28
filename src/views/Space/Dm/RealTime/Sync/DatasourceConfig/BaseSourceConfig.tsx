@@ -19,6 +19,7 @@ import {
 import { SyncJobType } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { useQuerySourceTableSchema } from 'hooks'
 import { useImmer } from 'use-immer'
+import BaseTableComponent from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTableComponent'
 import { baseSource$, source$, sourceColumns$ } from '../common/subjects'
 import BaseConfigCommon from './BaseConfigCommon'
 
@@ -73,7 +74,7 @@ const BaseSourceConfig = forwardRef((props: IBaseSourceConfigProps, ref) => {
   const { curJob } = props
   const sourceForm = useRef<Form>()
 
-  const [dbInfo, setDbInfo] = useImmer<any>({})
+  const [dbInfo, setDbInfo] = useImmer<Record<string, any>>({})
 
   const [conditionKey, setCondition] = useState('1')
   const [showSourceAdvance, setShowSourceAdvance] = useState(false)
@@ -117,10 +118,6 @@ const BaseSourceConfig = forwardRef((props: IBaseSourceConfigProps, ref) => {
     setDbInfo(() => v)
   }
 
-  const renderCommon = () => {
-    return <BaseConfigCommon from="source" sourceType={sourceType?.label} />
-  }
-
   const hasTable = !isEmpty(dbInfo?.tableName)
 
   const isOfflineIncrement =
@@ -158,10 +155,30 @@ const BaseSourceConfig = forwardRef((props: IBaseSourceConfigProps, ref) => {
       },
     }
   })
+  const renderCommon = () => {
+    return <BaseConfigCommon from="source" sourceType={sourceType?.label} />
+  }
+
+  const renderBaseTable = () => {
+    return (
+      <BaseTableComponent
+        from="source"
+        sourceType={sourceType?.label}
+        sourceId={dbInfo?.id}
+        tableName={dbInfo?.tableName}
+        onChange={(v: string) => {
+          setDbInfo((draft) => {
+            draft.tableName = v
+          })
+        }}
+      />
+    )
+  }
 
   return (
     <Form css={styles.form} ref={sourceForm}>
       {renderCommon()}
+      {renderBaseTable()}
       {hasTable && isOfflineIncrement && (
         <ConditionParameterField
           key={conditionKey}
