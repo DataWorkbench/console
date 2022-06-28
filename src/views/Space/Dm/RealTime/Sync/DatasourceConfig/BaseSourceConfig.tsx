@@ -137,7 +137,6 @@ const BaseSourceConfig = forwardRef((props: IBaseSourceConfigProps, ref) => {
         if (!dbInfo || !dbInfo.tableName) {
           return undefined
         }
-        console.log(sourceForm.current?.getFieldsValue())
         const { condition } = dbInfo
         return {
           table: [dbInfo.tableName],
