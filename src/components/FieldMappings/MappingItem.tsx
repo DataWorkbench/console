@@ -188,6 +188,7 @@ const MappingItem = (props: MappingItemProps) => {
       if (!ref.current) {
         return
       }
+      console.log(draggedId, item)
       if (draggedId !== item.uuid) {
         moveItem(draggedId, item.uuid, isTop)
         jsplumb?.repaintEverything()

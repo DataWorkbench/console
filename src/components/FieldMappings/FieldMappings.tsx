@@ -177,7 +177,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         const mappingFields = leftColumns.map((c) => {
           filedNames.push(c.name)
           const field = fields.find((f) => f.name === c.name)
-          const uuid = nanoid()
+          const uuid = `source--${c.name}`
           if (field) {
             return { ...field, uuid: field.uuid || uuid }
           }
@@ -200,7 +200,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         const mappingFields = rightColumns?.map((c) => {
           filedNames.push(c.name)
           const field = fields.find((f) => f.name === c.name)
-          const uuid = nanoid()
+          const uuid = `target--${c.name}`
           if (field) {
             return { ...field, uuid }
           }
@@ -237,6 +237,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       mappings.forEach(([left, right], index) => {
         const leftField = leftFields.find(({ name }) => name === left)!
         const rightField = rightFields.find(({ name }) => name === right)!
+        console.log(1111, leftField)
         leftColumns.push({
           format: leftField.formatter,
           index,
@@ -540,6 +541,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     )
   }
 
+  // console.log(leftFields, rightFields)
   return (
     <Root>
       <div tw="relative">

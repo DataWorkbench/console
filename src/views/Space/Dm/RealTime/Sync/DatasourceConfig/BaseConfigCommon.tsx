@@ -7,6 +7,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import {
   baseSource$,
   baseTarget$,
+  confColumns$,
   syncJobOp$,
 } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import tw, { css } from 'twin.macro'
@@ -62,12 +63,13 @@ const BaseConfigCommon = (props: IBaseConfigCommonProps) => {
       .pipe(
         pairwise(),
         filter(([perv, next]) => {
-          if (!perv || !next) {
+          if (!perv || !next || !perv.data || !next.data) {
             return true
           }
 
           if (
             next &&
+            next.data &&
             next.data.id &&
             next.data.tableName &&
             (next.data.id !== perv?.data.id ||
@@ -94,6 +96,7 @@ const BaseConfigCommon = (props: IBaseConfigCommonProps) => {
       ...data,
       data: { ...(data?.data ?? {}), tableName: e },
     })
+    confColumns$.next([])
   }
 
   const isSelected = !isEmpty(dbInfo)

@@ -1,9 +1,16 @@
 import { Form, Icon } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
-import { useLayoutEffect, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import {
   baseTarget$,
+  confColumns$,
   target$,
   targetColumns$,
 } from 'views/Space/Dm/RealTime/Sync/common/subjects'
@@ -14,7 +21,7 @@ import {
   sourceKinds,
   SourceType,
 } from 'views/Space/Upcloud/DataSourceList/constant'
-import { useQuerySourceTableSchema } from '../../../../../../hooks'
+import { useQuerySourceTableSchema } from 'hooks'
 
 const { TextField, SelectField } = Form
 
@@ -106,7 +113,7 @@ const getExactly = (types?: SourceType[]) => {
   return [Semantic.AtLeastOnce]
 }
 
-const BaseTargetConfig = (props: any) => {
+const BaseTargetConfig = forwardRef((props: any, ref) => {
   const { curJob } = props
   const targetForm = useRef<Form>()
 
@@ -115,7 +122,13 @@ const BaseTargetConfig = (props: any) => {
   const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
 
   useLayoutEffect(() => {
-    const unSub = baseTarget$.subscribe((e) => setDbInfo(e?.data))
+    const unSub = baseTarget$.subscribe((e) => {
+      setDbInfo(e?.data)
+      if (e?.data?.postSql?.length) {
+        setShowTargetAdvanced(true)
+      }
+    })
+
     return () => {
       unSub.unsubscribe()
     }
@@ -123,7 +136,7 @@ const BaseTargetConfig = (props: any) => {
 
   const sourceType = target$.getValue()?.sourceType
 
-  useQuerySourceTableSchema(
+  const { refetch } = useQuerySourceTableSchema(
     {
       sourceId: dbInfo?.id!,
       tableName: dbInfo?.tableName!,
@@ -132,7 +145,12 @@ const BaseTargetConfig = (props: any) => {
       enabled: !!(dbInfo?.id && dbInfo?.tableName),
       onSuccess: (data: any) => {
         const columns = get(data, 'schema.columns') || []
-        targetColumns$.next(columns)
+        targetColumns$.next(
+          columns.map((i) => ({
+            ...i,
+            uuid: `target--${i.name}`,
+          }))
+        )
       },
     },
     'source'
@@ -140,13 +158,40 @@ const BaseTargetConfig = (props: any) => {
 
   const handleUpdate = (e: Record<string, any>) => {
     baseTarget$.next({ data: { ...dbInfo, ...e }, sourceType })
+    confColumns$.next([])
   }
 
   const renderCommon = () => {
     return <BaseConfigCommon from="target" sourceType={sourceType?.label} />
   }
 
-  const hasTable = isEmpty(dbInfo?.name)
+  const hasTable = !isEmpty(dbInfo?.tableName)
+
+  useImperativeHandle(ref, () => {
+    return {
+      validate: () => {
+        return targetForm.current?.validateForm()
+      },
+      getData: () => {
+        const target = baseTarget$.getValue()
+        if (!target || !target.data) {
+          return undefined
+        }
+        return {
+          table: [target.data.tableName],
+          write_mode: target.data.writeMode,
+          semantic: target.data.semantic,
+          batch_size: target.data.batchSize,
+          pre_sql: target.data.preSql?.filter((v) => v !== ''),
+          post_sql: target.data.postSql?.filter((v) => v !== ''),
+        }
+      },
+      refetchColumn: () => {
+        refetch()
+      },
+    }
+  })
+
   return (
     <Form css={styles.form} ref={targetForm}>
       {renderCommon()}
@@ -342,6 +387,6 @@ const BaseTargetConfig = (props: any) => {
       )}
     </Form>
   )
-}
+})
 
 export default BaseTargetConfig

@@ -1,6 +1,6 @@
 import { camelCase, get, keys, trim } from 'lodash-es'
-import { BehaviorSubject, EMPTY, pairwise, Subject, switchMap } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { BehaviorSubject, pairwise, Subject } from 'rxjs'
+import { filter, map } from 'rxjs/operators'
 import { datasourceTypeObjs } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 interface IJob {
@@ -29,6 +29,10 @@ export const curJobConfSubject$ = new BehaviorSubject<Record<
   string,
   any
 > | null>(null)
+
+export const confColumns$ = new BehaviorSubject<
+  [Record<string, any>, Record<string, any>][]
+>([])
 
 export const source$ = new BehaviorSubject<Record<string, any> | null>(null)
 export const target$ = new BehaviorSubject<Record<string, any> | null>(null)
@@ -64,6 +68,17 @@ curJobDbConfSubject$
     })
   )
   .subscribe(curJobConfSubject$)
+
+curJobConfSubject$
+  .pipe(
+    map((e) => {
+      if (!e) {
+        return []
+      }
+      return [e.source.column, e.target.column]
+    })
+  )
+  .subscribe(confColumns$)
 
 curJobConfSubject$
   .pipe(
@@ -123,7 +138,9 @@ source$
         return null
       }
       const dbSource = e.data
-      let condition: any = {}
+      let condition: any = {
+        type: 1,
+      }
 
       if (get(dbSource, 'condition_type') === 2) {
         condition = {
@@ -158,19 +175,30 @@ source$
   .subscribe(baseSource$)
 
 const changeTableName = () =>
-  switchMap(([pervValue, value]) => {
+  filter(([pervValue, value]) => {
+    if (!pervValue || !value) {
+      return true
+    }
     if (
       value?.data?.tableName &&
       value?.data?.tableName !== pervValue?.data?.tableName
     ) {
-      return []
+      return true
     }
-    return EMPTY
+    return false
   })
-const clearTargetColumns$ = target$.pipe(pairwise(), changeTableName())
+const clearTargetColumns$ = baseTarget$.pipe(
+  pairwise(),
+  changeTableName(),
+  map(() => [])
+)
 clearTargetColumns$.subscribe(targetColumns$)
 clearTargetColumns$.subscribe(mapping$)
 
-const clearSourceColumns$ = source$.pipe(pairwise(), changeTableName())
+const clearSourceColumns$ = baseSource$.pipe(
+  pairwise(),
+  changeTableName(),
+  map(() => [])
+)
 clearSourceColumns$.subscribe(sourceColumns$)
 clearSourceColumns$.subscribe(mapping$)

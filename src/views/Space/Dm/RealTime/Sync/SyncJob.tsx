@@ -15,7 +15,12 @@ import {
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { timeFormat } from 'utils/convert'
-import { curJobDbConfSubject$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import {
+  confColumns$,
+  curJobDbConfSubject$,
+  sourceColumns$,
+  targetColumns$,
+} from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import DatasourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig'
 import { JobToolBar } from '../styled'
 import SyncCluster from './SyncCluster'
@@ -383,6 +388,27 @@ const SyncJob = () => {
   }
 
   const [showScheModal, toggleScheModal] = useState(false)
+  const [sourceColumns, setSourceColumns] = useState<Record<string, any>[]>([])
+  const [targetColumns, setTargetColumns] = useState<Record<string, any>[]>([])
+  const [columns, setColumns] = useState([[], []])
+  useLayoutEffect(() => {
+    const sourceColumnsSub = sourceColumns$.subscribe((e) => {
+      setSourceColumns(e)
+    })
+    const targetColumnsSub = targetColumns$.subscribe((e) => {
+      setTargetColumns(e)
+    })
+    const confSub = confColumns$.subscribe((e) => {
+      setColumns(e)
+    })
+    return () => {
+      sourceColumnsSub.unsubscribe()
+      targetColumnsSub.unsubscribe()
+      confSub.unsubscribe()
+    }
+  }, [])
+
+  console.log(3333333, sourceColumns, targetColumns, columns)
 
   const release = () => {
     if (!enableRelease) {
@@ -423,12 +449,12 @@ const SyncJob = () => {
                     }
                   }}
                   ref={mappingRef}
-                  mappings={[]}
-                  leftFields={[]}
-                  rightFields={[]}
+                  // mappings={[]}
+                  leftFields={sourceColumns as any}
+                  rightFields={targetColumns as any}
                   leftTypeName={sourceTypeName}
                   // rightTypeName={targetTypeName}
-                  // columns={columns}
+                  columns={columns}
                   topHelp={
                     <HelpCenterLink
                       href="/manual/integration_job/create_job_offline_1/#配置字段映射"
@@ -594,6 +620,20 @@ const SyncJob = () => {
         >
           <Icon name="export" />
           发布
+        </Button>
+        <Button
+          onClick={() => {
+            dbRef.current?.validate()
+          }}
+        >
+          validate
+        </Button>
+        <Button
+          onClick={() => {
+            console.log(dbRef.current?.getResource())
+          }}
+        >
+          getValue
         </Button>
         {!!confData?.updated && (
           <span tw="flex-auto text-right text-font">

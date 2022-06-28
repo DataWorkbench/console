@@ -97,6 +97,12 @@ const baseTarget = new Set([
 interface IDataSourceConfigProps {
   curJob?: Record<string, any>
 }
+interface ISourceRef {
+  validate: () => boolean
+  getData?: () => Record<string, any> | undefined
+  refetchColumn: () => void
+}
+
 const DatasourceConfig = observer(
   (props: IDataSourceConfigProps, ref) => {
     const { curJob } = props
@@ -119,16 +125,19 @@ const DatasourceConfig = observer(
       }
     }
 
+    const sourceRef = useRef<ISourceRef>()
+    const targetRef = useRef<ISourceRef>()
+
     const renderSource = () => {
       if (baseSource.has(curJob?.source_type)) {
-        return <BaseSourceConfig curJob={curJob} />
+        return <BaseSourceConfig curJob={curJob} ref={sourceRef} />
       }
       return null
     }
 
     const renderTarget = () => {
       if (baseTarget.has(curJob?.target_type)) {
-        return <BaseTargetConfig curJob={curJob} />
+        return <BaseTargetConfig curJob={curJob} ref={targetRef} />
       }
       return null
     }
@@ -144,7 +153,39 @@ const DatasourceConfig = observer(
     }, [])
 
     useImperativeHandle(ref, () => {
-      return {}
+      return {
+        validate: () => {
+          const re = sourceRef.current?.validate()
+          const re1 = targetRef.current?.validate()
+          return re && re1
+        },
+        getResource: () => {
+          const source = source$.getValue()
+          const target = target$.getValue()
+          const config = {
+            source_id: source?.data?.id,
+            target_id: target?.data?.id,
+            sync_resource: {
+              [`${source?.sourceType?.name}_source`]:
+                sourceRef.current?.getData?.(),
+              [`${target?.sourceType?.name}_target`]:
+                targetRef.current?.getData?.(),
+            },
+          }
+          return config
+        },
+
+        getTypeNames: () => {
+          return [
+            source$.getValue()?.sourceType?.name,
+            target$.getValue()?.sourceType?.name,
+          ]
+        },
+        refetchColumns: () => {
+          sourceRef.current?.refetchColumn?.()
+          targetRef.current?.refetchColumn?.()
+        },
+      }
     })
 
     console.log(source$.getValue())
