@@ -8,11 +8,18 @@ import tw, { css } from 'twin.macro'
 import { get, isEmpty, isEqual } from 'lodash-es'
 import { FlexBox } from 'components/Box'
 import { Center } from 'components/Center'
-import { useLayoutEffect, useRef, useState } from 'react'
+import {
+  forwardRef,
+  memo,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { SyncJobType } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { useQuerySourceTableSchema } from 'hooks'
 import { useImmer } from 'use-immer'
-import { baseSource$, sourceColumns$, target$ } from '../common/subjects'
+import { baseSource$, source$, sourceColumns$ } from '../common/subjects'
 import BaseConfigCommon from './BaseConfigCommon'
 
 const { TextField, TextAreaField } = Form
@@ -62,21 +69,28 @@ interface IBaseSourceConfigProps {
   curJob?: Record<string, any>
 }
 
-const BaseSourceConfig = (props: IBaseSourceConfigProps) => {
+const BaseSourceConfig = forwardRef((props: IBaseSourceConfigProps, ref) => {
   const { curJob } = props
   const sourceForm = useRef<Form>()
 
-  const [dbInfo, setDbInfo] = useImmer<Record<string, any>>({})
+  const [dbInfo, setDbInfo] = useImmer<any>({})
 
+  const [conditionKey, setCondition] = useState('1')
+  const [showSourceAdvance, setShowSourceAdvance] = useState(false)
   useLayoutEffect(() => {
-    const unSub = baseSource$.subscribe((e) => setDbInfo(e?.data))
+    const unSub = baseSource$.subscribe((e) => {
+      setDbInfo(() => e?.data)
+      setCondition((k) => `${k}1`)
+      if (e?.data?.where) {
+        setShowSourceAdvance(true)
+      }
+    })
     return () => {
       unSub.unsubscribe()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [setDbInfo])
 
-  const sourceType = target$.getValue()?.sourceType
+  const sourceType = source$.getValue()?.sourceType
 
   const sourceColumnRet = useQuerySourceTableSchema(
     {
@@ -87,14 +101,20 @@ const BaseSourceConfig = (props: IBaseSourceConfigProps) => {
       enabled: !!(dbInfo?.id && dbInfo?.tableName),
       onSuccess: (data: any) => {
         const columns = get(data, 'schema.columns') || []
-        sourceColumns$.next(columns)
+        sourceColumns$.next(
+          columns.map((i) => ({
+            ...i,
+            uuid: `source--${i.name}`,
+          }))
+        )
       },
     },
     'source'
   )
 
   const handleUpdate = (e: Record<string, any>) => {
-    baseSource$.next({ data: { ...dbInfo, ...e }, sourceType })
+    const v = { ...dbInfo, ...e }
+    setDbInfo(() => v)
   }
 
   const renderCommon = () => {
@@ -108,13 +128,44 @@ const BaseSourceConfig = (props: IBaseSourceConfigProps) => {
 
   const isOffLineFull = get(curJob, 'type') === SyncJobType.OFFLINEFULL
 
-  const [showSourceAdvance, setShowSourceAdvance] = useState(false)
+  useImperativeHandle(ref, () => {
+    return {
+      validate: () => {
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => {
+        if (!dbInfo || !dbInfo.tableName) {
+          return undefined
+        }
+        console.log(sourceForm.current?.getFieldsValue())
+        const { condition } = dbInfo
+        return {
+          table: [dbInfo.tableName],
+          schema: '',
+          where: dbInfo.where,
+          split_pk: dbInfo.splitPk,
+          condition_type: condition?.type,
+          visualization: {
+            column: condition?.column,
+            start_condition: condition?.startCondition,
+            start_value: condition?.startValue,
+            end_condition: condition?.endCondition,
+            end_value: condition?.endValue,
+          },
+        }
+      },
+      refetchColumn: () => {
+        sourceColumnRet.refetch()
+      },
+    }
+  })
 
   return (
     <Form css={styles.form} ref={sourceForm}>
       {renderCommon()}
       {hasTable && isOfflineIncrement && (
         <ConditionParameterField
+          key={conditionKey}
           name="condition"
           columns={(sourceColumns$.getValue() || []).map((c) => c.name)}
           label={<AffixLabel>条件参数配置</AffixLabel>}
@@ -125,7 +176,9 @@ const BaseSourceConfig = (props: IBaseSourceConfigProps) => {
           }}
           value={dbInfo?.condition}
           onChange={(v: any) => {
-            handleUpdate({ condition: v })
+            setDbInfo((draft) => {
+              draft.condition = v
+            })
           }}
           css={css`
             .help {
@@ -252,6 +305,6 @@ const BaseSourceConfig = (props: IBaseSourceConfigProps) => {
       )}
     </Form>
   )
-}
+})
 
-export default BaseSourceConfig
+export default memo(BaseSourceConfig)
