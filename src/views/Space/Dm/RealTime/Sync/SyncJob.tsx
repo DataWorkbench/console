@@ -2,10 +2,8 @@ import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { FieldMappings, HelpCenterLink, Modal, PopConfirm } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
-import { useImmer } from 'use-immer'
-import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
 import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
@@ -17,8 +15,9 @@ import {
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { timeFormat } from 'utils/convert'
+import { curJobDbConfSubject$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import DatasourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig'
 import { JobToolBar } from '../styled'
-import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
 import ReleaseModal from '../Modal/ReleaseModal'
@@ -112,13 +111,13 @@ const removeUndefined = (obj: any) => {
   return newObj
 }
 
-interface DbInfo {
+export interface DbInfo {
   id?: string
   tableName?: string
   fields?: TMappingField[]
 }
 
-const intTypes = new Set([
+export const intTypes = new Set([
   'TINYINT',
   'SMALLINT',
   'INT',
@@ -134,19 +133,25 @@ const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
   const { workFlowStore } = useStore()
-  const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
+  const {
+    data: confData,
+    isFetching,
+    refetch: confRefetch,
+  } = useQuerySyncJobConf()
 
   const {
     workFlowStore: { curJob },
   } = useStore()
 
-  const [db, setDb] = useImmer<{
-    source: DbInfo
-    target: DbInfo
-  }>({
-    source: { id: get(confData, 'source_id') },
-    target: { id: get(confData, 'target_id') },
-  })
+  useLayoutEffect(() => {
+    if (!isFetching) {
+      curJobDbConfSubject$.next({
+        ...confData,
+        sourceType: curJob?.source_type,
+        targetType: curJob?.target_type,
+      })
+    }
+  }, [confData, curJob, isFetching])
 
   const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
@@ -173,45 +178,23 @@ const SyncJob = () => {
     }>(null)
   const enableRelease = get(scheData, 'schedule_policy') !== 0
 
-  const [sourceTypeName, targetTypeName] = useMemo(() => {
+  const [sourceTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
     return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
   }, [curJob])
-
-  const sourceColumn = useMemo(() => {
-    if (confData && db.source.tableName && sourceTypeName) {
-      const source = get(
-        confData,
-        `sync_resource.${sourceTypeName?.toLowerCase()}_source`
-      )
-      const table = get(source, 'table[0]')
-      if (source && table === db.source.tableName) {
-        return get(source, 'column')
-      }
-    }
-    return []
-  }, [confData, sourceTypeName, db.source.tableName])
-
-  const targetColumn = useMemo(() => {
-    if (confData && db.target.tableName && targetTypeName) {
-      const source = get(
-        confData,
-        `sync_resource.${targetTypeName?.toLowerCase()}_target`
-      )
-      const table = get(source, 'table[0]')
-      if (source && table === db.target.tableName) {
-        return get(source, 'column')
-      }
-    }
-    return []
-  }, [confData, targetTypeName, db.target.tableName])
 
   const editorRef = useRef<any>(null)
 
   const [defaultJobContent, setDefaultJobContent] = useState(
     get(confData, 'job_content')
   )
+
+  useLayoutEffect(() => {
+    return () => {
+      curJobDbConfSubject$.next(null)
+    }
+  }, [])
 
   useEffect(() => {
     if (confData?.job_mode && confData?.job_mode !== mode) {
@@ -232,12 +215,6 @@ const SyncJob = () => {
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
-  useEffect(() => {
-    setDb((draft) => {
-      draft.source.id = get(confData, 'source_id')
-      draft.target.id = get(confData, 'target_id')
-    })
-  }, [confData, setDb])
 
   const handleEditorWillMount = (monaco: any) => {
     // editorRef.current = null
@@ -369,18 +346,19 @@ const SyncJob = () => {
               )?.[1] ?? {},
               'split_pk'
             )
-            if (
-              splitKey &&
-              !db?.source?.fields?.some(
-                (f) =>
-                  f.name === splitKey &&
-                  intTypes.has(f.type) &&
-                  f.is_primary_key
-              )
-            ) {
-              showConfWarn('切分键必须为主键且为整型')
-              return
-            }
+            // TODO
+            // if (
+            //   splitKey &&
+            //   !db?.source?.fields?.some(
+            //     (f) =>
+            //       f.name === splitKey &&
+            //       intTypes.has(f.type) &&
+            //       f.is_primary_key
+            //   )
+            // ) {
+            //   showConfWarn('切分键必须为主键且为整型')
+            //   return
+            // }
 
             // 如果并发数大于1  则切分键不能为空
             const parallelism = get(resource, 'channel_control.parallelism', 0)
@@ -415,10 +393,6 @@ const SyncJob = () => {
     }
   }
 
-  const columns = useMemo<[any, any]>(() => {
-    return [sourceColumn, targetColumn]
-  }, [sourceColumn, targetColumn])
-
   const renderGuideMode = () => {
     return (
       <CollapseWrapper>
@@ -436,46 +410,25 @@ const SyncJob = () => {
                 </>
               }
             >
-              {index === 0 && (
-                <SyncDataSource
-                  ref={dbRef}
-                  onSelectTable={(tp, tableName, data) => {
-                    const fieldData = data.map((field) => ({
-                      ...field,
-                      uuid: nanoid(),
-                    })) as TMappingField[]
-                    setDb((draft) => {
-                      const soruceInfo = draft[tp]
-                      soruceInfo.tableName = tableName
-                      soruceInfo.fields = fieldData
-                    })
-                  }}
-                  onDbChange={(tp: 'source' | 'target', data) => {
-                    setDb((draft) => {
-                      draft[tp] = data
-                    })
-                  }}
-                  conf={confData}
-                />
-              )}
+              {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob} />}
               {index === 1 && (
                 <FieldMappings
-                  key={
-                    // NOTE: 无法解决拖拽 bug, 只能这样了
-                    `${db?.source?.tableName}_${db?.target?.tableName}`
-                  }
+                  // key={
+                  // NOTE: 无法解决拖拽 bug, 只能这样了
+                  // `${db?.source?.tableName}_${db?.target?.tableName}`
+                  // }
                   onReInit={() => {
                     if (dbRef.current && dbRef.current?.refetchColumns) {
                       dbRef.current?.refetchColumns()
                     }
                   }}
                   ref={mappingRef}
-                  // mappings={mappings}
-                  leftFields={db.source.fields || []}
-                  rightFields={db.target.fields || []}
+                  mappings={[]}
+                  leftFields={[]}
+                  rightFields={[]}
                   leftTypeName={sourceTypeName}
                   // rightTypeName={targetTypeName}
-                  columns={columns}
+                  // columns={columns}
                   topHelp={
                     <HelpCenterLink
                       href="/manual/integration_job/create_job_offline_1/#配置字段映射"
@@ -488,8 +441,6 @@ const SyncJob = () => {
               )}
               {index === 2 && (
                 <SyncCluster
-                  sourceId={db.source?.id}
-                  targetId={db.target?.id}
                   ref={clusterRef}
                   clusterId={get(confData, 'cluster_id')}
                   defaultClusterName={get(confData, 'cluster_info.name')}

@@ -151,6 +151,9 @@ export const getDataSourceTypes = (type?: SourceType): string | undefined => {
         if (p === 'toLowerCase') {
           return () => item?.name
         }
+        if (p === 'getType') {
+          return () => item?.type
+        }
         const prim = Reflect.get(target, 'value')
         const value = prim[p]
         return typeof value === 'function' ? value.bind(prim) : value
