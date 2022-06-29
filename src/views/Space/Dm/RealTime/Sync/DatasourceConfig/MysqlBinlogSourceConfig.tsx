@@ -1,6 +1,7 @@
 import { memo, useLayoutEffect, useRef, useState } from 'react'
 import tw, { css } from 'twin.macro'
-import { Field, Form, Icon, Label, RadioButton } from '@QCFE/lego-ui'
+import { Form } from '@QCFE/qingcloud-portal-ui'
+import { Field, Icon, Label, RadioButton } from '@QCFE/lego-ui'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import { useImmer } from 'use-immer'
 import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
@@ -198,8 +199,6 @@ const MysqlBinlogSourceConfig = () => {
         <ToggleField
           name="isGtidMode"
           label="GTID 模式"
-          onText="是"
-          offText="否"
           value={dbInfo?.isGtidMode}
           onChange={(e) => {
             setDbInfo((draft) => {

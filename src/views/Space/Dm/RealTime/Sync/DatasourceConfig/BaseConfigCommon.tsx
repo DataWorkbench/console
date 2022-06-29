@@ -2,7 +2,7 @@ import { isEmpty } from 'lodash-es'
 import { ButtonWithClearField } from 'components/ButtonWithClear'
 import { AffixLabel } from 'components/AffixLabel'
 import { PopConfirm } from 'components/PopConfirm'
-import { Icon } from '@QCFE/lego-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useLayoutEffect, useRef, useState } from 'react'
 import {
   source$,

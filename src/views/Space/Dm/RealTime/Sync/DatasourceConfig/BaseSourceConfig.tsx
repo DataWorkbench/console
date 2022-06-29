@@ -1,4 +1,4 @@
-import { Form, Icon } from '@QCFE/lego-ui'
+import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
 import {
   ConditionParameterField,
   TConditionParameterVal,

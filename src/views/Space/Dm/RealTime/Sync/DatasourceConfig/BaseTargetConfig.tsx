@@ -1,4 +1,4 @@
-import { Form, Icon } from '@QCFE/lego-ui'
+import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled } from 'twin.macro'
 import {
   forwardRef,
