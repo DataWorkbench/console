@@ -21,6 +21,7 @@ import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import BaseSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseSourceConfig'
 import BaseTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTargetConfig'
 import MysqlBinlogSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/MysqlBinlogSourceConfig'
+import PgSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/PgSourceConfig'
 import { source$, syncJobOp$, target$ } from '../common/subjects'
 
 const styles = {
@@ -130,6 +131,7 @@ const DatasourceConfig = observer(
     const targetRef = useRef<ISourceRef>()
 
     const renderSource = () => {
+      return <PgSourceConfig curJob={curJob} ref={sourceRef} />
       return <MysqlBinlogSourceConfig curJob={curJob} ref={sourceRef} />
       if (baseSource.has(curJob?.source_type)) {
         return <BaseSourceConfig curJob={curJob} ref={sourceRef} />
