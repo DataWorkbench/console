@@ -1,8 +1,8 @@
 import { Icon } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
-import { get, cloneDeep, findKey } from 'lodash-es'
+import { cloneDeep, findKey, get } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
-import { Icons, Center } from 'components'
+import { Center, Icons } from 'components'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 export enum JobMode {
@@ -136,6 +136,11 @@ export const datasourceTypeObjs = [
     type: SourceType.PostgreSQL,
     name: 'postgresql',
     label: 'PostgreSQL',
+  },
+  {
+    type: SourceType.Hive,
+    name: 'hive',
+    label: 'Hive',
   },
 ]
 

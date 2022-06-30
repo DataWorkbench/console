@@ -29,6 +29,7 @@ import {
 import KafkaSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/KafkaSourceConfig'
 import SqlServerSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/SqlServerSourceConfig'
 import KafkaTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/KafkaTargetConfig'
+import HiveTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HiveTargetConfig'
 import { source$, syncJobOp$, target$ } from '../common/subjects'
 
 const styles = {
@@ -162,6 +163,8 @@ const DatasourceConfig = observer(
       switch (curJob?.target_type) {
         case SourceType.Kafka:
           return <KafkaTargetConfig curJob={curJob} ref={targetRef} />
+        case SourceType.Hive:
+          return <HiveTargetConfig curJob={curJob} ref={targetRef} />
         default:
           return null
       }
