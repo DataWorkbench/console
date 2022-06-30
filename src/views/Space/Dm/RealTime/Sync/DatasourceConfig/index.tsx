@@ -22,6 +22,10 @@ import BaseSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/Base
 import BaseTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTargetConfig'
 import MysqlBinlogSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/MysqlBinlogSourceConfig'
 import PgSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/PgSourceConfig'
+import {
+  IDataSourceConfigProps,
+  ISourceRef,
+} from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import { source$, syncJobOp$, target$ } from '../common/subjects'
 
 const styles = {
@@ -95,15 +99,6 @@ const baseTarget = new Set([
   SourceType.SqlServer,
   SourceType.ClickHouse,
 ])
-
-interface IDataSourceConfigProps {
-  curJob?: Record<string, any>
-}
-interface ISourceRef {
-  validate: () => boolean
-  getData?: () => Record<string, any> | undefined
-  refetchColumn: () => void
-}
 
 const DatasourceConfig = observer(
   (props: IDataSourceConfigProps, ref) => {

@@ -1,6 +1,7 @@
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled } from 'twin.macro'
 import {
+  ForwardedRef,
   forwardRef,
   useImperativeHandle,
   useLayoutEffect,
@@ -23,6 +24,10 @@ import {
 } from 'views/Space/Upcloud/DataSourceList/constant'
 import { useQuerySourceTableSchema } from 'hooks'
 import BaseTableComponent from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTableComponent'
+import {
+  IDataSourceConfigProps,
+  ISourceRef,
+} from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 
 const { TextField, SelectField } = Form
 
@@ -114,297 +119,302 @@ const getExactly = (types?: SourceType[]) => {
   return [Semantic.AtLeastOnce]
 }
 
-const BaseTargetConfig = forwardRef((props: any, ref) => {
-  const { curJob } = props
-  const targetForm = useRef<Form>()
+const BaseTargetConfig = forwardRef(
+  (props: IDataSourceConfigProps, ref: ForwardedRef<ISourceRef>) => {
+    const { curJob } = props
+    const targetForm = useRef<Form>()
 
-  const [dbInfo, setDbInfo] = useState<Record<string, any> | null>()
+    const [dbInfo, setDbInfo] = useState<Record<string, any> | null>()
 
-  const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
+    const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
 
-  useLayoutEffect(() => {
-    const unSub = baseTarget$.subscribe((e) => {
-      setDbInfo(e?.data)
-      if (e?.data?.postSql?.length) {
-        setShowTargetAdvanced(true)
+    useLayoutEffect(() => {
+      const unSub = baseTarget$.subscribe((e) => {
+        setDbInfo(e?.data)
+        if (e?.data?.postSql?.length) {
+          setShowTargetAdvanced(true)
+        }
+      })
+
+      return () => {
+        unSub.unsubscribe()
+      }
+    }, [])
+
+    const sourceType = target$.getValue()?.sourceType
+
+    const { refetch } = useQuerySourceTableSchema(
+      {
+        sourceId: dbInfo?.id!,
+        tableName: dbInfo?.tableName!,
+      },
+      {
+        enabled: !!(dbInfo?.id && dbInfo?.tableName),
+        onSuccess: (data: any) => {
+          const columns = get(data, 'schema.columns') || []
+          targetColumns$.next(
+            columns.map((i) => ({
+              ...i,
+              uuid: `target--${i.name}`,
+            }))
+          )
+        },
+      },
+      'source'
+    )
+
+    const handleUpdate = (e: Record<string, any>) => {
+      baseTarget$.next({ data: { ...dbInfo, ...e }, sourceType })
+      confColumns$.next([])
+    }
+
+    const renderCommon = () => {
+      return <BaseConfigCommon from="target" />
+    }
+
+    const hasTable = !isEmpty(dbInfo?.tableName)
+
+    useImperativeHandle(ref, () => {
+      return {
+        validate: () => {
+          if (!targetForm.current) {
+            return false
+          }
+          return targetForm.current?.validateForm()
+        },
+        getData: () => {
+          const target = baseTarget$.getValue()
+          if (!target || !target.data) {
+            return undefined
+          }
+          return {
+            table: [target.data.tableName],
+            write_mode: target.data.writeMode,
+            semantic: target.data.semantic,
+            batch_size: target.data.batchSize,
+            pre_sql: target.data.preSql?.filter((v) => v !== ''),
+            post_sql: target.data.postSql?.filter((v) => v !== ''),
+          }
+        },
+        refetchColumn: () => {
+          refetch()
+        },
       }
     })
 
-    return () => {
-      unSub.unsubscribe()
+    const renderBaseTable = () => {
+      return (
+        <BaseTableComponent
+          from="target"
+          sourceType={sourceType?.label}
+          sourceId={dbInfo?.id}
+          tableName={dbInfo?.tableName}
+          onChange={(v) => {
+            setDbInfo((draft) => {
+              draft.tableName = v
+            })
+          }}
+        />
+      )
     }
-  }, [])
 
-  const sourceType = target$.getValue()?.sourceType
-
-  const { refetch } = useQuerySourceTableSchema(
-    {
-      sourceId: dbInfo?.id!,
-      tableName: dbInfo?.tableName!,
-    },
-    {
-      enabled: !!(dbInfo?.id && dbInfo?.tableName),
-      onSuccess: (data: any) => {
-        const columns = get(data, 'schema.columns') || []
-        targetColumns$.next(
-          columns.map((i) => ({
-            ...i,
-            uuid: `target--${i.name}`,
-          }))
-        )
-      },
-    },
-    'source'
-  )
-
-  const handleUpdate = (e: Record<string, any>) => {
-    baseTarget$.next({ data: { ...dbInfo, ...e }, sourceType })
-    confColumns$.next([])
-  }
-
-  const renderCommon = () => {
-    return <BaseConfigCommon from="target" sourceType={sourceType?.label} />
-  }
-
-  const hasTable = !isEmpty(dbInfo?.tableName)
-
-  useImperativeHandle(ref, () => {
-    return {
-      validate: () => {
-        return targetForm.current?.validateForm()
-      },
-      getData: () => {
-        const target = baseTarget$.getValue()
-        if (!target || !target.data) {
-          return undefined
-        }
-        return {
-          table: [target.data.tableName],
-          write_mode: target.data.writeMode,
-          semantic: target.data.semantic,
-          batch_size: target.data.batchSize,
-          pre_sql: target.data.preSql?.filter((v) => v !== ''),
-          post_sql: target.data.postSql?.filter((v) => v !== ''),
-        }
-      },
-      refetchColumn: () => {
-        refetch()
-      },
-    }
-  })
-
-  const renderBaseTable = () => {
     return (
-      <BaseTableComponent
-        from="target"
-        sourceType={sourceType?.label}
-        sourceId={dbInfo?.id}
-        tableName={dbInfo?.tableName}
-        onChange={(v) => {
-          setDbInfo((draft) => {
-            draft.tableName = v
-          })
-        }}
-      />
+      <Form css={styles.form} ref={targetForm}>
+        {renderCommon()}
+        {renderBaseTable()}
+        {hasTable && (
+          <>
+            <SelectField
+              label={<AffixLabel>写入模式</AffixLabel>}
+              name="write_mode"
+              options={[
+                { label: 'insert 插入', value: WriteMode.Insert },
+                { label: 'replace 替换', value: WriteMode.Replace },
+                {
+                  label: 'update 更新插入',
+                  value: WriteMode.Update,
+                },
+              ].filter((i) =>
+                getWriteMode(curJob?.target_type).includes(i.value)
+              )}
+              value={dbInfo?.writeMode}
+              schemas={[
+                {
+                  help: '请选择写入模式',
+                  status: 'error',
+                  rule: { required: true },
+                },
+              ]}
+              validateOnChange
+              onChange={(v: WriteMode) => {
+                handleUpdate({ writeMode: +v })
+              }}
+              help={(() => {
+                let helpStr = ''
+                switch (dbInfo?.writeMode) {
+                  case WriteMode.Insert:
+                    helpStr =
+                      '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
+                    break
+                  case WriteMode.Replace:
+                    helpStr =
+                      '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会用新行替换已经指定的字段的语句。'
+                    break
+                  case WriteMode.Update:
+                    helpStr =
+                      '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
+                    break
+                  default:
+                    break
+                }
+                return helpStr
+              })()}
+            />
+            <SelectField
+              label={<AffixLabel>写入一致性语义</AffixLabel>}
+              name="semantic"
+              value={dbInfo?.semantic}
+              options={[
+                {
+                  label: 'exactly-once 正好一次',
+                  value: Semantic.ExactlyOnce,
+                },
+                {
+                  label: 'at-least-once 至少一次',
+                  value: Semantic.AtLeastOnce,
+                },
+              ].filter((i) =>
+                getExactly([curJob?.source_type, curJob?.target_type]).includes(
+                  i.value
+                )
+              )}
+              onChange={(v: Semantic) => {
+                handleUpdate({ semantic: +v })
+              }}
+              validateOnChange
+              schemas={[
+                {
+                  help: '请选择写入模式',
+                  status: 'error',
+                  rule: { required: true },
+                },
+              ]}
+            />
+            <TextField
+              label={<AffixLabel>批量写入条数</AffixLabel>}
+              name="batchSize"
+              help="范围: 1~65535, 该值可减少网络交互次数, 过大会造成 OOM"
+              validateOnChange
+              css={css`
+                input.input {
+                  ${tw`w-28!`}
+                }
+              `}
+              value={dbInfo?.batchSize || ''}
+              onChange={(v: string) => {
+                handleUpdate({ batchSize: +v })
+              }}
+              schemas={[
+                {
+                  help: '批量写入条数不能为空',
+                  status: 'error',
+                  rule: { required: true },
+                },
+                {
+                  help: '范围: 1~65535, 批量写入条数不能小于 1',
+                  status: 'error',
+                  rule: (v: any) =>
+                    /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535,
+                },
+              ]}
+            />
+            <FlexBox>
+              <div css={styles.line} />
+              <Center
+                tw="px-1 cursor-pointer"
+                onClick={() => setShowTargetAdvanced((prev) => !prev)}
+              >
+                <Icon
+                  name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`}
+                  type="light"
+                />
+                高级配置
+              </Center>
+              <div css={styles.line} />
+            </FlexBox>
+            {showTargetAdvanced && (
+              <>
+                <StyledSqlGroupField
+                  className="sql-group-field"
+                  name="pre_sql"
+                  label="写入前SQL语句组"
+                  size={2}
+                  onChange={(v: string[]) => {
+                    handleUpdate({ preSql: v })
+                  }}
+                  value={dbInfo?.preSql}
+                  validateOnChange
+                  placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                  schemas={[
+                    {
+                      rule: (arr: string[]) => {
+                        return (arr || []).every((v) => {
+                          if (!v) {
+                            return true
+                          }
+                          if (
+                            v.trim() &&
+                            v.trim().split(';').filter(Boolean).length > 1
+                          ) {
+                            return false
+                          }
+                          return true
+                        })
+                      },
+                      help: '单条语句只能包含一个 SQL 命令',
+                      status: 'error',
+                    },
+                  ]}
+                />
+                <StyledSqlGroupField
+                  className="sql-group-field"
+                  name="post_sql"
+                  value={dbInfo?.postSql}
+                  label="写入后SQL语句组"
+                  size={1}
+                  validateOnChange
+                  onChange={(v: string[]) => {
+                    handleUpdate({ postSql: v })
+                  }}
+                  schemas={[
+                    {
+                      rule: (arr: string[]) => {
+                        return (arr || []).every((v) => {
+                          if (!v) {
+                            return true
+                          }
+                          if (
+                            v.trim() &&
+                            v.trim().split(';').filter(Boolean).length > 1
+                          ) {
+                            return false
+                          }
+                          return true
+                        })
+                      },
+                      help: '单条语句只能包含一个 SQL 命令',
+                      status: 'error',
+                    },
+                  ]}
+                  placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
+                />
+              </>
+            )}
+          </>
+        )}
+      </Form>
     )
   }
-
-  return (
-    <Form css={styles.form} ref={targetForm}>
-      {renderCommon()}
-      {renderBaseTable()}
-      {hasTable && (
-        <>
-          <SelectField
-            label={<AffixLabel>写入模式</AffixLabel>}
-            name="write_mode"
-            options={[
-              { label: 'insert 插入', value: WriteMode.Insert },
-              { label: 'replace 替换', value: WriteMode.Replace },
-              {
-                label: 'update 更新插入',
-                value: WriteMode.Update,
-              },
-            ].filter((i) =>
-              getWriteMode(curJob?.target_type).includes(i.value)
-            )}
-            value={dbInfo?.writeMode}
-            schemas={[
-              {
-                help: '请选择写入模式',
-                status: 'error',
-                rule: { required: true },
-              },
-            ]}
-            validateOnChange
-            onChange={(v: WriteMode) => {
-              handleUpdate({ writeMode: +v })
-            }}
-            help={(() => {
-              let helpStr = ''
-              switch (dbInfo?.writeMode) {
-                case WriteMode.Insert:
-                  helpStr =
-                    '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
-                  break
-                case WriteMode.Replace:
-                  helpStr =
-                    '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会用新行替换已经指定的字段的语句。'
-                  break
-                case WriteMode.Update:
-                  helpStr =
-                    '没有遇到主键/唯一性索引冲突时，与 insert into 行为一致。冲突时会先删除原有行，再插入新行。即新行会替换原有行的所有字段。'
-                  break
-                default:
-                  break
-              }
-              return helpStr
-            })()}
-          />
-          <SelectField
-            label={<AffixLabel>写入一致性语义</AffixLabel>}
-            name="semantic"
-            value={dbInfo?.semantic}
-            options={[
-              {
-                label: 'exactly-once 正好一次',
-                value: Semantic.ExactlyOnce,
-              },
-              {
-                label: 'at-least-once 至少一次',
-                value: Semantic.AtLeastOnce,
-              },
-            ].filter((i) =>
-              getExactly([curJob?.source_type, curJob?.target_type]).includes(
-                i.value
-              )
-            )}
-            onChange={(v: Semantic) => {
-              handleUpdate({ semantic: +v })
-            }}
-            validateOnChange
-            schemas={[
-              {
-                help: '请选择写入模式',
-                status: 'error',
-                rule: { required: true },
-              },
-            ]}
-          />
-          <TextField
-            label={<AffixLabel>批量写入条数</AffixLabel>}
-            name="batchSize"
-            help="范围: 1~65535, 该值可减少网络交互次数, 过大会造成 OOM"
-            validateOnChange
-            css={css`
-              input.input {
-                ${tw`w-28!`}
-              }
-            `}
-            value={dbInfo?.batchSize || ''}
-            onChange={(v: string) => {
-              handleUpdate({ batchSize: +v })
-            }}
-            schemas={[
-              {
-                help: '批量写入条数不能为空',
-                status: 'error',
-                rule: { required: true },
-              },
-              {
-                help: '范围: 1~65535, 批量写入条数不能小于 1',
-                status: 'error',
-                rule: (v: any) =>
-                  /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535,
-              },
-            ]}
-          />
-          <FlexBox>
-            <div css={styles.line} />
-            <Center
-              tw="px-1 cursor-pointer"
-              onClick={() => setShowTargetAdvanced((prev) => !prev)}
-            >
-              <Icon
-                name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`}
-                type="light"
-              />
-              高级配置
-            </Center>
-            <div css={styles.line} />
-          </FlexBox>
-          {showTargetAdvanced && (
-            <>
-              <StyledSqlGroupField
-                className="sql-group-field"
-                name="pre_sql"
-                label="写入前SQL语句组"
-                size={2}
-                onChange={(v: string[]) => {
-                  handleUpdate({ preSql: v })
-                }}
-                value={dbInfo?.preSql}
-                validateOnChange
-                placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
-                schemas={[
-                  {
-                    rule: (arr: string[]) => {
-                      return (arr || []).every((v) => {
-                        if (!v) {
-                          return true
-                        }
-                        if (
-                          v.trim() &&
-                          v.trim().split(';').filter(Boolean).length > 1
-                        ) {
-                          return false
-                        }
-                        return true
-                      })
-                    },
-                    help: '单条语句只能包含一个 SQL 命令',
-                    status: 'error',
-                  },
-                ]}
-              />
-              <StyledSqlGroupField
-                className="sql-group-field"
-                name="post_sql"
-                value={dbInfo?.postSql}
-                label="写入后SQL语句组"
-                size={1}
-                validateOnChange
-                onChange={(v: string[]) => {
-                  handleUpdate({ postSql: v })
-                }}
-                schemas={[
-                  {
-                    rule: (arr: string[]) => {
-                      return (arr || []).every((v) => {
-                        if (!v) {
-                          return true
-                        }
-                        if (
-                          v.trim() &&
-                          v.trim().split(';').filter(Boolean).length > 1
-                        ) {
-                          return false
-                        }
-                        return true
-                      })
-                    },
-                    help: '单条语句只能包含一个 SQL 命令',
-                    status: 'error',
-                  },
-                ]}
-                placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
-              />
-            </>
-          )}
-        </>
-      )}
-    </Form>
-  )
-})
+)
 
 export default BaseTargetConfig

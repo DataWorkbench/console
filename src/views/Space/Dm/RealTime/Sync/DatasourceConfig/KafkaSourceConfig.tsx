@@ -1,7 +1,11 @@
-import { useRef } from 'react'
+import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from 'react'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import tw, { css } from 'twin.macro'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
+import {
+  IDataSourceConfigProps,
+  ISourceRef,
+} from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 // import { useImmer } from 'use-immer'
 
 // const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
@@ -51,23 +55,40 @@ const styles = {
   line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
 }
 
-const KafkaSourceConfig = () => {
-  const sourceForm = useRef<Form>()
+const KafkaSourceConfig = forwardRef(
+  (props: IDataSourceConfigProps, ref: ForwardedRef<ISourceRef>) => {
+    const sourceForm = useRef<Form>()
 
-  // const [db, setDbInfo] = useImmer<Partial<Record<string, any>>>({})
+    // const [db, setDbInfo] = useImmer<Partial<Record<string, any>>>({})
 
-  const renderCommon = () => {
+    useImperativeHandle(ref, () => {
+      return {
+        validate: () => {
+          if (!sourceForm.current) {
+            return false
+          }
+          return sourceForm.current?.validateForm()
+        },
+        getData: () => {
+          return {}
+        },
+        refetchColumn: () => {},
+      }
+    })
+
+    const renderCommon = () => {
+      return (
+        <>
+          <BaseConfigCommon from="source" />
+        </>
+      )
+    }
     return (
-      <>
-        <BaseConfigCommon from="source" />
-      </>
+      <Form css={styles.form} ref={sourceForm}>
+        {renderCommon()}
+      </Form>
     )
   }
-  return (
-    <Form css={styles.form} ref={sourceForm}>
-      {renderCommon()}
-    </Form>
-  )
-}
+)
 
 export default KafkaSourceConfig

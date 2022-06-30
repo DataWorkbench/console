@@ -39,7 +39,7 @@ const BaseTableComponent = (props: IBaseTableComponentProps) => {
   const tablesRet = from === 'source' ? sourceTablesRet : targetTablesRet
   const tables = (get(tablesRet, 'data.items', []) || []) as string[]
   if (!isSelected) {
-    return false
+    return null
   }
   return (
     <SelectWithRefresh

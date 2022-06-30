@@ -1,5 +1,12 @@
 import { Form, InputNumber } from '@QCFE/qingcloud-portal-ui'
-import { useLayoutEffect, useRef, useState } from 'react'
+import {
+  ForwardedRef,
+  forwardRef,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import tw, { css } from 'twin.macro'
 import {
@@ -14,6 +21,10 @@ import { useQuerySourceTables } from 'hooks'
 import { Control, Field, Icon, Label } from '@QCFE/lego-ui'
 import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { map } from 'rxjs'
+import {
+  IDataSourceConfigProps,
+  ISourceRef,
+} from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 
 const {
   // RadioGroupField,
@@ -93,181 +104,198 @@ type FieldKeys =
   | 'heartBeatPack'
   | 'lsn'
   | 'id'
-const PgSourceConfig = () => {
-  const sourceForm = useRef<Form>()
+const PgSourceConfig = forwardRef(
+  (props: IDataSourceConfigProps, ref: ForwardedRef<ISourceRef>) => {
+    const sourceForm = useRef<Form>()
 
-  const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
+    const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
 
-  useLayoutEffect(() => {
-    const sub = source$
-      .pipe(
-        map((e) => {
-          if (!e) {
-            return {}
-          }
-          return {
-            id: e?.data?.id,
-          }
+    useLayoutEffect(() => {
+      const sub = source$
+        .pipe(
+          map((e) => {
+            if (!e) {
+              return {}
+            }
+            return {
+              id: e?.data?.id,
+            }
+          })
+        )
+        .subscribe((e) => {
+          setDbInfo(e)
         })
-      )
-      .subscribe((e) => {
-        setDbInfo(e)
-      })
-    return () => {
-      sub.unsubscribe()
-    }
-  }, [setDbInfo])
+      return () => {
+        sub.unsubscribe()
+      }
+    }, [setDbInfo])
 
-  const { data: tableList, refetch } = useQuerySourceTables(
-    {
-      sourceId: dbInfo?.id,
-    },
-    { enabled: !!dbInfo?.id }
-  )
-
-  const renderCommon = () => {
-    return (
-      <>
-        <BaseConfigCommon from="source" />
-      </>
+    const { data: tableList, refetch } = useQuerySourceTables(
+      {
+        sourceId: dbInfo?.id,
+      },
+      { enabled: !!dbInfo?.id }
     )
-  }
 
-  const [showAdvanced, setShowAdvanced] = useState(false)
-
-  const renderAdvanced = () => {
-    if (!showAdvanced) {
-      return null
+    const renderCommon = () => {
+      return (
+        <>
+          <BaseConfigCommon from="source" />
+        </>
+      )
     }
+
+    useImperativeHandle(ref, () => {
+      return {
+        validate: () => {
+          if (!sourceForm.current) {
+            return false
+          }
+          return sourceForm.current?.validateForm()
+        },
+        getData: () => {
+          return {}
+        },
+        refetchColumn: () => {},
+      }
+    })
+
+    const [showAdvanced, setShowAdvanced] = useState(false)
+
+    const renderAdvanced = () => {
+      if (!showAdvanced) {
+        return null
+      }
+      return (
+        <>
+          <Field>
+            <Label className="label">
+              <AffixLabel>心跳间隔</AffixLabel>
+            </Label>
+            <Control>
+              <InputNumber
+                label={null}
+                name="heartBeatPack"
+                showButton={false}
+                min={0}
+                max={120}
+                step={1}
+                value={dbInfo?.heartBeatPack}
+                onChange={(e) => {
+                  setDbInfo((draft) => {
+                    draft.heartBeatPack = e
+                  })
+                }}
+              />
+              <span tw="leading-7 ml-1.5"> 秒 </span>
+            </Control>
+            <div className="help">0-120</div>
+          </Field>
+          <TextField
+            label="lsn"
+            value={dbInfo?.lsn}
+            onChenge={(e) => {
+              setDbInfo((draft) => {
+                draft.lsn = e
+              })
+            }}
+            placeholder="请输入日志序列号的起始位置"
+            help="日志序列号的起始位置，0-max"
+          />
+        </>
+      )
+    }
+
+    const hasSource = !!dbInfo?.id
     return (
-      <>
-        <Field>
-          <Label className="label">
-            <AffixLabel>心跳间隔</AffixLabel>
-          </Label>
-          <Control>
-            <InputNumber
-              label={null}
-              name="heartBeatPack"
-              showButton={false}
-              min={0}
-              max={120}
-              step={1}
-              value={dbInfo?.heartBeatPack}
+      <Form css={styles.form} ref={sourceForm}>
+        {renderCommon()}
+        {hasSource && (
+          <>
+            <SelectWithRefresh
+              label={<AffixLabel required>数据源表</AffixLabel>}
+              name="tableName"
+              onRefresh={refetch}
+              options={
+                tableList?.items?.map((i) => ({ label: i, value: i })) ?? []
+              }
+              value={dbInfo?.tableName ?? []}
               onChange={(e) => {
                 setDbInfo((draft) => {
-                  draft.heartBeatPack = e
+                  draft.tableName = e
+                })
+              }}
+              help={
+                <HelpCenterLink hasIcon isIframe={false} href="##">
+                  Postgres（ Postgres CDC）Source 配置文档
+                </HelpCenterLink>
+              }
+              placeholder="请选择数据源表"
+            />
+            <CheckboxGroupField
+              name={dbInfo?.updateType}
+              label={<AffixLabel required>更新类型</AffixLabel>}
+              options={updateTypes}
+              value={dbInfo?.updateType}
+              onChange={(v) => {
+                setDbInfo((draft) => {
+                  draft.updateType = v
                 })
               }}
             />
-            <span tw="leading-7 ml-1.5"> 秒 </span>
-          </Control>
-          <div className="help">0-120</div>
-        </Field>
-        <TextField
-          label="lsn"
-          value={dbInfo?.lsn}
-          onChenge={(e) => {
-            setDbInfo((draft) => {
-              draft.lsn = e
-            })
-          }}
-          placeholder="请输入日志序列号的起始位置"
-          help="日志序列号的起始位置，0-max"
-        />
-      </>
+
+            <TextField
+              name="slot"
+              label={<AffixLabel required>slot 名称</AffixLabel>}
+              placeholder="请输入 slot 名称"
+              value=""
+            />
+            {!!dbInfo?.slot && (
+              <>
+                <ToggleField
+                  name="autoCreate"
+                  label="自动创建 slot"
+                  value={dbInfo?.autoCreate}
+                  onChange={(e) => {
+                    setDbInfo((draft) => {
+                      draft.autoCreate = e
+                    })
+                  }}
+                  help="按照 slot 名称自动创建 slot"
+                />
+                <ToggleField
+                  value={dbInfo?.temp}
+                  name="temp"
+                  label={<AffixLabel required>临时 slot</AffixLabel>}
+                  onChange={(e) => {
+                    setDbInfo((draft) => {
+                      draft.temp = e
+                    })
+                  }}
+                  help="临时的 slot 当实时同步结束后删除"
+                />
+              </>
+            )}
+            <FlexBox>
+              <div css={styles.line} />
+              <Center
+                tw="px-1 cursor-pointer"
+                onClick={() => setShowAdvanced((prev) => !prev)}
+              >
+                <Icon
+                  name={`chevron-${showAdvanced ? 'up' : 'down'}`}
+                  type="light"
+                />
+                高级配置
+              </Center>
+              <div css={styles.line} />
+            </FlexBox>
+            {renderAdvanced()}
+          </>
+        )}
+      </Form>
     )
   }
-
-  const hasSource = !!dbInfo?.id
-  return (
-    <Form css={styles.form} ref={sourceForm}>
-      {renderCommon()}
-      {hasSource && (
-        <>
-          <SelectWithRefresh
-            label={<AffixLabel required>数据源表</AffixLabel>}
-            name="tableName"
-            onRefresh={refetch}
-            options={
-              tableList?.items?.map((i) => ({ label: i, value: i })) ?? []
-            }
-            value={dbInfo?.tableName ?? []}
-            onChange={(e) => {
-              setDbInfo((draft) => {
-                draft.tableName = e
-              })
-            }}
-            help={
-              <HelpCenterLink hasIcon isIframe={false} href="##">
-                Postgres（ Postgres CDC）Source 配置文档
-              </HelpCenterLink>
-            }
-            placeholder="请选择数据源表"
-          />
-          <CheckboxGroupField
-            name={dbInfo?.updateType}
-            label={<AffixLabel required>更新类型</AffixLabel>}
-            options={updateTypes}
-            value={dbInfo?.updateType}
-            onChange={(v) => {
-              setDbInfo((draft) => {
-                draft.updateType = v
-              })
-            }}
-          />
-
-          <TextField
-            name="slot"
-            label={<AffixLabel required>slot 名称</AffixLabel>}
-            placeholder="请输入 slot 名称"
-            value=""
-          />
-          {!!dbInfo?.slot && (
-            <>
-              <ToggleField
-                name="autoCreate"
-                label="自动创建 slot"
-                value={dbInfo?.autoCreate}
-                onChange={(e) => {
-                  setDbInfo((draft) => {
-                    draft.autoCreate = e
-                  })
-                }}
-                help="按照 slot 名称自动创建 slot"
-              />
-              <ToggleField
-                value={dbInfo?.temp}
-                name="temp"
-                label={<AffixLabel required>临时 slot</AffixLabel>}
-                onChange={(e) => {
-                  setDbInfo((draft) => {
-                    draft.temp = e
-                  })
-                }}
-                help="临时的 slot 当实时同步结束后删除"
-              />
-            </>
-          )}
-          <FlexBox>
-            <div css={styles.line} />
-            <Center
-              tw="px-1 cursor-pointer"
-              onClick={() => setShowAdvanced((prev) => !prev)}
-            >
-              <Icon
-                name={`chevron-${showAdvanced ? 'up' : 'down'}`}
-                type="light"
-              />
-              高级配置
-            </Center>
-            <div css={styles.line} />
-          </FlexBox>
-          {renderAdvanced()}
-        </>
-      )}
-    </Form>
-  )
-}
+)
 
 export default PgSourceConfig
