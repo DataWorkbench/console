@@ -183,7 +183,7 @@ const MysqlBinlogSourceConfig = forwardRef(
             start: {
               journal_name: dbInfo?.startFile,
               position: dbInfo?.startPosition,
-              timestamp: dbInfo?.startTime,
+              timestamp: parseInt(dbInfo?.startTime, 10),
             },
             connection_charset: dbInfo?.charset,
             parallel_thread_size: dbInfo?.threads,

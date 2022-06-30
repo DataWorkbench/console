@@ -412,8 +412,6 @@ const SyncJob = () => {
     }
   }, [])
 
-  console.log(3333333, sourceColumns, targetColumns, columns)
-
   const release = () => {
     if (!enableRelease) {
       toggleScheModal(true)

@@ -37,4 +37,9 @@ const autoIncrementKey = new Proxy({} as Record<string, any>, {
   },
 })
 
+export function check(num: number) {
+  // eslint-disable-next-line no-bitwise
+  return num > 0 && (num & (num - 1)) === 0
+}
+
 export { request, customRequest, emitter, autoIncrementKey }
