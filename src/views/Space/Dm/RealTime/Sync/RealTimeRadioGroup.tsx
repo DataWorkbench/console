@@ -3,7 +3,8 @@ import { Control, Form, Select } from '@QCFE/lego-ui'
 import { isFunction } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import { ArrowLine } from 'components'
-import { datasourceTypeObjs } from '../Job/JobUtils'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { datasourceRealtimeTypeObjs, datasourceTypeObjs } from '../Job/JobUtils'
 
 export interface RealTimeSyncTypeVal {
   sourceType: string
@@ -17,7 +18,10 @@ export interface RealTimeRadioGroupProps {
   onChange?: (value: RealTimeSyncTypeVal) => void
 }
 
-const sources = datasourceTypeObjs
+const sources = [
+  ...datasourceRealtimeTypeObjs,
+  { type: SourceType.Kafka, name: 'kafka', label: 'Kafka' },
+]
 const targets = datasourceTypeObjs
 
 const RealTimeRadioGroup = forwardRef<
