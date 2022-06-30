@@ -75,7 +75,7 @@ curJobConfSubject$
       if (!e) {
         return []
       }
-      return [e.source.column, e.target.column]
+      return [e.source?.column ?? [], e.target?.column ?? []]
     })
   )
   .subscribe(confColumns$)

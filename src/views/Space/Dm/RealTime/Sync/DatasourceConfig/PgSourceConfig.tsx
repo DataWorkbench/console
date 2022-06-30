@@ -25,6 +25,7 @@ import {
   IDataSourceConfigProps,
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
+import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 
 const {
   // RadioGroupField,
@@ -109,6 +110,7 @@ const PgSourceConfig = forwardRef(
     const sourceForm = useRef<Form>()
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
+    useSetRealtimeColumns(dbInfo?.id)
 
     useLayoutEffect(() => {
       const sub = source$

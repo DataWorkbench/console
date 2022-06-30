@@ -393,6 +393,7 @@ const SyncJob = () => {
   const [columns, setColumns] = useState([[], []])
   useLayoutEffect(() => {
     const sourceColumnsSub = sourceColumns$.subscribe((e) => {
+      console.log(33333333333, e)
       setSourceColumns(e)
     })
     const targetColumnsSub = targetColumns$.subscribe((e) => {

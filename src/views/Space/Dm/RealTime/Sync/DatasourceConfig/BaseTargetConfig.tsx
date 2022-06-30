@@ -28,6 +28,7 @@ import {
   IDataSourceConfigProps,
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
+import { useImmer } from 'use-immer'
 
 const { TextField, SelectField } = Form
 
@@ -124,7 +125,7 @@ const BaseTargetConfig = forwardRef(
     const { curJob } = props
     const targetForm = useRef<Form>()
 
-    const [dbInfo, setDbInfo] = useState<Record<string, any> | null>()
+    const [dbInfo, setDbInfo] = useImmer<Record<string, any> | null>({})
 
     const [showTargetAdvanced, setShowTargetAdvanced] = useState<boolean>(false)
 
@@ -139,7 +140,8 @@ const BaseTargetConfig = forwardRef(
       return () => {
         unSub.unsubscribe()
       }
-    }, [])
+    }, [setDbInfo])
+    console.log(dbInfo)
 
     const sourceType = target$.getValue()?.sourceType
 
@@ -172,6 +174,7 @@ const BaseTargetConfig = forwardRef(
       return <BaseConfigCommon from="target" />
     }
 
+    console.log(dbInfo?.tableName)
     const hasTable = !isEmpty(dbInfo?.tableName)
 
     useImperativeHandle(ref, () => {
@@ -210,6 +213,7 @@ const BaseTargetConfig = forwardRef(
           sourceId={dbInfo?.id}
           tableName={dbInfo?.tableName}
           onChange={(v) => {
+            console.log(v)
             setDbInfo((draft) => {
               draft.tableName = v
             })

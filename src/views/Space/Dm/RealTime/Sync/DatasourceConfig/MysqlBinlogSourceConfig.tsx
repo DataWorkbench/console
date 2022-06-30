@@ -22,6 +22,7 @@ import {
   IDataSourceConfigProps,
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
+import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 
 const {
   CheckboxGroupField,
@@ -110,6 +111,7 @@ const MysqlBinlogSourceConfig = forwardRef(
 
     const [dbInfo, setDbInfo] = useImmer<Record<string, any>>({})
     const [showAdvanced, setShowAdvanced] = useState(false)
+    const { refetch: refetchColumns } = useSetRealtimeColumns(dbInfo?.id)
     useLayoutEffect(() => {
       const sub = source$
         .pipe(
@@ -159,7 +161,10 @@ const MysqlBinlogSourceConfig = forwardRef(
         getData: () => {
           return {}
         },
-        refetchColumn: () => {},
+        refetchColumn: () => {
+          console.log(111)
+          refetchColumns()
+        },
       }
     })
 
@@ -174,6 +179,7 @@ const MysqlBinlogSourceConfig = forwardRef(
       return (
         <>
           <RadioGroupField
+            name="charset"
             label="字符编码"
             options={[
               {
@@ -320,6 +326,7 @@ canal schema下的一张表：canal.test1 `}
         {showTable && (
           <>
             <CheckboxGroupField
+              name="updateType"
               label={<AffixLabel required>更新类型</AffixLabel>}
               options={updateTypes}
               value={dbInfo?.updateType}
@@ -332,6 +339,7 @@ canal schema下的一张表：canal.test1 `}
 
             <SelectField
               label={<AffixLabel required={false}>起始位置</AffixLabel>}
+              name="startType"
               value={dbInfo?.startType}
               onChange={(e) => {
                 setDbInfo((draft) => {
@@ -343,6 +351,7 @@ canal schema下的一张表：canal.test1 `}
             {dbInfo?.startType === 1 && (
               <TextField
                 label={<AffixLabel required>指定时间戳</AffixLabel>}
+                name="startTime"
                 value={dbInfo?.startTime}
                 onChange={(e: string) => {
                   setDbInfo((draft) => {
@@ -356,6 +365,7 @@ canal schema下的一张表：canal.test1 `}
               <>
                 <TextField
                   label={<AffixLabel required>指定文件</AffixLabel>}
+                  name="startFile"
                   value={dbInfo?.startFile}
                   onChange={(e: string) => {
                     setDbInfo((draft) => {
@@ -367,6 +377,7 @@ canal schema下的一张表：canal.test1 `}
 
                 <TextField
                   label={<AffixLabel required>指定位置</AffixLabel>}
+                  name="startPosition"
                   value={dbInfo?.startPosition}
                   onChange={(e: string) => {
                     setDbInfo((draft) => {
