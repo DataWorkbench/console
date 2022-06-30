@@ -105,11 +105,26 @@ const startTypes = [
   },
 ]
 
+type FieldKeys =
+  | 'id'
+  | 'filterType'
+  | 'filter'
+  | 'tableName'
+  | 'updateType'
+  | 'charset'
+  | 'bufNumber'
+  | 'threads'
+  | 'isGtidMode'
+  | 'startType'
+  | 'startTime'
+  | 'startFile'
+  | 'startPosition'
+
 const MysqlBinlogSourceConfig = forwardRef(
   (props: IDataSourceConfigProps, ref: ForwardedRef<ISourceRef>) => {
     const sourceForm = useRef<Form>()
 
-    const [dbInfo, setDbInfo] = useImmer<Record<string, any>>({})
+    const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
     const [showAdvanced, setShowAdvanced] = useState(false)
     const { refetch: refetchColumns } = useSetRealtimeColumns(dbInfo?.id)
     useLayoutEffect(() => {
@@ -121,12 +136,13 @@ const MysqlBinlogSourceConfig = forwardRef(
             }
             return {
               id: e?.data?.id,
+              filter: get(e, 'data.filter', ''),
               filterType: e?.data?.filter ? 2 : 1,
               tableName: get(e, 'data.table', []),
-              updateType: [], // TODO ????
-              charset: undefined, // TODO ???
-              bufNumber: undefined,
-              threads: undefined,
+              updateType: get(e, 'data.cat', '').split(','),
+              charset: get(e, 'data.connection-charset', 'UTF-8'),
+              bufNumber: get(e, 'data.buffer-size', 1024),
+              threads: get(e, 'data.parallel-thread-size', 2),
               isGtidMode: get(e, 'data.is_gtid_mode', false),
               startType: e?.data?.start?.journal_name ? 2 : 1,
               startTime: get(e, 'data.start.timestamp'),
@@ -159,10 +175,22 @@ const MysqlBinlogSourceConfig = forwardRef(
           return sourceForm.current?.validateForm()
         },
         getData: () => {
-          return {}
+          return {
+            source_id: dbInfo?.id,
+            table: dbInfo?.tableName,
+            filter: dbInfo?.filter,
+            cat: dbInfo?.updateType.filter(Boolean)?.join(''),
+            start: {
+              journal_name: dbInfo?.startFile,
+              position: dbInfo?.startPosition,
+              timestamp: dbInfo?.startTime,
+            },
+            connection_charset: dbInfo?.charset,
+            parallel_thread_size: dbInfo?.threads,
+            is_gtid_mode: dbInfo?.isGtidMode,
+          }
         },
         refetchColumn: () => {
-          console.log(111)
           refetchColumns()
         },
       }
@@ -184,11 +212,11 @@ const MysqlBinlogSourceConfig = forwardRef(
             options={[
               {
                 label: 'UTF-8',
-                value: 1,
+                value: 'UTF-8',
               },
               {
                 label: 'GBK',
-                value: 2,
+                value: 'GBK',
               },
             ]}
             value={dbInfo?.charset}
@@ -411,3 +439,111 @@ canal schema下的一张表：canal.test1 `}
 )
 
 export default memo(MysqlBinlogSourceConfig)
+
+/**
+ *
+ * table
+ * 描述：需要解析的数据表。
+ * 注意：指定此参数后filter参数将无效，SQL任务只支持监听单张表
+ * 必选：否
+ * 字段类型：string
+ * 默认值：无
+ *
+ * filter
+ * 描述：过滤表名的Perl正则表达式
+ * 注意：SQL任务只支持监听单张表
+ * 必选：否
+ * 字段类型：string
+ * 默认值：无
+ * 例子：canal schema下的一张表：canal.test1
+ *
+ * cat
+ * 描述：需要解析的数据更新类型，包括insert、update、delete三种
+ * 注意：以英文逗号分割的格式填写。如果为空，解析所有数据更新类型
+ * 必选：否
+ * 字段类型：string
+ * 默认值：无
+ *
+ * timestamp
+ * 描述：要读取的binlog文件的开始位置，时间戳，采集起点从指定的时间戳处消费；
+ * 必选：否
+ * 字段类型：string
+ * 默认值：无
+ *
+ * journal-name
+ * 描述：要读取的binlog文件的开始位置，文件名，采集起点从指定文件的起始处消费；
+ * 必选：否
+ * 字段类型：string
+ * 默认值：无
+ *
+ * position
+ * 描述：要读取的binlog文件的开始位置，文件的指定位置，采集起点从指定文件的指定位置处消费
+ * 必选：否
+ * 字段类型：string
+ * 默认值：无
+ *
+ * connection-charset
+ * 描述：编码信息
+ * 必选：否
+ * 字段类型：string
+ * 默认值：UTF-8
+ *
+ * detecting-enable
+ * 描述：是否开启心跳
+ * 必选：否
+ * 字段类型：boolean
+ * 默认值：true
+ *
+ * detecting-sql
+ * 描述：心跳SQL
+ * 必选：否
+ * 字段类型：string
+ * 默认值：SELECT CURRENT_DATE
+ *
+ * enable-tsdb
+ * 描述：是否开启时序表结构能力
+ * 必选：否
+ * 字段类型：boolean
+ * 默认值：true
+ *
+ * buffer-size
+ * 描述：并发缓存大小
+ * 注意：必须为2的幂
+ * 必选：否
+ * 默认值：1024
+ *
+ * parallel
+ * 描述：是否开启并行解析binlog日志
+ * 必选：否
+ * 字段类型：boolean
+ * 默认值：true
+ *
+ * parallel-thread-size
+ * 描述：并行解析binlog日志线程数
+ * 注意：只有 paraller 设置为true才生效
+ * 必选：否
+ * 字段类型：int
+ * 默认值：2
+ *
+ * is-gtid-mode
+ * 描述：是否开启gtid模式
+ * 必选：否
+ * 字段类型：boolean
+ * 默认值：false
+ *
+ * query-time-out
+ * 描述：通过TCP连接发送数据(在这里就是要执行的sql)后，等待响应的超时时间，单位毫秒
+ * 必选：否
+ * 字段类型：int
+ * 默认值：300000
+ *
+ * connect-time-out
+ * 描述：数据库驱动(mysql-connector-java)与mysql服务器建立TCP连接的超时时间，单位毫秒
+ * 必选：否
+ * 字段类型：int
+ * 默认值：60000
+ *
+ * timestamp-format.standard
+ *
+ *
+ */

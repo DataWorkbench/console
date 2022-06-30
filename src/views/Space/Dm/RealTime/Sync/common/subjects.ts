@@ -1,7 +1,11 @@
 import { camelCase, get, keys, trim } from 'lodash-es'
 import { BehaviorSubject, pairwise, Subject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
-import { datasourceTypeObjs } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import {
+  datasourceRealtimeTypeObjs,
+  datasourceTypeObjs,
+} from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 interface IJob {
   id: string
@@ -49,15 +53,24 @@ export const syncJobOp$ = new BehaviorSubject({
   visible: false,
 })
 
+const getSourceType = (sourceType: SourceType, realtime: boolean = false) => {
+  if (
+    realtime &&
+    datasourceRealtimeTypeObjs.find((i) => i.type === sourceType)
+  ) {
+    return datasourceRealtimeTypeObjs.find((i) => i.type === sourceType)
+  }
+  return datasourceTypeObjs.find((i) => i.type === sourceType)
+}
 curJobDbConfSubject$
   .pipe(
     map((e) => {
       if (e === null) {
         return null
       }
-      const { sourceType, targetType } = e
-      const sourceKey = datasourceTypeObjs.find((i) => i.type === sourceType)
-      const targetKey = datasourceTypeObjs.find((i) => i.type === targetType)
+      const { sourceType, targetType, jobType } = e
+      const sourceKey = getSourceType(sourceType, jobType === 3)
+      const targetKey = getSourceType(targetType, false)
       return {
         ...e,
         sourceKey,

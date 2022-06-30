@@ -154,6 +154,7 @@ const SyncJob = () => {
         ...confData,
         sourceType: curJob?.source_type,
         targetType: curJob?.target_type,
+        jobType: curJob?.type,
       })
     }
   }, [confData, curJob, isFetching])
@@ -186,7 +187,10 @@ const SyncJob = () => {
   const [sourceTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
-    return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
+    return [
+      getDataSourceTypes(sourceType, curJob?.type === 3),
+      getDataSourceTypes(targetType),
+    ]
   }, [curJob])
 
   const editorRef = useRef<any>(null)
@@ -393,7 +397,6 @@ const SyncJob = () => {
   const [columns, setColumns] = useState([[], []])
   useLayoutEffect(() => {
     const sourceColumnsSub = sourceColumns$.subscribe((e) => {
-      console.log(33333333333, e)
       setSourceColumns(e)
     })
     const targetColumnsSub = targetColumns$.subscribe((e) => {
@@ -437,7 +440,7 @@ const SyncJob = () => {
                 </>
               }
             >
-              {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob} />}
+              {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob!} />}
               {index === 1 && (
                 <FieldMappings
                   // key={

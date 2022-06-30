@@ -139,11 +139,37 @@ export const datasourceTypeObjs = [
   },
 ]
 
-export const getDataSourceTypes = (type?: SourceType): string | undefined => {
+export const datasourceRealtimeTypeObjs = [
+  {
+    type: SourceType.Mysql,
+    name: 'binlog',
+    label: 'MySQL（MySQL Binlog）',
+  },
+
+  {
+    type: SourceType.SqlServer,
+    name: 'sql_server_cdc',
+    label: 'SqlServer（SqlServer CDC）',
+  },
+  {
+    type: SourceType.PostgreSQL,
+    name: 'pg_wal',
+    label: '  Postgres（Postgres CDC）',
+  },
+]
+
+export const getDataSourceTypes = (
+  type?: SourceType,
+  isRealtime: boolean = false
+): string | undefined => {
   if (!type) {
     return ''
   }
-  const item = datasourceTypeObjs.find((i) => i.type === type!)!
+  let obj = datasourceTypeObjs
+  if (isRealtime && datasourceRealtimeTypeObjs.find((i) => i.type === type)) {
+    obj = datasourceRealtimeTypeObjs
+  }
+  const item = obj.find((i) => i.type === type!)!
   return new Proxy(
     { value: item?.label },
     {
@@ -357,7 +383,7 @@ export const IconWrapper = styled(Center)(
   ]
 )
 
-export const renderSwitcherIcon = (props) => {
+export const renderSwitcherIcon = (props: any) => {
   const { expanded, isLeaf } = props
   if (isLeaf) {
     return null
