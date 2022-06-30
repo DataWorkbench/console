@@ -19,6 +19,6 @@ export interface IDataSourceConfigProps {
 }
 export interface ISourceRef {
   validate: () => boolean
-  getData?: () => Record<string, any> | undefined
-  refetchColumn: () => void
+  getData: () => Record<string, any> | undefined
+  refetchColumn?: () => void
 }

@@ -26,6 +26,9 @@ import {
   IDataSourceConfigProps,
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
+import KafkaSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/KafkaSourceConfig'
+import SqlServerSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/SqlServerSourceConfig'
+import KafkaTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/KafkaTargetConfig'
 import { source$, syncJobOp$, target$ } from '../common/subjects'
 
 const styles = {
@@ -122,23 +125,46 @@ const DatasourceConfig = observer(
       }
     }
 
-    const sourceRef = useRef<ISourceRef>()
-    const targetRef = useRef<ISourceRef>()
+    const sourceRef = useRef<ISourceRef>(null)
+    const targetRef = useRef<ISourceRef>(null)
+
+    const renderRealTimeSource = () => {
+      switch (curJob?.source_type) {
+        case SourceType.Mysql:
+          return <MysqlBinlogSourceConfig curJob={curJob} ref={sourceRef} />
+        case SourceType.PostgreSQL:
+          return <PgSourceConfig curJob={curJob} ref={sourceRef} />
+        case SourceType.SqlServer:
+          return <SqlServerSourceConfig curJob={curJob} ref={sourceRef} />
+        case SourceType.Kafka:
+          return <KafkaSourceConfig curJob={curJob} ref={sourceRef} />
+        default:
+          return null
+      }
+    }
 
     const renderSource = () => {
-      return <PgSourceConfig curJob={curJob} ref={sourceRef} />
-      return <MysqlBinlogSourceConfig curJob={curJob} ref={sourceRef} />
-      if (baseSource.has(curJob?.source_type)) {
+      if (curJob?.type === 3) {
+        return renderRealTimeSource()
+      }
+
+      if (baseSource.has(curJob?.source_type!)) {
         return <BaseSourceConfig curJob={curJob} ref={sourceRef} />
       }
       return null
     }
 
     const renderTarget = () => {
-      if (baseTarget.has(curJob?.target_type)) {
+      if (baseTarget.has(curJob?.target_type!)) {
         return <BaseTargetConfig curJob={curJob} ref={targetRef} />
       }
-      return null
+
+      switch (curJob?.target_type) {
+        case SourceType.Kafka:
+          return <KafkaTargetConfig curJob={curJob} ref={targetRef} />
+        default:
+          return null
+      }
     }
 
     useLayoutEffect(() => {
@@ -187,7 +213,6 @@ const DatasourceConfig = observer(
       }
     })
 
-    console.log(source$.getValue())
     return (
       <FormH7Wrapper>
         <FlexBox tw="flex-col">
