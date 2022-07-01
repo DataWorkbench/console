@@ -69,9 +69,20 @@ const HiveTargetConfig = forwardRef(
           return targetForm.current?.validateForm()
         },
         getData: () => {
-          return {}
+          return {
+            source_id: dbInfo?.id,
+            compress: dbInfo?.compress,
+            file_type: dbInfo?.fileType,
+            partition: dbInfo?.partition,
+            partition_type: dbInfo?.type,
+            table: dbInfo?.tableName,
+            use_partition: dbInfo?.usePartition,
+            write_mode: dbInfo?.writeMode,
+          }
         },
-        refetchColumn: () => {},
+        refetchColumn: () => {
+          // TODO: 从 columns 中获取 targetColumns
+        },
       }
     })
 
