@@ -48,7 +48,7 @@ const styles = {
   line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
 }
 
-const { TextField, TextAreaField, RadioGroupField } = Form
+const { TextField, TextAreaField } = Form
 
 type FieldKeys = 'id' | 'topic' | 'config' | 'writeType'
 
@@ -111,17 +111,6 @@ const KafkaTargetConfig = forwardRef(
               参考文档
             </HelpCenterLink>
           }
-        />
-        <RadioGroupField
-          label={<AffixLabel required>写入模式</AffixLabel>}
-          name="writeType"
-          value={dbInfo?.writeType}
-          options={['text', 'json'].map((i) => ({ label: i, value: i }))}
-          onChange={(e) => {
-            setDbInfo((draft) => {
-              draft.writeType = e
-            })
-          }}
         />
       </Form>
     )

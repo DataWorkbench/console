@@ -30,6 +30,9 @@ import KafkaSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/Kaf
 import SqlServerSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/SqlServerSourceConfig'
 import KafkaTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/KafkaTargetConfig'
 import HiveTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HiveTargetConfig'
+import HbaseSource from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseSource'
+import HbaseTarget from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseTarget'
+import MongoDbTarget from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/MongoDbTarget'
 import { source$, syncJobOp$, target$ } from '../common/subjects'
 
 const styles = {
@@ -145,6 +148,7 @@ const DatasourceConfig = observer(
     }
 
     const renderSource = () => {
+      return <HbaseSource curJob={curJob} ref={sourceRef} />
       if (curJob?.type === 3) {
         return renderRealTimeSource()
       }
@@ -156,6 +160,8 @@ const DatasourceConfig = observer(
     }
 
     const renderTarget = () => {
+      return <MongoDbTarget curJob={curJob} ref={targetRef} />
+      return <HbaseTarget curJob={curJob} ref={targetRef} />
       if (baseTarget.has(curJob?.target_type!)) {
         return <BaseTargetConfig curJob={curJob} ref={targetRef} />
       }

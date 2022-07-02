@@ -15,6 +15,7 @@ import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/Base
 import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
 import { useQuerySourceTables } from 'hooks'
 import { get } from 'lodash-es'
+import { map } from 'rxjs'
 import styles from './styles'
 import { target$ } from '../common/subjects'
 
@@ -216,14 +217,14 @@ const HiveTargetConfig = forwardRef(
                  * orc 默认为ZLIB格式
                  * parquet 默认为SNAPPY格式
                  */
-                const map = {
+                const map1 = {
                   text: undefined,
                   orc: 'ZLIB',
                   parquet: 'SNAPPY',
                 }
                 setDbInfo((draft) => {
                   draft.fileType = e
-                  draft.compress = map[e as 'text']
+                  draft.compress = map1[e as 'text']
                 })
               }}
               options={['text', 'orc', 'parquet'].map((i) => ({
