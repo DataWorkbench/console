@@ -20,6 +20,7 @@ import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
 import useIcon from 'hooks/useHooks/useIcon'
 import { Tooltip } from 'components/Tooltip'
+import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
 import MappingItem, { TMappingField, FieldRow } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
@@ -734,6 +735,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   />
                 )
               })}
+              <HbaseFieldMappings sourceColumns={leftFields} />
             </div>
           ) : (
             <EmptyFieldWrapper>
