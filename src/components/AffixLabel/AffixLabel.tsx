@@ -20,13 +20,14 @@ import tw, { styled, css } from 'twin.macro'
 
 const IconBoxWithTootip = styled(Center)(() => [
   css`
-      &{
-        [aria-expanded='true'] {
-          .icon svg.qicon {
-            ${tw`fill-[#324558]  dark:fill-[#fff]`}
-          }
+    & {
+      [aria-expanded='true'] {
+        .icon svg.qicon {
+          ${tw`fill-[#324558]  dark:fill-[#fff]`}
+        }
       }
-    `
+    }
+  `
 ])
 
 export const AffixLabel = ({

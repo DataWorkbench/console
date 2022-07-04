@@ -5,8 +5,9 @@ import { Form, Button } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useMutationApiService } from 'hooks'
+import { useMutationApiService, getQueryKeyListApiGroups } from 'hooks'
 import { strlen } from 'utils'
+import { useQueryClient } from 'react-query'
 
 const { TextField, TextAreaField } = Form
 
@@ -55,10 +56,11 @@ export const JobModal = observer((props: JobModalProps) => {
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
     name: '',
-    path: '/',
+    group_path: '/',
     desc: ''
   }))
 
+  const queryClient = useQueryClient()
   const mutation = useMutationApiService()
 
   const handleOK = () => {
@@ -69,6 +71,7 @@ export const JobModal = observer((props: JobModalProps) => {
       }
       mutation.mutate(paramsData, {
         onSuccess: () => {
+          queryClient.invalidateQueries(getQueryKeyListApiGroups())
           onClose?.()
         }
       })
@@ -126,12 +129,12 @@ export const JobModal = observer((props: JobModalProps) => {
               }
             />
             <TextField
-              name="path"
+              name="group_path"
               label={<AffixLabel>API服务组路径</AffixLabel>}
-              value={get(params, 'path', '/')}
+              value={get(params, 'group_path', '/')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.path = String(v)
+                  draft.group_path = String(v)
                 })
               }
               validateOnChange

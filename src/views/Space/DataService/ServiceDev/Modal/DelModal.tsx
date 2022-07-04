@@ -2,6 +2,8 @@ import { Confirm } from 'components'
 import tw, { css } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { Button } from '@QCFE/lego-ui'
+import { useFetchApi, useMutationDeleteApiConfigs } from 'hooks'
+import { get } from 'lodash-es'
 
 export interface JobModalData {
   id: string
@@ -13,13 +15,42 @@ export interface JobModalData {
 
 interface JobModalProps {
   isApiGroup?: boolean
+  currentGroupId?: string
+  currentApiId?: string
   onClose?: (data?: JobModalData) => void
 }
 
 export const JobModal = observer((props: JobModalProps) => {
-  const { isApiGroup = false, onClose } = props
+  const { isApiGroup = false, currentGroupId, currentApiId, onClose } = props
 
-  const handleOK = () => {}
+  const fetchApi = useFetchApi()
+  const mutation = useMutationDeleteApiConfigs()
+
+  const deleteApiConfig = (apiIds: string[]) => {
+    mutation.mutate(
+      {
+        apiIds
+      },
+      {
+        onSuccess: () => {
+          console.log('删除')
+        }
+      }
+    )
+  }
+
+  const handleOK = () => {
+    if (isApiGroup) {
+      fetchApi({
+        groupId: currentGroupId
+      }).then((data) => {
+        const apiList = get(data, 'infos', [])
+        if (apiList.length > 0) {
+          deleteApiConfig(apiList.map((item: { api_id: string }) => item.api_id))
+        }
+      })
+    } else if (currentApiId) deleteApiConfig([currentApiId])
+  }
 
   return (
     <Confirm

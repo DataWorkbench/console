@@ -1,4 +1,4 @@
-import { Checkbox, Label } from '@QCFE/lego-ui'
+import { Checkbox, Icon, Label } from '@QCFE/lego-ui'
 import { useCallback } from 'react'
 import tw, { css, styled } from 'twin.macro'
 
@@ -27,6 +27,23 @@ const TableHeader = styled('div')(() => [
     }
   `
 ])
+
+const Empty = styled.div`
+  & {
+    ${tw`h-[250px] overflow-hidden border-neut-13! border-t-[1px]`}
+  }
+
+  & > div {
+    ${tw`h-full flex justify-center items-center`}
+    .emptyBox {
+      ${tw`h-[112px] w-[112px] flex-col`}
+    }
+    .text {
+      ${tw`text-neut-0`}
+    }
+  }
+`
+
 export const TableBody = styled('div')(() => [
   css`
     .group {
@@ -87,6 +104,7 @@ export interface DargTableProps<T = any> {
   type?: string // 拖拽类型
   renderFooter?: () => React.ReactNode // 脚部渲染函数
   rowKey: string // 行key
+  disable?: boolean // 是否可以操作
 }
 
 export const DargTable = (props: DargTableProps<any>) => {
@@ -96,30 +114,35 @@ export const DargTable = (props: DargTableProps<any>) => {
     type = 'DraggableBodyRow',
     moveRow,
     renderFooter,
-    runDarg = true
+    runDarg = true,
+    disable = false
   } = props
 
-  const getData = useCallback((item: any, key: any, column: Columns<any>, idx: number) => {
-    const data = item[key]
+  const getData = useCallback(
+    (item: any, key: any, column: Columns<any>, idx: number) => {
+      const data = item[key]
 
-    //  如果行内是复选框
-    if (column.checkbox) {
-      return (
-        <CheckBoxLabel>
-          <Checkbox
-            checked={!!data}
-            onChange={(_, checked) => {
-              if (column?.onSelect) {
-                column?.onSelect(checked, item, idx)
-              }
-            }}
-          />
-          <CheckboxSpan>{column.checkboxText}</CheckboxSpan>
-        </CheckBoxLabel>
-      )
-    }
-    return data === undefined || data === null || data === '' ? '-' : data
-  }, [])
+      //  如果行内是复选框
+      if (column.checkbox) {
+        return (
+          <CheckBoxLabel>
+            <Checkbox
+              disabled={disable}
+              checked={!!data}
+              onChange={(_, checked) => {
+                if (column?.onSelect) {
+                  column?.onSelect(checked, item, idx)
+                }
+              }}
+            />
+            <CheckboxSpan>{column.checkboxText}</CheckboxSpan>
+          </CheckBoxLabel>
+        )
+      }
+      return data === undefined || data === null || data === '' ? '' : data
+    },
+    [disable]
+  )
 
   const indeterminate = useCallback(
     (key) => {
@@ -145,6 +168,7 @@ export const DargTable = (props: DargTableProps<any>) => {
             {item?.checkbox ? (
               <CheckBoxLabel>
                 <Checkbox
+                  disabled={disable}
                   onChange={(_, checked) => {
                     if (item?.onAllSelect) {
                       item?.onAllSelect(checked, item, index)
@@ -162,16 +186,29 @@ export const DargTable = (props: DargTableProps<any>) => {
         ))}
       </TableHeader>
       <TableBody className="darg-table-body">
-        {dataSource.map((item: any, i) => {
-          if (runDarg && moveRow) {
+        {dataSource.length > 0 ? (
+          dataSource.map((item: any, i) => {
+            if (runDarg && moveRow && !disable) {
+              return (
+                <DraggableRow
+                  type={type}
+                  index={i}
+                  moveRow={moveRow}
+                  key={String(i)}
+                  className="group"
+                >
+                  {columns.map((k, j) => (
+                    <div style={k?.width ? { width: k.width } : { flex: 1 }} key={j as number}>
+                      {k.render
+                        ? k.render && k.render(getData(item, k.key, k, i), item, i)
+                        : getData(item, k.key, k, i)}
+                    </div>
+                  ))}
+                </DraggableRow>
+              )
+            }
             return (
-              <DraggableRow
-                type={type}
-                index={i}
-                moveRow={moveRow}
-                key={String(i)}
-                className="group"
-              >
+              <Row key={String(i)} className="group">
                 {columns.map((k, j) => (
                   <div style={k?.width ? { width: k.width } : { flex: 1 }} key={j as number}>
                     {k.render
@@ -179,21 +216,21 @@ export const DargTable = (props: DargTableProps<any>) => {
                       : getData(item, k.key, k, i)}
                   </div>
                 ))}
-              </DraggableRow>
+              </Row>
             )
-          }
-          return (
-            <Row key={String(i)} className="group">
-              {columns.map((k, j) => (
-                <div style={k?.width ? { width: k.width } : { flex: 1 }} key={j as number}>
-                  {k.render
-                    ? k.render && k.render(getData(item, k.key, k, i), item, i)
-                    : getData(item, k.key, k, i)}
+          })
+        ) : (
+          <Empty>
+            <div>
+              <div className="emptyBox">
+                <Icon name="display" size={56} />
+                <div className="text">
+                  <span>暂无数据</span>
                 </div>
-              ))}
-            </Row>
-          )
-        })}
+              </div>
+            </div>
+          </Empty>
+        )}
       </TableBody>
       {renderFooter?.()}
     </DragTable>

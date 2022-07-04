@@ -41,7 +41,7 @@ const ApiMenu = observer((props: JobMenuProps) => {
 
   useEffect(() => {
     if (data) {
-      const tree = get(data, 'infos', []).map((item) => ({
+      const tree = get(data, 'infos', [])?.map((item) => ({
         ...item,
         key: item.id,
         pid: item.id,
@@ -125,6 +125,7 @@ const ApiMenu = observer((props: JobMenuProps) => {
           <div tw="border-b dark:border-neut-15">
             <div tw="mt-3 px-2 flex items-center">
               <InputSearch
+                tw="border-2 rounded-sm  dark:border-neut-15"
                 placeholder="搜索API/AP分组名称"
                 onPressEnter={(evt) => {
                   handleSearch((evt.target as HTMLInputElement).value)

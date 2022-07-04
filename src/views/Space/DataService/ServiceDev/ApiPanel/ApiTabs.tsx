@@ -161,7 +161,12 @@ const ApiTabs = observer(() => {
             label={
               <div tw="inline-flex items-center justify-center">
                 <IconWrapper tw="mr-2">
-                  <Icon name="q-apiFill" color={{ secondary: '#ffd0275d', primary: '#fff' }} />
+                  <Icon
+                    className="apiIcon"
+                    tw="mx-[2px]!"
+                    name="q-apiFill"
+                    color={{ secondary: '#ffd0275d', primary: '#fff' }}
+                  />
                 </IconWrapper>
                 <div>{api.api_name}</div>
               </div>

@@ -126,6 +126,8 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     operation
   )
 
+  const dataSource = get(data, 'entities', [])
+
   return (
     <FlexBox tw="w-full flex-1" orient="column">
       <div tw="mb-3">
@@ -169,7 +171,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
         </FlexBox>
       </div>
       <Table
-        dataSource={get(data, 'entities', [])}
+        dataSource={dataSource || []}
         loading={false}
         columns={columns}
         rowKey="id"

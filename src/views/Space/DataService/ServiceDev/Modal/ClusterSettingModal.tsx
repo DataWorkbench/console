@@ -1,11 +1,18 @@
 import { useRef, useState } from 'react'
-import { AffixLabel, ButtonWithClearField, DarkModal, ModalContent } from 'components'
+import {
+  AffixLabel,
+  ButtonWithClearField,
+  Center,
+  DarkModal,
+  ModalContent,
+  PopConfirm
+} from 'components'
 import { get, isEmpty } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useMutationPingSyncJobConnection, useStore } from 'hooks'
 import { Form, Button, Icon, Alert } from '@QCFE/lego-ui'
-import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
+import ClusterTableModal from './ClusterTableModal'
 
 const Root = styled.div`
   ${tw`text-white space-y-2 mb-5`}
@@ -48,7 +55,7 @@ export const JobModal = observer(() => {
   const mutation = useMutationPingSyncJobConnection()
   const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
-  const clusterName = get(cluster, 'name')
+  const clusterName = get(cluster, 'name', '')
   const [visible, setVisible] = useState(false)
   const form = useRef<Form>(null)
 
@@ -57,6 +64,7 @@ export const JobModal = observer(() => {
   const onClose = () => {
     dtsDevStore.set({ showClusterSetting: false })
   }
+  console.log(cluster, 'clustercluster', clusterId)
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
@@ -71,6 +79,8 @@ export const JobModal = observer(() => {
       title="服务集群"
       width={800}
       onCancel={onClose}
+      maskClosable={false}
+      closable={false}
       footer={
         <div tw="flex justify-end space-x-2">
           <Button onClick={onClose}>取消</Button>
@@ -92,6 +102,7 @@ export const JobModal = observer(() => {
             <ButtonWithClearField
               clearable={!!cluster}
               name="cluster"
+              popConfirm={<PopConfirm type="warning" content="请确认是否移除服务集群？" />}
               icon={<Icon name="pod" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />}
               value={clusterId}
               placeholder="选择服务集群"
@@ -103,6 +114,10 @@ export const JobModal = observer(() => {
               label={<AffixLabel required>服务集群</AffixLabel>}
             >
               {clusterName || clusterId}
+              <Center tw="space-x-1">
+                <span tw="ml-1">{clusterName}</span>
+                <span tw="text-neut-8">(ID:{clusterId})</span>
+              </Center>
             </ButtonWithClearField>
           </Form>
         </FormWrapper>

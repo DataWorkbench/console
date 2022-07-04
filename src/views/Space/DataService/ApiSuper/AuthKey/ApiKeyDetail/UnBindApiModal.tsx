@@ -118,7 +118,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           {selectKey.length === 1
             ? `与解绑 API 服务组后，密钥将不在限制访问，请谨慎操作。确认解绑API 服务组 ${selectKey[0]}`
             : `与以下 ${
-                get(dataSource, 'entities', []).length
+                get(dataSource, 'entities', [])?.length
               } 个 API 服务组解绑后，密钥将不在限制访问，请谨慎操作。确认解绑以下 API 服务组?`}
         </div>
         {selectKey.length > 1 && (

@@ -1,6 +1,15 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { Mapping } from 'utils/types'
 import { StatusBarEnum } from 'components/StatusBar'
+import { createEnhancedEnum } from 'utils'
+
+interface IStatusEnum {
+  [key: string]: {
+    label: string
+    value: any
+    style: number
+  }
+}
 
 function getField<T>(mapping: Mapping<T>): IColumn[] {
   return Array.from(mapping.values()).map((i) => ({
@@ -9,10 +18,14 @@ function getField<T>(mapping: Mapping<T>): IColumn[] {
     key: i.apiField
   }))
 }
-export const StopClusterTableFieldMapping: Mapping<'name' | 'domain' | 'desc'> = new Map()
-  .set('name', { label: '服务组名称 / ID', apiField: 'name' })
-  .set('domain', { label: '域名', apiField: 'domain' })
-  .set('desc', { label: '描述', apiField: 'desc' })
+export const StopClusterTableFieldMapping: Mapping<
+  'name' | 'api_id' | 'api_path' | 'path' | 'desc'
+> = new Map()
+  .set('name', { label: 'APP名称 / ID', apiField: 'api_name' })
+  .set('api_id', { label: '版本ID', apiField: 'api_id' })
+  .set('api_path', { label: 'API服务组', apiField: 'api_path' })
+  .set('path', { label: 'API访问路径', apiField: 'api_path' })
+  .set('desc', { label: '描述', apiField: 'api_description' })
 
 export const StopClusterTableColumns: IColumn[] = getField(StopClusterTableFieldMapping)
 
@@ -29,26 +42,35 @@ export const ClusterFieldMapping: Mapping<'status' | 'name' | 'cu' | 'last_updat
 // eslint-disable-next-line import/prefer-default-export
 export const ClusterColumns: IColumn[] = getField(ClusterFieldMapping)
 
-export const getStatusNumber = new Map()
-  .set(1, 'error')
-  .set(2, 'pending')
-  .set(3, 'stop')
-  .set(4, 'arrearage')
-
-export const StatusMap = new Map()
-  .set('error', {
-    label: '异常',
-    style: StatusBarEnum.red
-  })
-  .set('pending', {
-    label: '启动中',
-    style: StatusBarEnum.green
-  })
-  .set('stop', {
-    label: '已停用',
+export const StatusEnum = createEnhancedEnum<IStatusEnum>({
+  DELETED: {
+    label: '已删除',
+    value: 1,
     style: StatusBarEnum.gray
-  })
-  .set('arrearage', {
+  },
+  RUNNING: {
+    label: '运行中',
+    value: 2,
+    style: StatusBarEnum.green
+  },
+  STOPPED: {
+    label: '已停用',
+    value: 3,
+    style: StatusBarEnum.gray
+  },
+  STARTING: {
+    label: '启动中',
+    value: 4,
+    style: StatusBarEnum.blue
+  },
+  EXCEPTION: {
+    label: '异常',
+    value: 5,
+    style: StatusBarEnum.red
+  },
+  ARREARS: {
     label: '欠费',
+    value: 6,
     style: StatusBarEnum.purple
-  })
+  }
+})

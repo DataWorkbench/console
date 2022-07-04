@@ -1,8 +1,9 @@
 import { Select, Button, Alert } from '@QCFE/lego-ui'
-import { DargTable, HelpCenterLink } from 'components'
+import { DargTable, HelpCenterLink, Center, Tooltip } from 'components'
+
 import React, { useCallback, useMemo } from 'react'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { OrderText } from 'views/Space/DataService/ServiceDev/styled'
+import { OrderText, TitleInformation } from 'views/Space/DataService/ServiceDev/styled'
 import { useImmer } from 'use-immer'
 import update from 'immutability-helper'
 import { FlexBox } from 'components/Box'
@@ -94,7 +95,7 @@ const FieldOrder = observer(() => {
         $push: [
           {
             name: '',
-            order: ''
+            order: 'ascOrder'
           }
         ]
       })
@@ -103,8 +104,17 @@ const FieldOrder = observer(() => {
 
   const columnsRender = {
     [getName('index')]: {
-      title: <span>序号</span>,
-      width: 100,
+      title: (
+        <TitleInformation>
+          <span>序号</span>
+          <Tooltip theme="light" hasPadding content="序号序号序号序号序号序号">
+            <Center>
+              <Icon name="information" size={16} />
+            </Center>
+          </Tooltip>
+        </TitleInformation>
+      ),
+      width: 120,
       render: (_: any, record: any, index: number) => <OrderText>{index}</OrderText>
     },
     [getName('name')]: {
@@ -136,10 +146,11 @@ const FieldOrder = observer(() => {
               })
             }}
           />
-          <div css={[tw`px-2 hidden opacity-0  ml-24`, tw`block group-hover:opacity-100`]}>
-            <Button type="text" onClick={() => delRow(index)}>
-              <Icon name="trash" clickable type="dark" />
-            </Button>
+          <div
+            css={[tw`px-2 hidden opacity-0  ml-24`, tw`block group-hover:opacity-100`]}
+            onClick={() => delRow(index)}
+          >
+            <Icon name="trash" clickable />
           </div>
         </>
       )

@@ -5,7 +5,6 @@ import { MoreAction, FlexBox, Center, Modal, TextEllipsis, StatusBar } from 'com
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
 import { get, omitBy } from 'lodash-es'
-import dayjs from 'dayjs'
 import tw, { css } from 'twin.macro'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
@@ -18,10 +17,22 @@ import {
   ClusterListInfo,
   getQueryKeyListDataServiceClusters
 } from 'hooks/useDataService'
+import { useParams } from 'react-router-dom'
+import { formatDate } from 'utils'
 import NewClusterModal from './ClusterModal'
-import { ClusterColumns, StatusMap, getStatusNumber, ClusterFieldMapping } from './constants'
-
+import { ClusterColumns, ClusterFieldMapping, StatusEnum } from './constants'
 import StopClusterModal from './StopClusterModal'
+
+interface IRouteParams {
+  regionId: string
+  spaceId: string
+}
+
+interface ClusterTableProps {
+  selectMode?: boolean
+  selectedIds?: string[]
+  onSelect?: (clusterId?: any[]) => void
+}
 
 const { ColumnsSetting } = ToolBar as any
 
@@ -54,8 +65,10 @@ const getOptionText = (option: OP, id: string | undefined) => {
 
 const columnSettingsKey = 'DATA_SERVICE_CLUSTER_TABLE'
 
-const ClusterTable = observer(() => {
+const ClusterTable = observer((props: ClusterTableProps) => {
+  const { selectMode = false, selectedIds = [], onSelect } = props
   const queryClient = useQueryClient()
+  const { spaceId } = useParams<IRouteParams>()
 
   const {
     dtsStore: { setDataServiceOp, dataServiceOp }
@@ -71,13 +84,21 @@ const ClusterTable = observer(() => {
     Record<ReturnType<typeof getName>, number | string | boolean>,
     { pagination: true; sort: true }
   >(
-    { sort_by: getName('last_updated'), reverse: true },
+    { sort_by: getName('last_updated'), reverse: true, offset: 0, limit: 10 },
     { pagination: true, sort: true },
     columnSettingsKey
   )
 
-  const { isRefetching, data } = useQueryListDataServiceClusters(
-    omitBy(filter, (v) => v === '') as any
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>(selectedIds)
+
+  const { isRefetching, isLoading, data } = useQueryListDataServiceClusters(
+    {
+      uri: { space_id: spaceId },
+      params: omitBy(filter, (v) => v === '') as any
+    },
+    {
+      refetchInterval: 60 * 1000
+    }
   )
 
   const mutation = useMutationDataServiceCluster()
@@ -98,9 +119,6 @@ const ClusterTable = observer(() => {
       op: dataServiceOp,
       clusterId: opClusterList?.id
     }
-    if (dataServiceOp === 'delete') {
-      // TODO: 查服务集群对应的已发布api， 并弹出弹框
-    }
     mutation.mutate(params, {
       onSuccess: () => {
         setDataServiceOp('')
@@ -108,6 +126,12 @@ const ClusterTable = observer(() => {
       }
     })
   }
+
+  useEffect(() => {
+    if (selectMode) {
+      setSelectedRowKeys(selectedIds)
+    }
+  }, [selectMode, selectedIds])
 
   const handleMenuClick = (record: ClusterListInfo, key: string) => {
     if (key === 'update') {
@@ -120,9 +144,9 @@ const ClusterTable = observer(() => {
   }
 
   const getActions = (row: ClusterListInfo) => {
-    const result = [
+    let result = [
       {
-        text: '恢复',
+        text: '重启',
         icon: 'restart',
         key: 'reload',
         value: row
@@ -143,18 +167,33 @@ const ClusterTable = observer(() => {
         text: '修改',
         icon: 'edit',
         key: 'update',
+        disabled: [StatusEnum.RUNNING].includes(row.status),
         value: row,
         help: '如需修改，请先停用服务集群'
       },
       {
         text: '删除',
         icon: 'if-trash',
-        disabled: row.status === 1,
+        disabled: [StatusEnum.RUNNING].includes(row.status),
         key: 'delete',
         value: row,
         help: '如需删除，请先停用服务集群'
       }
     ]
+
+    if (row.status === StatusEnum.STOPPED) {
+      result = result.filter((item) => ['start', 'update', 'delete'].includes(item.key))
+    } else if (row.status === StatusEnum.RUNNING) {
+      result = result.filter((item) => ['stop', 'update', 'delete'].includes(item.key))
+    } else if (row.status === StatusEnum.EXCEPTION) {
+      result = result.filter((item) => ['reload', 'delete'].includes(item.key))
+    } else if (row.status === StatusEnum.STARTING) {
+      result = result.filter((item) => [''].includes(item.key))
+    } else if (row.status === StatusEnum.ARREARS) {
+      result = result.filter((item) => ['reload', 'update', 'delete'].includes(item.key))
+    } else if (row.status === StatusEnum.DELETED) {
+      result = result.filter((item) => [''].includes(item.key))
+    }
     return result
   }
 
@@ -178,17 +217,15 @@ const ClusterTable = observer(() => {
     [getName('status')]: {
       render: (v: number) => (
         <StatusBar
-          type={StatusMap.get(getStatusNumber.get(v))?.style}
-          label={StatusMap.get(getStatusNumber.get(v))?.label}
+          type={StatusEnum.getEnum(StatusEnum.getLabel(v) as string)?.style}
+          label={StatusEnum.getEnum(StatusEnum.getLabel(v) as string)?.label}
           isWrapper={false}
         />
       )
     },
     [getName('last_updated')]: {
       ...getSort(getName('last_updated')),
-      render: (v: number, row: any) => (
-        <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
-      )
+      render: (v: number, row: any) => <span tw="dark:text-neut-0">{formatDate(row.updated)}</span>
     }
   }
 
@@ -205,8 +242,10 @@ const ClusterTable = observer(() => {
     columnSettingsKey,
     ClusterColumns,
     columnsRender,
-    operation
+    !selectMode ? operation : undefined
   )
+
+  const infos = get(data, 'infos', []) || []
 
   return (
     <FlexBox tw="w-full flex-1" orient="column">
@@ -224,7 +263,7 @@ const ClusterTable = observer(() => {
               placeholder="请输入关键词进行搜索"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
-                  draft.search = (e.target as HTMLInputElement).value
+                  draft.name = (e.target as HTMLInputElement).value
                   draft.offset = 0
                 })
               }}
@@ -232,7 +271,7 @@ const ClusterTable = observer(() => {
                 setFilter((draft) => {
                   if (draft.search) {
                     draft.offset = 0
-                    draft.search = ''
+                    draft.name = ''
                   }
                 })
               }}
@@ -257,8 +296,21 @@ const ClusterTable = observer(() => {
       </div>
 
       <Table
-        dataSource={get(data, 'infos', [])}
-        loading={false}
+        dataSource={infos}
+        selectType={selectMode && 'radio'}
+        selectedRowKeys={selectedRowKeys}
+        onSelect={(keys: string[]) => {
+          setSelectedRowKeys(keys)
+          if (onSelect) {
+            onSelect(infos.filter((info: any) => keys.includes(info.id)))
+          }
+        }}
+        disabledRowKeys={
+          selectMode
+            ? infos.filter((info) => info.status !== StatusEnum.RUNNING).map((info) => info.id)
+            : []
+        }
+        loading={isLoading}
         columns={columns}
         rowKey="id"
         pagination={{
@@ -316,7 +368,10 @@ const ClusterTable = observer(() => {
         </Modal>
       )}
       {dataServiceOp === 'stop' && (
-        <StopClusterModal selectKey={opClusterList} onCancel={() => setDataServiceOp('')} />
+        <StopClusterModal
+          cluster={opClusterList as ClusterListInfo}
+          onCancel={() => setDataServiceOp('')}
+        />
       )}
     </FlexBox>
   )

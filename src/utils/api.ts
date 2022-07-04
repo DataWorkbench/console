@@ -35,13 +35,14 @@ async function fetchData(url = '', data = {}) {
   return response.json() // parses JSON response into native JavaScript objects
 }
 
+const regExp = /(service|gateway)/g
+const isMock = false // TODO: 是否使用mock
 export const apiRequest =
   <T extends keyof typeof apiList>(manage: T, item: keyof typeof apiList[T]) =>
   <U extends RequestParams>(params: U) => {
     const [method, url] = apiList[manage][item] as unknown as ['GET' | 'POST' | 'PUT', string]
     const [uri] = compilePath(url, { ...params.uri })
-    // TODO:
-    if (uri.match(/(service|gateway)/g)) {
+    if (uri.match(regExp) && isMock) {
       return fetchData(uri, {
         method,
         query: params.params,

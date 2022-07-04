@@ -16,6 +16,7 @@ export interface ApiProps {
   api_path: string
   space_id: string
   status?: number
+  group_id?: string
   [key: string]: any
 }
 

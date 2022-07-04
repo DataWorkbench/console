@@ -1,6 +1,10 @@
 import { observer } from 'mobx-react-lite'
 import { useImmer } from 'use-immer'
-import { useQueryDescribeDataSourceTables, useQueryDescribeDataSourceTableSchema } from 'hooks'
+import {
+  useQueryDescribeDataSourceTables,
+  useQueryDescribeDataSourceTableSchema,
+  useQueryDescribeServiceDataSourceKinds
+} from 'hooks'
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
@@ -13,23 +17,17 @@ import {
 } from 'components'
 import { useState, useMemo, useEffect } from 'react'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { findKey, get, isEmpty, pick } from 'lodash-es'
+import { cloneDeep, findKey, get, isEmpty, pick } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
 import { dataSourceTypes } from '../constants'
 import { tableSelectStyled } from '../styled'
 
-type SourceDataType = { id: string; name: string; networkId: string } | null
+type SourceDataType = { id: string; name: string; networkId?: string } | null
 interface IRouteParams {
   regionId: string
   spaceId: string
 }
-
-const dataSourceOption = [
-  { label: 'MySQL', value: 1 },
-  { label: 'ClickHouse', value: 5 },
-  { label: 'PostgreSQL', value: 2 }
-]
 
 const { SelectField } = Form
 
@@ -48,8 +46,35 @@ const SyncDataSource = observer(
     })
 
     const {
-      dtsDevStore: { setSchemaColumns }
+      dtsDevStore,
+      dtsDevStore: { setSchemaColumns, apiConfigData }
     } = useStore()
+
+    // 启动后回显数据
+    useEffect(() => {
+      if (apiConfigData) {
+        const data = cloneDeep(get(apiConfigData, 'api_config'))
+        if (!data) return
+        setSourceData((draft) => {
+          draft.type = get(data, 'dataSourceType', '') // TODO: 后端接口没有返回数据源类型
+          draft.tableName = get(data, 'table_name', '')
+          draft.source = { id: get(data, 'datasource_id', ''), name: '' } // TODO: 后端接口没有返回数据源
+        })
+      }
+    }, [apiConfigData, setSourceData])
+
+    const { data: kindsData } = useQueryDescribeServiceDataSourceKinds({
+      uri: { space_id: spaceId }
+    })
+
+    const dataSourceOption = useMemo(
+      () =>
+        kindsData?.kinds.map(({ type, name }: { type: number; name: string }) => ({
+          value: type,
+          label: name
+        })),
+      [kindsData?.kinds]
+    )
 
     const paramsTable = { uri: { space_id: spaceId, source_id: sourceData.source?.id || '' } }
     const tablesRet = useQueryDescribeDataSourceTables(paramsTable, {
@@ -100,6 +125,23 @@ const SyncDataSource = observer(
     const handleSelectDb = (data: SourceDataType) => {
       setSourceData((draft) => {
         draft.source = data
+      })
+    }
+
+    // 同步数据源到mobx
+    const handleSync = (tableName: string) => {
+      const config = {
+        ...apiConfigData,
+        api_config: {
+          ...apiConfigData?.api_config,
+          dataSourceType: sourceData.type,
+          datasource_id: sourceData.source?.id,
+          table_name: tableName
+        }
+      }
+
+      dtsDevStore.set({
+        apiConfigData: config
       })
     }
 
@@ -169,6 +211,7 @@ const SyncDataSource = observer(
                 setSourceData((draft) => {
                   draft.tableName = v
                 })
+                handleSync(v)
               }}
               css={tableSelectStyled}
               validateOnChange

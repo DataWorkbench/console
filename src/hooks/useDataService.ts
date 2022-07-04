@@ -3,10 +3,13 @@ import { useMutation, useQueryClient } from 'react-query'
 import { apiRequest } from 'utils/api'
 import { merge } from 'lodash-es'
 import { useCallback } from 'react'
+import { request } from 'utils'
+import { PbmodelApiConfig, PbmodelApiGroup } from 'types/types'
 import { apiHooks, queryKeyObj } from './apiHooks'
 import {
   ListApiGroupsRequestType,
   ListDataSourcesRequestType,
+  PingDataSourceConnectionRequestType,
   DescribeDataSourceRequestType,
   DescribeDataSourceTableSchemaRequestType,
   ListDataServiceClustersRequestType,
@@ -17,16 +20,14 @@ import {
   DataServiceManageListDataServiceClustersType,
   DataServiceManageListApiGroupsType,
   DataSourceManageCreateDataSourceType,
+  DataServiceManageDescribeServiceDataSourceKindsType,
   DataSourceManageDescribeDataSourceTablesType,
   DataSourceManageDescribeDataSourceTableSchemaType,
-  DataServiceManageDescribeApiConfigType,
   ServiceGatewayListApiServicesType,
   ServiceGatewayListRoutesType
 } from '../types/response'
 
-import { PbmodelApiGroup } from '../types/types'
-
-type Options = 'createApiGroup' | 'createApi'
+type Options = 'createApiGroup' | 'createApi' | 'updateApi'
 type AuthKeyOp = 'create' | 'update' | 'delete' | 'bind' | 'unbind'
 interface IParams {
   regionId: string
@@ -37,6 +38,12 @@ interface IParams {
 interface IRouteParams {
   regionId: string
   spaceId: string
+}
+
+interface IApiConfigParams {
+  regionId: string
+  spaceId: string
+  groupId: string
 }
 
 /**
@@ -76,7 +83,7 @@ export const DeleteDataServiceCluster = async ({
 }: IParams) => {
   const params = merge(
     { regionId, uri: { space_id: spaceId } },
-    { data: rest, cluster_id: [clusterId] }
+    { data: { cluster_ids: [clusterId], ...rest } }
   )
   return apiRequest('dataServiceManage', 'deleteDataServiceClusters')(params)
 }
@@ -120,10 +127,41 @@ export const useMutationDataServiceCluster = () => {
     return ret
   })
 }
+export const listPublishedApiVersionsByClusterId = async ({
+  regionId,
+  spaceId,
+  clusterId,
+  ...rest
+}: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId, cluster_id: clusterId } },
+    { data: rest }
+  )
+  console.log(params, 'params')
+
+  return apiRequest('dataServiceManage', 'listPublishedApiVersionsByClusterId')(params)
+}
+
+export const useMutationListPublishedApiVersionsByClusterId = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ ...rest }: { [key: string]: any }) => {
+    let ret = null
+    const params = {
+      ...rest,
+      regionId,
+      spaceId
+    }
+    ret = await listPublishedApiVersionsByClusterId(params)
+    return ret
+  })
+}
 
 /**
  *  服务开发
  */
+
+export const getQueryKeyListApiGroups = () => queryKeyObj.listApiGroups
 
 export const useQueryListApiGroups = apiHooks<
   'dataServiceManage',
@@ -133,10 +171,11 @@ export const useQueryListApiGroups = apiHooks<
 
 export type ListApiGroupInfo = PbmodelApiGroup
 
-export const getListApiConfigs = async ({ regionId, spaceId, clusterId, ...rest }: IParams) => {
-  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
-  return apiRequest('dataServiceManage', 'listApiConfigs')(params)
-}
+export const getListApiConfigs = ({ regionId, spaceId, groupId }: IApiConfigParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/dataservice/config?group_id=${groupId}`
+  })
 
 export const useFetchApi = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
@@ -149,12 +188,36 @@ export const useFetchApi = () => {
         search: '',
         ...filter
       }
+
       return queryClient.fetchQuery(['api', params], async () => getListApiConfigs(params), {
         ...options
       })
     },
     [queryClient, regionId, spaceId]
   )
+}
+
+export const UpdateApiConfig = async ({ regionId, spaceId, apiId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, api_id: apiId } }, { data: rest })
+  console.log(params, 'params')
+
+  return apiRequest('dataServiceManage', 'updateApiConfig')(params)
+}
+
+export const useMutationUpdateApiConfig = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      apiId,
+      regionId,
+      spaceId,
+      ...rest
+    }
+    ret = await UpdateApiConfig(params)
+    return ret
+  })
 }
 
 export const CreateApiGroup = async ({ regionId, spaceId, ...rest }: IParams) => {
@@ -170,18 +233,22 @@ export const CreateApiConfig = async ({ regionId, spaceId, ...rest }: IParams) =
 export const useMutationApiService = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
 
-  return useMutation(async ({ option, ...rest }: { option: Options; clusterId?: string }) => {
+  return useMutation(async ({ option, apiId, ...rest }: Record<string, any>) => {
     let ret = null
+    const op: Options = option as Options
     const params = {
       ...rest,
+      apiId,
       regionId,
       spaceId
     }
 
-    if (option === 'createApiGroup') {
+    if (op === 'createApiGroup') {
       ret = await CreateApiGroup(params)
-    } else if (option === 'createApi') {
+    } else if (op === 'createApi') {
       ret = await CreateApiConfig(params)
+    } else if (op === 'updateApi') {
+      ret = await UpdateApiConfig(params)
     }
     return ret
   })
@@ -192,12 +259,12 @@ export const useMutationListApiConfigs = () => {
 
   return useMutation(async ({ group_id }: { group_id: string }) => {
     let ret = null
-    const params = {
-      group_id,
+    const paramsData = {
+      groupId: group_id,
       regionId,
       spaceId
     }
-    ret = await getListApiConfigs(params)
+    ret = await getListApiConfigs(paramsData)
     return ret
   })
 }
@@ -207,7 +274,7 @@ export const DescribeApiConfig = async ({ regionId, spaceId, apiId, ...rest }: I
   return apiRequest('dataServiceManage', 'describeApiConfig')(params)
 }
 
-export type DataServiceManageDescribeApiConfig = DataServiceManageDescribeApiConfigType
+export type DataServiceManageDescribeApiConfig = PbmodelApiConfig
 export const useFetchApiConfig = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const queryClient = useQueryClient()
@@ -226,23 +293,27 @@ export const useFetchApiConfig = () => {
   )
 }
 
-export const UpdateApiConfig = async ({ regionId, spaceId, apiId, ...rest }: IParams) => {
-  const params = merge({ regionId, uri: { space_id: spaceId, api_id: apiId } }, { data: rest })
-  return apiRequest('dataServiceManage', 'updateApiConfig')(params)
+// 删除api
+export const DeleteApiConfigs = async ({ regionId, spaceId, apiIds, ...rest }: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId } },
+    { data: { ...rest, api_ids: apiIds } }
+  )
+  return apiRequest('dataServiceManage', 'deleteApiConfigs')(params)
 }
 
-export const useMutationUpdateApiConfig = () => {
+export const useMutationDeleteApiConfigs = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
 
-  return useMutation(async ({ apiId, ...rest }: Record<string, any>) => {
+  return useMutation(async ({ apiIds, ...rest }: Record<string, any>) => {
     let ret = null
     const params = {
-      apiId,
+      apiIds,
       regionId,
       spaceId,
       ...rest
     }
-    ret = await UpdateApiConfig(params)
+    ret = await DeleteApiConfigs(params)
     return ret
   })
 }
@@ -265,6 +336,14 @@ export const useQueryDescribeDataSourceTableSchema = apiHooks<
   DescribeDataSourceTableSchemaRequestType,
   DataSourceManageDescribeDataSourceTableSchemaType
 >('dataSourceManage', 'describeDataSourceTableSchema')
+
+// 数据源类型
+
+export const useQueryDescribeServiceDataSourceKinds = apiHooks<
+  'dataServiceManage',
+  PingDataSourceConnectionRequestType,
+  DataServiceManageDescribeServiceDataSourceKindsType
+>('dataServiceManage', 'describeServiceDataSourceKinds')
 
 /**
  *  API 管理

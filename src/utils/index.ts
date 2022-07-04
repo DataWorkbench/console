@@ -3,6 +3,8 @@ import request from './request'
 import customRequest from './customRequest'
 import emitter from './emitter'
 
+export * from './createEnhancedEnum'
+
 export * from './convert'
 
 export const getHelpCenterLink = (path: string) => {

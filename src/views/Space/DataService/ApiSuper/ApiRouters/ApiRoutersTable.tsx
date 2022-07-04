@@ -122,6 +122,8 @@ const ApiGroupTable = () => {
     operation
   )
 
+  const dataSource = get(data, 'entities') || []
+
   return (
     <FlexBox tw="w-full flex-1" orient="column">
       <div tw="mb-3">
@@ -182,7 +184,7 @@ const ApiGroupTable = () => {
         onSelect={(keys: string[]) => {
           setSelectedRowKeys(keys)
         }}
-        dataSource={get(data, 'entities', [])}
+        dataSource={dataSource}
         loading={false}
         columns={columns}
         rowKey="id"

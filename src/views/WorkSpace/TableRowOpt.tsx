@@ -5,14 +5,14 @@ import { useWorkSpaceContext } from 'contexts'
 import { Tooltip } from 'components'
 import { OptButton } from './styled'
 
-const { MenuItem, SubMenu } = Menu
+const { MenuItem, SubMenu } = Menu as any
 
 const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
   const stateStore = useWorkSpaceContext()
   const {
-    workSpaceStore: { funcList },
+    workSpaceStore: { funcList }
   } = useStore()
-  const handleClick = (e: React.SyntheticEvent, key, value: string) => {
+  const handleClick = (e: React.SyntheticEvent, _key: any, value: string) => {
     stateStore.set({ curSpaceOpt: value, optSpaces: [space] })
   }
   const disableStatus = space.status === 2
@@ -26,9 +26,7 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
           content={
             <>
               {disableStatus ? (
-                <div tw="px-3 py-2">
-                  该工作空间已被禁用，暂时无法操作其工作项
-                </div>
+                <div tw="px-3 py-2">该工作空间已被禁用，暂时无法操作其工作项</div>
               ) : (
                 <Menu mode="inline" defaultExpandKeys={['stream']}>
                   {subFuncList.map((subFunc: any) => {

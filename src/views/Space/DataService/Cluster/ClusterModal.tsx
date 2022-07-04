@@ -121,7 +121,8 @@ const ClusterModal = observer(
         const paramsData = assign(
           {
             op: dataServiceOp,
-            ...params
+            name: params.name,
+            resource_spec: params.resource_spec
           },
           opWork && { clusterId: opWork.id }
         )

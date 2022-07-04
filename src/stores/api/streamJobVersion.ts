@@ -11,58 +11,53 @@ export const listStreamJobVersions = ({
   spaceId,
   jobId,
   ...rest
-}: IStreamVersionParams) => {
-  return request({
+}: IStreamVersionParams) =>
+  request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version`,
-    query: rest,
+    query: rest
   })
-}
 
 export const getDescribeStreamJobVersion = ({
   regionId,
   spaceId,
   jobId,
-  versionId,
-}: IStreamVersionParams) => {
-  return request({
+  versionId
+}: IStreamVersionParams) =>
+  request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${versionId}`,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${versionId}`
   })
-}
 
 export const getStreamJobVersionSchedule = ({
   regionId,
   spaceId,
   jobId,
-  versionId,
-}: IStreamVersionParams) => {
-  return request({
+  versionId
+}: IStreamVersionParams) =>
+  request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${versionId}/schedule`,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${versionId}/schedule`
   })
-}
 
 export const getStreamJobVersionArgs = ({
   regionId,
   spaceId,
   jobId,
-  versionId,
-}: IStreamVersionParams) => {
-  return request({
+  versionId
+}: IStreamVersionParams) =>
+  request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${versionId}/args`,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/version/${versionId}/args`
   })
-}
 
 export const getStreamJobVersionCode = ({
   regionId,
   spaceId,
   jobIId,
-  versionId,
-}: IStreamVersionParams) => {
-  return request({
+  versionId
+}: IStreamVersionParams) =>
+  request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/stream/job/${jobIId}/version/${versionId}/code`,
+    uri: `/v1/workspace/${spaceId}/stream/job/${jobIId}/version/${versionId}/code`
   })
-}

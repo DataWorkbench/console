@@ -3,17 +3,15 @@ import { observer } from 'mobx-react-lite'
 import { Icon, Menu } from '@QCFE/lego-ui'
 import { Tree } from 'components'
 import tw, { css, styled } from 'twin.macro'
-import { useImmer } from 'use-immer'
 import { useFetchApi } from 'hooks'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { useUnmount } from 'react-use'
 import { cloneDeep, get } from 'lodash-es'
 import { useStore } from 'stores'
-import { TreeNodeProps } from 'rc-tree'
 import { useParams } from 'react-router-dom'
 import { ApiProps } from 'stores/DtsDevStore'
-import { JobType, getNewTreeData, renderIcon, renderSwitcherIcon } from './ApiUtils'
+import { getNewTreeData, renderIcon, renderSwitcherIcon } from './ApiUtils'
 import ApiModal from '../Modal/ApiModal'
 import DelModal from '../Modal/DelModal'
 
@@ -63,29 +61,20 @@ export const ApiTree = observer(
     } = useStore()
 
     const [expandedKeys, setExpandedKeys] = useState<string[]>(expandedKeysProp || [])
-    const [curOpNode, setCurOpNode] = useState(treeData[1])
+    const [curOpNode, setCurOpNode] = useState(treeData?.length > 0 ? treeData[0] : null)
     const [autoExpandParent, setAutoExpandParent] = useState(false)
     const [selectedKeys, setSelectedKeys] = useState<string[]>([])
     const treeEl = useRef(null)
     const [visible, setVisible] = useState<any>(null)
     const [curOp, setCurOp] = useState<string>('')
     const [currentApi, setCurrentApi] = useState<ApiProps>()
+    const [currentGroupId, setCurrentGroupId] = useState<string>()
     const [showApiModal, setShowApiModal] = useState<boolean>()
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>()
 
     const [search, setSearch] = useState('')
-    const [jobInfo, setJobInfo] = useImmer<{
-      op: 'create' | 'edit'
-      type?: JobType
-      node?: TreeNodeProps
-    }>({
-      op: 'create',
-      type: JobType.OFFLINE,
-      node: undefined
-    })
 
     useUnmount((): void => {
-      console.log(jobInfo)
       dtsDevStore.resetTreeData()
     })
 
@@ -100,13 +89,6 @@ export const ApiTree = observer(
     }, [curApi])
 
     useImperativeHandle(ref, () => ({
-      reset: () => {
-        setJobInfo({
-          op: 'create',
-          type: JobType.OFFLINE,
-          node: undefined
-        })
-      },
       search: (v: string) => {
         dtsDevStore.resetTreeData()
         setSearch(v)
@@ -123,7 +105,8 @@ export const ApiTree = observer(
     }, [])
 
     const onRightMenuClick = useCallback(
-      (e, key: string, val: CurOpProps, api?: ApiProps) => {
+      (e, key: string, val: CurOpProps, api?: ApiProps | null, groupId?: string) => {
+        if (groupId) setCurrentGroupId(groupId)
         if (api) setCurrentApi(api)
         setCurOp(val)
         if (val === 'createAPI') {
@@ -151,7 +134,7 @@ export const ApiTree = observer(
     const fetchJobTreeData = (node: any, movingNode = null) => {
       const rootKey = node.key === node.pid ? node.key : node.rootKey
       return fetchApi({
-        group_id: rootKey,
+        groupId: rootKey,
         search
       })
         .then((data) => {
@@ -173,7 +156,11 @@ export const ApiTree = observer(
         }
         if (!node.isLeaf) {
           return (
-            <Menu onClick={onRightMenuClick}>
+            <Menu
+              onClick={(e: any, key: string, val: string | number) =>
+                onRightMenuClick(e, key, val as CurOpProps, null, get(node, 'key', ''))
+              }
+            >
               <MenuItem value="createAPI">
                 <Icon name="edit" size={14} type="light" />
                 <span>创建API</span>
@@ -187,7 +174,7 @@ export const ApiTree = observer(
         }
         return (
           <Menu
-            onClick={(e, key: string, val: string | number) =>
+            onClick={(e: any, key: string, val: string | number) =>
               onRightMenuClick(e, key, val as CurOpProps, get(node, 'api', ''))
             }
           >
@@ -308,6 +295,8 @@ export const ApiTree = observer(
         {showDeleteModal && (
           <DelModal
             onClose={() => setShowDeleteModal(false)}
+            currentApiId={currentApi?.api_id}
+            currentGroupId={currentGroupId}
             isApiGroup={curOp === 'deleteApiGroup'}
           />
         )}

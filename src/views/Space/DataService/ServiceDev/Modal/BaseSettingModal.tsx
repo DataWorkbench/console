@@ -1,13 +1,14 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useImmer } from 'use-immer'
 import { AffixLabel, DarkModal, ModalContent } from 'components'
-import { get } from 'lodash-es'
+import { cloneDeep, get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
-import { strlen } from 'utils'
-import { Checkbox, Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
+import { strlen, formatDate } from 'utils'
+import { Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
+import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
 
@@ -47,26 +48,56 @@ export interface JobModalData {
 export const JobModal = observer(() => {
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
-    apiMode: '',
-    apiGroupName: '',
-    apiName: '',
-    apiPath: '/',
-    apiAgreement: '',
-    isCross: false,
-    methods: '',
-    responseType: 'json',
-    Desc: ''
+    group_name: '',
+    api_id: '',
+    api_name: '',
+    api_path: '/',
+    group_path: '/',
+    protocols: Protocol.HTTP,
+    cross_domain: false,
+    request_method: RequestMethods.GET,
+    response_type: ResponseMethods.JSON,
+    api_description: '',
+    timeout: '',
+    created: 0,
+    updated: 0
   }))
 
-  const { dtsDevStore } = useStore()
+  const {
+    dtsDevStore: { apiConfigData },
+    dtsDevStore
+  } = useStore()
 
   const onClose = () => {
     dtsDevStore.set({ showBaseSetting: false })
   }
 
+  // 启动后回显数据
+  useEffect(() => {
+    if (apiConfigData) {
+      const data = cloneDeep(get(apiConfigData, 'api_config', []))
+      console.log(data)
+
+      setParams((draft) => {
+        draft.api_id = get(data, 'api_id', '')
+        draft.group_name = get(data, 'group_name', 'APX 服务组') // TODO: 后端接口没有group_name
+        draft.api_name = get(data, 'api_name', '')
+        draft.group_path = get(data, 'group_path', '/') // TODO: 后端接口没有group_path
+        draft.api_path = get(data, 'api_path', '/')
+        draft.protocols = get(data, 'protocols', Protocol.HTTP)
+        draft.cross_domain = get(data, 'cross_domain', false)
+        draft.request_method = get(data, 'request_method', RequestMethods.GET)
+        draft.response_type = get(data, 'response_type', ResponseMethods.JSON)
+        draft.api_description = get(data, 'api_description', '')
+        draft.timeout = get(data, 'timeout', '')
+        draft.created = get(data, 'created', 0)
+        draft.updated = get(data, 'updated', 0)
+      })
+    }
+  }, [apiConfigData, setParams])
+
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      console.log(params)
       onClose()
     }
   }
@@ -78,6 +109,8 @@ export const JobModal = observer(() => {
       title="属性"
       width={900}
       onCancel={onClose}
+      maskClosable={false}
+      closable={false}
       footer={
         <div tw="flex justify-end space-x-2">
           <Button onClick={onClose}>取消</Button>
@@ -94,21 +127,21 @@ export const JobModal = observer(() => {
               <Label tw="items-start!">
                 <AffixLabel required>API 服务组</AffixLabel>
               </Label>
-              <Control tw="items-center">API 组 01</Control>
+              <Control tw="items-center">{params.group_name}</Control>
             </Field>
             <Field>
               <Label tw="items-start!">
                 <AffixLabel required>API ID</AffixLabel>
               </Label>
-              <Control tw="items-center">yrl0o4601938kr9y</Control>
+              <Control tw="items-center">{params.api_id}</Control>
             </Field>
             <TextField
-              name="apiName"
+              name="api_name"
               label={<AffixLabel>API名称</AffixLabel>}
-              value={get(params, 'apiName', '')}
+              value={get(params, 'api_name', '')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.apiName = String(v)
+                  draft.api_name = String(v)
                 })
               }
               validateOnChange
@@ -137,17 +170,19 @@ export const JobModal = observer(() => {
               </Label>
               <Control tw="items-center">
                 <Input
-                  name="apiGroupName"
-                  value={get(params, 'apiGroupName', '')}
+                  name="group_path"
+                  value={get(params, 'group_path', '')}
                   disabled
                   tw="w-[150px]! block! items-center! space-x-1 mr-2"
                 />
+
+                <Input value="/" disabled tw="w-[40px]! block!" />
                 <Input
-                  name="apiPath"
-                  value={get(params, 'apiPath', '')}
+                  name="api_path"
+                  value={get(params, 'api_path', '')}
                   onChange={(_, v: string | number) =>
                     setParams((draft) => {
-                      draft.apiPath = String(v)
+                      draft.api_path = String(v)
                     })
                   }
                   validateOnChange
@@ -176,31 +211,52 @@ export const JobModal = observer(() => {
                 <AffixLabel required>协议</AffixLabel>
               </Label>
               <Control tw="items-center">
-                <Checkbox
+                HTTP
+                {/* <Checkbox
                   tw="text-white!"
+                  checked={params.protocols === Protocol.HTTP}
                   onChange={(_: any, checked: boolean) => {
                     setParams((draft) => {
                       if (checked) {
-                        draft.apiAgreement = 'http'
+                        draft.protocols = 1
                       }
                     })
                   }}
                 >
                   HTTP
-                </Checkbox>
-                <Checkbox
-                  tw="text-white!"
-                  onChange={(_: any, checked: boolean) => {
-                    setParams((draft) => {
-                      if (checked) {
-                        draft.apiAgreement = 'http'
-                      }
-                    })
-                  }}
-                >
-                  HTTPS
-                </Checkbox>
+                </Checkbox> */}
               </Control>
+            </Field>
+            <Field>
+              <Label tw="items-start!">
+                <AffixLabel required>超时时间</AffixLabel>
+              </Label>
+              <Control tw="items-center">
+                <Input
+                  name="timeout"
+                  tw="w-[60px]! block! items-center! space-x-1 mr-2"
+                  value={get(params, 'timeout', '')}
+                  onChange={(_, v: any) =>
+                    setParams((draft) => {
+                      draft.timeout = Number(v) as unknown as string
+                    })
+                  }
+                  validateOnChange
+                  maxLength={50}
+                  schemas={[
+                    {
+                      rule: (value: number) => {
+                        const l = Number(value)
+                        return l >= 0 && l <= 300
+                      },
+                      help: '请输入范围0-300',
+                      status: 'error'
+                    }
+                  ]}
+                />
+                <div tw="ml-1">S</div>
+              </Control>
+              <div className="help">0-300</div>
             </Field>
             <Field>
               <Label>
@@ -208,10 +264,10 @@ export const JobModal = observer(() => {
               </Label>
               <Control tw="items-center">
                 <Toggle
-                  checked={params.isCross}
+                  checked={params.cross_domain}
                   onChange={(checked: boolean) => {
                     setParams((draft) => {
-                      draft.isCross = checked
+                      draft.cross_domain = checked
                     })
                   }}
                 />
@@ -224,16 +280,16 @@ export const JobModal = observer(() => {
             </Field>
             <RadioGroupField
               label={<AffixLabel required>请求方式</AffixLabel>}
-              value={params.methods}
+              value={params.request_method}
               name="immediately"
-              onChange={(v: string) => {
+              onChange={(v: number) => {
                 setParams((draft) => {
-                  draft.methods = v
+                  draft.request_method = v
                 })
               }}
             >
-              <Radio value="get">GET</Radio>
-              <Radio value="post">POST</Radio>
+              <Radio value={RequestMethods.GET}>GET</Radio>
+              <Radio value={RequestMethods.POST}>POST</Radio>
             </RadioGroupField>
             <Field>
               <Label tw="items-start!">
@@ -243,13 +299,13 @@ export const JobModal = observer(() => {
             </Field>
 
             <TextAreaField
-              name="Desc"
+              name="api_description"
               label="描述"
               rows={3}
-              value={get(params, 'Desc', '')}
+              value={get(params, 'api_description', '')}
               onChange={(v: string | number) =>
                 setParams((draft) => {
-                  draft.Desc = String(v)
+                  draft.api_description = String(v)
                 })
               }
               validateOnChange
@@ -270,13 +326,13 @@ export const JobModal = observer(() => {
               <Label tw="items-start!">
                 <AffixLabel>创建时间</AffixLabel>
               </Label>
-              <Control tw="items-center">2021.04.20 16:00:20</Control>
+              <Control tw="items-center">{formatDate(params.created)}</Control>
             </Field>
             <Field>
               <Label tw="items-start!">
                 <AffixLabel>最后修改时间</AffixLabel>
               </Label>
-              <Control tw="items-center">2021.04.20 16:00:20</Control>
+              <Control tw="items-center">{formatDate(params.updated)}</Control>
             </Field>
           </Form>
         </FormWrapper>

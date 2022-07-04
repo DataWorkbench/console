@@ -297,7 +297,11 @@ export const renderIcon = (props: any) => {
     }
     return (
       <IconWrapper>
-        <Icon name={iconName} color={{ secondary: '#ffd0275d', primary: '#FFD127' }} size={12} />
+        <Icon
+          name={iconName}
+          color={{ secondary: '#ffd0275d', primary: isLeaf ? '#fff' : '#FFD127' }}
+          size={12}
+        />
       </IconWrapper>
     )
   }

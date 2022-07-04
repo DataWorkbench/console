@@ -8,7 +8,11 @@ import { MappingKey } from 'utils/types'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { useImmer } from 'use-immer'
 import { cloneDeep, get } from 'lodash-es'
-import { ResponseSettingColumns, serviceDevResponseSettingMapping } from '../constants'
+import {
+  configMapData,
+  ResponseSettingColumns,
+  serviceDevResponseSettingMapping
+} from '../constants'
 
 export interface JobModalData {
   id: string
@@ -28,7 +32,7 @@ const styles = {
   `
 }
 
-type DataSourceProp = DataServiceManageDescribeApiConfig['response_params']
+type DataSourceProp = DataServiceManageDescribeApiConfig['response_params']['response_params']
 
 const dataServiceDataSettingKey = 'DATA_SERVICE_DATA__RESPONSE'
 const getName = (name: MappingKey<typeof serviceDevResponseSettingMapping>) =>
@@ -38,7 +42,7 @@ const { CollapseItem } = Collapse
 
 export const JobModal = observer(() => {
   const {
-    dtsDevStore: { apiConfigData },
+    dtsDevStore: { apiConfigData, fieldSettingData },
     dtsDevStore
   } = useStore()
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
@@ -46,10 +50,25 @@ export const JobModal = observer(() => {
 
   useEffect(() => {
     if (apiConfigData) {
-      const data = cloneDeep(get(apiConfigData, 'response_params', []))
-      setDataSource(data)
+      const filedData = cloneDeep(fieldSettingData)
+        .filter((item) => item.isResponse)
+        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
+      const config = cloneDeep(get(apiConfigData, 'api_config.response_params', []))
+
+      if (filedData.length) {
+        // 拼数据
+        const defaultValue = {
+          data_type: 0, // TODO: 暂时写死 字段映射表
+          is_required: false,
+          example_value: '',
+          default_value: '',
+          param_description: ''
+        }
+        const newRequestData = configMapData(filedData, config, defaultValue)
+        setDataSource(newRequestData)
+      }
     }
-  }, [apiConfigData, setDataSource])
+  }, [apiConfigData, setDataSource, fieldSettingData])
 
   const onClose = () => {
     dtsDevStore.set({ showResponseSetting: false })
@@ -73,13 +92,40 @@ export const JobModal = observer(() => {
 
   const renderColumns = {
     [getName('param_name')]: {
-      render: (text: string) => <Input value={text} />
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setDataSource((draft) => {
+              draft[index].param_name = `${value}`
+            })
+          }}
+        />
+      )
     },
     [getName('example_value')]: {
-      render: (text: string) => <Input value={text} />
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setDataSource((draft) => {
+              draft[index].example_value = `${value}`
+            })
+          }}
+        />
+      )
     },
     [getName('param_description')]: {
-      render: (text: string) => <Input value={text} />
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setDataSource((draft) => {
+              draft[index].param_description = `${value}`
+            })
+          }}
+        />
+      )
     }
   }
 
@@ -93,6 +139,8 @@ export const JobModal = observer(() => {
     <ResizeModal
       minWidth={800}
       maxWidth={1200}
+      maskClosable={false}
+      closable={false}
       enableResizing={{ left: true }}
       orient="fullright"
       visible

@@ -1,10 +1,23 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { Mapping } from 'utils/types'
+import { createEnhancedEnum } from 'utils'
 
 export interface Schema {
   type: string
   name: string
   is_primary: boolean
+}
+
+interface SchemaMap {
+  param_name: string
+  type: string
+}
+
+interface IStatusEnum {
+  [key: string]: {
+    label: string
+    value: any
+  }
 }
 
 export interface FieldSettingData {
@@ -117,3 +130,133 @@ export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[]
     type: column.type,
     isPrimary: column.is_primary
   }))
+
+export enum RequestMethods {
+  MethodUnSet = 0,
+  GET = 1,
+  POST = 2
+}
+
+export enum ResponseMethods {
+  TypeUnSet = 0,
+  JSON = 1,
+  XML = 2
+}
+
+export enum Protocol {
+  ProtocolsUnSet = 0,
+  HTTP = 1,
+  HTTPS = 2,
+  ALL = 3
+}
+export const ParameterOperator = createEnhancedEnum<IStatusEnum>({
+  OPERATORUNSET: {
+    label: 'UNSET',
+    value: 0
+  },
+  EQUAL: {
+    label: '=',
+    value: 1
+  },
+  NOTEQUAL: {
+    label: '!=',
+    value: 2
+  },
+  GREATERTHAN: {
+    label: '>',
+    value: 3
+  },
+  LESSTHAN: {
+    label: '<',
+    value: 4
+  },
+  LIKE: {
+    label: 'LIKE',
+    value: 5
+  },
+  CONST: {
+    label: 'CONST',
+    value: 6
+  },
+  IN: {
+    label: 'IN',
+    value: 7
+  }
+})
+
+export const ParameterPosition = createEnhancedEnum<IStatusEnum>({
+  POSITIONUNSET: {
+    label: 'UNSET',
+    value: 0
+  },
+  BODY: {
+    label: 'BODY',
+    value: 1
+  },
+  QUERY: {
+    label: 'QUERY',
+    value: 2
+  },
+  PATH: {
+    label: 'PATH',
+    value: 3
+  },
+  HEAD: {
+    label: 'HEAD',
+    value: 4
+  }
+})
+
+export const OrderMode = createEnhancedEnum<IStatusEnum>({
+  ORDERMODEUNSET: {
+    label: 'UNSET',
+    value: 0
+  },
+  ASC: {
+    label: 'ASC',
+    value: 1
+  },
+  DESC: {
+    label: 'DESC',
+    value: 2
+  }
+})
+
+// 字段类型映射
+const fieldTypeMapping: Map<string, number> = new Map()
+  .set('char', 1)
+  .set('vachar', 1)
+  .set('int', 2)
+  .set('number', 2)
+  .set('double', 3)
+  .set('boolean', 4)
+
+export const paramsDataType: (type: string) => number | undefined = (type: string) => {
+  const lowerType = type.toLocaleLowerCase()
+  return fieldTypeMapping.get(lowerType)
+}
+
+/**
+ * 请求参数配置 和 响应参数配置字段映射函数
+ * @param filedData 字段数据
+ * @param configData 配置数据
+ * @param defaultData 默认数据
+ * @returns
+ */
+export const configMapData = (filedData: SchemaMap[], configData: any[], defaultData: any) => {
+  const configMap = new Map()
+  configData?.forEach((item) => {
+    configMap.set(item.field, item)
+  })
+
+  return filedData?.map((item) => {
+    const configItem = configMap.get(item.param_name)
+    if (configItem) {
+      return {
+        ...item,
+        ...configItem
+      }
+    }
+    return { ...item, ...defaultData }
+  })
+}

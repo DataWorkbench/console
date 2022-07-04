@@ -1,16 +1,18 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 import { AffixLabel, Modal, ModalContent, TextLink } from 'components'
-import { get } from 'lodash-es'
+import { get, merge, pickBy } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useMutationApiService, useQueryListApiGroups } from 'hooks'
+import { useMutationApiService, useQueryListApiGroups, getQueryKeyListApiGroups } from 'hooks'
 import { strlen } from 'utils'
-import { Checkbox, Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
+import { Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
 import { useParams } from 'react-router-dom'
 import { ApiProps } from 'stores/DtsDevStore'
+import { useQueryClient } from 'react-query'
 import ModelItem from './ModeItem'
+import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 
 const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
 
@@ -85,53 +87,65 @@ const modelSource = [
 export const JobModal = observer((props: JobModalProps) => {
   const { isEdit = false, onClose, currentApi } = props
   const { spaceId } = useParams<{ spaceId: string }>()
+  const queryClient = useQueryClient()
 
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
     api_mode: 1,
-    group_id: '',
+    group_path: '',
     api_name: '',
-    api_path: '/',
-    apiAgreement: '',
+    api_path: '',
+    protocols: Protocol.HTTP,
     cross_domain: false,
-    request_method: '',
-    response_type: 'json',
-    api_description: ''
+    request_method: RequestMethods.GET,
+    response_type: ResponseMethods.JSON,
+    api_description: '',
+    timeout: ''
   }))
 
   const mutation = useMutationApiService()
   const { data } = useQueryListApiGroups({ uri: { space_id: spaceId } })
-  const apiGroupList = get(data, 'infos', [])
+  const apiGroupList = useMemo(() => get(data, 'infos', []) || [], [data])
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      const paramsData = {
-        option: 'createApi' as const,
-        ...params
-      }
+      const paramsData = merge(
+        {
+          option: isEdit ? 'updateApi' : ('createApi' as const),
+          ...pickBy(params, (v, k) => k !== 'group_path'),
+          api_path: params.api_path,
+          group_id: apiGroupList.find((item) => item.group_path === params.group_path)?.id,
+          space_id: spaceId
+        },
+        isEdit && { apiId: currentApi?.api_id }
+      )
+
       mutation.mutate(paramsData, {
         onSuccess: () => {
+          queryClient.invalidateQueries(getQueryKeyListApiGroups())
           onClose?.()
         }
       })
     }
   }
 
-  if (isEdit && !!currentApi) {
-    console.log(currentApi)
-
-    // setParams(date => {
-    //   date.api_mode = currentApi.api_mode
-    //   date.group_id = currentApi.group_id
-    //   date.api_name = currentApi.api_name
-    //   date.api_path = currentApi.api_path
-    //   date.apiAgreement = currentApi.apiAgreement
-    //   date.cross_domain = currentApi.cross_domain
-    //   date.request_method = currentApi.request_method
-    //   date.response_type = currentApi.response_type
-    //   date.api_description = currentApi.api_description
-    // })
-  }
+  useEffect(() => {
+    if (currentApi) {
+      const path = apiGroupList.find((item) => item.id === currentApi.group_id)?.group_path || '/'
+      setParams((date) => {
+        date.api_mode = currentApi.api_mode
+        date.group_path = path
+        date.api_name = currentApi.api_name
+        date.api_path = currentApi.api_path
+        date.protocols = currentApi.protocols
+        date.cross_domain = currentApi.cross_domain
+        date.request_method = currentApi.request_method
+        date.response_type = currentApi.response_type
+        date.api_description = currentApi.api_description
+        date.timeout = currentApi.timeout
+      })
+    }
+  }, [apiGroupList, currentApi, setParams])
 
   return (
     <Modal
@@ -184,39 +198,49 @@ export const JobModal = observer((props: JobModalProps) => {
                 ))}
               </Control>
             </Field>
-            <SelectField
-              label={<AffixLabel required>API 服务组</AffixLabel>}
-              name="version"
-              validateOnChange
-              placeholder="请选择API服务组"
-              options={apiGroupList.map((item) => ({
-                label: item.name,
-                value: item.id
-              }))}
-              value={params.group_id}
-              onChange={(v: string) => {
-                setParams((draft) => {
-                  draft.group_id = v
-                })
-              }}
-              schemas={[
-                {
-                  rule: {
-                    required: true,
-                    isExisty: false
-                  },
-                  status: 'error',
-                  help: '不能为空'
-                }
-              ]}
-              css={[
-                css`
-                  .select-control {
-                    ${tw`w-[326px]!`}
+            {isEdit ? (
+              <Field>
+                <Label tw="items-start!">
+                  <AffixLabel required>API 服务组</AffixLabel>
+                </Label>
+                <Control tw="items-center">
+                  {apiGroupList.find((item) => item.id === currentApi?.group_id)?.name}
+                </Control>
+              </Field>
+            ) : (
+              <SelectField
+                label={<AffixLabel required>API 服务组</AffixLabel>}
+                name="version"
+                validateOnChange
+                placeholder="请选择API服务组"
+                options={apiGroupList.map((item) => ({
+                  label: item.name,
+                  value: item.group_path
+                }))}
+                value={params.group_path}
+                onChange={(v: string) => {
+                  setParams((draft) => {
+                    draft.group_path = v
+                  })
+                }}
+                schemas={[
+                  {
+                    rule: {
+                      required: true
+                    },
+                    status: 'error',
+                    help: '不能为空'
                   }
-                `
-              ]}
-            />
+                ]}
+                css={[
+                  css`
+                    .select-control {
+                      ${tw`w-[326px]!`}
+                    }
+                  `
+                ]}
+              />
+            )}
             <TextField
               name="api_name"
               label={<AffixLabel>API名称</AffixLabel>}
@@ -252,11 +276,13 @@ export const JobModal = observer((props: JobModalProps) => {
               </Label>
               <Control tw="items-center">
                 <Input
-                  name="group_id"
-                  value={get(params, 'group_id', '')}
+                  name="group_path"
+                  value={get(params, 'group_path', '')}
                   disabled
                   tw="w-[150px]! block! items-center! space-x-1 mr-2"
                 />
+
+                <Input value="/" disabled tw="w-[40px]! block!" />
                 <Input
                   name="api_path"
                   value={get(params, 'api_path', '')}
@@ -291,31 +317,53 @@ export const JobModal = observer((props: JobModalProps) => {
                 <AffixLabel required>协议</AffixLabel>
               </Label>
               <Control tw="items-center">
-                <Checkbox
+                HTTP
+                {/* <Checkbox
                   tw="text-white!"
+                  checked={params.protocols === Protocol.HTTP}
                   onChange={(_: any, checked: boolean) => {
                     setParams((draft) => {
                       if (checked) {
-                        draft.apiAgreement = 'http'
+                        draft.protocols = 1
                       }
                     })
                   }}
                 >
                   HTTP
-                </Checkbox>
-                <Checkbox
-                  tw="text-white!"
-                  onChange={(_: any, checked: boolean) => {
-                    setParams((draft) => {
-                      if (checked) {
-                        draft.apiAgreement = 'http'
-                      }
-                    })
-                  }}
-                >
-                  HTTPS
-                </Checkbox>
+                </Checkbox> */}
               </Control>
+            </Field>
+
+            <Field>
+              <Label tw="items-start!">
+                <AffixLabel required>超时时间</AffixLabel>
+              </Label>
+              <Control tw="items-center">
+                <Input
+                  name="timeout"
+                  tw="w-[60px]! block! items-center! space-x-1 mr-2"
+                  value={get(params, 'timeout', '')}
+                  onChange={(_, v: any) =>
+                    setParams((draft) => {
+                      draft.timeout = Number(v) as unknown as string
+                    })
+                  }
+                  validateOnChange
+                  maxLength={50}
+                  schemas={[
+                    {
+                      rule: (value: number) => {
+                        const l = Number(value)
+                        return l >= 0 && l <= 300
+                      },
+                      help: '请输入范围0-300',
+                      status: 'error'
+                    }
+                  ]}
+                />
+                <div tw="ml-1">S</div>
+              </Control>
+              <div className="help">0-300</div>
             </Field>
             <Field>
               <Label>
@@ -341,14 +389,14 @@ export const JobModal = observer((props: JobModalProps) => {
               label={<AffixLabel required>请求方式</AffixLabel>}
               value={params.request_method}
               name="immediately"
-              onChange={(v: string) => {
+              onChange={(v: number) => {
                 setParams((draft) => {
                   draft.request_method = v
                 })
               }}
             >
-              <Radio value="get">GET</Radio>
-              <Radio value="post">POST</Radio>
+              <Radio value={RequestMethods.GET}>GET</Radio>
+              <Radio value={RequestMethods.POST}>POST</Radio>
             </RadioGroupField>
             <Field>
               <Label tw="items-start!">

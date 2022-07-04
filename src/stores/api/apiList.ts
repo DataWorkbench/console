@@ -382,11 +382,16 @@ export default {
       'GET',
       '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}'
     ],
+    listPublishedApiVersionsByClusterId: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/release/{cluster_id}'
+    ],
 
     describeDataServiceCluster: [
       'GET',
       '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}'
     ],
+    describeServiceDataSourceKinds: ['GET', '/v1/workspace/{space_id}/dataservice/kinds'],
 
     createApiConfig: ['POST', '/v1/workspace/{space_id}/dataservice/config'],
 
