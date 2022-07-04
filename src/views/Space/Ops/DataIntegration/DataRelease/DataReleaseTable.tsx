@@ -87,6 +87,7 @@ const DataRelease = observer(() => {
   )
 
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
+    // 详情文件位置 views/Space/Ops/DataIntegration/DataRelease/DataReleaseDetail.tsx
     window.open(
       `./data-release/${record.id}?version=${record.version}${
         tab ? `&tab=${tab}` : ''
@@ -241,6 +242,9 @@ const DataRelease = observer(() => {
       jobId: key,
       limit: 12,
       offset: 0,
+      verbose: 1,
+      sort_by: 'updated',
+      reverse: filter.reverse,
     }).then((res) => {
       const arr = res.infos
         ?.filter((item: Record<string, any>) => item.version !== version)

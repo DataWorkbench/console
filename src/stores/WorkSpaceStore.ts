@@ -53,21 +53,21 @@ const defaultFuncList = [
           },
         ],
       },
-      {
-        title: '监控告警',
-        name: 'alert',
-        icon: 'q-bell2Duotone',
-        items: [
-          {
-            name: 'alert-policy',
-            title: '告警策略',
-          },
-          {
-            name: 'alert-history',
-            title: '告警记录',
-          },
-        ],
-      },
+      // {
+      //   title: '监控告警',
+      //   name: 'alert',
+      //   icon: 'q-bell2Duotone',
+      //   items: [
+      //     {
+      //       name: 'alert-policy',
+      //       title: '告警策略',
+      //     },
+      //     {
+      //       name: 'alert-history',
+      //       title: '告警记录',
+      //     },
+      //   ],
+      // },
       // { name: 'offline', title: '离线任务运维', icon: 'blockchain' },
       // { name: 'monitor', title: '智能监控', icon: 'blockchain' },
       // { name: 'logs', title: '操作日志', icon: 'blockchain' },

@@ -16,6 +16,7 @@ import {
   isEqual,
   keys,
   pick,
+  set,
   trim,
 } from 'lodash-es'
 import { Form, Icon } from '@QCFE/lego-ui'
@@ -43,6 +44,7 @@ import {
   sourceKinds,
   SourceType,
 } from 'views/Space/Upcloud/DataSourceList/constant'
+import { FormH7Wrapper } from 'views/Space/Dm/RealTime/styled'
 import {
   DataSourceType,
   dataSourceTypes,
@@ -125,8 +127,9 @@ enum WriteMode {
 const getWriteMode = (type?: SourceType) => {
   switch (type) {
     case SourceType.Mysql:
-    case SourceType.PostgreSQL:
       return [WriteMode.Insert, WriteMode.Replace, WriteMode.Update]
+    case SourceType.PostgreSQL:
+      return [WriteMode.Insert, WriteMode.Update]
     case SourceType.ClickHouse:
       return [WriteMode.Insert]
     case SourceType.SqlServer:
@@ -385,7 +388,16 @@ const SyncDataSource = observer(
             preSql: get(dbTarget, 'pre_sql', []),
           },
         }
+
+        if (
+          newDB.source.id === db?.source?.id &&
+          newDB.source.tableName === db?.source?.tableName &&
+          db.source?.columns
+        ) {
+          set(newDB, 'source.columns', db.source.columns)
+        }
         setDB(newDB)
+
         if (
           newDB.target.postSql?.length > 0 ||
           newDB.target.preSql?.length > 0
@@ -396,6 +408,7 @@ const SyncDataSource = observer(
           setShowSourceAdvance(true)
         }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conf, setDB, sourceTypeName, targetTypeName])
 
     // console.log(db)
@@ -869,6 +882,7 @@ const SyncDataSource = observer(
                       })
                     }}
                     value={dbInfo.preSql}
+                    validateOnChange
                     placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
                     schemas={[
                       {
@@ -897,6 +911,7 @@ const SyncDataSource = observer(
                     value={dbInfo.postSql}
                     label="写入后SQL语句组"
                     size={1}
+                    validateOnChange
                     onChange={(v: string[]) => {
                       setDB((draft) => {
                         draft[from].postSql = v
@@ -933,43 +948,45 @@ const SyncDataSource = observer(
     }
 
     return (
-      <FlexBox tw="flex-col">
-        <Center tw="mb-[-15px]">
-          <Center css={styles.arrowBox}>
-            <Label>来源: {sourceTypeName}</Label>
-            <ArrowLine />
-            <Label>{curJob && getJobTypeName(curJob.type)}</Label>
-            <ArrowLine />
-            <Label>目的: {targetTypeName}</Label>
+      <FormH7Wrapper>
+        <FlexBox tw="flex-col">
+          <Center tw="mb-[-15px]">
+            <Center css={styles.arrowBox}>
+              <Label>来源: {sourceTypeName}</Label>
+              <ArrowLine />
+              <Label>{curJob && getJobTypeName(curJob.type)}</Label>
+              <ArrowLine />
+              <Label>目的: {targetTypeName}</Label>
+            </Center>
           </Center>
-        </Center>
-        <FlexBox css={styles.dashedBox}>
-          {renderSource()}
-          <DashedLine />
-          {renderTarget()}
+          <FlexBox css={styles.dashedBox}>
+            {renderSource()}
+            <DashedLine />
+            {renderTarget()}
+          </FlexBox>
+          <DataSourceSelectModal
+            selected={op.current === 'source' ? [db.source.id] : [db.target.id]}
+            title={`选择${
+              op.current === 'source' ? '来源' : '目的'
+            }数据源（已选类型为 ${findKey(
+              dataSourceTypes,
+              (v) => v === get(curJob, `${op.current}_type`)
+            )})`}
+            visible={visible}
+            sourceType={get(curJob, `${op.current}_type`)!}
+            onCancel={() => setVisible(false)}
+            onOk={(v: any) => {
+              setVisible(false)
+              if (v) {
+                handleSelectDb({
+                  ...pick(v, ['id', 'name']),
+                  networkId: get(v, 'last_connection.network_id', ''),
+                })
+              }
+            }}
+          />
         </FlexBox>
-        <DataSourceSelectModal
-          selected={op.current === 'source' ? [db.source.id] : [db.target.id]}
-          title={`选择${
-            op.current === 'source' ? '来源' : '目的'
-          }数据源（已选类型为 ${findKey(
-            dataSourceTypes,
-            (v) => v === get(curJob, `${op.current}_type`)
-          )})`}
-          visible={visible}
-          sourceType={get(curJob, `${op.current}_type`)!}
-          onCancel={() => setVisible(false)}
-          onOk={(v: any) => {
-            setVisible(false)
-            if (v) {
-              handleSelectDb({
-                ...pick(v, ['id', 'name']),
-                networkId: get(v, 'last_connection.network_id', ''),
-              })
-            }
-          }}
-        />
-      </FlexBox>
+      </FormH7Wrapper>
     )
   },
   { forwardRef: true }

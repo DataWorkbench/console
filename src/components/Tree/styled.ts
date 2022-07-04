@@ -49,6 +49,9 @@ const rcTreeStyle = css`
         }
       }
 
+      span.rc-tree-switcher {
+        ${tw`flex-none`}
+      }
       span {
         &.rc-tree-switcher,
         &.rc-tree-checkbox,

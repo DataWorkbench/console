@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react'
 import { Modal, HelpCenterModal } from '@QCFE/qingcloud-portal-ui'
-import { getHelpCenterLink } from 'utils'
+import { get } from 'lodash-es'
+import { getHelpCenterLinkWithNullHost } from 'utils'
 import { TextLink } from './TextLink'
 
 interface LinkInterface {
@@ -24,7 +25,7 @@ const HelpCenterLink = (
 
   const handleOpenHelpCenter = (link: string) => {
     const openModal = Modal.open(HelpCenterModal, {
-      link: getHelpCenterLink(link),
+      link: getHelpCenterLinkWithNullHost(link),
       onCancel: () => Modal.close(openModal),
     })
   }
@@ -35,7 +36,13 @@ const HelpCenterLink = (
         ...rest,
       }
     : {
-        href: href ? getHelpCenterLink(href) : '###',
+        href: href
+          ? `${get(
+              window,
+              'GLOBAL_CONFIG.new_docs_url',
+              ''
+            )}/bigdata/dataomnis${href}`
+          : '###',
         target: '_blank',
         hasIcon: true,
         ...rest,

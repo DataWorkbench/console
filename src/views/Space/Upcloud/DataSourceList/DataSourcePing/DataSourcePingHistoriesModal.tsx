@@ -28,7 +28,7 @@ const columns = [
     title: '耗时',
     dataIndex: 'elapse',
     width: 100,
-    render: (v?: number) => (v !== undefined ? timeFormat(v) : ''),
+    render: (v?: number) => (v !== undefined ? timeFormat(Date.now() - v) : ''),
     // render: (val?: number, record?: Record<string, any>) => (
     //   <TimeInterval consuming={val} startTime={record?.startAt} />
     // ),

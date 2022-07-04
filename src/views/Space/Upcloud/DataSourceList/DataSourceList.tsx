@@ -26,6 +26,7 @@ import {
   ContentBox,
   FlexBox,
   Icons,
+  RouterLink,
   TextEllipsis,
   TextLink,
   Tooltip,
@@ -409,7 +410,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
         if (selectMode) {
           return (
             <span
-              tw="cursor-pointer dark:text-white dark:hover:text-blue-12"
+              tw="cursor-pointer dark:text-white dark:hover:text-green-11"
               onClick={() => {
                 handlePing(info)
               }}
@@ -568,14 +569,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               ) : (
                 <div tw="text-neut-8">
                   如需选择新的数据源，您可以前往
-                  <TextLink
+                  <RouterLink
                     tw="ml-2 text-green-11!"
-                    href={`./${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                    to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
                     target="_blank"
-                    hasIcon={false}
+                    color="blue"
                   >
                     新建数据源
-                  </TextLink>
+                  </RouterLink>
                 </div>
               )}
             </ToolBarLeft>

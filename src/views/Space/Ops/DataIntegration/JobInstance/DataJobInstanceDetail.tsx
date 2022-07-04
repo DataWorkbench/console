@@ -35,7 +35,6 @@ import {
 } from 'hooks'
 import DevContent from 'views/Space/Ops/components/DevContent'
 import {
-  AlarmStatusCmp,
   Circle,
   DbTypeCmp,
   JobInstanceStatusCmp,
@@ -290,10 +289,6 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>告警状态:</span>
-              <span>
-                <AlarmStatusCmp type={data?.alarm_status} />
-              </span>
               <span>所属作业:</span>
               <span tw="inline-block">
                 {get(data, 'sync_job.desc') ? (

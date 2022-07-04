@@ -48,8 +48,11 @@ export const getColumnsRender = (
         status: keyof typeof dataReleaseScheduleType,
         record: Record<string, any>
       ) => {
-        if (record.__level !== 1) {
+        if (record.hasMore || record.hasNone) {
           return null
+        }
+        if (record.__level !== 1 || !status) {
+          return <span tw="text-font-secondary">N/A</span>
         }
         return <DataReleaseStatusCmp type={status} />
       },
@@ -102,10 +105,10 @@ export const getColumnsRender = (
       render: (text: string) => <span tw="text-neut-8">{text}</span>,
     },
     type: {
-      render: (text: keyof typeof jobType, record: Record<string, any>) => {
-        if (record.__level > 1) {
-          return null
-        }
+      render: (text: keyof typeof jobType) => {
+        // if (record.__level > 1) {
+        //   return null
+        // }
         return <JobTypeCmp type={text} />
       },
     },
@@ -122,13 +125,16 @@ export const getColumnsRender = (
       //   label,
       //   value,
       // })),
-      render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
-        record.__level === 1 ? (
-          <DbTypeCmp
-            type={get(record, 'sync_job.source_type', '')}
-            onClick={() => actions?.source(record)}
-          />
-        ) : null,
+      render: (text: keyof typeof sourceTypes, record: Record<string, any>) => (
+        <DbTypeCmp
+          type={get(
+            record,
+            record.__level === 1 ? 'sync_job.source_type' : 'source_type',
+            ''
+          )}
+          onClick={() => actions?.source(record)}
+        />
+      ),
     },
     target: {
       // filter: filter.target,
@@ -143,13 +149,16 @@ export const getColumnsRender = (
       //   label,
       //   value,
       // })),
-      render: (text: keyof typeof sourceTypes, record: Record<string, any>) =>
-        record.__level === 1 ? (
-          <DbTypeCmp
-            type={get(record, 'sync_job.target_type', '')}
-            onClick={() => actions?.target(record)}
-          />
-        ) : null,
+      render: (text: keyof typeof sourceTypes, record: Record<string, any>) => (
+        <DbTypeCmp
+          type={get(
+            record,
+            record.__level === 1 ? 'sync_job.target_type' : 'target_type',
+            ''
+          )}
+          onClick={() => actions?.target(record)}
+        />
+      ),
     },
     updated: {
       sortable: true,
@@ -157,12 +166,16 @@ export const getColumnsRender = (
       sortOrder:
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
-      render: (v: number, record: Record<string, any>) =>
-        record.__level === undefined || record.__level === 1 ? (
+      render: (v: number, record: Record<string, any>) => {
+        if (record.hasMore || record.hasNone) {
+          return null
+        }
+        return (
           <span tw="text-neut-8">
             {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
           </span>
-        ) : null,
+        )
+      },
     },
   }
   return (pickByKeys ? pick(columnsRender, pickByKeys) : columnsRender) as any

@@ -187,7 +187,7 @@ export const JobTree = observer(
           })
         } else if (val === 'argsSetting') {
           workFlowStore.set({
-            curJob: get(curOpNode, 'job'),
+            curJob: { ...get(curOpNode, 'job'), jobMode: curOpNode.jobMode },
             showArgsSetting: true,
           })
         }
@@ -506,6 +506,11 @@ export const JobTree = observer(
                 }
               }}
               onSelect={(keys: (string | number)[], { selected, node }) => {
+                if (visible) {
+                  setTimeout(() => {
+                    setVisible(false)
+                  })
+                }
                 const job = get(node, 'job')
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
@@ -514,6 +519,10 @@ export const JobTree = observer(
                   workFlowStore.curJob?.id !== job?.id &&
                   workFlowStore.isDirty
                 ) {
+                  workFlowStore.addPanel({
+                    ...job,
+                    jobMode: get(node, 'jobMode'),
+                  })
                   workFlowStore.set({ nextJob: job })
                   workFlowStore.showSaveConfirm(job.id, 'switch')
                   return
@@ -596,7 +605,7 @@ export const JobTree = observer(
                           <AffixLabel>{curOpWord}名称</AffixLabel>
                         </Label>
                         <Control>
-                          <Label>{curOpNode.title}</Label>
+                          <span>{curOpNode.title}</span>
                         </Control>
                       </Field>
                       <SelectTreeField
