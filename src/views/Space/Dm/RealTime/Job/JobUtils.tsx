@@ -98,22 +98,22 @@ export const datasourceTypeKey = [
 
 export const dataSourceTypes: { [key in string]?: number } = {
   mysql: 1,
-  // TIDB: 2,
-  // Kafka: 3,
+  TIDB: 2,
+  Kafka: 3,
   // S3: 4,
   click_house: 5,
-  // HBase: 6,
-  // FTP: 7,
-  // HDFS: 8,
+  HBase: 6,
+  FTP: 7,
+  HDFS: 8,
   sqlserver: 9,
-  // Oracle: 10,
+  Oracle: 10,
   postgresql: 2,
   // DB2: 11,
   // 'SAP HANA': 12,
-  // Hive: 13,
-  // MongoDB: 15,
-  // Redis: 16,
-  // ElasticSearch: 14,
+  Hive: 13,
+  MongoDB: 15,
+  Redis: 16,
+  ElasticSearch: 14,
 }
 
 export const datasourceTypeObjs = [
@@ -141,6 +141,36 @@ export const datasourceTypeObjs = [
     type: SourceType.Hive,
     name: 'hive',
     label: 'Hive',
+  },
+  {
+    type: SourceType.MongoDB,
+    name: 'mongodb',
+    label: 'MongoDB',
+  },
+  {
+    type: SourceType.Redis,
+    name: 'redis',
+    label: 'Redis',
+  },
+  {
+    type: SourceType.ElasticSearch,
+    name: 'elastic_search',
+    label: 'ElasticSearch',
+  },
+  {
+    type: SourceType.HBase,
+    name: 'hbase',
+    label: 'HBase',
+  },
+  {
+    type: SourceType.Kafka,
+    name: 'kafka',
+    label: 'Kafka',
+  },
+  {
+    type: SourceType.HDFS,
+    name: 'hdfs',
+    label: 'HDFS',
   },
 ]
 

@@ -21,13 +21,15 @@ import { HelpCenterLink } from 'components/Link'
 import useIcon from 'hooks/useHooks/useIcon'
 import { Tooltip } from 'components/Tooltip'
 import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import MappingItem, { TMappingField, FieldRow } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
 
 /* @refresh reset */
 const styles = {
-  wrapper: tw`border flex-1 border-neut-13 w-[40%]`,
+  borderX: tw`border-l border-r border-neut-13 `,
+  wrapper: tw`border-b border-t flex-1 border-neut-13 w-[40%]`,
   fieldType: tw`w-44 pl-5 xl:pl-12`,
   row: tw`flex border-b border-neut-13 last:border-b-0 p-1.5`,
   // row: tw`grid grid-template-columns[1fr 1.5fr 48px] text-left border-b border-neut-13 last:border-b-0 p-1.5`,
@@ -42,6 +44,7 @@ const Root = styled.div`
 `
 const EmptyFieldWrapper = styled(Center)(() => [
   styles.wrapper,
+  styles.borderX,
   tw`self-stretch text-neut-8`,
 ])
 
@@ -129,6 +132,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     leftFields: leftFieldsProp,
     rightFields: rightFieldsProp,
     leftTypeName,
+    rightTypeName,
     topHelp,
     mappings: mappingsProp,
     columns,
@@ -225,7 +229,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     }
   }, [columns])
 
-  // console.log('mappings', mappings)
+  console.log('rightcolumns', [...rightFields])
 
   useEffect(() => {
     jsPlumbInstRef.current?.repaintEverything()
@@ -473,12 +477,51 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     []
   )
 
+  const moveItemRight = useCallback(
+    (dragId: string, hoverId: string, isTop = false) => {
+      setRightFields((fields) => {
+        const dragFieldIndex = fields.findIndex(
+          (field) => field.uuid === dragId
+        )!
+        const dragField = fields[dragFieldIndex]
+        const newFields = [...fields]
+
+        newFields.splice(dragFieldIndex, 1)
+        const hoverFieldIndex = newFields.findIndex(
+          (field) => field.uuid === hoverId
+        )!
+        newFields.splice(isTop ? 0 : hoverFieldIndex + 1, 0, dragField)
+        return newFields
+      })
+    },
+    []
+  )
+
   const addCustomField = () => {
     const hasUnFinish = leftFields.find(
       (field) => field.custom && field.default === ''
     )
     if (!hasUnFinish) {
       setLeftFields((fields) => [
+        ...fields,
+        {
+          name: '',
+          type: '',
+          custom: true,
+          default: '',
+          isEditing: true,
+          uuid: nanoid(),
+        },
+      ])
+    }
+  }
+
+  const addCustomFieldRight = () => {
+    const hasUnFinish = rightFields.find(
+      (field) => field.custom && field.default === ''
+    )
+    if (!hasUnFinish) {
+      setRightFields((fields) => [
         ...fields,
         {
           name: '',
@@ -509,6 +552,23 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       return newFields
     })
   }
+
+  const keepEditingFieldRight = (field: TMappingField, index?: number) => {
+    setRightFields((fields) => {
+      const newFields = [...fields]
+      const itemIndex = index === undefined ? newFields.length - 1 : index
+
+      newFields[itemIndex] = omit(
+        {
+          ...newFields[itemIndex],
+          ...field,
+        },
+        field.custom ? ['isEditing'] : ['isEditing', 'custom', 'default']
+      )
+      return newFields
+    })
+  }
+
   const cancelAddCustomField = (field: TMappingField, index: number) => {
     // setLeftFields((fields) => fields.slice(0, -1))
 
@@ -636,7 +696,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       <Container ref={containerRef}>
         <FlexBox tw="flex items-start transition-all duration-500 overflow-x-auto">
           {leftFields.length ? (
-            <div css={styles.wrapper}>
+            <div css={[styles.wrapper, styles.borderX]}>
               <FieldRow isHeader>
                 <div>类型</div>
                 <div>来源表字段</div>
@@ -647,6 +707,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   item={item}
                   key={item.name}
                   index={i}
+                  isLeft={false}
                   hasConnection={!!mappings.find(([l]) => l === item?.name)}
                   anchor="Right"
                   typeName={leftTypeName}
@@ -676,7 +737,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                 />
               ))}
-              {false && !readonly && (
+              {!readonly && (
                 <Center
                   tw="bg-neut-16 cursor-pointer h-8"
                   onClick={addCustomField}
@@ -720,22 +781,67 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           </Tippy>
           {rightFields.length ? (
             <div css={styles.wrapper}>
-              <FieldRow isHeader isReverse>
-                <div>类型</div>
-                <div>目标表字段</div>
-              </FieldRow>
-              {rightFields.map((item, i) => {
-                return (
-                  <MappingItem
-                    jsplumb={jsPlumbInstRef.current}
-                    key={item.name}
-                    anchor="Left"
-                    item={item}
-                    index={i}
-                  />
-                )
-              })}
-              <HbaseFieldMappings sourceColumns={leftFields} />
+              <div css={styles.borderX}>
+                <FieldRow isHeader isReverse>
+                  <div>类型</div>
+                  <div>目标表字段</div>
+                </FieldRow>
+                {rightFields.map((item, i) => {
+                  return (
+                    <MappingItem
+                      jsplumb={jsPlumbInstRef.current}
+                      key={item.uuid}
+                      anchor="Left"
+                      item={item}
+                      index={i}
+                      hasConnection={
+                        !!mappings.find(([, r]) => r === item?.name)
+                      }
+                      typeName={rightTypeName}
+                      moveItem={moveItemRight}
+                      onOk={(info, index) => {
+                        keepEditingFieldRight(info, index)
+                      }}
+                      onCancel={console.log}
+                      deleteItem={(field) => {
+                        setRightFields((fields) =>
+                          fields.filter((f) => f.uuid !== field.uuid)
+                        )
+                        setMappings((prevMappings) =>
+                          prevMappings.filter(([, r]) => r !== field.name)
+                        )
+                      }}
+                      exist={(name: string) =>
+                        !!rightFields.find((f) => f.name === name)
+                      }
+                      getDeleteField={(name: string) => {
+                        const delItem = rightFieldsProp.find(
+                          (f) => f.name === name
+                        )
+                        const existItem = rightFields.find(
+                          (f) => f.name === name
+                        )
+                        if (delItem && !existItem) {
+                          return delItem
+                        }
+                        return undefined
+                      }}
+                    />
+                  )
+                })}
+                {!readonly && (
+                  <Center
+                    tw="bg-neut-16 cursor-pointer h-8"
+                    onClick={addCustomFieldRight}
+                  >
+                    <Icon name="add" type="light" />
+                    添加字段
+                  </Center>
+                )}
+              </div>
+              {rightTypeName?.getType() === SourceType.HBase && (
+                <HbaseFieldMappings sourceColumns={leftFields} />
+              )}
             </div>
           ) : (
             <EmptyFieldWrapper>
