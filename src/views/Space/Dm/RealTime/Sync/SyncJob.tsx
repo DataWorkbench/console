@@ -184,7 +184,7 @@ const SyncJob = () => {
     }>(null)
   const enableRelease = get(scheData, 'schedule_policy') !== 0
 
-  const [sourceTypeName] = useMemo(() => {
+  const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
     return [
@@ -439,6 +439,7 @@ const SyncJob = () => {
               }
             >
               {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob!} />}
+
               {index === 1 && (
                 <FieldMappings
                   // key={
@@ -455,7 +456,7 @@ const SyncJob = () => {
                   leftFields={sourceColumns as any}
                   rightFields={targetColumns as any}
                   leftTypeName={sourceTypeName}
-                  // rightTypeName={targetTypeName}
+                  rightTypeName={targetTypeName}
                   columns={columns}
                   topHelp={
                     <HelpCenterLink
