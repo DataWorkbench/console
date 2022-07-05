@@ -172,7 +172,7 @@ export const HbaseFieldMappings = (props: any) => {
 
   const [version, setVersion] = useImmer<{
     type: 1 | 2 | 3
-    column?: { name: string; type: string }
+    column?: string
     time?: string
   }>({ type: 1 })
 
@@ -281,26 +281,56 @@ export const HbaseFieldMappings = (props: any) => {
     )
   }
 
+  const [{ isOver: isVersionOver }, versionRef] = useDrop<
+    { uuid: string },
+    void,
+    { isOver: boolean }
+  >(() => ({
+    accept: leftDndType,
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+    drop: ({ uuid }) => {
+      setVersion((draft) => {
+        draft.column = uuid
+      })
+    },
+  }))
+
   const renderVersionColumn = () => {
     if (version.type !== 2) {
       return null
     }
     return (
       <div css={[styles.versions, styles.table]}>
-        <div css={[styles.dndWrapper, styles.versions, tw`h-6`]}>
+        <div
+          ref={versionRef}
+          css={[
+            styles.dndWrapper,
+            styles.versions,
+            tw`h-6`,
+            isVersionOver && tw`bg-green-4/10!`,
+          ]}
+        >
           {!version.column && (
             <div
-              css={css`
-                grid-column: 1 / -1;
-              `}
+              css={[
+                css`
+                  grid-column: 1 / -1;
+                `,
+              ]}
             >
               请从左侧拖拽指定时间列到此处
             </div>
           )}
           {version.column && (
             <>
-              <div>{version.column.name}</div>
-              <div>{version.column.type}</div>
+              <div>
+                {sourceColumns.find((i) => i.uuid === version.column)?.name}
+              </div>
+              <div>
+                {sourceColumns.find((i) => i.uuid === version.column)?.type}
+              </div>
             </>
           )}
         </div>
@@ -657,19 +687,21 @@ export const HbaseFieldMappings = (props: any) => {
         <div css={[styles.table]}>{renderAddRowKey()}</div>
         <FlexBox css={[styles.table, tw`flex bg-neut-18 items-center`]}>
           <span>原理：</span>
-          {new Array(2 * rowKeyIds.length - 1).fill(0).map((_, index) =>
-            index % 2 === 1 ? (
-              <span tw="inline-flex">_</span>
-            ) : (
-              <Center
-                tw="inline-flex"
-                key={index.toString()}
-                css={styles.iconNumber}
-              >
-                {index / 2 + 1}
-              </Center>
-            )
-          )}
+          {new Array(Math.max(0, 2 * (rowKeys || []).length - 1))
+            .fill(0)
+            .map((_, index) =>
+              index % 2 === 1 ? (
+                <span tw="inline-flex">_</span>
+              ) : (
+                <Center
+                  tw="inline-flex"
+                  key={index.toString()}
+                  css={styles.iconNumber}
+                >
+                  {index / 2 + 1}
+                </Center>
+              )
+            )}
           <span tw="ml-1">写入到 rowkey</span>
         </FlexBox>
       </div>
