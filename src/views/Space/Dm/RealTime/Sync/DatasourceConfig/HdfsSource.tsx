@@ -20,7 +20,7 @@ import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get } from 'lodash-es'
 import { map } from 'rxjs'
 
-const { SelectField, TextField } = Form
+const { SelectField, TextField, RadioGroupField } = Form
 type FieldKeys =
   | 'id'
   | 'path'
@@ -77,9 +77,7 @@ const HdfsSource = forwardRef(
         }
         return sourceRef.current?.validateForm()
       },
-      refetchColumn: () => {
-        // TODO
-      },
+      refetchColumn: () => {},
     }))
 
     return (
@@ -102,6 +100,22 @@ const HdfsSource = forwardRef(
                   HDFS Source 配置文档
                 </HelpCenterLink>
               }
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                        HDFS Source 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
             />
             <SelectField
               label={<AffixLabel required>文件类型</AffixLabel>}
@@ -125,6 +139,14 @@ const HdfsSource = forwardRef(
                 ]
               }
               placeholder="请选择文件类型"
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择文件类型',
+                  status: 'error',
+                },
+              ]}
             />
 
             {dbInfo?.fileType === 1 && (
@@ -140,7 +162,7 @@ const HdfsSource = forwardRef(
                   }}
                   placeholder="请输入分隔符"
                 />
-                <SelectField
+                <RadioGroupField
                   name="encoding"
                   label="字符编码"
                   value={dbInfo?.encoding}
@@ -187,6 +209,14 @@ const HdfsSource = forwardRef(
                 })
               }}
               placeholder="请填写文件正则表达，读取匹配到的文件列表"
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请填写文件正则表达，读取匹配到的文件列表',
+                  status: 'error',
+                },
+              ]}
             />
           </>
         )}

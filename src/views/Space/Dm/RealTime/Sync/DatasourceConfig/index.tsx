@@ -26,14 +26,17 @@ import {
   IDataSourceConfigProps,
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
-import KafkaSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/KafkaSourceConfig'
-import SqlServerSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/SqlServerSourceConfig'
-import KafkaTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/KafkaTargetConfig'
-import HiveTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HiveTargetConfig'
-import HbaseSource from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseSource'
-import HbaseTarget from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseTarget'
-import MongoDbTarget from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/MongoDbTarget'
+
 import { source$, syncJobOp$, target$ } from '../common/subjects'
+
+import KafkaSourceConfig from './KafkaSourceConfig'
+import SqlServerSourceConfig from './SqlServerSourceConfig'
+import KafkaTargetConfig from './KafkaTargetConfig'
+import HiveTargetConfig from './HiveTargetConfig'
+import EsTarget from './EsTarget'
+import EsSource from './EsSource'
+import HdfsSource from './HdfsSource'
+import HdfsTarget from './HdfsTarget'
 
 const styles = {
   arrowBox: tw`space-x-2 bg-neut-17 w-[70%] z-10`,
@@ -148,7 +151,7 @@ const DatasourceConfig = observer(
     }
 
     const renderSource = () => {
-      return <HbaseSource curJob={curJob} ref={sourceRef} />
+      // return <HbaseSource curJob={curJob} ref={sourceRef} />
       if (curJob?.type === 3) {
         return renderRealTimeSource()
       }
@@ -156,12 +159,18 @@ const DatasourceConfig = observer(
       if (baseSource.has(curJob?.source_type!)) {
         return <BaseSourceConfig curJob={curJob} ref={sourceRef} />
       }
+      switch (curJob?.source_type) {
+        case SourceType.ElasticSearch:
+          return <EsSource curJob={curJob} ref={sourceRef} />
+        case SourceType.HDFS:
+          return <HdfsSource curJob={curJob} ref={sourceRef} />
+        default:
+          break
+      }
       return null
     }
 
     const renderTarget = () => {
-      return <MongoDbTarget curJob={curJob} ref={targetRef} />
-      return <HbaseTarget curJob={curJob} ref={targetRef} />
       if (baseTarget.has(curJob?.target_type!)) {
         return <BaseTargetConfig curJob={curJob} ref={targetRef} />
       }
@@ -171,6 +180,10 @@ const DatasourceConfig = observer(
           return <KafkaTargetConfig curJob={curJob} ref={targetRef} />
         case SourceType.Hive:
           return <HiveTargetConfig curJob={curJob} ref={targetRef} />
+        case SourceType.ElasticSearch:
+          return <EsTarget curJob={curJob} ref={targetRef} />
+        case SourceType.HDFS:
+          return <HdfsTarget curJob={curJob} ref={targetRef} />
         default:
           return null
       }

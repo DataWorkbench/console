@@ -28,7 +28,7 @@ type FieldKeys =
   | 'encoding'
   | 'compress'
 
-const { TextField, SelectField } = Form
+const { TextField, SelectField, RadioGroupField } = Form
 const HdfsTarget = forwardRef(
   (props: IDataSourceConfigProps, ref: ForwardedRef<ISourceRef>) => {
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
@@ -45,10 +45,10 @@ const HdfsTarget = forwardRef(
               id: get(e, 'data.id'),
               path: get(e, 'data.path'),
               fileName: get(e, 'data.file_name'),
-              writeMode: get(e, 'data.write_mode'),
+              writeMode: get(e, 'data.write_mode', 1),
               fileType: get(e, 'data.file_type'),
-              fieldDelimiter: get(e, 'data.field_delimiter'),
-              encoding: get(e, 'data.encoding'),
+              fieldDelimiter: get(e, 'data.field_delimiter', '\\001'),
+              encoding: get(e, 'data.encoding', 1),
               compress: get(e, 'data.compress'),
             }
           })
@@ -100,6 +100,22 @@ const HdfsTarget = forwardRef(
                 })
               }}
               placeholder="请输入文件路径"
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                        HDFS Sink 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
               help={
                 <HelpCenterLink hasIcon isIframe={false} href="###">
                   HDFS Sink 配置文档
@@ -116,6 +132,14 @@ const HdfsTarget = forwardRef(
                 })
               }}
               placeholder="请输入写入文件名"
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请输入写入文件名',
+                  status: 'error',
+                },
+              ]}
             />
             <SelectField
               label={<AffixLabel required>写入模式</AffixLabel>}
@@ -137,29 +161,48 @@ const HdfsTarget = forwardRef(
                 ]
               }
               placeholder="请选择写入模式"
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择写入模式',
+                  status: 'error',
+                },
+              ]}
             />
             <SelectField
               label={<AffixLabel required>文件类型</AffixLabel>}
-              name="type"
               value={dbInfo?.fileType}
+              name="fileType"
               onChange={(e) => {
+                /**
+                 * text 默认不进行压缩
+                 * orc 默认为ZLIB格式
+                 * parquet 默认为SNAPPY格式
+                 */
+                const map1 = {
+                  1: 0,
+                  2: 0,
+                  3: 3,
+                }
                 setDbInfo((draft) => {
                   draft.fileType = e
+                  draft.compress = map1[e as 1]
                 })
               }}
-              options={
-                /**
-                 * text = 1;
-                 * orc = 2;
-                 * parquet = 3;
-                 */
-                [
-                  { label: 'text', value: 1 },
-                  { label: 'orc', value: 2 },
-                  { label: 'parquet', value: 3 },
-                ]
-              }
+              options={['text', 'orc', 'parquet'].map((i, index) => ({
+                label: i,
+                value: index + 1,
+              }))}
               placeholder="请选择文件类型"
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择文件类型',
+                  status: 'error',
+                },
+              ]}
             />
 
             {dbInfo?.fileType === 1 && (
@@ -175,7 +218,7 @@ const HdfsTarget = forwardRef(
                   }}
                   placeholder="请输入分隔符"
                 />
-                <SelectField
+                <RadioGroupField
                   name="encoding"
                   label="字符编码"
                   value={dbInfo?.encoding}
@@ -202,7 +245,8 @@ const HdfsTarget = forwardRef(
               <SelectField
                 label={<AffixLabel required>压缩类型</AffixLabel>}
                 value={dbInfo?.compress}
-                onChnage={(e) => {
+                name="compress"
+                onChange={(e) => {
                   setDbInfo((draft) => {
                     draft.compress = e
                   })
@@ -212,18 +256,48 @@ const HdfsTarget = forwardRef(
                    * text：支持GZIP、BZIP2格式
                    * orc：支持SNAPPY、GZIP、BZIP、LZ4格式
                    * parquet：支持SNAPPY、GZIP、LZO格式
+                   *
+                   * CompressTypeUnset = 0;
+                   *    GZIP = 1;
+                   *    BZIP2 = 2;
+                   *    SNAPPY = 3;
+                   *    BZIP = 4;
+                   *    LZ4 = 5;
+                   *    LZO = 6;
                    */
                   {
-                    text: ['GZIP', 'BZIP2'],
-                    orc: ['SNAPPY', 'GZIP', 'BZIP', 'LZ4'],
-                    parquet: ['SNAPPY', 'GZIP', 'LZO'],
-                  }[dbInfo?.fileType as 'text']?.map((i) => ({
-                    label: i,
-                    value: i,
+                    1: [
+                      ['不进行压缩', 0],
+                      ['GZIP', 1],
+                      ['BZIP2', 2],
+                    ],
+                    2: [
+                      ['不进行压缩', 0],
+                      ['SNAPPY', 3],
+                      ['GZIP', 1],
+                      ['BZIP', 4],
+                      ['LZ4', 5],
+                    ],
+                    3: [
+                      ['不进行压缩', 0],
+                      ['SNAPPY', 3],
+                      ['GZIP', 1],
+                      ['LZO', 6],
+                    ],
+                  }[dbInfo?.fileType as 1]?.map(([label, value]) => ({
+                    label,
+                    value,
                   })) ?? []
                 }
                 placeholder="请选择压缩类型"
                 validateOnChange
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请选择压缩类型',
+                    status: 'error',
+                  },
+                ]}
               />
             )}
           </>
