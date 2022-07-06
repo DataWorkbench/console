@@ -18,10 +18,14 @@ import { timeFormat } from 'utils/convert'
 import {
   confColumns$,
   curJobDbConfSubject$,
+  source$,
   sourceColumns$,
+  target$,
   targetColumns$,
 } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import DatasourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig'
+import { useImmer } from 'use-immer'
+import { map, filter, pairwise } from 'rxjs'
 import { JobToolBar } from '../styled'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
@@ -421,6 +425,40 @@ const SyncJob = () => {
     }
   }
 
+  const [{ sourceId, targetId }, setSourceId] = useImmer({
+    sourceId: confData?.source_id,
+    targetId: confData?.target_id,
+  })
+
+  useLayoutEffect(() => {
+    const sub = source$
+      .pipe(
+        pairwise(),
+        filter(([e1, e2]) => e1?.data?.id !== e2?.data?.id),
+        map(([, e]) => e?.data?.id)
+      )
+      .subscribe((e) =>
+        setSourceId((draft) => {
+          draft.sourceId = e
+        })
+      )
+    const sub1 = target$
+      .pipe(
+        pairwise(),
+        filter(([e1, e2]) => e1?.data?.id !== e2?.data?.id),
+        map(([, e]) => e?.data?.id)
+      )
+      .subscribe((e) =>
+        setSourceId((draft) => {
+          draft.targetId = e
+        })
+      )
+    return () => {
+      sub.unsubscribe()
+      sub1.unsubscribe()
+    }
+  }, [setSourceId])
+
   const renderGuideMode = () => {
     return (
       <CollapseWrapper>
@@ -451,8 +489,11 @@ const SyncJob = () => {
                   // mappings={[]}
                   leftFields={sourceColumns as any}
                   rightFields={targetColumns as any}
+                  sourceId={sourceId}
+                  targetId={targetId}
                   leftTypeName={sourceTypeName}
                   rightTypeName={targetTypeName}
+                  jobType={curJob?.type}
                   columns={columns}
                   topHelp={
                     <HelpCenterLink
