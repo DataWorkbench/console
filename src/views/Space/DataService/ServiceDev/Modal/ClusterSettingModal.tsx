@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   AffixLabel,
   ButtonWithClearField,
@@ -7,11 +7,12 @@ import {
   ModalContent,
   PopConfirm
 } from 'components'
-import { get, isEmpty } from 'lodash-es'
+import { cloneDeep, get, isEmpty } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useMutationPingSyncJobConnection, useStore } from 'hooks'
+import { useMutationUpdateApiConfig, useStore } from 'hooks'
 import { Form, Button, Icon, Alert } from '@QCFE/lego-ui'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import ClusterTableModal from './ClusterTableModal'
 
 const Root = styled.div`
@@ -52,23 +53,77 @@ export interface JobModalData {
 }
 
 export const JobModal = observer(() => {
-  const mutation = useMutationPingSyncJobConnection()
+  const mutation = useMutationUpdateApiConfig()
   const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
   const clusterName = get(cluster, 'name', '')
   const [visible, setVisible] = useState(false)
   const form = useRef<Form>(null)
 
-  const { dtsDevStore } = useStore()
+  const {
+    dtsDevStore,
+    dtsDevStore: { apiConfigData }
+  } = useStore()
+
+  useEffect(() => {
+    const serviceCluster = cloneDeep(get(apiConfigData, 'service_cluster'))
+    if (serviceCluster?.id) {
+      setCluster({ id: serviceCluster.id, name: serviceCluster.name })
+    }
+  }, [apiConfigData])
 
   const onClose = () => {
     dtsDevStore.set({ showClusterSetting: false })
   }
-  console.log(cluster, 'clustercluster', clusterId)
+
+  const handleSyncStore = () => {
+    const config = {
+      ...cloneDeep(apiConfigData),
+      service_cluster: {
+        ...cloneDeep(apiConfigData?.service_cluster),
+        ...cluster
+      }
+    }
+    dtsDevStore.set({
+      apiConfigData: config
+    })
+  }
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      onClose()
+      const configSource = cloneDeep(get(apiConfigData, 'data_source'))
+      const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
+      if (!configSource?.id) {
+        Notify.warning({
+          title: '操作提示',
+          content: '请先选择数据源',
+          placement: 'bottomRight'
+        })
+        return
+      }
+
+      mutation.mutate(
+        {
+          ...apiConfig,
+          apiId: get(apiConfig, 'api_id', ''),
+          datasource_id: configSource?.id,
+          table_name: apiConfig?.table_name,
+          cluster_id: cluster?.id
+        },
+        {
+          onSuccess: (res) => {
+            if (res.ret_code === 0) {
+              onClose()
+              Notify.success({
+                title: '操作提示',
+                content: '配置保存成功',
+                placement: 'bottomRight'
+              })
+              handleSyncStore()
+            }
+          }
+        }
+      )
     }
   }
 
@@ -113,7 +168,6 @@ export const JobModal = observer(() => {
               }}
               label={<AffixLabel required>服务集群</AffixLabel>}
             >
-              {clusterName || clusterId}
               <Center tw="space-x-1">
                 <span tw="ml-1">{clusterName}</span>
                 <span tw="text-neut-8">(ID:{clusterId})</span>

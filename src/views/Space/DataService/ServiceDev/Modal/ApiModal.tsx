@@ -4,7 +4,12 @@ import { AffixLabel, Modal, ModalContent, TextLink } from 'components'
 import { get, merge, pickBy } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useMutationApiService, useQueryListApiGroups, getQueryKeyListApiGroups } from 'hooks'
+import {
+  useMutationApiService,
+  useQueryListApiGroups,
+  getQueryKeyListApiGroups,
+  useStore
+} from 'hooks'
 import { strlen } from 'utils'
 import { Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
@@ -13,6 +18,7 @@ import { ApiProps } from 'stores/DtsDevStore'
 import { useQueryClient } from 'react-query'
 import ModelItem from './ModeItem'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
+import type { CurrentGroupApiProps } from '../ApiPanel/ApiTree'
 
 const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
 
@@ -52,6 +58,7 @@ export interface JobModalData {
 interface JobModalProps {
   isEdit?: boolean
   currentApi?: ApiProps
+  currentGroup?: CurrentGroupApiProps
   onClose?: (data?: JobModalData) => void
 }
 
@@ -85,14 +92,18 @@ const modelSource = [
 ]
 
 export const JobModal = observer((props: JobModalProps) => {
-  const { isEdit = false, onClose, currentApi } = props
+  const { isEdit = false, onClose, currentApi, currentGroup } = props
   const { spaceId } = useParams<{ spaceId: string }>()
   const queryClient = useQueryClient()
+  const {
+    dtsDevStore: { resetTreeData }
+  } = useStore()
 
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
     api_mode: 1,
     group_path: '',
+    group_name: '',
     api_name: '',
     api_path: '',
     protocols: Protocol.HTTP,
@@ -112,9 +123,9 @@ export const JobModal = observer((props: JobModalProps) => {
       const paramsData = merge(
         {
           option: isEdit ? 'updateApi' : ('createApi' as const),
-          ...pickBy(params, (v, k) => k !== 'group_path'),
+          ...pickBy(params, (v, k) => !['group_path', 'group_name'].includes(k)),
           api_path: params.api_path,
-          group_id: apiGroupList.find((item) => item.group_path === params.group_path)?.id,
+          group_id: apiGroupList.find((item) => item.name === params.group_name)?.id,
           space_id: spaceId
         },
         isEdit && { apiId: currentApi?.api_id }
@@ -123,6 +134,7 @@ export const JobModal = observer((props: JobModalProps) => {
       mutation.mutate(paramsData, {
         onSuccess: () => {
           queryClient.invalidateQueries(getQueryKeyListApiGroups())
+          resetTreeData()
           onClose?.()
         }
       })
@@ -131,10 +143,12 @@ export const JobModal = observer((props: JobModalProps) => {
 
   useEffect(() => {
     if (currentApi) {
-      const path = apiGroupList.find((item) => item.id === currentApi.group_id)?.group_path || '/'
+      const group = apiGroupList.find((item) => item.id === currentApi.group_id)
+
       setParams((date) => {
         date.api_mode = currentApi.api_mode
-        date.group_path = path
+        date.group_path = group?.group_path || '/'
+        date.group_name = group?.name || ''
         date.api_name = currentApi.api_name
         date.api_path = currentApi.api_path
         date.protocols = currentApi.protocols
@@ -144,8 +158,13 @@ export const JobModal = observer((props: JobModalProps) => {
         date.api_description = currentApi.api_description
         date.timeout = currentApi.timeout
       })
+    } else if (currentGroup) {
+      setParams((date) => {
+        date.group_path = currentGroup?.group_path || '/'
+        date.group_name = currentGroup?.name || ''
+      })
     }
-  }, [apiGroupList, currentApi, setParams])
+  }, [apiGroupList, currentApi, setParams, currentGroup])
 
   return (
     <Modal
@@ -215,12 +234,14 @@ export const JobModal = observer((props: JobModalProps) => {
                 placeholder="请选择API服务组"
                 options={apiGroupList.map((item) => ({
                   label: item.name,
-                  value: item.group_path
+                  value: item.name
                 }))}
-                value={params.group_path}
+                value={params.group_name}
                 onChange={(v: string) => {
+                  const path = apiGroupList.find((item) => item.name === v)?.group_path || '/'
                   setParams((draft) => {
-                    draft.group_path = v
+                    draft.group_path = path
+                    draft.group_name = v
                   })
                 }}
                 schemas={[
@@ -345,14 +366,14 @@ export const JobModal = observer((props: JobModalProps) => {
                   value={get(params, 'timeout', '')}
                   onChange={(_, v: any) =>
                     setParams((draft) => {
-                      draft.timeout = Number(v) as unknown as string
+                      draft.timeout = (Number(v) || 0) as unknown as string
                     })
                   }
-                  validateOnChange
-                  maxLength={50}
+                  validateOnBlur
+                  maxLength={3}
                   schemas={[
                     {
-                      rule: (value: number) => {
+                      rule: (value: string) => {
                         const l = Number(value)
                         return l >= 0 && l <= 300
                       },

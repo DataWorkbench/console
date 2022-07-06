@@ -1,6 +1,8 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { Mapping } from 'utils/types'
 import { createEnhancedEnum } from 'utils'
+import { DataServiceManageDescribeApiConfigType } from 'types/response'
+import { get } from 'lodash-es'
 
 export interface Schema {
   type: string
@@ -40,11 +42,11 @@ function getField<T>(mapping: Mapping<T>): IColumn[] {
 export const serviceDevVersionFieldMapping: Mapping<
   'apiName' | 'status' | 'versionId' | 'apiPath' | 'createTime'
 > = new Map()
-  .set('apiName', { label: 'API 名称', apiField: 'apiName' })
+  .set('apiName', { label: 'API 名称', apiField: 'api_name' })
   .set('status', { label: '状态', apiField: 'status' })
-  .set('versionId', { label: '版本 ID', apiField: 'versionId' })
-  .set('apiPath', { label: 'API 路径', apiField: 'apiPath' })
-  .set('createTime', { label: '发布时间', apiField: 'createTime' })
+  .set('versionId', { label: '版本 ID', apiField: 'version_id' })
+  .set('apiPath', { label: 'API 路径', apiField: 'api_path' })
+  .set('createTime', { label: '发布时间', apiField: 'created' })
 
 export const serviceDevVersionColumns: IColumn[] = getField(serviceDevVersionFieldMapping)
 
@@ -68,7 +70,7 @@ export const FieldSettingColumns: IColumn[] = getField(serviceDevVersionFieldSet
 export const serviceDevRequestSettingMapping: Mapping<
   | 'param_name'
   | 'column_name'
-  | 'data_type'
+  | 'type'
   | 'param_operator'
   | 'param_position'
   | 'is_required'
@@ -78,7 +80,7 @@ export const serviceDevRequestSettingMapping: Mapping<
 > = new Map()
   .set('param_name', { label: '参数名称', apiField: 'param_name' })
   .set('column_name', { label: '绑定字段', apiField: 'column_name' })
-  .set('data_type', { label: '参数字段', apiField: 'data_type' })
+  .set('type', { label: '参数字段', apiField: 'type' })
   .set('param_operator', { label: '操作符', apiField: 'param_operator' })
   .set('param_position', { label: '参数位置', apiField: 'param_position' })
   .set('is_required', { label: '必填', apiField: 'is_required' })
@@ -89,11 +91,11 @@ export const serviceDevRequestSettingMapping: Mapping<
 export const RequestSettingColumns: IColumn[] = getField(serviceDevRequestSettingMapping)
 
 export const serviceDevResponseSettingMapping: Mapping<
-  'param_name' | 'column_name' | 'data_type' | 'example_value' | 'param_description'
+  'param_name' | 'column_name' | 'type' | 'example_value' | 'param_description'
 > = new Map()
   .set('param_name', { label: '参数名称', apiField: 'param_name' })
   .set('column_name', { label: '绑定字段', apiField: 'column_name' })
-  .set('data_type', { label: '参数字段', apiField: 'data_type' })
+  .set('type', { label: '参数字段', apiField: 'type' })
   .set('example_value', { label: '示例值', apiField: 'example_value' })
   .set('param_description', { label: '描述', apiField: 'param_description' })
 
@@ -212,8 +214,8 @@ export const OrderMode = createEnhancedEnum<IStatusEnum>({
     label: 'UNSET',
     value: 0
   },
-  ASC: {
-    label: 'ASC',
+  ASE: {
+    label: 'ASE',
     value: 1
   },
   DESC: {
@@ -246,17 +248,91 @@ export const paramsDataType: (type: string) => number | undefined = (type: strin
 export const configMapData = (filedData: SchemaMap[], configData: any[], defaultData: any) => {
   const configMap = new Map()
   configData?.forEach((item) => {
-    configMap.set(item.field, item)
+    configMap.set(item.param_name, item)
   })
 
   return filedData?.map((item) => {
     const configItem = configMap.get(item.param_name)
+    const type = paramsDataType(item.type) || 1
+
     if (configItem) {
       return {
         ...item,
+        data_type: type,
         ...configItem
       }
     }
-    return { ...item, ...defaultData }
+    return { ...item, ...defaultData, data_type: type }
+  })
+}
+
+export const FieldCategory = createEnhancedEnum<IStatusEnum>({
+  CATEGORYUNSET: {
+    label: 'UNSET',
+    value: 0
+  },
+  PAGECONFIG: {
+    label: 'pageConfig',
+    value: 1
+  },
+  DATABASECOLUMN: {
+    label: 'databaseColumn',
+    value: 2
+  }
+})
+
+/**
+ * 根据请求参数和响应参数进行处理字段设置的请求和返回数据
+ * @param apiConfig api配置
+ * @param schema 数据源表字段
+ * @returns
+ */
+export const configMapFieldData = (
+  apiConfig: DataServiceManageDescribeApiConfigType | null,
+  schema: Schema[]
+) => {
+  const requestConfig = get(apiConfig, 'api_config.request_params.request_params', [])
+  const responseConfig = get(apiConfig, 'api_config.response_params.response_params', [])
+
+  const requestMap = new Map()
+  const responseMap = new Map()
+  requestConfig?.forEach((item: { column_name: any }) => {
+    requestMap.set(item.column_name, true)
+  })
+  responseConfig?.forEach((item: { column_name: any }) => {
+    responseMap.set(item.column_name, true)
+  })
+
+  const fieldSettingData = getFieldSettingParamsData(schema)
+
+  return fieldSettingData?.map((item) => {
+    const isRequest = requestMap.get(item.field)
+    const isResponse = responseMap.get(item.field)
+
+    return {
+      ...item,
+      isRequest: !!isRequest,
+      isResponse: !!isResponse
+    }
+  })
+}
+
+export const orderMapRequestData = (orderSourceData: any[], responseData: any[]) => {
+  const orderMap = new Map()
+  const orderData = orderSourceData?.map((item, index) => ({
+    ...item,
+    order_num: index + 1
+  }))
+
+  orderData?.forEach((item: any) => {
+    orderMap.set(item.name, item)
+  })
+
+  return responseData?.map((item: any) => {
+    const orderItem = orderMap.get(item.column_name)
+    return {
+      ...item,
+      ...orderItem
+    }
   })
 }

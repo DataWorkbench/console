@@ -7,6 +7,7 @@ import useFilter from 'hooks/useHooks/useFilter'
 import { assign, get, omitBy } from 'lodash-es'
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
+import { useParams } from 'react-router-dom'
 import tw from 'twin.macro'
 import { MappingKey } from 'utils/types'
 import { apiGroupTableFieldMapping, apiGroupTableColumns } from '../constants'
@@ -15,6 +16,11 @@ const { ColumnsSetting } = ToolBar as any
 
 interface ApiGroupTableProps {
   onSelect?: (selectedRowKeys: string[]) => void
+}
+
+interface IRouteParams {
+  regionId: string
+  spaceId: string
 }
 
 const columnSettingsKey = 'DATA_SERVICE_API_SERVICE'
@@ -26,6 +32,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
   const { onSelect } = props
 
   const queryClient = useQueryClient()
+  const { spaceId } = useParams<IRouteParams>()
 
   const {
     filter,
@@ -56,7 +63,10 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     }
   )
 
-  const { isRefetching, data } = useQueryListApiServices(omitBy(filter, (v) => v === '') as any)
+  const { isRefetching, data } = useQueryListApiServices({
+    uri: { space_id: spaceId },
+    params: omitBy(filter, (v) => v === '')
+  })
 
   // 刷新
   const refetchData = () => {

@@ -15,12 +15,12 @@ import {
   SelectWithRefresh,
   HelpCenterLink
 } from 'components'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useImperativeHandle } from 'react'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
 import { cloneDeep, findKey, get, isEmpty, pick } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
-import { dataSourceTypes } from '../constants'
+import { configMapFieldData, dataSourceTypes } from '../constants'
 import { tableSelectStyled } from '../styled'
 
 type SourceDataType = { id: string; name: string; networkId?: string } | null
@@ -29,18 +29,20 @@ interface IRouteParams {
   spaceId: string
 }
 
+export interface ISourceData {
+  type: number
+  tableName: string
+  source: SourceDataType
+}
+
 const { SelectField } = Form
 
 const SyncDataSource = observer(
   (props, ref) => {
     const [visible, setVisible] = useState<boolean | null>(null)
     const { spaceId } = useParams<IRouteParams>()
-    const [sourceData, setSourceData] = useImmer<{
-      type: string
-      tableName: string
-      source: SourceDataType
-    }>({
-      type: '',
+    const [sourceData, setSourceData] = useImmer<ISourceData>({
+      type: 0,
       source: null,
       tableName: ''
     })
@@ -53,12 +55,13 @@ const SyncDataSource = observer(
     // 启动后回显数据
     useEffect(() => {
       if (apiConfigData) {
-        const data = cloneDeep(get(apiConfigData, 'api_config'))
+        const data = cloneDeep(get(apiConfigData, 'data_source'))
+        const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
         if (!data) return
         setSourceData((draft) => {
-          draft.type = get(data, 'dataSourceType', '') // TODO: 后端接口没有返回数据源类型
-          draft.tableName = get(data, 'table_name', '')
-          draft.source = { id: get(data, 'datasource_id', ''), name: '' } // TODO: 后端接口没有返回数据源
+          draft.type = get(data, 'type', 0)
+          draft.tableName = get(apiConfig, 'table_name', '')
+          draft.source = { id: get(data, 'id', ''), name: get(data, 'name', '') }
         })
       }
     }, [apiConfigData, setSourceData])
@@ -103,8 +106,10 @@ const SyncDataSource = observer(
     useEffect(() => {
       const columns = get(TableSchema.data, 'schema.columns', [])
       if (!columns) return
-      setSchemaColumns(columns)
-    }, [TableSchema.data, setSchemaColumns])
+      const columnsData = configMapFieldData(cloneDeep(apiConfigData), columns)
+
+      setSchemaColumns(columnsData)
+    }, [TableSchema.data, apiConfigData, setSchemaColumns])
 
     const handleClick = () => {
       setVisible(true)
@@ -131,12 +136,15 @@ const SyncDataSource = observer(
     // 同步数据源到mobx
     const handleSync = (tableName: string) => {
       const config = {
-        ...apiConfigData,
+        ...cloneDeep(apiConfigData),
         api_config: {
-          ...apiConfigData?.api_config,
-          dataSourceType: sourceData.type,
-          datasource_id: sourceData.source?.id,
+          ...cloneDeep(apiConfigData?.api_config),
           table_name: tableName
+        },
+        data_source: {
+          id: sourceData.source?.id,
+          name: sourceData.source?.name,
+          type: sourceData.type
         }
       }
 
@@ -144,6 +152,10 @@ const SyncDataSource = observer(
         apiConfigData: config
       })
     }
+
+    useImperativeHandle(ref, () => ({
+      getDataSource: () => sourceData
+    }))
 
     return (
       <FlexBox tw="flex-col">
@@ -163,7 +175,7 @@ const SyncDataSource = observer(
               }
             ]}
             validateOnChange
-            onChange={(v: string) => {
+            onChange={(v: number) => {
               setSourceData((draft) => {
                 draft.type = v
                 draft.source = null
@@ -172,7 +184,7 @@ const SyncDataSource = observer(
               clearSchemaColumns()
             }}
           />
-          {sourceData.type !== '' && (
+          {sourceData.type !== 0 && (
             <ButtonWithClearField
               name="source"
               placeholder="选择数据来源"
@@ -197,7 +209,7 @@ const SyncDataSource = observer(
               </Center>
             </ButtonWithClearField>
           )}
-          {!isEmpty(sourceData.source) && (
+          {!isEmpty(sourceData.source?.id) && (
             <SelectWithRefresh
               name="table"
               label={<AffixLabel>数据源表</AffixLabel>}

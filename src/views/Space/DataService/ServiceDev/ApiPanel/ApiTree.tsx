@@ -7,7 +7,7 @@ import { useFetchApi } from 'hooks'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { useUnmount } from 'react-use'
-import { cloneDeep, get } from 'lodash-es'
+import { cloneDeep, get, pick } from 'lodash-es'
 import { useStore } from 'stores'
 import { useParams } from 'react-router-dom'
 import { ApiProps } from 'stores/DtsDevStore'
@@ -49,6 +49,12 @@ interface JobTreeProps {
   expandedKeys?: string[]
 }
 
+export interface CurrentGroupApiProps {
+  name: string
+  id: string
+  group_path: string
+}
+
 export const ApiTree = observer(
   (props: JobTreeProps, ref) => {
     const { expandedKeys: expandedKeysProp } = props
@@ -68,7 +74,7 @@ export const ApiTree = observer(
     const [visible, setVisible] = useState<any>(null)
     const [curOp, setCurOp] = useState<string>('')
     const [currentApi, setCurrentApi] = useState<ApiProps>()
-    const [currentGroupId, setCurrentGroupId] = useState<string>()
+    const [currentGroup, setCurrentGroup] = useState<CurrentGroupApiProps>()
     const [showApiModal, setShowApiModal] = useState<boolean>()
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>()
 
@@ -105,8 +111,11 @@ export const ApiTree = observer(
     }, [])
 
     const onRightMenuClick = useCallback(
-      (e, key: string, val: CurOpProps, api?: ApiProps | null, groupId?: string) => {
-        if (groupId) setCurrentGroupId(groupId)
+      (e, key: string, val: CurOpProps, api?: ApiProps | null, Group?: CurrentGroupApiProps) => {
+        if (Group) {
+          const groupData = pick(Group, ['name', 'id', 'group_path'])
+          setCurrentGroup(groupData)
+        }
         if (api) setCurrentApi(api)
         setCurOp(val)
         if (val === 'createAPI') {
@@ -138,7 +147,7 @@ export const ApiTree = observer(
         search
       })
         .then((data) => {
-          const apis = get(data, 'infos', [])
+          const apis = get(data, 'infos', []) || []
           const newTreeData = getNewTreeData(dtsDevStore.treeData, node, apis, movingNode)
           dtsDevStore.setTreeData(newTreeData)
           setExpandedKeys([...expandedKeys, node.key])
@@ -158,7 +167,7 @@ export const ApiTree = observer(
           return (
             <Menu
               onClick={(e: any, key: string, val: string | number) =>
-                onRightMenuClick(e, key, val as CurOpProps, null, get(node, 'key', ''))
+                onRightMenuClick(e, key, val as CurOpProps, null, node)
               }
             >
               <MenuItem value="createAPI">
@@ -289,14 +298,15 @@ export const ApiTree = observer(
           <ApiModal
             isEdit={curOp === 'editAPI'}
             currentApi={currentApi}
+            currentGroup={currentGroup}
             onClose={() => setShowApiModal(false)}
           />
         )}
         {showDeleteModal && (
           <DelModal
             onClose={() => setShowDeleteModal(false)}
-            currentApiId={currentApi?.api_id}
-            currentGroupId={currentGroupId}
+            currentApi={currentApi}
+            currentGroup={currentGroup}
             isApiGroup={curOp === 'deleteApiGroup'}
           />
         )}

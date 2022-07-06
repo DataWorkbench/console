@@ -7,12 +7,14 @@ import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
 import { useImmer } from 'use-immer'
 import { cloneDeep, get } from 'lodash-es'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import {
   RequestSettingColumns,
   serviceDevRequestSettingMapping,
   ParameterOperator,
   ParameterPosition,
-  configMapData
+  configMapData,
+  FieldCategory
 } from '../constants'
 
 type DataSourceProp = DataServiceManageDescribeApiConfig['request_params']['request_params']
@@ -24,9 +26,38 @@ export interface JobModalData {
   pNode?: Record<string, any>
 }
 const dataServiceDataSettingKey = 'DATA_SERVICE_DATA_REQUEST_TABLE'
-const dataServiceDataLimitSettingKey = 'DATA_SERVICE_DATA_REQUEST_LIMIT'
+const dataServiceDataLimitSettingKey = 'DATA_SERVICE_DATA_REQUEST_HIGH'
 const getName = (name: MappingKey<typeof serviceDevRequestSettingMapping>) =>
   serviceDevRequestSettingMapping.get(name)!.apiField
+
+const defaultHighSource = [
+  {
+    column_name: 'limit',
+    param_name: 'limit',
+    data_type: 1,
+    type: 'INt',
+    param_operator: ParameterOperator.EQUAL,
+    param_position: ParameterPosition.QUERY,
+    is_required: true,
+    field_category: FieldCategory.PAGECONFIG,
+    example_value: '',
+    default_value: '',
+    param_description: ''
+  },
+  {
+    column_name: 'offset',
+    param_name: 'offset',
+    data_type: 1,
+    type: 'INt',
+    param_operator: ParameterOperator.EQUAL,
+    param_position: ParameterPosition.QUERY,
+    is_required: true,
+    field_category: FieldCategory.PAGECONFIG,
+    example_value: '',
+    default_value: '',
+    param_description: ''
+  }
+]
 
 const { CollapseItem } = Collapse
 
@@ -34,28 +65,7 @@ export const JobModal = observer(() => {
   const modal = useRef(null)
 
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
-  const [limitSource, setLimitSource] = useImmer([
-    {
-      param_name: 'limit',
-      data_type: 'INT',
-      param_operator: ParameterOperator.EQUAL,
-      param_position: ParameterPosition.QUERY,
-      is_required: false,
-      example_value: '',
-      default_value: '',
-      param_description: ''
-    },
-    {
-      param_name: 'limit',
-      data_type: 'INT',
-      param_operator: ParameterOperator.EQUAL,
-      param_position: ParameterPosition.QUERY,
-      is_required: false,
-      example_value: '',
-      default_value: '',
-      param_description: ''
-    }
-  ])
+  const [highSource, setHighSource] = useImmer(defaultHighSource)
 
   const {
     dtsDevStore: { apiConfigData, fieldSettingData },
@@ -69,41 +79,68 @@ export const JobModal = observer(() => {
       const filedData = cloneDeep(fieldSettingData)
         .filter((item) => item.isRequest)
         .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
-      const config = cloneDeep(get(apiConfigData, 'api_config.request_params', []))
-
+      const config = cloneDeep(get(apiConfigData, 'api_config.request_params.request_params', []))
+      const hightConfig = config?.filter(
+        (item: any) => item.param_name === 'limit' || item.param_name === 'offset'
+      )
       if (filedData.length) {
         // 拼数据
         const defaultValue = {
-          data_type: 0, // TODO: 暂时写死 字段映射表
+          data_type: 1, // 字段类型 映射函数configMapData中赋值
           param_operator: ParameterOperator.EQUAL,
           param_position: ParameterPosition.QUERY,
           is_required: false,
           example_value: '',
           default_value: '',
-          param_description: ''
+          param_description: '',
+          field_category: FieldCategory.DATABASECOLUMN
         }
         const newRequestData = configMapData(filedData, config, defaultValue)
         setDataSource(newRequestData)
       }
+      if (hightConfig.length) {
+        setHighSource(hightConfig)
+      }
     }
-  }, [apiConfigData, setDataSource, fieldSettingData])
+  }, [apiConfigData, setDataSource, fieldSettingData, setHighSource])
 
   const onClose = () => {
     dtsDevStore.set({ showRequestSetting: false })
   }
 
   const handleOK = () => {
-    const apiConfig = cloneDeep(apiConfigData)
+    const configSource = cloneDeep(get(apiConfigData, 'data_source'))
+    const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
+
+    if (!configSource?.id) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请先选择数据源',
+        placement: 'bottomRight'
+      })
+      return
+    }
+
     mutation.mutate(
       {
-        apiId: get(apiConfig, 'api_config.api_id', ''),
+        ...apiConfig,
+        apiId: get(apiConfig, 'api_id', ''),
+        datasource_id: configSource?.id,
+        table_name: apiConfig?.table_name,
         request_params: {
-          request_params: dataSource
+          request_params: [...dataSource, ...highSource]
         }
       },
       {
-        onSuccess: () => {
-          onClose()
+        onSuccess: (res) => {
+          if (res.ret_code === 0) {
+            onClose()
+            Notify.success({
+              title: '操作提示',
+              content: '配置保存成功',
+              placement: 'bottomRight'
+            })
+          }
         }
       }
     )
@@ -143,7 +180,7 @@ export const JobModal = observer(() => {
     [getName('param_operator')]: {
       width: 100,
       render: (text: string) => (
-        <Select options={ParameterOperator.getList().map((item) => item)} value={text} />
+        <Select value={text} options={ParameterPosition.getList().map((item) => item)} />
       )
     },
     [getName('param_position')]: {
@@ -182,60 +219,6 @@ export const JobModal = observer(() => {
           value={text}
           onChange={(_, value) => {
             setDataSource((draft) => {
-              draft[index].param_description = `${value}`
-            })
-          }}
-        />
-      )
-    }
-  }
-
-  const renderLimitColumns = {
-    [getName('is_required')]: {
-      width: 50,
-      title: '必填',
-      render: () => <span>否</span>
-    },
-    [getName('param_operator')]: {
-      width: 100,
-      render: () => <span>=</span>
-    },
-    [getName('param_position')]: {
-      width: 100,
-      render: (text: string) => (
-        <Select value={text} options={ParameterPosition.getList().map((item) => item)} />
-      )
-    },
-    [getName('example_value')]: {
-      render: (text: string, __: any, index: number) => (
-        <Input
-          value={text}
-          onChange={(_, value) => {
-            setLimitSource((draft) => {
-              draft[index].example_value = `${value}`
-            })
-          }}
-        />
-      )
-    },
-    [getName('default_value')]: {
-      render: (text: string, __: any, index: number) => (
-        <Input
-          value={text}
-          onChange={(_, value) => {
-            setLimitSource((draft) => {
-              draft[index].default_value = `${value}`
-            })
-          }}
-        />
-      )
-    },
-    [getName('param_description')]: {
-      render: (text: string, __: any, index: number) => (
-        <Input
-          value={text}
-          onChange={(_, value) => {
-            setLimitSource((draft) => {
               draft[index].param_description = `${value}`
             })
           }}
@@ -249,11 +232,74 @@ export const JobModal = observer(() => {
     RequestSettingColumns,
     renderColumns as any
   )
+
+  const renderHighColumns = {
+    [getName('is_required')]: {
+      width: 50,
+      title: '必填',
+      render: () => <span>否</span>
+    },
+    [getName('param_operator')]: {
+      width: 100,
+      render: (text: string) => <div>{ParameterOperator.getLabel(text)}</div>
+    },
+    [getName('param_position')]: {
+      width: 100,
+      render: (text: string, __: any, index: number) => (
+        <Select
+          value={text}
+          options={ParameterPosition.getList().map((item) => item)}
+          onChange={(_, item) => {
+            setHighSource((draft) => {
+              draft[index].param_position = item.value
+            })
+          }}
+        />
+      )
+    },
+    [getName('example_value')]: {
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setHighSource((draft) => {
+              draft[index].example_value = `${value}`
+            })
+          }}
+        />
+      )
+    },
+    [getName('default_value')]: {
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setHighSource((draft) => {
+              draft[index].default_value = `${value}`
+            })
+          }}
+        />
+      )
+    },
+    [getName('param_description')]: {
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setHighSource((draft) => {
+              draft[index].param_description = `${value}`
+            })
+          }}
+        />
+      )
+    }
+  }
+
   const RequestColumns = RequestSettingColumns.filter((item) => item.key !== getName('column_name'))
   const { columns: limitColumns } = useColumns(
     dataServiceDataLimitSettingKey,
     RequestColumns,
-    renderLimitColumns as any
+    renderHighColumns as any
   )
 
   return (
@@ -306,7 +352,7 @@ export const JobModal = observer(() => {
           <DargTable
             columns={limitColumns as unknown as any}
             runDarg={false}
-            dataSource={limitSource}
+            dataSource={highSource}
             rowKey="param_name"
           />
         </CollapseItem>

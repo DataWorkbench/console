@@ -1,16 +1,17 @@
 import { DarkModal, FlexBox, ModalContent, TextLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { ListDataServiceApiVersions, useStore } from 'hooks'
 import { Table } from 'views/Space/styled'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
-import { useImmer } from 'use-immer'
 import { MappingKey } from 'utils/types'
 import {
   serviceDevVersionFieldMapping,
   serviceDevVersionColumns
 } from 'views/Space//DataService/ServiceDev/constants'
+import { useParams } from 'react-router-dom'
+import { get, omitBy } from 'lodash-es'
 
 const dataServiceVersionSettingKey = `DATA_SERVICE_VERSION_SETTING`
 
@@ -28,30 +29,17 @@ export interface JobModalData {
 }
 
 export const JobModal = observer(() => {
-  const [dataSource] = useImmer([
-    {
-      key: '1',
-      apiName: 'work1_item',
-      status: '222',
-      versionId: 'yrl0o4601938kr9y',
-      apiPath: '/v1.work1_item0129',
-      createTime: '2020-03-11 22:22:20'
-    },
-    {
-      key: '2',
-      apiName: 'work1_item',
-      status: '222',
-      versionId: 'yrl0o4601938kr9y',
-      apiPath: '/v1.work1_item0129',
-      createTime: '2020-03-11 22:22:20'
-    }
-  ])
-  const { dtsDevStore } = useStore()
+  const { spaceId } = useParams<{ spaceId: string }>()
+  const {
+    dtsDevStore,
+    dtsDevStore: { curApi }
+  } = useStore()
 
   const getName = (name: MappingKey<typeof serviceDevVersionFieldMapping>) =>
     serviceDevVersionFieldMapping.get(name)!.apiField
 
   const {
+    filter,
     pagination,
     sort,
     getColumnSort: getSort
@@ -65,6 +53,14 @@ export const JobModal = observer(() => {
     },
     { pagination: true, sort: true },
     dataServiceVersionSettingKey
+  )
+
+  const { data } = ListDataServiceApiVersions(
+    {
+      uri: { space_id: spaceId, api_id: curApi!.api_id },
+      params: omitBy(filter, (v) => v === '')
+    },
+    { enabled: !!curApi!.api_id }
   )
 
   const onClose = () => {
@@ -96,6 +92,8 @@ export const JobModal = observer(() => {
     )
   }
 
+  const infos = get(data, 'infos', []) || []
+
   const { columns } = useColumns(
     dataServiceVersionSettingKey,
     serviceDevVersionColumns,
@@ -116,12 +114,11 @@ export const JobModal = observer(() => {
         <FormWrapper>
           <Table
             columns={columns}
-            dataSource={dataSource || []}
+            dataSource={infos}
             onSort={sort}
             rowKey="key"
             pagination={{
-              total: 100,
-              pageSize: 10,
+              total: get(data, 'total', 0),
               ...pagination
             }}
           />

@@ -3,13 +3,16 @@ import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { HelpCenterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useRef } from 'react'
-import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
-import { useMutationSyncJobConf, useStore, useFetchApiConfig } from 'hooks'
+import { cloneDeep, get } from 'lodash-es'
+import { useMutationUpdateApiConfig, useStore, useFetchApiConfig } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
-import SyncDataSource from './SyncDataSource'
-import FieldOrder from './FieldOrder'
+import SyncDataSource, { ISourceData } from './SyncDataSource'
+
+import FieldOrder, { IOrderDataSource } from './FieldOrder'
+
 import FieldSetting from './FieldSetting'
+import { orderMapRequestData } from '../constants'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -98,54 +101,35 @@ const stepsData = [
   }
 ]
 
-const removeUndefined = (obj: any) => {
-  const newObj: any = isArray(obj) ? [] : {}
-  Object.entries(obj).forEach(([key, value]) => {
-    if (isObject(value)) {
-      newObj[key] = removeUndefined(value)
-    } else if (!isUndefined(value)) {
-      newObj[key] = value
-    }
-  })
-  return newObj
-}
-
 const SyncJob = () => {
-  const mutation = useMutationSyncJobConf()
+  const mutation = useMutationUpdateApiConfig()
   const fetchApi = useFetchApiConfig()
 
   const {
-    dtsDevStore: { curApi },
+    dtsDevStore: { curApi, apiConfigData },
     dtsDevStore
   } = useStore()
 
   useEffect(() => {
     if (curApi) {
+      // 更改完api， 请求api配置
       fetchApi({ apiId: get(curApi, 'api_id') }).then((res) => {
-        dtsDevStore.set({
-          apiConfigData: res
-        })
+        if (res) {
+          dtsDevStore.set({
+            apiConfigData: res
+          })
+        }
       })
     }
-  }, [curApi, fetchApi, dtsDevStore])
+  }, [curApi, dtsDevStore, fetchApi])
 
-  const dbRef =
+  const orderRef =
     useRef<{
-      getResource: () => Record<string, string>
-      getTypeNames: () => string[]
+      getDataSource: () => IOrderDataSource[]
     }>(null)
-  const mappingRef =
+  const dataSourceRef =
     useRef<{
-      rowMapping: () => [Record<string, string>, Record<string, string>]
-    }>(null)
-  const clusterRef =
-    useRef<{
-      getCluster: () => Record<string, string>
-      checkPingSuccess: () => boolean
-    }>(null)
-  const channelRef =
-    useRef<{
-      getChannel: () => Record<string, string>
+      getDataSource: () => ISourceData
     }>(null)
 
   const showConfWarn = (content: string) => {
@@ -157,69 +141,64 @@ const SyncJob = () => {
   }
 
   const save = () => {
-    if (!dbRef.current || !mappingRef.current || !clusterRef.current || !channelRef.current) {
+    if (!orderRef.current || !dataSourceRef.current) {
       return
     }
 
-    const resource = dbRef.current.getResource()
-    if (!resource) {
-      showConfWarn('未配置数据源信息')
+    const dataSourceData = dataSourceRef.current.getDataSource()
+    const orderSourceData = orderRef.current.getDataSource()
+
+    if (!dataSourceData.tableName) {
+      showConfWarn('未配置数据源表信息')
       return
     }
 
-    const sourceTypeNames = dbRef.current.getTypeNames()
-
-    const mapping = mappingRef.current.rowMapping()
-    if (!mapping) {
-      showConfWarn('未配置字段映射信息')
-      return
-    }
-
-    const cluster = clusterRef.current.getCluster()
-    if (!cluster) {
-      showConfWarn('未配置计算集群信息')
-      return
-    }
-    if (!clusterRef.current.checkPingSuccess()) {
-      showConfWarn('计算集群连通性未测试或者未通过测试')
-      return
-    }
-    const channel = channelRef.current.getChannel()
-    if (!channel) {
-      showConfWarn('未配置通道控制信息')
-      return
-    }
-
-    set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping[0])
-    set(resource, `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`, mapping[1])
-    set(resource, 'cluster_id', cluster.id)
-    set(resource, 'job_mode', 1)
-    set(resource, 'job_content', '')
-    set(resource, 'channel_control', channel)
-    const filterResouce = removeUndefined(resource)
-    // console.log('filterResouce', filterResouce)
-    mutation.mutate(filterResouce, {
-      onSuccess: () => {
-        Notify.success({
-          title: '操作提示',
-          content: '配置保存成功',
-          placement: 'bottomRight'
-        })
+    if (orderSourceData) {
+      if (orderSourceData?.some((item) => item.name === '')) {
+        showConfWarn('字段名称不能为空')
+        return
       }
-    })
-  }
-  const release = () => {
-    // if (!enableRelease) {
-    //   dtsDevStore.set({ showScheSetting: true })
-    // } else {
-    //   setShowRelaseModal(true)
-    // }
-  }
+    }
 
-  // const columns = useMemo<[any, any]>(
-  //   () => [sourceColumn, targetColumn],
-  //   [sourceColumn, targetColumn]
-  // )
+    // 映射字段排序字段到返回参数中
+    const responseConfig = cloneDeep(
+      get(apiConfigData, 'api_config.response_params.response_params', [])
+    )
+    const response = orderMapRequestData(orderSourceData, responseConfig)
+
+    const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
+
+    if (!dataSourceData?.source?.id) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请先选择数据源',
+        placement: 'bottomRight'
+      })
+      return
+    }
+
+    mutation.mutate(
+      {
+        ...apiConfig,
+        apiId: get(apiConfig, 'api_id', ''),
+        datasource_id: dataSourceData?.source?.id,
+        table_name: dataSourceData?.tableName,
+        response_params: {
+          response_params: response
+        }
+      },
+      {
+        onSuccess: () => {
+          Notify.success({
+            title: '操作提示',
+            content: '配置保存成功',
+            placement: 'bottomRight'
+          })
+        }
+      }
+    )
+  }
+  const release = () => {}
 
   const renderGuideMode = () => (
     <CollapseWrapper>
@@ -237,9 +216,9 @@ const SyncJob = () => {
               </>
             }
           >
-            {index === 0 && <SyncDataSource />}
+            {index === 0 && <SyncDataSource ref={dataSourceRef} />}
             {index === 1 && <FieldSetting />}
-            {index === 2 && <FieldOrder />}
+            {index === 2 && <FieldOrder ref={orderRef} />}
           </CollapseItem>
         ))}
       </Collapse>

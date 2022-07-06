@@ -4,10 +4,11 @@ import { AffixLabel, DarkModal, ModalContent } from 'components'
 import { cloneDeep, get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useStore } from 'hooks'
+import { useStore, useMutationUpdateApiConfig } from 'hooks'
 import { strlen, formatDate } from 'utils'
 import { Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
@@ -60,45 +61,117 @@ export const JobModal = observer(() => {
     api_description: '',
     timeout: '',
     created: 0,
-    updated: 0
+    updated: 0,
+    api_mode: 0,
+    group_id: ''
   }))
 
   const {
-    dtsDevStore: { apiConfigData },
+    dtsDevStore: { apiConfigData, treeData, setTreeData },
     dtsDevStore
   } = useStore()
+  const mutation = useMutationUpdateApiConfig()
 
   const onClose = () => {
     dtsDevStore.set({ showBaseSetting: false })
   }
-
   // 启动后回显数据
   useEffect(() => {
     if (apiConfigData) {
-      const data = cloneDeep(get(apiConfigData, 'api_config', []))
-      console.log(data)
+      const apiConfig = cloneDeep(get(apiConfigData, 'api_config', {}))
+      const GroupConfig = cloneDeep(get(apiConfigData, 'api_group', {}))
+      const apiPath = get(apiConfig, 'api_path', '/').split('/').splice(-1)
 
       setParams((draft) => {
-        draft.api_id = get(data, 'api_id', '')
-        draft.group_name = get(data, 'group_name', 'APX 服务组') // TODO: 后端接口没有group_name
-        draft.api_name = get(data, 'api_name', '')
-        draft.group_path = get(data, 'group_path', '/') // TODO: 后端接口没有group_path
-        draft.api_path = get(data, 'api_path', '/')
-        draft.protocols = get(data, 'protocols', Protocol.HTTP)
-        draft.cross_domain = get(data, 'cross_domain', false)
-        draft.request_method = get(data, 'request_method', RequestMethods.GET)
-        draft.response_type = get(data, 'response_type', ResponseMethods.JSON)
-        draft.api_description = get(data, 'api_description', '')
-        draft.timeout = get(data, 'timeout', '')
-        draft.created = get(data, 'created', 0)
-        draft.updated = get(data, 'updated', 0)
+        draft.api_id = get(apiConfig, 'api_id', '')
+        draft.group_name = get(GroupConfig, 'name', '')
+        draft.api_name = get(apiConfig, 'api_name', '')
+        draft.group_path = get(GroupConfig, 'group_path', '')
+        draft.api_path = apiPath.length > 0 ? apiPath[0] : ''
+        draft.protocols = get(apiConfig, 'protocols', Protocol.HTTP)
+        draft.cross_domain = get(apiConfig, 'cross_domain', false)
+        draft.request_method = get(apiConfig, 'request_method', RequestMethods.GET)
+        draft.response_type = get(apiConfig, 'response_type', ResponseMethods.JSON)
+        draft.api_description = get(apiConfig, 'api_description', '')
+        draft.timeout = get(apiConfig, 'timeout', '')
+        draft.created = get(apiConfig, 'created', 0)
+        draft.updated = get(apiConfig, 'updated', 0)
+        draft.api_mode = get(apiConfig, 'api_mode', 0)
+        draft.group_id = get(GroupConfig, 'id', '')
       })
     }
-  }, [apiConfigData, setParams])
+  }, [setParams, apiConfigData])
+
+  const handleSyncStore = () => {
+    const newTreeData = treeData.map((api) => {
+      const { children } = api
+      if (children) {
+        const newChildren = children.map((item: { id: string }) => {
+          if (item.id === params.api_id) {
+            return {
+              ...item,
+              title: params.api_name
+            }
+          }
+          return item
+        })
+        return {
+          ...api,
+          children: newChildren
+        }
+      }
+      return api
+    })
+
+    console.log(newTreeData, 'newTreeData')
+
+    const config = {
+      ...cloneDeep(apiConfigData),
+      api_config: {
+        ...cloneDeep(apiConfigData?.api_config),
+        ...params
+      }
+    }
+    dtsDevStore.set({
+      apiConfigData: config
+    })
+    setTreeData(newTreeData)
+  }
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      onClose()
+      const dataSource = cloneDeep(get(apiConfigData, 'data_source'))
+      const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
+      if (!dataSource?.id) {
+        Notify.warning({
+          title: '操作提示',
+          content: '请先选择数据源',
+          placement: 'bottomRight'
+        })
+        return
+      }
+
+      mutation.mutate(
+        {
+          apiId: params.api_id,
+          datasource_id: dataSource.id,
+          table_name: apiConfig?.table_name,
+          ...params
+        },
+        {
+          onSuccess: (res) => {
+            if (res.ret_code === 0) {
+              onClose()
+              Notify.success({
+                title: '操作提示',
+                content: '配置保存成功',
+                placement: 'bottomRight'
+              })
+              handleSyncStore()
+            }
+          }
+        }
+      )
     }
   }
 

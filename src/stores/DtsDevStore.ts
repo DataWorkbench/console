@@ -2,10 +2,7 @@ import { makeAutoObservable, observable, set } from 'mobx'
 import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
 import { DataServiceManageDescribeApiConfigType } from 'types/response'
-import {
-  getFieldSettingParamsData,
-  FieldSettingData
-} from 'views/Space/DataService/ServiceDev/constants'
+import { FieldSettingData } from 'views/Space/DataService/ServiceDev/constants'
 import type RootStore from './RootStore'
 
 export interface ApiProps {
@@ -21,9 +18,12 @@ export interface ApiProps {
 }
 
 export interface Schema {
+  key: string
+  field: string
+  isRequest: boolean
+  isResponse: boolean
   type: string
-  name: string
-  is_primary: boolean
+  isPrimary: boolean
 }
 
 class WorkFlowStore {
@@ -34,8 +34,6 @@ class WorkFlowStore {
   curApi: null | ApiProps = null
 
   apiConfigData: DataServiceManageDescribeApiConfigType | null = null
-
-  schemaColumns: Schema[] = []
 
   fieldSettingData: FieldSettingData[] = []
 
@@ -167,8 +165,11 @@ class WorkFlowStore {
   }
 
   setSchemaColumns = (schema: Schema[]) => {
-    this.schemaColumns = schema
-    this.fieldSettingData = getFieldSettingParamsData(schema)
+    this.fieldSettingData = schema
+  }
+
+  setApiConfigData = (data: DataServiceManageDescribeApiConfigType) => {
+    this.apiConfigData = data
   }
 }
 

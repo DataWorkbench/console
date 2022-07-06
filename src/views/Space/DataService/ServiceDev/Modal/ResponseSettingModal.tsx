@@ -2,14 +2,17 @@ import { useEffect } from 'react'
 import { DargTable, ResizeModal, FlexBox } from 'components'
 import { observer } from 'mobx-react-lite'
 import { DataServiceManageDescribeApiConfig, useMutationUpdateApiConfig, useStore } from 'hooks'
-import { Button, Collapse, Icon, Input, Toggle } from '@QCFE/lego-ui'
+import { Button, Collapse, Icon, Input } from '@QCFE/lego-ui'
 import tw, { css } from 'twin.macro'
 import { MappingKey } from 'utils/types'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { useImmer } from 'use-immer'
 import { cloneDeep, get } from 'lodash-es'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+
 import {
   configMapData,
+  FieldCategory,
   ResponseSettingColumns,
   serviceDevResponseSettingMapping
 } from '../constants'
@@ -35,8 +38,56 @@ const styles = {
 type DataSourceProp = DataServiceManageDescribeApiConfig['response_params']['response_params']
 
 const dataServiceDataSettingKey = 'DATA_SERVICE_DATA__RESPONSE'
+const dataServiceDataTotalSettingKey = 'DATA_SERVICE_DATA__RESPONSE_HIGH'
 const getName = (name: MappingKey<typeof serviceDevResponseSettingMapping>) =>
   serviceDevResponseSettingMapping.get(name)!.apiField
+
+const defaultHighSource = [
+  {
+    param_name: 'total',
+    column_name: 'total',
+    type: 'INT',
+    data_type: 1,
+    is_required: false,
+    field_category: FieldCategory.PAGECONFIG,
+    example_value: '',
+    default_value: '',
+    param_description: ''
+  },
+  {
+    param_name: 'limit',
+    column_name: 'limit',
+    type: 'INT',
+    data_type: 1,
+    is_required: false,
+    field_category: FieldCategory.PAGECONFIG,
+    example_value: '',
+    default_value: '',
+    param_description: ''
+  },
+  {
+    param_name: 'offset',
+    column_name: 'offset',
+    type: 'INT',
+    data_type: 1,
+    is_required: false,
+    field_category: FieldCategory.PAGECONFIG,
+    example_value: '',
+    default_value: '',
+    param_description: ''
+  },
+  {
+    param_name: 'next_offset',
+    column_name: 'next_offset',
+    type: 'INT',
+    data_type: 1,
+    is_required: false,
+    field_category: FieldCategory.PAGECONFIG,
+    example_value: '',
+    default_value: '',
+    param_description: ''
+  }
+]
 
 const { CollapseItem } = Collapse
 
@@ -46,6 +97,7 @@ export const JobModal = observer(() => {
     dtsDevStore
   } = useStore()
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
+  const [highDataSource, setHighDataSource] = useImmer(defaultHighSource)
   const mutation = useMutationUpdateApiConfig()
 
   useEffect(() => {
@@ -53,38 +105,67 @@ export const JobModal = observer(() => {
       const filedData = cloneDeep(fieldSettingData)
         .filter((item) => item.isResponse)
         .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
-      const config = cloneDeep(get(apiConfigData, 'api_config.response_params', []))
+      const config = cloneDeep(get(apiConfigData, 'api_config.response_params.response_params', []))
+      const hightConfig = config?.filter((item: any) =>
+        ['total', 'limit', 'offset', 'next_offset'].includes(item.param_name)
+      )
 
       if (filedData.length) {
         // 拼数据
         const defaultValue = {
-          data_type: 0, // TODO: 暂时写死 字段映射表
+          data_type: 1, // TODO: 暂时写死 字段映射表
           is_required: false,
           example_value: '',
           default_value: '',
-          param_description: ''
+          param_description: '',
+          field_category: FieldCategory.DATABASECOLUMN
         }
         const newRequestData = configMapData(filedData, config, defaultValue)
         setDataSource(newRequestData)
       }
+      if (hightConfig.length) {
+        setHighDataSource(hightConfig)
+      }
     }
-  }, [apiConfigData, setDataSource, fieldSettingData])
+  }, [apiConfigData, setDataSource, fieldSettingData, setHighDataSource])
 
   const onClose = () => {
     dtsDevStore.set({ showResponseSetting: false })
   }
 
   const handleOK = () => {
+    const configSource = cloneDeep(get(apiConfigData, 'data_source'))
+    const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
+
+    if (!configSource?.id) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请先选择数据源',
+        placement: 'bottomRight'
+      })
+      return
+    }
+
     mutation.mutate(
       {
-        apiId: get(apiConfigData, 'api_id') as string,
-        wizardDetails: {
-          response_params: dataSource
+        ...apiConfig,
+        apiId: get(apiConfig, 'api_id', ''),
+        datasource_id: configSource?.id,
+        table_name: apiConfig?.table_name,
+        response_params: {
+          response_params: [...dataSource, ...highDataSource]
         }
       },
       {
-        onSuccess: () => {
-          onClose()
+        onSuccess: (res) => {
+          if (res.ret_code === 0) {
+            onClose()
+            Notify.success({
+              title: '操作提示',
+              content: '配置保存成功',
+              placement: 'bottomRight'
+            })
+          }
         }
       }
     )
@@ -135,6 +216,41 @@ export const JobModal = observer(() => {
     renderColumns as any
   )
 
+  const renderTotalColumns = {
+    [getName('example_value')]: {
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setHighDataSource((draft) => {
+              draft[index].example_value = `${value}`
+            })
+          }}
+        />
+      )
+    },
+    [getName('param_description')]: {
+      render: (text: string, __: any, index: number) => (
+        <Input
+          value={text}
+          onChange={(_, value) => {
+            setHighDataSource((draft) => {
+              draft[index].param_description = `${value}`
+            })
+          }}
+        />
+      )
+    }
+  }
+  const ResponseColumns = ResponseSettingColumns.filter(
+    (item) => item.key !== getName('column_name')
+  )
+  const { columns: totalColumns } = useColumns(
+    dataServiceDataTotalSettingKey,
+    ResponseColumns,
+    renderTotalColumns as any
+  )
+
   return (
     <ResizeModal
       minWidth={800}
@@ -183,8 +299,12 @@ export const JobModal = observer(() => {
             </FlexBox>
           }
         >
-          <Toggle defaultChecked />
-          <span tw="ml-2">返回结果分页</span>
+          <DargTable
+            columns={totalColumns as unknown as any}
+            runDarg={false}
+            dataSource={highDataSource}
+            rowKey="key"
+          />
         </CollapseItem>
       </Collapse>
     </ResizeModal>

@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite'
 import { useMutationApiService, getQueryKeyListApiGroups } from 'hooks'
 import { strlen } from 'utils'
 import { useQueryClient } from 'react-query'
+import { useStore } from 'stores/index'
 
 const { TextField, TextAreaField } = Form
 
@@ -52,6 +53,9 @@ interface JobModalProps {
 
 export const JobModal = observer((props: JobModalProps) => {
   const { isEdit = false, onClose } = props
+  const {
+    dtsDevStore: { resetTreeData }
+  } = useStore()
 
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
@@ -72,6 +76,7 @@ export const JobModal = observer((props: JobModalProps) => {
       mutation.mutate(paramsData, {
         onSuccess: () => {
           queryClient.invalidateQueries(getQueryKeyListApiGroups())
+          resetTreeData()
           onClose?.()
         }
       })

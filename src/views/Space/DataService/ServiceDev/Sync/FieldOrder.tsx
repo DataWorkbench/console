@@ -1,7 +1,7 @@
 import { Select, Button, Alert } from '@QCFE/lego-ui'
 import { DargTable, HelpCenterLink, Center, Tooltip } from 'components'
 
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useImperativeHandle, useMemo } from 'react'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { OrderText, TitleInformation } from 'views/Space/DataService/ServiceDev/styled'
 import { useImmer } from 'use-immer'
@@ -13,8 +13,8 @@ import { MappingKey } from 'utils/types'
 
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'stores'
-import { assign, filter, includes, map } from 'lodash-es'
-import { FieldOrderColumns, serviceDevVersionFieldOrderMapping } from '../constants'
+import { assign, cloneDeep, filter, get, includes, map } from 'lodash-es'
+import { FieldOrderColumns, serviceDevVersionFieldOrderMapping, OrderMode } from '../constants'
 
 const Root = styled.div`
   ${tw`text-white space-y-2 mb-2`}
@@ -23,176 +23,216 @@ const Root = styled.div`
 const getName = (name: MappingKey<typeof serviceDevVersionFieldOrderMapping>) =>
   serviceDevVersionFieldOrderMapping.get(name)!.apiField
 
-const options2 = [
+export interface IOrderDataSource {
+  name: string
+  order: string
+  order_mode: number
+}
+const orderOption = [
   {
     label: '升序',
-    value: 'ascOrder'
+    value: 'ase'
   },
   {
     label: '降序',
-    value: 'descOrder'
+    value: 'desc'
   }
 ]
 
 const columnSettingsKey = 'DATA_SERVICE_FIELDORDER'
 
-const FieldOrder = observer(() => {
-  const [dataSource, setDataSource] = useImmer<{ name: string; order: string }[]>([])
-  const {
-    dtsDevStore: { fieldSettingData }
-  } = useStore()
+const FieldOrder = observer(
+  (props: any, ref) => {
+    const [dataSource, setDataSource] = useImmer<IOrderDataSource[]>([])
+    const {
+      dtsDevStore: { fieldSettingData, apiConfigData }
+    } = useStore()
 
-  const FieldOptions = useMemo(
-    () =>
-      map(
-        filter(fieldSettingData, (column) => column.isResponse),
-        (column) => ({ label: column.key, value: column.key })
-      ),
-    [fieldSettingData]
-  )
-
-  const FileOptionsDisable = useMemo(
-    () =>
-      map(FieldOptions, (option) =>
-        assign(
-          { ...option },
-          includes(
-            map(dataSource, (i) => i.name),
-            option.value
-          ) && { disabled: true }
-        )
-      ),
-    [FieldOptions, dataSource]
-  )
-
-  const delRow = useCallback(
-    (index: number) => {
-      setDataSource(update(dataSource, { $splice: [[index, 1]] }))
-    },
-    [setDataSource, dataSource]
-  )
-
-  const moveRow = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      const dragRow = dataSource[dragIndex]
-      const newData = update(dataSource, {
-        $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, dragRow]
-        ]
-      })
-      setDataSource(newData)
-    },
-    [dataSource, setDataSource]
-  )
-
-  const addRow = useCallback(() => {
-    if (dataSource.length >= 10) {
-      return
-    }
-    setDataSource(
-      update(dataSource, {
-        $push: [
-          {
-            name: '',
-            order: 'ascOrder'
-          }
-        ]
-      })
+    const FieldOptions = useMemo(
+      () =>
+        map(
+          filter(fieldSettingData, (column) => column.isResponse),
+          (column) => ({ label: column.key, value: column.key })
+        ),
+      [fieldSettingData]
     )
-  }, [dataSource, setDataSource])
 
-  const columnsRender = {
-    [getName('index')]: {
-      title: (
-        <TitleInformation>
-          <span>序号</span>
-          <Tooltip theme="light" hasPadding content="序号序号序号序号序号序号">
-            <Center>
-              <Icon name="information" size={16} />
-            </Center>
-          </Tooltip>
-        </TitleInformation>
-      ),
-      width: 120,
-      render: (_: any, record: any, index: number) => <OrderText>{index}</OrderText>
-    },
-    [getName('name')]: {
-      width: 400,
-      render: (text: any, record: any, index: number) => (
-        <Select
-          placeholder="请选择需要添加的字段"
-          options={FileOptionsDisable}
-          value={text}
-          onChange={(v) => {
-            setDataSource((draft) => {
-              draft[index].name = v
-            })
-          }}
-        />
+    const FileOptionsDisable = useMemo(
+      () =>
+        map(FieldOptions, (option) =>
+          assign(
+            { ...option },
+            includes(
+              map(dataSource, (i) => i.name),
+              option.value
+            ) && { disabled: true }
+          )
+        ),
+      [FieldOptions, dataSource]
+    )
+
+    useEffect(() => {
+      const responseConfig = cloneDeep(
+        get(apiConfigData, 'api_config.response_params.response_params', [])
       )
-    },
-    [getName('order')]: {
-      width: 300,
-      render: (text: any, record: any, index: number) => (
-        <>
+      if (responseConfig?.length) {
+        const orderConfigData = responseConfig.filter(
+          (item: { order_mode: number }) => item.order_mode !== 0
+        )
+        const sortOrder = orderConfigData?.sort(
+          (a: { order_num: number }, b: { order_num: number }) => a.order_num - b.order_num
+        )
+        const orderData = sortOrder.map((item: { order_mode: number; column_name: string }) => {
+          const order = OrderMode.getLabel(item.order_mode)?.toLocaleLowerCase()
+
+          return {
+            name: item.column_name,
+            order,
+            order_mode: item.order_mode
+          }
+        })
+        setDataSource(orderData)
+      } else {
+        setDataSource([])
+      }
+    }, [apiConfigData, setDataSource])
+
+    const delRow = useCallback(
+      (index: number) => {
+        setDataSource(update(dataSource, { $splice: [[index, 1]] }))
+      },
+      [setDataSource, dataSource]
+    )
+
+    const moveRow = useCallback(
+      (dragIndex: number, hoverIndex: number) => {
+        const dragRow = dataSource[dragIndex]
+        const newData = update(dataSource, {
+          $splice: [
+            [dragIndex, 1],
+            [hoverIndex, 0, dragRow]
+          ]
+        })
+        setDataSource(newData)
+      },
+      [dataSource, setDataSource]
+    )
+
+    const addRow = useCallback(() => {
+      if (dataSource.length >= 10) {
+        return
+      }
+      setDataSource(
+        update(dataSource, {
+          $push: [
+            {
+              name: '',
+              order: 'ase',
+              order_mode: 1
+            }
+          ]
+        })
+      )
+    }, [dataSource, setDataSource])
+
+    const columnsRender = {
+      [getName('index')]: {
+        title: (
+          <TitleInformation>
+            <span>序号</span>
+            <Tooltip theme="light" hasPadding content="序号序号序号序号序号序号">
+              <Center>
+                <Icon name="information" size={16} />
+              </Center>
+            </Tooltip>
+          </TitleInformation>
+        ),
+        width: 120,
+        render: (_: any, record: any, index: number) => <OrderText>{index}</OrderText>
+      },
+      [getName('name')]: {
+        width: 400,
+        render: (text: any, record: any, index: number) => (
           <Select
-            tw="w-24"
-            options={options2}
+            placeholder="请选择需要添加的字段"
+            options={FileOptionsDisable}
             value={text}
             onChange={(v) => {
               setDataSource((draft) => {
-                draft[index].order = v
+                draft[index].name = v
               })
             }}
           />
-          <div
-            css={[tw`px-2 hidden opacity-0  ml-24`, tw`block group-hover:opacity-100`]}
-            onClick={() => delRow(index)}
-          >
-            <Icon name="trash" clickable />
-          </div>
-        </>
-      )
+        )
+      },
+      [getName('order')]: {
+        width: 300,
+        render: (text: any, record: any, index: number) => (
+          <>
+            <Select
+              tw="w-24"
+              options={orderOption}
+              value={text}
+              onChange={(v) => {
+                setDataSource((draft) => {
+                  draft[index].order = v
+                  draft[index].order_mode = OrderMode.getEnum(v.toLocaleUpperCase())?.value
+                })
+              }}
+            />
+            <div
+              css={[tw`px-2 hidden opacity-0  ml-24`, tw`block group-hover:opacity-100`]}
+              onClick={() => delRow(index)}
+            >
+              <Icon name="trash" clickable />
+            </div>
+          </>
+        )
+      }
     }
-  }
 
-  const { columns } = useColumns(columnSettingsKey, FieldOrderColumns, columnsRender as any)
+    useImperativeHandle(ref, () => ({
+      getDataSource: () => dataSource
+    }))
 
-  const Footer = React.memo(() => (
-    <FlexBox tw="h-11 items-center justify-center border-t-[1px]! border-neut-13!">
-      <Button type="text" onClick={addRow}>
-        <Icon name="add" type="light" />
-        添加
-      </Button>
-    </FlexBox>
-  ))
+    const { columns } = useColumns(columnSettingsKey, FieldOrderColumns, columnsRender as any)
 
-  return (
-    <>
-      {dataSource.length === 0 && (
-        <Root>
-          <Alert
-            message="提示：排序字段非必须，如你需要排序字段，请在下方添加并选择需要排序的字段。"
-            type="info"
-            linkBtn={
-              <HelpCenterLink href="###" isIframe={false} hasIcon={false}>
-                查看详情 →
-              </HelpCenterLink>
-            }
-          />
-        </Root>
-      )}
-      <DargTable
-        rowKey="key"
-        moveRow={moveRow}
-        runDarg
-        dataSource={dataSource}
-        columns={columns as any}
-        renderFooter={() => <Footer />}
-      />
-    </>
-  )
-})
+    const Footer = React.memo(() => (
+      <FlexBox tw="h-11 items-center justify-center border-t-[1px]! border-neut-13!">
+        <Button type="text" onClick={addRow}>
+          <Icon name="add" type="light" />
+          添加
+        </Button>
+      </FlexBox>
+    ))
+
+    return (
+      <>
+        {dataSource.length === 0 && (
+          <Root>
+            <Alert
+              message="提示：排序字段非必须，如你需要排序字段，请在下方添加并选择需要排序的字段。"
+              type="info"
+              linkBtn={
+                <HelpCenterLink href="###" isIframe={false} hasIcon={false}>
+                  查看详情 →
+                </HelpCenterLink>
+              }
+            />
+          </Root>
+        )}
+        <DargTable
+          rowKey="key"
+          moveRow={moveRow}
+          runDarg
+          dataSource={dataSource}
+          columns={columns as any}
+          renderFooter={() => <Footer />}
+        />
+      </>
+    )
+  },
+  { forwardRef: true }
+)
 
 export default FieldOrder
