@@ -26,26 +26,27 @@ import {
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
+import { get } from 'lodash-es'
 
 const {
   // RadioGroupField,
   CheckboxGroupField,
   TextField,
   ToggleField,
-  // NumberField,
+  NumberField,
 } = Form
 const updateTypes = [
   {
     label: 'insert',
-    value: 1,
+    value: 'insert',
   },
   {
     label: 'update',
-    value: 2,
+    value: 'update',
   },
   {
     label: 'delete',
-    value: 3,
+    value: 'delete',
   },
 ]
 
@@ -120,6 +121,15 @@ const SqlServerSourceConfig = forwardRef(
             }
             return {
               id: e?.data?.id,
+              tableName: get(e, 'data.table_list'),
+              updateType: get(e, 'data.cat', ['insert,update,delete']).split(
+                ','
+              ),
+              slot: get(e, 'data.slot_name'),
+              lsn: get(e, 'data.lsn', 0),
+              time: get(e, 'data.poll_interval', 120),
+              autoCreate: get(e, 'data.allow_create_slot', true),
+              temp: get(e, 'data.temporary', true),
             }
           })
         )
@@ -140,7 +150,16 @@ const SqlServerSourceConfig = forwardRef(
           return sourceForm.current?.validateForm()
         },
         getData: () => {
-          return {}
+          return {
+            id: dbInfo?.id,
+            lsn: dbInfo?.lsn,
+            poll_interval: dbInfo?.time,
+            slot_name: dbInfo?.slot,
+            table_list: dbInfo?.tableName,
+            cat: dbInfo?.updateType.join(','),
+            // allow_create_slot: dbInfo?.autoCreate,
+            // temporary: dbInfo?.temp,
+          }
         },
         refetchColumn: () => {},
       }
@@ -191,16 +210,20 @@ const SqlServerSourceConfig = forwardRef(
             </Control>
             <div className="help">1-max</div>
           </Field>
-          <TextField
+          <NumberField
+            name="lsn"
+            step={1}
+            min={0}
+            showButton={false}
             label="lsn"
             value={dbInfo?.lsn}
-            onChenge={(e) => {
+            onChange={(e) => {
               setDbInfo((draft) => {
                 draft.lsn = e
               })
             }}
             placeholder="请输入"
-            help="读取 SqlServer CDC 日志序列号的开始位置x"
+            help="读取 SqlServer CDC 日志序列号的开始位置"
           />
         </>
       )
@@ -225,6 +248,22 @@ const SqlServerSourceConfig = forwardRef(
                   draft.tableName = e
                 })
               }}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="##">
+                        SqlServer （SqlServer CDC）Source 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
               help={
                 <HelpCenterLink hasIcon isIframe={false} href="##">
                   SqlServer （SqlServer CDC）Source 配置文档
@@ -253,8 +292,16 @@ const SqlServerSourceConfig = forwardRef(
                   draft.slot = e
                 })
               }}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请输入 slot 名称',
+                  status: 'error',
+                },
+              ]}
             />
-            {!!dbInfo?.slot && (
+            {false && !!dbInfo?.slot && (
               <>
                 <ToggleField
                   name="autoCreate"

@@ -140,7 +140,7 @@ const MysqlBinlogSourceConfig = forwardRef(
               filterType: e?.data?.filter ? 2 : 1,
               tableName: get(e, 'data.table', []),
               updateType: get(e, 'data.cat', '').split(','),
-              charset: get(e, 'data.connection-charset', 'UTF-8'),
+              charset: get(e, 'data.connection-charset', 1),
               bufNumber: get(e, 'data.buffer-size', 1024),
               threads: get(e, 'data.parallel-thread-size', 2),
               isGtidMode: get(e, 'data.is_gtid_mode', false),
@@ -212,11 +212,11 @@ const MysqlBinlogSourceConfig = forwardRef(
             options={[
               {
                 label: 'UTF-8',
-                value: 'UTF-8',
+                value: 1,
               },
               {
                 label: 'GBK',
-                value: 'GBK',
+                value: 2,
               },
             ]}
             value={dbInfo?.charset}
@@ -336,6 +336,14 @@ canal schema下的一张表：canal.test1 `}
                   })
                 }}
                 placeholder="请选择数据源表"
+                validateOnChange
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请选择数据源表',
+                    status: 'error',
+                  },
+                ]}
               />
             )}
             {dbInfo?.filterType === 2 && (
@@ -347,6 +355,14 @@ canal schema下的一张表：canal.test1 `}
                     draft.filter = e
                   })
                 }}
+                validateOnChange
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请输入过滤规则',
+                    status: 'error',
+                  },
+                ]}
               />
             )}
           </>
@@ -375,6 +391,14 @@ canal schema下的一张表：canal.test1 `}
                 })
               }}
               options={startTypes}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择起始位置',
+                  status: 'error',
+                },
+              ]}
             />
             {dbInfo?.startType === 1 && (
               <TextField
@@ -387,6 +411,14 @@ canal schema下的一张表：canal.test1 `}
                   })
                 }}
                 placeholder="时间戳（timestamp），采集起点从指定的时间戳处消费"
+                validateOnChange
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请输入时间戳',
+                    status: 'error',
+                  },
+                ]}
               />
             )}
             {dbInfo?.startType === 2 && (
@@ -401,6 +433,14 @@ canal schema下的一张表：canal.test1 `}
                     })
                   }}
                   placeholder="文件名（journalName），采集起点从指定文件的起始处消费"
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请输入文件名',
+                      status: 'error',
+                    },
+                  ]}
                 />
 
                 <TextField
@@ -413,6 +453,14 @@ canal schema下的一张表：canal.test1 `}
                     })
                   }}
                   placeholder="指定位置（position），采集起点从指定文件的指定位置处消费"
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请输入指定位置',
+                      status: 'error',
+                    },
+                  ]}
                 />
               </>
             )}

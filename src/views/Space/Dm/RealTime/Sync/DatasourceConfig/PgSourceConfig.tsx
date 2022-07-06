@@ -26,26 +26,27 @@ import {
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
+import { get } from 'lodash-es'
 
 const {
   // RadioGroupField,
   CheckboxGroupField,
   TextField,
   ToggleField,
-  // NumberField,
+  NumberField,
 } = Form
 const updateTypes = [
   {
     label: 'insert',
-    value: 1,
+    value: 'insert',
   },
   {
     label: 'update',
-    value: 2,
+    value: 'update',
   },
   {
     label: 'delete',
-    value: 3,
+    value: 'delete',
   },
 ]
 
@@ -119,8 +120,16 @@ const PgSourceConfig = forwardRef(
             if (!e) {
               return {}
             }
+            console.log(e)
             return {
               id: e?.data?.id,
+              tableName: get(e, 'data.table_list'),
+              updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
+              slot: get(e, 'data.slot_name'),
+              lsn: get(e, 'data.lsn', 0),
+              heartBeatPack: get(e, 'data.heart_beat_pack', 10),
+              autoCreate: get(e, 'data.allow_create_slot', true),
+              temp: get(e, 'data.temporary', true),
             }
           })
         )
@@ -156,7 +165,16 @@ const PgSourceConfig = forwardRef(
           return sourceForm.current?.validateForm()
         },
         getData: () => {
-          return {}
+          return {
+            id: dbInfo?.id,
+            lsn: dbInfo?.lsn,
+            slot_name: dbInfo?.slot,
+            table_list: dbInfo?.tableName,
+            cat: dbInfo?.updateType.join(','),
+            allow_create_slot: dbInfo?.autoCreate,
+            temporary: dbInfo?.temp,
+            heart_beat_pack: dbInfo?.heartBeatPack,
+          }
         },
         refetchColumn: () => {},
       }
@@ -188,27 +206,49 @@ const PgSourceConfig = forwardRef(
                     draft.heartBeatPack = e
                   })
                 }}
+                validateOnChange
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请输入心跳间隔',
+                    status: 'error',
+                  },
+                ]}
+                placeholder="请输入心跳间隔"
               />
               <span tw="leading-7 ml-1.5"> 秒 </span>
             </Control>
             <div className="help">0-120</div>
           </Field>
-          <TextField
+          <NumberField
             label="lsn"
+            name="lsn"
+            step={1}
+            min={0}
+            showButton={false}
             value={dbInfo?.lsn}
-            onChenge={(e) => {
+            onChange={(e) => {
               setDbInfo((draft) => {
                 draft.lsn = e
               })
             }}
             placeholder="请输入日志序列号的起始位置"
             help="日志序列号的起始位置，0-max"
+            validateOnChange
+            schemas={[
+              {
+                rule: { required: true },
+                help: '请输入日志序列号的起始位置',
+                status: 'error',
+              },
+            ]}
           />
         </>
       )
     }
 
     const hasSource = !!dbInfo?.id
+
     return (
       <Form css={styles.form} ref={sourceForm}>
         {renderCommon()}
@@ -227,6 +267,22 @@ const PgSourceConfig = forwardRef(
                   draft.tableName = e
                 })
               }}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                        Postgres（ Postgres CDC）Source 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
               help={
                 <HelpCenterLink hasIcon isIframe={false} href="##">
                   Postgres（ Postgres CDC）Source 配置文档
@@ -244,13 +300,34 @@ const PgSourceConfig = forwardRef(
                   draft.updateType = v
                 })
               }}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择更新类型',
+                  status: 'error',
+                },
+              ]}
             />
 
             <TextField
               name="slot"
               label={<AffixLabel required>slot 名称</AffixLabel>}
               placeholder="请输入 slot 名称"
-              value=""
+              value={dbInfo?.slot}
+              onChange={(e) => {
+                setDbInfo((draft) => {
+                  draft.slot = e
+                })
+              }}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请输入 slot 名称',
+                  status: 'error',
+                },
+              ]}
             />
             {!!dbInfo?.slot && (
               <>

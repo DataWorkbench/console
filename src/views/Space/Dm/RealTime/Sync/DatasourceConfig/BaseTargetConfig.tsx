@@ -141,7 +141,6 @@ const BaseTargetConfig = forwardRef(
         unSub.unsubscribe()
       }
     }, [setDbInfo])
-    console.log(dbInfo)
 
     const sourceType = target$.getValue()?.sourceType
 
@@ -187,7 +186,7 @@ const BaseTargetConfig = forwardRef(
         },
         getData: () => {
           const target = baseTarget$.getValue()
-          if (!target || !target.data) {
+          if (!target || !target.data || !target.data.id) {
             return undefined
           }
           return {

@@ -225,10 +225,12 @@ const DatasourceConfig = observer(
             source_id: source?.data?.id,
             target_id: target?.data?.id,
             sync_resource: {
-              [`${source?.sourceType?.name}_source`]:
-                sourceRef.current?.getData?.(),
-              [`${target?.sourceType?.name}_target`]:
-                targetRef.current?.getData?.(),
+              [`${source?.sourceType?.name}_source`]: source?.data?.id
+                ? sourceRef.current?.getData?.()
+                : undefined,
+              [`${target?.sourceType?.name}_target`]: target?.data?.id
+                ? targetRef.current?.getData?.()
+                : undefined,
             },
           }
           return config

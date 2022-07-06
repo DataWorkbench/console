@@ -1,4 +1,10 @@
-import { ForwardedRef, forwardRef, useImperativeHandle, useRef } from 'react'
+import {
+  ForwardedRef,
+  forwardRef,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+} from 'react'
 import {
   IDataSourceConfigProps,
   ISourceRef,
@@ -8,6 +14,9 @@ import tw, { css } from 'twin.macro'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import { useImmer } from 'use-immer'
 import { AffixLabel, HelpCenterLink } from 'components'
+import { target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { get } from 'lodash-es'
+import { map } from 'rxjs'
 
 const styles = {
   form: css`
@@ -50,7 +59,7 @@ const styles = {
 
 const { TextField, TextAreaField } = Form
 
-type FieldKeys = 'id' | 'topic' | 'config' | 'writeType'
+type FieldKeys = 'id' | 'topic' | 'config'
 
 const KafkaTargetConfig = forwardRef(
   (props: IDataSourceConfigProps, ref: ForwardedRef<ISourceRef>) => {
@@ -58,6 +67,22 @@ const KafkaTargetConfig = forwardRef(
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
 
+    useLayoutEffect(() => {
+      target$
+        .pipe(
+          map((e) => {
+            if (!e) {
+              return {}
+            }
+            return {
+              id: get(e, 'data.id'),
+              topic: get(e, 'data.topic'),
+              config: get(e, 'data.config'),
+            }
+          })
+        )
+        .subscribe((e) => setDbInfo(e))
+    }, [setDbInfo])
     useImperativeHandle(ref, () => {
       return {
         validate: () => {
@@ -67,7 +92,9 @@ const KafkaTargetConfig = forwardRef(
           return targetForm.current?.validateForm()
         },
         getData: () => {
-          return {}
+          return {
+            ...dbInfo,
+          }
         },
         refetchColumn: () => {},
       }
@@ -80,38 +107,58 @@ const KafkaTargetConfig = forwardRef(
     return (
       <Form css={styles.form} ref={targetForm}>
         {renderCommon()}
-        <TextField
-          label={<AffixLabel required>Topic</AffixLabel>}
-          name="topic"
-          value={dbInfo?.topic}
-          onChange={(e) => {
-            setDbInfo((draft) => {
-              draft.topic = e
-            })
-          }}
-          placeholder="请输入 Topic"
-          help={
-            <HelpCenterLink hasIcon href="###" isIframe={false}>
-              Kafka Sink 配置文档
-            </HelpCenterLink>
-          }
-        />
-        <TextAreaField
-          label={<AffixLabel required={false}>生产者配置</AffixLabel>}
-          name="config"
-          value={dbInfo?.config}
-          onChange={(e) => {
-            setDbInfo((draft) => {
-              draft.config = e
-            })
-          }}
-          placeholder="请输入"
-          help={
-            <HelpCenterLink hasIcon isIframe={false} href="###">
-              参考文档
-            </HelpCenterLink>
-          }
-        />
+        {!!dbInfo?.id && (
+          <>
+            <TextField
+              label={<AffixLabel required>Topic</AffixLabel>}
+              name="topic"
+              value={dbInfo?.topic}
+              onChange={(e) => {
+                setDbInfo((draft) => {
+                  draft.topic = e
+                })
+              }}
+              placeholder="请输入 Topic"
+              help={
+                <HelpCenterLink hasIcon href="###" isIframe={false}>
+                  Kafka Sink 配置文档
+                </HelpCenterLink>
+              }
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                        Kafka Sink 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
+            />
+            <TextAreaField
+              label={<AffixLabel required={false}>生产者配置</AffixLabel>}
+              name="config"
+              value={dbInfo?.config}
+              onChange={(e) => {
+                setDbInfo((draft) => {
+                  draft.config = e
+                })
+              }}
+              placeholder="请输入"
+              help={
+                <HelpCenterLink hasIcon isIframe={false} href="###">
+                  参考文档
+                </HelpCenterLink>
+              }
+            />
+          </>
+        )}
       </Form>
     )
   }
