@@ -8,10 +8,10 @@ import {
   useState,
 } from 'react'
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
-import { useMount, useUnmount, useMeasure } from 'react-use'
+import { useMeasure, useMount, useUnmount } from 'react-use'
 import tw, { styled } from 'twin.macro'
-import { intersectionBy, isEmpty, get, omit } from 'lodash-es'
-import { Button, Icon, Alert } from '@QCFE/lego-ui'
+import { get, intersectionBy, isEmpty, omit } from 'lodash-es'
+import { Alert, Button, Icon } from '@QCFE/lego-ui'
 import { nanoid } from 'nanoid'
 import Tippy from '@tippyjs/react'
 import { followCursor } from 'tippy.js'
@@ -22,7 +22,8 @@ import useIcon from 'hooks/useHooks/useIcon'
 import { Tooltip } from 'components/Tooltip'
 import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
-import MappingItem, { TMappingField, FieldRow } from './MappingItem'
+import { KafkaFieldMappings } from 'components/FieldMappings/KafkaFieldMappings'
+import MappingItem, { FieldRow, TMappingField } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
 
@@ -45,7 +46,7 @@ const Root = styled.div`
 const EmptyFieldWrapper = styled(Center)(() => [
   styles.wrapper,
   styles.borderX,
-  tw`self-stretch text-neut-8`,
+  tw`self-stretch text-neut-8 h-[280px]`,
 ])
 
 const OutlinedGreenButton = styled(Button)(
@@ -118,6 +119,9 @@ export interface IFieldMappingsProps {
   readonly?: boolean
   hasHeader?: boolean
   onReInit: () => void
+  sourceId?: string
+  targetId?: string
+  jobType: 1 | 2 | 3
 }
 
 export interface IFieldMappingsRecord {
@@ -138,6 +142,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     columns,
     readonly = false,
     hasHeader = true,
+    sourceId,
+    targetId,
   } = props
 
   useIcon(icons)
@@ -229,8 +235,6 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     }
   }, [columns])
 
-  console.log('rightcolumns', [...rightFields])
-
   useEffect(() => {
     jsPlumbInstRef.current?.repaintEverything()
   }, [rect.width])
@@ -242,23 +246,24 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       mappings.forEach(([left, right], index) => {
         const leftField = leftFields.find(({ name }) => name === left)!
         const rightField = rightFields.find(({ name }) => name === right)!
-        console.log(1111, leftField)
-        leftColumns.push({
-          format: leftField.formatter,
-          index,
-          is_part: false,
-          name: leftField.name,
-          type: leftField.type,
-          value: leftField.default,
-        })
-        rightColumns.push({
-          format: rightField.formatter,
-          index,
-          is_part: false,
-          name: rightField.name,
-          type: rightField.type,
-          value: rightField.default,
-        })
+        if (leftField && rightField) {
+          leftColumns.push({
+            format: leftField.formatter,
+            index,
+            is_part: false,
+            name: leftField.name,
+            type: leftField.type,
+            value: leftField.default,
+          })
+          rightColumns.push({
+            format: rightField.formatter,
+            index,
+            is_part: false,
+            name: rightField.name,
+            type: rightField.type,
+            value: rightField.default,
+          })
+        }
       })
       if (leftColumns.length === 0 && rightColumns.length === 0) {
         return null
@@ -582,11 +587,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     })
   }
 
-  if (leftFields.length === 0 && rightFields.length === 0) {
+  if (!sourceId && !targetId) {
     return (
       <Root>
         <Alert
-          message="提示：选择来源端与目的端的数据源与表，才会显示字段映射。"
+          message="提示：选择来源端与目的端的数据源，才会显示字段映射。"
           type="info"
           linkBtn={
             <HelpCenterLink
@@ -602,12 +607,138 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     )
   }
 
-  // console.log(leftFields, rightFields)
+  function showSource() {
+    if (
+      [
+        SourceType.Mysql,
+        SourceType.PostgreSQL,
+        SourceType.SqlServer,
+        SourceType.MongoDB,
+        // @ts-ignore
+      ].includes(leftTypeName?.getType?.()) &&
+      !leftFields.length
+    ) {
+      return false
+    }
+    return true
+  }
+
+  function showTarget() {
+    if (
+      [
+        SourceType.Mysql,
+        SourceType.PostgreSQL,
+        SourceType.SqlServer,
+        SourceType.MongoDB,
+        // @ts-ignore
+      ].includes(rightTypeName?.getType?.()) &&
+      !rightFields.length
+    ) {
+      return false
+    }
+    return true
+  }
+
+  function showHeader() {
+    if (
+      [
+        SourceType.HBase,
+        SourceType.Kafka,
+        SourceType.SqlServer,
+        SourceType.MongoDB,
+        // @ts-ignore
+      ].includes(rightTypeName?.getType?.())
+    ) {
+      return false
+    }
+    return true
+  }
+
+  function renderTarget() {
+    // @ts-ignore
+    if (rightTypeName?.getType() === SourceType.Kafka) {
+      return (
+        <div css={[styles.wrapper, styles.borderX]}>
+          <KafkaFieldMappings />
+        </div>
+      )
+    }
+
+    return showTarget() ? (
+      <div css={styles.wrapper}>
+        <div css={styles.borderX}>
+          <FieldRow isHeader isReverse>
+            <div>类型</div>
+            <div>目标表字段</div>
+          </FieldRow>
+          {rightFields.map((item, i) => {
+            return (
+              <MappingItem
+                jsplumb={jsPlumbInstRef.current}
+                key={item.uuid}
+                anchor="Left"
+                item={item}
+                index={i}
+                hasConnection={!!mappings.find(([, r]) => r === item?.name)}
+                typeName={rightTypeName}
+                moveItem={moveItemRight}
+                onOk={(info, index) => {
+                  keepEditingFieldRight(info, index)
+                }}
+                onCancel={console.log}
+                deleteItem={(field) => {
+                  setRightFields((fields) =>
+                    fields.filter((f) => f.uuid !== field.uuid)
+                  )
+                  setMappings((prevMappings) =>
+                    prevMappings.filter(([, r]) => r !== field.name)
+                  )
+                }}
+                exist={(name: string) =>
+                  !!rightFields.find((f) => f.name === name)
+                }
+                getDeleteField={(name: string) => {
+                  const delItem = rightFieldsProp.find((f) => f.name === name)
+                  const existItem = rightFields.find((f) => f.name === name)
+                  if (delItem && !existItem) {
+                    return delItem
+                  }
+                  return undefined
+                }}
+              />
+            )
+          })}
+          {!readonly && (
+            <Center
+              tw="bg-neut-16 cursor-pointer h-8"
+              onClick={addCustomFieldRight}
+            >
+              <Icon name="add" type="light" />
+              添加字段
+            </Center>
+          )}
+        </div>
+        {rightTypeName?.getType() === SourceType.HBase && (
+          <HbaseFieldMappings sourceColumns={leftFields} />
+        )}
+      </div>
+    ) : (
+      <EmptyFieldWrapper>
+        选择目的端数据源表（可获取表结构）后显示字段
+      </EmptyFieldWrapper>
+    )
+  }
+
   return (
     <Root>
       <div tw="relative">
         {topHelp && <Center tw="absolute left-0 bottom-0">{topHelp}</Center>}
-        {hasHeader && (
+        {hasHeader && !showHeader() && (
+          <Center>
+            由于当前数据目的情况比较灵活，暂不提供快捷映射方式，请按照提示进行拖拽操作
+          </Center>
+        )}
+        {hasHeader && showHeader() && (
           <Center tw="gap-4">
             <OutlinedGreenButton
               type="outlined"
@@ -695,7 +826,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       </div>
       <Container ref={containerRef}>
         <FlexBox tw="flex items-start transition-all duration-500 overflow-x-auto">
-          {leftFields.length ? (
+          {showSource() ? (
             <div css={[styles.wrapper, styles.borderX]}>
               <FieldRow isHeader>
                 <div>类型</div>
@@ -779,75 +910,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               onContextMenu={(e) => e.preventDefault()}
             />
           </Tippy>
-          {rightFields.length ? (
-            <div css={styles.wrapper}>
-              <div css={styles.borderX}>
-                <FieldRow isHeader isReverse>
-                  <div>类型</div>
-                  <div>目标表字段</div>
-                </FieldRow>
-                {rightFields.map((item, i) => {
-                  return (
-                    <MappingItem
-                      jsplumb={jsPlumbInstRef.current}
-                      key={item.uuid}
-                      anchor="Left"
-                      item={item}
-                      index={i}
-                      hasConnection={
-                        !!mappings.find(([, r]) => r === item?.name)
-                      }
-                      typeName={rightTypeName}
-                      moveItem={moveItemRight}
-                      onOk={(info, index) => {
-                        keepEditingFieldRight(info, index)
-                      }}
-                      onCancel={console.log}
-                      deleteItem={(field) => {
-                        setRightFields((fields) =>
-                          fields.filter((f) => f.uuid !== field.uuid)
-                        )
-                        setMappings((prevMappings) =>
-                          prevMappings.filter(([, r]) => r !== field.name)
-                        )
-                      }}
-                      exist={(name: string) =>
-                        !!rightFields.find((f) => f.name === name)
-                      }
-                      getDeleteField={(name: string) => {
-                        const delItem = rightFieldsProp.find(
-                          (f) => f.name === name
-                        )
-                        const existItem = rightFields.find(
-                          (f) => f.name === name
-                        )
-                        if (delItem && !existItem) {
-                          return delItem
-                        }
-                        return undefined
-                      }}
-                    />
-                  )
-                })}
-                {!readonly && (
-                  <Center
-                    tw="bg-neut-16 cursor-pointer h-8"
-                    onClick={addCustomFieldRight}
-                  >
-                    <Icon name="add" type="light" />
-                    添加字段
-                  </Center>
-                )}
-              </div>
-              {rightTypeName?.getType() === SourceType.HBase && (
-                <HbaseFieldMappings sourceColumns={leftFields} />
-              )}
-            </div>
-          ) : (
-            <EmptyFieldWrapper>
-              选择目的端数据源表（可获取表结构）后显示字段
-            </EmptyFieldWrapper>
-          )}
+          {renderTarget()}
         </FlexBox>
       </Container>
     </Root>
