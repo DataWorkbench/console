@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
@@ -55,9 +56,9 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
             return {
               id: get(e, 'data.id'),
               collectionName: get(e, 'data.collection_name'),
-              writeMode: get(e, 'data.write_mode'),
+              writeMode: get(e, 'data.write_mode', 1),
               replaceKey: get(e, 'data.replace_key'),
-              batchSize: get(e, 'data.batch_size'),
+              batchSize: get(e, 'data.batch_size', 1),
             }
           })
         )
@@ -95,6 +96,10 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
       { enabled: !!dbInfo?.id }
     )
 
+    const dbRef = useRef(dbInfo)
+    useEffect(() => {
+      dbRef.current = dbInfo
+    }, [dbInfo])
     return (
       <Form css={styles.form} ref={sourceForm}>
         <BaseConfigCommon from="source" />
@@ -116,9 +121,24 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
               }}
               placeholder=""
               validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                        MongoDb Slink 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
               help={
                 <HelpCenterLink isIframe={false} hasIcon href="###">
-                  MongoDb Source 配置文档
+                  MongoDb Slink 配置文档
                 </HelpCenterLink>
               }
             />
@@ -141,6 +161,24 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
               ]}
               placeholder="请选择写入模式"
               help="当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现"
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择写入模式',
+                  status: 'error',
+                },
+                {
+                  rule: (v: number) => {
+                    if (dbRef.current?.batchSize > 1 && v !== 1) {
+                      return false
+                    }
+                    return true
+                  },
+                  help: '当 batchSize > 1 时不支持 replace 和 update 模式',
+                  status: 'error',
+                },
+              ]}
             />
             {dbInfo?.writeMode === 2 && (
               <TextField
@@ -153,6 +191,14 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
                   })
                 }}
                 placeholder="请输入业务主键"
+                validateOnChange
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请输入业务主键',
+                    status: 'error',
+                  },
+                ]}
               />
             )}
             <FlexBox>
@@ -191,7 +237,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
                       value={dbInfo?.batchSize}
                       onChange={(e) => {
                         setDbInfo((draft) => {
-                          draft.batchSize = e
+                          draft.batchSize = Number(e)
                         })
                       }}
                     />

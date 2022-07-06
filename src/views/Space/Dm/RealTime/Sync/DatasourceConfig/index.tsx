@@ -29,6 +29,8 @@ import {
 
 import HbaseSource from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseSource'
 import HbaseTarget from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseTarget'
+import MongoDbTarget from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/MongoDbTarget'
+import MongoDbSource from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/MongoDbSource'
 import { source$, syncJobOp$, target$ } from '../common/subjects'
 
 import KafkaSourceConfig from './KafkaSourceConfig'
@@ -168,6 +170,8 @@ const DatasourceConfig = observer(
           return <HdfsSource curJob={curJob} ref={sourceRef} />
         case SourceType.HBase:
           return <HbaseSource curJob={curJob} ref={sourceRef} />
+        case SourceType.MongoDB:
+          return <MongoDbSource curJob={curJob} ref={sourceRef} />
         default:
           break
       }
@@ -190,6 +194,8 @@ const DatasourceConfig = observer(
           return <HdfsTarget curJob={curJob} ref={targetRef} />
         case SourceType.HBase:
           return <HbaseTarget curJob={curJob} ref={targetRef} />
+        case SourceType.MongoDB:
+          return <MongoDbTarget curJob={curJob} ref={targetRef} />
         default:
           return null
       }

@@ -10,7 +10,11 @@ const useTableColumns = (
   tableName: string,
   type: 'source' | 'target'
 ) => {
-  const { data: re, refetch: refetch1 } = useQuerySourceTableSchema(
+  const {
+    data: re,
+    isFetching,
+    refetch: refetch1,
+  } = useQuerySourceTableSchema(
     {
       sourceId,
       tableName,
@@ -33,6 +37,7 @@ const useTableColumns = (
 
   return {
     data: re,
+    loading: isFetching,
     refetch: () => {
       if (sourceId && tableName) {
         refetch1()
