@@ -147,11 +147,11 @@ export const datasourceTypeObjs = [
     name: 'mongodb',
     label: 'MongoDB',
   },
-  {
-    type: SourceType.Redis,
-    name: 'redis',
-    label: 'Redis',
-  },
+  // {
+  //   type: SourceType.Redis,
+  //   name: 'redis',
+  //   label: 'Redis',
+  // },
   {
     type: SourceType.ElasticSearch,
     name: 'elastic_search',
