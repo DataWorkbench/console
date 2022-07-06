@@ -587,6 +587,17 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     })
   }
 
+  const cancelAddCustomFieldRight = (field: TMappingField, index: number) => {
+    setRightFields((fields) => {
+      if (fields[index].name === '') {
+        return fields.filter((_, i) => i !== index)
+      }
+      const newFields = [...fields]
+      newFields[index] = omit(newFields[index], ['isEditing'])
+      return newFields
+    })
+  }
+
   if (!sourceId && !targetId) {
     return (
       <Root>
@@ -685,7 +696,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 onOk={(info, index) => {
                   keepEditingFieldRight(info, index)
                 }}
-                onCancel={console.log}
+                onCancel={cancelAddCustomFieldRight}
                 deleteItem={(field) => {
                   setRightFields((fields) =>
                     fields.filter((f) => f.uuid !== field.uuid)

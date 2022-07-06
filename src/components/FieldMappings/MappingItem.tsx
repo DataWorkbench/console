@@ -14,6 +14,8 @@ import Tippy from '@tippyjs/react'
 import { useImmer } from 'use-immer'
 import { TextEllipsis } from 'components/TextEllipsis'
 import { isDarkTheme } from 'utils/theme'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { HbaseNameField } from 'components/FieldMappings/HbaseNameField'
 import { fieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
@@ -436,8 +438,11 @@ const MappingItem = (props: MappingItemProps) => {
         }
       />
     )
+
+    const isHbase = (typeName as any)?.getType() === SourceType.HBase
+    const Cmp = isHbase ? HbaseNameField : TextField
     const name1 = (
-      <TextField
+      <Cmp
         name="fieldName"
         placeholder="请输入字段名"
         defaultValue={item.name}
@@ -446,7 +451,9 @@ const MappingItem = (props: MappingItemProps) => {
           {
             rule: {
               required: true,
-              matchRegex: nameMatchRegex,
+              matchRegex: isHbase
+                ? /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+:(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/
+                : nameMatchRegex,
             },
             status: 'error',
           },
