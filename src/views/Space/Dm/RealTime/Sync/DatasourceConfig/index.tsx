@@ -27,6 +27,8 @@ import {
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 
+import HbaseSource from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseSource'
+import HbaseTarget from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseTarget'
 import { source$, syncJobOp$, target$ } from '../common/subjects'
 
 import KafkaSourceConfig from './KafkaSourceConfig'
@@ -164,6 +166,8 @@ const DatasourceConfig = observer(
           return <EsSource curJob={curJob} ref={sourceRef} />
         case SourceType.HDFS:
           return <HdfsSource curJob={curJob} ref={sourceRef} />
+        case SourceType.HBase:
+          return <HbaseSource curJob={curJob} ref={sourceRef} />
         default:
           break
       }
@@ -184,6 +188,8 @@ const DatasourceConfig = observer(
           return <EsTarget curJob={curJob} ref={targetRef} />
         case SourceType.HDFS:
           return <HdfsTarget curJob={curJob} ref={targetRef} />
+        case SourceType.HBase:
+          return <HbaseTarget curJob={curJob} ref={targetRef} />
         default:
           return null
       }

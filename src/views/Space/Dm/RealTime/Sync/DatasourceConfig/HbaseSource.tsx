@@ -51,6 +51,16 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
             }
             return {
               id: get(e, 'data.id'),
+              table: get(e, 'data.table'),
+              customRange:
+                !!get(e, 'data.start_row_key') || !!get(e, 'data.end_row_key'),
+              startRowKey: get(e, 'data.start_row_key'),
+              endRowKey: get(e, 'data.end_row_key'),
+              isBinaryRowKey: get(e, 'data.is_binary_rowkey', true),
+              encoding: get(e, 'data.encoding', 'UTF-8'),
+              scanCacheSize: get(e, 'data.scan_cache_size', 256),
+              scanBatchSize: get(e, 'data.scan_batch_size', 100),
+              readMode: get(e, 'data.read_mode', 'NORMAL'),
             }
           })
         )
@@ -78,6 +88,15 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
         getData: () => {
           return {
             id: dbInfo?.id,
+            table: dbInfo?.table,
+            custom_range: dbInfo?.customRange,
+            start_row_key: dbInfo?.startRowKey,
+            end_row_key: dbInfo?.endRowKey,
+            is_binary_rowkey: dbInfo?.isBinaryRowKey,
+            encoding: dbInfo?.encoding,
+            scan_cache_size: dbInfo?.scanCacheSize,
+            scan_batch_size: dbInfo?.scanBatchSize,
+            read_mode: dbInfo?.readMode,
           }
         },
         refetchColumn: () => {},
@@ -104,6 +123,21 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
               }}
               placeholder="请选择数据源表"
               validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                        HBase Source 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
               help={
                 <HelpCenterLink isIframe={false} hasIcon href="###">
                   HBase Source 配置文档
@@ -119,6 +153,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
                   draft.customRange = e
                 })
               }}
+              validateOnChange
             />
             {dbInfo?.customRange && (
               <>
@@ -132,6 +167,14 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
                     })
                   }}
                   placeholder="请指定开始主键"
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请输入开始主键',
+                      status: 'error',
+                    },
+                  ]}
                 />
                 <TextField
                   label={<AffixLabel required>结束主键</AffixLabel>}
@@ -143,6 +186,14 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
                     })
                   }}
                   placeholder="请指定结束主键"
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请输入结束主键',
+                      status: 'error',
+                    },
+                  ]}
                 />
               </>
             )}
@@ -183,6 +234,14 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
                   },
                 ]
               }
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择起始主键类型',
+                  status: 'error',
+                },
+              ]}
             />
             <RadioGroupField
               name="encoding"
@@ -207,10 +266,18 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
                  * GBK = 2;
                  */
                 [
-                  { label: 'UTF-8', value: 1 },
-                  { label: 'GBK', value: 2 },
+                  { label: 'UTF-8', value: 'UTF-8' },
+                  { label: 'GBK', value: 'GBK' },
                 ]
               }
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择编码方式',
+                  status: 'error',
+                },
+              ]}
             />
             <FlexBox>
               <div css={styles.line} />
@@ -264,14 +331,14 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
                   <Control>
                     <InputNumber
                       label={null}
-                      name="scanCacheSize"
+                      name="scanColumnsSize"
                       showButton={false}
                       min={1}
                       step={1}
-                      value={dbInfo?.scanCacheSize}
+                      value={dbInfo?.scanBatchSize}
                       onChange={(e) => {
                         setDbInfo((draft) => {
-                          draft.scanCacheSize = e
+                          draft.scanBatchSize = e
                         })
                       }}
                     />
@@ -311,6 +378,14 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
                         </AffixLabel>
                       ),
                       value: 2,
+                    },
+                  ]}
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请选择读取模式',
+                      status: 'error',
                     },
                   ]}
                 />

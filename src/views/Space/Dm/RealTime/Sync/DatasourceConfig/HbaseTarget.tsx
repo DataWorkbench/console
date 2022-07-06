@@ -17,7 +17,13 @@ import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { source$ } from '../common/subjects'
 import { useQuerySourceTables } from '../../../../../../hooks'
 
-type FieldKeys = 'id' | 'nullMode' | 'encoding' | 'walFlag' | 'writeBufferSize'
+type FieldKeys =
+  | 'id'
+  | 'nullMode'
+  | 'encoding'
+  | 'walFlag'
+  | 'writeBufferSize'
+  | 'table'
 
 const { SelectField, RadioGroupField, ToggleField } = Form
 const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
@@ -35,6 +41,11 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
             }
             return {
               id: get(e, 'data.id'),
+              nullMode: get(e, 'data.null_mode', 'skip'),
+              encoding: get(e, 'data.encoding', 'utf-8'),
+              walFlag: get(e, 'data.wal_flag', false),
+              writeBufferSize: get(e, 'data.write_buffer_size', 8388608),
+              table: get(e, 'data.table'),
             }
           })
         )
@@ -62,6 +73,11 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
         getData: () => {
           return {
             id: dbInfo?.id,
+            null_mode: dbInfo?.nullMode,
+            encoding: dbInfo?.encoding,
+            wal_flag: dbInfo?.walFlag,
+            write_buffer_size: dbInfo?.writeBufferSize,
+            table: dbInfo?.table,
           }
         },
         refetchColumn: () => {},
@@ -88,6 +104,21 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
               }}
               placeholder="请选择数据源表"
               validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: (
+                    <div>
+                      <span>不能为空, </span>
+                      <span tw="text-font-placeholder mr-1">详见</span>
+                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                        HBase Sink 配置文档
+                      </HelpCenterLink>
+                    </div>
+                  ),
+                  status: 'error',
+                },
+              ]}
               help={
                 <HelpCenterLink isIframe={false} hasIcon href="###">
                   HBase Source 配置文档
@@ -118,6 +149,13 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
                 ]
               }
               validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择空值操作',
+                  status: 'error',
+                },
+              ]}
               placeholder="请选择空值操作"
               help="读取的 null 值时的处理方式"
             />
@@ -144,10 +182,18 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
                  * GBK = 2;
                  */
                 [
-                  { label: 'UTF-8', value: 1 },
-                  { label: 'GBK', value: 2 },
+                  { label: 'UTF-8', value: 'UTF-8' },
+                  { label: 'GBK', value: 'GBK' },
                 ]
               }
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择编码方式',
+                  status: 'error',
+                },
+              ]}
             />
             <FlexBox>
               <div css={styles.line} />
