@@ -142,10 +142,8 @@ const MappingItem = (props: MappingItemProps) => {
   const dndType = String(anchor)
 
   useEffect(() => {
-    console.log(itemProps)
     setItem(itemProps)
   }, [itemProps, setItem])
-  console.log(itemProps, item)
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: dndType,
@@ -193,7 +191,6 @@ const MappingItem = (props: MappingItemProps) => {
       if (!ref.current) {
         return
       }
-      console.log(draggedId, item)
       if (draggedId !== item.uuid) {
         moveItem(draggedId, item.uuid, isTop)
         jsplumb?.repaintEverything()
@@ -603,7 +600,6 @@ const MappingItem = (props: MappingItemProps) => {
   //   )
   // }
   drag(drop(ref))
-  console.log(item, item.isEditing)
   return (
     <Tippy
       content={renderConfirmContent()}

@@ -9,7 +9,6 @@ export const HbaseNameInput = (props: {
   onChange: (d: string) => void
   validateStatus?: 'success' | 'warning' | 'error' | 'validating' | undefined
 }) => {
-  console.log(props)
   const { value: valueProp = ':', onChange, validateStatus } = props
   const [family = '', name = ''] = valueProp.split(':')
   const [value, setValue] = useImmer<{ family: string; name: string }>({

@@ -1,6 +1,14 @@
 import tw, { css } from 'twin.macro'
 import { MoreAction } from 'components/MoreAction'
-import { useMemo, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useImmer } from 'use-immer'
 import { Select, Input, Icon } from '@QCFE/qingcloud-portal-ui'
 import { AffixLabel } from 'components/AffixLabel'
@@ -9,6 +17,8 @@ import { Center } from 'components/Center'
 import { useDrag, useDrop, XYCoord } from 'react-dnd'
 import { DragItem } from 'components/FieldMappings/MappingItem'
 import { PopConfirm } from 'components/PopConfirm'
+import { target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { map } from 'rxjs'
 
 const styles = {
   versionHeader: tw`bg-neut-16`,
@@ -160,8 +170,39 @@ interface ValueItem {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export const HbaseFieldMappings = (props: any) => {
-  const { sourceColumns } = props
+export const HbaseFieldMappings = forwardRef((props: any, ref) => {
+  const { sourceColumns = [] } = props
+  const [{ rowKeyString, versionTime, versionIndex }, setJob] = useState({
+    rowKeyString: '',
+    versionTime: undefined,
+    versionIndex: -1,
+  })
+
+  useLayoutEffect(() => {
+    const sub = target$
+      .pipe(
+        map((e) => {
+          if (!e || !e.data || !e.data.id) {
+            return {
+              rowKeyString: '',
+              versionTime: undefined,
+              versionIndex: -1,
+            }
+          }
+          return {
+            rowKeyString: e.data.rowkey_express ?? '',
+            versionIndex: e.data.version_column_index,
+            versionTime: e.data.version_column_value ?? undefined,
+          }
+        })
+      )
+      .subscribe((e) => {
+        setJob(e)
+      })
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [setJob])
 
   const [isEditingVersion, setIsEditingVersion] = useState(false)
   const [showVersionMoreAction, setShowVersionMoreAction] = useState(false)
@@ -178,6 +219,35 @@ export const HbaseFieldMappings = (props: any) => {
 
   const [rowKeyIds, setRowKeyIds] = useImmer<string[]>([])
 
+  useEffect(() => {
+    const r = rowKeyIds.join('_')
+    const list = rowKeyString.split('_')
+    if (rowKeyString !== r) {
+      setRowKeyIds(() => {
+        return sourceColumns
+          .filter((column: Record<string, any>) => list.includes(column.name))
+          .map((item: Record<string, any>) => item.uuid)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowKeyString, setRowKeyIds, sourceColumns])
+
+  useEffect(() => {
+    if (versionIndex !== -1 && sourceColumns[versionIndex]) {
+      setVersion({
+        type: 2,
+        column: sourceColumns[versionIndex].uuid,
+      })
+    } else if (versionTime) {
+      setVersion({
+        type: 3,
+        time: versionTime,
+      })
+    } else {
+      setVersion({ type: 1 })
+    }
+  }, [versionIndex, versionTime, setVersion, sourceColumns])
+
   const rowKeys = useMemo(() => {
     return rowKeyIds
       .map((id) => {
@@ -189,6 +259,21 @@ export const HbaseFieldMappings = (props: any) => {
       })
       .filter(Boolean)
   }, [rowKeyIds, sourceColumns])
+
+  useImperativeHandle(ref, () => {
+    return {
+      getData: () => {
+        return {
+          rowkeyExpress: rowKeys.map((item) => item.name).join('_'),
+          versionColumnIndex:
+            version.type === 2
+              ? sourceColumns.findIndex((i) => i.uuid === version.column)
+              : -1,
+          versionColumnValue: version.type === 3 ? version.time : undefined,
+        }
+      },
+    }
+  })
 
   const [editingValue, setEditingValue] = useImmer<{
     isAdd: boolean
@@ -476,7 +561,6 @@ export const HbaseFieldMappings = (props: any) => {
             theme="light"
             onClick={() => {
               const { index, isAdd, value: v } = editingValue
-              console.log(v, values)
               setValues((draft) => {
                 if (isAdd) {
                   return [...draft, v]
@@ -707,4 +791,4 @@ export const HbaseFieldMappings = (props: any) => {
       </div>
     </div>
   )
-}
+})

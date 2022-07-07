@@ -240,9 +240,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }, [rect.width])
 
   const kafkaRef = useRef<{ rowMapping: () => Record<string, any>[] }>(null)
+  const hbaseRef = useRef<{ getData: () => Record<string, any>[] }>(null)
 
   const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka
   const isKafkaTarget = (rightTypeName as any).getType() === SourceType.Kafka
+  const isHbaseTarget = (rightTypeName as any).getType() === SourceType.HBase
 
   useImperativeHandle(ref, () => ({
     rowMapping: () => {
@@ -277,6 +279,12 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         return null
       }
       return [leftColumns, rightColumns]
+    },
+    getOther: () => {
+      if (!isHbaseTarget || !hbaseRef.current) {
+        return {}
+      }
+      return hbaseRef.current?.getData()
     },
   }))
 
@@ -583,7 +591,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }
 
   const cancelAddCustomField = (field: TMappingField, index: number) => {
-    // setLeftFields((fields) => fields.slice(0, -1))
+    // setLeftFields((fields) => fields.slice(0, -1)useSetRealtimeColumns)
 
     setLeftFields((fields) => {
       if (fields[index].name === '') {
@@ -674,7 +682,6 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }
 
   function renderTarget() {
-    console.log(222, leftFields, mappings)
     if (isKafkaTarget) {
       return (
         <div css={[styles.wrapper, styles.borderX]}>
@@ -746,7 +753,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           )}
         </div>
         {(rightTypeName as any)?.getType() === SourceType.HBase && (
-          <HbaseFieldMappings sourceColumns={leftFields} />
+          <HbaseFieldMappings sourceColumns={leftFields} ref={hbaseRef} />
         )}
       </div>
     ) : (
