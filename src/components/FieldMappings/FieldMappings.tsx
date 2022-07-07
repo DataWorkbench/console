@@ -239,8 +239,16 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     jsPlumbInstRef.current?.repaintEverything()
   }, [rect.width])
 
+  const kafkaRef = useRef<{ rowMapping: () => Record<string, any>[] }>(null)
+
+  const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka
+  const isKafkaTarget = (rightTypeName as any).getType() === SourceType.Kafka
+
   useImperativeHandle(ref, () => ({
     rowMapping: () => {
+      if (isKafkaTarget && kafkaRef.current) {
+        return kafkaRef.current.rowMapping()
+      }
       const leftColumns: Record<string, any>[] = []
       const rightColumns: Record<string, any>[] = []
       mappings.forEach(([left, right], index) => {
@@ -666,11 +674,19 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }
 
   function renderTarget() {
-    // @ts-ignore
-    if (rightTypeName?.getType() === SourceType.Kafka) {
+    console.log(222, leftFields, mappings)
+    if (isKafkaTarget) {
       return (
         <div css={[styles.wrapper, styles.borderX]}>
-          <KafkaFieldMappings />
+          <KafkaFieldMappings
+            sourceColumns={leftFields}
+            ref={kafkaRef}
+            ids={leftFields
+              ?.filter((field) =>
+                (mappings ?? []).map(([, i]) => i).includes(field.name)
+              )
+              .map((i) => i.uuid)}
+          />
         </div>
       )
     }
@@ -729,7 +745,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             </Center>
           )}
         </div>
-        {rightTypeName?.getType() === SourceType.HBase && (
+        {(rightTypeName as any)?.getType() === SourceType.HBase && (
           <HbaseFieldMappings sourceColumns={leftFields} />
         )}
       </div>
@@ -738,6 +754,20 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         选择目的端数据源表（可获取表结构）后显示字段
       </EmptyFieldWrapper>
     )
+  }
+
+  const getLeftFields = () => {
+    if (isKafkaSource) {
+      return [
+        {
+          type: 'STRING',
+          name: 'message',
+          is_primary_key: false,
+          uuid: `source--message`,
+        },
+      ]
+    }
+    return leftFields
   }
 
   return (
@@ -843,7 +873,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <div>类型</div>
                 <div>来源表字段</div>
               </FieldRow>
-              {leftFields.map((item, i) => (
+              {getLeftFields().map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
                   item={item}
@@ -879,7 +909,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                 />
               ))}
-              {!readonly && (
+              {!readonly && !isKafkaSource && (
                 <Center
                   tw="bg-neut-16 cursor-pointer h-8"
                   onClick={addCustomField}

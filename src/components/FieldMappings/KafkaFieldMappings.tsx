@@ -1,5 +1,12 @@
 import tw, { css } from 'twin.macro'
-import { useMemo, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { useImmer } from 'use-immer'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { AffixLabel } from 'components/AffixLabel'
@@ -8,6 +15,7 @@ import { Center } from 'components/Center'
 import { useDrag, useDrop, XYCoord } from 'react-dnd'
 import { DragItem } from 'components/FieldMappings/MappingItem'
 import { PopConfirm } from 'components/PopConfirm'
+import { isEqual } from 'lodash-es'
 
 const styles = {
   versionHeader: tw`bg-neut-16`,
@@ -154,13 +162,21 @@ const Item = (props: any) => {
 }
 
 // eslint-disable-next-line import/prefer-default-export
-export const KafkaFieldMappings = (props: any) => {
-  const { sourceColumns } = props
+export const KafkaFieldMappings = forwardRef((props: any, ref) => {
+  const { sourceColumns, ids } = props
 
-  const [rowKeyIds, setRowKeyIds] = useImmer<string[]>([])
+  const [rowKeyIds, setRowKeyIds] = useImmer<string[]>(ids ?? [])
+
+  useEffect(() => {
+    const v = ids ?? []
+    if (!isEqual(v, rowKeyIds)) {
+      setRowKeyIds(v)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ids, setRowKeyIds])
 
   const rowKeys = useMemo(() => {
-    return rowKeyIds
+    return Array.from(new Set(rowKeyIds))
       .map((id) => {
         const item = sourceColumns.find((i) => i.uuid === id)
         if (item) {
@@ -170,6 +186,14 @@ export const KafkaFieldMappings = (props: any) => {
       })
       .filter(Boolean)
   }, [rowKeyIds, sourceColumns])
+
+  useImperativeHandle(ref, () => {
+    return {
+      rowMapping: () => {
+        return [rowKeys, rowKeys]
+      },
+    }
+  })
 
   const leftDndType = String('Right')
 
@@ -183,6 +207,9 @@ export const KafkaFieldMappings = (props: any) => {
       isOver: monitor.isOver(),
     }),
     drop: ({ uuid }) => {
+      if (rowKeyIds.includes(uuid)) {
+        return
+      }
       setRowKeyIds((draft) => {
         draft.push(uuid)
       })
@@ -271,4 +298,4 @@ export const KafkaFieldMappings = (props: any) => {
       </div>
     </div>
   )
-}
+})

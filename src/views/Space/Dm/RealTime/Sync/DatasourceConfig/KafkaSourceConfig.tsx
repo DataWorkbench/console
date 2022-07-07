@@ -19,6 +19,7 @@ import { Icon } from '@QCFE/lego-ui'
 import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { map } from 'rxjs'
 import { get } from 'lodash-es'
+import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 
 type FieldKeys =
   | 'topic'
@@ -101,6 +102,9 @@ const KafkaSourceConfig = forwardRef(
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
 
+    const { refetch } = useSetRealtimeColumns(dbInfo?.id, [
+      ['message', 'STRING'],
+    ])
     const [showAdvanced, setShowAdvanced] = useState(false)
     useLayoutEffect(() => {
       const sub = source$
@@ -144,7 +148,11 @@ const KafkaSourceConfig = forwardRef(
             config: dbInfo.config,
           }
         },
-        refetchColumn: () => {},
+        refetchColumn: () => {
+          if (dbInfo?.id) {
+            refetch()
+          }
+        },
       }
     })
 

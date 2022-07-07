@@ -26,6 +26,7 @@ import {
 import DatasourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig'
 import { useImmer } from 'use-immer'
 import { map, filter, pairwise } from 'rxjs'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { JobToolBar } from '../styled'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
@@ -302,11 +303,19 @@ const SyncJob = () => {
           `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
           mapping[0]
         )
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-          mapping[1]
-        )
+        if (curJob?.target_type !== SourceType.Kafka) {
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+            mapping[1]
+          )
+        } else {
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.tableFields`,
+            mapping[1]
+          )
+        }
 
         set(resource, 'channel_control', channel)
       }
