@@ -120,7 +120,6 @@ const PgSourceConfig = forwardRef(
             if (!e) {
               return {}
             }
-            console.log(e)
             return {
               id: e?.data?.id,
               tableName: get(e, 'data.table_list'),

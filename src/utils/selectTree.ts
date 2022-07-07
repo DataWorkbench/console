@@ -110,7 +110,6 @@ class SelectTreeData {
 
   // 选中节点
   onAdd(key: string | Symbol, withChildren = true, type: 1 | 2 = 1) {
-    console.log(9999, key)
     if (!this.keyChildrenMap.has(key)) {
       return
     }
