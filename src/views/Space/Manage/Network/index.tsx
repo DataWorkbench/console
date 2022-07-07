@@ -161,7 +161,37 @@ const Network = observer(() => {
             <MoreAction<'update' | 'close'>
               theme="auto"
               items={[
-                { key: 'update', text: '更换 VPC', icon: 'changing-over' },
+                {
+                  key: 'update',
+                  text: (
+                    <Center>
+                      <span tw="mr-1.5">更换 VPC</span>
+                      <Tooltip
+                        hasPadding
+                        content="暂未开放更换 VPC 功能"
+                        theme="instead"
+                      >
+                        <Icon
+                          name="information"
+                          css={css`
+                            svg.qicon {
+                              fill: ${
+                                isDarkTheme()
+                                  ? theme('colors.icon.single.white')
+                                  : theme('colors.icon.single.dark')
+                              };
+                              ${tw`text-icon-single-white! dark:text-icon-single-dark!`}
+                            }
+                          }
+                          `}
+                          type={isDarkTheme() ? 'light' : 'dark'}
+                        />
+                      </Tooltip>
+                    </Center>
+                  ),
+                  disabled: true,
+                  icon: 'changing-over',
+                },
                 {
                   key: 'close',
                   text: (
