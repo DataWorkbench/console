@@ -71,7 +71,11 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
       }
     }, [setDbInfo])
 
-    const { data: tableList, refetch } = useQuerySourceTables(
+    const {
+      data: tableList,
+      refetch,
+      isFetching,
+    } = useQuerySourceTables(
       {
         sourceId: dbInfo?.id,
       },
@@ -118,9 +122,10 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
         {dbInfo?.id && (
           <>
             <SelectWithRefresh
+              label={<AffixLabel>数据源表</AffixLabel>}
               name="table"
               onRefresh={refetch}
-              multi
+              isLoading={isFetching}
               options={
                 tableList?.items?.map((i) => ({ label: i, value: i })) ?? []
               }
