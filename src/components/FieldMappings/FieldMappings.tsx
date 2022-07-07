@@ -647,6 +647,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     ) {
       return false
     }
+    if (!sourceId) {
+      return false
+    }
     return true
   }
 
@@ -661,6 +664,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       ].includes(rightTypeName?.getType?.()) &&
       !rightFields.length
     ) {
+      return false
+    }
+    if (!targetId) {
       return false
     }
     return true
@@ -682,6 +688,13 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }
 
   function renderTarget() {
+    if (!showTarget()) {
+      return (
+        <EmptyFieldWrapper>
+          选择目的端数据源表（可获取表结构）后显示字段
+        </EmptyFieldWrapper>
+      )
+    }
     if (isKafkaTarget) {
       return (
         <div css={[styles.wrapper, styles.borderX]}>
@@ -698,7 +711,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
     }
 
-    return showTarget() ? (
+    return (
       <div css={styles.wrapper}>
         <div css={styles.borderX}>
           <FieldRow isHeader isReverse>
@@ -756,10 +769,6 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           <HbaseFieldMappings sourceColumns={leftFields} ref={hbaseRef} />
         )}
       </div>
-    ) : (
-      <EmptyFieldWrapper>
-        选择目的端数据源表（可获取表结构）后显示字段
-      </EmptyFieldWrapper>
     )
   }
 
