@@ -177,6 +177,7 @@ const SyncJob = () => {
   const mappingRef =
     useRef<{
       rowMapping: () => [Record<string, string>, Record<string, string>]
+      getOther: () => Record<string, string>
     }>(null)
   const clusterRef =
     useRef<{
@@ -278,7 +279,6 @@ const SyncJob = () => {
     const cluster = clusterRef.current?.getCluster()
     const channel = channelRef.current?.getChannel() ?? {}
     const syncJobScript = editorRef.current?.getValue() ?? ''
-
     try {
       if (mode === 2) {
         if (typeof JSON.parse(syncJobScript) !== 'object') {
@@ -303,6 +303,26 @@ const SyncJob = () => {
           `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
           mapping[0]
         )
+        if (curJob?.target_type === SourceType.HBase) {
+          const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
+            mappingRef.current!.getOther()
+
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
+            rowkeyExpress
+          )
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_index`,
+            versionColumnIndex
+          )
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_value`,
+            versionColumnValue
+          )
+        }
         if (curJob?.target_type !== SourceType.Kafka) {
           set(
             resource,
@@ -320,6 +340,7 @@ const SyncJob = () => {
         set(resource, 'channel_control', channel)
       }
     } catch (e) {
+      // console.log(e.message)
       // showConfWarn(e.message)
       // return
     }
@@ -670,20 +691,20 @@ const SyncJob = () => {
           <Icon name="export" />
           发布
         </Button>
-        <Button
-          onClick={() => {
-            dbRef.current?.validate()
-          }}
-        >
-          validate
-        </Button>
-        <Button
-          onClick={() => {
-            console.log(dbRef.current?.getResource())
-          }}
-        >
-          getValue
-        </Button>
+        {/* <Button */}
+        {/*   onClick={() => { */}
+        {/*     dbRef.current?.validate() */}
+        {/*   }} */}
+        {/* > */}
+        {/*   validate */}
+        {/* </Button> */}
+        {/* <Button */}
+        {/*   onClick={() => { */}
+        {/*     console.log(dbRef.current?.getResource()) */}
+        {/*   }} */}
+        {/* > */}
+        {/*   getValue */}
+        {/* </Button> */}
         {!!confData?.updated && (
           <span tw="flex-auto text-right text-font">
             最后更新时间：{timeFormat(confData.updated * 1000)}

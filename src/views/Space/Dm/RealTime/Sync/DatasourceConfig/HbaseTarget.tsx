@@ -14,7 +14,7 @@ import {
 } from 'components'
 import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
-import { source$ } from '../common/subjects'
+import { target$ } from '../common/subjects'
 import { useQuerySourceTables } from '../../../../../../hooks'
 
 type FieldKeys =
@@ -33,7 +33,7 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
 
     const [showAdvanced, setShowAdvanced] = useImmer(false)
     useLayoutEffect(() => {
-      const sub = source$
+      const sub = target$
         .pipe(
           map((e) => {
             if (!e) {
@@ -83,10 +83,9 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
         refetchColumn: () => {},
       }
     })
-
     return (
       <Form css={styles.form} ref={sourceForm}>
-        <BaseConfigCommon from="source" />
+        <BaseConfigCommon from="target" />
         {dbInfo?.id && (
           <>
             <SelectWithRefresh
