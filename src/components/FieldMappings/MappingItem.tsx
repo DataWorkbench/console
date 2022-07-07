@@ -14,6 +14,8 @@ import Tippy from '@tippyjs/react'
 import { useImmer } from 'use-immer'
 import { TextEllipsis } from 'components/TextEllipsis'
 import { isDarkTheme } from 'utils/theme'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { HbaseNameField } from 'components/FieldMappings/HbaseNameField'
 import { fieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
@@ -109,6 +111,7 @@ interface MappingItemProps {
   onOk?: (v: TMappingField, index?: number) => void
   getDeleteField?: (name: string) => TMappingField | undefined
   exist?: (name: string) => boolean
+  isLeft?: boolean
 }
 
 const MappingItem = (props: MappingItemProps) => {
@@ -127,6 +130,7 @@ const MappingItem = (props: MappingItemProps) => {
     onCancel = noop,
     getDeleteField,
     exist,
+    isLeft = true,
   } = props
   const [isTop, setIsTop] = useState(false)
   const [item, setItem] = useImmer(itemProps)
@@ -140,7 +144,6 @@ const MappingItem = (props: MappingItemProps) => {
   useEffect(() => {
     setItem(itemProps)
   }, [itemProps, setItem])
-
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: dndType,
@@ -406,75 +409,83 @@ const MappingItem = (props: MappingItemProps) => {
     )
   }
   const renderEditContent = () => {
+    const type1 = (
+      <SelectField
+        placeholder="字段类型"
+        value={item.type}
+        name="fieldType"
+        validateOnChange
+        schemas={[
+          {
+            rule: { required: true },
+            status: 'error',
+          },
+        ]}
+        options={
+          typeName
+            ? fieldTypeMapper
+                .get(typeName.toLowerCase())
+                ?.map((v) => ({ label: v, value: v }))
+            : []
+        }
+        onChange={(v: string) =>
+          setItem((draft) => {
+            draft.type = v
+          })
+        }
+      />
+    )
+
+    const isHbase = (typeName as any)?.getType() === SourceType.HBase
+    const Cmp = isHbase ? HbaseNameField : TextField
+    const name1 = (
+      <Cmp
+        name="fieldName"
+        placeholder="请输入字段名"
+        defaultValue={item.name}
+        validateOnChange
+        schemas={[
+          {
+            rule: {
+              required: true,
+              matchRegex: isHbase
+                ? /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+:(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/
+                : nameMatchRegex,
+            },
+            status: 'error',
+          },
+          {
+            rule: (v: string) => {
+              if (v !== item.name && exist) {
+                return !exist(v)
+              }
+              return true
+            },
+            status: 'error',
+          },
+        ]}
+        onChange={(v: string) => {
+          setItem((draft) => {
+            draft.name = v
+            if (draft.custom === false) {
+              draft.custom = true
+            }
+          })
+          if (getDeleteField) {
+            const delField = getDeleteField(v)
+            if (delField) {
+              onOk(delField, index)
+            }
+          }
+        }}
+      />
+    )
+
     return (
       <Form ref={formRef} tw="pl-0!">
         <FieldRow isEditing tw="p-0 ">
-          <div>
-            <SelectField
-              placeholder="字段类型"
-              value={item.type}
-              name="fieldType"
-              validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  status: 'error',
-                },
-              ]}
-              options={
-                typeName
-                  ? fieldTypeMapper
-                      .get(typeName.toString())
-                      ?.map((v) => ({ label: v, value: v }))
-                  : []
-              }
-              onChange={(v: string) =>
-                setItem((draft) => {
-                  draft.type = v
-                })
-              }
-            />
-          </div>
-          <FlexBox>
-            <TextField
-              name="fieldName"
-              placeholder="请输入字段名"
-              defaultValue={item.name}
-              validateOnChange
-              schemas={[
-                {
-                  rule: {
-                    required: true,
-                    matchRegex: nameMatchRegex,
-                  },
-                  status: 'error',
-                },
-                {
-                  rule: (v: string) => {
-                    if (v !== item.name && exist) {
-                      return !exist(v)
-                    }
-                    return true
-                  },
-                  status: 'error',
-                },
-              ]}
-              onChange={(v: string) => {
-                setItem((draft) => {
-                  draft.name = v
-                  if (draft.custom === false) {
-                    draft.custom = true
-                  }
-                })
-                if (getDeleteField) {
-                  const delField = getDeleteField(v)
-                  if (delField) {
-                    onOk(delField, index)
-                  }
-                }
-              }}
-            />
-          </FlexBox>
+          <div>{isLeft ? name1 : type1}</div>
+          <FlexBox>{isLeft ? type1 : name1}</FlexBox>
           <Center css={[tw`space-x-3`, item.custom && tw`translate-y-4`]}>
             <Tooltip
               theme="light"
@@ -536,14 +547,19 @@ const MappingItem = (props: MappingItemProps) => {
   }
 
   const renderContent = () => {
+    const type1 = <div>{item.type}</div>
+    const name1 = (
+      <div tw="truncate">
+        <TextEllipsis theme={isDarkTheme() ? 'light' : 'dark'}>
+          {item.name}
+        </TextEllipsis>
+      </div>
+    )
     return (
       <>
-        <div>{item.type}</div>
-        <div tw="truncate">
-          <TextEllipsis theme={isDarkTheme() ? 'light' : 'dark'}>
-            {item.name}
-          </TextEllipsis>
-        </div>
+        {!isLeft ? type1 : name1}
+        {!isLeft ? name1 : type1}
+
         {itemProps.formatter && (
           <Tooltip
             hasPadding
@@ -575,14 +591,14 @@ const MappingItem = (props: MappingItemProps) => {
     )
   }
 
-  if (anchor === 'Left') {
-    return (
-      <FieldRow ref={ref} className={className} isReverse>
-        <div>{item.type}</div>
-        <div>{item.name}</div>
-      </FieldRow>
-    )
-  }
+  // if (anchor === 'Left') {
+  //   return (
+  //     <FieldRow ref={ref} className={className} isReverse>
+  //       <div>{item.type}</div>
+  //       <div>{item.name}</div>
+  //     </FieldRow>
+  //   )
+  // }
   drag(drop(ref))
   return (
     <Tippy

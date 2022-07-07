@@ -8,10 +8,8 @@ import {
   // TextLink,
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
-import { useImmer } from 'use-immer'
-import { nanoid } from 'nanoid'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
 import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
@@ -23,9 +21,21 @@ import {
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { timeFormat } from 'utils/convert'
+
+import {
+  confColumns$,
+  curJobDbConfSubject$,
+  source$,
+  sourceColumns$,
+  target$,
+  targetColumns$,
+} from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import DatasourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig'
+import { useImmer } from 'use-immer'
+import { map, filter, pairwise } from 'rxjs'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { useParams } from 'react-router-dom'
 import { JobToolBar } from '../styled'
-import SyncDataSource from './SyncDataSource'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
 import ReleaseModal from '../Modal/ReleaseModal'
@@ -118,13 +128,13 @@ const removeUndefined = (obj: any) => {
   return newObj
 }
 
-interface DbInfo {
+export interface DbInfo {
   id?: string
   tableName?: string
   fields?: TMappingField[]
 }
 
-const intTypes = new Set([
+export const intTypes = new Set([
   'TINYINT',
   'SMALLINT',
   'INT',
@@ -140,7 +150,11 @@ const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
   const { workFlowStore } = useStore()
-  const { data: confData, refetch: confRefetch } = useQuerySyncJobConf()
+  const {
+    data: confData,
+    isFetching,
+    refetch: confRefetch,
+  } = useQuerySyncJobConf()
 
   const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
@@ -149,17 +163,22 @@ const SyncJob = () => {
     workFlowStore: { curJob },
   } = useStore()
 
+
+  useLayoutEffect(() => {
+    if (!isFetching) {
+      curJobDbConfSubject$.next({
+        ...confData,
+        sourceType: curJob?.source_type,
+        targetType: curJob?.target_type,
+        jobType: curJob?.type,
+      })
+    }
+  }, [confData, curJob, isFetching])
+
   const stepsData = useMemo(() => {
     return getStepsData(regionId, spaceId)
   }, [regionId, spaceId])
 
-  const [db, setDb] = useImmer<{
-    source: DbInfo
-    target: DbInfo
-  }>({
-    source: { id: get(confData, 'source_id') },
-    target: { id: get(confData, 'target_id') },
-  })
 
   const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
@@ -174,6 +193,7 @@ const SyncJob = () => {
   const mappingRef =
     useRef<{
       rowMapping: () => [Record<string, string>, Record<string, string>]
+      getOther: () => Record<string, string>
     }>(null)
   const clusterRef =
     useRef<{
@@ -189,42 +209,23 @@ const SyncJob = () => {
   const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
-    return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
+    return [
+      getDataSourceTypes(sourceType, curJob?.type === 3),
+      getDataSourceTypes(targetType),
+    ]
   }, [curJob])
-
-  const sourceColumn = useMemo(() => {
-    if (confData && db.source.tableName && sourceTypeName) {
-      const source = get(
-        confData,
-        `sync_resource.${sourceTypeName?.toLowerCase()}_source`
-      )
-      const table = get(source, 'table[0]')
-      if (source && table === db.source.tableName) {
-        return get(source, 'column')
-      }
-    }
-    return []
-  }, [confData, sourceTypeName, db.source.tableName])
-
-  const targetColumn = useMemo(() => {
-    if (confData && db.target.tableName && targetTypeName) {
-      const source = get(
-        confData,
-        `sync_resource.${targetTypeName?.toLowerCase()}_target`
-      )
-      const table = get(source, 'table[0]')
-      if (source && table === db.target.tableName) {
-        return get(source, 'column')
-      }
-    }
-    return []
-  }, [confData, targetTypeName, db.target.tableName])
 
   const editorRef = useRef<any>(null)
 
   const [defaultJobContent, setDefaultJobContent] = useState(
     get(confData, 'job_content')
   )
+
+  useLayoutEffect(() => {
+    return () => {
+      curJobDbConfSubject$.next(null)
+    }
+  }, [])
 
   useEffect(() => {
     if (confData?.job_mode && confData?.job_mode !== mode) {
@@ -245,12 +246,6 @@ const SyncJob = () => {
   // console.log(db)
 
   // console.log('sourceColumn', sourceColumn, 'targetColumn', targetColumn)
-  useEffect(() => {
-    setDb((draft) => {
-      draft.source.id = get(confData, 'source_id')
-      draft.target.id = get(confData, 'target_id')
-    })
-  }, [confData, setDb])
 
   const handleEditorWillMount = (monaco: any) => {
     // editorRef.current = null
@@ -300,7 +295,6 @@ const SyncJob = () => {
     const cluster = clusterRef.current?.getCluster()
     const channel = channelRef.current?.getChannel() ?? {}
     const syncJobScript = editorRef.current?.getValue() ?? ''
-
     try {
       if (mode === 2) {
         if (typeof JSON.parse(syncJobScript) !== 'object') {
@@ -325,15 +319,44 @@ const SyncJob = () => {
           `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
           mapping[0]
         )
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-          mapping[1]
-        )
+        if (curJob?.target_type === SourceType.HBase) {
+          const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
+            mappingRef.current!.getOther()
+
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
+            rowkeyExpress
+          )
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_index`,
+            versionColumnIndex
+          )
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_value`,
+            versionColumnValue
+          )
+        }
+        if (curJob?.target_type !== SourceType.Kafka) {
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+            mapping[1]
+          )
+        } else {
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.tableFields`,
+            mapping[1]
+          )
+        }
 
         set(resource, 'channel_control', channel)
       }
     } catch (e) {
+      // console.log(e.message)
       // showConfWarn(e.message)
       // return
     }
@@ -382,18 +405,19 @@ const SyncJob = () => {
               )?.[1] ?? {},
               'split_pk'
             )
-            if (
-              splitKey &&
-              !db?.source?.fields?.some(
-                (f) =>
-                  f.name === splitKey &&
-                  intTypes.has(f.type) &&
-                  f.is_primary_key
-              )
-            ) {
-              showConfWarn('切分键必须为主键且为整型')
-              return
-            }
+            // TODO
+            // if (
+            //   splitKey &&
+            //   !db?.source?.fields?.some(
+            //     (f) =>
+            //       f.name === splitKey &&
+            //       intTypes.has(f.type) &&
+            //       f.is_primary_key
+            //   )
+            // ) {
+            //   showConfWarn('切分键必须为主键且为整型')
+            //   return
+            // }
 
             // 如果并发数大于1  则切分键不能为空
             const parallelism = get(resource, 'channel_control.parallelism', 0)
@@ -418,6 +442,25 @@ const SyncJob = () => {
   }
 
   const [showScheModal, toggleScheModal] = useState(false)
+  const [sourceColumns, setSourceColumns] = useState<Record<string, any>[]>([])
+  const [targetColumns, setTargetColumns] = useState<Record<string, any>[]>([])
+  const [columns, setColumns] = useState([[], []])
+  useLayoutEffect(() => {
+    const sourceColumnsSub = sourceColumns$.subscribe((e) => {
+      setSourceColumns(e)
+    })
+    const targetColumnsSub = targetColumns$.subscribe((e) => {
+      setTargetColumns(e)
+    })
+    const confSub = confColumns$.subscribe((e) => {
+      setColumns(e)
+    })
+    return () => {
+      sourceColumnsSub.unsubscribe()
+      targetColumnsSub.unsubscribe()
+      confSub.unsubscribe()
+    }
+  }, [])
 
   const release = () => {
     if (!enableRelease) {
@@ -428,9 +471,39 @@ const SyncJob = () => {
     }
   }
 
-  const columns = useMemo<[any, any]>(() => {
-    return [sourceColumn, targetColumn]
-  }, [sourceColumn, targetColumn])
+  const [{ sourceId, targetId }, setSourceId] = useImmer({
+    sourceId: confData?.source_id,
+    targetId: confData?.target_id,
+  })
+
+  useLayoutEffect(() => {
+    const sub = source$
+      .pipe(
+        pairwise(),
+        filter(([e1, e2]) => e1?.data?.id !== e2?.data?.id),
+        map(([, e]) => e?.data?.id)
+      )
+      .subscribe((e) =>
+        setSourceId((draft) => {
+          draft.sourceId = e
+        })
+      )
+    const sub1 = target$
+      .pipe(
+        pairwise(),
+        filter(([e1, e2]) => e1?.data?.id !== e2?.data?.id),
+        map(([, e]) => e?.data?.id)
+      )
+      .subscribe((e) =>
+        setSourceId((draft) => {
+          draft.targetId = e
+        })
+      )
+    return () => {
+      sub.unsubscribe()
+      sub1.unsubscribe()
+    }
+  }, [setSourceId])
 
   const renderGuideMode = () => {
     return (
@@ -449,45 +522,24 @@ const SyncJob = () => {
                 </>
               }
             >
-              {index === 0 && (
-                <SyncDataSource
-                  ref={dbRef}
-                  onSelectTable={(tp, tableName, data) => {
-                    const fieldData = data.map((field) => ({
-                      ...field,
-                      uuid: nanoid(),
-                    })) as TMappingField[]
-                    setDb((draft) => {
-                      const soruceInfo = draft[tp]
-                      soruceInfo.tableName = tableName
-                      soruceInfo.fields = fieldData
-                    })
-                  }}
-                  onDbChange={(tp: 'source' | 'target', data) => {
-                    setDb((draft) => {
-                      draft[tp] = data
-                    })
-                  }}
-                  conf={confData}
-                />
-              )}
+              {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob!} />}
+
               {index === 1 && (
                 <FieldMappings
-                  key={
-                    // NOTE: 无法解决拖拽 bug, 只能这样了
-                    `${db?.source?.tableName}_${db?.target?.tableName}`
-                  }
                   onReInit={() => {
                     if (dbRef.current && dbRef.current?.refetchColumns) {
                       dbRef.current?.refetchColumns()
                     }
                   }}
                   ref={mappingRef}
-                  // mappings={mappings}
-                  leftFields={db.source.fields || []}
-                  rightFields={db.target.fields || []}
+                  // mappings={[]}
+                  leftFields={sourceColumns as any}
+                  rightFields={targetColumns as any}
+                  sourceId={sourceId}
+                  targetId={targetId}
                   leftTypeName={sourceTypeName}
-                  // rightTypeName={targetTypeName}
+                  rightTypeName={targetTypeName}
+                  jobType={curJob?.type}
                   columns={columns}
                   topHelp={
                     <HelpCenterLink
@@ -501,8 +553,6 @@ const SyncJob = () => {
               )}
               {index === 2 && (
                 <SyncCluster
-                  sourceId={db.source?.id}
-                  targetId={db.target?.id}
                   ref={clusterRef}
                   clusterId={get(confData, 'cluster_id')}
                   defaultClusterName={get(confData, 'cluster_info.name')}
@@ -622,6 +672,29 @@ const SyncJob = () => {
   return (
     <div tw="flex flex-col flex-1 relative">
       <JobToolBar>
+        {mode === 1 ? (
+          <PopConfirm
+            type="warning"
+            content={
+              <>
+                <div tw="text-base font-medium">确认转变为脚本模式？</div>
+                <div tw="text-neut-8 mt-2">
+                  一旦数据集成过程由向导转变为脚本模式，不可逆转，且来源、目的数据源需要和向导模式保持一致，确认转变为脚本模式么？
+                </div>
+              </>
+            }
+            okText="转变"
+            onOk={handleConvert}
+            // onOk={() => {
+            //   save(false, () => setMode(2), false)
+            // }}
+          >
+            <Button type="black">
+              <Icon name="coding" type="light" />
+              脚本模式
+            </Button>
+          </PopConfirm>
+        ) : null}
         <Button onClick={() => save()} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存
@@ -636,6 +709,20 @@ const SyncJob = () => {
           <Icon name="export" />
           发布
         </Button>
+        {/* <Button */}
+        {/*   onClick={() => { */}
+        {/*     dbRef.current?.validate() */}
+        {/*   }} */}
+        {/* > */}
+        {/*   validate */}
+        {/* </Button> */}
+        {/* <Button */}
+        {/*   onClick={() => { */}
+        {/*     console.log(dbRef.current?.getResource()) */}
+        {/*   }} */}
+        {/* > */}
+        {/*   getValue */}
+        {/* </Button> */}
         {!!confData?.updated && (
           <span tw="flex-auto text-right text-font">
             最后更新时间：{timeFormat(confData.updated * 1000)}

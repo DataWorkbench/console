@@ -85,6 +85,7 @@ specifiers:
   react-router-dom: ^5.2.0
   react-table: ^7.7.0
   react-use: ^17.2.4
+  rxjs: ^7.5.5
   simplebar-react: ^2.3.6
   style-loader: ^2.0.0
   stylelint: ^13.13.1
@@ -140,6 +141,7 @@ dependencies:
   react-router-dom: 5.2.0_react@17.0.2
   react-table: 7.7.0_react@17.0.2
   react-use: 17.2.4_react-dom@17.0.2+react@17.0.2
+  rxjs: 7.5.5
   simplebar-react: 2.3.6_react-dom@17.0.2+react@17.0.2
   tippy.js: 6.3.1
   twin.macro: 2.8.2
@@ -10085,6 +10087,12 @@ packages:
     dependencies:
       tslib: 1.14.1
     dev: true
+
+  /rxjs/7.5.5:
+    resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
+    dependencies:
+      tslib: 2.3.0
+    dev: false
 
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
