@@ -96,7 +96,7 @@ const types = [
 export const ConditionParameter = React.forwardRef(
   (props: IConditionParameterProps, ref: React.ForwardedRef<any>) => {
     const {
-      value: defaultValue = { type: ConditionType.Visualization },
+      value: defaultValue,
       onChange,
       helpStr,
       helpLink,
@@ -135,8 +135,8 @@ export const ConditionParameter = React.forwardRef(
         //         'endCondition',
         //       ])
         //     : (pick(value, ['type', 'column', 'expression']) as any)
-        onChange(value)
         prevValue.current = value
+        onChange(value)
       }
     }, [onChange, value])
 

@@ -205,5 +205,9 @@ export const useDescribeDataSource = (sourceId: string) => {
   }
 
   const key: any = ['datasourceDetail', params]
-  return useQuery(key, async () => dataSourceManage.describeDataSource(params))
+  return useQuery(
+    key,
+    async () => dataSourceManage.describeDataSource(params),
+    { enabled: !!sourceId }
+  )
 }
