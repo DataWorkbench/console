@@ -1,6 +1,12 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { FieldMappings, HelpCenterLink, Modal, PopConfirm } from 'components'
+import {
+  FieldMappings,
+  HelpCenterLink,
+  Modal,
+  RouterLink,
+  // TextLink,
+} from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -15,6 +21,7 @@ import {
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { timeFormat } from 'utils/convert'
+
 import {
   confColumns$,
   curJobDbConfSubject$,
@@ -27,6 +34,7 @@ import DatasourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig'
 import { useImmer } from 'use-immer'
 import { map, filter, pairwise } from 'rxjs'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { useParams } from 'react-router-dom'
 import { JobToolBar } from '../styled'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
@@ -60,21 +68,20 @@ const styles = {
   stepText: tw`ml-2 inline-block border-green-11 text-green-11`,
 }
 
-const stepsData = [
+const getStepsData = (regionId: string, spaceId: string) => [
   {
     key: 'p0',
     title: '选择数据源',
     desc: (
       <>
         在这里配置数据的来源端和目的端；仅支持在
-        <HelpCenterLink
-          hasIcon
-          isIframe={false}
-          href="/manual/source_data/add_data/"
-          onClick={(e) => e.stopPropagation()}
+        <RouterLink
+          to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+          target="_blank"
+          color="blue"
         >
           数据源管理
-        </HelpCenterLink>
+        </RouterLink>
         创建的数据源。
       </>
     ),
@@ -149,9 +156,13 @@ const SyncJob = () => {
     refetch: confRefetch,
   } = useQuerySyncJobConf()
 
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+
   const {
     workFlowStore: { curJob },
   } = useStore()
+
 
   useLayoutEffect(() => {
     if (!isFetching) {
@@ -163,6 +174,11 @@ const SyncJob = () => {
       })
     }
   }, [confData, curJob, isFetching])
+
+  const stepsData = useMemo(() => {
+    return getStepsData(regionId, spaceId)
+  }, [regionId, spaceId])
+
 
   const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
@@ -603,6 +619,8 @@ const SyncJob = () => {
     )
   }
   const mutationConvert = useMutationSyncJobConvert()
+
+  // eslint-disable-next-line
   const handleConvert = () => {
     if (
       !dbRef.current ||
