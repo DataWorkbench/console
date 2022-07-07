@@ -25,8 +25,8 @@ import {
   IDataSourceConfigProps,
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
-import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 import { get } from 'lodash-es'
+import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 
 const {
   // RadioGroupField,
@@ -111,8 +111,11 @@ const PgSourceConfig = forwardRef(
     const sourceForm = useRef<Form>()
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
-    useSetRealtimeColumns(dbInfo?.id)
-
+    const { refetch: refetchColumns } = useTableColumns(
+      dbInfo?.id,
+      dbInfo?.tableName,
+      'source'
+    )
     useLayoutEffect(() => {
       const sub = source$
         .pipe(
@@ -175,7 +178,9 @@ const PgSourceConfig = forwardRef(
             heart_beat_pack: dbInfo?.heartBeatPack,
           }
         },
-        refetchColumn: () => {},
+        refetchColumn: () => {
+          refetchColumns()
+        },
       }
     })
 

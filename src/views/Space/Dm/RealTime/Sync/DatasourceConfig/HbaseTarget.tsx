@@ -13,6 +13,7 @@ import {
   SelectWithRefresh,
 } from 'components'
 import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
+import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { target$ } from '../common/subjects'
 import { useQuerySourceTables } from '../../../../../../hooks'
@@ -61,6 +62,11 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
       },
       { enabled: !!dbInfo?.id }
     )
+    const { refetch: refetchColumns } = useTableColumns(
+      dbInfo?.id,
+      dbInfo?.table,
+      'target'
+    )
 
     useImperativeHandle(ref, () => {
       return {
@@ -80,7 +86,9 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
             table: dbInfo?.table,
           }
         },
-        refetchColumn: () => {},
+        refetchColumn: () => {
+          refetchColumns()
+        },
       }
     })
     return (

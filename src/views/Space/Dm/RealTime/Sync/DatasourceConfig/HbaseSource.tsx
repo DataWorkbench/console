@@ -20,6 +20,7 @@ import {
   SelectWithRefresh,
 } from 'components'
 import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
+import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { source$ } from '../common/subjects'
 
@@ -77,6 +78,12 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
       { enabled: !!dbInfo?.id }
     )
 
+    const { refetch: refetchColumns } = useTableColumns(
+      dbInfo?.id,
+      dbInfo?.table,
+      'source'
+    )
+
     useImperativeHandle(ref, () => {
       return {
         validate: () => {
@@ -99,7 +106,9 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>(
             read_mode: dbInfo?.readMode,
           }
         },
-        refetchColumn: () => {},
+        refetchColumn: () => {
+          refetchColumns()
+        },
       }
     })
 

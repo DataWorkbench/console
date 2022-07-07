@@ -16,6 +16,7 @@ import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
 import { useQuerySourceTables } from 'hooks'
 import { get } from 'lodash-es'
 import { map } from 'rxjs'
+import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import styles from './styles'
 import { target$ } from '../common/subjects'
 
@@ -67,6 +68,12 @@ const HiveTargetConfig = forwardRef(
       { enabled: !!dbInfo?.id }
     )
 
+    const { refetch: refetchColumns } = useTableColumns(
+      dbInfo?.id,
+      dbInfo?.tableName,
+      'target'
+    )
+
     useImperativeHandle(ref, () => {
       return {
         validate: () => {
@@ -89,7 +96,9 @@ const HiveTargetConfig = forwardRef(
             encoding: dbInfo?.encoding,
           }
         },
-        refetchColumn: () => {},
+        refetchColumn: () => {
+          refetchColumns()
+        },
       }
     })
 

@@ -45,7 +45,6 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
       dbInfo?.collectionName,
       'target'
     )
-
     useLayoutEffect(() => {
       const sub = source$
         .pipe(

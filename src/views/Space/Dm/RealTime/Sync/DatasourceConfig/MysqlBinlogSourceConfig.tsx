@@ -22,7 +22,7 @@ import {
   IDataSourceConfigProps,
   ISourceRef,
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
-import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
+import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 
 const {
   CheckboxGroupField,
@@ -126,7 +126,12 @@ const MysqlBinlogSourceConfig = forwardRef(
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
     const [showAdvanced, setShowAdvanced] = useState(false)
-    const { refetch: refetchColumns } = useSetRealtimeColumns(dbInfo?.id)
+    // const { refetch: refetchColumns } = useSetRealtimeColumns(dbInfo?.id)
+    const { refetch: refetchColumns } = useTableColumns(
+      dbInfo?.id,
+      dbInfo?.tableName,
+      'source'
+    )
     useLayoutEffect(() => {
       const sub = source$
         .pipe(
