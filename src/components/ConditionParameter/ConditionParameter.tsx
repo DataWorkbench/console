@@ -18,7 +18,7 @@ import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
 import { isEqual, isNil, pick, values } from 'lodash-es'
 
-import { PopConfirm } from 'components/PopConfirm'
+import { PopConfirm } from '../PopConfirm'
 import { FlexBox } from '../Box'
 import { Tooltip } from '../Tooltip'
 import { HelpCenterLink } from '../Link'
