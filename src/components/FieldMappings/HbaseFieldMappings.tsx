@@ -11,14 +11,15 @@ import {
 } from 'react'
 import { useImmer } from 'use-immer'
 import { Select, Input, Icon } from '@QCFE/qingcloud-portal-ui'
-import { AffixLabel } from 'components/AffixLabel'
-import { FlexBox } from 'components/Box'
-import { Center } from 'components/Center'
 import { useDrag, useDrop, XYCoord } from 'react-dnd'
-import { DragItem } from 'components/FieldMappings/MappingItem'
-import { PopConfirm } from 'components/PopConfirm'
+// eslint-disable-next-line import/no-cycle
 import { target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { map } from 'rxjs'
+import { AffixLabel } from '../AffixLabel'
+import { FlexBox } from '../Box'
+import { Center } from '../Center'
+import { DragItem } from './MappingItem'
+import { PopConfirm } from '../PopConfirm'
 
 const styles = {
   versionHeader: tw`bg-neut-16`,
