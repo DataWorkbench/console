@@ -31,7 +31,7 @@ const useQueryListAlertLogs = apiHooks<
 
 // const getQueryListAlertLogsKey = () => queryKeyObj.listAlertLogs
 
-interface IAlertHistory {}
+// interface IAlertHistory {}
 
 const instanceNameStyle = css`
   &:hover {
@@ -51,8 +51,8 @@ const getName = (name: MappingKey<typeof historyFiledMapping>) =>
   historyFiledMapping.get(name)!.apiField
 
 const alertHistorySettingKey = 'ALERT_HISTORY_SETTING_KEY'
-const AlertHistory = (props: IAlertHistory) => {
-  console.log(props)
+const AlertHistory = () => {
+  // console.log(props)
   useIcon(icons)
   const { filter, pagination, sort, getColumnFilter } = useFilter<
     {
