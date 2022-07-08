@@ -11,7 +11,6 @@ type RequestParams = {
 }
 
 // mock-fetch
-// TODO:
 async function fetchData(url = '', data = {}) {
   // Default options are marked with *
   const baseUrl = 'https://yapi.yunify.com/mock/327'
@@ -36,7 +35,7 @@ async function fetchData(url = '', data = {}) {
 }
 
 const regExp = /(service|gateway)/g
-const isMock = false // TODO: 是否使用mock
+const isMock = true // TODO: 是否使用mock
 export const apiRequest =
   <T extends keyof typeof apiList>(manage: T, item: keyof typeof apiList[T]) =>
   <U extends RequestParams>(params: U) => {

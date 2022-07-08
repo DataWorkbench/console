@@ -6,8 +6,6 @@ import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
 import emitter from 'utils/emitter'
 import { useParams } from 'react-router-dom'
-import { AlertStoreProvider } from 'views/Space/Ops/Alert/AlertStore'
-import { DataReleaseStoreProvider } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import ApiMenu from './ApiPanel/ApiMenu'
 import ApiTabs from './ApiPanel/ApiTabs'
 import StreamRightMenu from './Stream/StreamRightMenu'
@@ -76,45 +74,41 @@ const RealTime = observer(() => {
   }
 
   return (
-    <AlertStoreProvider>
-      <DataReleaseStoreProvider>
-        <div tw="flex min-h-[600px] w-full h-full overflow-auto p-2 pr-0 ">
-          <div tw="flex w-full">
-            <ApiMenu tw="mr-2" />
-            {curApi ? (
-              <>
-                <ApiTabs />
-                <StreamRightMenu />
-              </>
-            ) : (
-              <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
-                <div tw="space-y-2">
-                  <FlexBox tw="space-x-1">
-                    {steps.slice(0, 3).map((step, i) => renderStep(step, i, i !== 2))}
-                  </FlexBox>
-                  <FlexBox tw="justify-end">
-                    <div tw="flex flex-col items-center pr-5">
-                      <div tw="border-l border-neut-13 h-16" />
-                      <div
-                        tw="w-0 h-0"
-                        css={`
-                          border-left: 4px solid transparent;
-                          border-right: 4px solid transparent;
-                          border-top: 4px solid ${theme('colors.line.dark')};
-                        `}
-                      />
-                    </div>
-                  </FlexBox>
-                  <FlexBox tw="space-x-1 flex-row-reverse">
-                    {steps.slice(3).map((step, i) => renderStep(step, i + 3, i + 3 !== 4, true))}
-                  </FlexBox>
+    <div tw="flex min-h-[600px] w-full h-full overflow-auto p-2 pr-0 ">
+      <div tw="flex w-full">
+        <ApiMenu tw="mr-2" />
+        {curApi ? (
+          <>
+            <ApiTabs />
+            <StreamRightMenu />
+          </>
+        ) : (
+          <Center tw="flex-1 w-full text-neut-8 bg-neut-18 rounded">
+            <div tw="space-y-2">
+              <FlexBox tw="space-x-1">
+                {steps.slice(0, 3).map((step, i) => renderStep(step, i, i !== 2))}
+              </FlexBox>
+              <FlexBox tw="justify-end">
+                <div tw="flex flex-col items-center pr-5">
+                  <div tw="border-l border-neut-13 h-16" />
+                  <div
+                    tw="w-0 h-0"
+                    css={`
+                      border-left: 4px solid transparent;
+                      border-right: 4px solid transparent;
+                      border-top: 4px solid ${theme('colors.line.dark')};
+                    `}
+                  />
                 </div>
-              </Center>
-            )}
-          </div>
-        </div>
-      </DataReleaseStoreProvider>
-    </AlertStoreProvider>
+              </FlexBox>
+              <FlexBox tw="space-x-1 flex-row-reverse">
+                {steps.slice(3).map((step, i) => renderStep(step, i + 3, i + 3 !== 4, true))}
+              </FlexBox>
+            </div>
+          </Center>
+        )}
+      </div>
+    </div>
   )
 })
 

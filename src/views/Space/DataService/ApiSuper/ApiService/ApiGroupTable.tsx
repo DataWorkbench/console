@@ -1,6 +1,5 @@
 import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { MoreAction, FlexBox, Center, TextEllipsis } from 'components'
-import dayjs from 'dayjs'
+import { MoreAction, FlexBox, Center } from 'components'
 import { useQueryListApiServices, getQueryKeyListApiServices } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
@@ -8,9 +7,10 @@ import { assign, get, omitBy } from 'lodash-es'
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useParams } from 'react-router-dom'
-import tw from 'twin.macro'
+import { formatDate } from 'utils'
 import { MappingKey } from 'utils/types'
 import { apiGroupTableFieldMapping, apiGroupTableColumns } from '../constants'
+import { NameWrapper } from '../styles'
 
 const { ColumnsSetting } = ToolBar as any
 
@@ -23,7 +23,7 @@ interface IRouteParams {
   spaceId: string
 }
 
-const columnSettingsKey = 'DATA_SERVICE_API_SERVICE'
+const columnSettingsKey = 'DATA_SERVICE_API_GROUP_TABLE'
 
 const getName = (name: MappingKey<typeof apiGroupTableFieldMapping>) =>
   apiGroupTableFieldMapping.get(name)!.apiField
@@ -44,7 +44,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     Record<ReturnType<typeof getName>, number | string | boolean>,
     { pagination: true; sort: true }
   >(
-    { sort_by: getName('create_time'), reverse: true },
+    { sort_by: getName('update_time'), reverse: true },
     { pagination: true, sort: true },
     columnSettingsKey
   )
@@ -73,8 +73,12 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     queryClient.invalidateQueries(getQueryKeyListApiServices())
   }
 
+  const goDetail = ({ id, key = 'api' }: { id: string; key?: string }) => {
+    window.open(`./apiService/${id}?tab=${key === 'bingKey' ? 'authKey' : 'api'}`, '_blank')
+  }
+
   const handleMenuClick = (row: Record<string, any>, key: string) => {
-    window.open(`./apiService/${row.id}?tab=${key === 'bingKey' ? 'authKey' : 'api'}`, '_blank')
+    goDetail({ id: row.id, key })
   }
 
   const getActions = (row: Record<string, any>) => {
@@ -98,25 +102,32 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
   const columnsRender = {
     [getName('name')]: {
       render: (v: any, row: any) => (
-        <FlexBox tw="items-center space-x-1 truncate">
-          <Center
-            className="clusterIcon"
-            tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
-          >
-            <Icon name="q-dockerHubDuotone" type="light" />
-          </Center>
-          <div tw="truncate">
-            <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>
-            <div tw="dark:text-neut-8">{row.id}</div>
-          </div>
-        </FlexBox>
+        <NameWrapper
+          isHover={!onSelect}
+          onClick={() => {
+            if (!onSelect) {
+              goDetail({ id: row.id })
+            }
+          }}
+        >
+          <FlexBox tw="items-center space-x-1 truncate">
+            <Center
+              className="clusterIcon"
+              tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5 "
+            >
+              <Icon name="q-apps3Duotone" type="light" />
+            </Center>
+            <div tw="truncate">
+              <div className="name">{row.name}</div>
+              <div tw="dark:text-neut-8">{row.id}</div>
+            </div>
+          </FlexBox>
+        </NameWrapper>
       )
     },
-    [getName('create_time')]: {
-      ...getSort(getName('create_time')),
-      render: (v: number, row: any) => (
-        <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
-      )
+    [getName('update_time')]: {
+      ...getSort(getName('update_time')),
+      render: (v: number) => <span tw="dark:text-neut-0">{formatDate(v)}</span>
     }
   }
 
@@ -129,14 +140,20 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     )
   }
 
+  const TableColumns = onSelect
+    ? apiGroupTableColumns.filter(
+        (item) => !['api_count', 'pre_path'].includes(item.dataIndex as string)
+      )
+    : apiGroupTableColumns
+
   const { columns, setColumnSettings } = useColumns(
     columnSettingsKey,
-    apiGroupTableColumns,
+    TableColumns,
     columnsRender,
-    operation
+    onSelect ? undefined : operation
   )
 
-  const dataSource = get(data, 'entities', [])
+  const dataSource = get(data, 'entities', []) || []
 
   return (
     <FlexBox tw="w-full flex-1" orient="column">

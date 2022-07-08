@@ -339,6 +339,71 @@ export const useMutationDeleteApiConfigs = () => {
   })
 }
 
+// 测试API
+export const TestDataServiceApi = async ({
+  regionId,
+  spaceId,
+  apiId,
+  groupIds,
+  ...rest
+}: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId, api_id: apiId } },
+    { data: { ...rest } }
+  )
+  return apiRequest('dataServiceManage', 'testDataServiceApi')(params)
+}
+
+export const useMutationTestDataServiceApi = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      apiId,
+      regionId,
+      spaceId,
+      ...rest
+    }
+
+    ret = await TestDataServiceApi(params)
+    return ret
+  })
+}
+
+// 发布API
+
+export const PublishDataServiceApi = async ({
+  regionId,
+  spaceId,
+  apiId,
+  groupIds,
+  ...rest
+}: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId, api_id: apiId } },
+    { data: { ...rest } }
+  )
+  return apiRequest('dataServiceManage', 'publishDataServiceApi')(params)
+}
+
+export const useMutationPublishDataServiceApi = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      apiId,
+      regionId,
+      spaceId,
+      ...rest
+    }
+
+    ret = await PublishDataServiceApi(params)
+    return ret
+  })
+}
+
 export const useQueryListDataSources = apiHooks<
   'dataSourceManage',
   ListDataSourcesRequestType,

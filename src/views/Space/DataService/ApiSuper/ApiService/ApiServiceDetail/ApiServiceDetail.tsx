@@ -6,11 +6,13 @@ import { useState } from 'react'
 import { useQueryListApiServices } from 'hooks'
 import { get } from 'lodash-es'
 import { PbmodelApiServiceEntity } from 'types/types'
-import dayjs from 'dayjs'
 import { useLocation, useParams } from 'react-router-dom'
 import qs from 'qs'
+import { formatDate } from 'utils'
 import { dataReleaseDetailActions } from '../../constants'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
+import ApiRouterTable from '../../ApiRouters/ApiRoutersTable'
+import AuthKeyTable from './AuthKeyTable'
 
 const { CollapsePanel } = Collapse
 
@@ -28,7 +30,7 @@ const ApiServiceDetail = (props: { id: string }) => {
 
   const { isLoading, data } = useQueryListApiServices({
     uri: { space_id: spaceId },
-    data: { ids: [id] } as any
+    params: { ids: [id] } as any
   })
 
   const detail: PbmodelApiServiceEntity = get(data, 'entities[0]')
@@ -68,7 +70,7 @@ const ApiServiceDetail = (props: { id: string }) => {
           <Center tw="flex-auto">
             <Circle tw="w-10! h-10!">
               <Icon
-                name="q-downloadBoxFill"
+                name="q-apps3Duotone"
                 type="light"
                 size={28}
                 css={css`
@@ -116,13 +118,13 @@ const ApiServiceDetail = (props: { id: string }) => {
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem labelWidth={60}>
               <span>域名 ID:</span>
-              <span>{detail?.pre_path}</span>
+              <span>{detail?.id}</span>
               <span>路径:</span>
               <span>{detail?.pre_path}</span>
             </GridItem>
             <GridItem labelWidth={100}>
               <span>最新更新时间:</span>
-              <span>{dayjs(detail?.update_time).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>{formatDate(detail?.update_time)}</span>
               <span>描述:</span>
               <span>{detail?.desc}</span>
             </GridItem>
@@ -143,11 +145,11 @@ const ApiServiceDetail = (props: { id: string }) => {
           }
         `}
       >
-        <TabPanel label="已发布 API" name="api">
-          22222
+        <TabPanel label="已发布 API" name="api" tw="pt-5">
+          <ApiRouterTable apiServiceId={detail?.id} />
         </TabPanel>
-        <TabPanel label="已绑定秘钥" name="authKey">
-          22222
+        <TabPanel label="已绑定秘钥" name="authKey" tw="mt-5">
+          <AuthKeyTable authKeyId={detail?.auth_key_id} apiServiceId={detail?.id} />
         </TabPanel>
       </HorizonTabs>
     </Root>

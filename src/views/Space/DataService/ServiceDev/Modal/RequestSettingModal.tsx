@@ -179,14 +179,30 @@ export const JobModal = observer(() => {
     },
     [getName('param_operator')]: {
       width: 100,
-      render: (text: string) => (
-        <Select value={text} options={ParameterPosition.getList().map((item) => item)} />
+      render: (text: string, __: any, index: number) => (
+        <Select
+          value={text}
+          options={ParameterOperator.getList().map((item) => item)}
+          onChange={(_, item) => {
+            setDataSource((draft) => {
+              draft[index].param_operator = item.value
+            })
+          }}
+        />
       )
     },
     [getName('param_position')]: {
       width: 100,
-      render: (text: string) => (
-        <Select value={text} options={ParameterPosition.getList().map((item) => item)} />
+      render: (text: string, __: any, index: number) => (
+        <Select
+          value={text}
+          options={ParameterPosition.getList().map((item) => item)}
+          onChange={(_, item) => {
+            setDataSource((draft) => {
+              draft[index].param_position = item.value
+            })
+          }}
+        />
       )
     },
     [getName('example_value')]: {

@@ -228,3 +228,26 @@ export const TitleInformation = styled('div')(() => [
     }
   `
 ])
+
+export const TitleItem = styled('div')(() => [
+  css`
+    ${tw` border-l-4 border-solid border-green-11  pl-3`}
+  `
+])
+
+export const TestContent = styled('div')(() => [
+  css`
+    ${tw`h-[370px] w-full my-5 p-2 bg-neut-19 text-neut-7 rounded overflow-y-auto`}
+  `
+])
+
+export const MessageBox = styled('div')(({ color = 'green' }: { color?: 'red' | 'green' }) => [
+  tw`h-9 rounded border-solid border-[1px] mt-3 px-3 flex items-center `,
+  color === 'red' && tw`bg-[rgba(207, 59, 55, 0.1)] border-red-11  text-red-11 `,
+  color === 'green' && tw`bg-[ rgba(21, 166, 117, 0.1)]  border-green-11 text-green-11`,
+  css`
+    > span {
+      ${tw`mr-1`}
+    }
+  `
+])

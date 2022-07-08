@@ -1,29 +1,35 @@
 import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { MoreAction, FlexBox, Center, TextEllipsis, Confirm, HelpCenterLink } from 'components'
+import { MoreAction, FlexBox, Center, Confirm, HelpCenterLink } from 'components'
 import dayjs from 'dayjs'
 import { useQueryListAuthKeys, getQueryKeyListAuthKeys, useMutationListApiServices } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
-import { get, omitBy } from 'lodash-es'
+import { assign, get } from 'lodash-es'
 
 import { useQueryClient } from 'react-query'
 import tw, { css } from 'twin.macro'
 import { MappingKey } from 'utils/types'
 import { PbmodelAuthKeyEntity } from 'types/types'
 import { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { authKeyTableFieldMapping, authKeyTableColumns } from '../constants'
 import AuthKeyModal from './AuthKeyModal'
 import SelectApiServiceModal from './SelectApiServiceModal'
+import { NameWrapper } from '../styles'
 
+interface AuthKeyTableProps {
+  onSelect?: (selectedRowKeys: string[]) => void
+}
 const { ColumnsSetting } = ToolBar as any
 
-const columnSettingsKey = 'DATA_SERVICE_API_SERVICE'
+const columnSettingsKey = 'DATA_SERVICE_AUTH_KEY_TABLE'
 
 const getName = (name: MappingKey<typeof authKeyTableFieldMapping>) =>
   authKeyTableFieldMapping.get(name)!.apiField
 
-const ApiGroupTable = () => {
+const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
   const queryClient = useQueryClient()
+  const { spaceId } = useParams<{ spaceId: string }>()
 
   const {
     filter,
@@ -43,7 +49,25 @@ const ApiGroupTable = () => {
   const [curOp, setCurOp] = useState<string>()
   const [isDeleteKey, setIsDeleteKey] = useState<boolean>(false)
   const [curAuthRow, setCurAuthRow] = useState<PbmodelAuthKeyEntity | null>()
-  const { isRefetching, data } = useQueryListAuthKeys(omitBy(filter, (v) => v === '') as any)
+  const { isRefetching, data } = useQueryListAuthKeys({
+    uri: { space_id: spaceId },
+    params: { ...filter } as any
+  })
+
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+
+  const tablePropsData = assign(
+    {},
+    !!onSelect && {
+      selectType: 'radio',
+      selectedRowKeys,
+      onSelect: (keys: string[]) => {
+        onSelect?.(keys)
+        setSelectedRowKeys(keys)
+      }
+    }
+  )
+
   const mutation = useMutationListApiServices()
 
   // 刷新
@@ -54,6 +78,10 @@ const ApiGroupTable = () => {
   const handleCancel = () => {
     setCurOp('')
     setCurAuthRow(null)
+  }
+
+  const goDetail = (id: string) => {
+    window.open(`./authKey/${id}`, '_blank')
   }
 
   const handleMenuClick = (row: PbmodelAuthKeyEntity, key: string) => {
@@ -70,7 +98,7 @@ const ApiGroupTable = () => {
         }
       )
     } else if (key === 'detail') {
-      window.open(`./authKey/${row.id}`, '_blank')
+      goDetail(row.id)
     }
   }
   const handleConfirmOK = () => {}
@@ -108,17 +136,26 @@ const ApiGroupTable = () => {
   const columnsRender = {
     [getName('name')]: {
       render: (v: any, row: any) => (
-        <FlexBox tw="items-center space-x-1 truncate">
-          <Center
-            className="clusterIcon"
-            tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
-          >
-            <Icon name="q-dockerHubDuotone" type="light" />
-          </Center>
-          <div tw="truncate">
-            <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>
-          </div>
-        </FlexBox>
+        <NameWrapper
+          isHover={!onSelect}
+          onClick={() => {
+            if (!onSelect) {
+              goDetail(row.id)
+            }
+          }}
+        >
+          <FlexBox tw="items-center space-x-1 truncate">
+            <Center
+              className="clusterIcon"
+              tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
+            >
+              <Icon name="q-kmsFill" type="light" />
+            </Center>
+            <div tw="truncate">
+              <div className="name">{row.name}</div>
+            </div>
+          </FlexBox>
+        </NameWrapper>
       )
     },
     [getName('create_time')]: {
@@ -142,7 +179,7 @@ const ApiGroupTable = () => {
     columnSettingsKey,
     authKeyTableColumns,
     columnsRender,
-    operation
+    onSelect ? undefined : operation
   )
 
   const dataSource = get(data, 'entities') || []
@@ -208,6 +245,8 @@ const ApiGroupTable = () => {
           ...pagination
         }}
         onSort={sort}
+        emptyPlaceholder={{ icon: 'q-kmsFill', text: '暂未绑定密钥，请点击左上方按钮绑定密钥' }}
+        {...tablePropsData}
       />
       {(curOp === 'create' || curOp === 'update') && (
         <AuthKeyModal curOp={curOp} curAuthRow={curAuthRow} onCancel={handleCancel} />

@@ -6,6 +6,7 @@ import ClusterSettingModal from '../Modal/ClusterSettingModal'
 import RequestSettingModal from '../Modal/RequestSettingModal'
 import ResponseSettingModal from '../Modal/ResponseSettingModal'
 import VersionsModal from '../Modal/VersionsModal'
+import TestModal from '../Modal/TestModal'
 
 const MenuRoot = styled('div')(() => [
   tw`pt-8 space-y-4 align-middle bg-neut-17 w-10`,
@@ -25,7 +26,8 @@ const StreamRightMenu = observer(() => {
       showClusterSetting,
       showRequestSetting,
       showResponseSetting,
-      showVersions
+      showVersions,
+      showTestModal
     }
   } = useStore()
   return (
@@ -43,6 +45,7 @@ const StreamRightMenu = observer(() => {
       {showRequestSetting && <RequestSettingModal />}
       {showResponseSetting && <ResponseSettingModal />}
       {showVersions && <VersionsModal />}
+      {showTestModal && <TestModal />}
     </>
   )
 })

@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import tw, { css, styled } from 'twin.macro'
 
 import DraggableRow, { Row } from './DraggableRow'
+import Empty from '../Empty'
 
 const CheckBoxLabel = styled(Label)(() => [
   css`
@@ -28,21 +29,21 @@ const TableHeader = styled('div')(() => [
   `
 ])
 
-const Empty = styled.div`
-  & {
-    ${tw`h-[250px] overflow-hidden border-neut-13! border-t-[1px]`}
-  }
+// const Empty = styled.div`
+//   & {
+//     ${tw`h-[250px] overflow-hidden border-neut-13! border-t-[1px]`}
+//   }
 
-  & > div {
-    ${tw`h-full flex justify-center items-center`}
-    .emptyBox {
-      ${tw`h-[112px] w-[112px] flex-col`}
-    }
-    .text {
-      ${tw`text-neut-0`}
-    }
-  }
-`
+//   & > div {
+//     ${tw`h-full flex justify-center items-center`}
+//     .emptyBox {
+//       ${tw`h-[112px] w-[112px] flex-col`}
+//     }
+//     .text {
+//       ${tw`text-neut-0`}
+//     }
+//   }
+// `
 
 export const TableBody = styled('div')(() => [
   css`
@@ -220,16 +221,7 @@ export const DargTable = (props: DargTableProps<any>) => {
             )
           })
         ) : (
-          <Empty>
-            <div>
-              <div className="emptyBox">
-                <Icon name="display" size={56} />
-                <div className="text">
-                  <span>暂无数据</span>
-                </div>
-              </div>
-            </div>
-          </Empty>
+          <Empty icon={<Icon name="display" size={56} />} description="暂无数据" />
         )}
       </TableBody>
       {renderFooter?.()}

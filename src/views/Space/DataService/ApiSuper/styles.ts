@@ -43,7 +43,7 @@ export const HorizonTabs = styled(Tabs)(() => [
       }
     }
     .tab-content {
-      ${tw`py-5`}
+      ${tw`py-5!`}
     }
     .grid-table-content {
       .grid-table-header {
@@ -110,4 +110,21 @@ export const FormWrapper = styled('div')(() => [
       ${tw`pl-0`}
     }
   `
+])
+
+export const NameWrapper = styled('div')(({ isHover = true }: { isHover?: boolean }) => [
+  isHover &&
+    css`
+      &:hover {
+        .clusterIcon {
+          ${tw`bg-[#13966a80] border-[#9ddfc966]`}
+          .icon svg.qicon {
+            ${tw`text-green-11`}
+          }
+        }
+        .name {
+          ${tw`text-green-11 cursor-pointer`}
+        }
+      }
+    `
 ])

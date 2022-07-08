@@ -20,7 +20,7 @@ interface ApiGroupTableProps {
 
 const { ColumnsSetting } = ToolBar as any
 
-const columnSettingsKey = 'DATA_SERVICE_API_SERVICE'
+const columnSettingsKey = 'DATA_SERVICE_BIND_API_TABLE'
 
 const getName = (name: MappingKey<typeof apiGroupTableFieldMapping>) =>
   apiGroupTableFieldMapping.get(name)!.apiField

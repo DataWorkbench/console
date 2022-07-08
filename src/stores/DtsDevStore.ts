@@ -51,6 +51,8 @@ class WorkFlowStore {
 
   showRequestSetting = false
 
+  showTestModal = false
+
   showResponseSetting = false
 
   showVersions = false

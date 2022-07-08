@@ -26,7 +26,7 @@ const ApiServiceDetail = (props: { id: string }) => {
 
   const { isLoading, data } = useQueryListAuthKeys({
     uri: { space_id: spaceId },
-    data: { ids: [id] } as any
+    params: { ids: [id] } as any
   })
 
   const detail: PbmodelAuthKeyEntity = get(data, 'entities[0]')

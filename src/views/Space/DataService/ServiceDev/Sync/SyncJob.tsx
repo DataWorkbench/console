@@ -4,7 +4,12 @@ import { HelpCenterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useRef } from 'react'
 import { cloneDeep, get } from 'lodash-es'
-import { useMutationUpdateApiConfig, useStore, useFetchApiConfig } from 'hooks'
+import {
+  useMutationUpdateApiConfig,
+  useStore,
+  useFetchApiConfig,
+  useMutationPublishDataServiceApi
+} from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { JobToolBar } from '../styled'
 import SyncDataSource, { ISourceData } from './SyncDataSource'
@@ -104,6 +109,7 @@ const stepsData = [
 const SyncJob = () => {
   const mutation = useMutationUpdateApiConfig()
   const fetchApi = useFetchApiConfig()
+  const publishMutation = useMutationPublishDataServiceApi()
 
   const {
     dtsDevStore: { curApi, apiConfigData },
@@ -113,7 +119,8 @@ const SyncJob = () => {
   useEffect(() => {
     if (curApi) {
       // 更改完api， 请求api配置
-      fetchApi({ apiId: get(curApi, 'api_id') }).then((res) => {
+      const apiId = get(curApi, 'api_id')
+      fetchApi({ apiId }).then((res) => {
         if (res) {
           dtsDevStore.set({
             apiConfigData: res
@@ -167,6 +174,7 @@ const SyncJob = () => {
     const response = orderMapRequestData(orderSourceData, responseConfig)
 
     const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
+    const apiId = get(curApi, 'api_id')
 
     if (!dataSourceData?.source?.id) {
       Notify.warning({
@@ -180,7 +188,7 @@ const SyncJob = () => {
     mutation.mutate(
       {
         ...apiConfig,
-        apiId: get(apiConfig, 'api_id', ''),
+        apiId,
         datasource_id: dataSourceData?.source?.id,
         table_name: dataSourceData?.tableName,
         response_params: {
@@ -198,7 +206,28 @@ const SyncJob = () => {
       }
     )
   }
-  const release = () => {}
+  const release = () => {
+    const apiId = get(curApi, 'api_id')
+
+    publishMutation.mutate(
+      { apiId },
+      {
+        onSuccess: (res) => {
+          if (res.ret_code === 0) {
+            Notify.success({
+              title: '操作提示',
+              content: '发布成功',
+              placement: 'bottomRight'
+            })
+          }
+        }
+      }
+    )
+  }
+
+  const test = () => {
+    dtsDevStore.set({ showTestModal: true })
+  }
 
   const renderGuideMode = () => (
     <CollapseWrapper>
@@ -232,13 +261,11 @@ const SyncJob = () => {
           <Icon name="data" type="dark" />
           保存
         </Button>
-        {/* loading={releaseMutation.isLoading} disabled={!enableRelease} */}
-        <Button
-          type="primary"
-          onClick={release}
-          // disabled={!enableRelease}
-          // disabled={get(confData, 'source_id') === '' && enableRelease}
-        >
+        <Button onClick={test}>
+          <Icon name="data" type="dark" />
+          测试
+        </Button>
+        <Button type="primary" onClick={release}>
           <Icon name="export" />
           发布
         </Button>

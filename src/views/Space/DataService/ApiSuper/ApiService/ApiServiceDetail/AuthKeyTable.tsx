@@ -1,35 +1,35 @@
 import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { MoreAction, FlexBox, Center } from 'components'
-import { useQueryListRoutes, getQueryKeyListRoutes } from 'hooks'
+import { FlexBox, Center, Confirm } from 'components'
+import dayjs from 'dayjs'
+import { useQueryListAuthKeys, getQueryKeyListAuthKeys, useMutationAuthKey } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
 import { get } from 'lodash-es'
-import { useState } from 'react'
-import { useQueryClient } from 'react-query'
-import { useParams } from 'react-router-dom'
-import { MappingKey } from 'utils/types'
-import { formatDate } from 'utils'
-import { PbmodelRoute } from 'types/types'
-import { apiRoutersTableFieldMapping, apiRouterTableColumns } from '../constants'
-import AbolishApiModal from './AbolishApiModal'
-import { NameWrapper } from '../styles'
-import TestModal from './TestModal'
 
-interface ApiRouterTableProps {
+import { useQueryClient } from 'react-query'
+import { MappingKey } from 'utils/types'
+import { useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { Tooltip } from 'components/Tooltip'
+import tw, { css } from 'twin.macro'
+import { authKeyTableFieldMapping, authKeyTableColumns } from '../../constants'
+import { NameWrapper } from '../../styles'
+import SelectAuthKeyModal from './SelectAuthKeyModal'
+
+interface AuthKeyTableProps {
+  authKeyId?: string
   apiServiceId?: string
 }
 const { ColumnsSetting } = ToolBar as any
 
-const columnSettingsKey = 'DATA_SERVICE_API_SERVICE_API_ROUTER'
+const columnSettingsKey = 'DATA_SERVICE_AUTH_KEY_TABLE'
 
-const getName = (name: MappingKey<typeof apiRoutersTableFieldMapping>) =>
-  apiRoutersTableFieldMapping.get(name)!.apiField
+const getName = (name: MappingKey<typeof authKeyTableFieldMapping>) =>
+  authKeyTableFieldMapping.get(name)!.apiField
 
-const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
+const ApiGroupTable = ({ authKeyId, apiServiceId }: AuthKeyTableProps) => {
   const queryClient = useQueryClient()
   const { spaceId } = useParams<{ spaceId: string }>()
-  const [curOp, setOp] = useState<string>()
-  const [currentRow, setCurrentRow] = useState<PbmodelRoute>()
 
   const {
     filter,
@@ -45,74 +45,52 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     { pagination: true, sort: true },
     columnSettingsKey
   )
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
 
-  const { isRefetching, data } = useQueryListRoutes({
+  const [curOp, setCurOp] = useState<string>()
+  const [curAuthKey, setCurAuthKey] = useState<{ id: string; name: string }>()
+  const { isRefetching, data } = useQueryListAuthKeys({
     uri: { space_id: spaceId },
-    params: { api_service_id: apiServiceId, ...filter } as any
+    params: { ids: authKeyId, ...filter } as any
   })
+
+  // const mutation = useMutationListApiServices()
+  const authMutation = useMutationAuthKey()
 
   // 刷新
   const refetchData = () => {
-    queryClient.invalidateQueries(getQueryKeyListRoutes())
-  }
-
-  const handleMenuClick = (row: PbmodelRoute, key: string) => {
-    if (key === 'stop') {
-      setSelectedRowKeys([row.id])
-    } else if (key === 'detail') {
-      window.open(`../serviceDev`, '_blank')
-    }
-    setOp(key)
-    setCurrentRow(row)
+    queryClient.invalidateQueries(getQueryKeyListAuthKeys())
   }
 
   const handleCancel = () => {
-    setOp('')
-    refetchData()
+    setCurOp('')
   }
 
-  const getActions = (row: Record<string, any>) => {
-    const result = [
-      {
-        text: '查看详情',
-        icon: 'q-pingFill',
-        key: 'detail',
-        value: row
-      },
-      {
-        text: '测试',
-        icon: 'q-pingFill',
-        key: 'test',
-        value: row
-      },
-      {
-        text: '下线',
-        icon: 'q-down2Fill',
-        key: 'stop',
-        value: row
-      }
-    ]
-    if (apiServiceId) {
-      return result
+  const handleUnbind = () => {
+    const paramsData = {
+      option: 'unbind' as any,
+      auth_key_id: curAuthKey?.id,
+      api_service_ids: [apiServiceId]
     }
-    return result.filter((item) => item.key !== 'detail')
+    authMutation.mutate(paramsData, {
+      onSuccess: () => {
+        refetchData()
+        handleCancel()
+      }
+    })
   }
-
   const columnsRender = {
     [getName('name')]: {
       render: (v: any, row: any) => (
-        <NameWrapper isHover={!apiServiceId} onClick={() => {}}>
+        <NameWrapper isHover={false}>
           <FlexBox tw="items-center space-x-1 truncate">
             <Center
               className="clusterIcon"
               tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
             >
-              <Icon name="q-apiDuotone" type="light" />
+              <Icon name="q-kmsFill" type="light" />
             </Center>
             <div tw="truncate">
               <div className="name">{row.name}</div>
-              <div tw="dark:text-neut-8">{row.id}</div>
             </div>
           </FlexBox>
         </NameWrapper>
@@ -120,7 +98,9 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     },
     [getName('create_time')]: {
       ...getSort(getName('create_time')),
-      render: (v: number) => <span tw="dark:text-neut-0">{formatDate(v)}</span>
+      render: (v: number, row: any) => (
+        <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+      )
     }
   }
 
@@ -129,38 +109,48 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     dataIndex: 'operation',
     key: 'operation',
     render: (_: never, record: any) => (
-      <MoreAction theme="darker" items={getActions(record)} onMenuClick={handleMenuClick} />
+      <div
+        tw="cursor-pointer hover:text-green-11"
+        onClick={() => {
+          setCurOp('unbind')
+          setCurAuthKey(record)
+        }}
+      >
+        解绑
+      </div>
     )
   }
 
-  const tableColums = apiServiceId
-    ? apiRouterTableColumns.filter((item) => item.dataIndex !== 'proxy_uri')
-    : apiRouterTableColumns
   const { columns, setColumnSettings } = useColumns(
     columnSettingsKey,
-    tableColums,
+    authKeyTableColumns,
     columnsRender,
     operation
   )
 
   const dataSource = get(data, 'entities') || []
-
   return (
     <FlexBox tw="w-full flex-1" orient="column">
       <div tw="mb-3">
         <FlexBox tw="justify-between">
           <Center tw="space-x-3">
-            {selectedRowKeys.length !== 0 && (
+            <Tooltip
+              theme="light"
+              content="当前支持绑定单个密钥，如需换绑，请先解绑密钥"
+              hasPadding
+              twChild={tw`flex items-center`}
+            >
               <Button
-                tw="w-[72px]"
-                type="danger"
+                type="primary"
+                // disabled={dataSource.length !== 0}
                 onClick={() => {
-                  setOp('stop')
+                  setCurOp('bindKey')
                 }}
               >
-                下线
+                <Icon name="add" />
+                绑定密钥
               </Button>
-            )}
+            </Tooltip>
           </Center>
           <Center tw="space-x-3">
             <InputSearch
@@ -200,11 +190,6 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
         </FlexBox>
       </div>
       <Table
-        selectType="checkbox"
-        selectedRowKeys={selectedRowKeys}
-        onSelect={(keys: string[]) => {
-          setSelectedRowKeys(keys)
-        }}
         dataSource={dataSource}
         loading={false}
         columns={columns}
@@ -214,10 +199,39 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
           ...pagination
         }}
         onSort={sort}
+        emptyPlaceholder={{ icon: 'q-kmsFill', text: '暂未绑定密钥，请点击左上方按钮绑定密钥' }}
       />
+      {curOp === 'bindKey' && (
+        <SelectAuthKeyModal apiServiceId={apiServiceId} onCancel={() => setCurOp('')} />
+      )}
+      {curOp === 'unbind' && (
+        <Confirm
+          title={`解绑密钥: ${curAuthKey?.name}`}
+          visible
+          css={css`
+            .modal-card-head {
+              ${tw`border-0`}
+            }
+          `}
+          type="warn"
+          width={400}
+          maskClosable={false}
+          appendToBody
+          draggable
+          onCancel={handleCancel}
+          footer={
+            <div tw="flex justify-end space-x-2">
+              <Button onClick={() => setCurOp('')}>取消</Button>
 
-      {curOp === 'stop' && <AbolishApiModal selectKey={selectedRowKeys} onCancel={handleCancel} />}
-      {curOp === 'test' && <TestModal currentRow={currentRow} onCancel={handleCancel} />}
+              <Button type="danger" onClick={handleUnbind}>
+                解绑
+              </Button>
+            </div>
+          }
+        >
+          <div>解绑后，密钥将不再限制 API 访问， 请谨慎操作。确认解绑？</div>
+        </Confirm>
+      )}
     </FlexBox>
   )
 }
