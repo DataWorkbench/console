@@ -94,7 +94,7 @@ const ConnectorOption = ({
 )
 
 const ResourceSelect = (props: ResourceSelectProps) => {
-  const { icon, isUdf = false } = props
+  const { icon, isUdf = false, type } = props
   const [filter, setFilter] = useImmer<{
     limit: number
     offset: number
@@ -104,7 +104,7 @@ const ResourceSelect = (props: ResourceSelectProps) => {
     limit: 15,
     offset: 0,
     search: '',
-    // ...(isUdf ? { udf_type: type } : { type }),
+    ...(isUdf ? { udf_type: type } : { type }),
   })
 
   const fn = !isUdf ? useQueryResource : useQueryUdf
@@ -167,6 +167,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   const [params, setParams] = useImmer({
     clusterId: '',
     files: [] as string[],
+    pyFiles: [] as string[],
     connectors: [] as string[],
     parallelism: 0,
     builtInConnectors: [] as string[],
@@ -207,6 +208,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
       draft.clusterId = get(data, 'cluster_id', '')
       draft.parallelism = get(data, 'parallelism', 0)
       draft.files = get(data, 'files', [])
+      draft.pyFiles = get(data, 'py_files', [])
       draft.connectors = get(data, 'connectors', [])
       draft.builtInConnectors = get(data, 'built_in_connectors', [])
     })
@@ -226,6 +228,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
         cluster_id: params.clusterId,
         // connectors: params.connectors,
         files: params.files,
+        py_files: params.pyFiles,
         parallelism: params.parallelism,
         built_in_connectors: params.builtInConnectors,
       },
@@ -358,25 +361,47 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     </Control>
                   </Field>
                 ) : (
-                  <ResourceSelect
-                    name="connectors"
-                    label="资源引用"
-                    icon={<Icons name="icon_dependency" />}
-                    placeholder={
-                      curJob?.type === 2
-                        ? '请选择运行所需的函数包及自定义 connector 包'
-                        : '请选择运行所需依赖资源'
-                    }
-                    value={params.files}
-                    multi
-                    closeOnSelect={false}
-                    onChange={(files: string[]) =>
-                      setParams((draft) => {
-                        draft.files = files
-                      })
-                    }
-                    type={3}
-                  />
+                  <>
+                    <ResourceSelect
+                      name="connectors"
+                      label="JAR 类型资源"
+                      icon={<Icons name="icon_dependency" />}
+                      placeholder={
+                        curJob?.type === 2
+                          ? '请选择运行所需的函数包及自定义 connector 包'
+                          : '请选择运行所需依赖资源'
+                      }
+                      value={params.files}
+                      multi
+                      closeOnSelect={false}
+                      onChange={(files: string[]) =>
+                        setParams((draft) => {
+                          draft.files = files
+                        })
+                      }
+                      type={1}
+                    />
+
+                    <ResourceSelect
+                      name="connectors"
+                      label="Python 类型资源"
+                      icon={<Icons name="icon_dependency" />}
+                      placeholder={
+                        curJob?.type === 2
+                          ? '请选择运行所需的函数包及自定义 connector 包'
+                          : '请选择运行所需依赖资源'
+                      }
+                      value={params.pyFiles}
+                      multi
+                      closeOnSelect={false}
+                      onChange={(files: string[]) =>
+                        setParams((draft) => {
+                          draft.pyFiles = files
+                        })
+                      }
+                      type={2}
+                    />
+                  </>
                 )}
                 {/* eslint-disable-next-line no-nested-ternary */}
                 {curJob?.type === 2 ? (
