@@ -9,7 +9,11 @@ import tw, { css } from 'twin.macro'
 import dayjs from 'dayjs'
 import { MappingKey } from 'utils/types'
 import { historyFiledMapping } from 'views/Space/Ops/Alert/common/mapping'
-import useFilter from '../../../../hooks/useHooks/useFilter'
+import { apiHooks } from 'hooks/apiHooks'
+import { ListAlertLogsRequestType } from 'types/request'
+import { AlertManageListAlertLogsType } from 'types/response'
+import { useParams } from 'react-router-dom'
+import useFilter from 'hooks/useHooks/useFilter'
 import icons from './common/icons'
 import {
   alertHistoryColumns,
@@ -18,6 +22,14 @@ import {
   alertStatus,
   monitorObjectTypes,
 } from './common/constants'
+
+const useQueryListAlertLogs = apiHooks<
+  'alertManage',
+  ListAlertLogsRequestType,
+  AlertManageListAlertLogsType
+>('alertManage', 'listAlertLogs')
+
+// const getQueryListAlertLogsKey = () => queryKeyObj.listAlertLogs
 
 interface IAlertHistory {}
 
@@ -53,7 +65,6 @@ const AlertHistory = (props: IAlertHistory) => {
     { pagination: true; sort: false }
   >({}, { pagination: true }, alertHistorySettingKey)
 
-  console.log(filter)
   const { columns, setColumnSettings } = useColumns(
     alertHistorySettingKey,
     alertHistoryColumns,
@@ -97,10 +108,15 @@ const AlertHistory = (props: IAlertHistory) => {
     [setColumnSettings]
   )
 
-  console.log(filter)
-  const { data, isFetching } = { data: {}, isFetching: true }
+  const { spaceId } = useParams<{ spaceId: string }>()
+  const { data, isFetching } = useQueryListAlertLogs({
+    uri: {
+      space_id: spaceId,
+    },
+    params: filter as any,
+  })
 
-  const infos = get(data, 'infos', [])
+  const infos = get(data, 'infos', []) ?? []
   return (
     <FlexBox orient="column" tw="p-5 h-full">
       <PageTab tabs={alertHistoryTabs} />
