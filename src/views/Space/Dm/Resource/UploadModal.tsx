@@ -91,7 +91,14 @@ interface IFormFields {
 }
 
 const UploadModal = (props: any) => {
-  const { visible, operation, handleCancel, handleSuccess, initFields } = props
+  const {
+    visible,
+    operation,
+    handleCancel,
+    handleSuccess,
+    initFields,
+    size: sizeConf,
+  } = props
 
   const [fields, setFields] = useImmer<IFormFields>({
     id: undefined,
@@ -156,7 +163,7 @@ const UploadModal = (props: any) => {
       Message.error('文件大小为0')
       return
     }
-    if (size > 100 * 1024 * 1024) {
+    if (size > sizeConf) {
       setFileTip('size')
       return
     }
@@ -390,7 +397,8 @@ const UploadModal = (props: any) => {
         {operation !== 'edit' && (
           <div tw="pb-3">
             <div tw="pl-28 ml-2 pt-1 text-neut-8">
-              支持 JAR，PY，ZIP 格式文件、大小不超过 500 MB、且仅支持单个上传
+              支持 JAR，PY，ZIP 格式文件、大小不超过{' '}
+              {Math.floor(sizeConf / (1024 * 1024))} MB、且仅支持单个上传
             </div>
             {fileTip && (
               <div tw="text-red-10 ml-2 pl-28 align-middle mt-1">

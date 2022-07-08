@@ -11,6 +11,7 @@ import tw, { css } from 'twin.macro'
 import {
   getResourcePageQueryKey,
   useMutationResource,
+  useQueryDescribeWorkspaceConfig,
   useQueryResourceByPage,
 } from 'hooks'
 import { get, omitBy } from 'lodash-es'
@@ -20,6 +21,7 @@ import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { formatBytes } from 'utils/convert'
+import { useParams } from 'react-router-dom'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
 
@@ -350,6 +352,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
       setSelectedRows(selectedRowKeys.map((el: string) => selectedMap[el]))
     }, [selectedMap, selectedRowKeys])
 
+    const { spaceId } = useParams<{ spaceId: string }>()
+    const { data: configData } = useQueryDescribeWorkspaceConfig({
+      uri: { space_id: spaceId },
+    })
+
+    const sizeConf = get(configData!, 'file.size_single', 100 * 1024 * 1024)
     return (
       <>
         <div tw="bg-neut-16 p-5" className={className}>
@@ -459,6 +467,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(
               setOperation('')
             }}
             handleSuccess={refetchData}
+            size={sizeConf}
           />
         )}
 
