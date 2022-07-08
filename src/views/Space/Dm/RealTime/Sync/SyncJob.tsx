@@ -5,6 +5,7 @@ import {
   HelpCenterLink,
   Modal,
   RouterLink,
+  PopConfirm,
   // TextLink,
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
@@ -163,7 +164,6 @@ const SyncJob = () => {
     workFlowStore: { curJob },
   } = useStore()
 
-
   useLayoutEffect(() => {
     if (!isFetching) {
       curJobDbConfSubject$.next({
@@ -178,7 +178,6 @@ const SyncJob = () => {
   const stepsData = useMemo(() => {
     return getStepsData(regionId, spaceId)
   }, [regionId, spaceId])
-
 
   const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
