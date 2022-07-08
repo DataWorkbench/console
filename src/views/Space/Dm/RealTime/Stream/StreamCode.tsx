@@ -86,7 +86,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   const { data, isFetching } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
-  const codeStr = get(data, `${codeName}.code`)
+  const codeStr = get(data, `${{ 2: 'sql', 4: 'python_code' }[tp as 2]}.code`)
   const loadingWord = '代码加载中......'
   const queryClient = useQueryClient()
   const defaultCode = useMemo(() => {
