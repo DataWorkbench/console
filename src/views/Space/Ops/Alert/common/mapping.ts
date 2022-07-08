@@ -1,18 +1,27 @@
 export type Mapping<T> = Map<T, { label: string; apiField: string }>
 
+// const historyFiledMapping = {
+//   '告警策略 ID': 'alert_id',
+//   '作业 ID': 'job_id',
+//   '实例 ID': 'instance_id',
+//   '告警作业类型': 'monitor_object',
+//   '告警类型': 'event_type',
+//   '告警时间': 'updated',
+// }
 export const historyFiledMapping: Mapping<
-  'alert_content' | 'alert_instance_id' | 'alert_time'
-> = new Map([
-  ['alert_content', { label: '告警内容', apiField: 'alert_content' }],
-  [
-    'alert_instance_id',
-    {
-      label: '告警实例 ID',
-      apiField: 'alert_instance_id',
-    },
-  ],
-  ['alert_time', { label: '告警时间', apiField: 'alert_time' }],
-])
+  | 'alert_id'
+  | 'job_id'
+  | 'instance_id'
+  | 'monitor_object'
+  | 'event_type'
+  | 'updated'
+> = new Map()
+  .set('alert_id', { label: '告警策略 ID', apiField: 'alert_id' })
+  .set('job_id', { label: '作业 ID', apiField: 'job_id' })
+  .set('instance_id', { label: '实例 ID', apiField: 'instance_id' })
+  .set('monitor_object', { label: '告警作业类型', apiField: 'monitor_object' })
+  .set('event_type', { label: '告警类型', apiField: 'event_type' })
+  .set('updated', { label: '告警时间', apiField: 'updated' })
 
 export const policyFieldMapping: Mapping<
   'id' | 'monitor_object' | 'description' | 'last_update_time'
