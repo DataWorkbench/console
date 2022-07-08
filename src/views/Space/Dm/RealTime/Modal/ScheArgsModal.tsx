@@ -104,7 +104,7 @@ const ResourceSelect = (props: ResourceSelectProps) => {
     limit: 15,
     offset: 0,
     search: '',
-    ...(isUdf ? { udf_type: type } : { type }),
+    ...(isUdf ? { udf_type: type } : { types: [type] }),
   })
 
   const fn = !isUdf ? useQueryResource : useQueryUdf
