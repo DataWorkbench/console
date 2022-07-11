@@ -16,6 +16,7 @@ import { Sider } from '../Sider'
 import icons from './icons'
 // import Release from './Stream/Release'
 import Job from './Stream/Job'
+import AlertPolicyDetail from './Alert/AlertPolicyDetail'
 
 export const Ops = () => {
   useIcon(icons)
@@ -38,6 +39,7 @@ export const Ops = () => {
         {mod === 'data-release' && !detail && <DataRelease />}
         {mod === 'data-job' && detail && <DataJobInstanceDetail id={detail!} />}
         {mod === 'data-job' && !detail && <DataJobInstance />}
+        {mod === 'alert-policy' && detail && <AlertPolicyDetail id={detail} />}
         {mod === 'alert-policy' && <AlertPolicy />}
         {mod === 'alert-history' && <AlertHistory />}
       </div>

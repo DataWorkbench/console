@@ -12,7 +12,7 @@ import { historyFiledMapping } from 'views/Space/Ops/Alert/common/mapping'
 import { apiHooks } from 'hooks/apiHooks'
 import { ListAlertLogsRequestType } from 'types/request'
 import { AlertManageListAlertLogsType } from 'types/response'
-import { useParams } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 import useFilter from 'hooks/useHooks/useFilter'
 import icons from './common/icons'
 import {
@@ -65,6 +65,8 @@ const AlertHistory = () => {
     { pagination: true; sort: false }
   >({}, { pagination: true }, alertHistorySettingKey)
 
+  const history = useHistory()
+
   const { columns, setColumnSettings } = useColumns(
     alertHistorySettingKey,
     alertHistoryColumns,
@@ -72,7 +74,14 @@ const AlertHistory = () => {
       alert_id: {
         render: (text) => {
           return (
-            <InstanceName theme="dark" name={text} css={instanceNameStyle} />
+            <InstanceName
+              theme="dark"
+              name={text}
+              css={instanceNameStyle}
+              onClick={() => {
+                history.push(`../alert-policy/${text}`)
+              }}
+            />
           )
         },
       },
