@@ -24,7 +24,8 @@ export const alertHistoryTabs: ITab[] = [
 export const alertPolicyTabs: ITab[] = [
   {
     title: '告警策略',
-    description: '告警策略说明',
+    description:
+      '支持为作业运行情况设置告警。设置告警后，系统定期检查查询或分析结果，当检查结果满足预设条件时发送告警通知，实现实时的服务状态监控。',
     icon: 'q-bellGearDuotone',
     helpLink: getHelpCenterLink(
       '/manual/operation_center/monitor/alert_rules/'
@@ -50,15 +51,15 @@ export const jobColumns: IColumn[] = getField(jobFieldMapping)
 
 //  1 => "StreamJob" 2 => "SyncJob'
 export const monitorObjectTypes = {
-  0: {
-    label: '实时计算',
-    value: 0,
-    type: 0,
-  },
   1: {
-    label: '数据集成',
+    label: '实时计算',
     value: 1,
     type: 1,
+  },
+  2: {
+    label: '数据集成',
+    value: 2,
+    type: 2,
   },
 }
 
@@ -124,5 +125,17 @@ export const alertHistorySuggestions: ISuggestion[] = [
     label: '告警类型',
     options: getSuggestionOptions(alertStatus),
     key: 'event_type',
+  },
+]
+
+export const alertPolicySuggestions: ISuggestion[] = [
+  {
+    label: '策略名称',
+    key: 'search',
+  },
+  {
+    label: '告警作业类型',
+    key: 'monitor_object',
+    options: getSuggestionOptions(monitorObjectTypes),
   },
 ]

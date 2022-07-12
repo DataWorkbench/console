@@ -1,5 +1,6 @@
 import { createContext, useContext, useRef } from 'react'
 import { makeAutoObservable, set } from 'mobx'
+import { PbmodelAlertPolicy } from 'types/types'
 
 export class AlertStore {
   showMonitor = false
@@ -16,9 +17,10 @@ export class AlertStore {
   // 绑定作业 有值的时候,表单字段不显示
   jobs?: string[]
 
-  selectedData?: Record<string, any> = undefined
+  // selectedData?: Record<string, any> = undefined
+  selectedMonitor?: Partial<PbmodelAlertPolicy> = {}
 
-  selectedList?: Record<string, any>[] = []
+  selectedList?: PbmodelAlertPolicy[] = []
 
   constructor() {
     makeAutoObservable(this)

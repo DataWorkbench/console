@@ -24,16 +24,16 @@ export const historyFiledMapping: Mapping<
   .set('updated', { label: '告警时间', apiField: 'updated' })
 
 export const policyFieldMapping: Mapping<
-  'id' | 'monitor_object' | 'description' | 'last_update_time'
+  'id' | 'monitor_object' | 'desc' | 'updated'
 > = new Map([
   ['id', { label: '名称/ID', apiField: 'id' }],
   ['monitor_object', { label: '监控对象', apiField: 'monitor_object' }],
-  ['description', { label: '描述', apiField: 'description' }],
+  ['desc', { label: '描述', apiField: 'desc' }],
   [
-    'last_update_time',
+    'updated',
     {
       label: '最近更新时间',
-      apiField: 'last_update_time',
+      apiField: 'updated',
     },
   ],
 ])
@@ -48,6 +48,6 @@ export const jobFieldMapping: Mapping<
   'name' | 'ID' | 'description' | 'last_update_time'
 > = new Map()
   .set('name', { label: '作业/文件夹名称', apiField: 'name' })
-  .set('ID', { label: 'ID', apiField: 'ID' })
-  .set('description', { label: '描述', apiField: 'description' })
-  .set('last_update_time', { label: '更新时间', apiField: 'last_update_time' })
+  .set('ID', { label: 'ID', apiField: 'id' })
+  .set('description', { label: '描述', apiField: 'desc' })
+  .set('last_update_time', { label: '更新时间', apiField: 'updated' })
