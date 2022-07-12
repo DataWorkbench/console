@@ -1,6 +1,8 @@
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
+import { Icon } from '@QCFE/lego-ui'
+import { Tooltip } from 'components'
 import BaseSettingModal from '../Modal/BaseSettingModal'
 import ClusterSettingModal from '../Modal/ClusterSettingModal'
 import RequestSettingModal from '../Modal/RequestSettingModal'
@@ -27,14 +29,37 @@ const StreamRightMenu = observer(() => {
       showRequestSetting,
       showResponseSetting,
       showVersions,
-      showTestModal
+      showTestModal,
+      showClusterErrorTip
     }
   } = useStore()
+
   return (
     <>
       <MenuRoot>
         <span onClick={() => dtsDevStore.set({ showBaseSetting: true })}>属 性</span>
-        <span onClick={() => dtsDevStore.set({ showClusterSetting: true })}>服 务 集 群</span>
+        <span onClick={() => dtsDevStore.set({ showClusterSetting: true })}>
+          服 务 集 群
+          <Tooltip
+            content={
+              <div tw="flex items-center">
+                <Icon
+                  name="information"
+                  tw="mr-2"
+                  size={20}
+                  color={{ secondary: '#CF3B37', primary: '#fff' }}
+                />
+                <span tw="text-red-10">测试 API 需要指定服务集群</span>
+              </div>
+            }
+            placement="left"
+            hasPadding
+            theme="light"
+            visible={showClusterErrorTip}
+          >
+            <Icon name="information" tw="mt-2" size={20} color={{ secondary: '#CF3B37' }} />
+          </Tooltip>
+        </span>
         <span onClick={() => dtsDevStore.set({ showRequestSetting: true })}>请 求 参 数</span>
         <span onClick={() => dtsDevStore.set({ showResponseSetting: true })}>返 回 参 数</span>
         <span onClick={() => dtsDevStore.set({ showVersions: true })}>历 史 版 本</span>

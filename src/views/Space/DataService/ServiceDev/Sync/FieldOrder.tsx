@@ -13,7 +13,7 @@ import { MappingKey } from 'utils/types'
 
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'stores'
-import { assign, cloneDeep, filter, get, includes, map } from 'lodash-es'
+import { assign, cloneDeep, filter, get, includes, intersectionBy, map } from 'lodash-es'
 import { FieldOrderColumns, serviceDevVersionFieldOrderMapping, OrderMode } from '../constants'
 
 const Root = styled.div`
@@ -76,10 +76,23 @@ const FieldOrder = observer(
         get(apiConfigData, 'api_config.response_params.response_params', [])
       )
       if (responseConfig?.length) {
+        const filedData = cloneDeep(fieldSettingData).map((item) => ({
+          ...item,
+          column_name: item.field
+        }))
+
         const orderConfigData = responseConfig.filter(
           (item: { order_mode: number }) => item.order_mode !== 0
         )
-        const sortOrder = orderConfigData?.sort(
+
+        // orderConfigData 和 filedData 取交集
+        const insectOrderConfig: any = intersectionBy(orderConfigData, filedData, 'column_name')
+        if (insectOrderConfig?.length === 0) {
+          setDataSource([])
+          return
+        }
+
+        const sortOrder = insectOrderConfig?.sort(
           (a: { order_num: number }, b: { order_num: number }) => a.order_num - b.order_num
         )
         const orderData = sortOrder.map((item: { order_mode: number; column_name: string }) => {
@@ -91,11 +104,12 @@ const FieldOrder = observer(
             order_mode: item.order_mode
           }
         })
+
         setDataSource(orderData)
       } else {
         setDataSource([])
       }
-    }, [apiConfigData, setDataSource])
+    }, [apiConfigData, fieldSettingData, setDataSource])
 
     const delRow = useCallback(
       (index: number) => {

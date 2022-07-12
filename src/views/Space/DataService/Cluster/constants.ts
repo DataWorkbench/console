@@ -3,6 +3,12 @@ import { Mapping } from 'utils/types'
 import { StatusBarEnum } from 'components/StatusBar'
 import { createEnhancedEnum } from 'utils'
 
+interface EnhanceState {
+  [key: string]: {
+    label: string
+    value: any
+  }
+}
 interface IStatusEnum {
   [key: string]: {
     label: string
@@ -33,7 +39,7 @@ export const StopClusterTableColumns: IColumn[] = getField(StopClusterTableField
 export const ClusterFieldMapping: Mapping<'status' | 'name' | 'cu' | 'last_updated'> = new Map([
   ['name', { label: '名称/ID', apiField: 'name' }],
   ['status', { label: '状态', apiField: 'status' }],
-  ['cu', { label: 'CU 规格', apiField: 'network_address' }],
+  ['cu', { label: 'CU 规格', apiField: 'resource_spec' }],
   ['last_updated', { label: '最近更新时间', apiField: 'updated' }]
   // ['mode', { label: '计费模式', apiField: 'network_address_v1' }],
   // ['created_time', { label: '购买有效期', apiField: 'created' }],
@@ -72,5 +78,20 @@ export const StatusEnum = createEnhancedEnum<IStatusEnum>({
     label: '欠费',
     value: 6,
     style: StatusBarEnum.purple
+  }
+})
+
+export const resourceSpecState = createEnhancedEnum<EnhanceState>({
+  BASE: {
+    label: '基础版',
+    value: 1
+  },
+  CROSS: {
+    label: '入门版',
+    value: 2
+  },
+  VIP: {
+    label: '专业版',
+    value: 3
   }
 })

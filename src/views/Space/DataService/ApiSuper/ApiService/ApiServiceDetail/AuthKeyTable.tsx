@@ -1,7 +1,14 @@
-import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
+import {
+  Button,
+  Icon,
+  InputSearch,
+  Table,
+  ToolBar,
+  Notification as Notify
+} from '@QCFE/qingcloud-portal-ui'
 import { FlexBox, Center, Confirm } from 'components'
 import dayjs from 'dayjs'
-import { useQueryListAuthKeys, getQueryKeyListAuthKeys, useMutationAuthKey } from 'hooks'
+import { useQueryListAuthKeys, getQueryKeyListApiServices, useMutationAuthKey } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
 import { get } from 'lodash-es'
@@ -48,17 +55,17 @@ const ApiGroupTable = ({ authKeyId, apiServiceId }: AuthKeyTableProps) => {
 
   const [curOp, setCurOp] = useState<string>()
   const [curAuthKey, setCurAuthKey] = useState<{ id: string; name: string }>()
-  const { isRefetching, data } = useQueryListAuthKeys({
+  const { isRefetching, data, refetch } = useQueryListAuthKeys({
     uri: { space_id: spaceId },
     params: { ids: authKeyId, ...filter } as any
   })
 
-  // const mutation = useMutationListApiServices()
   const authMutation = useMutationAuthKey()
 
   // 刷新
   const refetchData = () => {
-    queryClient.invalidateQueries(getQueryKeyListAuthKeys())
+    queryClient.invalidateQueries(getQueryKeyListApiServices())
+    refetch()
   }
 
   const handleCancel = () => {
@@ -72,9 +79,16 @@ const ApiGroupTable = ({ authKeyId, apiServiceId }: AuthKeyTableProps) => {
       api_service_ids: [apiServiceId]
     }
     authMutation.mutate(paramsData, {
-      onSuccess: () => {
-        refetchData()
-        handleCancel()
+      onSuccess: (res) => {
+        if (res.ret_code === 0) {
+          Notify.success({
+            title: '操作提示',
+            content: '密钥解绑成功',
+            placement: 'bottomRight'
+          })
+          refetchData()
+          handleCancel()
+        }
       }
     })
   }
@@ -142,7 +156,7 @@ const ApiGroupTable = ({ authKeyId, apiServiceId }: AuthKeyTableProps) => {
             >
               <Button
                 type="primary"
-                // disabled={dataSource.length !== 0}
+                disabled={dataSource.length !== 0}
                 onClick={() => {
                   setCurOp('bindKey')
                 }}
@@ -178,6 +192,7 @@ const ApiGroupTable = ({ authKeyId, apiServiceId }: AuthKeyTableProps) => {
                 type="light"
                 onClick={() => {
                   refetchData()
+                  // refetch()
                 }}
               />
             </Button>
@@ -191,7 +206,7 @@ const ApiGroupTable = ({ authKeyId, apiServiceId }: AuthKeyTableProps) => {
       </div>
       <Table
         dataSource={dataSource}
-        loading={false}
+        loading={isRefetching}
         columns={columns}
         rowKey="id"
         pagination={{

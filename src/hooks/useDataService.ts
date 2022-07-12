@@ -531,7 +531,7 @@ export const useMutationAuthKey = () => {
 
 // api服务列表
 export const ListApiServices = async ({ regionId, spaceId, ...rest }: IParams) => {
-  const params = merge({ regionId, uri: { space_id: spaceId } }, { data: rest })
+  const params = merge({ regionId, uri: { space_id: spaceId } }, { params: rest })
   return apiRequest('serviceGateway', 'listApiServices')(params)
 }
 

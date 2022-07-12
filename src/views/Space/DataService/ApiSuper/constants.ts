@@ -16,9 +16,19 @@ export const dataReleaseDetailActions = [
 
 export const ApiKeyDetailActions = [
   {
-    icon: 'q-subtractBoxFill',
-    text: '解绑',
-    key: 'offline'
+    text: '编辑',
+    icon: 'edit',
+    key: 'update'
+  },
+  {
+    text: '绑定API服务',
+    icon: 'q-apps3Fill',
+    key: 'bingKey'
+  },
+  {
+    text: '删除',
+    icon: 'if-trash',
+    key: 'delete'
   }
 ]
 
@@ -56,7 +66,7 @@ export const apiRouterTableColumns: IColumn[] = getField(apiRoutersTableFieldMap
 export const authKeyTableFieldMapping: Mapping<'name' | 'secret_key' | 'create_time'> = new Map()
   .set('name', { label: '密钥名称', apiField: 'name' })
   .set('secret_key', { label: '密钥', apiField: 'secret_key' })
-  .set('create_time', { label: '绑定时间', apiField: 'create_time' })
+  .set('create_time', { label: '创建时间', apiField: 'create_time' })
 
 export const authKeyTableColumns: IColumn[] = getField(authKeyTableFieldMapping)
 

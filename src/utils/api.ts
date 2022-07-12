@@ -35,7 +35,7 @@ async function fetchData(url = '', data = {}) {
 }
 
 const regExp = /(service|gateway)/g
-const isMock = true // TODO: 是否使用mock
+const isMock = false // TODO: 是否使用mock
 export const apiRequest =
   <T extends keyof typeof apiList>(manage: T, item: keyof typeof apiList[T]) =>
   <U extends RequestParams>(params: U) => {

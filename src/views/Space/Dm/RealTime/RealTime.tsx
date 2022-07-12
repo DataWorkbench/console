@@ -46,30 +46,30 @@ const RealTime = observer(() => {
   )
 
   const renderStep = (step: string, i: number, hasArrow = true, reverse = false) => (
-      <Center key={step} css={[reverse && tw`flex-row-reverse`]}>
-        <Center>
-          <div tw="inline-flex justify-center items-center bg-neut-16  rounded-full w-4 h-4 mr-2">
-            {i + 1}
-          </div>
-          <div>{step}</div>
-        </Center>
-        {hasArrow && (
-          <Center css={[tw`px-2`, reverse && tw`flex-row-reverse`]}>
-            <div tw="border-t border-neut-13 w-12" />
-            <div
-              tw="w-0 h-0"
-              css={[
-                css`
+    <Center key={step} css={[reverse && tw`flex-row-reverse`]}>
+      <Center>
+        <div tw="inline-flex justify-center items-center bg-neut-16  rounded-full w-4 h-4 mr-2">
+          {i + 1}
+        </div>
+        <div>{step}</div>
+      </Center>
+      {hasArrow && (
+        <Center css={[tw`px-2`, reverse && tw`flex-row-reverse`]}>
+          <div tw="border-t border-neut-13 w-12" />
+          <div
+            tw="w-0 h-0"
+            css={[
+              css`
                   border-top: 4px solid transparent;
                   border-bottom: 4px solid transparent;
                   border-${reverse ? 'right' : 'left'}: 4px solid ${theme('colors.line.dark')};
                 `
-              ]}
-            />
-          </Center>
-        )}
-      </Center>
-    )
+            ]}
+          />
+        </Center>
+      )}
+    </Center>
+  )
   const showVersion = curVersion && curJob?.id === curVersion.id
   if (showVersion) {
     return (

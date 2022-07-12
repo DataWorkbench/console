@@ -1,18 +1,19 @@
 import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox, Center, TextEllipsis } from 'components'
-import dayjs from 'dayjs'
+import { FlexBox, Center } from 'components'
 import { useQueryListApiServices, getQueryKeyListApiServices } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
-import { get, omitBy } from 'lodash-es'
+import { get } from 'lodash-es'
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
-import tw from 'twin.macro'
 import { MappingKey } from 'utils/types'
 import { PbmodelAuthKeyEntity } from 'types/types'
+import { useParams } from 'react-router-dom'
+import { formatDate } from 'utils'
 import { apiGroupTableFieldMapping, apiGroupTableColumns } from '../../constants'
 import SelectApiServiceModal from '../SelectApiServiceModal'
 import UnBindApiModal from './UnBindApiModal'
+import { NameWrapper } from '../../styles'
 
 interface ApiGroupTableProps {
   authKey: PbmodelAuthKeyEntity
@@ -26,6 +27,7 @@ const getName = (name: MappingKey<typeof apiGroupTableFieldMapping>) =>
   apiGroupTableFieldMapping.get(name)!.apiField
 
 const ApiGroupTable = (props: ApiGroupTableProps) => {
+  const { detail: authId, spaceId } = useParams<{ detail: string; spaceId: string }>()
   const { authKey } = props
 
   const queryClient = useQueryClient()
@@ -40,7 +42,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     Record<ReturnType<typeof getName>, number | string | boolean>,
     { pagination: true; sort: true }
   >(
-    { sort_by: getName('create_time'), reverse: true },
+    { sort_by: getName('update_time'), reverse: true },
     { pagination: true, sort: true },
     columnSettingsKey
   )
@@ -48,7 +50,15 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const [curOp, setOp] = useState<string>()
 
-  const { isRefetching, data } = useQueryListApiServices(omitBy(filter, (v) => v === '') as any)
+  const { isRefetching, data } = useQueryListApiServices({
+    uri: { space_id: spaceId },
+    params: { auth_key_id: authId, ...filter } as any
+  })
+
+  // 跳转到API服务详情页
+  const goDetail = (id: string) => {
+    window.open(`../apiService/${id}?tab=authKey`, '_blank')
+  }
 
   // 刷新
   const refetchData = () => {
@@ -57,29 +67,38 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
 
   const handleCancel = () => {
     setOp('')
+    refetchData()
+    setSelectedRowKeys([])
   }
 
   const columnsRender = {
     [getName('name')]: {
       render: (v: any, row: any) => (
-        <FlexBox tw="items-center space-x-1 truncate">
-          <Center
-            className="clusterIcon"
-            tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
-          >
-            <Icon name="q-dockerHubDuotone" type="light" />
-          </Center>
-          <div tw="truncate">
-            <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>
-            <div tw="dark:text-neut-8">{row.id}</div>
-          </div>
-        </FlexBox>
+        <NameWrapper
+          isHover
+          onClick={() => {
+            goDetail(row.id)
+          }}
+        >
+          <FlexBox tw="items-center space-x-1 truncate">
+            <Center
+              className="clusterIcon"
+              tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
+            >
+              <Icon name="q-apps3Duotone" type="light" />
+            </Center>
+            <div tw="truncate">
+              <div className="name">{row.name}</div>
+              <div tw="dark:text-neut-8">{row.id}</div>
+            </div>
+          </FlexBox>
+        </NameWrapper>
       )
     },
-    [getName('create_time')]: {
-      ...getSort(getName('create_time')),
+    [getName('update_time')]: {
+      ...getSort(getName('update_time')),
       render: (v: number, row: any) => (
-        <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+        <span tw="dark:text-neut-0">{formatDate(row.update_time)}</span>
       )
     }
   }
@@ -107,6 +126,8 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     columnsRender,
     operation
   )
+
+  const infos = get(data, 'entities', []) || []
 
   return (
     <FlexBox tw="w-full flex-1" orient="column">
@@ -141,7 +162,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
               placeholder="请输入关键词进行搜索"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
-                  draft.search = (e.target as HTMLInputElement).value
+                  draft.name = (e.target as HTMLInputElement).value
                   draft.offset = 0
                 })
               }}
@@ -149,7 +170,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
                 setFilter((draft) => {
                   if (draft.search) {
                     draft.offset = 0
-                    draft.search = ''
+                    draft.name = ''
                   }
                 })
               }}
@@ -178,8 +199,8 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
         onSelect={(keys: string[]) => {
           setSelectedRowKeys(keys)
         }}
-        dataSource={get(data, 'entities', [])}
-        loading={false}
+        dataSource={infos}
+        loading={isRefetching}
         columns={columns}
         rowKey="id"
         pagination={{
@@ -188,7 +209,9 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
         }}
         onSort={sort}
       />
-      {curOp === 'bind' && <SelectApiServiceModal curAuthRow={authKey} onCancel={handleCancel} />}
+      {curOp === 'bind' && (
+        <SelectApiServiceModal curAuthRow={authKey} infos={infos} onCancel={handleCancel} />
+      )}
       {curOp === 'unbind' && <UnBindApiModal selectKey={selectedRowKeys} onCancel={handleCancel} />}
     </FlexBox>
   )

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { QueryKey, useQuery, UseQueryOptions } from 'react-query'
-import { merge, omit } from 'lodash-es'
+import { merge } from 'lodash-es'
 import { apiRequest } from 'utils/api'
 import apiList from 'stores/api/apiList'
 import { getStorage, setStorage } from 'utils/storage'
@@ -26,7 +26,7 @@ export const apiHooks =
 
     const params = merge({ regionId, uri: { space_id: spaceId } }, filter)
 
-    queryKeyObj[item as string] = [item, omit(params, 'params.offset')]
+    queryKeyObj[item as string] = [item, params]
 
     return useQuery<U>(
       queryKeyObj[item as string],

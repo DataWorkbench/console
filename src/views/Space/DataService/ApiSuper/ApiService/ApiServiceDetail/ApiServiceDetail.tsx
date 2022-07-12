@@ -1,5 +1,5 @@
 import { Collapse, Icon, Tabs } from '@QCFE/lego-ui'
-import { Card, Center, FlexBox, MoreAction, Tooltip } from 'components'
+import { Card, Center, FlexBox, Tooltip } from 'components'
 import tw, { css } from 'twin.macro'
 import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useState } from 'react'
@@ -9,7 +9,6 @@ import { PbmodelApiServiceEntity } from 'types/types'
 import { useLocation, useParams } from 'react-router-dom'
 import qs from 'qs'
 import { formatDate } from 'utils'
-import { dataReleaseDetailActions } from '../../constants'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
 import ApiRouterTable from '../../ApiRouters/ApiRoutersTable'
 import AuthKeyTable from './AuthKeyTable'
@@ -88,16 +87,6 @@ const ApiServiceDetail = (props: { id: string }) => {
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            <MoreAction
-              items={dataReleaseDetailActions.map((i) => ({
-                ...i,
-                value: '2'
-              }))}
-              type="button"
-              buttonText="更多操作"
-              placement="bottom-start"
-            />
-
             <Button
               type="icon"
               onClick={() => {

@@ -1,5 +1,7 @@
 import { Modal } from 'components'
-import { getQueryKeyListAuthKeys, useMutationAuthKey } from 'hooks'
+import { getQueryKeyListApiServices, useMutationAuthKey } from 'hooks'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+
 import { assign } from 'lodash-es'
 
 import { useQueryClient } from 'react-query'
@@ -20,7 +22,8 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
 
   // 刷新
   const refetchData = () => {
-    queryClient.invalidateQueries(getQueryKeyListAuthKeys())
+    // queryClient.invalidateQueries(getQueryKeyListAuthKeys())
+    queryClient.invalidateQueries(getQueryKeyListApiServices())
   }
 
   const handelCancel = () => {
@@ -34,9 +37,16 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
       api_service_ids: [apiServiceId]
     })
     mutation.mutate(paramsData, {
-      onSuccess: () => {
-        refetchData()
-        handelCancel()
+      onSuccess: (res) => {
+        if (res.ret_code === 0) {
+          Notify.success({
+            title: '操作提示',
+            content: '密钥绑定成功',
+            placement: 'bottomRight'
+          })
+          refetchData()
+          handelCancel()
+        }
       }
     })
   }

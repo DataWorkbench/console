@@ -1,6 +1,7 @@
-import { Button, Icon, Table } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Table, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { Center, Confirm, FlexBox, TextEllipsis } from 'components'
 import { useQueryListRoutes, useMutationAbolishDataServiceApis } from 'hooks'
+
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
 import tw, { css } from 'twin.macro'
@@ -9,7 +10,7 @@ import { get } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { apiRoutersTableFieldMapping, apiRouterTableColumns } from '../constants'
 
-interface UnBindApiModalProps {
+interface AbolishApiModalProps {
   selectKey: string[]
   onCancel: () => void
 }
@@ -19,7 +20,7 @@ const getName = (name: MappingKey<typeof apiRoutersTableFieldMapping>) =>
 
 const columnSettingsKey = 'DATA_SERVICE_API_SERVICE_ABOLISH_API_TABLE'
 
-const UnBindApiModal = (props: UnBindApiModalProps) => {
+const AbolishApiModal = (props: AbolishApiModalProps) => {
   const { selectKey, onCancel } = props
 
   const { spaceId } = useParams<{ spaceId: string }>()
@@ -41,8 +42,15 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
 
   const abolishApi = (apiIds: string[]) => {
     abolishMutation.mutate(apiIds, {
-      onSuccess: () => {
-        handleCancel()
+      onSuccess: (res) => {
+        if (res.ret_code === 0) {
+          Notify.success({
+            title: '操作提示',
+            content: 'API 下线成功',
+            placement: 'bottomRight'
+          })
+          handleCancel()
+        }
       }
     })
   }
@@ -70,10 +78,10 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
     }
   }
 
-  const tableColums = apiRouterTableColumns.filter(
+  const tableColumns = apiRouterTableColumns.filter(
     (item) => !['proxy_uri', 'create_time'].includes(item.dataIndex as string)
   )
-  const { columns } = useColumns(columnSettingsKey, tableColums, columnsRender)
+  const { columns } = useColumns(columnSettingsKey, tableColumns, columnsRender)
 
   const dataSource = get(data, 'entities') || []
 
@@ -134,4 +142,4 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
   )
 }
 
-export default UnBindApiModal
+export default AbolishApiModal

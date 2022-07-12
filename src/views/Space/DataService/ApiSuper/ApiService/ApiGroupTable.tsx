@@ -16,6 +16,7 @@ const { ColumnsSetting } = ToolBar as any
 
 interface ApiGroupTableProps {
   onSelect?: (selectedRowKeys: string[]) => void
+  selectRowKeys?: string[] // 初始化选中的行
 }
 
 interface IRouteParams {
@@ -29,7 +30,7 @@ const getName = (name: MappingKey<typeof apiGroupTableFieldMapping>) =>
   apiGroupTableFieldMapping.get(name)!.apiField
 
 const ApiGroupTable = (props: ApiGroupTableProps) => {
-  const { onSelect } = props
+  const { onSelect, selectRowKeys = [] } = props
 
   const queryClient = useQueryClient()
   const { spaceId } = useParams<IRouteParams>()
@@ -49,13 +50,14 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
     columnSettingsKey
   )
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>(selectRowKeys)
 
   const tablePropsData = assign(
     {},
     !!onSelect && {
       selectType: 'checkbox',
       selectedRowKeys,
+      disabledRowKeys: selectRowKeys,
       onSelect: (keys: string[]) => {
         onSelect?.(keys)
         setSelectedRowKeys(keys)

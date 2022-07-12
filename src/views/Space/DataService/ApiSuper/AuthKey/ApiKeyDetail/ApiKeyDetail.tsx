@@ -1,17 +1,20 @@
 import { Collapse, Icon, Tabs } from '@QCFE/lego-ui'
-import { Card, Center, FlexBox, MoreAction, Tooltip } from 'components'
+import { Card, Center, FlexBox, MoreAction, Tooltip, Confirm } from 'components'
 import tw, { css } from 'twin.macro'
-import { Button, Loading } from '@QCFE/qingcloud-portal-ui'
+import { Button, Loading, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+
 import { useState } from 'react'
-import { useQueryListAuthKeys } from 'hooks'
+import { useQueryListAuthKeys, useMutationListApiServices, useMutationAuthKey } from 'hooks'
 import { get } from 'lodash-es'
 import { PbmodelAuthKeyEntity } from 'types/types'
 
-import dayjs from 'dayjs'
 import { useParams } from 'react-router-dom'
+import { formatDate } from 'utils'
 import { ApiKeyDetailActions } from '../../constants'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
 import BindApiTable from './BindApiTable'
+import SelectApiServiceModal from '../SelectApiServiceModal'
+import AuthKeyModal from '../AuthKeyModal'
 
 const { CollapsePanel } = Collapse
 
@@ -23,13 +26,59 @@ const ApiServiceDetail = (props: { id: string }) => {
   const { spaceId } = useParams<{ spaceId: string }>()
 
   const [isOpen, setOpen] = useState(true)
+  const [isDeleteKey, setIsDeleteKey] = useState<boolean>(false)
+  const [infos, setInfos] = useState<any[]>([])
+  const [curOp, setCurOp] = useState<string>()
 
   const { isLoading, data } = useQueryListAuthKeys({
     uri: { space_id: spaceId },
     params: { ids: [id] } as any
   })
-
   const detail: PbmodelAuthKeyEntity = get(data, 'entities[0]')
+
+  const mutation = useMutationListApiServices()
+  const authMutation = useMutationAuthKey()
+
+  const handleCancel = () => {
+    setCurOp('')
+  }
+
+  const handleConfirmOK = () => {
+    const paramsData = {
+      option: 'delete' as any,
+      id: detail?.id
+    }
+    authMutation.mutate(paramsData, {
+      onSuccess: (res) => {
+        if (res.ret_code === 0) {
+          Notify.success({
+            title: '操作提示',
+            content: '删除密钥成功',
+            placement: 'bottomRight'
+          })
+          handleCancel()
+          // 回退到列表
+          window.open(`./authKey`)
+        }
+      }
+    })
+  }
+
+  const handleAction = (row: PbmodelAuthKeyEntity, key: string) => {
+    setCurOp(key)
+    if (['delete', 'bingKey'].includes(key)) {
+      mutation.mutate(
+        { auth_key_id: row.id },
+        {
+          onSuccess: (source) => {
+            const entities = get(source, 'entities', []) || []
+            setInfos(entities)
+            setIsDeleteKey(entities.length === 0)
+          }
+        }
+      )
+    }
+  }
 
   return (
     <Root tw="relative">
@@ -86,11 +135,12 @@ const ApiServiceDetail = (props: { id: string }) => {
             <MoreAction
               items={ApiKeyDetailActions.map((i) => ({
                 ...i,
-                value: '2'
+                value: detail
               }))}
               type="button"
               buttonText="更多操作"
               placement="bottom-start"
+              onMenuClick={handleAction}
             />
 
             <Button
@@ -117,7 +167,7 @@ const ApiServiceDetail = (props: { id: string }) => {
             </GridItem>
             <GridItem labelWidth={60}>
               <span>创建时间:</span>
-              <span>{dayjs(detail?.create_time).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>{formatDate(detail.create_time)}</span>
             </GridItem>
           </div>
         </CollapsePanel>
@@ -128,6 +178,52 @@ const ApiServiceDetail = (props: { id: string }) => {
           <BindApiTable authKey={detail} />
         </TabPanel>
       </HorizonTabs>
+      {(curOp === 'create' || curOp === 'update') && (
+        <AuthKeyModal curOp={curOp} curAuthRow={detail} onCancel={handleCancel} />
+      )}
+      {curOp === 'bingKey' && !mutation.isLoading && (
+        <SelectApiServiceModal curAuthRow={detail} infos={infos} onCancel={handleCancel} />
+      )}
+      {curOp === 'delete' && !mutation.isLoading && (
+        <Confirm
+          title={`${isDeleteKey ? '删除密钥：' : '不可删除密钥：'}密钥名称 ${detail?.name}`}
+          visible
+          css={css`
+            .modal-card-head {
+              ${tw`border-0`}
+            }
+          `}
+          type="warn"
+          width={400}
+          maskClosable={false}
+          appendToBody
+          draggable
+          onCancel={handleCancel}
+          footer={
+            <div tw="flex justify-end space-x-2">
+              <Button onClick={() => handleCancel()} type={isDeleteKey ? 'default' : 'primary'}>
+                {isDeleteKey ? '取消' : '确定'}
+              </Button>
+              {isDeleteKey && (
+                <Button type="danger" onClick={handleConfirmOK}>
+                  删除
+                </Button>
+              )}
+            </div>
+          }
+        >
+          <div>
+            {isDeleteKey ? (
+              `删除后不可恢复，确认删除密钥名称 ${detail?.name}?`
+            ) : (
+              <div>
+                删除密钥 {detail?.name} 需先移除所有
+                <span> 绑定的 API服务组</span>
+              </div>
+            )}
+          </div>
+        </Confirm>
+      )}
     </Root>
   )
 }

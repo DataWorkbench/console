@@ -1,7 +1,19 @@
-import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
-import { MoreAction, FlexBox, Center, Confirm, HelpCenterLink } from 'components'
-import dayjs from 'dayjs'
-import { useQueryListAuthKeys, getQueryKeyListAuthKeys, useMutationListApiServices } from 'hooks'
+import {
+  Button,
+  Icon,
+  InputSearch,
+  Table,
+  ToolBar,
+  Notification as Notify
+} from '@QCFE/qingcloud-portal-ui'
+
+import { MoreAction, FlexBox, Center, Confirm } from 'components'
+import {
+  useQueryListAuthKeys,
+  getQueryKeyListAuthKeys,
+  useMutationListApiServices,
+  useMutationAuthKey
+} from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
 import { assign, get } from 'lodash-es'
@@ -12,6 +24,7 @@ import { MappingKey } from 'utils/types'
 import { PbmodelAuthKeyEntity } from 'types/types'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { formatDate } from 'utils'
 import { authKeyTableFieldMapping, authKeyTableColumns } from '../constants'
 import AuthKeyModal from './AuthKeyModal'
 import SelectApiServiceModal from './SelectApiServiceModal'
@@ -41,13 +54,14 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
     Record<ReturnType<typeof getName>, number | string | boolean>,
     { pagination: true; sort: true }
   >(
-    { sort_by: getName('create_time'), reverse: true },
+    { sort_by: getName('create_time'), reverse: true, curr_status: 1 },
     { pagination: true, sort: true },
     columnSettingsKey
   )
 
   const [curOp, setCurOp] = useState<string>()
   const [isDeleteKey, setIsDeleteKey] = useState<boolean>(false)
+  const [infos, setInfos] = useState<any[]>([])
   const [curAuthRow, setCurAuthRow] = useState<PbmodelAuthKeyEntity | null>()
   const { isRefetching, data } = useQueryListAuthKeys({
     uri: { space_id: spaceId },
@@ -69,6 +83,7 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
   )
 
   const mutation = useMutationListApiServices()
+  const authMutation = useMutationAuthKey()
 
   // 刷新
   const refetchData = () => {
@@ -87,12 +102,13 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
   const handleMenuClick = (row: PbmodelAuthKeyEntity, key: string) => {
     setCurOp(key)
     setCurAuthRow(row)
-    if (key === 'delete') {
+    if (['delete', 'bingKey'].includes(key)) {
       mutation.mutate(
         { auth_key_id: row.id },
         {
           onSuccess: (source) => {
-            const entities = get(source, 'entities', [])
+            const entities = get(source, 'entities', []) || []
+            setInfos(entities)
             setIsDeleteKey(entities.length === 0)
           }
         }
@@ -101,7 +117,25 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
       goDetail(row.id)
     }
   }
-  const handleConfirmOK = () => {}
+  const handleConfirmOK = () => {
+    const paramsData = {
+      option: 'delete' as any,
+      id: curAuthRow?.id
+    }
+    authMutation.mutate(paramsData, {
+      onSuccess: (res) => {
+        if (res.ret_code === 0) {
+          Notify.success({
+            title: '操作提示',
+            content: '删除密钥成功',
+            placement: 'bottomRight'
+          })
+          handleCancel()
+          refetchData()
+        }
+      }
+    })
+  }
 
   const getActions = (row: PbmodelAuthKeyEntity) => {
     const result = [
@@ -161,7 +195,7 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
     [getName('create_time')]: {
       ...getSort(getName('create_time')),
       render: (v: number, row: any) => (
-        <span tw="dark:text-neut-0">{dayjs(row.last_updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+        <span tw="dark:text-neut-0">{formatDate(row.create_time)}</span>
       )
     }
   }
@@ -204,7 +238,7 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
               placeholder="请输入关键词进行搜索"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
-                  draft.search = (e.target as HTMLInputElement).value
+                  draft.name = (e.target as HTMLInputElement).value
                   draft.offset = 0
                 })
               }}
@@ -212,7 +246,7 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
                 setFilter((draft) => {
                   if (draft.search) {
                     draft.offset = 0
-                    draft.search = ''
+                    draft.name = ''
                   }
                 })
               }}
@@ -237,7 +271,7 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
       </div>
       <Table
         dataSource={dataSource}
-        loading={false}
+        loading={isRefetching}
         columns={columns}
         rowKey="id"
         pagination={{
@@ -245,14 +279,13 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
           ...pagination
         }}
         onSort={sort}
-        emptyPlaceholder={{ icon: 'q-kmsFill', text: '暂未绑定密钥，请点击左上方按钮绑定密钥' }}
         {...tablePropsData}
       />
       {(curOp === 'create' || curOp === 'update') && (
         <AuthKeyModal curOp={curOp} curAuthRow={curAuthRow} onCancel={handleCancel} />
       )}
-      {curOp === 'bingKey' && (
-        <SelectApiServiceModal curAuthRow={curAuthRow} onCancel={handleCancel} />
+      {curOp === 'bingKey' && !mutation.isLoading && (
+        <SelectApiServiceModal curAuthRow={curAuthRow} infos={infos} onCancel={handleCancel} />
       )}
       {curOp === 'delete' && !mutation.isLoading && (
         <Confirm
@@ -288,7 +321,13 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
             ) : (
               <div>
                 删除密钥 {curAuthRow?.name} 需先移除所有
-                <HelpCenterLink> 绑定的 API服务组</HelpCenterLink>
+                <span
+                  tw=" text-blue-10 cursor-pointer underline"
+                  onClick={() => goDetail(curAuthRow?.id as string)}
+                >
+                  {' '}
+                  绑定的 API服务组
+                </span>
               </div>
             )}
           </div>

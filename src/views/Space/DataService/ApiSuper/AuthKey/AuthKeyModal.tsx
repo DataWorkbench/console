@@ -1,6 +1,7 @@
 import { FlexBox, Modal, AffixLabel } from 'components'
 import { getQueryKeyListAuthKeys, useMutationAuthKey } from 'hooks'
 import { assign } from 'lodash-es'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { Form } from '@QCFE/lego-ui'
 
 import { useQueryClient } from 'react-query'
@@ -47,9 +48,16 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
         curOp === 'update' && { auth_key_id: curAuthRow?.id }
       )
       mutation.mutate(paramsData, {
-        onSuccess: () => {
-          refetchData()
-          handelCancel()
+        onSuccess: (res) => {
+          if (res.ret_code === 0) {
+            Notify.success({
+              title: '操作提示',
+              content: '操作成功',
+              placement: 'bottomRight'
+            })
+            refetchData()
+            handelCancel()
+          }
         }
       })
     }

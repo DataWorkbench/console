@@ -53,6 +53,8 @@ class WorkFlowStore {
 
   showTestModal = false
 
+  showClusterErrorTip = false
+
   showResponseSetting = false
 
   showVersions = false
@@ -86,6 +88,10 @@ class WorkFlowStore {
       loadedKeys: observable.ref
     })
     this.rootStore = rootStore
+  }
+
+  set(params: { [key: string]: any }) {
+    set(this, { ...params })
   }
 
   setTreeData = (data: ApiProps[]) => {
@@ -148,10 +154,6 @@ class WorkFlowStore {
     this.showSaveJobConfirm = false
     this.opTabName = ''
     this.tabOp = ''
-  }
-
-  set(params: { [key: string]: any }) {
-    set(this, { ...params })
   }
 
   resetTreeData = () => {

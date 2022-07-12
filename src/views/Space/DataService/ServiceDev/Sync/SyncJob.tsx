@@ -1,4 +1,5 @@
 import { Collapse } from '@QCFE/lego-ui'
+import { observer } from 'mobx-react-lite'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { HelpCenterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
@@ -106,13 +107,13 @@ const stepsData = [
   }
 ]
 
-const SyncJob = () => {
+const SyncJob = observer(() => {
   const mutation = useMutationUpdateApiConfig()
   const fetchApi = useFetchApiConfig()
   const publishMutation = useMutationPublishDataServiceApi()
 
   const {
-    dtsDevStore: { curApi, apiConfigData },
+    dtsDevStore: { curApi, apiConfigData, showClusterErrorTip },
     dtsDevStore
   } = useStore()
 
@@ -127,8 +128,13 @@ const SyncJob = () => {
           })
         }
       })
+      if (showClusterErrorTip) {
+        dtsDevStore.set({
+          showClusterErrorTip: false
+        })
+      }
     }
-  }, [curApi, dtsDevStore, fetchApi])
+  }, [curApi, dtsDevStore, fetchApi, showClusterErrorTip])
 
   const orderRef =
     useRef<{
@@ -146,6 +152,8 @@ const SyncJob = () => {
       placement: 'bottomRight'
     })
   }
+
+  console.log('apiConfigData', apiConfigData)
 
   const save = () => {
     if (!orderRef.current || !dataSourceRef.current) {
@@ -165,6 +173,14 @@ const SyncJob = () => {
         showConfWarn('字段名称不能为空')
         return
       }
+    }
+
+    // 检测是否有服务集群
+    const clusterId = get(apiConfigData, 'service_cluster.id')
+    if (!clusterId) {
+      dtsDevStore.set({
+        showClusterErrorTip: true
+      })
     }
 
     // 映射字段排序字段到返回参数中
@@ -275,6 +291,6 @@ const SyncJob = () => {
       </div>
     </SyncJobWrapper>
   )
-}
+})
 
 export default SyncJob

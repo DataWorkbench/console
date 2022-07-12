@@ -152,10 +152,10 @@ export enum Protocol {
   ALL = 3
 }
 export const ParameterOperator = createEnhancedEnum<IStatusEnum>({
-  OPERATORUNSET: {
-    label: 'UNSET',
-    value: 0
-  },
+  // OPERATORUNSET: {
+  //   label: 'UNSET',
+  //   value: 0
+  // },
   EQUAL: {
     label: '=',
     value: 1
@@ -164,25 +164,37 @@ export const ParameterOperator = createEnhancedEnum<IStatusEnum>({
     label: '!=',
     value: 2
   },
-  GREATERTHAN: {
+  GREATERTHEN: {
     label: '>',
     value: 3
   },
-  LESSTHAN: {
-    label: '<',
+  GREATEREQUAL: {
+    label: '>=',
     value: 4
   },
-  LIKE: {
-    label: 'LIKE',
+  LESSTHEN: {
+    label: '<',
     value: 5
   },
-  CONST: {
-    label: 'CONST',
+  LESSEQUAL: {
+    label: '<=',
     value: 6
   },
+  // LIKE: {
+  //   label: 'LIKE',
+  //   value: 7
+  // },
+  // CONST: {
+  //   label: 'CONST',
+  //   value: 8
+  // },
   IN: {
     label: 'IN',
-    value: 7
+    value: 9
+  },
+  NOTIN: {
+    label: 'NOT IN',
+    value: 10
   }
 })
 

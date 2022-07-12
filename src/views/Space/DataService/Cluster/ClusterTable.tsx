@@ -20,7 +20,7 @@ import {
 import { useParams } from 'react-router-dom'
 import { formatDate } from 'utils'
 import NewClusterModal from './ClusterModal'
-import { ClusterColumns, ClusterFieldMapping, StatusEnum } from './constants'
+import { ClusterColumns, ClusterFieldMapping, StatusEnum, resourceSpecState } from './constants'
 import StopClusterModal from './StopClusterModal'
 
 interface IRouteParams {
@@ -63,7 +63,7 @@ const getOptionText = (option: OP, id: string | undefined) => {
   return { text, desc }
 }
 
-const columnSettingsKey = 'DATA_SERVICE_CLUSTER_TABLE'
+const columnSettingsKey = 'DATA_SERVICE_DEV_CLUSTER_TABLE'
 
 const ClusterTable = observer((props: ClusterTableProps) => {
   const { selectMode = false, selectedIds = [], onSelect } = props
@@ -222,6 +222,9 @@ const ClusterTable = observer((props: ClusterTableProps) => {
           isWrapper={false}
         />
       )
+    },
+    [getName('cu')]: {
+      render: (v: any) => <div tw="flex items-center">{resourceSpecState.getLabel(v)}</div>
     },
     [getName('last_updated')]: {
       ...getSort(getName('last_updated')),

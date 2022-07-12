@@ -1,4 +1,4 @@
-import { Button, Icon, Table } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Table, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { Center, Confirm, FlexBox, TextEllipsis } from 'components'
 import { useMutationListApiServices, useMutationAuthKey } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
@@ -36,7 +36,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
   useMount(() => {
     if (selectKey.length > 1) {
       mutation.mutate(
-        { auth_key_id: selectKey, ...filter },
+        { ids: selectKey, ...filter },
         {
           onSuccess: (source) => {
             setSourceData(source)
@@ -51,14 +51,28 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
   }
 
   const handleConfirmOK = () => {
+    if (selectKey?.length === 0) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请选择要解绑的API服务',
+        placement: 'bottomRight'
+      })
+      return
+    }
     const paramsData = {
       option: 'unbind' as any,
-      auth_key_id: '',
       api_service_ids: selectKey
     }
     authMutation.mutate(paramsData, {
-      onSuccess: () => {
-        handleCancel()
+      onSuccess: (res) => {
+        if (res.ret_code === 0) {
+          Notify.success({
+            title: '操作提示',
+            content: '解绑成功',
+            placement: 'bottomRight'
+          })
+          handleCancel()
+        }
       }
     })
   }
@@ -83,6 +97,8 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
   }
 
   const { columns } = useColumns(columnSettingsKey, unbindApiTableColumns, columnsRender)
+
+  const infos = get(dataSource, 'entities', []) || []
 
   return (
     <Confirm
@@ -117,13 +133,11 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
         <div tw=" mt-3 ml-9 mb-3">
           {selectKey.length === 1
             ? `与解绑 API 服务组后，密钥将不在限制访问，请谨慎操作。确认解绑API 服务组 ${selectKey[0]}`
-            : `与以下 ${
-                get(dataSource, 'entities', [])?.length
-              } 个 API 服务组解绑后，密钥将不在限制访问，请谨慎操作。确认解绑以下 API 服务组?`}
+            : `与以下 ${infos.length} 个 API 服务组解绑后，密钥将不在限制访问，请谨慎操作。确认解绑以下 API 服务组?`}
         </div>
         {selectKey.length > 1 && (
           <Table
-            dataSource={get(dataSource, 'entities', [])}
+            dataSource={infos}
             loading={false}
             columns={columns}
             rowKey="id"
