@@ -1,4 +1,4 @@
-import { FilterInput, FlexBox, InstanceName } from 'components'
+import { FilterInput, FlexBox, InstanceName, PopConfirm } from 'components'
 import { PageTab, ToolBar, Button, Icon } from '@QCFE/qingcloud-portal-ui'
 import {
   alertPolicyColumns,
@@ -24,6 +24,7 @@ import { AlertManageListAlertPoliciesType } from 'types/response'
 import { ListAlertPoliciesRequestType } from 'types/request'
 import { AlertContext, AlertStore } from './AlertStore'
 import icons from './common/icons'
+import { useMutationAlert } from '../../../../hooks/useAlert'
 
 const useQueryListAlertPolicies = apiHooks<
   'alertManage',
@@ -54,6 +55,7 @@ const getName = (name: MappingKey<typeof policyFieldMapping>) =>
   policyFieldMapping.get(name)!.apiField
 
 const alertPolicySettingKey = 'ALERT_POLICY_SETTING_KEY'
+
 const AlertPolicy = () => {
   useIcon(icons)
   const { filter, pagination, sort, getColumnFilter, getColumnSort } =
@@ -67,6 +69,11 @@ const AlertPolicy = () => {
 
   const history = useHistory()
   const [store] = useState(new AlertStore())
+  const { isLoading, mutateAsync } = useMutationAlert(
+    {},
+    getQueryKeyListAlertPolicies
+  )
+
   const { columns, setColumnSettings } = useColumns(
     alertPolicySettingKey,
     alertPolicyColumns,
@@ -113,28 +120,33 @@ const AlertPolicy = () => {
     {
       title: '操作',
       dataIndex: 'id',
-      render: (v: any, row: any) => (
+      render: (v: any, record: any) => (
         <FlexBox tw="items-center">
           <Button
             type="text"
             onClick={() => {
               store.set({
                 showAddMonitorForm: true,
-                selectedMonitor: row,
+                selectedMonitor: record,
               })
             }}
           >
             修改
           </Button>
-          <Button
-            type="text"
-            onClick={() => {
-              // setNetWorkOp('delete')
-              // setOpNetworkList([row])
+          <PopConfirm
+            type="warning"
+            content={`确定删除 ${record.name} ?`}
+            onOk={() => {
+              mutateAsync({
+                op: 'delete',
+                data: {
+                  alert_ids: [record.id],
+                },
+              })
             }}
           >
-            删除
-          </Button>
+            <Button type="text">删除</Button>
+          </PopConfirm>
         </FlexBox>
       ),
     }
@@ -146,15 +158,7 @@ const AlertPolicy = () => {
     params: filter as any,
   })
 
-  const infos = get(data, 'infos', []) ?? [
-    {
-      id: 111,
-      name: 'stadfa',
-      monitor_object: 1,
-      desc: 'asdfas',
-      updated: new Date().getTime() / 1000,
-    },
-  ]
+  const infos = get(data, 'infos', []) ?? []
 
   return (
     <AlertContext.Provider value={store}>
@@ -202,7 +206,7 @@ const AlertPolicy = () => {
           <Table
             columns={columns}
             dataSource={infos}
-            loading={!!isFetching}
+            loading={!!isFetching || !!isLoading}
             onSort={sort}
             pagination={{
               total: get(data, 'total', 0),
