@@ -527,12 +527,12 @@ const MappingItem = (props: MappingItemProps) => {
               name="fieldValue"
               defaultValue={item.default}
               validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  status: 'error',
-                },
-              ]}
+            //   schemas={[
+            //     {
+            //       rule: { required: true },
+            //       status: 'error',
+            //     },
+            //   ]}
               placeholder="请输入字段值"
               onChange={(v: string) => {
                 setItem((draft) => {
