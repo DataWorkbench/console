@@ -13,6 +13,7 @@ import SelectTreeData from 'utils/selectTree'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Checkbox, Loading } from '@QCFE/lego-ui'
 import { IColumn } from 'hooks/useHooks/useColumns'
+import { isEqual } from 'lodash-es'
 import { FlexBox } from '../Box'
 
 export interface ISelectTreeTableProps {
@@ -28,6 +29,9 @@ export interface ISelectTreeTableProps {
   [propName: string]: any
   rowKey?: string
   showItemCheckboxFn?: (item: Record<string, any>) => boolean
+  showItemOpenFn?: (item: Record<string, any>) => boolean
+  onChecked?: (key: string, checked: boolean) => void
+  checkedKeys?: string[]
 }
 
 export const SelectTreeTable = (props: ISelectTreeTableProps) => {
@@ -40,6 +44,9 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     indentSpace = 32,
     getChildren = async () => [],
     showItemCheckboxFn,
+    showItemOpenFn,
+    onChecked,
+    checkedKeys = [],
   } = props
 
   const [, fourUpdate] = useReducer((x) => x + 1, 0)
@@ -48,15 +55,35 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
   const loadingKeySet = useRef<Set<string>>(new Set())
 
   const tableTreeRef = useRef<SelectTreeData>(
-    new SelectTreeData({
-      key: SelectTreeData.rootKey,
-      value: {},
-      children: dataSource.map((d) => ({
-        key: d[rowKey],
-        value: d,
-      })),
-    })
+    new SelectTreeData(
+      {
+        key: SelectTreeData.rootKey,
+        value: {},
+        children: dataSource.map((d) => ({
+          key: d[rowKey],
+          value: d,
+        })),
+      },
+      {
+        selectedAll: new Set(checkedKeys),
+        map: new Map(),
+        openedAll: new Set(),
+      }
+    )
   )
+
+  useEffect(() => {
+    console.log(11111111, checkedKeys, tableTreeRef.current?.state?.selectedAll)
+    if (
+      !isEqual(
+        checkedKeys,
+        Array.from(tableTreeRef.current?.state?.selectedAll ?? [])
+      )
+    ) {
+      tableTreeRef.current.setSelectedKeys(checkedKeys)
+      fourUpdate()
+    }
+  }, [checkedKeys])
 
   useEffect(() => {
     tableTreeRef.current = new SelectTreeData({
@@ -84,6 +111,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
             })) as any
           )
           tableTreeRef.current.onOpen(key)
+          tableTreeRef.current.setSelectedKeys(checkedKeys)
           loadingKeySet.current.delete(key)
           setLoading(false)
           fourUpdate()
@@ -93,7 +121,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
         fourUpdate()
       }
     },
-    [getChildren, rowKey]
+    [checkedKeys, getChildren, rowKey]
   )
 
   const renderTd =
@@ -107,8 +135,12 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
   const renderFirstTd = useCallback(
     (column) => (text: string, record: Record<string, any>) => {
       let show = true
+      if (showItemOpenFn) {
+        show = showItemOpenFn(record)
+      }
+      let showCheckbox = true
       if (showItemCheckboxFn) {
-        show = showItemCheckboxFn(record)
+        showCheckbox = showItemCheckboxFn(record)
       }
       return (
         <FlexBox
@@ -132,10 +164,19 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
                   type="light"
                   clickable
                   size={16}
-                  onClick={() => handleOpen(record[rowKey], record)}
+                  onClick={() => {
+                    if (
+                      tableTreeRef.current.state.openedAll?.has(record[rowKey])
+                    ) {
+                      tableTreeRef.current.onOpen(record[rowKey])
+                      fourUpdate()
+                    } else {
+                      handleOpen(record[rowKey], record)
+                    }
+                  }}
                 />
               ))}
-            {record.__level <= selectedLevel && (
+            {record.__level <= selectedLevel && showCheckbox && (
               <Checkbox
                 indeterminate={record.__isSelected === 2}
                 checked={record.__isSelected === 1 || record.isSelected === 2}
@@ -144,6 +185,9 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
                     tableTreeRef.current.onRemove(record[rowKey])
                   } else {
                     tableTreeRef.current.onAdd(record[rowKey])
+                  }
+                  if (onChecked) {
+                    onChecked(record[rowKey], checked)
                   }
                   fourUpdate()
                 }}
@@ -158,10 +202,12 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
       handleOpen,
       indentSpace,
       loading,
+      onChecked,
       openLevel,
       rowKey,
       selectedLevel,
       showItemCheckboxFn,
+      showItemOpenFn,
     ]
   )
 
