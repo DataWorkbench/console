@@ -62,7 +62,7 @@ export const useColumns = (
                           : undefined
                       }
                     >
-                      <MenuItem value="" key="all">
+                      <MenuItem value={undefined} key="all">
                         全部
                       </MenuItem>
                       {item.filtersNew.map(

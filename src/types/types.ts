@@ -2003,6 +2003,7 @@ export type PbmodelAlertPolicy =
     monitor_item: PbmodelAlertPolicyMonitorItem
     status: number
     created: number
+    job_ids: string[]
     monitor_object: number
     name: string
     created_by: string
