@@ -281,11 +281,11 @@ const MappingItem = (props: MappingItemProps) => {
           icon: 'if-pen',
           text: '编辑',
         },
-        {
-          key: 'constant',
-          icon: 'q-counterFill',
-          text: '设置常量',
-        },
+        // {
+        //   key: 'constant',
+        //   icon: 'q-counterFill',
+        //   text: '设置常量',
+        // },
         {
           key: 'parse',
           icon: 'q-textFill',
@@ -527,12 +527,12 @@ const MappingItem = (props: MappingItemProps) => {
               name="fieldValue"
               defaultValue={item.default}
               validateOnChange
-            //   schemas={[
-            //     {
-            //       rule: { required: true },
-            //       status: 'error',
-            //     },
-            //   ]}
+              //   schemas={[
+              //     {
+              //       rule: { required: true },
+              //       status: 'error',
+              //     },
+              //   ]}
               placeholder="请输入字段值"
               onChange={(v: string) => {
                 setItem((draft) => {
@@ -575,7 +575,7 @@ const MappingItem = (props: MappingItemProps) => {
             </span>
           </Tooltip>
         )}
-        {itemProps.default && (
+        {false && (
           <Tooltip
             hasPadding
             content={<div>{itemProps.default}</div>}
