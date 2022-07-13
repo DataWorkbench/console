@@ -1,20 +1,25 @@
-import { Button, Icon, ToolBar } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, ToolBar, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { Center, FlexBox, InstanceName, Modal } from 'components/index'
 import { observer } from 'mobx-react-lite'
 import { Table } from 'views/Space/styled'
-import { InputSearch } from '@QCFE/lego-ui'
 import React, { useMemo, useState } from 'react'
 import dayjs from 'dayjs'
 import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
 import tw, { css } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
+import {
+  getQueryKeyListAlertPolicies,
+  getQueryKeyListAlertPoliciesByJob,
+  useMutationAlert,
+  useQueryListAlertPolicies,
+} from 'hooks/useAlert'
 
 interface IMonitorAddProps {
   onCancel: () => void
 }
 
-const storageKey = 'monitor-add-modal-columns'
+const storageKey = 'monitor-add-modal-columns-11'
 
 const { ColumnsSetting } = ToolBar as any
 
@@ -27,18 +32,18 @@ const defaultColumns: IColumn[] = [
   },
   {
     title: '监控对象',
-    dataIndex: 'monitorObject',
-    key: 'monitorObject',
+    dataIndex: 'monitor_object',
+    key: 'monitor_object',
   },
   {
     title: '描述',
-    dataIndex: 'description',
-    key: 'description',
+    dataIndex: 'desc',
+    key: 'desc',
   },
   {
     title: '最近更新时间',
-    dataIndex: 'updated_at',
-    key: 'updated_at',
+    dataIndex: 'updated',
+    key: 'updated',
   },
 ]
 
@@ -57,19 +62,30 @@ const instanceNameStyle = css`
 `
 
 const MonitorAddModal = observer((props: IMonitorAddProps) => {
-  const { set } = useAlertStore()
+  const {
+    set,
+    jobDetail: { spaceId, regionId, jobId, jobType } = {},
+    disabledIds,
+  } = useAlertStore()
   const { onCancel } = props
   const { filter, setFilter, sort, pagination } = useFilter<
-    { search: string },
+    { search: string; monitor_object: number },
     { pagination: true; sort: true }
-  >({})
+  >({ monitor_object: jobType }, { pagination: true, sort: true })
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
-  const { data, isFetching, refetch } = {
-    data: { total: 0, infos: [{ name: 'xxx', id: 1111 }] },
-    isFetching: false,
-    refetch: () => {},
-  }
+  const { data, isFetching, refetch } = useQueryListAlertPolicies({
+    uri: {
+      space_id: spaceId,
+    },
+    params: filter,
+    regionId,
+  } as any)
+
+  const { mutateAsync, isLoading } = useMutationAlert(
+    {},
+    getQueryKeyListAlertPoliciesByJob
+  )
 
   // 带自定义的列
   const columnsRender: Record<string, Partial<IColumn>> = useMemo(
@@ -86,27 +102,32 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
               onClick={() =>
                 set({
                   showAddMonitorDetail: true,
-                  selectedData: record,
+                  selectedMonitor: record,
                 })
               }
             />
           )
         },
       },
-      description: {
+      monitor_object: {
+        render: (type: 1 | 2) => {
+          return (
+            <span tw="text-neut-8">
+              {{ 1: '数据集成作业', 2: '数据开发作业' }[type]}
+            </span>
+          )
+        },
+      },
+      desc: {
         render: (text: string) => <span tw="text-neut-8">{text}</span>,
       },
-      updated_at: {
+      updated: {
         width: 150,
         sortable: true,
         // filter.reverse ? 'asc' : 'desc',
         sortOrder:
           // eslint-disable-next-line no-nested-ternary
-          filter.sort_by === 'updated_at'
-            ? filter.reverse
-              ? 'asc'
-              : 'desc'
-            : '',
+          filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (v: number) =>
           v ? (
             <span tw="text-neut-8">
@@ -134,8 +155,20 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
     <Modal
       visible
       width={1200}
-      onOk={onCancel}
+      okType={selectedRowKeys.length ? 'primary' : 'hidden'}
       onCancel={onCancel}
+      onOk={() => {
+        mutateAsync({
+          op: 'bound',
+          data: { alert_ids: selectedRowKeys },
+          uri: { job_id: jobId, space_id: spaceId },
+          regionId,
+        }).then(() => {
+          onCancel()
+        })
+      }}
+      showConfirmLoading
+      confirmLoading={isLoading}
       title="选择告警策略"
       appendToBody
     >
@@ -144,7 +177,11 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
           <Button
             type="primary"
             onClick={() => {
-              set({ showAddMonitorForm: true })
+              set({
+                showAddMonitorForm: true,
+                getQueryListKey: getQueryKeyListAlertPolicies,
+                selectedMonitor: {},
+              })
             }}
           >
             <Icon name="add" />
@@ -195,7 +232,8 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
           onSelect={(keys: string[]) => {
             setSelectedRowKeys(keys)
           }}
-          selectedKeys={selectedRowKeys}
+          disabledRowKeys={disabledIds}
+          selectedRowKeys={selectedRowKeys}
           columns={columns}
           dataSource={data?.infos || []}
           pagination={{
