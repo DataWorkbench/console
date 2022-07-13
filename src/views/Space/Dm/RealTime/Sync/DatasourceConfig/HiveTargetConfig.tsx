@@ -110,7 +110,6 @@ const HiveTargetConfig = forwardRef(
             <SelectWithRefresh
               name="tableName"
               onRefresh={refetch}
-              multi
               options={
                 tableList?.items?.map((i) => ({ label: i, value: i })) ?? []
               }
