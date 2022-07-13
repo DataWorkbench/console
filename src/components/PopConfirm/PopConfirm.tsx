@@ -138,11 +138,11 @@ export const PopConfirm = (
   }
 
   const handleOk: MouseEventHandler = (e) => {
+    e.stopPropagation()
     if (typeof onOk === 'function') {
       onOk()
     }
     hide()
-    e.stopPropagation()
   }
 
   const renderChildren = () => {
@@ -231,7 +231,12 @@ export const PopConfirm = (
         </div>
       }
     >
-      <div css={[tw`inline-block`, [twChild]]}>{renderChildren()}</div>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        css={[tw`inline-block`, [twChild]]}
+      >
+        {renderChildren()}
+      </div>
     </Tippy>
   )
 }

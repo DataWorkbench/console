@@ -18,22 +18,30 @@ export const UserItem = (props: IUserInfo) => {
       theme="light"
       content={
         <div tw="text-xs text-neut-13">
-          <div>
-            <span>手机：</span>
-            <span>{tel}</span>
-          </div>
-          <div>
-            <span>邮箱：</span>
-            <span>{email}</span>
-          </div>
-          <div>
-            <span>微信：</span>
-            <span>{wechat}</span>
-          </div>
-          <div>
-            <span>webhook：</span>
-            <span>{webhook}</span>
-          </div>
+          {!!tel && (
+            <div>
+              <span>手机：</span>
+              <span>{tel}</span>
+            </div>
+          )}
+          {!!email && (
+            <div>
+              <span>邮箱：</span>
+              <span>{email}</span>
+            </div>
+          )}
+          {!!wechat && (
+            <div>
+              <span>微信：</span>
+              <span>{wechat}</span>
+            </div>
+          )}
+          {!!webhook && (
+            <div>
+              <span>webhook：</span>
+              <span>{webhook}</span>
+            </div>
+          )}
         </div>
       }
     >
