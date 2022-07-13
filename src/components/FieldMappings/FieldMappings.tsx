@@ -20,6 +20,7 @@ import { FlexBox } from 'components/Box'
 import { HelpCenterLink } from 'components/Link'
 import useIcon from 'hooks/useHooks/useIcon'
 import { Tooltip } from 'components/Tooltip'
+// eslint-disable-next-line import/no-cycle
 import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { KafkaFieldMappings } from 'components/FieldMappings/KafkaFieldMappings'
@@ -519,9 +520,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   )
 
   const addCustomField = () => {
-    const hasUnFinish = leftFields.find(
-      (field) => field.custom && field.default === ''
-    )
+    const hasUnFinish = leftFields.find(() => false)
     if (!hasUnFinish) {
       setLeftFields((fields) => [
         ...fields,
@@ -538,9 +537,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }
 
   const addCustomFieldRight = () => {
-    const hasUnFinish = rightFields.find(
-      (field) => field.custom && field.default === ''
-    )
+    const hasUnFinish = rightFields.find(() => false)
     if (!hasUnFinish) {
       setRightFields((fields) => [
         ...fields,
