@@ -233,7 +233,7 @@ const AlertPolicyDetail = ({
             },
           ]}
           rowKey="id"
-          datasource={data?.notifications.filter(
+          datasource={data?.notifications?.filter(
             (i) => !search || i.name.includes(search)
           )}
         />

@@ -3,13 +3,13 @@ import { makeAutoObservable, set } from 'mobx'
 import { PbmodelAlertPolicy } from 'types/types'
 
 export class AlertStore {
-  showMonitor = false
+  showMonitor = false //  job alert
 
-  showAddMonitor = false
+  showAddMonitor = false // job add alert
 
-  showAddMonitorDetail = false
+  showAddMonitorDetail = false // alert detail
 
-  showAddMonitorForm = false
+  showAddMonitorForm = false // alert form
 
   // 监控对象 有值的时候, 表单显示字符串
   monitorObject?: number
