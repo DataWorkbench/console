@@ -78,6 +78,7 @@ const filterFullTargets: SourceType[] = [
   SourceType.MongoDB,
   SourceType.Redis,
   SourceType.ElasticSearch,
+  SourceType.Kafka,
 ]
 
 const filterIncrSources: SourceType[] = [
