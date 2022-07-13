@@ -11,13 +11,18 @@ import { Checkbox, Field, Label, RadioButton } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useImmer } from 'use-immer'
-import { flatten, get, isEqual, isNil, pick, set } from 'lodash-es'
+import { flatten, get, isEqual, pick, set } from 'lodash-es'
 import { monitorObjectTypes } from 'views/Space/Ops/Alert/common/constants'
 import { toJS } from 'mobx'
 import { useParams } from 'react-router-dom'
 import { PbmodelAlertPolicy } from 'types/types'
-import { useQueryListAvailableUsers } from 'hooks/useMember'
+import {
+  // useQueryListAvailableUsers,
+  useQueryListNotifications,
+} from 'hooks/useMember'
 import { useMutationAlert } from 'hooks/useAlert'
+import { observer } from 'mobx-react-lite'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import JobSelectModal from './JobSelectModal'
 
 const { TextField, TextAreaField, RadioGroupField, SelectField } = Form
@@ -88,14 +93,15 @@ const getData = (data: Record<string, any>) => {
   return d
 }
 
-const MonitorAddFormModal = (props: IMonitorAddProps) => {
-  const { onCancel, data, getQueryListKey } = props
+const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
+  const { onCancel, data } = props
+  const { getQueryListKey, jobDetail } = useAlertStore()
 
   const form = useRef<Form>()
   const [value, setValue] = useImmer<
     Partial<Record<keyof PbmodelAlertPolicy | string, any>>
   >(() => {
-    getData(data as any)
+    return getData(data as any)
   })
 
   useEffect(() => {
@@ -116,7 +122,7 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
     fetchNextPage,
     hasNextPage,
     isFetching,
-  } = useQueryListAvailableUsers({})
+  } = useQueryListNotifications({})
 
   const userOptions = flatten(
     users?.pages.map((page: Record<string, any>) => page.infos || [])
@@ -147,6 +153,9 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
             'desc',
             'notification_ids',
           ])
+          if (jobDetail?.jobType) {
+            set(d, 'monitor_object', jobDetail?.jobType)
+          }
           set(d, 'trigger_action', 1)
           set(d, 'trigger_rule', 1)
           const item = {
@@ -172,7 +181,7 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
         }
       }}
       onCancel={onCancel}
-      title="创建告警策略"
+      title={isEdit ? '编辑告警策略' : '创建告警策略'}
       appendToBody
       showConfirmLoading
       confirmLoading={isLoading}
@@ -206,37 +215,46 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
                 },
               ]}
             />
-            {isEdit ? (
+            {jobDetail?.jobType && (
               <Field>
                 <Label tw="label-required">监控对象</Label>
                 <span>
-                  {monitorObjectTypes[value?.monitor_object as 1]?.label}
+                  {monitorObjectTypes[jobDetail?.jobType as 1]?.label}
                 </span>
               </Field>
-            ) : (
-              <RadioGroupField
-                label={<AffixLabel required>监控对象</AffixLabel>}
-                name="monitor-object"
-                onChange={(e) => {
-                  setValue((draft) => {
-                    draft.monitor_object = e
-                    draft.job_ids = []
-                  })
-                }}
-                validateOnChange
-                value={value?.monitor_object}
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请选择监控对象',
-                    status: 'error',
-                  },
-                ]}
-              >
-                <RadioButton value={1}>流式计算作业</RadioButton>
-                <RadioButton value={2}>数据集成作业</RadioButton>
-              </RadioGroupField>
             )}
+            {!jobDetail?.jobType &&
+              (isEdit ? (
+                <Field>
+                  <Label tw="label-required">监控对象</Label>
+                  <span>
+                    {monitorObjectTypes[value?.monitor_object as 1]?.label}
+                  </span>
+                </Field>
+              ) : (
+                <RadioGroupField
+                  label={<AffixLabel required>监控对象</AffixLabel>}
+                  name="monitor-object"
+                  onChange={(e) => {
+                    setValue((draft) => {
+                      draft.monitor_object = e
+                      draft.job_ids = []
+                    })
+                  }}
+                  validateOnChange
+                  value={value?.monitor_object}
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请选择监控对象',
+                      status: 'error',
+                    },
+                  ]}
+                >
+                  <RadioButton value={1}>流式计算作业</RadioButton>
+                  <RadioButton value={2}>数据集成作业</RadioButton>
+                </RadioGroupField>
+              ))}
 
             <Field>
               <Label tw="label-required mt-2 items-baseline!	">监控项</Label>
@@ -296,8 +314,7 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
                 {
                   rule: (v) => {
                     return !(
-                      isNil(v.instance_run_timeout) ||
-                      !v.instance_run_failed_flag ||
+                      !v.instance_run_failed_flag &&
                       !v.instance_run_timeout_flag
                     )
                   },
@@ -315,60 +332,71 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
               <Label tw="label-required">触发行为</Label>
               <span>发送通知</span>
             </Field>
-            <Field tw="mb-1!" label="绑定作业">
-              <Label tw="label-required mt-2 items-baseline!">绑定作业</Label>
-              <div>
-                {value?.monitor_object ? (
-                  <Button
-                    type="black"
-                    onClick={() => setVisible(true)}
-                    disabled={!value?.monitor_object}
-                  >
-                    <Icon name="add" type="light" />
-                    选择作业
-                  </Button>
-                ) : (
-                  <Tooltip hasPadding theme="light" content="请先选择监控对象">
-                    <Button type="black" disabled>
-                      <Icon name="add" type="light" />
-                      选择作业
-                    </Button>
-                  </Tooltip>
-                )}
-                {Array.isArray(value?.job_ids) && value?.job_ids.length > 0 && (
-                  <div tw="mt-1 flex flex-wrap w-[640px] gap-1">
-                    {value?.job_ids.map((i) => (
-                      <Item
-                        id={i}
-                        key={i}
-                        onDelete={(id) =>
-                          setValue((draft) => {
-                            draft.job_ids = draft.job_ids?.filter(
-                              (j) => j !== id
-                            )
-                          })
-                        }
-                      />
-                    ))}
+            {!jobDetail?.jobId && (
+              <>
+                <Field tw="mb-1!" label="绑定作业">
+                  <Label tw="label-required mt-2 items-baseline!">
+                    绑定作业
+                  </Label>
+                  <div>
+                    {value?.monitor_object ? (
+                      <Button
+                        type="black"
+                        onClick={() => setVisible(true)}
+                        disabled={!value?.monitor_object}
+                      >
+                        <Icon name="add" type="light" />
+                        选择作业
+                      </Button>
+                    ) : (
+                      <Tooltip
+                        hasPadding
+                        theme="light"
+                        content="请先选择监控对象"
+                      >
+                        <Button type="black" disabled>
+                          <Icon name="add" type="light" />
+                          选择作业
+                        </Button>
+                      </Tooltip>
+                    )}
+                    {Array.isArray(value?.job_ids) &&
+                      value?.job_ids.length > 0 && (
+                        <div tw="mt-1 flex flex-wrap w-[640px] gap-1">
+                          {value?.job_ids.map((i) => (
+                            <Item
+                              id={i}
+                              key={i}
+                              onDelete={(id) =>
+                                setValue((draft) => {
+                                  draft.job_ids = draft.job_ids?.filter(
+                                    (j) => j !== id
+                                  )
+                                })
+                              }
+                            />
+                          ))}
+                        </div>
+                      )}
                   </div>
-                )}
-              </div>
-            </Field>
-            <HiddenTextField
-              name="job_ids"
-              label={null}
-              value={value?.job_ids}
-              key={value?.job_ids?.length}
-              schemas={[
-                {
-                  rule: () => {
-                    return !!value?.job_ids?.length
-                  },
-                  help: '请选择绑定作业',
-                  status: 'error',
-                },
-              ]}
-            />
+                </Field>
+                <HiddenTextField
+                  name="job_ids"
+                  label={null}
+                  value={value?.job_ids}
+                  key={value?.job_ids?.length}
+                  schemas={[
+                    {
+                      rule: () => {
+                        return !!value?.job_ids?.length
+                      },
+                      help: '请选择绑定作业',
+                      status: 'error',
+                    },
+                  ]}
+                />
+              </>
+            )}
 
             {/* <AdduserField label="消息接受人" labelClasName="label-required" /> */}
             <SelectField
@@ -388,7 +416,7 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
               onMenuScrollToBottom={loadData}
               bottomTextVisible
               validateOnChange
-              valueKey="user_id"
+              valueKey="id"
               clearable
               schemas={[
                 {
@@ -440,6 +468,6 @@ const MonitorAddFormModal = (props: IMonitorAddProps) => {
       </ModalContent>
     </Modal>
   )
-}
+})
 
 export default MonitorAddFormModal

@@ -7,52 +7,51 @@ import { observer } from 'mobx-react-lite'
 import useIcon from 'hooks/useHooks/useIcon'
 import icons from './common/icons'
 
-const AlertModal = observer(
-  ({ getQueryListKey }: { getQueryListKey?: () => string }) => {
-    const {
-      set,
-      showAddMonitor,
-      showAddMonitorDetail,
-      showAddMonitorForm,
-      showMonitor,
-      selectedMonitor,
-    } = useAlertStore()
-    useIcon(icons)
-    return (
-      <>
-        {showMonitor && (
-          <MonitorModal
-            onCancel={() => {
-              set({ showMonitor: false })
-            }}
-          />
-        )}
-        {showAddMonitor && (
-          <MonitorAddModal
-            onCancel={() => {
-              set({ showAddMonitor: false })
-            }}
-          />
-        )}
-        {showAddMonitorForm && (
-          <MonitorAddFormModal
-            onCancel={() => {
-              set({ showAddMonitorForm: false })
-            }}
-            data={selectedMonitor as any}
-            getQueryListKey={getQueryListKey}
-          />
-        )}
-        {showAddMonitorDetail && (
-          <MonitorAddFormDetail
-            onCancel={() => {
-              set({ showAddMonitorDetail: false })
-            }}
-            data={selectedMonitor!}
-          />
-        )}
-      </>
-    )
-  }
-)
+const AlertModal = observer(() => {
+  const {
+    set,
+    showAddMonitor,
+    showAddMonitorDetail,
+    showAddMonitorForm,
+    showMonitor,
+    selectedMonitor,
+    getQueryListKey,
+  } = useAlertStore()
+  useIcon(icons)
+  return (
+    <>
+      {showMonitor && (
+        <MonitorModal
+          onCancel={() => {
+            set({ showMonitor: false })
+          }}
+        />
+      )}
+      {showAddMonitor && (
+        <MonitorAddModal
+          onCancel={() => {
+            set({ showAddMonitor: false })
+          }}
+        />
+      )}
+      {showAddMonitorForm && (
+        <MonitorAddFormModal
+          onCancel={() => {
+            set({ showAddMonitorForm: false })
+          }}
+          data={selectedMonitor as any}
+          getQueryListKey={getQueryListKey}
+        />
+      )}
+      {showAddMonitorDetail && (
+        <MonitorAddFormDetail
+          onCancel={() => {
+            set({ showAddMonitorDetail: false })
+          }}
+          data={selectedMonitor!}
+        />
+      )}
+    </>
+  )
+})
 export default AlertModal

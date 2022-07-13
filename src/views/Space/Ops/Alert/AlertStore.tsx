@@ -22,6 +22,14 @@ export class AlertStore {
 
   selectedList?: PbmodelAlertPolicy[] = []
 
+  disabledIds: string[] = []
+
+  getQueryListKey?: () => string
+
+  jobDetail?: Partial<
+    Record<'jobId' | 'jobName' | 'spaceId' | 'regionId' | 'jobType', any>
+  > = {}
+
   constructor() {
     makeAutoObservable(this)
   }

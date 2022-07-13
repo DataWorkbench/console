@@ -9,11 +9,10 @@ import tw, { css } from 'twin.macro'
 import dayjs from 'dayjs'
 import { MappingKey } from 'utils/types'
 import { historyFiledMapping } from 'views/Space/Ops/Alert/common/mapping'
-import { apiHooks } from 'hooks/apiHooks'
-import { ListAlertLogsRequestType } from 'types/request'
-import { AlertManageListAlertLogsType } from 'types/response'
+
 import { useHistory, useParams } from 'react-router-dom'
 import useFilter from 'hooks/useHooks/useFilter'
+import { useQueryListAlertLogs } from 'hooks/useAlert'
 import icons from './common/icons'
 import {
   alertHistoryColumns,
@@ -22,14 +21,6 @@ import {
   alertStatus,
   monitorObjectTypes,
 } from './common/constants'
-
-const useQueryListAlertLogs = apiHooks<
-  'alertManage',
-  ListAlertLogsRequestType,
-  AlertManageListAlertLogsType
->('alertManage', 'listAlertLogs')
-
-// const getQueryListAlertLogsKey = () => queryKeyObj.listAlertLogs
 
 // interface IAlertHistory {}
 

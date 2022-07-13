@@ -128,6 +128,8 @@ const AlertPolicy = () => {
               store.set({
                 showAddMonitorForm: true,
                 selectedMonitor: record,
+                getQueryListKey: getQueryKeyListAlertPolicies,
+                jobDetail: {},
               })
             }}
           >
@@ -172,6 +174,8 @@ const AlertPolicy = () => {
                 store.set({
                   showAddMonitorForm: true,
                   selectedMonitor: {},
+                  getQueryListKey: getQueryKeyListAlertPolicies,
+                  jobDetail: {},
                 })
               }}
             >
@@ -215,7 +219,7 @@ const AlertPolicy = () => {
           />
         </FlexBox>
       </FlexBox>
-      <AlertModal getQueryListKey={getQueryKeyListAlertPolicies} />
+      <AlertModal />
     </AlertContext.Provider>
   )
 }
