@@ -203,7 +203,7 @@ const AlertPolicyDetail = ({
           }
         `}
       >
-        <FlexBox tw="justify-end gap-2">
+        <FlexBox tw="justify-end gap-2 mb-3">
           <InputSearch
             tw="w-64"
             placeholder="请输入关键词进行搜索"
@@ -233,7 +233,7 @@ const AlertPolicyDetail = ({
             },
           ]}
           rowKey="id"
-          datasource={data?.notifications?.filter(
+          dataSource={data?.notifications?.filter(
             (i) => !search || i.name.includes(search)
           )}
         />
@@ -319,7 +319,7 @@ const AlertPolicyDetail = ({
             },
           ]}
           rowKey="id"
-          datasource={infos ?? []}
+          dataSource={infos ?? []}
           page={{ total: get(jobList, 'total', 0), ...pagination }}
           loading={jobLoading}
         />
