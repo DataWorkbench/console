@@ -156,82 +156,86 @@ const HiveTargetConfig = forwardRef(
               }}
               validateOnChange
             />
-            <TextField
-              label={
-                <AffixLabel
-                  required
-                  help={
-                    <div>
-                      <div>Hive 表的分区信息：</div>
-                      <div>
-                        如果您写出的 Hive 表是分区表，您需要配置 partition
-                        信息。同步任务会写出 partition 对应的分区数据。
-                      </div>
-                    </div>
+            {dbInfo?.usePartition && (
+              <>
+                <TextField
+                  label={
+                    <AffixLabel
+                      required
+                      help={
+                        <div>
+                          <div>Hive 表的分区信息：</div>
+                          <div>
+                            如果您写出的 Hive 表是分区表，您需要配置 partition
+                            信息。同步任务会写出 partition 对应的分区数据。
+                          </div>
+                        </div>
+                      }
+                      theme="green"
+                    >
+                      分区字段
+                    </AffixLabel>
                   }
-                  theme="green"
-                >
-                  分区字段
-                </AffixLabel>
-              }
-              name="partition"
-              value={dbInfo?.partition}
-              onChange={(e) => {
-                setDbInfo((draft) => {
-                  draft.partition = e
-                })
-              }}
-              placeholder="请输入分区字段"
-              validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请输入分区字段',
-                  status: 'error',
-                },
-              ]}
-            />
+                  name="partition"
+                  value={dbInfo?.partition}
+                  onChange={(e) => {
+                    setDbInfo((draft) => {
+                      draft.partition = e
+                    })
+                  }}
+                  placeholder="请输入分区字段"
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请输入分区字段',
+                      status: 'error',
+                    },
+                  ]}
+                />
 
-            <SelectField
-              label={
-                <AffixLabel
-                  required
-                  help="分区类型包括 DAY、HOUR、MINUTE 三种。若分区不存在则会自动创建，自动创建的分区时间以当前任务运行的服务器时间为准。"
-                >
-                  分区类型
-                </AffixLabel>
-              }
-              name="type"
-              value={dbInfo?.type}
-              onChange={(e) => {
-                setDbInfo((draft) => {
-                  draft.type = e
-                })
-              }}
-              options={[
-                {
-                  label: 'DAY：天分区，分区示例：pt=20200101',
-                  value: 1,
-                },
-                {
-                  label: 'HOUR：小时分区，分区示例：pt=2020010110',
-                  value: 2,
-                },
-                {
-                  label: 'MINUTE：分钟分区，分区示例：pt=202001011027',
-                  value: 3,
-                },
-              ]}
-              placeholder="请选择分区类型"
-              validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请选择分区类型',
-                  status: 'error',
-                },
-              ]}
-            />
+                <SelectField
+                  label={
+                    <AffixLabel
+                      required
+                      help="分区类型包括 DAY、HOUR、MINUTE 三种。若分区不存在则会自动创建，自动创建的分区时间以当前任务运行的服务器时间为准。"
+                    >
+                      分区类型
+                    </AffixLabel>
+                  }
+                  name="type"
+                  value={dbInfo?.type}
+                  onChange={(e) => {
+                    setDbInfo((draft) => {
+                      draft.type = e
+                    })
+                  }}
+                  options={[
+                    {
+                      label: 'DAY：天分区，分区示例：pt=20200101',
+                      value: 1,
+                    },
+                    {
+                      label: 'HOUR：小时分区，分区示例：pt=2020010110',
+                      value: 2,
+                    },
+                    {
+                      label: 'MINUTE：分钟分区，分区示例：pt=202001011027',
+                      value: 3,
+                    },
+                  ]}
+                  placeholder="请选择分区类型"
+                  validateOnChange
+                  schemas={[
+                    {
+                      rule: { required: true },
+                      help: '请选择分区类型',
+                      status: 'error',
+                    },
+                  ]}
+                />
+              </>
+            )}
             <SelectField
               label={<AffixLabel required>写入模式</AffixLabel>}
               name="writeMode"
