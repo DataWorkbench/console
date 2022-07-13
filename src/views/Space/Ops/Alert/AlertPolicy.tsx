@@ -83,7 +83,7 @@ const AlertPolicy = () => {
           <InstanceName
             theme="dark"
             onClick={() => {
-              history.push(`.alert-policy/${id}`)
+              history.push(`./alert-policy/${id}`)
             }}
             name={record.name}
             desc={id}

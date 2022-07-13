@@ -40,7 +40,7 @@ export const Ops = () => {
         {mod === 'data-job' && detail && <DataJobInstanceDetail id={detail!} />}
         {mod === 'data-job' && !detail && <DataJobInstance />}
         {mod === 'alert-policy' && detail && <AlertPolicyDetail id={detail} />}
-        {mod === 'alert-policy' && <AlertPolicy />}
+        {mod === 'alert-policy' && !detail && <AlertPolicy />}
         {mod === 'alert-history' && <AlertHistory />}
       </div>
     </div>
