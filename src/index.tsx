@@ -10,6 +10,7 @@ import './themes/colors/index.tpl'
 // import 'tippy.js/dist/svg-arrow.css'
 // import 'tippy.js/animations/scale-subtle.css'
 import 'dayjs/locale/zh-cn'
+import './config.tpl'
 
 dayjs.extend(relativeTime)
 
