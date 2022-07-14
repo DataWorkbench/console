@@ -6,7 +6,7 @@ import {
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { InstanceName } from 'components/InstanceName'
 import React from 'react'
-import { PbmodelNotificationList } from '../../../../../types/types'
+// import { PbmodelNotification } from 'types/types'
 
 export const pageTabsData = [
   {
@@ -35,10 +35,10 @@ export const columnsRender = {
       <InstanceName theme="light" name={text} icon="q-humanAppDuotone" />
     ),
   },
-  [getName('email')]: {
-    render: (_: never, record: PbmodelNotificationList) =>
-      record.items.find((i) => i.notification_item_type === 'email')?.content,
-  },
+  // [getName('email')]: {
+  //   render: (_: never, record: PbmodelNotification) => '',
+  //   // record.items.find((i) => i.notification_item_type === 'email')?.content,
+  // },
   [getName('desc')]: {
     render: () => <div tw="text-font-placeholder">asdfasfd</div>,
   },

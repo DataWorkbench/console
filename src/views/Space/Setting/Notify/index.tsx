@@ -13,10 +13,10 @@ import { useParams } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
-import { getQueryKeyListNotifications, useQueryListNotifications } from 'hooks'
+import { getQueryKeyListNotifications, useQueryListNotifications1 } from 'hooks'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { set } from 'mobx'
-import { PbmodelNotificationList } from 'types/types'
+import { PbmodelNotification } from 'types/types'
 import { columnsRender, notifyColumns, pageTabsData } from './common/constants'
 import icons from './common/icons'
 import ActionModals from './ActionModals'
@@ -44,7 +44,7 @@ const Notify = observer(() => {
   const operations = {
     title: '操作',
     key: 'operation',
-    render: (record: PbmodelNotificationList) => (
+    render: (record: PbmodelNotification) => (
       <Center>
         <Button
           type="text"
@@ -86,7 +86,7 @@ const Notify = observer(() => {
   >({}, { pagination: true })
 
   const { spaceId } = useParams<{ spaceId: string }>()
-  const { data, isFetching } = useQueryListNotifications({
+  const { data, isFetching } = useQueryListNotifications1({
     uri: { space_id: spaceId },
     data: filter,
   })

@@ -3,11 +3,11 @@ import Member from './MemberList'
 import { MemberContext, MemberStore } from './store'
 
 export default () => {
-  const { spaceId, regionId } =
+  const { regionId, spaceId } =
     useParams<{ regionId: string; spaceId: string }>()
   return (
     <MemberContext.Provider value={new MemberStore()}>
-      <Member space={spaceId} regionId={regionId} />
+      <Member spaceId={spaceId} regionId={regionId} />
     </MemberContext.Provider>
   )
 }

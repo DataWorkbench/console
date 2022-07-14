@@ -71,10 +71,11 @@ const Tags = (props: ITagsProps) => {
         )
       })}
       <Tooltip
+        key={systemRoles.length}
         theme="light"
         // interactive
         // appendTo="parent"
-        // trigger="click"
+        trigger="click"
         arrow={false}
         placement="bottom"
         content={
@@ -109,10 +110,11 @@ const Tags = (props: ITagsProps) => {
               <Tooltip
                 theme="light"
                 interactive
-                // trigger="click"
+                trigger="click"
                 // appendTo="parent"
                 arrow={false}
                 placement="right"
+                hideOnClick
                 twChild={tw`w-full`}
                 css={css`
                   transform: translateX(-16px);
@@ -120,10 +122,10 @@ const Tags = (props: ITagsProps) => {
                 content={
                   <div
                     tw="py-1 min-w-[140px]"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      e.preventDefault()
-                    }}
+                    // onClick={(e) => {
+                    //   e.stopPropagation()
+                    //   e.preventDefault()
+                    // }}
                   >
                     {xorBy(systemRoles, list, 'id').map(
                       (role: Record<string, any>) => {

@@ -127,7 +127,7 @@ export const getQueryKeyDescribeNetworkConfig = () =>
 
 export default useQueryWorkSpace
 
-export const useQueryListNotifications = apiHooks<
+export const useQueryListNotifications1 = apiHooks<
   'notifierManage',
   ListNotificationsRequestType,
   NotifierManageListNotificationsType
