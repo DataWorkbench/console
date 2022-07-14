@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom'
-// import { OverView } from './OverView'
 import DataJobInstance from 'views/Space/Ops/DataIntegration/JobInstance'
 import DataRelease from 'views/Space/Ops/DataIntegration/DataRelease'
 import DataJobInstanceDetail from 'views/Space/Ops/DataIntegration/JobInstance/JobInstance'
@@ -7,11 +6,15 @@ import DataReleaseDetail from 'views/Space/Ops/DataIntegration/DataRelease/DataR
 import AlertHistory from 'views/Space/Ops/Alert/AlertHistory'
 import AlertPolicy from 'views/Space/Ops/Alert/AlertPolicy'
 import StreamRelease from 'views/Space/Ops/Stream1/StreamRelease'
+import GeneralView from 'views/Space/Ops/GeneralView/Index'
+import Login from 'views/Space/Ops/Login/Index'
+
 // import StreamInstance from 'views/Space/Ops/Stream1/StreamInstance'
 import useIcon from 'hooks/useHooks/useIcon'
 import StreamReleaseDetail from 'views/Space/Ops/Stream1/StreamReleaseDetail'
 // import StreamInstanceDetail from 'views/Space/Ops/Stream1/StreamInstanceDetail'
 import { DataReleaseStoreProvider } from 'views/Space/Ops/DataIntegration/DataRelease/store'
+import { OverView } from './OverView'
 import { Sider } from '../Sider'
 import icons from './icons'
 // import Release from './Stream/Release'
@@ -25,7 +28,7 @@ export const Ops = () => {
     <div tw="flex-1 flex h-full">
       <Sider funcMod="ops" />
       <div tw="flex-1 overflow-y-auto">
-        {/* {(mod === 'overview' || !mod) && <OverView />} */}
+        {(mod === 'overview' || !mod) && <OverView />}
         {((mod === 'release' && !detail) || !mod) && (
           <DataReleaseStoreProvider>
             <StreamRelease />
@@ -42,6 +45,8 @@ export const Ops = () => {
         {mod === 'alert-policy' && detail && <AlertPolicyDetail id={detail} />}
         {mod === 'alert-policy' && !detail && <AlertPolicy />}
         {mod === 'alert-history' && <AlertHistory />}
+        {mod === 'general-view' && <GeneralView />}
+        {mod === 'login' && <Login />}
       </div>
     </div>
   )

@@ -15,5 +15,7 @@ export * from './useStreamVersion'
 export * from './useSyncJobInstance'
 export * from './useJobVersion'
 export * from './useJobRelease'
+export * from './useLogin'
+export * from './useGeneralView'
 
 export { useDarkMode, useScrollBlock, useStore }

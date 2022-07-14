@@ -29,6 +29,8 @@ const defaultFuncList = [
     title: '运维中心',
     subFuncList: [
       // { name: 'overview', title: '运维大屏', icon: 'blockchain' },
+      { name: 'login', title: '登录', icon: 'blockchain' },
+      { name: 'general-view', title: '运维概览', icon: 'blockchain' },
       {
         name: 'stream',
         title: '流式计算运维',
