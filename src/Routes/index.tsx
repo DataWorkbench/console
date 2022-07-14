@@ -3,7 +3,7 @@ import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
 import { useDarkMode } from 'hooks'
 
-// // describeDataOmnis
+// describeDataOmnis
 // const DescribeDataOmnis = lazy(
 //   () =>
 //     import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
