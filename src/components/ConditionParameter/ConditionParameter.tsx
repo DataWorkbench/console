@@ -18,7 +18,7 @@ import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
 import { isEqual, isNil, pick, values } from 'lodash-es'
 
-import { PopConfirm } from 'components/PopConfirm'
+import { PopConfirm } from '../PopConfirm'
 import { FlexBox } from '../Box'
 import { Tooltip } from '../Tooltip'
 import { HelpCenterLink } from '../Link'
@@ -96,7 +96,7 @@ const types = [
 export const ConditionParameter = React.forwardRef(
   (props: IConditionParameterProps, ref: React.ForwardedRef<any>) => {
     const {
-      value: defaultValue = { type: ConditionType.Visualization },
+      value: defaultValue,
       onChange,
       helpStr,
       helpLink,
@@ -135,8 +135,8 @@ export const ConditionParameter = React.forwardRef(
         //         'endCondition',
         //       ])
         //     : (pick(value, ['type', 'column', 'expression']) as any)
-        onChange(value)
         prevValue.current = value
+        onChange(value)
       }
     }, [onChange, value])
 

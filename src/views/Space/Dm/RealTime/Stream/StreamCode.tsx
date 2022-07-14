@@ -8,21 +8,23 @@ import {
   Loading,
 } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
-import { Prompt, useHistory } from 'react-router-dom'
+import { Prompt, useHistory, useParams } from 'react-router-dom'
 import tw, { styled, theme, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { useUnmount, useMeasure, useBeforeUnload } from 'react-use'
+import { useUnmount, useBeforeUnload, useMeasure } from 'react-use'
 import Editor from 'react-monaco-editor'
 import { useQueryClient } from 'react-query'
-import { Rnd } from 'react-rnd'
+import { loadSignature } from 'stores/api'
+
 import SimpleBar from 'simplebar-react'
 import {
   useMutationStreamJobCode,
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
   useQueryStreamJobCode,
+  // useQueryStreamJobArgs,
   useMutationStreamJobCodeSyntax,
-  useMutationStreamJobCodeRun,
+  // useMutationStreamJobCodeRun,
   getFlowKey,
   useStore,
 } from 'hooks'
@@ -30,9 +32,12 @@ import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
 import * as scalaMod from 'utils/languages/scala'
 import { timeFormat } from 'utils/convert'
+import { connect as connectSocket } from 'utils/socket'
+import codePlaceholder from './Code/config'
 import { JobToolBar } from '../styled'
 import ReleaseModal from '../Modal/ReleaseModal'
 import VersionHeader from '../Version/VersionHeader'
+import Result from './Code/Result'
 
 const CODETYPE = {
   2: 'sql',
@@ -61,11 +66,26 @@ interface IProp {
 }
 
 const StreamCode = observer(({ tp }: IProp) => {
+  const [runLoading, setRunLoading] = useState(false)
   const {
     workFlowStore,
     workFlowStore: { curJob, curVersion, showSaveJobConfirm },
   } = useStore()
   const readOnly = !!curVersion
+  // const funcRef = useRef()
+  // const { data: jobArgs, refetch: refetchJobAr } = useQueryStreamJobArgs({
+  //   onSuccess: (data) => {
+  //     console.log(
+  //       '%c [ data ]-77',
+  //       'font-size:13px; background:pink; color:#bf2c9f;',
+  //       data
+  //     )
+  //     if (funcRef.current) {
+  //       funcRef.current()
+  //       funcRef.current = null
+  //     }
+  //   },
+  // })
 
   const [nextLocation, setNextLocation] = useState(null)
   const [shouldNav, setShouldNav] = useState(false)
@@ -76,67 +96,80 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [show, toggleShow] = useState(false)
   const [, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
-  const [showRunLog, setShowRunLog] = useState(false)
   // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef<any>(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
-  const runMutation = useMutationStreamJobCodeRun()
+  // const runMutation = useMutationStreamJobCodeRun()
   const { data, isFetching } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
-  const codeStr = get(data, `${codeName}.code`)
+  const codeStr = get(data, `${{ 2: 'sql', 4: 'python_code' }[tp as 2]}.code`)
   const loadingWord = '代码加载中......'
   const queryClient = useQueryClient()
-  const defaultCode = useMemo(() => {
-    let v = ''
-    if (codeName === 'sql') {
-      v = `-- 如果在 Flink SQL 里存在 flink_test 表则删除，防止重复创建
-drop table if exists flink_test;
--- 在 Flink SQL 里注册 MySQL 数据库的 test 表，需提前在 MySQL 中创建该表
-create table flink_test (
-  id BIGINT,
-  name STRING,
-  age INT,
-  PRIMARY KEY (id) NOT ENFORCED
-) WITH (
-  'connector' = 'jdbc',
-  'url' = 'jdbc:mysql://127.0.0.1:3306/database',
-  'table-name' = 'test',
-  'username' = 'root',
-  'password' = '123456'
-);
--- 通过 Flink SQL 向 MySQL 的 test 表中插入数据
-insert into flink_test values(1, 'Jack', 22);
-insert into flink_test values(2, 'Tom', 23);`
-    } else if (codeName === 'python') {
-      v = `import os
+  const defaultCode = useMemo(() => codePlaceholder[codeName] || '', [codeName])
+  const { spaceId, regionId } = useParams([])
+  const jobId = curJob?.id
+  const socketRef = useRef(null)
+  const [resultType, setResultType] = useState(0)
+  const [socketId, setSocketId] = useState()
+  console.log(jobId, spaceId)
+  // `/v1/job/9584ee8e375937418cfbafdb3c23dd1a/ws`
+  //
 
-from pyflink.datastream import StreamExecutionEnvironment
-from pyflink.table import StreamTableEnvironment, EnvironmentSettings
-from enjoyment.cdn.cdn_udf import ip_to_province
-from enjoyment.cdn.cdn_connector_ddl import kafka_source_ddl, mysql_sink_ddl
+  const onListening = async (func) => {
+    const signature = await loadSignature({
+      region: regionId,
+      uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/ws`,
+      method: 'GET',
+    })
+    const endpoint = signature.endpoint
+      .replace('http:', 'ws:')
+      .replace('https:', 'wss:')
+    // const { headers } = signature
+    const url = `${endpoint}/v1/workspace/${spaceId}/stream/job/${jobId}/ws` // 'ws://localhost:3030'
+    let socket = socketRef.current
 
-# 创建Table Environment， 并选择使用的Planner
-env = StreamExecutionEnvironment.get_execution_environment()
-t_env = StreamTableEnvironment.create(
-    env,
-    environment_settings=EnvironmentSettings.new_instance().use_blink_planner().build())
-
-# 创建Kafka数据源表
-t_env.sql_update(kafka_source_ddl)
-# 创建MySql结果表
-t_env.sql_update(mysql_sink_ddl)`
-    } else if (codeName === 'scala') {
-      v = `object HelloWorld {
-def main(args: Array[String]): Unit = {
-    println("Hello, world!")
-  }
-}`
+    if (socket?.close) {
+      socket.close()
     }
-    return v
-  }, [codeName])
+    // []
+    // const opts = [
+    //   `Authorization: ${headers.Authorization}`,
+    //   `X-Date: ${headers['X-Date']}`,
+    // ]
+    // JSON.stringify(headers)
+    //   .slice(1, -1)
+    //   .split('","')
+    //   .map((r) => r.replaceAll('"', ''))
+    socket = await connectSocket(url, '', true)
+
+    socket.onOpen((currSocket) => {
+      setSocketId(currSocket.socketId)
+      socketRef.current = currSocket
+      currSocket.on('message', ({ type }) => {
+        if (type) {
+          setResultType(type)
+          setRunLoading(type < 2)
+        }
+      })
+      currSocket.on('close', () => {
+        socketRef.current = null
+      })
+      if (func) {
+        setTimeout(() => func(currSocket), 100)
+      }
+    })
+  }
+
+  useEffect(() => {
+    return () => {
+      if (socketRef.current?.close) {
+        socketRef.current.close()
+      }
+    }
+  }, [])
 
   const showWarn = () => {
     Notify.warning({
@@ -146,18 +179,45 @@ def main(args: Array[String]): Unit = {
     })
   }
 
+  const run = () => {
+    const send = (socket) => {
+      const code = trim(editorRef.current?.getValue())
+      socket.send({ code })
+      setResultType(999)
+    }
+
+    onListening(send)
+  }
+
   const handleRun = () => {
-    runMutation.mutate(
-      {},
-      {
-        onSuccess: () => {
-          setShowRunLog(true)
-        },
-        onError: () => {
-          setShowRunLog(true)
-        },
-      }
-    )
+    setRunLoading(true)
+    run()
+    // refetchJobAr()
+    // funcRef.current = run
+
+    // console.log(
+    //   '%c [ data ]-152',
+    //   'font-size:13px; background:pink; color:#bf2c9f;',
+    //   jobArgs
+    // )
+
+    // if (!socketRef.current || !socketRef.current.alive) {
+    //   await
+    // } else {
+    //   send(socketRef.current)
+    // }
+
+    // runMutation.mutate(
+    //   {},
+    //   {
+    //     onSuccess: () => {
+    //       setShowRunLog(true)
+    //     },
+    //     onError: () => {
+    //       setShowRunLog(true)
+    //     },
+    //   }
+    // )
   }
 
   const mutateCodeData = (
@@ -251,7 +311,7 @@ def main(args: Array[String]): Unit = {
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': theme('colors.neut.18'),
+        'editor.background': theme('colors.neut.17'),
       },
     })
     let mod: any = null
@@ -383,16 +443,10 @@ def main(args: Array[String]): Unit = {
               <Icon name="remark" type="light" />
               语法检查
             </Button>
-            {false && (
-              <Button
-                type="black"
-                onClick={handleRun}
-                loading={runMutation.isLoading}
-              >
-                <Icon name="triangle-right" type="light" />
-                运行
-              </Button>
-            )}
+            <Button type="black" onClick={handleRun} loading={runLoading}>
+              <Icon name="triangle-right" type="light" />
+              运行
+            </Button>
             <Button
               onClick={() => mutateCodeData('codeSave')}
               loading={mutation.isLoading}
@@ -481,36 +535,16 @@ def main(args: Array[String]): Unit = {
           onCancel={() => toggleShow(false)}
         />
       )}
-      {showRunLog && boxDimensions.height && (
-        <Rnd
-          tw="z-[999] bg-neut-20 text-white border border-neut-15 rounded-t-sm"
-          bounds="parent"
-          minHeight={64}
-          default={{
-            width: '100%',
-            height: 384,
-            x: 0,
-            y: boxDimensions.height - 384,
-          }}
-          dragHandleClassName="runlog-toolbar"
-        >
-          <div tw="flex justify-between h-10 items-center border-b border-b-neut-15 px-3">
-            <div className="runlog-toolbar" tw="flex-1 cursor-move">
-              运行日志
-            </div>
-            <div>
-              <Center
-                tw="select-text cursor-pointer"
-                onClick={() => setShowRunLog(false)}
-              >
-                <Icon name="close" type="light" />
-                关闭面板
-              </Center>
-            </div>
-          </div>
-          <div>xxxxx</div>
-        </Rnd>
+      {resultType > 0 && (
+        <Result
+          width={boxDimensions.width}
+          height={boxDimensions.height}
+          socketId={socketId}
+          loading={runLoading}
+          onClose={setResultType}
+        />
       )}
+
       {showSaveJobConfirm && (
         <Modal
           visible

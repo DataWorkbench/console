@@ -87,7 +87,7 @@ export const AffixLabel = ({
                 css={[
                   css`
                     svg {
-                      ${tw`text-white fill-[#939ea9] dark:text-[#000] dark:fill-[#939ea9]`}
+                      ${tw`text-white! fill-[#939ea9]! dark:text-[#000]! dark:fill-[#939ea9]!`}
                     }
                   `,
                 ]}

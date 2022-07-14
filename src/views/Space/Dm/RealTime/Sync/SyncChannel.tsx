@@ -180,7 +180,6 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
                 value={(channel.record_num as number) ?? undefined}
                 onChange={(v) => {
                   const num = +v
-                  console.log(num, v, isNAN(num))
                   if (!isNAN(num)) {
                     setChannel((draft) => {
                       draft.record_num = num

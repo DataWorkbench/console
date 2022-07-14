@@ -33,11 +33,86 @@ const SyncItem = styled('div')(({ selected = true }: { selected: boolean }) => [
   selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`,
 ])
 
+/**
+ * 二、全量、增量同步
+ * 1、 全量同步
+ *
+ * 支持 source： MySQL、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、HBase、HDFS、FTP、MongoDB、ElasticSearch
+ *
+ * 支持 sink：MySQL、TiDB、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、Hive、HBase、HDFS、FTP、MongoDB、Redis、ElasticSearch
+ *
+ * 2、增量同步
+ *
+ * 支持 source： MySQL、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、MongoDB
+ *
+ * 支持 sink：MySQL、TiDB、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、Hive、HBase、HDFS、FTP、MongoDB、Redis、ElasticSearch
+ */
 const sources = datasourceTypeObjs
-const filterfullSources: SourceType[] = []
-const filterIncrSources: SourceType[] = []
-const fullSources = sources.filter((s) => !filterfullSources.includes(s.type))
-const incrSources = sources.filter((s) => !filterIncrSources.includes(s.type))
+const filterfullSources: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.HBase,
+  SourceType.HDFS,
+  SourceType.Ftp,
+  SourceType.MongoDB,
+  SourceType.ElasticSearch,
+]
+const filterFullTargets: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.TiDB,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.Hive,
+  SourceType.HBase,
+  SourceType.HDFS,
+  SourceType.Ftp,
+  SourceType.MongoDB,
+  SourceType.Redis,
+  SourceType.ElasticSearch,
+  SourceType.Kafka,
+]
+
+const filterIncrSources: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.MongoDB,
+]
+
+const filterIncrTargets: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.TiDB,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.Hive,
+  SourceType.HBase,
+  SourceType.HDFS,
+  SourceType.Ftp,
+  SourceType.MongoDB,
+  SourceType.Redis,
+  SourceType.ElasticSearch,
+]
+const fullSources = sources.filter((s) => filterfullSources.includes(s.type))
+const fullTargets = sources.filter((s) => filterFullTargets.includes(s.type))
+const incrSources = sources.filter((s) => filterIncrSources.includes(s.type))
+const incrTargets = sources.filter((s) => filterIncrTargets.includes(s.type))
 
 const SyncTypeRadioGroup = forwardRef<
   React.ReactElement,
@@ -47,9 +122,9 @@ const SyncTypeRadioGroup = forwardRef<
     {
       value,
       fullSourceData = fullSources,
-      fullSinkData = sources,
+      fullSinkData = fullTargets,
       incrSourceData = incrSources,
-      incrSinkData = sources,
+      incrSinkData = incrTargets,
       onChange,
     },
     ref

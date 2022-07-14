@@ -3,6 +3,8 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from 'hooks'
 import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease/store'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
+import { useParams } from 'react-router-dom'
 import ScheSettingModal from '../Modal/ScheSettingModal'
 import ScheArgsModal from '../Modal/ScheArgsModal'
 import VersionsModal from '../Modal/VersionsModal'
@@ -23,6 +25,9 @@ const StreamRightMenu = observer(() => {
     workFlowStore: { curJob, showScheSetting, showArgsSetting },
   } = useStore()
   const drStore = useDataReleaseStore()
+  const alertStore = useAlertStore()
+  const { spaceId, regionId } =
+    useParams<{ regionId: string; spaceId: string }>()
   return (
     <>
       <MenuRoot>
@@ -43,6 +48,22 @@ const StreamRightMenu = observer(() => {
           }
         >
           历 史 版 本
+        </span>
+        <span
+          onClick={() => {
+            alertStore.set({
+              showMonitor: true,
+              jobDetail: {
+                jobId: curJob?.id,
+                jobName: curJob?.name,
+                spaceId,
+                regionId,
+                jobType: curJob?.jobMode! === 'RT' ? 1 : 2,
+              },
+            })
+          }}
+        >
+          告 警 策 略
         </span>
         {/* <span tw="cursor-not-allowed! hover:text-neut-5!">历 史 版 本</span> */}
       </MenuRoot>
