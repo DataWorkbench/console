@@ -200,7 +200,7 @@ const HdfsSource = forwardRef(
               <div css={styles.line} />
             </FlexBox>
             <TextField
-              label={<AffixLabel required>文件正则</AffixLabel>}
+              label={<AffixLabel>文件正则</AffixLabel>}
               name="reg"
               value={dbInfo?.filterRegex}
               onChange={(e) => {
@@ -210,13 +210,13 @@ const HdfsSource = forwardRef(
               }}
               placeholder="请填写文件正则表达，读取匹配到的文件列表"
               validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请填写文件正则表达，读取匹配到的文件列表',
-                  status: 'error',
-                },
-              ]}
+              // schemas={[
+              //   {
+              //     rule: { required: true },
+              //     help: '请填写文件正则表达，读取匹配到的文件列表',
+              //     status: 'error',
+              //   },
+              // ]}
             />
           </>
         )}
