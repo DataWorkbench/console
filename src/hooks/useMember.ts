@@ -10,6 +10,7 @@ import {
   loadRolePermissionList,
   updateMember,
 } from 'stores/api'
+import { getListAvailableUsers, getListNotifications } from 'stores/api/member'
 import { getNextPageParam } from './apiHooks'
 
 interface IRouteParams {
@@ -105,6 +106,88 @@ export const useQueryInfiniteMember = (
     {
       ...config,
       getNextPageParam,
+    }
+  )
+}
+
+let allUsersKey: any = null
+
+export const useQueryListAvailableUsers = (filter: Record<string, any>) => {
+  const rest = omit(filter, 'offset')
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const params = {
+    regionId,
+    spaceId,
+    limit: 20,
+    offset: 0,
+    ...rest,
+  }
+  allUsersKey = ['ListAvailableUsers', params]
+
+  return useInfiniteQuery(
+    allUsersKey,
+    async ({ pageParam = params }) => {
+      return getListAvailableUsers(pageParam)
+    },
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        if (lastPage.has_more) {
+          const nextOffset = allPages.reduce(
+            (acc, cur) => acc + cur.infos.length,
+            0
+          )
+          if (nextOffset < lastPage.total) {
+            const nextFilter = {
+              ...params,
+              offset: nextOffset,
+            }
+
+            return nextFilter
+          }
+        }
+        return undefined
+      },
+    }
+  )
+}
+
+export const useQueryListNotifications = (filter: Record<string, any>) => {
+  const rest = omit(filter, 'offset')
+  const { regionId, spaceId } =
+    useParams<{ regionId: string; spaceId: string }>()
+  const params = {
+    regionId,
+    spaceId,
+    limit: 20,
+    offset: 0,
+    ...rest,
+  }
+  allUsersKey = ['ListAvailableUsers', params]
+
+  return useInfiniteQuery(
+    allUsersKey,
+    async ({ pageParam = params }) => {
+      return getListNotifications(pageParam)
+    },
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        if (lastPage.has_more) {
+          const nextOffset = allPages.reduce(
+            (acc, cur) => acc + cur.infos.length,
+            0
+          )
+          if (nextOffset < lastPage.total) {
+            const nextFilter = {
+              ...params,
+              offset: nextOffset,
+            }
+
+            return nextFilter
+          }
+        }
+        return undefined
+      },
     }
   )
 }

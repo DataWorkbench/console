@@ -77,12 +77,14 @@ let resourcePageKey: any = ''
 export const getResourcePageQueryKey = () => resourcePageKey
 
 export const useQueryResourceByPage = (filter: any) => {
+  const types = filter.type ? [filter.type] : undefined
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
     spaceId,
     limit: 10,
     offset: 0,
+    types,
     ...filter,
   }
   resourcePageKey = ['resourcePageList', params]

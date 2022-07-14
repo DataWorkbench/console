@@ -91,7 +91,14 @@ interface IFormFields {
 }
 
 const UploadModal = (props: any) => {
-  const { visible, operation, handleCancel, handleSuccess, initFields } = props
+  const {
+    visible,
+    operation,
+    handleCancel,
+    handleSuccess,
+    initFields,
+    size: sizeConf,
+  } = props
 
   const [fields, setFields] = useImmer<IFormFields>({
     id: undefined,
@@ -156,11 +163,11 @@ const UploadModal = (props: any) => {
       Message.error('文件大小为0')
       return
     }
-    if (size > 100 * 1024 * 1024) {
+    if (size > sizeConf) {
       setFileTip('size')
       return
     }
-    if (!/.jar$/.test(name)) {
+    if (!/.(jar|py|zip)$/.test(name)) {
       setFileTip('type')
       return
     }
@@ -317,7 +324,7 @@ const UploadModal = (props: any) => {
                   onClick={handleFile}
                 >
                   <input
-                    accept=".jar"
+                    accept=".jar,.py,.zip"
                     name="file"
                     type="file"
                     multiple={false}
@@ -330,7 +337,17 @@ const UploadModal = (props: any) => {
                 </Button>
               ) : (
                 <>
-                  <Icon className="is-left" name="jar" />
+                  <Icon
+                    className="is-left"
+                    name={
+                      // eslint-disable-next-line no-nested-ternary
+                      fields.file.name.includes('.jar')
+                        ? 'q-jar-duotone'
+                        : fields.file.name.includes('.py')
+                        ? 'q-python-duotone'
+                        : 'q-zip-duotone'
+                    }
+                  />
                   &nbsp;
                   <InputWapper />
                   <div tw="absolute left-8 top-1/2 -translate-y-1/2">
@@ -380,7 +397,8 @@ const UploadModal = (props: any) => {
         {operation !== 'edit' && (
           <div tw="pb-3">
             <div tw="pl-28 ml-2 pt-1 text-neut-8">
-              仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
+              支持 JAR，PY，ZIP 格式文件、大小不超过{' '}
+              {Math.floor(sizeConf / (1024 * 1024))} MB、且仅支持单个上传
             </div>
             {fileTip && (
               <div tw="text-red-10 ml-2 pl-28 align-middle mt-1">
@@ -424,9 +442,10 @@ const UploadModal = (props: any) => {
             },
             {
               rule: {
-                matchRegex: /^(?!_)(?!.*?(_.jar)$)[a-zA-Z0-9_]+((\.jar)$)/,
+                matchRegex:
+                  /(^(?!_)(?!.*?(_.jar)$)[a-zA-Z0-9_]+((\.jar)$))|(^(?!_)(?!.*?(_.py)$)[a-zA-Z0-9_]+((\.py)$))|(^(?!_)(?!.*?(_.zip)$)[a-zA-Z0-9_]+((\.zip)$))/,
               },
-              help: '只允许数字、字母或下划线(_) 且以(.jar)结尾 不能以(_)开头',
+              help: '只允许数字、字母或下划线(_) 且以(.jar 或 .py 或 .zip)结尾 不能以(_)开头',
               status: 'error',
             },
           ]}

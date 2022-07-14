@@ -15,8 +15,38 @@ export default {
     listIaaSRouters: ['GET', '/v1/proxy/iaas/routers'],
   },
 
+  serviceGateway: {
+    bindAuthKey: [
+      'POST',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/bind',
+    ],
+
+    createAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth'],
+
+    deleteAuthKey: [
+      'DELETE',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
+    ],
+
+    listApiServices: ['GET', '/v1/workspace/{space_id}/gateway/service'],
+
+    listAuthKeys: ['GET', '/v1/workspace/{space_id}/gateway/auth'],
+
+    listRoutes: ['GET', '/v1/workspace/{space_id}/gateway/route'],
+
+    unbindAuthKey: [
+      'POST',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/unbind',
+    ],
+
+    updateAuthKey: [
+      'PUT',
+      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
+    ],
+  },
+
   dataServiceManage: {
-    listApiGroups: ['GET', '/v1/workspace/{space_id}/dataservice/group'],
+    listApiConfigs: ['GET', '/v1/workspace/{space_id}/dataservice/config'],
 
     abolishDataServiceApis: [
       'POST',
@@ -52,11 +82,6 @@ export default {
 
     describeDataServiceApiVersion: [
       'GET',
-      '/v1/workspace/{space_id}/dataservice/cluster/{ver_id}',
-    ],
-
-    describeDataServiceApiVersion: [
-      'GET',
       '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}',
     ],
 
@@ -65,28 +90,28 @@ export default {
       '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}',
     ],
 
-    listApiConfigs: ['GET', '/v1/workspace/{space_id}/dataservice/config'],
+    describeServiceDataSourceKinds: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/kinds',
+    ],
 
     createApiConfig: ['POST', '/v1/workspace/{space_id}/dataservice/config'],
 
-    listDataServiceApiVersions: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/release/list/{api_id}',
-    ],
+    listApiGroups: ['GET', '/v1/workspace/{space_id}/dataservice/group'],
 
     listDataServiceApiVersions: [
       'GET',
       '/v1/workspace/{space_id}/dataservice/version/{api_id}',
     ],
 
-    listDataServiceApis: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/group/{group_id}',
-    ],
-
     listDataServiceClusters: [
       'GET',
       '/v1/workspace/{space_id}/dataservice/cluster',
+    ],
+
+    listPublishedApiVersionsByClusterId: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/release/{cluster_id}',
     ],
 
     publishDataServiceApi: [
@@ -96,17 +121,17 @@ export default {
 
     republishDataServiceApi: [
       'POST',
-      '/v1/workspace/{space_id}/dataservice/release/{ver_id}',
-    ],
-
-    republishDataServiceApi: [
-      'POST',
       '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}/reopen',
     ],
 
-    testDataServiceApi: [
+    startDataServiceClusters: [
       'POST',
-      '/v1/workspace/{space_id}/dataservice/test/{api_id}',
+      '/v1/workspace/{space_id}/dataservice/cluster/starts',
+    ],
+
+    stopDataServiceClusters: [
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/cluster/stops',
     ],
 
     testDataServiceApi: [
@@ -125,49 +150,10 @@ export default {
     ],
   },
 
-  serviceGateway: {
-    listAuthKeys: ['POST', '/v1/workspace/{space_id}/gateway/auth/list'],
-
-    bindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/bind'],
-
-    createAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/create'],
-
-    createAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth'],
-
-    deleteAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/delete'],
-
-    deleteAuthKey: [
-      'DELETE',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
-    ],
-
-    listApiServices: ['POST', '/v1/workspace/{space_id}/gateway/service/list'],
-
-    listApiServices: ['GET', '/v1/workspace/{space_id}/gateway/service'],
-
-    bindAuthKey: [
-      'POST',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/bind',
-    ],
-
-    listAuthKeys: ['GET', '/v1/workspace/{space_id}/gateway/auth'],
-
-    listRoutes: ['POST', '/v1/workspace/{space_id}/gateway/route/list'],
-
-    listRoutes: ['GET', '/v1/workspace/{space_id}/gateway/route'],
-
-    unbindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/unbind'],
-
-    unbindAuthKey: [
-      'POST',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/unbind',
-    ],
-
-    updateAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/update'],
-
-    updateAuthKey: [
-      'PUT',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
+  observable: {
+    describeWorkspaceOverview: [
+      'GET',
+      '/v1/workspace/{space_id}/op/observable/overview',
     ],
   },
 
@@ -445,9 +431,9 @@ export default {
   },
 
   alertManage: {
-    jobBoundAlertPolicies: [
+    jobUnboundAlertPolicies: [
       'POST',
-      '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/bound',
+      '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/unbound',
     ],
 
     alertPolicyBoundJobs: [
@@ -464,15 +450,17 @@ export default {
       '/v1/workspace/{space_id}/op/alert/{alert_id}',
     ],
 
+    jobBoundAlertPolicies: [
+      'POST',
+      '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/bound',
+    ],
+
     alertPolicyUnboundJobs: [
       'POST',
       '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/unbound',
     ],
 
-    jobUnboundAlertPolicies: [
-      'POST',
-      '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/unbound',
-    ],
+    listAlertLogs: ['GET', '/v1/workspace/{space_id}/op/alert/logs'],
 
     listAlertPolicies: ['GET', '/v1/workspace/{space_id}/op/alert'],
 
@@ -512,6 +500,8 @@ export default {
 
     describeWorkspace: ['GET', '/v1/workspace/{space_id}'],
 
+    describeWorkspaceConfig: ['GET', '/v1/workspace/{space_id}/config'],
+
     createWorkspace: ['POST', '/v1/workspace'],
 
     disableWorkspaces: ['POST', '/v1/workspace/disables'],
@@ -538,6 +528,8 @@ export default {
       'GET',
       '/v1/workspace/{space_id}/member/{user_id}/quota',
     ],
+
+    listAvailableUsers: ['GET', '/v1/workspace/{space_id}/member/users'],
 
     listMembers: ['GET', '/v1/workspace/{space_id}/member'],
 
@@ -645,6 +637,11 @@ export default {
     ],
 
     listFlinkClusters: ['GET', '/v1/workspace/{space_id}/cluster/flink'],
+
+    restartFlinkClusters: [
+      'POST',
+      '/v1/workspace/{space_id}/cluster/flink/restarts',
+    ],
 
     startFlinkClusters: [
       'POST',

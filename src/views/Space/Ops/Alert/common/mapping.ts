@@ -1,30 +1,39 @@
 export type Mapping<T> = Map<T, { label: string; apiField: string }>
 
+// const historyFiledMapping = {
+//   '告警策略 ID': 'alert_id',
+//   '作业 ID': 'job_id',
+//   '实例 ID': 'instance_id',
+//   '告警作业类型': 'monitor_object',
+//   '告警类型': 'event_type',
+//   '告警时间': 'updated',
+// }
 export const historyFiledMapping: Mapping<
-  'alert_content' | 'alert_instance_id' | 'alert_time'
-> = new Map([
-  ['alert_content', { label: '告警内容', apiField: 'alert_content' }],
-  [
-    'alert_instance_id',
-    {
-      label: '告警实例 ID',
-      apiField: 'alert_instance_id',
-    },
-  ],
-  ['alert_time', { label: '告警时间', apiField: 'alert_time' }],
-])
+  | 'alert_id'
+  | 'job_id'
+  | 'instance_id'
+  | 'monitor_object'
+  | 'event_type'
+  | 'updated'
+> = new Map()
+  .set('alert_id', { label: '告警策略 ID', apiField: 'alert_id' })
+  .set('job_id', { label: '作业 ID', apiField: 'job_id' })
+  .set('instance_id', { label: '实例 ID', apiField: 'instance_id' })
+  .set('monitor_object', { label: '告警作业类型', apiField: 'monitor_object' })
+  .set('event_type', { label: '告警类型', apiField: 'event_type' })
+  .set('updated', { label: '告警时间', apiField: 'updated' })
 
 export const policyFieldMapping: Mapping<
-  'id' | 'monitor_object' | 'description' | 'last_update_time'
+  'id' | 'monitor_object' | 'desc' | 'updated'
 > = new Map([
   ['id', { label: '名称/ID', apiField: 'id' }],
   ['monitor_object', { label: '监控对象', apiField: 'monitor_object' }],
-  ['description', { label: '描述', apiField: 'description' }],
+  ['desc', { label: '描述', apiField: 'desc' }],
   [
-    'last_update_time',
+    'updated',
     {
       label: '最近更新时间',
-      apiField: 'last_update_time',
+      apiField: 'updated',
     },
   ],
 ])
@@ -39,6 +48,6 @@ export const jobFieldMapping: Mapping<
   'name' | 'ID' | 'description' | 'last_update_time'
 > = new Map()
   .set('name', { label: '作业/文件夹名称', apiField: 'name' })
-  .set('ID', { label: 'ID', apiField: 'ID' })
-  .set('description', { label: '描述', apiField: 'description' })
-  .set('last_update_time', { label: '更新时间', apiField: 'last_update_time' })
+  .set('ID', { label: 'ID', apiField: 'id' })
+  .set('description', { label: '描述', apiField: 'desc' })
+  .set('last_update_time', { label: '更新时间', apiField: 'updated' })

@@ -1,4 +1,4 @@
-import { get } from 'lodash-es'
+// import { get } from 'lodash-es'
 import request from './request'
 import customRequest from './customRequest'
 import emitter from './emitter'
@@ -6,7 +6,7 @@ import emitter from './emitter'
 export * from './convert'
 
 export const getHelpCenterLink = (path: string) => {
-  const prefix = get(window, 'GLOBAL_CONFIG.new_docs_url', '')
+  const prefix = ''
   return `${prefix}/bigdata/dataomnis${path}`
 }
 
@@ -36,5 +36,10 @@ const autoIncrementKey = new Proxy({} as Record<string, any>, {
     return target[p]
   },
 })
+
+export function check(num: number) {
+  // eslint-disable-next-line no-bitwise
+  return num > 0 && (num & (num - 1)) === 0
+}
 
 export { request, customRequest, emitter, autoIncrementKey }

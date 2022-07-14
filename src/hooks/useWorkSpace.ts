@@ -15,11 +15,13 @@ import {
   DescribePlatformConfigRequestType,
   DescribeNetworkConfigRequestType,
   ListNotificationsRequestType,
+  DescribeWorkspaceConfigRequestType,
 } from '../types/request'
 import {
   PlatformManageDescribePlatformConfigType,
   SpaceManageDescribeNetworkConfigType,
   NotifierManageListNotificationsType,
+  SpaceManageDescribeWorkspaceConfigType,
 } from '../types/response'
 
 const keys: {
@@ -132,3 +134,12 @@ export const useQueryListNotifications = apiHooks<
 >('notifierManage', 'listNotifications')
 
 export const getQueryKeyListNotifications = () => queryKeyObj.listNotifications
+
+export const useQueryDescribeWorkspaceConfig = apiHooks<
+  'spaceManage',
+  DescribeWorkspaceConfigRequestType,
+  SpaceManageDescribeWorkspaceConfigType
+>('spaceManage', 'describeWorkspaceConfig')
+
+export const getQueryKeyDescribeWorkspaceConfig = () =>
+  queryKeyObj.describeWorkspaceConfig
