@@ -1,5 +1,5 @@
 import {
-  Divider,
+  FlexBox,
   HelpCenterLink,
   Modal,
   ModalContent,
@@ -24,7 +24,7 @@ import { useQueryClient } from 'react-query'
 import {
   getMemberKeys,
   useMutationMember,
-  useQueryInfiniteMember,
+  useQueryListAvailableUsers,
   useQueryRoleList,
 } from 'hooks'
 import { flatten, get, omit } from 'lodash-es'
@@ -71,6 +71,23 @@ const MemberModal = observer((props: IMemberModalProps) => {
     }
   )
 
+  const {
+    data: users,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+  } = useQueryListAvailableUsers({})
+
+  const userOptions = flatten(
+    users?.pages.map((page: Record<string, any>) => page.infos || [])
+  )
+
+  const loadData = () => {
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }
+
   const roleList = roleListProp ?? roles?.infos
   const mutation = useMutationMember()
   const queryClient = useQueryClient()
@@ -112,7 +129,8 @@ const MemberModal = observer((props: IMemberModalProps) => {
     }
   }
 
-  const [filter, setFilter] = useImmer({
+  const [show] = useState(true)
+  const [, setFilter] = useImmer({
     search: '',
   })
   const [search, setSearch] = useState('')
@@ -126,22 +144,6 @@ const MemberModal = observer((props: IMemberModalProps) => {
     300,
     [search]
   )
-
-  const {
-    status,
-    data: memberList,
-    fetchNextPage,
-    hasNextPage,
-  } = useQueryInfiniteMember(filter)
-  const options = flatten(
-    memberList?.pages?.map((page: Record<string, any>) => page.infos || [])
-  ).map((i) => ({ label: i.name, value: i.id }))
-
-  const loadData = () => {
-    if (hasNextPage) {
-      fetchNextPage()
-    }
-  }
 
   const footer = (
     <div>
@@ -190,6 +192,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
       )}
     </div>
   )
+
   return (
     <Modal
       title={op === 'create' ? '添加成员' : '修改成员'}
@@ -225,11 +228,13 @@ const MemberModal = observer((props: IMemberModalProps) => {
               placeholder="请选择或搜索账户名称、邮箱"
               multi
               searchable
-              options={options}
+              options={userOptions}
               closeOnSelect={false}
               openOnClick
-              isLoading={status === 'loading'}
+              isLoading={isFetching}
               isLoadingAtBottom
+              labelKey="name"
+              valueKey="user_id"
               onMenuScrollToBottom={loadData}
               onInputChange={setSearch}
               bottomTextVisible
@@ -280,28 +285,32 @@ const MemberModal = observer((props: IMemberModalProps) => {
               </span>
               <HelpCenterLink isIframe={false}>角色权限详情</HelpCenterLink>
             </div>
-            <Divider tw="mt-4 mb-4" />
-            <div tw="flex gap-3">
-              {(roleList || []).map((item: Record<string, any>) => {
-                const checked = value.system_role_ids.includes(item.id)
-                return (
-                  <Button
-                    key={item.id}
-                    css={checkboxButtonStyles.wrapper({
-                      checked,
-                    })}
-                    onClick={() => handleClickRole(item.id)}
-                  >
-                    <Icon
-                      name={
-                        item.type === RoleType.SpaceAdmin ? 'admin' : 'human'
-                      }
-                    />
-                    {item.name}
-                  </Button>
-                )
-              })}
-            </div>
+            <FlexBox>
+              <div tw="my-4 flex-1 border-t border-neut-2 translate-y-1/2" />
+            </FlexBox>
+            {show && (
+              <div tw="flex gap-3">
+                {(roleList || []).map((item: Record<string, any>) => {
+                  const checked = value.system_role_ids.includes(item.id)
+                  return (
+                    <Button
+                      key={item.id}
+                      css={checkboxButtonStyles.wrapper({
+                        checked,
+                      })}
+                      onClick={() => handleClickRole(item.id)}
+                    >
+                      <Icon
+                        name={
+                          item.type === RoleType.SpaceAdmin ? 'admin' : 'human'
+                        }
+                      />
+                      {item.name}
+                    </Button>
+                  )
+                })}
+              </div>
+            )}
           </Field>
         </FormWrapper>
       </ModalContent>

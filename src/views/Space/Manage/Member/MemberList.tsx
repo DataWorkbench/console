@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Icon, localstorage, PageTab, Table } from '@QCFE/qingcloud-portal-ui'
+import { localstorage, PageTab, Table } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components/Box'
-import { Card, Center, TextEllipsis } from 'components'
+import { Card, InstanceName, TextEllipsis } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import MemberModal from 'views/Space/Manage/Member/MemberModal'
 import { observer } from 'mobx-react-lite'
@@ -35,21 +35,14 @@ const columns = [
     dataIndex: 'user_id',
     key: 'user_id',
     render: (text: string, record: Record<string, any>) => {
-      const { user_id: userId, user_name: userName } = record.user_info ?? {}
+      const { user_id: userId, name: userName } = record.user_info ?? {}
       return (
-        <FlexBox tw="items-center truncate space-x-2">
-          <Center tw="bg-[#E2E8F0] rounded-full w-6 h-6">
-            <Icon name="human" type="dark" size={16} />
-          </Center>
-          <div tw="flex-1 break-all truncate">
-            <div tw="truncate ">
-              <TextEllipsis>{userId ? userName : '用户不存在'}</TextEllipsis>
-            </div>
-            <div tw="truncate ">
-              <TextEllipsis>{userId}</TextEllipsis>
-            </div>
-          </div>
-        </FlexBox>
+        <InstanceName
+          theme="light"
+          name={userName}
+          desc={userId}
+          icon="human"
+        />
       )
     },
   },
@@ -93,14 +86,12 @@ interface IRouteParams {
 const Member = observer(
   ({
     modalView = false,
-    // spaceId: spaceIdFromProps,
+    spaceId,
     regionId: regionIdFromProps,
-    space: spaceFromProps,
   }: {
     modalView?: boolean
-    // spaceId?: string
+    spaceId?: string
     regionId?: string
-    space?: Record<string, any>
   }) => {
     const {
       op,
@@ -112,14 +103,13 @@ const Member = observer(
       activeKeys,
     } = useMemberStore()
 
-    const { workSpaceStore } = useStore()
+    const {
+      workSpaceStore: { space },
+    } = useStore()
 
-    const { regionId: regionIdFromParams, spaceId: spaceIdFromParams } =
-      useParams<IRouteParams>()
+    const { regionId: regionIdFromParams } = useParams<IRouteParams>()
 
-    const space: any = spaceFromProps ?? workSpaceStore.space
     const regionId = regionIdFromProps ?? regionIdFromParams
-    const spaceId = space?.id || spaceIdFromParams
 
     const isOwner =
       !!space?.owner && get(window, 'USER.user_id') === space?.owner
