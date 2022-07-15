@@ -1,54 +1,54 @@
-import { useEffect } from 'react'
+import { lazy, useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
 import { useDarkMode } from 'hooks'
 
 // describeDataOmnis
-// const DescribeDataOmnis = lazy(
-//   () =>
-//     import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
-// )
+const DescribeDataOmnis = lazy(
+  () =>
+    import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
+)
 
-// // activateDataOmnis
-// const ActivateDataOmnis = lazy(
-//   () =>
-//     import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
-// )
+// activateDataOmnis
+const ActivateDataOmnis = lazy(
+  () =>
+    import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
+)
 
-// // home
-// const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
+// home
+const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
 
-// const Overview = lazy(
-//   () => import(/* webpackChunkName: "home" */ 'views/Overview')
-// )
-// const WorkSpace = lazy(
-//   () => import(/* webpackChunkName: "home" */ 'views/WorkSpace')
-// )
+const Overview = lazy(
+  () => import(/* webpackChunkName: "home" */ 'views/Overview')
+)
+const WorkSpace = lazy(
+  () => import(/* webpackChunkName: "home" */ 'views/WorkSpace')
+)
 
-// // space
-// const SpaceLayout = lazy(
-//   () => import(/* webpackChunkName: "space" */ 'views/Layout/SpaceLayout')
-// )
-// const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
-// const Manage = lazy(
-//   () => import(/* webpackChunkName: "space" */ 'views/Space/Manage')
-// )
-// const Ops = lazy(
-//   () => import(/* webpackChunkName: "space" */ 'views/Space/Ops')
-// )
-// const Upcloud = lazy(
-//   () => import(/* webpackChunkName: "space" */ 'views/Space/Upcloud')
-// )
-import DescribeDataOmnis from 'views/DataOmnis/DescribeDataOmnis'
-import ActivateDataOmnis from 'views/DataOmnis/ActivateDataOmnis'
-import { Layout } from 'views/Layout'
-import Overview from 'views/Overview'
-import WorkSpace from 'views/WorkSpace'
-import { SpaceLayout } from 'views/Layout/SpaceLayout'
-import Dm from 'views/space/Dm'
-import Manage from 'views/space/Manage'
-import Ops from 'views/space/Ops'
-import Upcloud from 'views/space/Upcloud'
+// space
+const SpaceLayout = lazy(
+  () => import(/* webpackChunkName: "space" */ 'views/Layout/SpaceLayout')
+)
+const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
+const Manage = lazy(
+  () => import(/* webpackChunkName: "space" */ 'views/Space/Manage')
+)
+const Ops = lazy(
+  () => import(/* webpackChunkName: "space" */ 'views/Space/Ops')
+)
+const Upcloud = lazy(
+  () => import(/* webpackChunkName: "space" */ 'views/Space/Upcloud')
+)
+// import DescribeDataOmnis from 'views/DataOmnis/DescribeDataOmnis'
+// import ActivateDataOmnis from 'views/DataOmnis/ActivateDataOmnis'
+// import { Layout } from 'views/Layout'
+// import Overview from 'views/Overview'
+// import WorkSpace from 'views/WorkSpace'
+// import { SpaceLayout } from 'views/Layout/SpaceLayout'
+// import Dm from 'views/Space/Dm'
+// import Manage from 'views/Space/Manage'
+// import Ops from 'views/Space/Ops'
+// import Upcloud from 'views/Space/Upcloud'
 
 const Routes = () => {
   const { globalStore } = useStore()

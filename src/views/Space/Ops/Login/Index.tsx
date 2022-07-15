@@ -19,20 +19,6 @@ const Index = () => {
         console.log('in')
       },
     })
-    // console.log(formRef)
-    // if (formRef.current.validateForm()) {
-    // const { remember, username, password } = data
-    // if (data.remember) {
-    //   setCookie('remember.user', username)
-    //   setCookie('remember.auth', encrypt(password))
-    //   setCookie('remember', remember)
-    // } else {
-    //   setCookie('remember.user', null)
-    //   setCookie('remember.auth', null)
-    //   setCookie('remember', false)
-    // }
-    // onSubmit(data)
-    // }
   }
   const handleInputChange = (value: string | number) => {
     setUsername(String(value))

@@ -1,11 +1,9 @@
 import { css } from 'twin.macro'
 import { Card, CardContent, Icons } from 'components'
-// import { useState } from 'react'
-import { useMount } from 'react-use'
-
 import * as echarts from 'echarts/core'
 import { PieChart } from 'echarts/charts'
 import { LegendComponent } from 'echarts/components'
+import { useEffect } from 'react'
 
 echarts.use([PieChart, LegendComponent])
 interface Props {
@@ -16,9 +14,7 @@ interface Props {
   statusData: { value: number; name: string }[]
 }
 export const Release = ({ iconName, name, amount, id, statusData }: Props) => {
-  // const [chart, setChart] = useState(null)
-
-  useMount(() => {
+  useEffect(() => {
     const myChart = echarts.init(document.getElementById(id as any) as any)
     const option = {
       tooltip: {
@@ -46,7 +42,8 @@ export const Release = ({ iconName, name, amount, id, statusData }: Props) => {
         formatter(e: string) {
           const { data } = option.series[0]
           let tarValue: string = ''
-          for (let i: number = 0; i < data.length; i + 1) {
+          // eslint-disable-next-line no-plusplus
+          for (let i: number = 0; i < data.length; i++) {
             if (data[i].name === e) {
               tarValue = String(data[i].value)
             }
@@ -88,13 +85,7 @@ export const Release = ({ iconName, name, amount, id, statusData }: Props) => {
       ],
     }
     myChart.setOption(option)
-    // setChart(myChart)
   })
-  // useUnmount(() => {
-  //   if (chart) {
-  //     chart.dispose()
-  //   }
-  // })
   return (
     <Card
       tw="border border-[#4C5E70] border-solid rounded-[10px] w-[49%]"

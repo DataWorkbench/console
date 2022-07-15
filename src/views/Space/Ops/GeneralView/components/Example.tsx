@@ -5,12 +5,12 @@ import { TextTitle } from './TextTitle'
 
 interface Props {
   textTitle: string
-  statusData: { value: string; name: string; color: string }[]
+  statusData: { value: number; name: string; color: string }[]
   total: number
 }
 export const Example = ({ textTitle, statusData, total }: Props) => {
   const [tabIndex, setTabIndex] = useState('')
-  const toPercent = (point) => {
+  const toPercent = (point: any) => {
     let percent = Number((point / total) * 100).toFixed(1)
     percent += '%'
     return percent

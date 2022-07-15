@@ -1,8 +1,7 @@
-import { useMount } from 'react-use'
 import * as echarts from 'echarts/core'
 import { PieChart } from 'echarts/charts'
 import { LegendComponent } from 'echarts/components'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 echarts.use([PieChart, LegendComponent])
 interface Props {
@@ -14,7 +13,7 @@ interface Props {
 export const Pie = ({ id, title, amount, pieData }: Props) => {
   const [cuName, setCuName] = useState('')
   const [cuValue, setCuValue] = useState('')
-  useMount(() => {
+  useEffect(() => {
     const myChart = echarts.init(document.getElementById(id as any) as any)
     const option = {
       tooltip: {

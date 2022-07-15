@@ -1,4 +1,4 @@
-const { lazy, merge } = require('webpack-merge')
+const { merge } = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
@@ -178,6 +178,10 @@ let config = {
         target: apiUrl,
         changeOrigin: true,
       },
+      '/global_api': {
+        target: apiUrl,
+        changeOrigin: true,
+      },
     },
   },
   plugins: [
@@ -216,39 +220,39 @@ if (isDev) {
     ],
     optimization: {
       minimizer: [`...`, new CssMinimizerPlugin()],
-      // splitChunks: {
-      //   chunks: 'all',
-      //   minChunks: 1,
-      //   cacheGroups: {
-      //     vendors: {
-      //       chunks: 'initial',
-      //       name: 'vendor',
-      //       minChunks: 1,
-      //       priority: 3,
-      //       test: /[\\/]node_modules[\\/].*\.js$/,
-      //     },
-      //     'async-vendors': {
-      //       chunks: 'async',
-      //       minChunks: 1,
-      //       name: 'async-vendors',
-      //       priority: 2,
-      //       test: /[\\/]node_modules[\\/].*\.js$/,
-      //     },
-      //     'css-vendor': {
-      //       chunks: 'all',
-      //       test: /[\\/]node_modules[\\/].*\.css$/,
-      //       name: 'css-vendor',
-      //       minChunks: 1,
-      //       priority: 3,
-      //     },
-      //     default: {
-      //       name: 'common',
-      //       chunks: 'all',
-      //       minChunks: 2,
-      //       priority: 1,
-      //     },
-      //   },
-      // },
+      splitChunks: {
+        chunks: 'all',
+        minChunks: 1,
+        cacheGroups: {
+          vendors: {
+            chunks: 'initial',
+            name: 'vendor',
+            minChunks: 1,
+            priority: 3,
+            test: /[\\/]node_modules[\\/].*\.js$/,
+          },
+          'async-vendors': {
+            chunks: 'async',
+            minChunks: 1,
+            name: 'async-vendors',
+            priority: 2,
+            test: /[\\/]node_modules[\\/].*\.js$/,
+          },
+          'css-vendor': {
+            chunks: 'all',
+            test: /[\\/]node_modules[\\/].*\.css$/,
+            name: 'css-vendor',
+            minChunks: 1,
+            priority: 3,
+          },
+          default: {
+            name: 'common',
+            chunks: 'all',
+            minChunks: 2,
+            priority: 1,
+          },
+        },
+      },
     },
   })
 }
