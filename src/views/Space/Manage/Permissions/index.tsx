@@ -5,6 +5,7 @@ import { getHelpCenterLink } from 'utils'
 import { useQueryRoleList, useQueryRolePermissionList } from 'hooks'
 
 import { Card, Center } from 'components'
+import { useState } from 'react'
 import Permission from './Permission'
 
 const { FilterInput } = LTable as any
@@ -49,6 +50,8 @@ const PermissionList = () => {
   //   perm_type: undefined as unknown as number,
   // })
 
+  const [tags, setTags] = useState<any[]>([])
+
   return (
     <Root>
       <PageTab tabs={permissionTabs} />
@@ -66,12 +69,30 @@ const PermissionList = () => {
               }
             `}
           >
-            <FilterInput tw="w-[400px]" />
+            {/* <InputSearch */}
+            {/*   tw="w-[400px]" */}
+            {/*   onPressEnter={(e) => setSearch((e.target as any).value)} */}
+            {/*   onClear={() => setSearch('')} */}
+            {/* /> */}
+            <FilterInput
+              placeholder="请输入关键词进行搜索"
+              suggestions={(rolePermissionList?.infos ?? []).map((i) => ({
+                label: i.name,
+                key: i.id,
+              }))}
+              tags={tags}
+              onChange={setTags}
+            />
           </div>
           <Card tw="p-5">
             {getPermissionList(rolePermissionList?.infos || []).map(
               (item: Record<string, any>) => (
-                <Permission data={item} roles={roleList?.infos || []} />
+                <Permission
+                  data={item}
+                  roles={roleList?.infos || []}
+                  search={tags.find((i) => i.filter === item.id)?.value}
+                  key={item.id}
+                />
               )
             )}
           </Card>

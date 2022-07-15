@@ -52,7 +52,7 @@ const permissionStyle = {
 }
 
 const permissionTypes = [
-  { value: 0, label: '全部' },
+  { value: 0, text: '全部' },
   { value: 1, text: '读' },
   { value: 2, text: '写' },
 ]
@@ -60,16 +60,24 @@ const permissionTypes = [
 interface IPermissionProps {
   data: Record<string, any>
   roles: Record<string, any>[]
+  search?: string
 }
 
 const Permission = (props: IPermissionProps) => {
-  const { data: dataProp, roles } = props
+  const { data: dataProp, roles, search } = props
   const [filter, setFilter] = useState<number>(0)
 
-  const data = (dataProp?.api_lists ?? []).filter(
-    (item: Record<string, any>) =>
-      !filter || (filter && item.perm_type === filter)
-  )
+  const data = (dataProp?.api_lists ?? [])
+    .filter(
+      (item: Record<string, any>) =>
+        !filter || (filter && item.perm_type === filter)
+    )
+    .filter(
+      (i) =>
+        !search ||
+        (search &&
+          (i.display_name.includes(search) || i.api_name.includes(search)))
+    )
 
   const [hidden, setHidden] = useState<boolean>(false)
   const defaultColumns = [
