@@ -91,7 +91,15 @@ curJobConfSubject$
       }
       return [
         e.source?.column ?? [],
-        e.target?.column ?? e.target?.tableFields ?? [],
+        (e.target?.column ?? e.target?.tableFields ?? []).map((i) => {
+          if (!i.name && i.key) {
+            return {
+              ...i,
+              name: i.key,
+            }
+          }
+          return i
+        }),
       ]
     })
   )

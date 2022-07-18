@@ -129,7 +129,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
               />
             )}
             <TextField
-              label={<AffixLabel required>分隔符号</AffixLabel>}
+              label={<AffixLabel>分隔符号</AffixLabel>}
               name="keyDelimiter"
               value={dbInfo?.keyDelimiter}
               onChange={(v) => {
@@ -142,13 +142,13 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
                 '文档 ID 之间的分隔符号，eg:“${col1}_${col2}” 默认值是下划线。'
               }
               validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请输入分隔符号',
-                  status: 'error',
-                },
-              ]}
+              // schemas={[
+              //   {
+              //     rule: { required: true },
+              //     help: '请输入分隔符号',
+              //     status: 'error',
+              //   },
+              // ]}
             />
             <FlexBox>
               <div css={styles.line} />
@@ -167,7 +167,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
 
             {showAdvanced && (
               <NumberField
-                label={<AffixLabel required>批量大小</AffixLabel>}
+                label={<AffixLabel>批量大小</AffixLabel>}
                 name="batchSize"
                 value={dbInfo?.batchSize}
                 onChange={(v) => {
@@ -181,13 +181,13 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>(
                 help="1-65535"
                 placeholder="批量大小"
                 validateOnChange
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请设置批量大小',
-                    status: 'error',
-                  },
-                ]}
+                // schemas={[
+                //   {
+                //     rule: { required: true },
+                //     help: '请设置批量大小',
+                //     status: 'error',
+                //   },
+                // ]}
                 showButton={false}
               />
             )}
