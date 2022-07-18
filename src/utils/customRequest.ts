@@ -53,11 +53,16 @@ const customRequest = async (
 ) => {
   const { method = 'POST', url, headers, params } = data
   const { cancel, ...config } = options
+  const conf: AxiosRequestConfig = {}
+  if (method === 'GET') {
+    conf.params = params
+  }
   const axiosConfig: AxiosRequestConfig = {
     url,
     method,
     data: params,
     headers,
+    ...conf,
     ...config,
   }
   if (isFunction(cancel)) {

@@ -11,6 +11,7 @@ import {
 } from 'views/Space/Setting/Notify/common/constants'
 import { getName } from 'views/Space/Setting/Notify/common/mappings'
 import { useColumns } from '../../../../hooks/useHooks/useColumns'
+import { useMutationNotification } from '../../../../hooks/useGlobalAPI'
 
 interface INotifyStore {
   op: 'list' | 'update' | 'delete' | 'create'
@@ -36,6 +37,8 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
   const { op, selected = [] } = store
   const form = useRef<Form>(null)
 
+  const { mutateAsync } = useMutationNotification()
+
   const handleClose = () => {
     store.set({
       op: 'list',
@@ -44,7 +47,10 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
   }
   const handleSubmit = () => {
     if (form.current?.validateFields()) {
-      console.log(form.current?.getFieldsValue())
+      const value = form.current?.getFieldsValue()
+      mutateAsync({ op, ...value }).then(() => {
+        handleClose()
+      })
     }
   }
 
@@ -73,7 +79,7 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
         <Form css={formModalStyle} ref={form}>
           <TextField
             label="接收人"
-            name="receiver"
+            name="name"
             placeholder="请输入接收人姓名"
             defaultValue={selected[0]?.receiver}
             validataOnChange
@@ -108,7 +114,7 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
           />
           <TextAreaField
             label="备注"
-            name="remark"
+            name="description"
             defaultValue={selected[0]?.remark}
             validataOnChange
             placeholder="请输入消息接收人的备注内容"

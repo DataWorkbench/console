@@ -4,6 +4,7 @@ import { get } from 'lodash-es'
 import tw, { styled, css } from 'twin.macro'
 
 import { Center, Tooltip, HelpCenterLink, FlexBox } from 'components'
+import { useHistory, useParams } from 'react-router-dom'
 
 const menuList = [
   {
@@ -19,7 +20,7 @@ const menuList = [
   {
     label: '通知列表',
     icon: 'q-listViewFill',
-    key: 'notification',
+    key: 'notify',
   },
   {
     label: '账户安全',
@@ -38,8 +39,8 @@ const menuList = [
 ]
 
 // const platformAdminMenuKeys = new Set([''])
-// const issaKeys = new Set(Set['account', 'security', 'api', 'notification'])
-// const privateKeys = new Set(['account', 'api', 'notification'])
+const iaasKeys = new Set(['account', 'security', 'notify', 'divider', 'logout'])
+const privateKeys = new Set(['account', 'notify', 'divider', 'logout'])
 
 // let isPrivate = (process.env.IS_PRIVATE)
 
@@ -60,7 +61,7 @@ const IconBox = styled(Center)(() => {
   ]
 })
 
-const IconBoxWithTootip = styled(Center)(() => {
+const IconBoxWithTooltip = styled(Center)(() => {
   return [
     css`
       &{
@@ -106,13 +107,54 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   //   })
   // }
 
-  const handleMenu = (_: never, key: string) => {
-    console.log(111, key)
+  const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
+  const filter = isPrivate ? privateKeys : iaasKeys
+  const menus = menuList.filter((item) => filter.has(item.key))
+  const handleMenu2Iaas = (key: string) => {
+    switch (key) {
+      case 'account':
+        window.location.href = '/account/profile/basic/'
+        break
+      case 'notify':
+        window.location.href = '/notify/recipient'
+        break
+      case 'security':
+        window.location.href = '/account/security/center/'
+        break
+      default:
+        break
+    }
   }
 
+  const { spaceId, regionId } =
+    useParams<{ spaceId: string; regionId: string }>()
+
+  const history = useHistory()
+  const handleMenu2Page = (key: string) => {
+    switch (key) {
+      case 'notify':
+        history.push(`/${regionId}/workspace/${spaceId}/settings/notify`)
+        break
+      case 'account':
+        history.push(`/${regionId}/workspace/${spaceId}/settings/account`)
+        break
+      default:
+        break
+    }
+  }
+
+  const handleMenu = (_: never, key: string) => {
+    if (isPrivate) {
+      handleMenu2Page(key)
+    } else {
+      handleMenu2Iaas(key)
+    }
+  }
+
+  console.log(isPrivate, filter, menus)
   return (
     <Center>
-      <IconBoxWithTootip tw="mr-3">
+      <IconBoxWithTooltip tw="mr-3">
         {/* <IconBox size={28} tw="mr-2">
         <Icon
           name="bell"
@@ -152,7 +194,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
             </IconBox>
           </HelpCenterLink>
         </Tooltip>
-      </IconBoxWithTootip>
+      </IconBoxWithTooltip>
 
       <UserInfoWrapper>
         <Tooltip
@@ -160,7 +202,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
           trigger="click"
           content={
             <Menu onClick={handleMenu}>
-              {menuList.map((item) => {
+              {menus.map((item) => {
                 if (item.key === 'divider') {
                   return (
                     <li
@@ -194,7 +236,9 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
             </Center>
             <div>
               <div>租户管理员</div>
-              <div>{get(window, 'USER.user_name', '')}</div>
+              <div>
+                {get(window, isPrivate ? 'USER.name' : 'USER.user_name', '')}
+              </div>
             </div>
           </UserInfo>
         </Tooltip>

@@ -15,7 +15,7 @@ export const accountSettings = [
   },
   {
     label: '账户 ID:',
-    dataIndex: 'id',
+    dataIndex: 'user_id',
     disabled: true,
   },
   {
@@ -26,6 +26,6 @@ export const accountSettings = [
   {
     dataIndex: 'password',
     label: '密码:',
-    disabled: false,
+    disabled: true,
   },
 ]

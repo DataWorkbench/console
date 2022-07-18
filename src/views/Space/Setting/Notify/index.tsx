@@ -9,17 +9,15 @@ import useIcon from 'hooks/useHooks/useIcon'
 import { Card, Center, FlexBox } from 'components'
 import React from 'react'
 import { get } from 'lodash-es'
-import { useParams } from 'react-router-dom'
-import { useQueryClient } from 'react-query'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
-import { getQueryKeyListNotifications, useQueryListNotifications1 } from 'hooks'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { set } from 'mobx'
 import { PbmodelNotification } from 'types/types'
 import { columnsRender, notifyColumns, pageTabsData } from './common/constants'
 import icons from './common/icons'
 import ActionModals from './ActionModals'
+import { useListNotifications } from '../../../../hooks/useGlobalAPI'
 
 interface INotifyStore {
   op: 'list' | 'update' | 'delete' | 'create'
@@ -85,15 +83,10 @@ const Notify = observer(() => {
     { pagination: true }
   >({}, { pagination: true })
 
-  const { spaceId } = useParams<{ spaceId: string }>()
-  const { data, isFetching } = useQueryListNotifications1({
-    uri: { space_id: spaceId },
-    data: filter,
-  })
+  const { data, isFetching, refetch } = useListNotifications(filter)
 
-  const queryClient = useQueryClient()
   const refetchData = () => {
-    queryClient.invalidateQueries(getQueryKeyListNotifications())
+    refetch()
   }
 
   const infos = get(data, 'notification_lists', [])

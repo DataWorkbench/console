@@ -6,7 +6,9 @@ import { Modal } from 'components/Modal'
 
 import { AffixLabel } from 'components/AffixLabel'
 import tw, { css } from 'twin.macro'
+import { get, set } from 'lodash-es'
 import { accountSettings, pageTabsData } from './constants'
+import { useMutationUser } from '../../../../hooks/useGlobalAPI'
 
 const { TextField } = Form
 
@@ -44,17 +46,24 @@ const cardStyles = {
 }
 
 const Account = () => {
-  const userInfo: Record<string, any> = {
-    email: 'hello',
-  }
+  const userInfo: Record<string, any> = get(window, 'USER', {})
   const [visible, setVisible] = useState(false)
   const formRef = useRef<Form>(null)
+  const { mutateAsync } = useMutationUser()
   const handleEdit = () => {
     setVisible(true)
   }
   const handleOk = () => {
     if (formRef.current?.validateFields()) {
-      setVisible(false)
+      const { email } = formRef.current.getFieldsValue()
+      mutateAsync({
+        op: 'update',
+        userId: userInfo?.user_id,
+        email,
+      }).then(() => {
+        set(window, 'USER.email', email)
+        setVisible(false)
+      })
     }
   }
 
@@ -68,7 +77,11 @@ const Account = () => {
             <div title="text-font-placeholder" tw="ml-6">
               {item.label}
             </div>
-            <div tw="font-semibold">{userInfo[item.dataIndex]}</div>
+            <div tw="font-semibold">
+              {item.dataIndex === 'password'
+                ? '*******'
+                : userInfo[item.dataIndex]}
+            </div>
             {item.disabled ? (
               <div tw="text-font-placeholder cursor-not-allowed">不可编辑</div>
             ) : (
