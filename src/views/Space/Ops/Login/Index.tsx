@@ -1,23 +1,34 @@
 import { FlexBox } from 'components/Box'
 import { Form, Button } from '@QCFE/lego-ui'
 import { useState } from 'react'
-import { useMutationLogin } from 'hooks'
 import LoginBg from 'assets/LoginBg.png'
 import LoginGroup from 'assets/loginGroup.svg'
-
+import { useHistory } from 'react-router-dom'
+import { useCookie } from 'react-use'
 import { css } from 'twin.macro'
+import { omit } from 'lodash-es'
+import { useMutationUser } from '../../../../hooks/useGlobalAPI'
 import { InputField, PasswordField } from './components'
 
-const Index = () => {
+const Index = ({
+  onLogin,
+}: {
+  onLogin: (d: Record<string, any>, jump: boolean) => void
+}) => {
+  const history = useHistory()
+  const [, setSk] = useCookie('sk')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const mutation = useMutationLogin()
+  const { mutateAsync } = useMutationUser()
   const onFormSubmit = () => {
-    const data = { username, password }
-    mutation.mutate(data, {
-      onSuccess: () => {
-        console.log('in')
-      },
+    mutateAsync({
+      op: 'login',
+      password,
+      username,
+    }).then((e) => {
+      setSk(e.session_id)
+      onLogin(omit(e.user_set, 'password'), true)
+      history.push('/overview')
     })
   }
   const handleInputChange = (value: string | number) => {
