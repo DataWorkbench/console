@@ -4,6 +4,7 @@ import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { Center, Icons } from 'components'
 import { cloneDeep, findKey, get } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
+// eslint-disable-next-line import/no-cycle
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 export enum JobMode {

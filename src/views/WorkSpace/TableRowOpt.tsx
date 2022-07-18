@@ -3,16 +3,24 @@ import { useStore } from 'stores'
 import { Icon, Menu } from '@QCFE/lego-ui'
 import { useWorkSpaceContext } from 'contexts'
 import { Tooltip } from 'components'
+import { observer } from 'mobx-react-lite'
 import { OptButton } from './styled'
 
 const { MenuItem, SubMenu } = Menu as any
 
-const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
+function getSubName(funcName: string, subFuncList: Record<string, any>[]): string {
+  if (!Array.isArray(subFuncList) || subFuncList.length === 0) {
+    return funcName
+  }
+  return getSubName(subFuncList[0].name, subFuncList[0].subFuncList || subFuncList[0].items)
+}
+
+const TableRowOpt = observer(({ space, regionId }: { space: any; regionId: string }) => {
   const stateStore = useWorkSpaceContext()
   const {
     workSpaceStore: { funcList }
   } = useStore()
-  const handleClick = (e: React.SyntheticEvent, _key: any, value: string) => {
+  const handleClick = (e: React.SyntheticEvent, key, value: string) => {
     stateStore.set({ curSpaceOpt: value, optSpaces: [space] })
   }
   const disableStatus = space.status === 2
@@ -28,7 +36,7 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
               {disableStatus ? (
                 <div tw="px-3 py-2">该工作空间已被禁用，暂时无法操作其工作项</div>
               ) : (
-                <Menu mode="inline" defaultExpandKeys={['stream']}>
+                <Menu mode="inline" defaultExpandKeys={['stream', 'sync', 'alert']}>
                   {subFuncList.map((subFunc: any) => {
                     const subItems = subFunc.items || []
                     return subItems.length ? (
@@ -74,9 +82,10 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
           }
         >
           <Link
-            to={`/${regionId}/workspace/${space.id}/${
-              funcName === 'ops' ? 'ops/release' : funcName
-            }`}
+            to={`/${regionId}/workspace/${space.id}/${funcName}/${getSubName(
+              funcName,
+              subFuncList
+            )}`}
             onClick={(e) => {
               if (disableStatus) {
                 e.preventDefault()
@@ -122,6 +131,5 @@ const TableRowOpt = ({ space, regionId }: { space: any; regionId: string }) => {
       </Tooltip>
     </div>
   )
-}
-
+})
 export default TableRowOpt

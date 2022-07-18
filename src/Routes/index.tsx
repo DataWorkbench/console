@@ -34,12 +34,15 @@ const WorkSpace = lazy(() => import(/* webpackChunkName: "home" */ 'views/WorkSp
 // space
 const SpaceLayout = lazy(() => import(/* webpackChunkName: "space" */ 'views/Layout/SpaceLayout'))
 const Dm = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Dm'))
-
 const DataService = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/DataService'))
-
 const Manage = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Manage'))
+const Member = lazy(
+  () => import(/* webpackChunkName: "space" */ 'views/Space/Manage/Member') // 成员管理
+)
 const Ops = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Ops'))
 const Upcloud = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Upcloud'))
+
+const Setting = lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Setting'))
 
 const Routes = () => {
   const { globalStore } = useStore()
@@ -79,13 +82,14 @@ const Routes = () => {
           <Switch>
             <Route path="/:regionId/workspace/:spaceId/upcloud/:mod?" component={Upcloud} />
             <Route path="/:regionId/workspace/:spaceId/dm/:mod?" component={Dm} />
+            <Route path="/:regionId/workspace/:spaceId/ops/:mod?/:detail?" component={Ops} />
             <Route
               path="/:regionId/workspace/:spaceId/dts/:mod?/:detail?"
               component={DataService}
             />
-            <Route path="/:regionId/workspace/:spaceId/ops/:mod?/:detail?" component={Ops} />
-
             <Route path="/:regionId/workspace/:spaceId/manage/:mod?" component={Manage} />
+            <Route path="/:regionId/workspace/:spaceId/settings/:mod?" component={Setting} />
+            <Route path="/:regionId/workspace/:spaceId/member" component={Member} />
             <Route component={Upcloud} />
           </Switch>
         </SpaceLayout>

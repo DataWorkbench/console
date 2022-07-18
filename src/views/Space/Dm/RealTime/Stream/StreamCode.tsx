@@ -17,9 +17,7 @@ import {
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
   useQueryStreamJobCode,
-  // useQueryStreamJobArgs,
   useMutationStreamJobCodeSyntax,
-  // useMutationStreamJobCodeRun,
   getFlowKey,
   useStore
 } from 'hooks'
@@ -65,21 +63,6 @@ const StreamCode = observer(({ tp }: IProp) => {
     workFlowStore: { curJob, curVersion, showSaveJobConfirm }
   } = useStore()
   const readOnly = !!curVersion
-  // const funcRef = useRef()
-  // const { data: jobArgs, refetch: refetchJobAr } = useQueryStreamJobArgs({
-  //   onSuccess: (data) => {
-  //     console.log(
-  //       '%c [ data ]-77',
-  //       'font-size:13px; background:pink; color:#bf2c9f;',
-  //       data
-  //     )
-  //     if (funcRef.current) {
-  //       funcRef.current()
-  //       funcRef.current = null
-  //     }
-  //   },
-  // })
-
   const [nextLocation, setNextLocation] = useState(null)
   const [shouldNav, setShouldNav] = useState(false)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
@@ -89,12 +72,10 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [show, toggleShow] = useState(false)
   const [, setEnableRelease] = useState(false)
   const [showScheModal, toggleScheModal] = useState(false)
-  // const [showScheSettingModal, setShowScheSettingModal] = useState(false)
   const editorRef = useRef<any>(null)
   const mutation = useMutationStreamJobCode()
   const syntaxMutation = useMutationStreamJobCodeSyntax()
   const releaseMutation = useMutationReleaseStreamJob()
-  // const runMutation = useMutationStreamJobCodeRun()
   const { data, isFetching } = useQueryStreamJobCode()
   const { data: scheData } = useQueryStreamJobSchedule()
   const codeName = CODETYPE[tp]
@@ -107,31 +88,35 @@ const StreamCode = observer(({ tp }: IProp) => {
   const socketRef = useRef(null)
   const [resultType, setResultType] = useState(0)
   const [socketId, setSocketId] = useState()
+  console.log(jobId, spaceId)
+  const [socketUrl, setSocketUrl] = useState()
+  const [btnDisabled, setDisabled] = useState(false)
+
+  useEffect(() => {
+    setDisabled(true)
+    const getEndpoint = async () => {
+      const signature = await loadSignature({
+        region: regionId,
+        uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/ws`,
+        method: 'GET'
+      })
+      const endpoint = signature.endpoint.replace('http:', 'ws:').replace('https:', 'wss:')
+      const url = `${endpoint}/v1/workspace/${spaceId}/stream/job/${jobId}/ws` // 'ws://localhost:3030'
+      setSocketUrl(url)
+      setDisabled(false)
+      return endpoint
+    }
+    getEndpoint()
+  }, [regionId, spaceId, jobId])
 
   const onListening = async (func) => {
-    const signature = await loadSignature({
-      region: regionId,
-      uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/ws`,
-      method: 'GET'
-    })
-    const endpoint = signature.endpoint.replace('http:', 'ws:').replace('https:', 'wss:')
-    // const { headers } = signature
-    const url = `${endpoint}/v1/workspace/${spaceId}/stream/job/${jobId}/ws` // 'ws://localhost:3030'
-    let socket: any = socketRef.current
+    let socket = socketRef.current
 
     if (socket?.close) {
       socket.close()
     }
-    // []
-    // const opts = [
-    //   `Authorization: ${headers.Authorization}`,
-    //   `X-Date: ${headers['X-Date']}`,
-    // ]
-    // JSON.stringify(headers)
-    //   .slice(1, -1)
-    //   .split('","')
-    //   .map((r) => r.replaceAll('"', ''))
-    socket = await connectSocket(url, '', true)
+
+    socket = await connectSocket(socketUrl, '', true)
 
     socket.onOpen((currSocket) => {
       setSocketId(currSocket.socketId)
@@ -143,6 +128,12 @@ const StreamCode = observer(({ tp }: IProp) => {
         }
       })
       currSocket.on('close', () => {
+        setRunLoading(false)
+        socketRef.current = null
+      })
+
+      currSocket.on('error', () => {
+        setRunLoading(false)
         socketRef.current = null
       })
       if (func) {
@@ -181,32 +172,6 @@ const StreamCode = observer(({ tp }: IProp) => {
   const handleRun = () => {
     setRunLoading(true)
     run()
-    // refetchJobAr()
-    // funcRef.current = run
-
-    // console.log(
-    //   '%c [ data ]-152',
-    //   'font-size:13px; background:pink; color:#bf2c9f;',
-    //   jobArgs
-    // )
-
-    // if (!socketRef.current || !socketRef.current.alive) {
-    //   await
-    // } else {
-    //   send(socketRef.current)
-    // }
-
-    // runMutation.mutate(
-    //   {},
-    //   {
-    //     onSuccess: () => {
-    //       setShowRunLog(true)
-    //     },
-    //     onError: () => {
-    //       setShowRunLog(true)
-    //     },
-    //   }
-    // )
   }
 
   const mutateCodeData = (op: 'codeSave' | 'codeSyntax', cb?: () => void, hideNotify = false) => {
@@ -416,18 +381,22 @@ const StreamCode = observer(({ tp }: IProp) => {
               </Button> */}
             <Button
               type="black"
-              disabled={tp !== 2}
+              disabled={tp !== 2 || btnDisabled}
               onClick={() => mutateCodeData('codeSyntax')}
               loading={syntaxMutation.isLoading}
             >
               <Icon name="remark" type="light" />
               语法检查
             </Button>
-            <Button type="black" onClick={handleRun} loading={runLoading}>
+            <Button disabled={btnDisabled} type="black" onClick={handleRun} loading={runLoading}>
               <Icon name="triangle-right" type="light" />
               运行
             </Button>
-            <Button onClick={() => mutateCodeData('codeSave')} loading={mutation.isLoading}>
+            <Button
+              disabled={btnDisabled}
+              onClick={() => mutateCodeData('codeSave')}
+              loading={mutation.isLoading}
+            >
               <Icon name="data" />
               保存
             </Button>

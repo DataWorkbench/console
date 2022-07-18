@@ -1,6 +1,6 @@
-import { useParams, useLocation, useHistory } from 'react-router-dom'
+import { useHistory, useLocation, useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
-import { flatten } from 'lodash-es'
+import { flatten, pick } from 'lodash-es'
 import { getShortSpaceName } from 'utils/convert'
 import { useStore } from 'stores'
 import { Center } from 'components'
@@ -9,10 +9,12 @@ import { useQueryWorkSpace } from 'hooks'
 import { css } from 'twin.macro'
 import { useEffect, useReducer } from 'react'
 import emitter from 'utils/emitter'
+import useIcon from 'hooks/useHooks/useIcon'
 import { Settings } from './Settings'
 import { Navs } from './Navs'
 import { BackMenu } from './BackMenu'
 import { Root, SelectWrapper } from './styled'
+import icons from './icons'
 
 const colorVars = {
   backColors: ['#D9F4F1', '#FDEFD8', '#F1E4FE', '#E0EBFE', '#FEE9DA'],
@@ -20,11 +22,14 @@ const colorVars = {
 }
 
 export const Header = observer(() => {
+  useIcon(icons)
   const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const { pathname } = useLocation()
   const history = useHistory()
   const {
-    globalStore: { darkMode }
+    globalStore: { darkMode },
+    workSpaceStore: { set, showHeaderNav },
+    workSpaceStore
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
@@ -55,6 +60,15 @@ export const Header = observer(() => {
     fetchNextPage()
   }
 
+  useEffect(() => {
+    if (space && space.id !== workSpaceStore?.space?.id) {
+      set({
+        space: { ...pick(space, ['id', 'name', 'owner']), regionId },
+        spaceIndex
+      })
+    }
+  }, [regionId, set, space, spaceIndex, workSpaceStore?.space?.id])
+
   return (
     <Root tw="z-[100]">
       <Center tw="space-x-3">
@@ -83,12 +97,20 @@ export const Header = observer(() => {
             label: name
           }))}
           onChange={(v) => {
+            const space1 = workspaces?.find(({ id }) => id === v)
+            const spaceIndex1: number = workspaces?.findIndex(({ id }) => id === v)
+
+            set({
+              space: { ...pick(space1, ['id', 'name', 'owner']), regionId },
+              spaceIndex: spaceIndex1
+            })
+
             // history.push(pathname.replace(/(?<=workspace\/)[^/]*/, String(v)))
             history.push(pathname.replace(/\/workspace\/[^/]*/, `/workspace/${v}`))
           }}
         />
       </Center>
-      <Navs mod={mod} />
+      {showHeaderNav && <Navs mod={mod} />}
       <Settings darkMode={darkMode} />
     </Root>
   )

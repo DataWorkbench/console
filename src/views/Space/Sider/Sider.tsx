@@ -66,7 +66,7 @@ const SideMenuWrapper = styled('div')(() => [
           }
         }
       }
-      .side-menu-collapse .side-menu-pickup .side-content .icon-li span.icon > svg {
+      .side-menu-collapse .side-menu-pickup .side-content .icon-li.selected span.icon > svg {
         ${tw`text-green-11 fill-[#9ddfc9]`}
       }
       .side-menu-pickup {
@@ -84,7 +84,7 @@ const SideMenuWrapper = styled('div')(() => [
             span.icon {
               ${tw`border-l-2 border-neut-2 dark:(border-neut-17) pl-2 box-content`}
               svg {
-                ${tw`dark:text-white text[#fff6] fill-[#fff] dark:fill-[#fff6]`}
+                ${tw`dark:text-white dark:fill-[#fff6]`}
               }
             }
             &.selected,
@@ -122,7 +122,7 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
 
   const func = funcList.find(({ name }) => name === funcMod)
   if (!func) {
-    return <div>empty</div>
+    return null
   }
   const curFunc = func.subFuncList.find((fn: any) => fn.name === mod) || func.subFuncList[0]
 

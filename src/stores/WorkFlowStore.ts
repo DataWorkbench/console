@@ -159,7 +159,7 @@ class WorkFlowStore {
     this.tabOp = ''
   }
 
-  set(params: { [key: string]: any }) {
+  set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }
 

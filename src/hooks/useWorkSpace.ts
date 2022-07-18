@@ -14,11 +14,13 @@ import { apiHooks, queryKeyObj } from './apiHooks'
 import {
   DescribePlatformConfigRequestType,
   DescribeNetworkConfigRequestType,
+  ListNotificationsRequestType,
   DescribeWorkspaceConfigRequestType
 } from '../types/request'
 import {
   PlatformManageDescribePlatformConfigType,
   SpaceManageDescribeNetworkConfigType,
+  NotifierManageListNotificationsType,
   SpaceManageDescribeWorkspaceConfigType
 } from '../types/response'
 
@@ -111,8 +113,18 @@ export const getQueryKeyDescribeNetworkConfig = () => queryKeyObj.describeNetwor
 
 export default useQueryWorkSpace
 
+export const useQueryListNotifications1 = apiHooks<
+  'notifierManage',
+  ListNotificationsRequestType,
+  NotifierManageListNotificationsType
+>('notifierManage', 'listNotifications')
+
+export const getQueryKeyListNotifications = () => queryKeyObj.listNotifications
+
 export const useQueryDescribeWorkspaceConfig = apiHooks<
   'spaceManage',
   DescribeWorkspaceConfigRequestType,
   SpaceManageDescribeWorkspaceConfigType
 >('spaceManage', 'describeWorkspaceConfig')
+
+export const getQueryKeyDescribeWorkspaceConfig = () => queryKeyObj.describeWorkspaceConfig
