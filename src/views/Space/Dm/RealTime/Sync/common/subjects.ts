@@ -1,6 +1,7 @@
 import { camelCase, get, keys, trim } from 'lodash-es'
 import { BehaviorSubject, pairwise, Subject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
+// eslint-disable-next-line import/no-cycle
 import {
   datasourceRealtimeTypeObjs,
   datasourceTypeObjs,
@@ -90,7 +91,15 @@ curJobConfSubject$
       }
       return [
         e.source?.column ?? [],
-        e.target?.column ?? e.target?.tableFields ?? [],
+        (e.target?.column ?? e.target?.tableFields ?? []).map((i) => {
+          if (!i.name && i.key) {
+            return {
+              ...i,
+              name: i.key,
+            }
+          }
+          return i
+        }),
       ]
     })
   )

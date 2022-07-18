@@ -1,1 +1,1 @@
-import "./{theme}.css";
+import "./{THEME}.css";

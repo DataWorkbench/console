@@ -7,7 +7,7 @@ import AlertHistory from 'views/Space/Ops/Alert/AlertHistory'
 import AlertPolicy from 'views/Space/Ops/Alert/AlertPolicy'
 import StreamRelease from 'views/Space/Ops/Stream1/StreamRelease'
 import GeneralView from 'views/Space/Ops/GeneralView/Index'
-import Login from 'views/Space/Ops/Login/Index'
+// import Login from 'views/Space/Ops/Login/Index'
 
 // import StreamInstance from 'views/Space/Ops/Stream1/StreamInstance'
 import useIcon from 'hooks/useHooks/useIcon'
@@ -46,7 +46,7 @@ export const Ops = () => {
         {mod === 'alert-policy' && !detail && <AlertPolicy />}
         {mod === 'alert-history' && <AlertHistory />}
         {mod === 'general-view' && <GeneralView />}
-        {mod === 'login' && <Login />}
+        {/* {mod === 'login' && <Login />} */}
       </div>
     </div>
   )

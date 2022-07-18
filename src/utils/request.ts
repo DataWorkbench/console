@@ -11,6 +11,7 @@ const baseConfig: AxiosRequestConfig = {
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
     'X-CSRFToken': Cookies.get('csrftoken'),
+    'Content-Type': 'application/json;charset=UTF-8',
   },
 }
 
@@ -110,6 +111,7 @@ const request = async (
       cancel(c)
     }
   })
+
   axiosList.set(axiosConfig, tempCancel)
 
   return client.request(axiosConfig).then((response) => {

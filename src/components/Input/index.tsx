@@ -4,6 +4,7 @@ import { compose, connect } from 'utils/functions'
 import { IInputProps, Input } from './Input'
 
 export * from './Input'
+export * from './ArrayInputField'
 
 const mapChange = (props: Record<string, any>) => ({
   ...props,

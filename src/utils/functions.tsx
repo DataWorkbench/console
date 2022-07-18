@@ -52,6 +52,9 @@ export const collect =
     ...mapper: ((v: (d: U) => any) => (d: T) => any)[]
   ): ((v: U[]) => T[]) =>
   (v: U[]): T[] => {
+    if (!mapper.length) {
+      return v as T[]
+    }
     const result: T[] = []
     v.forEach(pipe(...mapper)((i: T) => result.push(i)))
     return result

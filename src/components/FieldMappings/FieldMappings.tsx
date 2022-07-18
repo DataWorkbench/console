@@ -263,6 +263,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             index,
             is_part: false,
             name: leftField.name,
+            key: leftField.name,
             type: leftField.type,
             value: leftField.default,
           })
@@ -271,6 +272,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             index,
             is_part: false,
             name: rightField.name,
+            key: rightField.name,
             type: rightField.type,
             value: rightField.default,
           })
