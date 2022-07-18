@@ -5,13 +5,13 @@ const { DatePickerField } = Form
 
 export const AlertWrapper = styled(Alert)(({ isJar }: { isJar?: boolean }) => [
   tw`h-9 mx-2 mt-2 mb-3 items-center text-[#FACC15]! bg-[#FEF9C3]! bg-opacity-10! border-[#F5C414]!`,
-  isJar && tw`mb-6`,
+  isJar && tw`mb-6`
 ])
 
 export const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
   tw`border border-neut-13 rounded-sm leading-5 px-1.5 text-neut-8 scale-75 origin-left`,
   tw`group-hover:(bg-white text-neut-13 border-white)`,
-  selected && tw`bg-white text-neut-13 border-white`,
+  selected && tw`bg-white text-neut-13 border-white`
 ])
 
 export const JobToolBar = styled('div')(
@@ -68,7 +68,7 @@ export const ScheForm = styled(Form)(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 export const ScheSettingForm = styled(ScheForm)(() => [
@@ -95,7 +95,7 @@ export const ScheSettingForm = styled(ScheForm)(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 export const SmallDatePicker = styled(DatePicker)(() => [
@@ -103,7 +103,7 @@ export const SmallDatePicker = styled(DatePicker)(() => [
     > input {
       ${tw`w-60!`}
     }
-  `,
+  `
 ])
 
 export const SmallDatePickerField = styled(DatePickerField)(() => [
@@ -113,7 +113,7 @@ export const SmallDatePickerField = styled(DatePickerField)(() => [
         ${tw`w-28!`}
       }
     }
-  `,
+  `
 ])
 
 export const HorizonFiledsWrapper = styled('div')(() => [
@@ -147,7 +147,7 @@ export const HorizonFiledsWrapper = styled('div')(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 export const HourFiledsWrapper = styled('div')(() => [
@@ -181,7 +181,7 @@ export const HourFiledsWrapper = styled('div')(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 export const FormH7Wrapper = styled('div')(() => [
@@ -226,5 +226,5 @@ export const FormH7Wrapper = styled('div')(() => [
         }
       }
     }
-  `,
+  `
 ])

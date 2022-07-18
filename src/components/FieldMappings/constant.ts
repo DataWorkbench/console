@@ -12,7 +12,7 @@ const mysql = [
   'CHAR',
   'TIMESTAMP',
   'DATE',
-  'BINARY',
+  'BINARY'
 ]
 
 const pg = [
@@ -48,7 +48,7 @@ const pg = [
   'TIME',
   'TIMETZ',
   ' BOOLEAN',
-  'BOOL',
+  'BOOL'
 ]
 
 const sqlServer = [
@@ -83,7 +83,7 @@ const sqlServer = [
   'IMAGE',
   'MONEY',
   'SMALLMONEY',
-  'UNIQUEIDENTIFIER',
+  'UNIQUEIDENTIFIER'
 ]
 
 export const fieldTypeMapper = new Map([
@@ -111,8 +111,8 @@ export const fieldTypeMapper = new Map([
       'TIMESTAMP WITH LOCAL TIME ZONE',
       'TIMESTAMP WITH TIME ZON',
       'INTERVAL YEAR',
-      'INTERVAL DAY',
-    ],
+      'INTERVAL DAY'
+    ]
   ],
   ['postgresql', pg],
   ['sqlserver', sqlServer],
@@ -132,8 +132,8 @@ export const fieldTypeMapper = new Map([
       'CHAR',
       'TIMESTAMP',
       'DATE',
-      'BINARY',
-    ],
+      'BINARY'
+    ]
   ],
   [
     'click_house',
@@ -152,8 +152,8 @@ export const fieldTypeMapper = new Map([
       'TIMESTAMP',
       'DATE',
       'BINARY',
-      'NULL',
-    ],
+      'NULL'
+    ]
   ],
   [
     'hive',
@@ -172,8 +172,8 @@ export const fieldTypeMapper = new Map([
       'CHAR',
       'TIMESTAMP',
       'DATE',
-      'BINARY',
-    ],
+      'BINARY'
+    ]
   ],
   [
     'elastic_search',
@@ -188,8 +188,8 @@ export const fieldTypeMapper = new Map([
       'DATE',
       'VARCHAR',
       'TIME',
-      'BYTE',
-    ],
+      'BYTE'
+    ]
   ],
   [
     'kafka',
@@ -226,8 +226,8 @@ export const fieldTypeMapper = new Map([
       'TIME',
       'TIMETZ',
       'BOOLEAN',
-      'BOOL',
-    ],
+      'BOOL'
+    ]
   ],
   ['binlog', mysql],
   ['pg_wal', pg],
@@ -249,8 +249,8 @@ export const fieldTypeMapper = new Map([
       'CHAR',
       'TIMESTAMP',
       'DATE',
-      'BINARY',
-    ],
+      'BINARY'
+    ]
   ],
   [
     'hdfs',
@@ -269,8 +269,8 @@ export const fieldTypeMapper = new Map([
       'CHAR',
       'TIMESTAMP',
       'DATE',
-      'BINARY',
-    ],
+      'BINARY'
+    ]
   ],
   [
     'mongodb',
@@ -284,9 +284,9 @@ export const fieldTypeMapper = new Map([
       'bindata',
       'date',
       'timestamp',
-      'bool',
-    ],
-  ],
+      'bool'
+    ]
+  ]
 ])
 
 export default {}

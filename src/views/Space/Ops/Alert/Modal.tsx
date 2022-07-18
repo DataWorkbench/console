@@ -15,7 +15,7 @@ const AlertModal = observer(() => {
     showAddMonitorForm,
     showMonitor,
     selectedMonitor,
-    getQueryListKey,
+    getQueryListKey
   } = useAlertStore()
   useIcon(icons)
   return (

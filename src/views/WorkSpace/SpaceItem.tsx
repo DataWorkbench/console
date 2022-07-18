@@ -4,15 +4,7 @@ import { Link, useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import { Icon, Menu, Radio } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import {
-  Box,
-  Card,
-  Center,
-  FlexBox,
-  TextEllipsis,
-  Tooltip,
-  TextLink,
-} from 'components'
+import { Box, Card, Center, FlexBox, TextEllipsis, Tooltip, TextLink } from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
 
@@ -29,29 +21,29 @@ const roleList = [
     // icon: 'admin',
     icon: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
     color: '#00aa72',
-    email: 'ramones@yunify.com',
+    email: 'ramones@yunify.com'
   },
   {
     id: 2,
     name: '普通用户',
     // icon: 'user',
     color: '#a16207',
-    email: 'ramones@yunify.com',
+    email: 'ramones@yunify.com'
   },
   {
     id: 3,
     name: '访客',
     // icon: 'guest',
     color: '#a48a19',
-    email: 'ramones@yunify.com',
+    email: 'ramones@yunify.com'
   },
   {
     id: 4,
     name: '禁用',
     // icon: 'disable',
     color: '#a48a19',
-    email: 'ramones@yunify.com',
-  },
+    email: 'ramones@yunify.com'
+  }
 ]
 
 const RoleIcons = ({ list }: { list: Record<string, any>[] }) => {
@@ -59,39 +51,32 @@ const RoleIcons = ({ list }: { list: Record<string, any>[] }) => {
 
   return (
     <div tw="flex" onMouseLeave={() => setHoverIndex(0)}>
-      {list.slice(0, 3).map((item, idx) => {
-        return (
-          <div
-            key={item.id}
-            css={roleIcon.item({
-              zIndex: list.length - Math.abs(hoverIndex - idx),
-              index: idx,
-            })}
-            onMouseMove={() => setHoverIndex(idx)}
-          >
-            <Tooltip
-              content={item.email}
-              hasPadding
-              theme="darker"
-              twChild={tw`flex`}
-            >
-              <Center tw="h-6 w-6">
-                {item.icon ? (
-                  <img src={item.icon} alt="" width={24} />
-                ) : (
-                  <Icon name="human" size={14} />
-                )}
-              </Center>
-            </Tooltip>
-          </div>
-        )
-      })}
+      {list.slice(0, 3).map((item, idx) => (
+        <div
+          key={item.id}
+          css={roleIcon.item({
+            zIndex: list.length - Math.abs(hoverIndex - idx),
+            index: idx
+          })}
+          onMouseMove={() => setHoverIndex(idx)}
+        >
+          <Tooltip content={item.email} hasPadding theme="darker" twChild={tw`flex`}>
+            <Center tw="h-6 w-6">
+              {item.icon ? (
+                <img src={item.icon} alt="" width={24} />
+              ) : (
+                <Icon name="human" size={14} />
+              )}
+            </Center>
+          </Tooltip>
+        </div>
+      ))}
       {list.length > 3 && (
         <div
           key="others"
           css={roleIcon.item({
             zIndex: list.length - Math.abs(hoverIndex - 3),
-            index: 3,
+            index: 3
           })}
           onMouseMove={() => setHoverIndex(3)}
         >
@@ -125,7 +110,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
         fill: #dff7ed;
       }
     `,
-  status !== 1 && tw`w-24`,
+  status !== 1 && tw`w-24`
 ])
 
 // const Disp = tw.div`pt-0.5 pr-6 h-7 truncate`
@@ -139,30 +124,18 @@ interface IProps {
   className?: string
 }
 
-const isNetworkInit = (
-  platform: Record<string, any>,
-  space: Record<string, any>
-) => {
-  return (
-    platform &&
-    platform.work_in_iaas &&
-    platform.enable_network &&
-    space.status !== 2 &&
-    !space.network_is_init
-  )
-}
+const isNetworkInit = (platform: Record<string, any>, space: Record<string, any>) =>
+  platform &&
+  platform.work_in_iaas &&
+  platform.enable_network &&
+  space.status !== 2 &&
+  !space.network_is_init
 
-function getSubName(
-  funcName: string,
-  subFuncList: Record<string, any>[]
-): string {
+function getSubName(funcName: string, subFuncList: Record<string, any>[]): string {
   if (!Array.isArray(subFuncList) || subFuncList.length === 0) {
     return funcName
   }
-  return getSubName(
-    subFuncList[0].name,
-    subFuncList[0].subFuncList || subFuncList[0].items
-  )
+  return getSubName(subFuncList[0].name, subFuncList[0].subFuncList || subFuncList[0].items)
 }
 
 const SpaceItem = observer(({ regionId, space, className }: IProps) => {
@@ -170,7 +143,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const { isModal, curSpaceId, onItemCheck, platformConfig } = stateStore
   const history = useHistory()
   const {
-    workSpaceStore: { funcList },
+    workSpaceStore: { funcList }
   } = useStore()
 
   const memberStore = useMemberStore()
@@ -203,9 +176,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           </Box> */}
           <Box>
             创建时间：
-            <span tw="text-neut-16">
-              {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
-            </span>
+            <span tw="text-neut-16">{formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}</span>
           </Box>
         </FlexBox>
       )
@@ -244,17 +215,12 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           <div>
             <span>
               创建时间：
-              <span tw="text-neut-16">
-                {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
-              </span>
+              <span tw="text-neut-16">{formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}</span>
             </span>
           </div>
         </FlexBox>
 
-        <FlexBox
-          tw="justify-between mt-3 cursor-auto"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <FlexBox tw="justify-between mt-3 cursor-auto" onClick={(e) => e.stopPropagation()}>
           <div>
             <div tw="inline">我的角色：</div>
             <RoleNameWrapper>空间所有者</RoleNameWrapper>
@@ -276,8 +242,8 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                       spaceItem: {
                         id: space.id,
                         name: space.name,
-                        regionId,
-                      },
+                        regionId
+                      }
                     })
                   }}
                 >
@@ -306,11 +272,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           tw="absolute inset-0 z-50"
           title="请单击以绑定网络信息"
           onClick={(e) => {
-            handleSpaceOpt(
-              e as unknown as MouseEvent,
-              undefined as never,
-              'network'
-            )
+            handleSpaceOpt(e as unknown as MouseEvent, undefined as never, 'network')
           }}
         />
       )}
@@ -319,11 +281,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
         css={space.status !== 1 && tw`cursor-default`}
       >
         {isModal && (
-          <Radio
-            tw="absolute top-2 right-3"
-            value={space.id}
-            checked={space.id === curSpaceId}
-          />
+          <Radio tw="absolute top-2 right-3" value={space.id} checked={space.id === curSpaceId} />
         )}
         <FlexBox tw="mb-7 items-center">
           <FlexBox tw="space-x-3 w-full items-center">
@@ -350,9 +308,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 </StateTag>
               </FlexBox>
               <div tw="pt-0.5 h-7 truncate" title={space.desc || ''}>
-                <TextEllipsis twStyle={tw`text-neut-8`}>
-                  {space.desc || '暂无描述'}
-                </TextEllipsis>
+                <TextEllipsis twStyle={tw`text-neut-8`}>{space.desc || '暂无描述'}</TextEllipsis>
               </div>
             </Box>
             {!isModal && (
@@ -378,10 +334,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                       </MenuItem>
                       {!disableStatus && (
                         <MenuItem value="disable" disabled={disableStatus}>
-                          <i
-                            className="if if-minus-square"
-                            tw="text-base mr-2"
-                          />
+                          <i className="if if-minus-square" tw="text-base mr-2" />
                           禁用工作空间
                         </MenuItem>
                       )}
@@ -475,11 +428,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                                 to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
                                 tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
                               >
-                                <Icon
-                                  name={subFunc.icon}
-                                  type="dark"
-                                  tw="mr-1"
-                                />
+                                <Icon name={subFunc.icon} type="dark" tw="mr-1" />
                                 {subFunc.title}
                               </Link>
                             </MenuItem>
@@ -491,9 +440,10 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 }
               >
                 <Link
-                  to={`/${regionId}/workspace/${
-                    space.id
-                  }/${funcName}/${getSubName(funcName, subFuncList)}`}
+                  to={`/${regionId}/workspace/${space.id}/${funcName}/${getSubName(
+                    funcName,
+                    subFuncList
+                  )}`}
                   onClick={(e) => {
                     if (disableStatus) {
                       e.preventDefault()

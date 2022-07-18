@@ -17,7 +17,7 @@ import {
   ToolBarLeft,
   ToolBarRight,
   // @ts-ignore
-  utils,
+  utils
 } from '@QCFE/qingcloud-portal-ui'
 import { useMutationSource, useQuerySource, useStore } from 'hooks'
 import {
@@ -29,16 +29,13 @@ import {
   RouterLink,
   TextEllipsis,
   TextLink,
-  Tooltip,
+  Tooltip
 } from 'components'
 import { NetworkModal } from 'views/Space/Dm/Network'
 
 import DataSourceModal from './DataSourceModal'
 import DataEmpty from './DataEmpty'
-import {
-  getPingConnection,
-  DataSourcePingHistoriesModal,
-} from './DataSourcePing'
+import { getPingConnection, DataSourcePingHistoriesModal } from './DataSourcePing'
 import { usePingEvent } from './DataSourcePing/hooks'
 import {
   confirmMsgInfo,
@@ -47,7 +44,7 @@ import {
   DATASOURCE_STATUS,
   getUrl,
   sourceKinds,
-  tabs,
+  tabs
 } from './constant'
 import { SourceKindImg } from './styled'
 
@@ -77,7 +74,7 @@ const Root = styled('div')(() => [
     .page-tab-container {
       margin-bottom: 20px;
     }
-  `,
+  `
 ])
 
 const ModalWrapper = styled(Modal)(() => [
@@ -93,7 +90,7 @@ const ModalWrapper = styled(Modal)(() => [
     .modal-card-foot {
       border-top: 0;
     }
-  `,
+  `
 ])
 
 const columnSettingsKey = 'DATAOMNIS_SOURCELISTS_COLUMN_SETTINGS'
@@ -124,12 +121,11 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       addItemHistories,
       removeItemHistories,
       itemLoadingHistories,
-      setShowPingHistories,
+      setShowPingHistories
     },
-    dmStore: { networkOp },
+    dmStore: { networkOp }
   } = useStore()
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const [filter, setFilter] = useImmer<{
     regionId: string
     spaceId: string
@@ -149,7 +145,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     offset: 0,
     limit: 10,
     verbose: 2,
-    status: selectMode ? DATASOURCE_STATUS.ENABLED : 0,
+    status: selectMode ? DATASOURCE_STATUS.ENABLED : 0
   })
   const { isLoading, refetch, data } = useQuerySource(
     merge({ ...filter }, sourceType !== undefined ? { type: sourceType } : {})
@@ -159,8 +155,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
   const shouldRefetch = useRef<string>()
   const removeItem = (sourceId: string, item: Record<'uuid' & string, any>) => {
     removeItemHistories(sourceId, item)
-    const shouldUpdate =
-      !itemLoadingHistories[sourceId] || !itemLoadingHistories[sourceId].size
+    const shouldUpdate = !itemLoadingHistories[sourceId] || !itemLoadingHistories[sourceId].size
     if (shouldUpdate && op === '') {
       refetch()
     } else if (shouldUpdate) {
@@ -179,7 +174,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     addEmpty: addEmptyHistories,
     addItem: addItemHistories,
     updateEmpty: addEmptyHistories,
-    removeItem,
+    removeItem
   })
 
   useEffect(() => {
@@ -202,7 +197,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       },
       onError: () => {
         mutateOperation()
-      },
+      }
     })
   }
 
@@ -211,14 +206,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     const item = {
       uuid: Math.random().toString(32),
       sourceId: id,
-      stage: DATASOURCE_PING_STAGE.UPDATE,
+      stage: DATASOURCE_PING_STAGE.UPDATE
     }
     addPing(item)
     mutation
       .mutateAsync({
         op: 'ping',
         source_id: id,
-        stage: DATASOURCE_PING_STAGE.UPDATE,
+        stage: DATASOURCE_PING_STAGE.UPDATE
       })
       .finally(() => {
         updatePing(item)
@@ -232,7 +227,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     if (['disable', 'enable', 'delete'].includes(op)) {
       handleMutate({
         op,
-        sourceIds: opSourceList.map((r) => r.id),
+        sourceIds: opSourceList.map((r) => r.id)
       })
     }
   }
@@ -243,14 +238,10 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       dataIndex: 'id',
       width: 230,
       render: (v: string, info: any) => {
-        const sourceKindName = sourceKinds.find(
-          (kind) => kind.source_type === info.type
-        )?.name
+        const sourceKindName = sourceKinds.find((kind) => kind.source_type === info.type)?.name
         return (
           <FlexBox tw="space-x-2 items-center truncate">
-            <Center>
-              {sourceKindName && <SourceKindImg type={sourceKindName as any} />}
-            </Center>
+            <Center>{sourceKindName && <SourceKindImg type={sourceKindName as any} />}</Center>
             <div tw="flex-1 truncate">
               <TextEllipsis>
                 <span>{info.name}</span>
@@ -259,7 +250,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             </div>
           </FlexBox>
         )
-      },
+      }
     },
     {
       title: '状态',
@@ -280,15 +271,13 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             <span>已停用</span>
           </Center>
         )
-      },
+      }
     },
     {
       title: '数据源类型',
       dataIndex: 'type',
       width: 110,
-      render: (v: number) => {
-        return sourceKinds.find((kind) => kind.source_type === v)?.name
-      },
+      render: (v: number) => sourceKinds.find((kind) => kind.source_type === v)?.name
     },
     {
       title: '连接信息',
@@ -312,19 +301,12 @@ const DataSourceList = observer((props: DataSourceListProps) => {
 
                   <span tw="truncate max-w-[180px] inline-block">
                     {!['mysql', 'clickhouse', 'postgresql'].includes(key) ? (
-                      <TextEllipsis>
-                        {getUrl(urlObj, key as 'mysql')}
-                      </TextEllipsis>
+                      <TextEllipsis>{getUrl(urlObj, key as 'mysql')}</TextEllipsis>
                     ) : (
-                      <Tooltip
-                        theme="instead"
-                        content={getUrl(urlObj, key as 'mysql')}
-                        hasPadding
-                      >
-                        <span>{`${getEllipsisText(
-                          `jdbc:${key}://${urlObj.host}`,
-                          16
-                        )}:${urlObj.port}/${urlObj.database}`}</span>
+                      <Tooltip theme="instead" content={getUrl(urlObj, key as 'mysql')} hasPadding>
+                        <span>{`${getEllipsisText(`jdbc:${key}://${urlObj.host}`, 16)}:${
+                          urlObj.port
+                        }/${urlObj.database}`}</span>
                       </Tooltip>
                     )}
                   </span>
@@ -334,7 +316,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
           )
         }
         return ''
-      },
+      }
     },
     {
       title: '数据源可用性',
@@ -362,10 +344,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                 }
               `}
             >
-              {getPingConnection(
-                isItemLoading ? CONNECTION_STATUS.LOADING : result,
-                {}
-              )}
+              {getPingConnection(isItemLoading ? CONNECTION_STATUS.LOADING : result, {})}
               {(isItemLoading || v) && (
                 <TextLink
                   color="green"
@@ -382,25 +361,23 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             </Center>
           </>
         )
-      },
+      }
     },
     {
       title: '数据源描述',
       dataIndex: 'desc',
-      render: (v: string) => {
-        return (
-          <Tooltip content={v} theme="instead" hasPadding>
-            <span>{getEllipsisText(v, 20)}</span>
-          </Tooltip>
-        )
-      },
+      render: (v: string) => (
+        <Tooltip content={v} theme="instead" hasPadding>
+          <span>{getEllipsisText(v, 20)}</span>
+        </Tooltip>
+      )
     },
     {
       title: '创建时间',
       dataIndex: 'created',
       sortable: true,
       sortOrder: filter.reverse ? 'desc' : 'asc',
-      render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
+      render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '操作',
@@ -461,10 +438,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                     <Icon name="if-doublecheck" tw="mr-2" />
                     可用性测试
                   </MenuItem>
-                  <MenuItem
-                    key="update"
-                    disabled={info.status === DATASOURCE_STATUS.DISABLED}
-                  >
+                  <MenuItem key="update" disabled={info.status === DATASOURCE_STATUS.DISABLED}>
                     <Icon name="pen" tw="mr-2" />
                     编辑
                   </MenuItem>
@@ -492,8 +466,8 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             </Tooltip>
           </>
         )
-      },
-    },
+      }
+    }
   ]
 
   const columns = utils.getTableColumnsBySetting(defaultColumns, columnSettings)
@@ -532,10 +506,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
             <ToolBarLeft>
               {!selectMode ? (
                 <>
-                  <Button
-                    type="primary"
-                    onClick={() => mutateOperation('create')}
-                  >
+                  <Button type="primary" onClick={() => mutateOperation('create')}>
                     <Icon name="add" />
                     新增数据源
                   </Button>
@@ -594,10 +565,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                   }
                 }}
               />
-              <Button
-                loading={isReFetching}
-                tw="px-[5px] dark:bg-neut-16! dark:hover:bg-neut-13!"
-              >
+              <Button loading={isReFetching} tw="px-[5px] dark:bg-neut-16! dark:hover:bg-neut-13!">
                 <Icon
                   name="if-refresh"
                   tw="text-xl"
@@ -613,17 +581,14 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               <ColumnsSetting
                 defaultColumns={defaultColumns.map(({ title, dataIndex }) => ({
                   title,
-                  dataIndex,
+                  dataIndex
                 }))}
                 onSave={setColumnSettings}
                 storageKey={columnSettingsKey}
               />
             </ToolBarRight>
           </ToolBar>
-          <Card
-            tw="flex-1 pb-5 dark:bg-neut-16"
-            css={[!selectMode && tw`px-5`]}
-          >
+          <Card tw="flex-1 pb-5 dark:bg-neut-16" css={[!selectMode && tw`px-5`]}>
             <Table
               selectType={selectMode ? 'radio' : 'checkbox'}
               dataSource={sourceList}
@@ -667,7 +632,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                     draft.offset = 0
                     draft.limit = limit
                   })
-                },
+                }
               }}
             />
           </Card>
@@ -724,7 +689,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                             ${tw`text-white fill-[#2193D3]`}
                           }
                         `
-                      : tw`text-red-10`,
+                      : tw`text-red-10`
                   ]}
                 />
                 <div tw="space-y-2 text-neut-13 ">
@@ -739,21 +704,15 @@ const DataSourceList = observer((props: DataSourceListProps) => {
                     rowKey="id"
                     columns={columns
                       .filter((col: any) =>
-                        ['name', 'type', 'id', 'url', 'created'].includes(
-                          col.dataIndex
-                        )
+                        ['name', 'type', 'id', 'url', 'created'].includes(col.dataIndex)
                       )
-                      .map((col: any) =>
-                        pick(col, ['title', 'dataIndex', 'render', 'width'])
-                      )}
+                      .map((col: any) => pick(col, ['title', 'dataIndex', 'render', 'width']))}
                     dataSource={filterSourceList}
                   />
 
                   {op === 'delete' && (
                     <div tw="pt-3 space-y-1 border-t border-neut-2">
-                      <div>
-                        *请在下方输入框中输入&quot;delete&quot;以确认操作
-                      </div>
+                      <div>*请在下方输入框中输入&quot;delete&quot;以确认操作</div>
                       <div>
                         <Input
                           autoComplete="off"

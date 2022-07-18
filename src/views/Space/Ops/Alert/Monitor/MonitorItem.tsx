@@ -9,7 +9,7 @@ interface IMonitorItemProps {
 }
 
 const itemStyle = {
-  itemText: tw`text-xs text-neut-8`,
+  itemText: tw`text-xs text-neut-8`
 }
 
 const Line = styled.div`
@@ -22,19 +22,12 @@ const Tag = styled.div`
 const MonitorItem = (props: IMonitorItemProps) => {
   const { data } = props
   const monitorItem =
-    data?.monitor_object === 1
-      ? data?.monitor_item?.stream_job
-      : data?.monitor_item?.sync_job
+    data?.monitor_object === 1 ? data?.monitor_item?.stream_job : data?.monitor_item?.sync_job
 
   return (
     <div>
       <FlexBox tw="items-center">
-        <Icon
-          name="q-shieldCheckFill"
-          type="light"
-          size={16}
-          tw="text-[16px]"
-        />
+        <Icon name="q-shieldCheckFill" type="light" size={16} tw="text-[16px]" />
         <span tw="text-xs ml-2.5 text-white">监控项</span>
       </FlexBox>
       <Line />
@@ -50,12 +43,7 @@ const MonitorItem = (props: IMonitorItemProps) => {
         </FlexBox>
       )}
       <FlexBox tw="items-center mt-5">
-        <Icon
-          name="q-switchButtonGroupFill"
-          type="light"
-          size={16}
-          tw="text-[16px]"
-        />
+        <Icon name="q-switchButtonGroupFill" type="light" size={16} tw="text-[16px]" />
         <span tw="text-xs ml-2.5 text-white">触发规则</span>
       </FlexBox>
       <Line />

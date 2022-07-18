@@ -5,10 +5,7 @@ import { Form, Icon, Table } from '@QCFE/qingcloud-portal-ui'
 
 import { useRef } from 'react'
 import { FlexBox } from 'components/Box'
-import {
-  columnsRender,
-  notifyColumns,
-} from 'views/Space/Setting/Notify/common/constants'
+import { columnsRender, notifyColumns } from 'views/Space/Setting/Notify/common/constants'
 import { getName } from 'views/Space/Setting/Notify/common/mappings'
 import { useColumns } from '../../../../hooks/useHooks/useColumns'
 import { useMutationNotification } from '../../../../hooks/useGlobalAPI'
@@ -42,7 +39,7 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
   const handleClose = () => {
     store.set({
       op: 'list',
-      selected: [],
+      selected: []
     })
   }
   const handleSubmit = () => {
@@ -58,9 +55,7 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
 
   const { columns } = useColumns(
     'NOTIFY_MODAL_TABLE',
-    notifyColumns.filter(({ dataIndex }) =>
-      [getName('id'), getName('email')].includes(dataIndex!)
-    ),
+    notifyColumns.filter(({ dataIndex }) => [getName('id'), getName('email')].includes(dataIndex!)),
     columnsRender as any
   )
 
@@ -87,15 +82,13 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
               {
                 rule: ['required'],
                 help: '请输入接收人姓名',
-                status: 'error',
+                status: 'error'
               },
               {
-                rule: (s: String) => {
-                  return s.length <= 64
-                },
+                rule: (s: String) => s.length <= 64,
                 help: '接收人姓名不能超过 64 个字符',
-                status: 'error',
-              },
+                status: 'error'
+              }
             ]}
           />
           <TextField
@@ -108,8 +101,8 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
               {
                 rule: ['required'],
                 help: '请输入接收人邮箱',
-                status: 'error',
-              },
+                status: 'error'
+              }
             ]}
           />
           <TextAreaField
@@ -145,9 +138,7 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
           />
           {selected.length > 1 && (
             <div>
-              <div tw="text-[16px] leading-6 font-semibold">
-                确定要将以下消息接收人删除吗？
-              </div>
+              <div tw="text-[16px] leading-6 font-semibold">确定要将以下消息接收人删除吗？</div>
               <div tw="text-font-secondary">
                 消息接收人删除后将无法收到告警通知消息，请谨慎操作。
               </div>

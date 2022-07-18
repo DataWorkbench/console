@@ -14,8 +14,7 @@ interface JobMenuProps {
 }
 
 const JobMenu = observer((props: JobMenuProps) => {
-  const jobTree =
-    useRef<{ reset: () => void; search: (v: string) => void }>(null)
+  const jobTree = useRef<{ reset: () => void; search: (v: string) => void }>(null)
   const [isOpenHelp, setIsOpenHelp] = useState(true)
   const { workFlowStore } = useStore()
 
@@ -40,23 +39,18 @@ const JobMenu = observer((props: JobMenuProps) => {
       minWidth={224}
       maxWidth={480}
       enableResizing={{
-        right: true,
+        right: true
       }}
       style={{
         position: 'relative',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column'
       }}
     >
       <div tw="flex justify-between items-center h-11 px-2 border-b dark:border-neut-15">
         <span tw="text-xs font-semibold">作业</span>
         <div tw="flex items-center">
-          <Icon
-            name="add"
-            type="light"
-            clickable
-            onClick={() => showCreateModal()}
-          />
+          <Icon name="add" type="light" clickable onClick={() => showCreateModal()} />
         </div>
       </div>
       <div tw="border-b dark:border-neut-15">
@@ -77,13 +71,13 @@ const JobMenu = observer((props: JobMenuProps) => {
           animate={
             isOpenHelp
               ? {
-                  opacity: 1,
+                  opacity: 1
                 }
               : {
                   opacity: 0,
                   transitionEnd: {
-                    display: 'none',
-                  },
+                    display: 'none'
+                  }
                 }
           }
           exit={{ display: 'none' }}
@@ -102,10 +96,10 @@ const JobMenu = observer((props: JobMenuProps) => {
                       ${tw`text-white!`}
                     }
                   }
-                `,
+                `
               ]}
               color={{
-                primary: theme('colors.neut.8'),
+                primary: theme('colors.neut.8')
               }}
             />
           </div>

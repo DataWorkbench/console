@@ -2,31 +2,25 @@
 
 export default {
   auditManage: {
-    listOpAudits: ['GET', '/v1/audit'],
+    listOpAudits: ['GET', '/v1/audit']
   },
 
   notifierManage: {
-    listNotifications: ['GET', '/v1/workspace/{space_id}/op/notice'],
+    listNotifications: ['GET', '/v1/workspace/{space_id}/op/notice']
   },
 
   iaaSProxy: {
     listIaaSRouterVXNets: ['GET', '/v1/proxy/iaas/routers/{router_id}/vxnets'],
 
-    listIaaSRouters: ['GET', '/v1/proxy/iaas/routers'],
+    listIaaSRouters: ['GET', '/v1/proxy/iaas/routers']
   },
 
   serviceGateway: {
-    bindAuthKey: [
-      'POST',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/bind',
-    ],
+    bindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/bind'],
 
     createAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth'],
 
-    deleteAuthKey: [
-      'DELETE',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
-    ],
+    deleteAuthKey: ['DELETE', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}'],
 
     listApiServices: ['GET', '/v1/workspace/{space_id}/gateway/service'],
 
@@ -34,127 +28,73 @@ export default {
 
     listRoutes: ['GET', '/v1/workspace/{space_id}/gateway/route'],
 
-    unbindAuthKey: [
-      'POST',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/unbind',
-    ],
+    unbindAuthKey: ['POST', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}/unbind'],
 
-    updateAuthKey: [
-      'PUT',
-      '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}',
-    ],
+    updateAuthKey: ['PUT', '/v1/workspace/{space_id}/gateway/auth/{auth_key_id}']
   },
 
   dataServiceManage: {
     listApiConfigs: ['GET', '/v1/workspace/{space_id}/dataservice/config'],
 
-    abolishDataServiceApis: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/abolish',
-    ],
+    abolishDataServiceApis: ['POST', '/v1/workspace/{space_id}/dataservice/abolish'],
 
     createApiGroup: ['POST', '/v1/workspace/{space_id}/dataservice/group'],
 
-    createDataServiceCluster: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/cluster',
-    ],
+    createDataServiceCluster: ['POST', '/v1/workspace/{space_id}/dataservice/cluster'],
 
-    deleteApiConfigs: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/config/deletes',
-    ],
+    deleteApiConfigs: ['POST', '/v1/workspace/{space_id}/dataservice/config/deletes'],
 
-    deleteApiGroups: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/group/deletes',
-    ],
+    deleteApiGroups: ['POST', '/v1/workspace/{space_id}/dataservice/group/deletes'],
 
-    deleteDataServiceClusters: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/cluster/deletes',
-    ],
+    deleteDataServiceClusters: ['POST', '/v1/workspace/{space_id}/dataservice/cluster/deletes'],
 
-    describeApiConfig: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/config/{api_id}',
-    ],
+    describeApiConfig: ['GET', '/v1/workspace/{space_id}/dataservice/config/{api_id}'],
 
     describeDataServiceApiVersion: [
       'GET',
-      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}',
+      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}'
     ],
 
     describeDataServiceCluster: [
       'GET',
-      '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}',
+      '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}'
     ],
 
-    describeServiceDataSourceKinds: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/kinds',
-    ],
+    describeServiceDataSourceKinds: ['GET', '/v1/workspace/{space_id}/dataservice/kinds'],
 
     createApiConfig: ['POST', '/v1/workspace/{space_id}/dataservice/config'],
 
     listApiGroups: ['GET', '/v1/workspace/{space_id}/dataservice/group'],
 
-    listDataServiceApiVersions: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/version/{api_id}',
-    ],
+    listDataServiceApiVersions: ['GET', '/v1/workspace/{space_id}/dataservice/version/{api_id}'],
 
-    listDataServiceClusters: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/cluster',
-    ],
+    listDataServiceClusters: ['GET', '/v1/workspace/{space_id}/dataservice/cluster'],
 
     listPublishedApiVersionsByClusterId: [
       'GET',
-      '/v1/workspace/{space_id}/dataservice/release/{cluster_id}',
+      '/v1/workspace/{space_id}/dataservice/release/{cluster_id}'
     ],
 
-    publishDataServiceApi: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/release/{api_id}',
-    ],
+    publishDataServiceApi: ['POST', '/v1/workspace/{space_id}/dataservice/release/{api_id}'],
 
     republishDataServiceApi: [
       'POST',
-      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}/reopen',
+      '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}/reopen'
     ],
 
-    startDataServiceClusters: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/cluster/starts',
-    ],
+    startDataServiceClusters: ['POST', '/v1/workspace/{space_id}/dataservice/cluster/starts'],
 
-    stopDataServiceClusters: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/cluster/stops',
-    ],
+    stopDataServiceClusters: ['POST', '/v1/workspace/{space_id}/dataservice/cluster/stops'],
 
-    testDataServiceApi: [
-      'POST',
-      '/v1/workspace/{space_id}/dataservice/config/{api_id}/test',
-    ],
+    testDataServiceApi: ['POST', '/v1/workspace/{space_id}/dataservice/config/{api_id}/test'],
 
-    updateApiConfig: [
-      'PUT',
-      '/v1/workspace/{space_id}/dataservice/config/{api_id}',
-    ],
+    updateApiConfig: ['PUT', '/v1/workspace/{space_id}/dataservice/config/{api_id}'],
 
-    updateDataServiceCluster: [
-      'PUT',
-      '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}',
-    ],
+    updateDataServiceCluster: ['PUT', '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}']
   },
 
   observable: {
-    describeWorkspaceOverview: [
-      'GET',
-      '/v1/workspace/{space_id}/op/observable/overview',
-    ],
+    describeWorkspaceOverview: ['GET', '/v1/workspace/{space_id}/op/observable/overview']
   },
 
   fileManage: {
@@ -170,93 +110,57 @@ export default {
 
     updateFileMeta: ['PUT', '/v1/workspace/{space_id}/file/{file_id}'],
 
-    uploadFile: ['POST', '/v1/workspace/{space_id}/file'],
+    uploadFile: ['POST', '/v1/workspace/{space_id}/file']
   },
 
   syncJobInstanceManage: {
-    describeSyncInstance: [
-      'GET',
-      '/v1/workspace/{space_id}/sync/job/instance/{instance_id}',
-    ],
+    describeSyncInstance: ['GET', '/v1/workspace/{space_id}/sync/job/instance/{instance_id}'],
 
     listSyncInstances: ['GET', '/v1/workspace/{space_id}/sync/job/instance'],
 
-    terminateSyncInstances: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/instance/terminates',
-    ],
+    terminateSyncInstances: ['POST', '/v1/workspace/{space_id}/sync/job/instance/terminates']
   },
 
   syncJobReleaseManage: {
     listReleaseSyncJobs: ['GET', '/v1/workspace/{space_id}/sync/job/release'],
 
-    offlineReleaseSyncJob: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/release/{job_id}/offline',
-    ],
+    offlineReleaseSyncJob: ['POST', '/v1/workspace/{space_id}/sync/job/release/{job_id}/offline'],
 
-    releaseSyncJob: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/release',
-    ],
+    releaseSyncJob: ['POST', '/v1/workspace/{space_id}/sync/job/{job_id}/release'],
 
-    reopenReleaseSyncJob: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/release/{job_id}/reopen',
-    ],
+    reopenReleaseSyncJob: ['POST', '/v1/workspace/{space_id}/sync/job/release/{job_id}/reopen'],
 
-    suspendReleaseSyncJob: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/release/{job_id}/suspend',
-    ],
+    suspendReleaseSyncJob: ['POST', '/v1/workspace/{space_id}/sync/job/release/{job_id}/suspend']
   },
 
   syncJobVersionManage: {
-    describeSyncJobVersion: [
-      'GET',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}',
-    ],
+    describeSyncJobVersion: ['GET', '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}'],
 
     getSyncJobVersionConf: [
       'GET',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/conf',
+      '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/conf'
     ],
 
     getSyncJobVersionSchedule: [
       'GET',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/schedule',
+      '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/schedule'
     ],
 
-    listSyncJobVersions: [
-      'GET',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/version',
-    ],
+    listSyncJobVersions: ['GET', '/v1/workspace/{space_id}/sync/job/{job_id}/version']
   },
 
   syncJobDevManage: {
-    getSyncJobSchedule: [
-      'GET',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
-    ],
+    getSyncJobSchedule: ['GET', '/v1/workspace/{space_id}/sync/job/{job_id}/schedule'],
 
-    convertSyncJobMode: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/convert',
-    ],
+    convertSyncJobMode: ['POST', '/v1/workspace/{space_id}/sync/job/{job_id}/convert'],
 
     deleteSyncJobs: ['POST', '/v1/workspace/{space_id}/sync/job/deletes'],
 
-    describeSyncConnection: [
-      'GET',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
-    ],
+    describeSyncConnection: ['GET', '/v1/workspace/{space_id}/sync/job/{job_id}/conn'],
 
     describeSyncJob: ['GET', '/v1/workspace/{space_id}/sync/job/{job_id}'],
 
-    generateJobJson: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/generate',
-    ],
+    generateJobJson: ['POST', '/v1/workspace/{space_id}/sync/job/{job_id}/generate'],
 
     getSyncJobConf: ['GET', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
 
@@ -266,28 +170,19 @@ export default {
 
     moveSyncJobs: ['POST', '/v1/workspace/{space_id}/sync/job/moves'],
 
-    pingSyncJobConnection: [
-      'POST',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
-    ],
+    pingSyncJobConnection: ['POST', '/v1/workspace/{space_id}/sync/job/{job_id}/conn'],
 
     setSyncJobConf: ['PUT', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
 
-    setSyncJobSchedule: [
-      'PUT',
-      '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
-    ],
+    setSyncJobSchedule: ['PUT', '/v1/workspace/{space_id}/sync/job/{job_id}/schedule'],
 
-    updateSyncJob: ['PUT', '/v1/workspace/{space_id}/sync/job/{job_id}'],
+    updateSyncJob: ['PUT', '/v1/workspace/{space_id}/sync/job/{job_id}']
   },
 
   roleManage: {
-    listSystemRolePermissions: [
-      'GET',
-      '/v1/workspace/{space_id}/role/system/permission',
-    ],
+    listSystemRolePermissions: ['GET', '/v1/workspace/{space_id}/role/system/permission'],
 
-    listSystemRoles: ['GET', '/v1/workspace/{space_id}/role/system'],
+    listSystemRoles: ['GET', '/v1/workspace/{space_id}/role/system']
   },
 
   streamJobDevMange: {
@@ -297,206 +192,134 @@ export default {
 
     describeStreamJob: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}'],
 
-    getStreamJobArgs: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/args',
-    ],
+    getStreamJobArgs: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}/args'],
 
-    getStreamJobCode: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/code',
-    ],
+    getStreamJobCode: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}/code'],
 
-    getStreamJobSchedule: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/schedule',
-    ],
+    getStreamJobSchedule: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}/schedule'],
 
-    listBuiltInConnectors: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/args/connectors',
-    ],
+    listBuiltInConnectors: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}/args/connectors'],
 
     listStreamJobs: ['GET', '/v1/workspace/{space_id}/stream/job'],
 
     deleteStreamJobs: ['POST', '/v1/workspace/{space_id}/stream/job/deletes'],
 
-    setStreamJobArgs: [
-      'PUT',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/args',
-    ],
+    setStreamJobArgs: ['PUT', '/v1/workspace/{space_id}/stream/job/{job_id}/args'],
 
-    setStreamJobCode: [
-      'PUT',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/code',
-    ],
+    setStreamJobCode: ['PUT', '/v1/workspace/{space_id}/stream/job/{job_id}/code'],
 
-    setStreamJobSchedule: [
-      'PUT',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/schedule',
-    ],
+    setStreamJobSchedule: ['PUT', '/v1/workspace/{space_id}/stream/job/{job_id}/schedule'],
 
-    streamJobCodeRun: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/code/run',
-    ],
+    streamJobCodeRun: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}/code/run'],
 
-    streamJobCodeSyntax: [
-      'POST',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/code/syntax',
-    ],
+    streamJobCodeSyntax: ['POST', '/v1/workspace/{space_id}/stream/job/{job_id}/code/syntax'],
 
-    submitFlinkSqlJobInteractive: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/ws',
-    ],
+    submitFlinkSqlJobInteractive: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}/ws'],
 
-    updateStreamJob: ['PUT', '/v1/workspace/{space_id}/stream/job/{job_id}'],
+    updateStreamJob: ['PUT', '/v1/workspace/{space_id}/stream/job/{job_id}']
   },
 
   streamJobVersionManage: {
     describeStreamJobVersion: [
       'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}',
+      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}'
     ],
 
     getStreamJobVersionArgs: [
       'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/args',
+      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/args'
     ],
 
     getStreamJobVersionCode: [
       'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/code',
+      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/code'
     ],
 
     getStreamJobVersionSchedule: [
       'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/schedule',
+      '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/schedule'
     ],
 
-    listStreamJobVersions: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/version',
-    ],
+    listStreamJobVersions: ['GET', '/v1/workspace/{space_id}/stream/job/{job_id}/version']
   },
 
   streamJobInstanceManage: {
     describeFlinkUIByInstanceId: [
       'GET',
-      '/v1/workspace/{space_id}/stream/job/instance/{instance_id}/flink-ui',
+      '/v1/workspace/{space_id}/stream/job/instance/{instance_id}/flink-ui'
     ],
 
-    listStreamInstances: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/instance',
-    ],
+    listStreamInstances: ['GET', '/v1/workspace/{space_id}/stream/job/instance'],
 
-    terminateStreamInstances: [
-      'POST',
-      '/v1/workspace/{space_id}/stream/job/instance/terminates',
-    ],
+    terminateStreamInstances: ['POST', '/v1/workspace/{space_id}/stream/job/instance/terminates']
   },
 
   streamJobReleaseManage: {
-    listReleaseStreamJobs: [
-      'GET',
-      '/v1/workspace/{space_id}/stream/job/release',
-    ],
+    listReleaseStreamJobs: ['GET', '/v1/workspace/{space_id}/stream/job/release'],
 
     offlineReleaseStreamJob: [
       'POST',
-      '/v1/workspace/{space_id}/stream/job/release/{job_id}/offline',
+      '/v1/workspace/{space_id}/stream/job/release/{job_id}/offline'
     ],
 
-    releaseStreamJob: [
-      'POST',
-      '/v1/workspace/{space_id}/stream/job/{job_id}/release',
-    ],
+    releaseStreamJob: ['POST', '/v1/workspace/{space_id}/stream/job/{job_id}/release'],
 
-    reopenReleaseStreamJob: [
-      'POST',
-      '/v1/workspace/{space_id}/stream/job/release/{job_id}/reopen',
-    ],
+    reopenReleaseStreamJob: ['POST', '/v1/workspace/{space_id}/stream/job/release/{job_id}/reopen'],
 
     resumeReleaseStreamJobs: [
       'POST',
-      '/v1/workspace/{space_id}/stream/job/release/{job_id}/resume',
+      '/v1/workspace/{space_id}/stream/job/release/{job_id}/resume'
     ],
 
     suspendReleaseStreamJob: [
       'POST',
-      '/v1/workspace/{space_id}/stream/job/release/{job_id}/suspend',
-    ],
+      '/v1/workspace/{space_id}/stream/job/release/{job_id}/suspend'
+    ]
   },
 
   alertManage: {
-    jobUnboundAlertPolicies: [
-      'POST',
-      '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/unbound',
-    ],
+    jobUnboundAlertPolicies: ['POST', '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/unbound'],
 
-    alertPolicyBoundJobs: [
-      'POST',
-      '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/bound',
-    ],
+    alertPolicyBoundJobs: ['POST', '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/bound'],
 
     createAlertPolicy: ['POST', '/v1/workspace/{space_id}/op/alert'],
 
     deleteAlertPolicies: ['POST', '/v1/workspace/{space_id}/op/alert/deletes'],
 
-    describeAlertPolicy: [
-      'GET',
-      '/v1/workspace/{space_id}/op/alert/{alert_id}',
-    ],
+    describeAlertPolicy: ['GET', '/v1/workspace/{space_id}/op/alert/{alert_id}'],
 
-    jobBoundAlertPolicies: [
-      'POST',
-      '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/bound',
-    ],
+    jobBoundAlertPolicies: ['POST', '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/bound'],
 
     alertPolicyUnboundJobs: [
       'POST',
-      '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/unbound',
+      '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/unbound'
     ],
 
     listAlertLogs: ['GET', '/v1/workspace/{space_id}/op/alert/logs'],
 
     listAlertPolicies: ['GET', '/v1/workspace/{space_id}/op/alert'],
 
-    listAlertPoliciesByJob: [
-      'GET',
-      '/v1/workspace/{space_id}/op/alert/map/job/{job_id}',
-    ],
+    listAlertPoliciesByJob: ['GET', '/v1/workspace/{space_id}/op/alert/map/job/{job_id}'],
 
-    listJobsByAlertPolicy: [
-      'GET',
-      '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}',
-    ],
+    listJobsByAlertPolicy: ['GET', '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}'],
 
-    updateAlertPolicy: ['PUT', '/v1/workspace/{space_id}/op/alert/{alert_id}'],
+    updateAlertPolicy: ['PUT', '/v1/workspace/{space_id}/op/alert/{alert_id}']
   },
 
   platformManage: {
-    describePlatformConfig: ['GET', '/v1/platform/config'],
+    describePlatformConfig: ['GET', '/v1/platform/config']
   },
 
   spaceManage: {
     describeWorkspaceQuota: ['GET', '/v1/workspace/{space_id}/quota'],
 
-    attachVPCToWorkspace: [
-      'POST',
-      '/v1/workspace/{space_id}/config/networks/vpc/attach',
-    ],
+    attachVPCToWorkspace: ['POST', '/v1/workspace/{space_id}/config/networks/vpc/attach'],
 
     deleteWorkspaces: ['POST', '/v1/workspace/deletes'],
 
     describeNetworkConfig: ['GET', '/v1/workspace/{space_id}/config/networks'],
 
-    describeResourceBinding: [
-      'GET',
-      '/v1/workspace/{space_id}/binding/resources',
-    ],
+    describeResourceBinding: ['GET', '/v1/workspace/{space_id}/binding/resources'],
 
     describeWorkspace: ['GET', '/v1/workspace/{space_id}'],
 
@@ -514,7 +337,7 @@ export default {
 
     updateWorkspace: ['PUT', '/v1/workspace/{space_id}'],
 
-    upsertWorkspaceQuota: ['POST', '/v1/workspace/{space_id}/quota'],
+    upsertWorkspaceQuota: ['POST', '/v1/workspace/{space_id}/quota']
   },
 
   memberManage: {
@@ -524,10 +347,7 @@ export default {
 
     describeMember: ['GET', '/v1/workspace/{space_id}/member/{user_id}'],
 
-    describeMemberQuota: [
-      'GET',
-      '/v1/workspace/{space_id}/member/{user_id}/quota',
-    ],
+    describeMemberQuota: ['GET', '/v1/workspace/{space_id}/member/{user_id}/quota'],
 
     listAvailableUsers: ['GET', '/v1/workspace/{space_id}/member/users'],
 
@@ -535,125 +355,71 @@ export default {
 
     updateMember: ['POST', '/v1/workspace/{space_id}/member/{user_id}'],
 
-    upsertMemberQuota: [
-      'POST',
-      '/v1/workspace/{space_id}/member/{user_id}/quota',
-    ],
+    upsertMemberQuota: ['POST', '/v1/workspace/{space_id}/member/{user_id}/quota']
   },
 
   statManage: {
-    getPeriodicTasksDispatchCount: [
-      'GET',
-      '/v1/workspace/:space_id/statistics/periodic/tasks',
-    ],
+    getPeriodicTasksDispatchCount: ['GET', '/v1/workspace/:space_id/statistics/periodic/tasks'],
 
-    getPeriodicTasksErrorRanking: [
-      'GET',
-      '/v1/workspace/:space_id/statistics/periodic/error',
-    ],
+    getPeriodicTasksErrorRanking: ['GET', '/v1/workspace/:space_id/statistics/periodic/error'],
 
     getPeriodicTasksExecutingStatistics: [
       'GET',
-      '/v1/workspace/:space_id/statistics/periodic/execution',
+      '/v1/workspace/:space_id/statistics/periodic/execution'
     ],
 
-    getPeriodicTasksRuntimeRanking: [
-      'GET',
-      '/v1/workspace/:space_id/statistics/periodic/runtime',
-    ],
+    getPeriodicTasksRuntimeRanking: ['GET', '/v1/workspace/:space_id/statistics/periodic/runtime'],
 
-    getPeriodicTasksStatusStatistics: [
-      'GET',
-      '/v1/workspace/:space_id/statistics/periodic/status',
-    ],
+    getPeriodicTasksStatusStatistics: ['GET', '/v1/workspace/:space_id/statistics/periodic/status']
   },
 
   dataSourceManage: {
-    disableDataSources: [
-      'POST',
-      '/v1/workspace/{space_id}/datasource/disables',
-    ],
+    disableDataSources: ['POST', '/v1/workspace/{space_id}/datasource/disables'],
 
     createDataSource: ['POST', '/v1/workspace/{space_id}/datasource'],
 
-    describeDataSource: [
-      'GET',
-      '/v1/workspace/{space_id}/datasource/{source_id}',
-    ],
+    describeDataSource: ['GET', '/v1/workspace/{space_id}/datasource/{source_id}'],
 
-    describeDataSourceKinds: [
-      'GET',
-      '/v1/workspace/{space_id}/datasource/kinds',
-    ],
+    describeDataSourceKinds: ['GET', '/v1/workspace/{space_id}/datasource/kinds'],
 
     describeDataSourceTableSchema: [
       'GET',
-      '/v1/workspace/{space_id}/datasource/{source_id}/table/{table_name}/schema',
+      '/v1/workspace/{space_id}/datasource/{source_id}/table/{table_name}/schema'
     ],
 
-    describeDataSourceTables: [
-      'GET',
-      '/v1/workspace/{space_id}/datasource/{source_id}/tables',
-    ],
+    describeDataSourceTables: ['GET', '/v1/workspace/{space_id}/datasource/{source_id}/tables'],
 
     deleteDataSources: ['POST', '/v1/workspace/{space_id}/datasource/deletes'],
 
     enableDataSources: ['POST', '/v1/workspace/{space_id}/datasource/enables'],
 
-    listDataSourceConnections: [
-      'GET',
-      '/v1/workspace/{space_id}/datasource/{source_id}/conn',
-    ],
+    listDataSourceConnections: ['GET', '/v1/workspace/{space_id}/datasource/{source_id}/conn'],
 
     listDataSources: ['GET', '/v1/workspace/{space_id}/datasource'],
 
-    pingDataSourceConnection: [
-      'POST',
-      '/v1/workspace/{space_id}/datasource/ping',
-    ],
+    pingDataSourceConnection: ['POST', '/v1/workspace/{space_id}/datasource/ping'],
 
-    updateDataSource: [
-      'PUT',
-      '/v1/workspace/{space_id}/datasource/{source_id}',
-    ],
+    updateDataSource: ['PUT', '/v1/workspace/{space_id}/datasource/{source_id}']
   },
 
   clusterManage: {
     createFlinkCluster: ['POST', '/v1/workspace/{space_id}/cluster/flink'],
 
-    deleteFlinkClusters: [
-      'POST',
-      '/v1/workspace/{space_id}/cluster/flink/deletes',
-    ],
+    deleteFlinkClusters: ['POST', '/v1/workspace/{space_id}/cluster/flink/deletes'],
 
-    describeFlinkCluster: [
-      'GET',
-      '/v1/workspace/{space_id}/cluster/flink/{cluster_id}',
-    ],
+    describeFlinkCluster: ['GET', '/v1/workspace/{space_id}/cluster/flink/{cluster_id}'],
 
-    listAvailableFlinkVersions: [
-      'GET',
-      '/v1/workspace/{space_id}/cluster/flink/versions',
-    ],
+    listAvailableFlinkVersions: ['GET', '/v1/workspace/{space_id}/cluster/flink/versions'],
 
     listFlinkClusters: ['GET', '/v1/workspace/{space_id}/cluster/flink'],
 
-    restartFlinkClusters: [
-      'POST',
-      '/v1/workspace/{space_id}/cluster/flink/restarts',
-    ],
+    restartFlinkClusters: ['POST', '/v1/workspace/{space_id}/cluster/flink/restarts'],
 
-    startFlinkClusters: [
-      'POST',
-      '/v1/workspace/{space_id}/cluster/flink/starts',
-    ],
+    startFlinkClusters: ['POST', '/v1/workspace/{space_id}/cluster/flink/starts'],
 
     stopFlinkClusters: ['POST', '/v1/workspace/{space_id}/cluster/flink/stops'],
 
-    updateFlinkCluster: [
-      'PUT',
-      '/v1/workspace/{space_id}/cluster/flink/{cluster_id}',
-    ],
+    updateFlinkCluster: ['PUT', '/v1/workspace/{space_id}/cluster/flink/{cluster_id}']
   },
 
   networkMange: {
@@ -665,6 +431,6 @@ export default {
 
     listNetworks: ['GET', '/v1/workspace/{space_id}/network'],
 
-    updateNetwork: ['PUT', '/v1/workspace/{space_id}/network/{network_id}'],
-  },
+    updateNetwork: ['PUT', '/v1/workspace/{space_id}/network/{network_id}']
+  }
 }

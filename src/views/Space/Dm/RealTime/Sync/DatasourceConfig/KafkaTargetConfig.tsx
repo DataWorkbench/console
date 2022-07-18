@@ -1,13 +1,7 @@
-import {
-  ForwardedRef,
-  forwardRef,
-  useImperativeHandle,
-  useLayoutEffect,
-  useRef,
-} from 'react'
+import { ForwardedRef, forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react'
 import {
   IDataSourceConfigProps,
-  ISourceRef,
+  ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import tw, { css } from 'twin.macro'
@@ -52,9 +46,9 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
 const { TextField, TextAreaField } = Form
@@ -77,32 +71,26 @@ const KafkaTargetConfig = forwardRef(
             return {
               id: get(e, 'data.id'),
               topic: get(e, 'data.topic'),
-              config: get(e, 'data.config'),
+              config: get(e, 'data.config')
             }
           })
         )
         .subscribe((e) => setDbInfo(e))
     }, [setDbInfo])
-    useImperativeHandle(ref, () => {
-      return {
-        validate: () => {
-          if (!targetForm.current) {
-            return false
-          }
-          return targetForm.current?.validateForm()
-        },
-        getData: () => {
-          return {
-            ...dbInfo,
-          }
-        },
-        refetchColumn: () => {},
-      }
-    })
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        if (!targetForm.current) {
+          return false
+        }
+        return targetForm.current?.validateForm()
+      },
+      getData: () => ({
+        ...dbInfo
+      }),
+      refetchColumn: () => {}
+    }))
 
-    const renderCommon = () => {
-      return <BaseConfigCommon from="target" />
-    }
+    const renderCommon = () => <BaseConfigCommon from="target" />
 
     return (
       <Form css={styles.form} ref={targetForm}>
@@ -137,8 +125,8 @@ const KafkaTargetConfig = forwardRef(
                       </HelpCenterLink>
                     </div>
                   ),
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             <TextAreaField

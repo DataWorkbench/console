@@ -13,46 +13,36 @@ let queryKey: any = ''
 
 export const getJobReleaseKey = () => queryKey
 
-export const useQuerySyncJobRelease = (
-  filter: any,
-  config: Record<string, any> = {}
-) => {
+export const useQuerySyncJobRelease = (filter: any, config: Record<string, any> = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   const { enabled = true } = config
   queryKey = ['jobRelease', params]
-  return useQuery(
-    queryKey,
-    async ({ pageParam = params }) => listReleaseSyncJobs(pageParam),
-    {
-      enabled,
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+  return useQuery(queryKey, async ({ pageParam = params }) => listReleaseSyncJobs(pageParam), {
+    enabled,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.has_more) {
+        const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
 
-          if (nextOffset < lastPage.total) {
-            const nextParams = {
-              ...params,
-              offset: nextOffset,
-            }
-            return nextParams
+        if (nextOffset < lastPage.total) {
+          const nextParams = {
+            ...params,
+            offset: nextOffset
           }
+          return nextParams
         }
+      }
 
-        return undefined
-      },
-      ...config,
-    }
-  )
+      return undefined
+    },
+    ...config
+  })
 }
 
 export const useMutationJobRelease = (options?: {}, type = JobMode.DI) => {
@@ -70,8 +60,7 @@ export const useMutationJobRelease = (options?: {}, type = JobMode.DI) => {
     default:
       break
   }
-  const path =
-    '/v1/workspace/{space_id}/{jobMode}/job/release/{job_id}/{action}'
+  const path = '/v1/workspace/{space_id}/{jobMode}/job/release/{job_id}/{action}'
 
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(async ({ op, ...rest }: Record<string, any>) => {
@@ -87,7 +76,7 @@ export const useMutationJobRelease = (options?: {}, type = JobMode.DI) => {
         regionId,
         action: op1,
         jobMode,
-        job_id: rest.jobId ?? rest.job_id,
+        job_id: rest.jobId ?? rest.job_id
       })
       return ret
     }

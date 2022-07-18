@@ -5,19 +5,17 @@ import { observer } from 'mobx-react-lite'
 import { FlexBox } from 'components'
 import { set as lodashSet } from 'lodash-es'
 import { clearStorage } from 'utils/storage'
-// import { Header } from 'views/Space/Header'
+// import Header from 'views/Space/Header'
 import { useQueryDescribePlatformConfig } from '../../hooks'
 
-const Header = React.lazy(
-  () => import(/* webpackChunkName: "space" */ 'views/Space/Header')
-)
+const Header = React.lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Header'))
 
 export const SpaceLayout = observer(({ children }) => {
   const { regionId } = useParams<{ regionId: string }>()
   const [zone, updateZone] = useCookie('zone')
   const { data: platform } = useQueryDescribePlatformConfig(
     {
-      regionId,
+      regionId
     },
     {},
     1000 * 60 * 60 * 24 * 30
@@ -43,10 +41,7 @@ export const SpaceLayout = observer(({ children }) => {
   }, [regionId, zone, updateZone])
 
   return (
-    <FlexBox
-      orient="column"
-      tw="h-screen bg-neut-2 dark:bg-neut-17 transition-colors duration-500"
-    >
+    <FlexBox orient="column" tw="h-screen bg-neut-2 dark:bg-neut-17 transition-colors duration-500">
       <Header />
       <FlexBox flex="1" tw="overflow-y-auto pb-5">
         {children}

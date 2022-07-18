@@ -7,7 +7,7 @@ import {
   updateNetwork,
   deleteNetworks,
   describeRouters,
-  describeRouterVxnets,
+  describeRouterVxnets
 } from 'stores/api'
 
 interface IRouteParams {
@@ -32,11 +32,11 @@ export const useQueryNetworks = (filter: any) => {
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   queryKey = ['network', params]
   return useQuery(queryKey, async () => listNetworks(params), {
-    keepPreviousData: true,
+    keepPreviousData: true
   })
 }
 
@@ -47,33 +47,26 @@ export const useInfiniteQueryNetworks = (filter: any) => {
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   queryKey = ['network', omit(params, 'offset')]
-  return useInfiniteQuery(
-    queryKey,
-    async ({ pageParam = params }) => listNetworks(pageParam),
-    {
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+  return useInfiniteQuery(queryKey, async ({ pageParam = params }) => listNetworks(pageParam), {
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.has_more) {
+        const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
 
-          if (nextOffset < lastPage.total) {
-            const nextParams = {
-              ...params,
-              offset: nextOffset,
-            }
-            return nextParams
+        if (nextOffset < lastPage.total) {
+          const nextParams = {
+            ...params,
+            offset: nextOffset
           }
+          return nextParams
         }
+      }
 
-        return undefined
-      },
+      return undefined
     }
-  )
+  })
 }
 
 export const useQueryDescribeRouters = (filter: {
@@ -88,31 +81,26 @@ export const useQueryDescribeRouters = (filter: {
     regionId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   queryRoutersKey = ['DescribeRouters', omit(params, 'offset')]
   return useInfiniteQuery(
     queryRoutersKey,
-    async ({ pageParam = params }) => {
-      return describeRouters(pageParam)
-    },
+    async ({ pageParam = params }) => describeRouters(pageParam),
     {
       getNextPageParam: (lastPage, allPages) => {
-        const nextOffset = allPages.reduce(
-          (acc, cur) => acc + cur.router_set.length,
-          0
-        )
+        const nextOffset = allPages.reduce((acc, cur) => acc + cur.router_set.length, 0)
         if (nextOffset < lastPage.total) {
           const nextFilter = {
             ...filter,
-            offset: nextOffset,
+            offset: nextOffset
           }
 
           return nextFilter
         }
 
         return undefined
-      },
+      }
     }
   )
 }
@@ -129,32 +117,27 @@ export const useQueryDescribeRoutersVxnets = (filter: {
     regionId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   queryVxnetsKey = ['DescribeRouterVxnets', omit(params, 'offset')]
   return useInfiniteQuery(
     queryVxnetsKey,
-    async ({ pageParam = params }) => {
-      return describeRouterVxnets(pageParam)
-    },
+    async ({ pageParam = params }) => describeRouterVxnets(pageParam),
     {
       enabled: !!params.router,
       getNextPageParam: (lastPage, allPages) => {
-        const nextOffset = allPages.reduce(
-          (acc, cur) => acc + cur.router_vxnet_set.length,
-          0
-        )
+        const nextOffset = allPages.reduce((acc, cur) => acc + cur.router_vxnet_set.length, 0)
         if (nextOffset < lastPage.total) {
           const nextFilter = {
             ...filter,
-            offset: nextOffset,
+            offset: nextOffset
           }
 
           return nextFilter
         }
 
         return undefined
-      },
+      }
     }
   )
 }
@@ -170,56 +153,54 @@ export const useQueryDescribeRoutersAllVxnets = (filter: {
     regionId,
     offset: 0,
     ...filter,
-    limit: 200,
+    limit: 200
   }
-  queryAllVxnetsKey = ['DescribeRouterVxnets', omit(params, 'offset')]
+  queryAllVxnetsKey = ['DescribeRouterVxnets', params]
   return useQuery(
     queryAllVxnetsKey,
     async () => {
       const params1 = {
-        ...params,
+        ...params
       }
       const params2 = {
         ...params,
-        offset: 200,
+        offset: 200
       }
       const [res1, res2] = await Promise.all([
         describeRouterVxnets(params1),
-        describeRouterVxnets(params2),
+        describeRouterVxnets(params2)
       ])
 
       const allVxnets = [...res1.router_vxnet_set, ...res2.router_vxnet_set]
       return {
         router_vxnet_set: allVxnets,
-        total: allVxnets.length,
+        total: allVxnets.length
       }
     },
     {
-      enabled: !!params.router,
+      enabled: !!params.router
     }
   )
 }
 
 export const useMutationNetwork = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  return useMutation(
-    async ({ op, ...rest }: { op: OP; networkIds?: string[] }) => {
-      let ret = null
-      const params = {
-        ...rest,
-        regionId,
-        spaceId,
-      }
-      if (op === 'create') {
-        ret = await createNetwork(params)
-      } else if (op === 'update') {
-        ret = await updateNetwork(params)
-      } else if (op === 'delete') {
-        ret = await deleteNetworks(params)
-      }
-      return ret
+  return useMutation(async ({ op, ...rest }: { op: OP; networkIds?: string[] }) => {
+    let ret = null
+    const params = {
+      ...rest,
+      regionId,
+      spaceId
     }
-  )
+    if (op === 'create') {
+      ret = await createNetwork(params)
+    } else if (op === 'update') {
+      ret = await updateNetwork(params)
+    } else if (op === 'delete') {
+      ret = await deleteNetworks(params)
+    }
+    return ret
+  })
 }
 
 export default {}

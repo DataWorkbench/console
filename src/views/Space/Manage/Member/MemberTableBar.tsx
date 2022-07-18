@@ -1,9 +1,4 @@
-import {
-  Icon,
-  ToolBar,
-  ToolBarLeft,
-  ToolBarRight,
-} from '@QCFE/qingcloud-portal-ui'
+import { Icon, ToolBar, ToolBarLeft, ToolBarRight } from '@QCFE/qingcloud-portal-ui'
 import { Button, InputSearch } from '@QCFE/lego-ui'
 import React, { useCallback, useState } from 'react'
 import { observer } from 'mobx-react-lite'
@@ -32,7 +27,7 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
     setColumnSettings,
     isOwner = true,
     modalView = false,
-    spaceItem,
+    spaceItem
   } = props
   const { set, selectedKeys = [] } = useMemberStore()
   const [searchName, setSearchName] = React.useState('')
@@ -60,7 +55,7 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
             set({
               op: 'create',
               activeKeys: [],
-              spaceItem,
+              spaceItem
             })
           }}
         >
@@ -73,7 +68,7 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
           onClick={() => {
             set({
               op: 'delete',
-              activeKeys: selectedKeys,
+              activeKeys: selectedKeys
             })
           }}
         >
@@ -111,7 +106,7 @@ const MemberTableBar = observer((props: IMemberTableBarProps) => {
             <ColumnsSetting
               defaultColumns={columns.map(({ title, dataIndex }) => ({
                 title,
-                dataIndex,
+                dataIndex
               }))}
               onSave={setColumnSettings}
               storageKey={columnSettingsKey}

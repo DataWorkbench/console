@@ -13,6 +13,14 @@ dotenv.config()
 
 const resolve = (dir) => path.join(__dirname, dir)
 const { NODE_ENV } = process.env
+const envConfigPath = {
+  qa: resolve('./env/.env.qa'),
+  test: resolve('./env/.env.test'),
+}
+
+dotenv.config({
+  path: envConfigPath[process.env.CURRENT_ENV],
+})
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
@@ -42,7 +50,17 @@ let config = {
       {
         test: /\.(t|j)sx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        use:[
+          {
+            loader:'babel-loader',
+            options: {
+              cacheDirectory: true,
+              cacheCompression: false,
+              sourceMaps: true,
+              inputSourceMap: true,
+            }
+          }
+        ]
       },
       {
         test: /\.css$/,
@@ -59,14 +77,18 @@ let config = {
       {
         test: /\.tpl$/,
         use: [
-          { loader: 'babel-loader' },
-          {
-            loader: resolve('./loaders/tpl-loader.js'),
+          {loader: 'babel-loader',
             options: {
-              tplValue: { ...process.env, ...getTheme() },
-            },
+              cacheDirectory: true,
+              cacheCompression: false,
+              sourceMaps: true,
+              inputSourceMap: true,
+            }
           },
-        ],
+          {loader: resolve('./loaders/tpl-loader.js'), options: {
+               tplValue: { ...process.env, ...getTheme() },
+            }},
+        ]
       },
       {
         test: /\.svg$/i,
@@ -189,6 +211,14 @@ let config = {
       },
     },
   },
+  cache: {
+      // 磁盘存储
+      type: "filesystem",
+      buildDependencies: {
+        // 当配置修改时，缓存失效
+        config: [__filename]
+      }
+    },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',

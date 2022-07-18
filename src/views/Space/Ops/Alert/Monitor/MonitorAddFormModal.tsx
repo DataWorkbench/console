@@ -1,12 +1,5 @@
 import { Button, Form, Icon, InputNumber } from '@QCFE/qingcloud-portal-ui'
-import {
-  AffixLabel,
-  Center,
-  FlexBox,
-  Modal,
-  ModalContent,
-  Tooltip,
-} from 'components/index'
+import { AffixLabel, Center, FlexBox, Modal, ModalContent, Tooltip } from 'components/index'
 import { Checkbox, Field, Label, RadioButton } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -18,7 +11,7 @@ import { useParams } from 'react-router-dom'
 import { PbmodelAlertPolicy } from 'types/types'
 import {
   // useQueryListAvailableUsers,
-  useQueryListNotifications,
+  useQueryListNotifications
 } from 'hooks/useMember'
 import { useMutationAlert } from 'hooks/useAlert'
 import { observer } from 'mobx-react-lite'
@@ -33,26 +26,12 @@ const HiddenTextField = styled(TextField)`
   }
 `
 
-const Item = ({
-  id,
-  onDelete,
-}: {
-  id: string
-  onDelete: (s: string) => void
-}) => {
-  return (
-    <Center tw="gap-3 h-6 bg-neut-13 px-2">
-      <span tw="text-white">{`ID: ${id}`}</span>
-      <Icon
-        clickable
-        onClick={() => onDelete(id)}
-        name="if-close"
-        size={16}
-        type="light"
-      />
-    </Center>
-  )
-}
+const Item = ({ id, onDelete }: { id: string; onDelete: (s: string) => void }) => (
+  <Center tw="gap-3 h-6 bg-neut-13 px-2">
+    <span tw="text-white">{`ID: ${id}`}</span>
+    <Icon clickable onClick={() => onDelete(id)} name="if-close" size={16} type="light" />
+  </Center>
+)
 
 interface IMonitorAddProps {
   onCancel: () => void
@@ -67,7 +46,7 @@ const formStyle = {
     & textarea.textarea {
       ${tw`min-w-[500px]!`}
     }
-  `,
+  `
 }
 
 const getData = (data: Record<string, any>) => {
@@ -79,14 +58,8 @@ const getData = (data: Record<string, any>) => {
     type = 'sync_job'
   }
   if (type) {
-    d.instance_run_failed_flag = get(
-      d,
-      `monitor_item.${type}.instance_run_failed`
-    )
-    d.instance_run_timeout_flag = get(
-      d,
-      `monitor_item.${type}.instance_run_timeout`
-    )
+    d.instance_run_failed_flag = get(d, `monitor_item.${type}.instance_run_failed`)
+    d.instance_run_timeout_flag = get(d, `monitor_item.${type}.instance_run_timeout`)
     d.instance_run_timeout = get(d, `monitor_item.${type}.instance_timeout`)
     d.notification_ids = get(d, 'notification_ids', '').split(',')
   }
@@ -98,11 +71,9 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
   const { getQueryListKey, jobDetail } = useAlertStore()
 
   const form = useRef<Form>()
-  const [value, setValue] = useImmer<
-    Partial<Record<keyof PbmodelAlertPolicy | string, any>>
-  >(() => {
-    return getData(data as any)
-  })
+  const [value, setValue] = useImmer<Partial<Record<keyof PbmodelAlertPolicy | string, any>>>(() =>
+    getData(data as any)
+  )
 
   useEffect(() => {
     const v = data ?? {}
@@ -117,16 +88,9 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
 
   const { mutateAsync, isLoading } = useMutationAlert({}, getQueryListKey)
 
-  const {
-    data: users,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-  } = useQueryListNotifications({})
+  const { data: users, fetchNextPage, hasNextPage, isFetching } = useQueryListNotifications({})
 
-  const userOptions = flatten(
-    users?.pages.map((page: Record<string, any>) => page.infos || [])
-  )
+  const userOptions = flatten(users?.pages.map((page: Record<string, any>) => page.infos || []))
 
   const loadData = () => {
     if (hasNextPage) {
@@ -151,7 +115,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
             'monitor_object',
             'name',
             'desc',
-            'notification_ids',
+            'notification_ids'
           ])
           if (jobDetail?.jobType) {
             set(d, 'monitor_object', jobDetail?.jobType)
@@ -161,23 +125,21 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
           const item = {
             instance_run_failed: value?.instance_run_failed_flag,
             instance_run_timeout: value?.instance_run_timeout_flag,
-            instance_timeout: value?.instance_run_timeout,
+            instance_timeout: value?.instance_run_timeout
           }
           if (d.monitor_object === 1) {
             set(d, 'monitor_item', {
-              stream_job: item,
+              stream_job: item
             })
           } else {
             set(d, 'monitor_item', {
-              sync_job: item,
+              sync_job: item
             })
           }
           set(d, 'space_id', spaceId)
-          mutateAsync({ uri: { alert_id: value?.id }, data: d, op }).then(
-            () => {
-              onCancel()
-            }
-          )
+          mutateAsync({ uri: { alert_id: value?.id }, data: d, op }).then(() => {
+            onCancel()
+          })
         }
       }}
       onCancel={onCancel}
@@ -211,25 +173,21 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                 {
                   rule: { required: true },
                   help: '请输入告警策略名称',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             {jobDetail?.jobType && (
               <Field>
                 <Label tw="label-required">监控对象</Label>
-                <span>
-                  {monitorObjectTypes[jobDetail?.jobType as 1]?.label}
-                </span>
+                <span>{monitorObjectTypes[jobDetail?.jobType as 1]?.label}</span>
               </Field>
             )}
             {!jobDetail?.jobType &&
               (isEdit ? (
                 <Field>
                   <Label tw="label-required">监控对象</Label>
-                  <span>
-                    {monitorObjectTypes[value?.monitor_object as 1]?.label}
-                  </span>
+                  <span>{monitorObjectTypes[value?.monitor_object as 1]?.label}</span>
                 </Field>
               ) : (
                 <RadioGroupField
@@ -247,8 +205,8 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                     {
                       rule: { required: true },
                       help: '请选择监控对象',
-                      status: 'error',
-                    },
+                      status: 'error'
+                    }
                   ]}
                 >
                   <RadioButton value={1}>流式计算作业</RadioButton>
@@ -308,19 +266,14 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
               value={{
                 instance_run_failed_flag: value?.instance_run_failed_flag,
                 instance_run_timeout_flag: value?.instance_run_timeout_flag,
-                instance_run_timeout: value?.instance_run_timeout,
+                instance_run_timeout: value?.instance_run_timeout
               }}
               schemas={[
                 {
-                  rule: (v) => {
-                    return !(
-                      !v.instance_run_failed_flag &&
-                      !v.instance_run_timeout_flag
-                    )
-                  },
+                  rule: (v) => !(!v.instance_run_failed_flag && !v.instance_run_timeout_flag),
                   help: '监控项不能为空',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
 
@@ -335,9 +288,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
             {!jobDetail?.jobId && (
               <>
                 <Field tw="mb-1!" label="绑定作业">
-                  <Label tw="label-required mt-2 items-baseline!">
-                    绑定作业
-                  </Label>
+                  <Label tw="label-required mt-2 items-baseline!">绑定作业</Label>
                   <div>
                     {value?.monitor_object ? (
                       <Button
@@ -349,35 +300,28 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                         选择作业
                       </Button>
                     ) : (
-                      <Tooltip
-                        hasPadding
-                        theme="light"
-                        content="请先选择监控对象"
-                      >
+                      <Tooltip hasPadding theme="light" content="请先选择监控对象">
                         <Button type="black" disabled>
                           <Icon name="add" type="light" />
                           选择作业
                         </Button>
                       </Tooltip>
                     )}
-                    {Array.isArray(value?.job_ids) &&
-                      value?.job_ids.length > 0 && (
-                        <div tw="mt-1 flex flex-wrap w-[640px] gap-1">
-                          {value?.job_ids.map((i) => (
-                            <Item
-                              id={i}
-                              key={i}
-                              onDelete={(id) =>
-                                setValue((draft) => {
-                                  draft.job_ids = draft.job_ids?.filter(
-                                    (j) => j !== id
-                                  )
-                                })
-                              }
-                            />
-                          ))}
-                        </div>
-                      )}
+                    {Array.isArray(value?.job_ids) && value?.job_ids.length > 0 && (
+                      <div tw="mt-1 flex flex-wrap w-[640px] gap-1">
+                        {value?.job_ids.map((i) => (
+                          <Item
+                            id={i}
+                            key={i}
+                            onDelete={(id) =>
+                              setValue((draft) => {
+                                draft.job_ids = draft.job_ids?.filter((j) => j !== id)
+                              })
+                            }
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </Field>
                 <HiddenTextField
@@ -387,12 +331,10 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                   key={value?.job_ids?.length}
                   schemas={[
                     {
-                      rule: () => {
-                        return !!value?.job_ids?.length
-                      },
+                      rule: () => !!value?.job_ids?.length,
                       help: '请选择绑定作业',
-                      status: 'error',
-                    },
+                      status: 'error'
+                    }
                   ]}
                 />
               </>
@@ -420,12 +362,10 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
               clearable
               schemas={[
                 {
-                  rule: (v) => {
-                    return Array.isArray(v) && v.length
-                  },
+                  rule: (v) => Array.isArray(v) && v.length,
                   help: '请选择消息接收人',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
 
@@ -443,11 +383,11 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
               schemas={[
                 {
                   rule: {
-                    max: 1024,
+                    max: 1024
                   },
                   help: '策略描述不能超过1024个字符',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
           </Form>

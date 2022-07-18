@@ -9,11 +9,11 @@ export interface IRoleParams {
 export const loadRoleList = ({ regionId, spaceId }: IRoleParams) =>
   request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/role/system`,
+    uri: `/v1/workspace/${spaceId}/role/system`
   })
 
 export const loadRolePermissionList = ({ regionId, spaceId }: IRoleParams) =>
   request({
     region: regionId,
-    uri: `/v1/workspace/${spaceId}/role/system/permission`,
+    uri: `/v1/workspace/${spaceId}/role/system/permission`
   })

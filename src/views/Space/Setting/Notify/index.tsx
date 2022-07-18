@@ -1,10 +1,4 @@
-import {
-  Button,
-  Icon,
-  InputSearch,
-  PageTab,
-  Table,
-} from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, InputSearch, PageTab, Table } from '@QCFE/qingcloud-portal-ui'
 import useIcon from 'hooks/useHooks/useIcon'
 import { Card, Center, FlexBox } from 'components'
 import React from 'react'
@@ -36,7 +30,7 @@ const Notify = observer(() => {
     selectedRowKeys: [],
     set(params: any) {
       set(this, { ...params })
-    },
+    }
   }))
 
   const operations = {
@@ -50,7 +44,7 @@ const Notify = observer(() => {
           onClick={() => {
             store.set({
               op: 'update',
-              selected: [record],
+              selected: [record]
             })
           }}
         >
@@ -62,26 +56,21 @@ const Notify = observer(() => {
           onClick={() => {
             store.set({
               op: 'delete',
-              selected: [record],
+              selected: [record]
             })
           }}
         >
           删除
         </Button>
       </Center>
-    ),
+    )
   }
 
-  const { columns } = useColumns(
-    settingKeys,
-    notifyColumns,
-    columnsRender as any,
-    operations
-  )
-  const { filter, setFilter, pagination } = useFilter<
-    { search?: string },
+  const { columns } = useColumns(settingKeys, notifyColumns, columnsRender as any, operations)
+  const { filter, setFilter, pagination } = useFilter<{ search?: string }, { pagination: true }>(
+    {},
     { pagination: true }
-  >({}, { pagination: true })
+  )
 
   const { data, isFetching, refetch } = useListNotifications(filter)
 
@@ -101,7 +90,7 @@ const Notify = observer(() => {
               onClick={() => {
                 store.set({
                   op: 'create',
-                  selected: [],
+                  selected: []
                 })
               }}
             >
@@ -113,10 +102,8 @@ const Notify = observer(() => {
               type="danger"
               onClick={() => {
                 store.set({
-                  selected: infos.filter((i) =>
-                    store.selectedRowKeys.includes(i.id)
-                  ),
-                  op: 'delete',
+                  selected: infos.filter((i) => store.selectedRowKeys.includes(i.id)),
+                  op: 'delete'
                 })
               }}
             >
@@ -143,10 +130,7 @@ const Notify = observer(() => {
                 })
               }}
             />
-            <Button
-              loading={isFetching}
-              tw="px-[5px] dark:bg-neut-16! dark:hover:bg-neut-13!"
-            >
+            <Button loading={isFetching} tw="px-[5px] dark:bg-neut-16! dark:hover:bg-neut-13!">
               <Icon
                 name="if-refresh"
                 tw="text-xl"
@@ -163,14 +147,14 @@ const Notify = observer(() => {
           selectedRowKeys={store.selectedRowKeys}
           onSelect={(keys: string[]) => {
             store.set({
-              selectedRowKeys: keys,
+              selectedRowKeys: keys
             })
           }}
           columns={columns}
           dataSource={infos}
           pagination={{
             total: infos.length ?? 0,
-            ...pagination,
+            ...pagination
           }}
         />
       </Card>

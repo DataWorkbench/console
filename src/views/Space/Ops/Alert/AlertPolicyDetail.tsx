@@ -14,7 +14,7 @@ import {
   CopyText,
   Icon,
   Loading,
-  InputSearch,
+  InputSearch
 } from '@QCFE/qingcloud-portal-ui'
 import { HorizonTabs } from 'views/Space/Dm/styled'
 import emitter from 'utils/emitter'
@@ -25,12 +25,9 @@ import { Table } from 'views/Space/styled'
 import { get } from 'lodash-es'
 import {
   AlertManageDescribeAlertPolicyType,
-  AlertManageListJobsByAlertPolicyType,
+  AlertManageListJobsByAlertPolicyType
 } from 'types/response'
-import {
-  DescribeAlertPolicyRequestType,
-  ListJobsByAlertPolicyRequestType,
-} from 'types/request'
+import { DescribeAlertPolicyRequestType, ListJobsByAlertPolicyRequestType } from 'types/request'
 import { apiHooks } from 'hooks/apiHooks'
 import useFilter from 'hooks/useHooks/useFilter'
 
@@ -68,7 +65,7 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
         ${tw`text-white!`}
       }
     }
-  `,
+  `
 ])
 
 const CopyTextWrapper = styled(CopyText)`
@@ -119,7 +116,7 @@ const alertJobSettingKey = 'alert_job_setting_key'
 const AlertPolicyDetail = ({
   id,
   spaceId,
-  regionId,
+  regionId
 }: {
   id: string
   spaceId: string
@@ -134,9 +131,9 @@ const AlertPolicyDetail = ({
   const { data, isFetching } = useQueryDescribeAlertPolicy({
     uri: {
       space_id: spaceId,
-      alert_id: id,
+      alert_id: id
     },
-    regionId,
+    regionId
   } as any)
 
   const { filter, pagination } = useFilter<{}, { pagination: true }>(
@@ -147,20 +144,17 @@ const AlertPolicyDetail = ({
   const {
     data: jobList,
     isFetching: jobLoading,
-    refetch,
+    refetch
   } = useQueryListJobsByAlertPolicy({
     uri: {
       space_id: spaceId,
-      alert_id: id,
+      alert_id: id
     },
     regionId,
-    params: filter,
+    params: filter
   } as any)
 
-  const infos =
-    data?.monitor_object === 1
-      ? jobList?.stream_jobs ?? []
-      : jobList?.sync_jobs ?? []
+  const infos = data?.monitor_object === 1 ? jobList?.stream_jobs ?? [] : jobList?.sync_jobs ?? []
 
   const [isOpen, setOpen] = useState(true)
   const [activeName, setActiveName] = useState('items')
@@ -174,14 +168,11 @@ const AlertPolicyDetail = ({
 
   function renderItems() {
     const type = data?.monitor_object
-    const items =
-      type === 1 ? data?.monitor_item?.stream_job : data?.monitor_item?.sync_job
+    const items = type === 1 ? data?.monitor_item?.stream_job : data?.monitor_item?.sync_job
     return (
       <div tw="w-full mt-5">
         {items?.instance_run_failed && (
-          <div tw="px-5 w-full py-[14px] bg-neut-16 text-white mb-2">
-            实例运行失败时告警
-          </div>
+          <div tw="px-5 w-full py-[14px] bg-neut-16 text-white mb-2">实例运行失败时告警</div>
         )}
         {items?.instance_run_timeout && (
           <FlexBox tw="px-5 w-full py-[14px] bg-neut-16 text-white gap-2">
@@ -224,18 +215,16 @@ const AlertPolicyDetail = ({
             {
               title: '消息接收人',
               dataIndex: 'name',
-              key: 'name',
+              key: 'name'
             },
             {
               title: '邮箱',
               dataIndex: 'email',
-              key: 'email',
-            },
+              key: 'email'
+            }
           ]}
           rowKey="id"
-          dataSource={data?.notifications?.filter(
-            (i) => !search || i.name.includes(search)
-          )}
+          dataSource={data?.notifications?.filter((i) => !search || i.name.includes(search))}
         />
       </div>
     )
@@ -269,38 +258,32 @@ const AlertPolicyDetail = ({
               title: '作业/文件夹名称',
               dataIndex: 'name',
               key: 'name',
-              render: (name: string) => {
-                return (
-                  <FlexBox tw="items-center">
-                    <Icon
-                      name="q-downloadBoxFill"
-                      type="light"
-                      css={css`
-                        & .qicon {
-                          ${tw`text-white! fill-[#fff]!`}
-                        }
-                      `}
-                    />
-                    <span tw="text-white">{name}</span>
-                  </FlexBox>
-                )
-              },
+              render: (name: string) => (
+                <FlexBox tw="items-center">
+                  <Icon
+                    name="q-downloadBoxFill"
+                    type="light"
+                    css={css`
+                      & .qicon {
+                        ${tw`text-white! fill-[#fff]!`}
+                      }
+                    `}
+                  />
+                  <span tw="text-white">{name}</span>
+                </FlexBox>
+              )
             },
             {
               title: 'ID',
               dataIndex: 'id',
               key: 'id',
-              render: (text: string) => {
-                return <span tw="text-font-secondary">{text}</span>
-              },
+              render: (text: string) => <span tw="text-font-secondary">{text}</span>
             },
             {
               title: '描述',
               dataIndex: 'desc',
               key: 'desc',
-              render: (text: string) => {
-                return <span tw="text-font-secondary">{text}</span>
-              },
+              render: (text: string) => <span tw="text-font-secondary">{text}</span>
             },
             {
               title: '更新时间',
@@ -315,8 +298,8 @@ const AlertPolicyDetail = ({
                     {dayjs(updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
                   </span>
                 )
-              },
-            },
+              }
+            }
           ]}
           rowKey="id"
           dataSource={infos ?? []}
@@ -361,10 +344,7 @@ const AlertPolicyDetail = ({
             />
           </div>
         </Tooltip>
-        <CopyTextWrapper
-          text={`${data?.name ?? ''}(ID: ${id})`}
-          theme="light"
-        />
+        <CopyTextWrapper text={`${data?.name ?? ''}(ID: ${id})`} theme="light" />
       </FlexBox>
 
       <Card hasBoxShadow tw="bg-neut-16 relative">
@@ -420,9 +400,7 @@ const AlertPolicyDetail = ({
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
               <span>监控对象:</span>
-              <span>
-                {monitorObjectTypes[data?.monitor_object as 1]?.label}
-              </span>
+              <span>{monitorObjectTypes[data?.monitor_object as 1]?.label}</span>
               <span>触发规则：</span>
               <span>触发任意一项监控项</span>
             </GridItem>
@@ -431,8 +409,7 @@ const AlertPolicyDetail = ({
               <span>发送通知</span>
               <span>最近更新时间：</span>
               <span>
-                {!!data?.updated &&
-                  dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
+                {!!data?.updated && dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
               </span>
             </GridItem>
 
@@ -477,14 +454,14 @@ const AlertPolicyDetailPage = () => {
   const {
     detail: id,
     spaceId,
-    regionId,
+    regionId
   } = useParams<{ detail: string; spaceId: string; regionId: string }>()
 
   const history = useHistory()
 
   if (!id) {
     emitter.emit('error', {
-      title: `请先选择具体告警规则`,
+      title: `请先选择具体告警规则`
     })
     setTimeout(() => {
       history.goBack()

@@ -5,17 +5,11 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
-  useState,
+  useState
 } from 'react'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import tw, { css } from 'twin.macro'
-import {
-  AffixLabel,
-  Center,
-  FlexBox,
-  HelpCenterLink,
-  SelectWithRefresh,
-} from 'components'
+import { AffixLabel, Center, FlexBox, HelpCenterLink, SelectWithRefresh } from 'components'
 import { useImmer } from 'use-immer'
 import { useQuerySourceTables } from 'hooks'
 import { Control, Field, Icon, Label } from '@QCFE/lego-ui'
@@ -23,7 +17,7 @@ import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { map } from 'rxjs'
 import {
   IDataSourceConfigProps,
-  ISourceRef,
+  ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import { get } from 'lodash-es'
 import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
@@ -33,21 +27,21 @@ const {
   CheckboxGroupField,
   TextField,
   ToggleField,
-  NumberField,
+  NumberField
 } = Form
 const updateTypes = [
   {
     label: 'insert',
-    value: 'insert',
+    value: 'insert'
   },
   {
     label: 'update',
-    value: 'update',
+    value: 'update'
   },
   {
     label: 'delete',
-    value: 'delete',
-  },
+    value: 'delete'
+  }
 ]
 
 const styles = {
@@ -91,9 +85,9 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
 type FieldKeys =
@@ -111,11 +105,7 @@ const PgSourceConfig = forwardRef(
     const sourceForm = useRef<Form>()
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
-    const { refetch: refetchColumns } = useTableColumns(
-      dbInfo?.id,
-      dbInfo?.tableName,
-      'source'
-    )
+    const { refetch: refetchColumns } = useTableColumns(dbInfo?.id, dbInfo?.tableName, 'source')
     useLayoutEffect(() => {
       const sub = source$
         .pipe(
@@ -131,7 +121,7 @@ const PgSourceConfig = forwardRef(
               lsn: get(e, 'data.lsn', 0),
               heartBeatPack: get(e, 'data.heart_beat_pack', 10),
               autoCreate: get(e, 'data.allow_create_slot', true),
-              temp: get(e, 'data.temporary', true),
+              temp: get(e, 'data.temporary', true)
             }
           })
         )
@@ -145,44 +135,38 @@ const PgSourceConfig = forwardRef(
 
     const { data: tableList, refetch } = useQuerySourceTables(
       {
-        sourceId: dbInfo?.id,
+        sourceId: dbInfo?.id
       },
       { enabled: !!dbInfo?.id }
     )
 
-    const renderCommon = () => {
-      return (
-        <>
-          <BaseConfigCommon from="source" />
-        </>
-      )
-    }
+    const renderCommon = () => (
+      <>
+        <BaseConfigCommon from="source" />
+      </>
+    )
 
-    useImperativeHandle(ref, () => {
-      return {
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => {
-          return {
-            id: dbInfo?.id,
-            lsn: dbInfo?.lsn,
-            slot_name: dbInfo?.slot,
-            table_list: dbInfo?.tableName,
-            cat: dbInfo?.updateType.join(','),
-            allow_create_slot: dbInfo?.autoCreate,
-            temporary: dbInfo?.temp,
-            heart_beat_pack: dbInfo?.heartBeatPack,
-          }
-        },
-        refetchColumn: () => {
-          refetchColumns()
-        },
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
+        }
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => ({
+        id: dbInfo?.id,
+        lsn: dbInfo?.lsn,
+        slot_name: dbInfo?.slot,
+        table_list: dbInfo?.tableName,
+        cat: dbInfo?.updateType.join(','),
+        allow_create_slot: dbInfo?.autoCreate,
+        temporary: dbInfo?.temp,
+        heart_beat_pack: dbInfo?.heartBeatPack
+      }),
+      refetchColumn: () => {
+        refetchColumns()
       }
-    })
+    }))
 
     const [showAdvanced, setShowAdvanced] = useState(false)
 
@@ -215,8 +199,8 @@ const PgSourceConfig = forwardRef(
                   {
                     rule: { required: true },
                     help: '请输入心跳间隔',
-                    status: 'error',
-                  },
+                    status: 'error'
+                  }
                 ]}
                 placeholder="请输入心跳间隔"
               />
@@ -243,8 +227,8 @@ const PgSourceConfig = forwardRef(
               {
                 rule: { required: true },
                 help: '请输入日志序列号的起始位置',
-                status: 'error',
-              },
+                status: 'error'
+              }
             ]}
           />
         </>
@@ -262,9 +246,7 @@ const PgSourceConfig = forwardRef(
               label={<AffixLabel required>数据源表</AffixLabel>}
               name="tableName"
               onRefresh={refetch}
-              options={
-                tableList?.items?.map((i) => ({ label: i, value: i })) ?? []
-              }
+              options={tableList?.items?.map((i) => ({ label: i, value: i })) ?? []}
               value={dbInfo?.tableName ?? []}
               onChange={(e) => {
                 setDbInfo((draft) => {
@@ -284,8 +266,8 @@ const PgSourceConfig = forwardRef(
                       </HelpCenterLink>
                     </div>
                   ),
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
               help={
                 <HelpCenterLink hasIcon isIframe={false} href="##">
@@ -309,8 +291,8 @@ const PgSourceConfig = forwardRef(
                 {
                   rule: { required: true },
                   help: '请选择更新类型',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
 
@@ -329,8 +311,8 @@ const PgSourceConfig = forwardRef(
                 {
                   rule: { required: true },
                   help: '请输入 slot 名称',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             {!!dbInfo?.slot && (
@@ -361,14 +343,8 @@ const PgSourceConfig = forwardRef(
             )}
             <FlexBox>
               <div css={styles.line} />
-              <Center
-                tw="px-1 cursor-pointer"
-                onClick={() => setShowAdvanced((prev) => !prev)}
-              >
-                <Icon
-                  name={`chevron-${showAdvanced ? 'up' : 'down'}`}
-                  type="light"
-                />
+              <Center tw="px-1 cursor-pointer" onClick={() => setShowAdvanced((prev) => !prev)}>
+                <Icon name={`chevron-${showAdvanced ? 'up' : 'down'}`} type="light" />
                 高级配置
               </Center>
               <div css={styles.line} />

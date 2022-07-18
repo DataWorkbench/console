@@ -29,7 +29,7 @@ export const loadWorkSpace = (
     {
       region: regionId,
       uri: url,
-      query: rest,
+      query: rest
     },
     options
   )
@@ -40,19 +40,15 @@ export const createWorkSpace = ({ regionId, ...rest }: IWorkSpaceParams) =>
     region: regionId,
     uri: '/v1/workspace',
     method: 'POST',
-    body: rest,
+    body: rest
   })
 
-export const updateWorkSpace = ({
-  regionId,
-  spaceId,
-  ...rest
-}: IWorkSpaceParams) =>
+export const updateWorkSpace = ({ regionId, spaceId, ...rest }: IWorkSpaceParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}`,
     method: 'PUT',
-    body: rest,
+    body: rest
   })
 
 export const deleteWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
@@ -60,7 +56,7 @@ export const deleteWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
     region: regionId,
     uri: '/v1/workspace/deletes',
     method: 'POST',
-    body: { space_ids: spaceIds },
+    body: { space_ids: spaceIds }
   })
 
 export const enableWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
@@ -68,7 +64,7 @@ export const enableWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
     region: regionId,
     uri: '/v1/workspace/enables',
     body: { space_ids: spaceIds },
-    method: 'POST',
+    method: 'POST'
   })
 
 export const disableWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
@@ -76,17 +72,13 @@ export const disableWorkSpaces = ({ regionId, spaceIds }: IWorkSpaceParams) =>
     region: regionId,
     uri: '/v1/workspace/disables',
     body: { space_ids: spaceIds },
-    method: 'POST',
+    method: 'POST'
   })
 
-export const attachWorkSpacesNetwork = ({
-  regionId,
-  spaceId,
-  ...rest
-}: IWorkSpaceParams) =>
+export const attachWorkSpacesNetwork = ({ regionId, spaceId, ...rest }: IWorkSpaceParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/config/networks/vpc/attach`,
     body: rest,
-    method: 'POST',
+    method: 'POST'
   })

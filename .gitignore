@@ -17,3 +17,4 @@ selenium-debug.log
 
 docker/web_console_settings.py
 .env
+pnpm-lock.yaml

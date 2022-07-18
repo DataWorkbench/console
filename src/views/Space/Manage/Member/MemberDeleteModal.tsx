@@ -27,17 +27,11 @@ const MemberDeleteModal = (props: IMemberDeleteModal) => {
       <Global styles={OwnerWrapper.isOwner({ isOwner: false })} />
       <FlexBox tw="gap-3">
         <div>
-          <Icon
-            name="exclamation"
-            color={{ secondary: '#F5C414', primary: 'white' }}
-            size={24}
-          />
+          <Icon name="exclamation" color={{ secondary: '#F5C414', primary: 'white' }} size={24} />
         </div>
         <div tw="flex-auto">
           <div tw="text-neut-15 font-semibold text-base mb-2">
-            {justOne
-              ? `确定要将成员 (${data[0].user_id}) 移除吗？`
-              : '确定要将以下成员移除吗？'}
+            {justOne ? `确定要将成员 (${data[0].user_id}) 移除吗？` : '确定要将以下成员移除吗？'}
           </div>
           <div tw="text-neut-13 leading-[20px] mb-3">
             成员移除后将无法访问该空间所有数据信息，正在运行的任务不会停止，请谨慎操作。
@@ -51,7 +45,7 @@ const MemberDeleteModal = (props: IMemberDeleteModal) => {
                     ${tw`hidden`}
                   }
                 `,
-                OwnerWrapper.isOwner({ isOwner: false }),
+                OwnerWrapper.isOwner({ isOwner: false })
               ]}
               dataSource={data}
               columns={columns}

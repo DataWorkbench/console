@@ -66,12 +66,7 @@ const SideMenuWrapper = styled('div')(() => [
           }
         }
       }
-      .side-menu-collapse
-        .side-menu-pickup
-        .side-content
-        .icon-li.selected
-        span.icon
-        > svg {
+      .side-menu-collapse .side-menu-pickup .side-content .icon-li.selected span.icon > svg {
         ${tw`text-green-11 fill-[#9ddfc9]`}
       }
       .side-menu-pickup {
@@ -106,15 +101,14 @@ const SideMenuWrapper = styled('div')(() => [
         ${tw`border-t border-r bg-neut-2 dark:(bg-neut-17 border-neut-15) border-neut-3`}
       }
     }
-  `,
+  `
 ])
 
 export const Sider = ({ funcMod }: { funcMod: string }) => {
-  const { regionId, spaceId, mod } =
-    useParams<{ regionId: string; spaceId: string; mod: string }>()
+  const { regionId, spaceId, mod } = useParams<{ regionId: string; spaceId: string; mod: string }>()
   const {
     globalStore: { darkMode },
-    workSpaceStore: { funcList },
+    workSpaceStore: { funcList }
   } = useStore()
 
   const [key, setSiderKey] = useReducer((v) => v + 1, 0)
@@ -130,8 +124,7 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
   if (!func) {
     return null
   }
-  const curFunc =
-    func.subFuncList.find((fn: any) => fn.name === mod) || func.subFuncList[0]
+  const curFunc = func.subFuncList.find((fn: any) => fn.name === mod) || func.subFuncList[0]
 
   const navMenu = func?.subFuncList.map((fn: any) => {
     let items = []
@@ -139,27 +132,22 @@ export const Sider = ({ funcMod }: { funcMod: string }) => {
     if (fn.items) {
       items = fn.items.map((subFn: any) => ({
         ...subFn,
-        link: `/${regionId}/workspace/${spaceId}/${funcMod}/${subFn.name}`,
+        link: `/${regionId}/workspace/${spaceId}/${funcMod}/${subFn.name}`
       }))
       return {
         ...fn,
-        items,
+        items
       }
     }
     return {
       ...fn,
-      link: `/${regionId}/workspace/${spaceId}/${funcMod}/${fn.name}`,
+      link: `/${regionId}/workspace/${spaceId}/${funcMod}/${fn.name}`
     }
   })
 
   return (
     <SideMenuWrapper>
-      <SideMenu
-        key={key}
-        darkMode={darkMode}
-        menus={navMenu}
-        defaultSelectedMenu={curFunc.name}
-      />
+      <SideMenu key={key} darkMode={darkMode} menus={navMenu} defaultSelectedMenu={curFunc.name} />
     </SideMenuWrapper>
   )
 }

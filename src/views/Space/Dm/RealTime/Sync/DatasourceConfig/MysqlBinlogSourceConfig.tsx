@@ -5,7 +5,7 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
-  useState,
+  useState
 } from 'react'
 import tw, { css } from 'twin.macro'
 import { Form } from '@QCFE/qingcloud-portal-ui'
@@ -20,18 +20,12 @@ import { AffixLabel, FlexBox, Center, SelectWithRefresh } from 'components'
 import { useQuerySourceTables } from 'hooks'
 import {
   IDataSourceConfigProps,
-  ISourceRef,
+  ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 
-const {
-  CheckboxGroupField,
-  SelectField,
-  TextField,
-  RadioGroupField,
-  NumberField,
-  ToggleField,
-} = Form
+const { CheckboxGroupField, SelectField, TextField, RadioGroupField, NumberField, ToggleField } =
+  Form
 
 const styles = {
   arrowBox: tw`space-x-2 bg-neut-17 w-[70%] z-10`,
@@ -74,35 +68,35 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
 const updateTypes = [
   {
     label: 'insert',
-    value: 1,
+    value: 1
   },
   {
     label: 'update',
-    value: 2,
+    value: 2
   },
   {
     label: 'delete',
-    value: 3,
-  },
+    value: 3
+  }
 ]
 
 const startTypes = [
   {
     label: '从指定时间戳开始消费',
-    value: 1,
+    value: 1
   },
   {
     label: '从指定文件的指定位置处消费',
-    value: 2,
-  },
+    value: 2
+  }
 ]
 
 type FieldKeys =
@@ -127,11 +121,7 @@ const MysqlBinlogSourceConfig = forwardRef(
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
     const [showAdvanced, setShowAdvanced] = useState(false)
     // const { refetch: refetchColumns } = useSetRealtimeColumns(dbInfo?.id)
-    const { refetch: refetchColumns } = useTableColumns(
-      dbInfo?.id,
-      dbInfo?.tableName,
-      'source'
-    )
+    const { refetch: refetchColumns } = useTableColumns(dbInfo?.id, dbInfo?.tableName, 'source')
     useLayoutEffect(() => {
       const sub = source$
         .pipe(
@@ -152,7 +142,7 @@ const MysqlBinlogSourceConfig = forwardRef(
               startType: e?.data?.start?.journal_name ? 2 : 1,
               startTime: get(e, 'data.start.timestamp'),
               startFile: get(e, 'data.start.journal_name'),
-              startPosition: get(e, 'data.start.position'),
+              startPosition: get(e, 'data.start.position')
             }
           })
         )
@@ -166,44 +156,38 @@ const MysqlBinlogSourceConfig = forwardRef(
 
     const { data: tableList, refetch } = useQuerySourceTables(
       {
-        sourceId: dbInfo?.id,
+        sourceId: dbInfo?.id
       },
       { enabled: !!dbInfo?.id }
     )
 
-    useImperativeHandle(ref, () => {
-      return {
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
+        }
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => ({
+        source_id: dbInfo?.id,
+        table: dbInfo?.tableName,
+        filter: dbInfo?.filter,
+        cat: dbInfo?.updateType.filter(Boolean)?.join(''),
+        start: {
+          journal_name: dbInfo?.startFile,
+          position: dbInfo?.startPosition,
+          timestamp: parseInt(dbInfo?.startTime, 10)
         },
-        getData: () => {
-          return {
-            source_id: dbInfo?.id,
-            table: dbInfo?.tableName,
-            filter: dbInfo?.filter,
-            cat: dbInfo?.updateType.filter(Boolean)?.join(''),
-            start: {
-              journal_name: dbInfo?.startFile,
-              position: dbInfo?.startPosition,
-              timestamp: parseInt(dbInfo?.startTime, 10),
-            },
-            connection_charset: dbInfo?.charset,
-            parallel_thread_size: dbInfo?.threads,
-            is_gtid_mode: dbInfo?.isGtidMode,
-          }
-        },
-        refetchColumn: () => {
-          refetchColumns()
-        },
+        connection_charset: dbInfo?.charset,
+        parallel_thread_size: dbInfo?.threads,
+        is_gtid_mode: dbInfo?.isGtidMode
+      }),
+      refetchColumn: () => {
+        refetchColumns()
       }
-    })
+    }))
 
-    const renderCommon = () => {
-      return <BaseConfigCommon from="source" />
-    }
+    const renderCommon = () => <BaseConfigCommon from="source" />
 
     const renderAdvanced = () => {
       if (!showAdvanced) {
@@ -217,12 +201,12 @@ const MysqlBinlogSourceConfig = forwardRef(
             options={[
               {
                 label: 'UTF-8',
-                value: 1,
+                value: 1
               },
               {
                 label: 'GBK',
-                value: 2,
-              },
+                value: 2
+              }
             ]}
             value={dbInfo?.charset}
             onChange={(e) => {
@@ -331,9 +315,7 @@ canal schema下的一张表：canal.test1 `}
                 name="tableName"
                 onRefresh={refetch}
                 multi
-                options={
-                  tableList?.items?.map((i) => ({ label: i, value: i })) ?? []
-                }
+                options={tableList?.items?.map((i) => ({ label: i, value: i })) ?? []}
                 value={dbInfo?.tableName ?? []}
                 onChange={(e) => {
                   setDbInfo((draft) => {
@@ -346,8 +328,8 @@ canal schema下的一张表：canal.test1 `}
                   {
                     rule: { required: true },
                     help: '请选择数据源表',
-                    status: 'error',
-                  },
+                    status: 'error'
+                  }
                 ]}
               />
             )}
@@ -365,8 +347,8 @@ canal schema下的一张表：canal.test1 `}
                   {
                     rule: { required: true },
                     help: '请输入过滤规则',
-                    status: 'error',
-                  },
+                    status: 'error'
+                  }
                 ]}
               />
             )}
@@ -401,8 +383,8 @@ canal schema下的一张表：canal.test1 `}
                 {
                   rule: { required: true },
                   help: '请选择起始位置',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             {dbInfo?.startType === 1 && (
@@ -421,8 +403,8 @@ canal schema下的一张表：canal.test1 `}
                   {
                     rule: { required: true },
                     help: '请输入时间戳',
-                    status: 'error',
-                  },
+                    status: 'error'
+                  }
                 ]}
               />
             )}
@@ -443,8 +425,8 @@ canal schema下的一张表：canal.test1 `}
                     {
                       rule: { required: true },
                       help: '请输入文件名',
-                      status: 'error',
-                    },
+                      status: 'error'
+                    }
                   ]}
                 />
 
@@ -463,22 +445,16 @@ canal schema下的一张表：canal.test1 `}
                     {
                       rule: { required: true },
                       help: '请输入指定位置',
-                      status: 'error',
-                    },
+                      status: 'error'
+                    }
                   ]}
                 />
               </>
             )}
             <FlexBox>
               <div css={styles.line} />
-              <Center
-                tw="px-1 cursor-pointer"
-                onClick={() => setShowAdvanced((prev) => !prev)}
-              >
-                <Icon
-                  name={`chevron-${showAdvanced ? 'up' : 'down'}`}
-                  type="light"
-                />
+              <Center tw="px-1 cursor-pointer" onClick={() => setShowAdvanced((prev) => !prev)}>
+                <Icon name={`chevron-${showAdvanced ? 'up' : 'down'}`} type="light" />
                 高级配置
               </Center>
               <div css={styles.line} />

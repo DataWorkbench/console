@@ -1,12 +1,6 @@
 import dayjs from 'dayjs'
 
-const defineKeys = [
-  'heartBeat',
-  'heartMsg',
-  'reconnect',
-  'reconnectTime',
-  'reconnectTimes',
-]
+const defineKeys = ['heartBeat', 'heartMsg', 'reconnect', 'reconnectTime', 'reconnectTimes']
 
 class Socket {
   ws = null // websocket实例
@@ -54,13 +48,7 @@ class Socket {
 
     const { url, needHeartbeat } = params
 
-    const globalParams = [
-      'heartBeat',
-      'heartMsg',
-      'reconnect',
-      'reconnectTime',
-      'reconnectTimes',
-    ]
+    const globalParams = ['heartBeat', 'heartMsg', 'reconnect', 'reconnectTime', 'reconnectTimes']
 
     // 定义全局变量
     Object.keys(params).forEach((key) => {

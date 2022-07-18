@@ -19,7 +19,7 @@ import {
   alertHistorySuggestions,
   alertHistoryTabs,
   alertStatus,
-  monitorObjectTypes,
+  monitorObjectTypes
 } from './common/constants'
 
 // interface IAlertHistory {}
@@ -58,52 +58,38 @@ const AlertHistory = () => {
 
   const history = useHistory()
 
-  const { columns, setColumnSettings } = useColumns(
-    alertHistorySettingKey,
-    alertHistoryColumns,
-    {
-      alert_id: {
-        render: (text) => {
-          return (
-            <InstanceName
-              theme="dark"
-              name={text}
-              css={instanceNameStyle}
-              onClick={() => {
-                history.push(`../alert-policy/${text}`)
-              }}
-            />
-          )
-        },
-      },
+  const { columns, setColumnSettings } = useColumns(alertHistorySettingKey, alertHistoryColumns, {
+    alert_id: {
+      render: (text) => (
+        <InstanceName
+          theme="dark"
+          name={text}
+          css={instanceNameStyle}
+          onClick={() => {
+            history.push(`../alert-policy/${text}`)
+          }}
+        />
+      )
+    },
 
-      [getName('monitor_object')]: {
-        ...getColumnFilter(getName('monitor_object'), monitorObjectTypes),
-        render: (type: keyof typeof monitorObjectTypes) => {
-          return monitorObjectTypes[type]?.label
-        },
-      },
-      [getName('event_type')]: {
-        ...getColumnFilter(getName('event_type'), alertStatus),
-        render: (type: keyof typeof alertStatus) => {
-          return alertStatus[type]?.label
-        },
-      },
-      [getName('updated')]: {
-        render: (v) => (
-          <span tw="text-neut-8">
-            {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
-          </span>
-        ),
-      },
+    [getName('monitor_object')]: {
+      ...getColumnFilter(getName('monitor_object'), monitorObjectTypes),
+      render: (type: keyof typeof monitorObjectTypes) => monitorObjectTypes[type]?.label
+    },
+    [getName('event_type')]: {
+      ...getColumnFilter(getName('event_type'), alertStatus),
+      render: (type: keyof typeof alertStatus) => alertStatus[type]?.label
+    },
+    [getName('updated')]: {
+      render: (v) => <span tw="text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
     }
-  )
+  })
 
   const columnSettings = useMemo(
     () => ({
       columns: alertHistoryColumns,
       onSave: setColumnSettings as any,
-      storageKey: alertHistorySettingKey,
+      storageKey: alertHistorySettingKey
     }),
     [setColumnSettings]
   )
@@ -111,9 +97,9 @@ const AlertHistory = () => {
   const { spaceId } = useParams<{ spaceId: string }>()
   const { data, isFetching } = useQueryListAlertLogs({
     uri: {
-      space_id: spaceId,
+      space_id: spaceId
     },
-    params: filter as any,
+    params: filter as any
   })
 
   const infos = get(data, 'infos', []) ?? []
@@ -127,7 +113,7 @@ const AlertHistory = () => {
           suggestions={alertHistorySuggestions}
           filterInputConfig={{
             defaultKeywordLabel: '告警策略 ID',
-            searchKey: 'alert_id',
+            searchKey: 'alert_id'
           }}
         />
         <Table
@@ -137,7 +123,7 @@ const AlertHistory = () => {
           onSort={sort}
           pagination={{
             total: get(data, 'total', 0),
-            ...pagination,
+            ...pagination
           }}
         />
       </FlexBox>

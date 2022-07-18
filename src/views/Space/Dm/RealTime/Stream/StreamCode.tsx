@@ -1,12 +1,7 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
 import { Center, FlexBox, Modal } from 'components'
-import {
-  Icon,
-  Notification as Notify,
-  Button,
-  Loading,
-} from '@QCFE/qingcloud-portal-ui'
+import { Icon, Notification as Notify, Button, Loading } from '@QCFE/qingcloud-portal-ui'
 import { get, trim, isUndefined } from 'lodash-es'
 import { Prompt, useHistory, useParams } from 'react-router-dom'
 import tw, { styled, theme, css } from 'twin.macro'
@@ -24,7 +19,7 @@ import {
   useQueryStreamJobCode,
   useMutationStreamJobCodeSyntax,
   getFlowKey,
-  useStore,
+  useStore
 } from 'hooks'
 import * as flinksqlMod from 'utils/languages/flinksql'
 import * as pythonMod from 'utils/languages/python'
@@ -40,23 +35,21 @@ import Result from './Code/Result'
 const CODETYPE = {
   2: 'sql',
   4: 'python',
-  5: 'scala',
+  5: 'scala'
 }
 
-const SyntaxBox = styled(Center)(
-  ({ isBigger = false }: { isBigger?: boolean }) => [
-    tw`fixed-center backdrop-blur-sm text-center bg-neut-20 bg-opacity-60  rounded-md text-neut-8 transition-all`,
-    isBigger ? tw`w-[600px] h-[386px]` : tw`w-96 h-60`,
-    css`
-      .simplebar-scrollbar:before {
-        ${tw`bg-neut-8`}
-      }
-      .portal-loading .circle span {
-        ${tw`bg-white`}
-      }
-    `,
-  ]
-)
+const SyntaxBox = styled(Center)(({ isBigger = false }: { isBigger?: boolean }) => [
+  tw`fixed-center backdrop-blur-sm text-center bg-neut-20 bg-opacity-60  rounded-md text-neut-8 transition-all`,
+  isBigger ? tw`w-[600px] h-[386px]` : tw`w-96 h-60`,
+  css`
+    .simplebar-scrollbar:before {
+      ${tw`bg-neut-8`}
+    }
+    .portal-loading .circle span {
+      ${tw`bg-white`}
+    }
+  `
+])
 
 interface IProp {
   /** 2: SQL 4: Python 5: Scala */
@@ -67,7 +60,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   const [runLoading, setRunLoading] = useState(false)
   const {
     workFlowStore,
-    workFlowStore: { curJob, curVersion, showSaveJobConfirm },
+    workFlowStore: { curJob, curVersion, showSaveJobConfirm }
   } = useStore()
   const readOnly = !!curVersion
   const [nextLocation, setNextLocation] = useState(null)
@@ -89,8 +82,8 @@ const StreamCode = observer(({ tp }: IProp) => {
   const codeStr = get(data, `${{ 2: 'sql', 4: 'python_code' }[tp as 2]}.code`)
   const loadingWord = '代码加载中......'
   const queryClient = useQueryClient()
-  const defaultCode = useMemo(() => codePlaceholder[codeName] || '', [codeName])
-  const { spaceId, regionId } = useParams([])
+  const defaultCode = useMemo(() => codePlaceholder[codeName as 'sql'] || '', [codeName])
+  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
   const jobId = curJob?.id
   const socketRef = useRef(null)
   const [resultType, setResultType] = useState(0)
@@ -105,11 +98,9 @@ const StreamCode = observer(({ tp }: IProp) => {
       const signature = await loadSignature({
         region: regionId,
         uri: `/v1/workspace/${spaceId}/stream/job/${jobId}/ws`,
-        method: 'GET',
+        method: 'GET'
       })
-      const endpoint = signature.endpoint
-        .replace('http:', 'ws:')
-        .replace('https:', 'wss:')
+      const endpoint = signature.endpoint.replace('http:', 'ws:').replace('https:', 'wss:')
       const url = `${endpoint}/v1/workspace/${spaceId}/stream/job/${jobId}/ws` // 'ws://localhost:3030'
       setSocketUrl(url)
       setDisabled(false)
@@ -151,19 +142,20 @@ const StreamCode = observer(({ tp }: IProp) => {
     })
   }
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (socketRef.current?.close) {
         socketRef.current.close()
       }
-    }
-  }, [])
+    },
+    []
+  )
 
   const showWarn = () => {
     Notify.warning({
       title: '操作提示',
       content: '请先填写代码',
-      placement: 'bottomRight',
+      placement: 'bottomRight'
     })
   }
 
@@ -182,11 +174,7 @@ const StreamCode = observer(({ tp }: IProp) => {
     run()
   }
 
-  const mutateCodeData = (
-    op: 'codeSave' | 'codeSyntax',
-    cb?: () => void,
-    hideNotify = false
-  ) => {
+  const mutateCodeData = (op: 'codeSave' | 'codeSyntax', cb?: () => void, hideNotify = false) => {
     const code = trim(editorRef.current?.getValue())
     if (code === '') {
       showWarn()
@@ -206,9 +194,9 @@ const StreamCode = observer(({ tp }: IProp) => {
     opMutation.mutate(
       {
         [codeName]: {
-          code,
+          code
         },
-        type: tp,
+        type: tp
       },
       {
         onSuccess: (ret: any) => {
@@ -235,7 +223,7 @@ const StreamCode = observer(({ tp }: IProp) => {
             Notify.success({
               title: '操作提示',
               content: isSaveOp ? '代码保存成功' : '语法检查成功',
-              placement: 'bottomRight',
+              placement: 'bottomRight'
             })
           }
           if (cb) {
@@ -248,7 +236,7 @@ const StreamCode = observer(({ tp }: IProp) => {
             draft.showBox = false
             draft.errMsg = ''
           })
-        },
+        }
       }
     )
   }
@@ -273,8 +261,8 @@ const StreamCode = observer(({ tp }: IProp) => {
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': theme('colors.neut.17'),
-      },
+        'editor.background': theme('colors.neut.17')
+      }
     })
     let mod: any = null
     if (tp === 2) {
@@ -290,16 +278,13 @@ const StreamCode = observer(({ tp }: IProp) => {
       monaco.languages.setLanguageConfiguration(codeName, conf)
       monaco.languages.registerCompletionItemProvider(codeName, {
         provideCompletionItems: () => ({
-          suggestions: keywords.map((value: string) => {
-            return {
-              label: value,
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: value,
-              insertTextRules:
-                monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            }
-          }),
-        }),
+          suggestions: keywords.map((value: string) => ({
+            label: value,
+            kind: monaco.languages.CompletionItemKind.Keyword,
+            insertText: value,
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+          }))
+        })
       })
     }
   }
@@ -320,9 +305,7 @@ const StreamCode = observer(({ tp }: IProp) => {
       }
     })
     // eslint-disable-next-line no-bitwise
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
-      mutateCodeData('codeSave')
-    )
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => mutateCodeData('codeSave'))
   }
 
   const handleEditorChange = (v: string) => {
@@ -331,7 +314,7 @@ const StreamCode = observer(({ tp }: IProp) => {
       isDirty = false
     }
     workFlowStore.set({
-      isDirty,
+      isDirty
     })
   }
 
@@ -371,7 +354,7 @@ const StreamCode = observer(({ tp }: IProp) => {
 
   useUnmount(() => {
     workFlowStore.set({
-      showNotify: false,
+      showNotify: false
     })
     workFlowStore.resetNeedSave()
   })
@@ -381,7 +364,7 @@ const StreamCode = observer(({ tp }: IProp) => {
   const handleReleaseSuccess = () => {
     toggleShow(false)
     workFlowStore.set({
-      showNotify: true,
+      showNotify: true
     })
   }
 
@@ -405,12 +388,7 @@ const StreamCode = observer(({ tp }: IProp) => {
               <Icon name="remark" type="light" />
               语法检查
             </Button>
-            <Button
-              disabled={btnDisabled}
-              type="black"
-              onClick={handleRun}
-              loading={runLoading}
-            >
+            <Button disabled={btnDisabled} type="black" onClick={handleRun} loading={runLoading}>
               <Icon name="triangle-right" type="light" />
               运行
             </Button>
@@ -453,7 +431,7 @@ const StreamCode = observer(({ tp }: IProp) => {
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
               automaticLayout: true,
-              readOnly,
+              readOnly
             }}
             editorWillMount={handleEditorWillMount}
             editorDidMount={handleEditorDidMount}
@@ -476,33 +454,22 @@ const StreamCode = observer(({ tp }: IProp) => {
           okText="调度配置"
           onOk={() => {
             workFlowStore.set({
-              showScheSetting: true,
+              showScheSetting: true
             })
             // setShowScheSettingModal(true)
             toggleScheModal(false)
           }}
         >
           <div tw="flex">
-            <Icon
-              name="exclamation"
-              color={{ secondary: '#F5C414' }}
-              size={20}
-            />
+            <Icon name="exclamation" color={{ secondary: '#F5C414' }} size={20} />
             <div tw="ml-3">
               <div tw="text-base">尚未配置调度任务</div>
-              <div tw="mt-2 text-neut-8">
-                发布调度任务前，请先完成调度配置，否则无法发布
-              </div>
+              <div tw="mt-2 text-neut-8">发布调度任务前，请先完成调度配置，否则无法发布</div>
             </div>
           </div>
         </Modal>
       )}
-      {show && (
-        <ReleaseModal
-          onSuccess={handleReleaseSuccess}
-          onCancel={() => toggleShow(false)}
-        />
-      )}
+      {show && <ReleaseModal onSuccess={handleReleaseSuccess} onCancel={() => toggleShow(false)} />}
       {resultType > 0 && (
         <Result
           width={boxDimensions.width}
@@ -538,9 +505,7 @@ const StreamCode = observer(({ tp }: IProp) => {
                 不保存
               </Button>
               <div>
-                <Button onClick={() => workFlowStore.hideSaveConfirm()}>
-                  取消
-                </Button>
+                <Button onClick={() => workFlowStore.hideSaveConfirm()}>取消</Button>
                 <Button
                   type="primary"
                   loading={mutation.isLoading}
@@ -562,31 +527,23 @@ const StreamCode = observer(({ tp }: IProp) => {
           }
         >
           <div tw="flex">
-            <Icon
-              name="exclamation"
-              color={{ secondary: '#F5C414' }}
-              size={20}
-            />
+            <Icon name="exclamation" color={{ secondary: '#F5C414' }} size={20} />
             <div tw="ml-3">
               <div tw="text-base">尚未保存</div>
-              <div tw="mt-2 text-neut-8">
-                未保存时刷新、离开，将丢失已输入内容
-              </div>
+              <div tw="mt-2 text-neut-8">未保存时刷新、离开，将丢失已输入内容</div>
             </div>
           </div>
         </Modal>
       )}
       <Prompt when={workFlowStore.isDirty} message={handlePrompt} />
       {syntaxState.showBox && (
-        <SyntaxBox
-          isBigger={syntaxMutation.isSuccess && syntaxState.errMsg !== ''}
-        >
+        <SyntaxBox isBigger={syntaxMutation.isSuccess && syntaxState.errMsg !== ''}>
           <div tw="absolute right-2 top-2">
             <Icon
               name="close"
               type="dark"
               color={{
-                primary: theme('colors.white'),
+                primary: theme('colors.white')
               }}
               tw="cursor-pointer"
               onClick={() => {
@@ -612,7 +569,7 @@ const StreamCode = observer(({ tp }: IProp) => {
                     size={40}
                     color={{
                       primary: theme('colors.green.11'),
-                      secondary: '#9DDFC9',
+                      secondary: '#9DDFC9'
                     }}
                   />
                   <div>检查完毕，未发现语法错误</div>
@@ -624,7 +581,7 @@ const StreamCode = observer(({ tp }: IProp) => {
                     size={30}
                     color={{
                       primary: theme('colors.white'),
-                      secondary: theme('colors.blue.10'),
+                      secondary: theme('colors.blue.10')
                     }}
                   />
                   <SimpleBar

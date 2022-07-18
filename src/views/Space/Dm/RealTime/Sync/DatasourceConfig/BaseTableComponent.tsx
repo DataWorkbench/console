@@ -10,8 +10,8 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
-  ],
+    `
+  ]
 }
 
 interface IBaseTableComponentProps {
@@ -48,7 +48,7 @@ const BaseTableComponent = (props: IBaseTableComponentProps) => {
       label={<AffixLabel>数据源表</AffixLabel>}
       options={tables.map((tabName) => ({
         label: tabName,
-        value: tabName,
+        value: tabName
       }))}
       onChange={onChange}
       isLoading={tablesRet.isFetching}
@@ -64,24 +64,20 @@ const BaseTableComponent = (props: IBaseTableComponentProps) => {
             validateHelp: (
               <div>
                 当前数据源不可用，请前往{' '}
-                <HelpCenterLink
-                  hasIcon
-                  isIframe={false}
-                  href="/manual/source_data/add_data/"
-                >
+                <HelpCenterLink hasIcon isIframe={false} href="/manual/source_data/add_data/">
                   数据源管理
                 </HelpCenterLink>{' '}
                 页面配置
               </div>
-            ) as any,
+            ) as any
           }
         : {})}
       schemas={[
         {
           help: '请选择数据源表',
           status: 'error',
-          rule: (v?: string) => !!v,
-        },
+          rule: (v?: string) => !!v
+        }
         // todo:当前数据源不可用，请前往 [数据源管理] 页面配置
       ]}
       help={

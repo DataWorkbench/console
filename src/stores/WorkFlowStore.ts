@@ -19,7 +19,7 @@ enum SourceType {
   ElasticSearch = 14,
   MongoDB = 15,
   Redis = 16,
-  TiDB = 1000000000000,
+  TiDB = 1000000000000
 }
 
 interface IJob {
@@ -43,7 +43,7 @@ const initTreeData = [
     jobMode: 'DI',
     title: '数据集成',
     isLeaf: false,
-    children: [],
+    children: []
   },
   {
     key: 'rt-root',
@@ -51,8 +51,8 @@ const initTreeData = [
     jobMode: 'RT',
     title: '数据开发',
     isLeaf: false,
-    children: [],
-  },
+    children: []
+  }
 ]
 class WorkFlowStore {
   rootStore
@@ -101,7 +101,7 @@ class WorkFlowStore {
     makeAutoObservable(this, {
       rootStore: false,
       treeData: observable.ref,
-      loadedKeys: observable.ref,
+      loadedKeys: observable.ref
     })
     this.rootStore = rootStore
   }
@@ -130,8 +130,7 @@ class WorkFlowStore {
     if (this.tabOp === 'close') {
       this.removePanel(this.opTabName)
     } else if (this.tabOp === 'switch') {
-      const job =
-        this.panels.find((p) => p.id === this.opTabName) || this.nextJob
+      const job = this.panels.find((p) => p.id === this.opTabName) || this.nextJob
       if (job) {
         this.curJob = job
       }
@@ -147,10 +146,7 @@ class WorkFlowStore {
     this.nextJob = null
   }
 
-  showSaveConfirm = (
-    opTabName: string,
-    op: 'switch' | 'close' | 'leave' = 'switch'
-  ) => {
+  showSaveConfirm = (opTabName: string, op: 'switch' | 'close' | 'leave' = 'switch') => {
     this.showSaveJobConfirm = true
     this.opTabName = opTabName
     this.tabOp = op

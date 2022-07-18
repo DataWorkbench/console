@@ -6,27 +6,23 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
-  useState,
+  useState
 } from 'react'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import {
   baseTarget$,
   confColumns$,
   target$,
-  targetColumns$,
+  targetColumns$
 } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { AffixLabel, Center, FlexBox, SqlGroupField } from 'components'
-import {
-  DbType,
-  sourceKinds,
-  SourceType,
-} from 'views/Space/Upcloud/DataSourceList/constant'
+import { DbType, sourceKinds, SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { useQuerySourceTableSchema } from 'hooks'
 import BaseTableComponent from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTableComponent'
 import {
   IDataSourceConfigProps,
-  ISourceRef,
+  ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import { useImmer } from 'use-immer'
 
@@ -42,7 +38,7 @@ const StyledSqlGroupField = styled(SqlGroupField)(() => [
         ${tw`w-[378px]!`}
       }
     }
-  `,
+  `
 ])
 
 const styles = {
@@ -79,15 +75,15 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
 enum WriteMode {
   Insert = 1,
   Replace = 2,
-  Update = 3,
+  Update = 3
 }
 
 const getWriteMode = (type?: SourceType) => {
@@ -107,13 +103,11 @@ const getWriteMode = (type?: SourceType) => {
 
 enum Semantic {
   'AtLeastOnce' = 1,
-  'ExactlyOnce' = 2,
+  'ExactlyOnce' = 2
 }
 
 const getExactly = (types?: SourceType[]) => {
-  const sql = new Set(
-    sourceKinds.filter((i) => i.type === DbType.Sql).map((i) => i.source_type)
-  )
+  const sql = new Set(sourceKinds.filter((i) => i.type === DbType.Sql).map((i) => i.source_type))
   if (types?.every((i) => sql.has(i))) {
     return [Semantic.ExactlyOnce, Semantic.AtLeastOnce]
   }
@@ -147,7 +141,7 @@ const BaseTargetConfig = forwardRef(
     const { refetch } = useQuerySourceTableSchema(
       {
         sourceId: dbInfo?.id!,
-        tableName: dbInfo?.tableName!,
+        tableName: dbInfo?.tableName!
       },
       {
         enabled: !!(dbInfo?.id && dbInfo?.tableName),
@@ -156,10 +150,10 @@ const BaseTargetConfig = forwardRef(
           targetColumns$.next(
             columns.map((i) => ({
               ...i,
-              uuid: `target--${i.name}`,
+              uuid: `target--${i.name}`
             }))
           )
-        },
+        }
       },
       'source'
     )
@@ -169,57 +163,51 @@ const BaseTargetConfig = forwardRef(
       confColumns$.next([])
     }
 
-    const renderCommon = () => {
-      return <BaseConfigCommon from="target" />
-    }
+    const renderCommon = () => <BaseConfigCommon from="target" />
 
     console.log(dbInfo?.tableName)
     const hasTable = !isEmpty(dbInfo?.tableName)
 
-    useImperativeHandle(ref, () => {
-      return {
-        validate: () => {
-          if (!targetForm.current) {
-            return false
-          }
-          return targetForm.current?.validateForm()
-        },
-        getData: () => {
-          const target = baseTarget$.getValue()
-          if (!target || !target.data || !target.data.id) {
-            return undefined
-          }
-          return {
-            table: [target.data.tableName],
-            write_mode: target.data.writeMode,
-            semantic: target.data.semantic,
-            batch_size: target.data.batchSize,
-            pre_sql: target.data.preSql?.filter((v) => v !== ''),
-            post_sql: target.data.postSql?.filter((v) => v !== ''),
-          }
-        },
-        refetchColumn: () => {
-          refetch()
-        },
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        if (!targetForm.current) {
+          return false
+        }
+        return targetForm.current?.validateForm()
+      },
+      getData: () => {
+        const target = baseTarget$.getValue()
+        if (!target || !target.data || !target.data.id) {
+          return undefined
+        }
+        return {
+          table: [target.data.tableName],
+          write_mode: target.data.writeMode,
+          semantic: target.data.semantic,
+          batch_size: target.data.batchSize,
+          pre_sql: target.data.preSql?.filter((v) => v !== ''),
+          post_sql: target.data.postSql?.filter((v) => v !== '')
+        }
+      },
+      refetchColumn: () => {
+        refetch()
       }
-    })
+    }))
 
-    const renderBaseTable = () => {
-      return (
-        <BaseTableComponent
-          from="target"
-          sourceType={sourceType?.label}
-          sourceId={dbInfo?.id}
-          tableName={dbInfo?.tableName}
-          onChange={(v) => {
-            console.log(v)
-            setDbInfo((draft) => {
-              draft.tableName = v
-            })
-          }}
-        />
-      )
-    }
+    const renderBaseTable = () => (
+      <BaseTableComponent
+        from="target"
+        sourceType={sourceType?.label}
+        sourceId={dbInfo?.id}
+        tableName={dbInfo?.tableName}
+        onChange={(v) => {
+          console.log(v)
+          setDbInfo((draft) => {
+            draft.tableName = v
+          })
+        }}
+      />
+    )
 
     return (
       <Form css={styles.form} ref={targetForm}>
@@ -235,18 +223,16 @@ const BaseTargetConfig = forwardRef(
                 { label: 'replace 替换', value: WriteMode.Replace },
                 {
                   label: 'update 更新插入',
-                  value: WriteMode.Update,
-                },
-              ].filter((i) =>
-                getWriteMode(curJob?.target_type).includes(i.value)
-              )}
+                  value: WriteMode.Update
+                }
+              ].filter((i) => getWriteMode(curJob?.target_type).includes(i.value))}
               value={dbInfo?.writeMode}
               schemas={[
                 {
                   help: '请选择写入模式',
                   status: 'error',
-                  rule: { required: true },
-                },
+                  rule: { required: true }
+                }
               ]}
               validateOnChange
               onChange={(v: WriteMode) => {
@@ -256,8 +242,7 @@ const BaseTargetConfig = forwardRef(
                 let helpStr = ''
                 switch (dbInfo?.writeMode) {
                   case WriteMode.Insert:
-                    helpStr =
-                      '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
+                    helpStr = '当主键/唯一性索引冲突时会写不进去冲突的行，以脏数据的形式体现。'
                     break
                   case WriteMode.Replace:
                     helpStr =
@@ -280,16 +265,14 @@ const BaseTargetConfig = forwardRef(
               options={[
                 {
                   label: 'exactly-once 正好一次',
-                  value: Semantic.ExactlyOnce,
+                  value: Semantic.ExactlyOnce
                 },
                 {
                   label: 'at-least-once 至少一次',
-                  value: Semantic.AtLeastOnce,
-                },
+                  value: Semantic.AtLeastOnce
+                }
               ].filter((i) =>
-                getExactly([curJob?.source_type, curJob?.target_type]).includes(
-                  i.value
-                )
+                getExactly([curJob?.source_type, curJob?.target_type]).includes(i.value)
               )}
               onChange={(v: Semantic) => {
                 handleUpdate({ semantic: +v })
@@ -299,8 +282,8 @@ const BaseTargetConfig = forwardRef(
                 {
                   help: '请选择写入模式',
                   status: 'error',
-                  rule: { required: true },
-                },
+                  rule: { required: true }
+                }
               ]}
             />
             <TextField
@@ -321,14 +304,13 @@ const BaseTargetConfig = forwardRef(
                 {
                   help: '批量写入条数不能为空',
                   status: 'error',
-                  rule: { required: true },
+                  rule: { required: true }
                 },
                 {
                   help: '范围: 1~65535, 批量写入条数不能小于 1',
                   status: 'error',
-                  rule: (v: any) =>
-                    /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535,
-                },
+                  rule: (v: any) => /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535
+                }
               ]}
             />
             <FlexBox>
@@ -337,10 +319,7 @@ const BaseTargetConfig = forwardRef(
                 tw="px-1 cursor-pointer"
                 onClick={() => setShowTargetAdvanced((prev) => !prev)}
               >
-                <Icon
-                  name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`}
-                  type="light"
-                />
+                <Icon name={`chevron-${showTargetAdvanced ? 'up' : 'down'}`} type="light" />
                 高级配置
               </Center>
               <div css={styles.line} />
@@ -360,23 +339,19 @@ const BaseTargetConfig = forwardRef(
                   placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
                   schemas={[
                     {
-                      rule: (arr: string[]) => {
-                        return (arr || []).every((v) => {
+                      rule: (arr: string[]) =>
+                        (arr || []).every((v) => {
                           if (!v) {
                             return true
                           }
-                          if (
-                            v.trim() &&
-                            v.trim().split(';').filter(Boolean).length > 1
-                          ) {
+                          if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
                             return false
                           }
                           return true
-                        })
-                      },
+                        }),
                       help: '单条语句只能包含一个 SQL 命令',
-                      status: 'error',
-                    },
+                      status: 'error'
+                    }
                   ]}
                 />
                 <StyledSqlGroupField
@@ -391,23 +366,19 @@ const BaseTargetConfig = forwardRef(
                   }}
                   schemas={[
                     {
-                      rule: (arr: string[]) => {
-                        return (arr || []).every((v) => {
+                      rule: (arr: string[]) =>
+                        (arr || []).every((v) => {
                           if (!v) {
                             return true
                           }
-                          if (
-                            v.trim() &&
-                            v.trim().split(';').filter(Boolean).length > 1
-                          ) {
+                          if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
                             return false
                           }
                           return true
-                        })
-                      },
+                        }),
                       help: '单条语句只能包含一个 SQL 命令',
-                      status: 'error',
-                    },
+                      status: 'error'
+                    }
                   ]}
                   placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
                 />

@@ -1,29 +1,7 @@
-import {
-  useRef,
-  useState,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-} from 'react'
+import { useRef, useState, useCallback, useEffect, useImperativeHandle } from 'react'
 import { observer } from 'mobx-react-lite'
-import {
-  Icon,
-  Menu,
-  Form,
-  Control,
-  Field,
-  Label,
-  Input,
-  Button,
-} from '@QCFE/lego-ui'
-import {
-  Icons,
-  AffixLabel,
-  Confirm,
-  Tree,
-  SelectTreeField,
-  PortalModal,
-} from 'components'
+import { Icon, Menu, Form, Control, Field, Label, Input, Button } from '@QCFE/lego-ui'
+import { Icons, AffixLabel, Confirm, Tree, SelectTreeField, PortalModal } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useMutationStreamJob, useFetchJob } from 'hooks'
@@ -46,7 +24,7 @@ import {
   getJobIdByKey,
   renderIcon,
   renderSwitcherIcon,
-  JobMode,
+  JobMode
 } from './JobUtils'
 import { JobModal, JobModalData } from '../Modal/JobModal'
 
@@ -69,7 +47,7 @@ const TreeWrapper = styled('div')(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 interface JobTreeProps {
@@ -84,12 +62,10 @@ export const JobTree = observer(
 
     const {
       workFlowStore,
-      workFlowStore: { treeData, loadedKeys, showJobModal },
+      workFlowStore: { treeData, loadedKeys, showJobModal }
     } = useStore()
 
-    const [expandedKeys, setExpandedKeys] = useState<string[]>(
-      expandedKeysProp || []
-    )
+    const [expandedKeys, setExpandedKeys] = useState<string[]>(expandedKeysProp || [])
     const [curOpNode, setCurOpNode] = useState(treeData[1])
     const [autoExpandParent, setAutoExpandParent] = useState(false)
     const [targetNodeKey, setTargetNodeKey] = useState<string>('')
@@ -110,7 +86,7 @@ export const JobTree = observer(
     }>({
       op: 'create',
       type: JobType.OFFLINE,
-      node: undefined,
+      node: undefined
     })
     const curOpWord = curOpNode.isLeaf ? '作业' : '文件夹'
 
@@ -135,14 +111,14 @@ export const JobTree = observer(
         setJobInfo({
           op: 'create',
           type: JobType.OFFLINE,
-          node: undefined,
+          node: undefined
         })
       },
       search: (v: string) => {
         workFlowStore.resetTreeData()
         setSearch(v)
         setExpandedKeys(['di-root', 'rt-root'])
-      },
+      }
     }))
 
     const onRightClick = useCallback(({ node }) => {
@@ -169,7 +145,7 @@ export const JobTree = observer(
             JobType.JAR,
             JobType.PYTHON,
             JobType.SCALA,
-            JobType.OPERATOR,
+            JobType.OPERATOR
           ].includes(val as JobType) ||
           val === 'editJob'
         ) {
@@ -183,12 +159,12 @@ export const JobTree = observer(
         } else if (val === 'scheSetting') {
           workFlowStore.set({
             curJob: { ...get(curOpNode, 'job'), jobMode: curOpNode.jobMode },
-            showScheSetting: true,
+            showScheSetting: true
           })
         } else if (val === 'argsSetting') {
           workFlowStore.set({
             curJob: { ...get(curOpNode, 'job'), jobMode: curOpNode.jobMode },
-            showArgsSetting: true,
+            showArgsSetting: true
           })
         }
       },
@@ -221,7 +197,7 @@ export const JobTree = observer(
                     tw="mr-2"
                     color={{
                       primary: theme('colors.white'),
-                      secondary: theme('colors.white'),
+                      secondary: theme('colors.white')
                     }}
                   />
                   <span>关联实例</span>
@@ -300,11 +276,7 @@ export const JobTree = observer(
 
                 {false && (
                   <>
-                    <MenuItem
-                      disabled
-                      value={JobType.SCALA}
-                      onClick={onRightMenuClick}
-                    >
+                    <MenuItem disabled value={JobType.SCALA} onClick={onRightMenuClick}>
                       <Icons name="scala" size={14} tw="mr-2" />
                       <span>Scala 包模式</span>
                     </MenuItem>
@@ -319,10 +291,7 @@ export const JobTree = observer(
             )}
 
             {!isRoot && (
-              <MenuItem
-                value="delete"
-                disabled={!node.isLeaf && node.children?.length > 0}
-              >
+              <MenuItem value="delete" disabled={!node.isLeaf && node.children?.length > 0}>
                 <Icon name="delete" size={14} type="light" />
                 <span>删除</span>
               </MenuItem>
@@ -337,18 +306,15 @@ export const JobTree = observer(
       const rootKey = node.key === node.pid ? node.key : node.rootKey
       return fetchJob(rootKey === RootKey.DI ? 'sync' : 'stream', {
         pid,
-        search,
+        search
       })
         .then((data) => {
           const jobs = get(data, 'infos') || []
-          const newTreeData = getNewTreeData(
-            workFlowStore.treeData,
-            node,
-            jobs,
-            movingNode
-          )
+          const newTreeData = getNewTreeData(workFlowStore.treeData, node, jobs, movingNode)
+          console.log('newTreeData', newTreeData)
+
           workFlowStore.set({
-            treeData: newTreeData,
+            treeData: newTreeData
           })
           setExpandedKeys([...expandedKeys, node.key])
         })
@@ -373,7 +339,7 @@ export const JobTree = observer(
         const pid = op === 'move' ? targetNodeKey : curOpNode.key
         data = {
           ...data,
-          ...fields,
+          ...fields
         }
         if (op === 'create') {
           data.pid = getJobIdByKey(pid)
@@ -387,7 +353,7 @@ export const JobTree = observer(
       } else if (op === 'delete') {
         data = {
           ...data,
-          job_ids: [key],
+          job_ids: [key]
         }
       }
 
@@ -396,37 +362,29 @@ export const JobTree = observer(
           setShowOpModal(false)
           setShowConfirm(false)
           const pNode =
-            op === 'create'
-              ? curOpNode
-              : findTreeNode(workFlowStore.treeData, curOpNode.pid)
+            op === 'create' ? curOpNode : findTreeNode(workFlowStore.treeData, curOpNode.pid)
           if (op === 'create' || op === 'edit') {
             fetchJobTreeData(pNode)
           } else if (op === 'move' || op === 'delete') {
             const node = findTreeNode(workFlowStore.treeData, key)
-            const newTreeData = removeTreeNode(
-              workFlowStore.treeData,
-              curOpNode
-            )
+            const newTreeData = removeTreeNode(workFlowStore.treeData, curOpNode)
             workFlowStore.set({
-              treeData: newTreeData,
+              treeData: newTreeData
             })
             if (op === 'move') {
-              const targetNode = findTreeNode(
-                workFlowStore.treeData,
-                targetNodeKey
-              )
+              const targetNode = findTreeNode(workFlowStore.treeData, targetNodeKey)
               fetchJobTreeData(targetNode, node)
             }
             if (op === 'delete') {
               setDelBtnEnable(false)
               if (workFlowStore.curJob?.id === data.job_ids[0]) {
                 workFlowStore.set({
-                  curJob: null,
+                  curJob: null
                 })
               }
             }
           }
-        },
+        }
       })
     }
 
@@ -435,10 +393,7 @@ export const JobTree = observer(
       if (data) {
         const { isEdit, pNode } = data
         const node =
-          pNode ||
-          (isEdit
-            ? findTreeNode(workFlowStore.treeData, curOpNode.pid)
-            : curOpNode)
+          pNode || (isEdit ? findTreeNode(workFlowStore.treeData, curOpNode.pid) : curOpNode)
 
         fetchJobTreeData(node).then(() => {
           setAutoExpandParent(true)
@@ -460,11 +415,7 @@ export const JobTree = observer(
           duration={[100, 0]}
           offset={[5, 5]}
           appendTo={() => document.body}
-          content={
-            <div tw="border border-neut-13 rounded-sm">
-              {renderRightMenu(curOpNode)}
-            </div>
-          }
+          content={<div tw="border border-neut-13 rounded-sm">{renderRightMenu(curOpNode)}</div>}
         >
           <TreeWrapper ref={treeEl}>
             <Tree
@@ -507,13 +458,10 @@ export const JobTree = observer(
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
                 }
-                if (
-                  workFlowStore.curJob?.id !== job?.id &&
-                  workFlowStore.isDirty
-                ) {
+                if (workFlowStore.curJob?.id !== job?.id && workFlowStore.isDirty) {
                   workFlowStore.addPanel({
                     ...job,
-                    jobMode: get(node, 'jobMode'),
+                    jobMode: get(node, 'jobMode')
                   })
                   workFlowStore.set({ nextJob: job })
                   workFlowStore.showSaveConfirm(job.id, 'switch')
@@ -521,12 +469,10 @@ export const JobTree = observer(
                 }
                 if (node.isLeaf) {
                   workFlowStore.set({
-                    curJob: { ...job, jobMode: get(node, 'jobMode') },
+                    curJob: { ...job, jobMode: get(node, 'jobMode') }
                   })
                 } else if (node.expanded) {
-                  setExpandedKeys(
-                    expandedKeys.filter((key) => key !== node.key)
-                  )
+                  setExpandedKeys(expandedKeys.filter((key) => key !== node.key))
                 } else {
                   setExpandedKeys([...expandedKeys, node.key as string])
                 }
@@ -544,12 +490,12 @@ export const JobTree = observer(
             const opTxt = {
               create: `创建文件夹`,
               edit: `编辑文件夹`,
-              move: `移动${curOpWord}${isLeaf ? `: ${key}` : ''}`,
+              move: `移动${curOpWord}${isLeaf ? `: ${key}` : ''}`
             }[curOp]
             const okTxt = {
               create: '创建',
               edit: '保存',
-              move: '移动',
+              move: '移动'
             }[curOp]
             return (
               <PortalModal
@@ -574,10 +520,10 @@ export const JobTree = observer(
                         {
                           rule: {
                             required: true,
-                            matchRegex: nameMatchRegex,
+                            matchRegex: nameMatchRegex
                           },
                           help: '允许包含字母、数字或下划线（_）,不能以（_）开始结尾',
-                          status: 'error',
+                          status: 'error'
                         },
                         {
                           rule: (value: string) => {
@@ -585,8 +531,8 @@ export const JobTree = observer(
                             return l >= 2 && l <= 128
                           },
                           help: '允许包含字母、数字 及 "_"，长度2～128',
-                          status: 'error',
-                        },
+                          status: 'error'
+                        }
                       ]}
                     />
                   )}
@@ -610,28 +556,20 @@ export const JobTree = observer(
                         treeHeight={160}
                         schemas={[
                           {
-                            rule: (v: string) => {
-                              return v !== ''
-                            },
+                            rule: (v: string) => v !== '',
                             help: '请选择作业所在目录',
-                            status: 'error',
-                          },
+                            status: 'error'
+                          }
                         ]}
                         icon={renderIcon}
                         switcherIcon={renderSwitcherIcon}
                         treeData={filterFolderOfTreeData(
-                          cloneDeep(
-                            treeData.filter(
-                              (item) => item.key === curOpNode.rootKey
-                            )
-                          ),
+                          cloneDeep(treeData.filter((item) => item.key === curOpNode.rootKey)),
                           curOpNode.key
                         )}
                         loadData={fetchJobTreeData}
                         loadedKeys={loadedKeys}
-                        onLoad={(keys: string | number) =>
-                          workFlowStore.set({ loadedKeys: keys })
-                        }
+                        onLoad={(keys: string | number) => workFlowStore.set({ loadedKeys: keys })}
                         value={targetNodeKey || ''}
                         onChange={(v: string) => {
                           setTargetNodeKey(v)

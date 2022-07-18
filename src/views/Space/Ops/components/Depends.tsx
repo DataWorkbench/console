@@ -5,7 +5,7 @@ import { FlexBox } from 'components'
 const itemStyle = (isDelete: boolean) => [
   tw`flex items-center px-2 gap-1 leading-6 mb-2`,
   !isDelete && tw`bg-neut-13`,
-  isDelete && tw`bg-[rgba(207, 59, 55, 0.1)] border border-red-10`,
+  isDelete && tw`bg-[rgba(207, 59, 55, 0.1)] border border-red-10`
 ]
 
 const Empty = styled.div`
@@ -49,7 +49,7 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
                   name="coding"
                   color={{
                     primary: '#fff',
-                    secondary: '##949ea9',
+                    secondary: '##949ea9'
                   }}
                   size={40}
                 />
@@ -72,7 +72,7 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
               type="light"
               color={{
                 primary: '#219861',
-                secondary: '#8EDABD',
+                secondary: '#8EDABD'
               }}
             />
             <span tw="text-white">{file}</span>
@@ -88,7 +88,7 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
                 type="light"
                 color={{
                   primary: '#219861',
-                  secondary: '#8EDABD',
+                  secondary: '#8EDABD'
                 }}
               />
               <span tw="text-white">{file}</span>

@@ -17,7 +17,7 @@ emitter.on('error', ({ title, content }: any) =>
     title,
     content,
     placement: 'bottomRight',
-    type: 'error',
+    type: 'error'
   })
 )
 
@@ -33,12 +33,7 @@ const App = () => {
         throw new Error()
       })
       .then(
-        (id) => {
-          return apiRequest(
-            'platformManage',
-            'describePlatformConfig'
-          )({ regionId: id })
-        },
+        (id) => apiRequest('platformManage', 'describePlatformConfig')({ regionId: id }),
         () => {}
       )
       .then((platform: Record<string, any>) => {

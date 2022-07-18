@@ -10,12 +10,7 @@ import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import { Button } from '@QCFE/lego-ui'
 import { emitter } from 'utils/index'
-import {
-  useMutationMember,
-  useQueryMemberList,
-  useQueryRoleList,
-  useStore,
-} from 'hooks'
+import { useMutationMember, useQueryMemberList, useQueryRoleList, useStore } from 'hooks'
 
 import RoleFilter from 'views/Space/Manage/Member/components/RoleFilter'
 import { get } from 'lodash-es'
@@ -36,15 +31,8 @@ const columns = [
     key: 'user_id',
     render: (text: string, record: Record<string, any>) => {
       const { user_id: userId, name: userName } = record.user_info ?? {}
-      return (
-        <InstanceName
-          theme="light"
-          name={userName}
-          desc={userId}
-          icon="human"
-        />
-      )
-    },
+      return <InstanceName theme="light" name={userName} desc={userId} icon="human" />
+    }
   },
   {
     title: '成员邮箱',
@@ -54,19 +42,19 @@ const columns = [
     render: (text: string, record: Record<string, any>) => {
       const { email } = record.user_info ?? {}
       return <TextEllipsis>{email}</TextEllipsis>
-    },
+    }
   },
   {
     title: '角色',
     dataIndex: 'system_role_ids',
-    key: 'system_role_ids',
+    key: 'system_role_ids'
   },
   {
     title: '加入时间',
     dataIndex: 'created',
     key: 'created',
-    width: 150,
-  },
+    width: 150
+  }
 ]
 
 const Root = styled('div')(() => [
@@ -75,7 +63,7 @@ const Root = styled('div')(() => [
     .page-tab-container {
       margin-bottom: 20px;
     }
-  `,
+  `
 ])
 
 interface IRouteParams {
@@ -87,32 +75,24 @@ const Member = observer(
   ({
     modalView = false,
     spaceId,
-    regionId: regionIdFromProps,
+    regionId: regionIdFromProps
   }: {
     modalView?: boolean
     spaceId?: string
     regionId?: string
   }) => {
-    const {
-      op,
-      set,
-      setOp,
-      setActiveKeys,
-      setSelectedKeys,
-      selectedKeys,
-      activeKeys,
-    } = useMemberStore()
+    const { op, set, setOp, setActiveKeys, setSelectedKeys, selectedKeys, activeKeys } =
+      useMemberStore()
 
     const {
-      workSpaceStore: { space },
+      workSpaceStore: { space }
     } = useStore()
 
     const { regionId: regionIdFromParams } = useParams<IRouteParams>()
 
     const regionId = regionIdFromProps ?? regionIdFromParams
 
-    const isOwner =
-      !!space?.owner && get(window, 'USER.user_id') === space?.owner
+    const isOwner = !!space?.owner && get(window, 'USER.user_id') === space?.owner
 
     const [filter, setFilter] = useImmer({
       search: '',
@@ -122,7 +102,7 @@ const Member = observer(
       sort_by: '',
       filter: undefined as unknown as string[],
       regionId,
-      spaceId,
+      spaceId
     })
     const handleSelect = (keys: string[]) => {
       setSelectedKeys(keys)
@@ -155,7 +135,7 @@ const Member = observer(
               onClick={() => {
                 set({
                   op: 'update',
-                  spaceItem: { ...toJS(space), regionId },
+                  spaceItem: { ...toJS(space), regionId }
                 })
                 setActiveKeys([record.user_id])
               }}
@@ -174,7 +154,7 @@ const Member = observer(
               删除
             </Button>
           </FlexBox>
-        ),
+        )
       }),
       [isOwner, set, space, regionId, setActiveKeys, setOp]
     )
@@ -188,7 +168,7 @@ const Member = observer(
             op: 'update',
             user_id: record.user_id,
             system_role_ids: record.system_role_ids,
-            desc: record.desc,
+            desc: record.desc
           })
           .finally(() => {
             refetch()
@@ -210,7 +190,7 @@ const Member = observer(
           handleUpdate({
             user_id: userId,
             system_role_ids: newRoleIds,
-            desc: record.desc,
+            desc: record.desc
           })
         }
       },
@@ -219,14 +199,11 @@ const Member = observer(
     const handleAddRole = useCallback(
       (record: Record<string, any>, roleId: string) => {
         const { user_id: userId, system_roles: systemRoles } = record
-        const newRoleIds = [
-          ...systemRoles.map(({ id }: { id: string }) => id),
-          roleId,
-        ]
+        const newRoleIds = [...systemRoles.map(({ id }: { id: string }) => id), roleId]
         handleUpdate({
           user_id: userId,
           system_role_ids: newRoleIds,
-          desc: record.desc,
+          desc: record.desc
         })
       },
       [handleUpdate]
@@ -238,12 +215,10 @@ const Member = observer(
           title: (
             <RoleFilter
               value={filter.filter}
-              options={(roleList?.infos || []).map(
-                (i: Record<string, any>) => ({
-                  label: i.name,
-                  value: i.id,
-                })
-              )}
+              options={(roleList?.infos || []).map((i: Record<string, any>) => ({
+                label: i.name,
+                value: i.id
+              }))}
               onChange={(roleIds) =>
                 setFilter((draft) => {
                   draft.filter = roleIds
@@ -251,35 +226,27 @@ const Member = observer(
               }
             />
           ),
-          render: (_: any, record: Record<string, any>) => {
-            return (
-              <div tw="overflow-auto">
-                <Tags
-                  data={record}
-                  list={roleList?.infos || []}
-                  handleAdd={handleAddRole}
-                  handleRemove={handleRemoveRole}
-                />
-              </div>
-            )
-          },
+          render: (_: any, record: Record<string, any>) => (
+            <div tw="overflow-auto">
+              <Tags
+                data={record}
+                list={roleList?.infos || []}
+                handleAdd={handleAddRole}
+                handleRemove={handleRemoveRole}
+              />
+            </div>
+          )
         },
         created: {
           sortable: true,
           sortOrder:
             // filter.reverse ? 'asc' : 'desc',
             // eslint-disable-next-line no-nested-ternary
-            filter.sort_by === 'created'
-              ? !filter.reverse
-                ? 'asc'
-                : 'desc'
-              : '',
+            filter.sort_by === 'created' ? (!filter.reverse ? 'asc' : 'desc') : '',
           render: (v: number) => (
-            <span tw="dark:text-neut-8">
-              {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          ),
-        },
+            <span tw="dark:text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+          )
+        }
       }),
       [
         filter.filter,
@@ -288,7 +255,7 @@ const Member = observer(
         handleAddRole,
         handleRemoveRole,
         roleList?.infos,
-        setFilter,
+        setFilter
       ]
     )
 
@@ -298,7 +265,7 @@ const Member = observer(
           if (columnsRender[column.key]) {
             return {
               ...column,
-              ...columnsRender[column.key],
+              ...columnsRender[column.key]
             }
           }
           return column
@@ -322,7 +289,7 @@ const Member = observer(
       mutation
         .mutateAsync({
           op: 'delete',
-          userIds: activeKeys,
+          userIds: activeKeys
         })
         .then(() => {
           refetch()
@@ -332,12 +299,10 @@ const Member = observer(
 
     const filterColumn = columnSettings.length
       ? columnSettings
-          .map((o: { key: string; checked: boolean }) => {
-            return (
-              o.checked &&
-              columnsWithRender.find((col: any) => col.key === o.key)
-            )
-          })
+          .map(
+            (o: { key: string; checked: boolean }) =>
+              o.checked && columnsWithRender.find((col: any) => col.key === o.key)
+          )
           .filter(Boolean)
       : columnsWithRender
 
@@ -361,7 +326,7 @@ const Member = observer(
             isOwner={isOwner}
             spaceItem={{
               ...space,
-              regionId,
+              regionId
             }}
           />
           <Card css={[tw`flex-1 p-5 pt-2`]}>
@@ -389,7 +354,7 @@ const Member = observer(
                     draft.offset = 0
                     draft.limit = size
                   })
-                },
+                }
               }}
               columns={columnsWithOperation}
               rowKey="user_id"

@@ -4,19 +4,10 @@ import { Center } from 'components/Center'
 import { ArrowLine } from 'components/ArrowLine'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
 import { findKey, get, pick } from 'lodash-es'
-import {
-  dataSourceTypes,
-  getDataSourceTypes,
-} from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { dataSourceTypes, getDataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
-import {
-  useImperativeHandle,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import BaseSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseSourceConfig'
 import BaseTargetConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTargetConfig'
@@ -24,7 +15,7 @@ import MysqlBinlogSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConf
 import PgSourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/PgSourceConfig'
 import {
   IDataSourceConfigProps,
-  ISourceRef,
+  ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 
 import HbaseSource from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/HbaseSource'
@@ -76,18 +67,14 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
-const Label = styled('div')(() => [
-  tw`border border-white px-2 py-1 leading-none rounded-[3px]`,
-])
+const Label = styled('div')(() => [tw`border border-white px-2 py-1 leading-none rounded-[3px]`])
 
-const DashedLine = styled('div')(() => [
-  tw`border-neut-13 border-l border-dashed my-1`,
-])
+const DashedLine = styled('div')(() => [tw`border-neut-13 border-l border-dashed my-1`])
 
 type OpType = 'source' | 'target'
 
@@ -95,7 +82,7 @@ const getJobTypeName = (type: 1 | 2 | 3) => {
   const typeNameMap = new Map([
     [1, '离线 - 全量'],
     [2, '离线 - 增量'],
-    [3, '实时'],
+    [3, '实时']
   ])
   return typeNameMap.get(type)
 }
@@ -104,14 +91,14 @@ const baseSource = new Set([
   SourceType.Mysql,
   SourceType.PostgreSQL,
   SourceType.SqlServer,
-  SourceType.ClickHouse,
+  SourceType.ClickHouse
 ])
 
 const baseTarget = new Set([
   SourceType.Mysql,
   SourceType.PostgreSQL,
   SourceType.SqlServer,
-  SourceType.ClickHouse,
+  SourceType.ClickHouse
 ])
 
 const DatasourceConfig = observer(
@@ -211,43 +198,39 @@ const DatasourceConfig = observer(
       }
     }, [])
 
-    useImperativeHandle(ref, () => {
-      return {
-        validate: () => {
-          const re = sourceRef.current?.validate()
-          const re1 = targetRef.current?.validate()
-          return re && re1
-        },
-        getResource: () => {
-          const source = source$.getValue()
-          const target = target$.getValue()
-          const config = {
-            source_id: source?.data?.id,
-            target_id: target?.data?.id,
-            sync_resource: {
-              [`${source?.sourceType?.name}_source`]: source?.data?.id
-                ? sourceRef.current?.getData?.()
-                : undefined,
-              [`${target?.sourceType?.name}_target`]: target?.data?.id
-                ? targetRef.current?.getData?.()
-                : undefined,
-            },
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        const re = sourceRef.current?.validate()
+        const re1 = targetRef.current?.validate()
+        return re && re1
+      },
+      getResource: () => {
+        const source = source$.getValue()
+        const target = target$.getValue()
+        const config = {
+          source_id: source?.data?.id,
+          target_id: target?.data?.id,
+          sync_resource: {
+            [`${source?.sourceType?.name}_source`]: source?.data?.id
+              ? sourceRef.current?.getData?.()
+              : undefined,
+            [`${target?.sourceType?.name}_target`]: target?.data?.id
+              ? targetRef.current?.getData?.()
+              : undefined
           }
-          return config
-        },
+        }
+        return config
+      },
 
-        getTypeNames: () => {
-          return [
-            source$.getValue()?.sourceType?.name,
-            target$.getValue()?.sourceType?.name,
-          ]
-        },
-        refetchColumns: () => {
-          sourceRef.current?.refetchColumn?.()
-          targetRef.current?.refetchColumn?.()
-        },
+      getTypeNames: () => [
+        source$.getValue()?.sourceType?.name,
+        target$.getValue()?.sourceType?.name
+      ],
+      refetchColumns: () => {
+        sourceRef.current?.refetchColumn?.()
+        targetRef.current?.refetchColumn?.()
       }
-    })
+    }))
 
     return (
       <FormH7Wrapper>
@@ -272,9 +255,7 @@ const DatasourceConfig = observer(
                 ? [source$.getValue()?.data?.id]
                 : [target$.getValue()?.data?.id]
             }
-            title={`选择${
-              op.current === 'source' ? '来源' : '目的'
-            }数据源（已选类型为 ${findKey(
+            title={`选择${op.current === 'source' ? '来源' : '目的'}数据源（已选类型为 ${findKey(
               dataSourceTypes,
               (v) => v === get(curJob, `${op.current}_type`)
             )})`}
@@ -286,7 +267,7 @@ const DatasourceConfig = observer(
               if (v) {
                 handleSelectDb({
                   ...pick(v, ['id', 'name']),
-                  networkId: get(v, 'last_connection.network_id', ''),
+                  networkId: get(v, 'last_connection.network_id', '')
                 })
               }
             }}

@@ -4,14 +4,14 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
-  useState,
+  useState
 } from 'react'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import tw, { css } from 'twin.macro'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import {
   IDataSourceConfigProps,
-  ISourceRef,
+  ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import { useImmer } from 'use-immer'
 import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
@@ -21,32 +21,24 @@ import { map } from 'rxjs'
 import { get } from 'lodash-es'
 import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 
-type FieldKeys =
-  | 'topic'
-  | 'id'
-  | 'consumer'
-  | 'consumerId'
-  | 'charset'
-  | 'readType'
-  | 'config'
+type FieldKeys = 'topic' | 'id' | 'consumer' | 'consumerId' | 'charset' | 'readType' | 'config'
 
 const consumers = {
-  'group-offsets':
-    '从 ZK/Kafka borders 中指定的消费组已经提交的 offset 开始消费',
+  'group-offsets': '从 ZK/Kafka borders 中指定的消费组已经提交的 offset 开始消费',
   'earliest-offset': '从最早的偏移量开始（如果可能）',
   'latest-offset': '从最新的偏移量开始（如果可能）',
   timestamp: '从每个分区的指定的时间戳开始',
-  'specific-offsets': '从每个分区的指定偏移量开始',
+  'specific-offsets': '从每个分区的指定偏移量开始'
 }
 
 const readType = ['text', 'json'].map((i) => ({
   label: i,
-  value: i,
+  value: i
 }))
 
 const consumerOptions = Object.keys(consumers).map((i) => ({
   label: i,
-  value: i,
+  value: i
 }))
 
 const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
@@ -91,9 +83,9 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
 const KafkaSourceConfig = forwardRef(
@@ -102,9 +94,7 @@ const KafkaSourceConfig = forwardRef(
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
 
-    const { refetch } = useSetRealtimeColumns(dbInfo?.id, [
-      ['message', 'STRING'],
-    ])
+    const { refetch } = useSetRealtimeColumns(dbInfo?.id, [['message', 'STRING']])
     const [showAdvanced, setShowAdvanced] = useState(false)
     useLayoutEffect(() => {
       const sub = source$
@@ -120,7 +110,7 @@ const KafkaSourceConfig = forwardRef(
               consumerId: get(e, 'data.group_id', 'default'),
               charset: get(e, 'data.encoding', 'UTF-8'),
               readType: get(e, 'data.codec', 'text'),
-              config: get(e, 'data.config'),
+              config: get(e, 'data.config')
             }
           })
         )
@@ -130,39 +120,33 @@ const KafkaSourceConfig = forwardRef(
       }
     }, [setDbInfo])
 
-    useImperativeHandle(ref, () => {
-      return {
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => {
-          return {
-            topic: dbInfo.topic,
-            mode: dbInfo.consumer,
-            group_id: dbInfo.consumerId,
-            encoding: dbInfo.charset,
-            codec: dbInfo.readType,
-            config: dbInfo.config,
-          }
-        },
-        refetchColumn: () => {
-          if (dbInfo?.id) {
-            refetch()
-          }
-        },
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
+        }
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => ({
+        topic: dbInfo.topic,
+        mode: dbInfo.consumer,
+        group_id: dbInfo.consumerId,
+        encoding: dbInfo.charset,
+        codec: dbInfo.readType,
+        config: dbInfo.config
+      }),
+      refetchColumn: () => {
+        if (dbInfo?.id) {
+          refetch()
+        }
       }
-    })
+    }))
 
-    const renderCommon = () => {
-      return (
-        <>
-          <BaseConfigCommon from="source" />
-        </>
-      )
-    }
+    const renderCommon = () => (
+      <>
+        <BaseConfigCommon from="source" />
+      </>
+    )
     return (
       <Form css={styles.form} ref={sourceForm}>
         {renderCommon()}
@@ -191,8 +175,8 @@ const KafkaSourceConfig = forwardRef(
                       </HelpCenterLink>
                     </div>
                   ),
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
               help={
                 <HelpCenterLink hasIcon isIframe={false} href="###">
@@ -220,8 +204,8 @@ const KafkaSourceConfig = forwardRef(
                 {
                   rule: { required: true },
                   help: '请选择消费模式',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             <TextField
@@ -240,8 +224,8 @@ const KafkaSourceConfig = forwardRef(
                 {
                   rule: { required: true },
                   help: '请输入消费组 ID',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             <RadioGroupField
@@ -249,12 +233,12 @@ const KafkaSourceConfig = forwardRef(
               options={[
                 {
                   label: 'UTF-8',
-                  value: 'UTF-8',
+                  value: 'UTF-8'
                 },
                 {
                   label: 'GBK',
-                  value: 'BGK',
-                },
+                  value: 'BGK'
+                }
               ]}
               value={dbInfo?.charset}
               onChange={(e) => {
@@ -267,8 +251,8 @@ const KafkaSourceConfig = forwardRef(
                 {
                   rule: { required: true },
                   help: '请选择字符编码',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             <RadioGroupField
@@ -286,20 +270,14 @@ const KafkaSourceConfig = forwardRef(
                 {
                   rule: { required: true },
                   help: '请选择读取模式',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             <FlexBox>
               <div css={styles.line} />
-              <Center
-                tw="px-1 cursor-pointer"
-                onClick={() => setShowAdvanced((prev) => !prev)}
-              >
-                <Icon
-                  name={`chevron-${showAdvanced ? 'up' : 'down'}`}
-                  type="light"
-                />
+              <Center tw="px-1 cursor-pointer" onClick={() => setShowAdvanced((prev) => !prev)}>
+                <Icon name={`chevron-${showAdvanced ? 'up' : 'down'}`} type="light" />
                 高级配置
               </Center>
               <div css={styles.line} />

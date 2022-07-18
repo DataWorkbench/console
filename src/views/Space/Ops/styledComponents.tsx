@@ -4,10 +4,7 @@ import tw, { css, styled, theme } from 'twin.macro'
 import React, { ReactElement } from 'react'
 import { isFunction } from 'lodash-es'
 import { Center, FlexBox, Tooltip } from 'components/index'
-import {
-  sourceKinds,
-  SourceType,
-} from 'views/Space/Upcloud/DataSourceList/constant'
+import { sourceKinds, SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import {
   AlarmStatus,
   alarmStatus,
@@ -18,13 +15,10 @@ import {
   jobInstanceStatus,
   JobInstanceStatusType,
   JobType,
-  jobType,
+  jobType
 } from './DataIntegration/constants'
 
-import {
-  StreamReleaseScheduleType,
-  streamReleaseScheduleTypes,
-} from './Stream1/common/constants'
+import { StreamReleaseScheduleType, streamReleaseScheduleTypes } from './Stream1/common/constants'
 
 export const statusStyle = (
   type: JobInstanceStatusType | DataReleaseSchedule | StreamReleaseScheduleType
@@ -82,25 +76,22 @@ export const statusStyle = (
       break
   }
   return {
-    wrapper: [
-      tw`inline-flex items-center justify-center w-3 h-3 rounded-full`,
-      wrapperBg,
-    ],
+    wrapper: [tw`inline-flex items-center justify-center w-3 h-3 rounded-full`, wrapperBg],
     item: [
       tw`inline-block w-2 h-2 rounded-full border`,
       // css`
       //   transform: translate(-0.5px, -0.5px);
       // `,
       centerBorder,
-      bg,
-    ],
+      bg
+    ]
   }
 }
 
 export const StatusCmp = ({
   label,
   type,
-  className,
+  className
 }: {
   label: string
   type?: JobInstanceStatusType | DataReleaseSchedule
@@ -127,13 +118,7 @@ const getStatusCmp =
     if (type === undefined || types[type] === undefined) {
       return null
     }
-    return (
-      <StatusCmp
-        label={types[type].label}
-        type={types[type]?.type}
-        className={className}
-      />
-    )
+    return <StatusCmp label={types[type].label} type={types[type]?.type} className={className} />
   }
 
 export const JobInstanceStatusCmp = getStatusCmp(jobInstanceStatus)
@@ -174,10 +159,7 @@ export const StreamReleaseStatusCmp = getStatusCmp(streamReleaseScheduleTypes)
 //   )
 // }
 
-export const AlarmStatusCmp = (props: {
-  type?: keyof typeof alarmStatus
-  onClick?: Function
-}) => {
+export const AlarmStatusCmp = (props: { type?: keyof typeof alarmStatus; onClick?: Function }) => {
   const { type, onClick } = props
   if (type === undefined || alarmStatus[type] === undefined) {
     return null
@@ -185,25 +167,16 @@ export const AlarmStatusCmp = (props: {
   return (
     <div tw="items-center gap-2 inline-flex">
       <Icon
-        name={
-          alarmStatus[type].type === AlarmStatus.NORMAL
-            ? 'if-information'
-            : 'if-exclamation'
-        }
+        name={alarmStatus[type].type === AlarmStatus.NORMAL ? 'if-information' : 'if-exclamation'}
         size={14}
         css={[
-          alarmStatus[type].type === AlarmStatus.NORMAL
-            ? tw`text-blue-10`
-            : tw`text-[#FFD127]`,
+          alarmStatus[type].type === AlarmStatus.NORMAL ? tw`text-blue-10` : tw`text-[#FFD127]`,
 
-          tw`text-[14px]`,
+          tw`text-[14px]`
         ]}
       />
       {isFunction(onClick) ? (
-        <span
-          tw="hover:text-green-11 cursor-pointer hover:underline "
-          onClick={onClick}
-        >
+        <span tw="hover:text-green-11 cursor-pointer hover:underline " onClick={onClick}>
           {alarmStatus[type].label}
         </span>
       ) : (
@@ -218,31 +191,31 @@ const jobTypeConfig = new Map([
     JobType.REALTIME_UPDATE,
     {
       label: '实时',
-      css: '#14B8A6',
-    },
+      css: '#14B8A6'
+    }
   ],
 
   [
     JobType.INCREMENT_UPDATE | JobType.FULL_UPDATE,
     {
       label: '离线',
-      css: theme('colors.deepblue.12'),
-    },
+      css: theme('colors.deepblue.12')
+    }
   ],
   [
     JobType.INCREMENT_UPDATE,
     {
       label: '增量',
-      css: '#F97316',
-    },
+      css: '#F97316'
+    }
   ],
   [
     JobType.FULL_UPDATE,
     {
       label: '全量',
-      css: '#A855F7',
-    },
-  ],
+      css: '#A855F7'
+    }
+  ]
 ])
 
 export const JobTypeCmp = (props: { type: keyof typeof jobType }) => {
@@ -296,7 +269,7 @@ export const DbTypeCmp = ({
   type,
   onClick,
   className,
-  devMode,
+  devMode
 }: {
   type: SourceType
   onClick?: Function
@@ -312,20 +285,15 @@ export const DbTypeCmp = ({
     <div
       onClick={onClick as any}
       css={[
-        onClick
-          ? tw`hover:text-green-11 cursor-pointer`
-          : tw`hover:text-neut-19`,
-        tw`inline-block h-4 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2 leading-[16px]`,
+        onClick ? tw`hover:text-green-11 cursor-pointer` : tw`hover:text-neut-19`,
+        tw`inline-block h-4 bg-white text-neut-13 px-2 font-medium rounded-[2px] mr-2 leading-[16px]`
       ]}
       className={className}
     >
       {kind.showname ?? kind.name}
     </div>
   )
-  if (
-    devMode &&
-    dataReleaseDevModeType[devMode!]?.type !== DataReleaseDevMode.UI
-  ) {
+  if (devMode && dataReleaseDevModeType[devMode!]?.type !== DataReleaseDevMode.UI) {
     return (
       <Tooltip hasPadding content="脚本模式请查看开发内容" theme="light">
         {item}

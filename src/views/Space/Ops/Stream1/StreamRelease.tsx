@@ -5,7 +5,7 @@ import {
   streamReleaseColumns,
   streamReleaseScheduleTypes,
   streamReleaseSuggestions,
-  streamReleaseTabs,
+  streamReleaseTabs
 } from 'views/Space/Ops/Stream1/common/constants'
 import { Icon, PageTab, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { Button } from '@QCFE/lego-ui'
@@ -24,7 +24,7 @@ import {
   SelectTreeTable,
   TextEllipsis,
   Tooltip,
-  FlexBox,
+  FlexBox
 } from 'components'
 import { getOperations } from 'views/Space/Ops/DataIntegration/DataRelease/utils'
 import { StreamReleaseStatusCmp } from 'views/Space/Ops/styledComponents'
@@ -65,14 +65,14 @@ const StreamRelease = observer(() => {
     pagination,
     sort,
     getColumnFilter: getFilter,
-    getColumnSort: getSort,
+    getColumnSort: getSort
   } = useFilter<
     Record<ReturnType<typeof getName>, string | number | boolean>,
     { pagination: true; sort: true }
   >(
     {
       reverse: true,
-      sort_by: getName('lastPublishTime'),
+      sort_by: getName('lastPublishTime')
     },
     { pagination: true, sort: true },
     streamReleaseSettingKey
@@ -81,17 +81,13 @@ const StreamRelease = observer(() => {
   const { set, selectedData } = useDataReleaseStore()
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     window.open(
-      `./release/${record.id}?version=${record[getName('versionId')]}${
-        tab ? `&tab=${tab}` : ''
-      }`,
+      `./release/${record.id}?version=${record[getName('versionId')]}${tab ? `&tab=${tab}` : ''}`,
       '_blank'
     )
   }
   const columnsRender = {
     [getName('versionId')]: {
-      render: (text: string) => {
-        return <span tw="text-neut-8">{text}</span>
-      },
+      render: (text: string) => <span tw="text-neut-8">{text}</span>
     },
     [getName('status')]: {
       ...getFilter(getName('status'), streamReleaseScheduleTypes),
@@ -103,7 +99,7 @@ const StreamRelease = observer(() => {
           return <span tw="text-font-secondary">N/A</span>
         }
         return <StreamReleaseStatusCmp type={type as 1} />
-      },
+      }
     },
     // [getName('alarmStatus')]: {
     //   ...getFilter(getName('alarmStatus'), alarmStatus),
@@ -126,26 +122,16 @@ const StreamRelease = observer(() => {
           >
             {streamDevModeType[type]?.label}
           </span>
-        ),
+        )
     },
     [getName('lastPublishTime')]: {
       ...getSort(getName('lastPublishTime')),
-      render: (d: number) => {
-        return (
-          d && (
-            <span tw="text-neut-8">
-              {dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </span>
-          )
-        )
-      },
-    },
+      render: (d: number) =>
+        d && <span tw="text-neut-8">{dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+    }
   }
 
-  const handleMenuClick = (
-    record: Record<string, any>,
-    key: DataReleaseActionType
-  ) => {
+  const handleMenuClick = (record: Record<string, any>, key: DataReleaseActionType) => {
     switch (key) {
       case 'link':
       case 'dev':
@@ -157,19 +143,19 @@ const StreamRelease = observer(() => {
       case 'offline':
         set({
           selectedData: record,
-          showOffline: true,
+          showOffline: true
         })
         break
       case 'resume':
         set({
           selectedData: record,
-          showResume: true,
+          showResume: true
         })
         break
       case 'suspend':
         set({
           selectedData: record,
-          showSuspend: true,
+          showSuspend: true
         })
         break
       default:
@@ -190,7 +176,7 @@ const StreamRelease = observer(() => {
             onClick={() => {
               set({
                 selectedData: record,
-                showVersion: true,
+                showVersion: true
               })
             }}
           >
@@ -219,11 +205,7 @@ const StreamRelease = observer(() => {
         <Center tw="truncate" css={jobNameStyle}>
           <InstanceName
             theme="dark"
-            icon={
-              streamDevModeType[
-                get(record, getName('devMode') as string, 2) as 2
-              ]?.icon
-            }
+            icon={streamDevModeType[get(record, getName('devMode') as string, 2) as 2]?.icon}
             name={record.name}
             desc={record.id}
             onClick={() => jumpDetail()(record)}
@@ -238,7 +220,7 @@ const StreamRelease = observer(() => {
         )
       }
       return child
-    },
+    }
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -252,7 +234,7 @@ const StreamRelease = observer(() => {
 
   const isFetching = useIsFetching()
   const { data } = useQueryReleaseJobs(omitBy(filter, isNil), {
-    refetchInterval: 1000 * 60,
+    refetchInterval: 1000 * 60
   })
 
   const infos = get(data, 'infos', []) || []
@@ -262,8 +244,7 @@ const StreamRelease = observer(() => {
     queryClient.invalidateQueries(getReleaseJobsKey())
   }, [queryClient])
 
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
 
   const getChildren = async (uuid: string) => {
     const [key, version] = uuid.split('=-=')
@@ -275,21 +256,21 @@ const StreamRelease = observer(() => {
         limit: 12,
         offset: 0,
         reverse: filter.reverse,
-        sort_by: 'updated',
+        sort_by: 'updated'
       })
       .then((res) => {
         const arr = res.infos
           ?.filter((item: Record<string, any>) => item.version !== version)
           ?.map((i: any) => ({
             ...i,
-            uuid: `${i.id}=-=${i.version}`,
+            uuid: `${i.id}=-=${i.version}`
           }))
         if (arr.length >= 11) {
           const value = arr.slice(0, 10).concat({
             key: `${key}-more`,
             uuid: `${key}-more`,
             id: key,
-            hasMore: true,
+            hasMore: true
           })
           return value
         }
@@ -338,18 +319,16 @@ const StreamRelease = observer(() => {
             selectedLevel={-1}
             getChildren={getChildren}
             columns={columns}
-            dataSource={infos.map((i: any) => {
-              return {
-                ...i,
-                uuid: `${i.id}=-=${i.version}`,
-              }
-            })}
+            dataSource={infos.map((i: any) => ({
+              ...i,
+              uuid: `${i.id}=-=${i.version}`
+            }))}
             loading={!!isFetching}
             onSort={sort}
             rowKey="uuid"
             pagination={{
               total: get(data, 'total', 0),
-              ...pagination,
+              ...pagination
             }}
           />
         </FlexBox>

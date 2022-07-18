@@ -15,7 +15,7 @@ export const streamReleaseFieldMapping: Mapping<
   .set('versionId', { label: '版本 ID', apiField: 'version' })
   .set('lastPublishTime', {
     label: '最近发布时间',
-    apiField: 'updated',
+    apiField: 'updated'
   })
 
 export const streamInstanceFieldMapping: Mapping<

@@ -15,34 +15,27 @@ const columns = [
   {
     title: '可用性测试',
     dataIndex: 'result',
-    render: getPingConnection,
+    render: getPingConnection
   },
   {
     title: '测试开始时间',
     dataIndex: 'created',
-    render: (val: number) => {
-      return dayjs(val * 1000).format('YYYY-MM-DD HH:mm:ss')
-    },
+    render: (val: number) => dayjs(val * 1000).format('YYYY-MM-DD HH:mm:ss')
   },
   {
     title: '耗时',
     dataIndex: 'elapse',
     width: 100,
-    render: (v?: number) => (v !== undefined ? timeFormat(Date.now() - v) : ''),
+    render: (v?: number) => (v !== undefined ? timeFormat(Date.now() - v) : '')
     // render: (val?: number, record?: Record<string, any>) => (
     //   <TimeInterval consuming={val} startTime={record?.startAt} />
     // ),
-  },
+  }
 ]
 
 export const DataSourcePingHistoriesModal = () => {
   const {
-    dataSourceStore: {
-      itemLoadingHistories,
-      opSourceList,
-      emptyHistories,
-      setShowPingHistories,
-    },
+    dataSourceStore: { itemLoadingHistories, opSourceList, emptyHistories, setShowPingHistories }
   } = useStore()
 
   const onClose = () => {
@@ -62,7 +55,7 @@ export const DataSourcePingHistoriesModal = () => {
     sourceId,
     verbose: 1,
     sort_by: 'created',
-    reverse: true,
+    reverse: true
   })
   const { data, refetch, isFetching } = useQuerySourceHistories(
     filter,
@@ -103,7 +96,7 @@ export const DataSourcePingHistoriesModal = () => {
               draft.offset = 0
               draft.limit = size
             })
-          },
+          }
         }}
       />
     </Modal>

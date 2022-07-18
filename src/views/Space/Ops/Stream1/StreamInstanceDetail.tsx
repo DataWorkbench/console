@@ -40,7 +40,7 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
         ${tw`text-white!`}
       }
     }
-  `,
+  `
 ])
 
 const Root = styled.div`
@@ -136,10 +136,7 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
             />
           </div>
         </Tooltip>
-        <CopyTextWrapper
-          text={`${data?.name ?? ''}(ID: ${id})`}
-          theme="light"
-        />
+        <CopyTextWrapper text={`${data?.name ?? ''}(ID: ${id})`} theme="light" />
       </FlexBox>
 
       <Card hasBoxShadow tw="bg-neut-16 relative">
@@ -164,10 +161,7 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
             <div tw="flex-auto">
               <div tw="text-white">
                 <span tw="mr-3">{data?.name}</span>
-                <JobInstanceStatusCmp
-                  type={data?.status as 1}
-                  tw="inline-flex"
-                />
+                <JobInstanceStatusCmp type={data?.status as 1} tw="inline-flex" />
               </div>
               <div tw="text-neut-8">{data?.id}</div>
             </div>
@@ -209,16 +203,10 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
               <span>所属作业:</span>
               <span tw="inline-block">
                 {data?.desc ? (
-                  <Tooltip
-                    theme="light"
-                    hasPadding
-                    content={`发布描述：${data?.desc}`}
-                  >
+                  <Tooltip theme="light" hasPadding content={`发布描述：${data?.desc}`}>
                     <div>
                       <div>
-                        <span tw="text-white font-semibold mr-1">
-                          {data?.job_name}
-                        </span>
+                        <span tw="text-white font-semibold mr-1">{data?.job_name}</span>
                         <span tw="text-neut-8">({data?.job_id})</span>
                       </div>
                       <div tw="text-neut-8">版本 ID: {data?.version}</div>
@@ -227,9 +215,7 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
                 ) : (
                   <div>
                     <div>
-                      <span tw="text-white font-semibold mr-1">
-                        {data?.job_name}
-                      </span>
+                      <span tw="text-white font-semibold mr-1">{data?.job_name}</span>
                       <span tw="text-neut-8">({data?.job_id})</span>
                     </div>
                     <div tw="text-neut-8">版本 ID: {data?.version}</div>

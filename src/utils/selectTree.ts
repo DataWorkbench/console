@@ -27,31 +27,29 @@ export function isRoot(tree: TreeNode): boolean {
 
 function renderTreeNode(tree: TreeNode) {
   const map: TreeKeyChildrenMap = new Map()
-  const getItem = (t: TreeNode) => {
-    return omit(t, 'children')
-    // {
-    //   t
-    // value: t.value,
-    // key: t.key, // isOpen: s.openedAll.has(t.key as string),
-    // isSelected: s.selectedAll.has(t.key as string)
-    // }
-  }
+  const getItem = (t: TreeNode) => omit(t, 'children')
+  // {
+  //   t
+  // value: t.value,
+  // key: t.key, // isOpen: s.openedAll.has(t.key as string),
+  // isSelected: s.selectedAll.has(t.key as string)
+  // }
 
   map.set(tree.key, {
     pid: outSy,
-    children: new Set(tree?.children?.map((t) => t.key) || []),
+    children: new Set(tree?.children?.map((t) => t.key) || [])
   })
   const list = [getItem(tree)]
   let children = (tree.children || []).map((n) => ({
     ...n,
     pid: tree.key,
-    level: 1,
+    level: 1
   }))
   while (Array.isArray(children) && children.length > 0) {
     const child = children[0]
     map.set(child.key, {
       pid: child.pid,
-      children: new Set(child?.children?.map((c) => c.key) || []),
+      children: new Set(child?.children?.map((c) => c.key) || [])
     })
     list.push(getItem(child))
     children = children.slice(1)
@@ -80,7 +78,7 @@ class SelectTreeData {
     state: State = {
       selectedAll: new Set(),
       map: new Map(),
-      openedAll: new Set(),
+      openedAll: new Set()
     }
   ) {
     this.state = state
@@ -95,7 +93,7 @@ class SelectTreeData {
     new Set([
       ...Array.from(this.state?.map?.keys()),
       ...Array.from(this.state?.openedAll ?? []),
-      ...Array.from(this.state?.selectedAll ?? []),
+      ...Array.from(this.state?.selectedAll ?? [])
     ]).forEach((key) => {
       if (!map.has(key)) {
         this.state.map.delete(key)
@@ -121,8 +119,7 @@ class SelectTreeData {
         : this.state.map.set(pid, new Set([key]))
       if (
         type === 1 &&
-        this.keyChildrenMap.get(pid)?.children?.size ===
-          this.state.map.get(pid)?.size
+        this.keyChildrenMap.get(pid)?.children?.size === this.state.map.get(pid)?.size
       ) {
         this.onAdd(pid, false)
       } else {
@@ -187,7 +184,7 @@ class SelectTreeData {
         node.children = children
         this.keyChildrenMap.set(nodeKey, {
           pid: this.keyChildrenMap.get(nodeKey)?.pid!,
-          children: new Set(children.map((c) => c.key)),
+          children: new Set(children.map((c) => c.key))
         })
         children.forEach((c) => {
           this.keyChildrenMap.set(c.key, { pid: nodeKey, children: new Set() })
@@ -197,9 +194,9 @@ class SelectTreeData {
           ...this.list.slice(0, index + 1),
           ...children.map((i) => ({
             ...i,
-            level: (this.list[index].level ?? 0) + 1,
+            level: (this.list[index].level ?? 0) + 1
           })),
-          ...this.list.slice(index + 1),
+          ...this.list.slice(index + 1)
         ]
 
         if (this.state.selectedAll?.has(nodeKey)) {
@@ -232,7 +229,7 @@ class SelectTreeData {
             ? 1
             : this.state.map.get(item.key)?.size
             ? 2
-            : 0,
+            : 0
         })
       )
   }

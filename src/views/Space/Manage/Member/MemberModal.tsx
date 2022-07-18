@@ -1,10 +1,4 @@
-import {
-  FlexBox,
-  HelpCenterLink,
-  Modal,
-  ModalContent,
-  PopConfirm,
-} from 'components'
+import { FlexBox, HelpCenterLink, Modal, ModalContent, PopConfirm } from 'components'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button, Field, Form, Label } from '@QCFE/lego-ui'
 // import tw, { css } from 'twin.macro'
@@ -17,7 +11,7 @@ import {
   checkboxButtonStyles,
   DisableTextField,
   FormWrapper,
-  TextAreaFieldWrapper,
+  TextAreaFieldWrapper
 } from 'views/Space/Manage/Member/styled'
 import { RoleType } from 'views/Space/Manage/Member/constants'
 import { useQueryClient } from 'react-query'
@@ -25,7 +19,7 @@ import {
   getMemberKeys,
   useMutationMember,
   useQueryListAvailableUsers,
-  useQueryRoleList,
+  useQueryRoleList
 } from 'hooks'
 import { flatten, get, omit } from 'lodash-es'
 import { useDebounce } from 'react-use'
@@ -52,7 +46,7 @@ interface IMemberModalProps {
 
 const MemberModal = observer((props: IMemberModalProps) => {
   const {
-    workSpaceStore: { space },
+    workSpaceStore: { space }
   } = useStore()
   const { op, setOp, spaceItem } = useMemberStore()
   const { roleList: roleListProp, data, cb } = props
@@ -61,26 +55,19 @@ const MemberModal = observer((props: IMemberModalProps) => {
     user_ids: data ? [data.user_id] : [],
     system_role_ids: data ? data.system_roles.map((i) => i.id) : [],
     desc: data ? data.desc : '',
-    user_id: data ? data.user_id : '',
+    user_id: data ? data.user_id : ''
   })
 
   const { data: roles } = useQueryRoleList(
     { spaceId: spaceItem.id, regionId: spaceItem.regionId },
     {
-      enabled: !roleListProp,
+      enabled: !roleListProp
     }
   )
 
-  const {
-    data: users,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-  } = useQueryListAvailableUsers({})
+  const { data: users, fetchNextPage, hasNextPage, isFetching } = useQueryListAvailableUsers({})
 
-  const userOptions = flatten(
-    users?.pages.map((page: Record<string, any>) => page.infos || [])
-  )
+  const userOptions = flatten(users?.pages.map((page: Record<string, any>) => page.infos || []))
 
   const loadData = () => {
     if (hasNextPage) {
@@ -101,7 +88,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
         op,
         ...omit(value, op === 'create' ? 'user_id' : 'user_ids'),
         spaceId: spaceItem.id,
-        regionId: (spaceItem as any)?.regionId || undefined,
+        regionId: (spaceItem as any)?.regionId || undefined
       },
       {
         onSuccess: () => {
@@ -111,16 +98,14 @@ const MemberModal = observer((props: IMemberModalProps) => {
             refetch()
           }
           setOp('')
-        },
+        }
       }
     )
   }, [mutation, op, value, spaceItem, cb, refetch, setOp])
   const handleClickRole = (roleId: string) => {
     if (value.system_role_ids.includes(roleId)) {
       setValue((draft) => {
-        draft.system_role_ids = draft.system_role_ids.filter(
-          (item) => item !== roleId
-        )
+        draft.system_role_ids = draft.system_role_ids.filter((item) => item !== roleId)
       })
     } else {
       setValue((draft) => {
@@ -131,7 +116,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
 
   const [show] = useState(true)
   const [, setFilter] = useImmer({
-    search: '',
+    search: ''
   })
   const [search, setSearch] = useState('')
 
@@ -296,15 +281,11 @@ const MemberModal = observer((props: IMemberModalProps) => {
                     <Button
                       key={item.id}
                       css={checkboxButtonStyles.wrapper({
-                        checked,
+                        checked
                       })}
                       onClick={() => handleClickRole(item.id)}
                     >
-                      <Icon
-                        name={
-                          item.type === RoleType.SpaceAdmin ? 'admin' : 'human'
-                        }
-                      />
+                      <Icon name={item.type === RoleType.SpaceAdmin ? 'admin' : 'human'} />
                       {item.name}
                     </Button>
                   )

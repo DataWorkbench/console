@@ -1,23 +1,16 @@
 import { get } from 'lodash-es'
-import {
-  sourceColumns$,
-  targetColumns$,
-} from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { sourceColumns$, targetColumns$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { useQuerySourceTableSchema } from 'hooks'
 
-const useTableColumns = (
-  sourceId: string,
-  tableName: string,
-  type: 'source' | 'target'
-) => {
+const useTableColumns = (sourceId: string, tableName: string, type: 'source' | 'target') => {
   const {
     data: re,
     isFetching,
-    refetch: refetch1,
+    refetch: refetch1
   } = useQuerySourceTableSchema(
     {
       sourceId,
-      tableName,
+      tableName
     },
     {
       enabled: !!(sourceId && tableName),
@@ -27,10 +20,10 @@ const useTableColumns = (
         subject.next(
           columns.map((i) => ({
             ...i,
-            uuid: `${type}--${i.name}`,
+            uuid: `${type}--${i.name}`
           }))
         )
-      },
+      }
     },
     type
   )
@@ -42,7 +35,7 @@ const useTableColumns = (
       if (sourceId && tableName) {
         refetch1()
       }
-    },
+    }
   }
 }
 

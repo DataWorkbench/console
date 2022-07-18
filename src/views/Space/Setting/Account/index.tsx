@@ -41,8 +41,8 @@ const cardStyles = {
       & {
         grid-template-columns: 100px 1fr 110px;
       }
-    `,
-  ],
+    `
+  ]
 }
 
 const Account = () => {
@@ -59,7 +59,7 @@ const Account = () => {
       mutateAsync({
         op: 'update',
         userId: userInfo?.user_id,
-        email,
+        email
       }).then(() => {
         set(window, 'USER.email', email)
         setVisible(false)
@@ -78,9 +78,7 @@ const Account = () => {
               {item.label}
             </div>
             <div tw="font-semibold">
-              {item.dataIndex === 'password'
-                ? '*******'
-                : userInfo[item.dataIndex]}
+              {item.dataIndex === 'password' ? '*******' : userInfo[item.dataIndex]}
             </div>
             {item.disabled ? (
               <div tw="text-font-placeholder cursor-not-allowed">不可编辑</div>
@@ -118,8 +116,8 @@ const Account = () => {
                 {
                   rule: { required: true },
                   help: '请输入新邮箱',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
           </Form>

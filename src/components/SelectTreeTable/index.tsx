@@ -1,14 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { css } from 'twin.macro'
 import { Table } from 'views/Space/styled'
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import SelectTreeData from 'utils/selectTree'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Checkbox, Loading } from '@QCFE/lego-ui'
@@ -19,10 +12,7 @@ import { FlexBox } from '../Box'
 export interface ISelectTreeTableProps {
   columns: IColumn[]
   dataSource: Record<string, any>[]
-  getChildren: (
-    key: string,
-    record: Record<string, any>
-  ) => PromiseLike<Record<string, any>[]>
+  getChildren: (key: string, record: Record<string, any>) => PromiseLike<Record<string, any>[]>
   openLevel?: number
   selectedLevel?: number
   indentSpace?: number
@@ -46,7 +36,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     showItemCheckboxFn,
     showItemOpenFn,
     onChecked,
-    checkedKeys = [],
+    checkedKeys = []
   } = props
 
   const [, fourUpdate] = useReducer((x) => x + 1, 0)
@@ -61,25 +51,20 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
         value: {},
         children: dataSource.map((d) => ({
           key: d[rowKey],
-          value: d,
-        })),
+          value: d
+        }))
       },
       {
         selectedAll: new Set(checkedKeys),
         map: new Map(),
-        openedAll: new Set(),
+        openedAll: new Set()
       }
     )
   )
 
   useEffect(() => {
     console.log(11111111, checkedKeys, tableTreeRef.current?.state?.selectedAll)
-    if (
-      !isEqual(
-        checkedKeys,
-        Array.from(tableTreeRef.current?.state?.selectedAll ?? [])
-      )
-    ) {
+    if (!isEqual(checkedKeys, Array.from(tableTreeRef.current?.state?.selectedAll ?? []))) {
       tableTreeRef.current.setSelectedKeys(checkedKeys)
       fourUpdate()
     }
@@ -91,8 +76,8 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
       value: {},
       children: dataSource.map((d) => ({
         key: d[rowKey],
-        value: d,
-      })),
+        value: d
+      }))
     })
     fourUpdate()
   }, [dataSource, rowKey])
@@ -107,7 +92,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
             key,
             data.map((i) => ({
               key: i[rowKey],
-              value: i,
+              value: i
             })) as any
           )
           tableTreeRef.current.onOpen(key)
@@ -124,13 +109,12 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
     [checkedKeys, getChildren, rowKey]
   )
 
-  const renderTd =
-    (column: IColumn) => (text: never, dataItem: Record<string, any>) => {
-      if (typeof column.render === 'function') {
-        return <div tw="flex-auto ">{column.render(text, dataItem)}</div>
-      }
-      return <div tw="flex-auto">{text}</div>
+  const renderTd = (column: IColumn) => (text: never, dataItem: Record<string, any>) => {
+    if (typeof column.render === 'function') {
+      return <div tw="flex-auto ">{column.render(text, dataItem)}</div>
     }
+    return <div tw="flex-auto">{text}</div>
+  }
 
   const renderFirstTd = useCallback(
     (column) => (text: string, record: Record<string, any>) => {
@@ -165,9 +149,7 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
                   clickable
                   size={16}
                   onClick={() => {
-                    if (
-                      tableTreeRef.current.state.openedAll?.has(record[rowKey])
-                    ) {
+                    if (tableTreeRef.current.state.openedAll?.has(record[rowKey])) {
                       tableTreeRef.current.onOpen(record[rowKey])
                       fourUpdate()
                     } else {
@@ -207,20 +189,21 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
       rowKey,
       selectedLevel,
       showItemCheckboxFn,
-      showItemOpenFn,
+      showItemOpenFn
     ]
   )
 
-  const columns = useMemo(() => {
-    return [
+  const columns = useMemo(
+    () => [
       {
         ...columnsProp[0],
         render: renderFirstTd(columnsProp[0]),
-        title: <div tw="pl-10">{columnsProp[0]?.title}</div>,
+        title: <div tw="pl-10">{columnsProp[0]?.title}</div>
       },
-      ...columnsProp.slice(1).map((i) => ({ ...i, render: renderTd(i) })),
-    ]
-  }, [columnsProp, renderFirstTd])
+      ...columnsProp.slice(1).map((i) => ({ ...i, render: renderTd(i) }))
+    ],
+    [columnsProp, renderFirstTd]
+  )
 
   return (
     <Table
@@ -228,13 +211,11 @@ export const SelectTreeTable = (props: ISelectTreeTableProps) => {
       columns={columns}
       rowKey={rowKey}
       dataSource={tableTreeRef.current
-        .getList((d) => {
-          return {
-            ...d.value,
-            __level: d.level,
-            __isSelected: d.isSelected,
-          }
-        })
+        .getList((d) => ({
+          ...d.value,
+          __level: d.level,
+          __isSelected: d.isSelected
+        }))
         .filter((i) => {
           if (i.__level === 1) {
             return true

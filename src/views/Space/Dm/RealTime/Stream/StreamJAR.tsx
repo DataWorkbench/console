@@ -1,14 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { Form, Icon } from '@QCFE/lego-ui'
 import { Button, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import {
-  FlexBox,
-  AffixLabel,
-  Tooltip,
-  TextLink,
-  Modal,
-  SelectWithRefresh,
-} from 'components'
+import { FlexBox, AffixLabel, Tooltip, TextLink, Modal, SelectWithRefresh } from 'components'
 import { useImmer } from 'use-immer'
 import { useUnmount } from 'react-use'
 import { useQueryClient } from 'react-query'
@@ -19,7 +12,7 @@ import {
   useMutationReleaseStreamJob,
   useQueryStreamJobSchedule,
   getResourceKey,
-  useStore,
+  useStore
 } from 'hooks'
 import { strlen, timeFormat } from 'utils/convert'
 import { get, flatten } from 'lodash-es'
@@ -34,7 +27,7 @@ const { TextField } = Form
 const StreamJAR = () => {
   const {
     workFlowStore,
-    workFlowStore: { curVersion },
+    workFlowStore: { curVersion }
   } = useStore()
   const readOnly = !!curVersion
 
@@ -47,10 +40,10 @@ const StreamJAR = () => {
   const [params, setParams] = useImmer({
     jarArgs: '',
     jarEntry: '',
-    fileId: '',
+    fileId: ''
   })
   const resouceRet = useQueryResource({
-    limit: 100,
+    limit: 100
   })
   const { data: scheData } = useQueryStreamJobSchedule()
   const { data } = useQueryStreamJobCode()
@@ -85,7 +78,7 @@ const StreamJAR = () => {
       mutation.mutate(
         {
           jar: jarData,
-          type: 3,
+          type: 3
         },
         {
           onSuccess: () => {
@@ -96,10 +89,10 @@ const StreamJAR = () => {
               Notify.success({
                 title: '操作提示',
                 content: '保存成功',
-                placement: 'bottomRight',
+                placement: 'bottomRight'
               })
             }
-          },
+          }
         }
       )
     }
@@ -115,14 +108,14 @@ const StreamJAR = () => {
 
   useUnmount(() => {
     workFlowStore.set({
-      showNotify: false,
+      showNotify: false
     })
   })
 
   const handleReleaseSuccess = () => {
     toggleShow(false)
     workFlowStore.set({
-      showNotify: true,
+      showNotify: true
     })
   }
 
@@ -133,20 +126,11 @@ const StreamJAR = () => {
           <VersionHeader />
         ) : (
           <JobToolBar tw="px-2 pt-2">
-            <Button
-              tw="w-[68px] px-0"
-              onClick={handleSave}
-              loading={mutation.isLoading}
-            >
+            <Button tw="w-[68px] px-0" onClick={handleSave} loading={mutation.isLoading}>
               <Icon name="data" type="dark" />
               保存
             </Button>
-            <Tooltip
-              disabled={enableRelease}
-              theme="light"
-              hasPadding
-              content="请添加Jar包后发布"
-            >
+            <Tooltip disabled={enableRelease} theme="light" hasPadding content="请添加Jar包后发布">
               <Button
                 type="primary"
                 tw="w-[68px] px-0"
@@ -198,7 +182,7 @@ const StreamJAR = () => {
                     type="light"
                     color={{
                       primary: '#219861',
-                      secondary: '#8EDABD',
+                      secondary: '#8EDABD'
                     }}
                   />
                   <span>{option.label}</span>
@@ -212,7 +196,7 @@ const StreamJAR = () => {
                     type="light"
                     color={{
                       primary: '#219861',
-                      secondary: '#8EDABD',
+                      secondary: '#8EDABD'
                     }}
                   />
                   <span>{option.label}</span>
@@ -223,14 +207,14 @@ const StreamJAR = () => {
               options={resources.map((res) => ({
                 label: res.name,
                 value: res.id,
-                type: res.type,
+                type: res.type
               }))}
               schemas={[
                 {
                   rule: { required: true },
                   help: '请选择要引用的 Jar 包资源',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
               isLoading={resouceRet.isFetching}
               isLoadingAtBottom
@@ -268,12 +252,10 @@ const StreamJAR = () => {
               }}
               schemas={[
                 {
-                  rule: (value: string) => {
-                    return strlen(value) <= 1024
-                  },
+                  rule: (value: string) => strlen(value) <= 1024,
                   help: '最大字符长度1024字节',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             <TextField
@@ -290,21 +272,16 @@ const StreamJAR = () => {
               }}
               schemas={[
                 {
-                  rule: (value: string) => {
-                    return strlen(value) <= 1024
-                  },
+                  rule: (value: string) => strlen(value) <= 1024,
                   help: '最大字符长度1024字节',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
           </Form>
         </div>
         {show && (
-          <ReleaseModal
-            onSuccess={handleReleaseSuccess}
-            onCancel={() => toggleShow(false)}
-          />
+          <ReleaseModal onSuccess={handleReleaseSuccess} onCancel={() => toggleShow(false)} />
         )}
         {showScheModal && (
           <Modal
@@ -320,16 +297,10 @@ const StreamJAR = () => {
             }}
           >
             <div tw="flex">
-              <Icon
-                name="exclamation"
-                color={{ secondary: '#F5C414' }}
-                size={20}
-              />
+              <Icon name="exclamation" color={{ secondary: '#F5C414' }} size={20} />
               <div tw="ml-3">
                 <div tw="text-base">尚未配置调度任务</div>
-                <div tw="mt-2 text-neut-8">
-                  发布调度任务前，请先完成调度配置，否则无法发布
-                </div>
+                <div tw="mt-2 text-neut-8">发布调度任务前，请先完成调度配置，否则无法发布</div>
               </div>
             </div>
           </Modal>
@@ -341,9 +312,7 @@ const StreamJAR = () => {
           operation="create"
           visible={uploadVisible}
           handleCancel={() => setUploadVisible(false)}
-          handleSuccess={() =>
-            queryClient.invalidateQueries(getResourceKey('infinite'))
-          }
+          handleSuccess={() => queryClient.invalidateQueries(getResourceKey('infinite'))}
         />
       )}
     </FlexBox>

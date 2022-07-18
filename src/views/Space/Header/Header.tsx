@@ -18,19 +18,18 @@ import icons from './icons'
 
 const colorVars = {
   backColors: ['#D9F4F1', '#FDEFD8', '#F1E4FE', '#E0EBFE', '#FEE9DA'],
-  fontColors: ['#14B8A6', '#F59E0B', '#A855F7', '#3B82F6', '#F97316'],
+  fontColors: ['#14B8A6', '#F59E0B', '#A855F7', '#3B82F6', '#F97316']
 }
 
 export const Header = observer(() => {
   useIcon(icons)
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const { pathname } = useLocation()
   const history = useHistory()
   const {
     globalStore: { darkMode },
     workSpaceStore: { set, showHeaderNav },
-    workSpaceStore,
+    workSpaceStore
   } = useStore()
   const matched = pathname.match(/workspace\/[^/]*\/([^/]*)/)
   const mod = matched ? matched[1] : 'upcloud'
@@ -40,7 +39,7 @@ export const Header = observer(() => {
     reverse: true,
     limit: 100,
     status: 1,
-    search: '',
+    search: ''
   })
 
   const { status, data, fetchNextPage, hasNextPage } = useQueryWorkSpace(filter)
@@ -65,7 +64,7 @@ export const Header = observer(() => {
     if (space && space.id !== workSpaceStore?.space?.id) {
       set({
         space: { ...pick(space, ['id', 'name', 'owner']), regionId },
-        spaceIndex,
+        spaceIndex
       })
     }
   }, [regionId, set, space, spaceIndex, workSpaceStore?.space?.id])
@@ -78,12 +77,8 @@ export const Header = observer(() => {
           size={32}
           tw="text-sm rounded-sm  font-semibold"
           css={css`
-            background: ${colorVars.backColors[
-              spaceIndex % colorVars.backColors.length
-            ]};
-            color: ${colorVars.fontColors[
-              spaceIndex % colorVars.fontColors.length
-            ]};
+            background: ${colorVars.backColors[spaceIndex % colorVars.backColors.length]};
+            color: ${colorVars.fontColors[spaceIndex % colorVars.fontColors.length]};
           `}
         >
           {getShortSpaceName(space?.name)}
@@ -99,23 +94,19 @@ export const Header = observer(() => {
           // bottomTextVisible
           options={workspaces.map(({ id, name }) => ({
             value: id,
-            label: name,
+            label: name
           }))}
           onChange={(v) => {
             const space1 = workspaces?.find(({ id }) => id === v)
-            const spaceIndex1: number = workspaces?.findIndex(
-              ({ id }) => id === v
-            )
+            const spaceIndex1: number = workspaces?.findIndex(({ id }) => id === v)
 
             set({
               space: { ...pick(space1, ['id', 'name', 'owner']), regionId },
-              spaceIndex: spaceIndex1,
+              spaceIndex: spaceIndex1
             })
 
             // history.push(pathname.replace(/(?<=workspace\/)[^/]*/, String(v)))
-            history.push(
-              pathname.replace(/\/workspace\/[^/]*/, `/workspace/${v}`)
-            )
+            history.push(pathname.replace(/\/workspace\/[^/]*/, `/workspace/${v}`))
           }}
         />
       </Center>

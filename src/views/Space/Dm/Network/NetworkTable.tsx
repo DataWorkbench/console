@@ -1,12 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { useImmer } from 'use-immer'
-import {
-  Button,
-  Icon,
-  InputSearch,
-  Table,
-  ToolBar,
-} from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, InputSearch, Table, ToolBar } from '@QCFE/qingcloud-portal-ui'
 import { useParams } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
@@ -15,12 +9,7 @@ import dayjs from 'dayjs'
 import tw, { css } from 'twin.macro'
 
 import { FlexBox, Center, Modal, TextLink, TextEllipsis } from 'components'
-import {
-  useStore,
-  useQueryNetworks,
-  getNetworkKey,
-  useMutationNetwork,
-} from 'hooks'
+import { useStore, useQueryNetworks, getNetworkKey, useMutationNetwork } from 'hooks'
 
 import NetworkModal from './NetworkModal'
 
@@ -36,7 +25,7 @@ interface IFilter {
 const columnSettingsKey = 'DATAOMNIS_NETWORK_COLUMN_SETTINGS'
 const NetworkTable = observer(() => {
   const {
-    dmStore: { setNetWorkOp, networkOp },
+    dmStore: { setNetWorkOp, networkOp }
   } = useStore()
   const [opNetworkList, setOpNetworkList] = useState<any[]>([])
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
@@ -49,7 +38,7 @@ const NetworkTable = observer(() => {
     limit: 10,
     reverse: true,
     search: '',
-    sort_by: 'created',
+    sort_by: 'created'
   })
   const queryClient = useQueryClient()
   const mutation = useMutationNetwork()
@@ -60,8 +49,8 @@ const NetworkTable = observer(() => {
     }
   }, [networkOp])
 
-  const columns = useMemo(() => {
-    return [
+  const columns = useMemo(
+    () => [
       {
         title: '名称/ID',
         fixedInSetting: true,
@@ -76,13 +65,11 @@ const NetworkTable = observer(() => {
               <Icon name="earth" type="light" />
             </Center>
             <div tw="truncate">
-              <TextEllipsis twStyle={tw`font-semibold`}>
-                {row.name}
-              </TextEllipsis>
+              <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>
               <div tw="dark:text-neut-8">{row.id}</div>
             </div>
           </FlexBox>
-        ),
+        )
       },
       {
         title: 'VPC 网络',
@@ -96,7 +83,7 @@ const NetworkTable = observer(() => {
             >
               {v}
             </TextLink>
-          ) : null,
+          ) : null
       },
       {
         title: '私有网络',
@@ -110,7 +97,7 @@ const NetworkTable = observer(() => {
             >
               {v}
             </TextLink>
-          ) : null,
+          ) : null
       },
       {
         title: '创建时间',
@@ -121,10 +108,8 @@ const NetworkTable = observer(() => {
           // eslint-disable-next-line no-nested-ternary
           filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (v: number) => (
-          <span tw="dark:text-neut-8">
-            {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
-          </span>
-        ),
+          <span tw="dark:text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+        )
       },
       {
         title: '最近更新时间',
@@ -136,10 +121,8 @@ const NetworkTable = observer(() => {
           filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
 
         render: (v: number) => (
-          <span tw="dark:text-neut-8">
-            {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
-          </span>
-        ),
+          <span tw="dark:text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+        )
       },
       {
         title: '操作',
@@ -165,10 +148,11 @@ const NetworkTable = observer(() => {
               删除
             </Button>
           </FlexBox>
-        ),
-      },
-    ]
-  }, [setNetWorkOp, setOpNetworkList, filter.sort_by, regionId, filter.reverse])
+        )
+      }
+    ],
+    [setNetWorkOp, setOpNetworkList, filter.sort_by, regionId, filter.reverse]
+  )
 
   const refetchData = () => {
     queryClient.invalidateQueries(getNetworkKey())
@@ -179,33 +163,29 @@ const NetworkTable = observer(() => {
     mutation.mutate(
       {
         op: networkOp,
-        networkIds,
+        networkIds
       },
       {
         onSuccess: () => {
           setNetWorkOp('')
           refetchData()
           if (networkOp === 'delete') {
-            setSelectedRowKeys(
-              selectedRowKeys.filter((k) => !networkIds.includes(k))
-            )
+            setSelectedRowKeys(selectedRowKeys.filter((k) => !networkIds.includes(k)))
           }
-        },
+        }
       }
     )
   }
 
-  const { isFetching, isRefetching, data } = useQueryNetworks(
-    omitBy(filter, (v) => v === '')
-  )
+  const { isFetching, isRefetching, data } = useQueryNetworks(omitBy(filter, (v) => v === ''))
   const infos = get(data, 'infos', []) || []
-  const filterNetworkInfos =
-    infos.filter((info: any) => selectedRowKeys.includes(info.id)) || []
+  const filterNetworkInfos = infos.filter((info: any) => selectedRowKeys.includes(info.id)) || []
 
   const filterColumn = columnSettings
-    .map((o: { key: string; checked: boolean }) => {
-      return o.checked && columns.find((col) => col.dataIndex === o.key)
-    })
+    .map(
+      (o: { key: string; checked: boolean }) =>
+        o.checked && columns.find((col) => col.dataIndex === o.key)
+    )
     .filter((o) => o)
 
   return (
@@ -218,9 +198,7 @@ const NetworkTable = observer(() => {
               创建网络
             </Button>
             <Button
-              disabled={
-                selectedRowKeys.length === 0 || filterNetworkInfos.length === 0
-              }
+              disabled={selectedRowKeys.length === 0 || filterNetworkInfos.length === 0}
               onClick={() => {
                 if (filterNetworkInfos.length) {
                   setOpNetworkList(filterNetworkInfos)
@@ -251,11 +229,7 @@ const NetworkTable = observer(() => {
                 })
               }}
             />
-            <Button
-              type="black"
-              loading={isRefetching}
-              tw="px-[5px] border-line-dark!"
-            >
+            <Button type="black" loading={isRefetching} tw="px-[5px] border-line-dark!">
               <Icon
                 name="if-refresh"
                 tw="text-xl text-white"
@@ -293,7 +267,7 @@ const NetworkTable = observer(() => {
               draft.offset = 0
               draft.limit = size
             })
-          },
+          }
         }}
         selectedRowKeys={selectedRowKeys}
         onSelect={(keys: string[]) => {
@@ -309,9 +283,7 @@ const NetworkTable = observer(() => {
       {(networkOp === 'create' || networkOp === 'update') && (
         <NetworkModal opNetwork={opNetworkList[0]} />
       )}
-      {(networkOp === 'start' ||
-        networkOp === 'stop' ||
-        networkOp === 'delete') && (
+      {(networkOp === 'start' || networkOp === 'stop' || networkOp === 'delete') && (
         <Modal
           noBorder
           visible
@@ -350,9 +322,7 @@ const NetworkTable = observer(() => {
                   opNetworkLen === 1 ? (
                     <>
                       确认{opText}网络配置{opNetworkList[0].name}
-                      <span tw="text-neut-8 break-all">
-                        ({opNetworkList[0].id})
-                      </span>
+                      <span tw="text-neut-8 break-all">({opNetworkList[0].id})</span>
                     </>
                   ) : (
                     <>
@@ -361,9 +331,7 @@ const NetworkTable = observer(() => {
                   )
                 return (
                   <>
-                    <div tw="font-medium mb-2 text-base">
-                      {networkText}注意事项
-                    </div>
+                    <div tw="font-medium mb-2 text-base">{networkText}注意事项</div>
                     <div className="modal-content-message">
                       删除网络配置后，关联该资源的内网数据源将无法正常访问，且该操作无法撤回，确认删除吗？
                     </div>
@@ -379,13 +347,7 @@ const NetworkTable = observer(() => {
                 rowKey="id"
                 columns={columns
                   .filter((col) =>
-                    [
-                      'name',
-                      'router_id',
-                      'vxnet_id',
-                      'created',
-                      'updated',
-                    ].includes(col.dataIndex)
+                    ['name', 'router_id', 'vxnet_id', 'created', 'updated'].includes(col.dataIndex)
                   )
                   .map((row) => pick(row, ['title', 'dataIndex', 'render']))}
               />

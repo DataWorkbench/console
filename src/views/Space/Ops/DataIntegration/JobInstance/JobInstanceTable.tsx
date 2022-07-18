@@ -5,12 +5,12 @@ import {
   dataJobInstanceColumns,
   jobInstanceStatus,
   JobInstanceStatusType,
-  jobType,
+  jobType
 } from 'views/Space/Ops/DataIntegration/constants'
 import {
   Divider,
   JobInstanceStatusCmp,
-  JobTypeCmp,
+  JobTypeCmp
 } from 'views/Space/Ops/DataIntegration/styledComponents'
 import tw, { css } from 'twin.macro'
 import dayjs from 'dayjs'
@@ -20,18 +20,11 @@ import TableHeader from 'views/Space/Ops/DataIntegration/JobInstance/TableHeader
 import { Table } from 'views/Space/styled'
 import { tuple } from 'utils/functions'
 import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
-import {
-  FlexBox,
-  IMoreActionItem,
-  MoreAction,
-  TextEllipsis,
-  TextLink,
-  Tooltip,
-} from 'components'
+import { FlexBox, IMoreActionItem, MoreAction, TextEllipsis, TextLink, Tooltip } from 'components'
 import {
   getSyncJobInstanceKey,
   useMutationJobInstance,
-  useQuerySyncJobInstances,
+  useQuerySyncJobInstances
 } from 'hooks/useSyncJobInstance'
 import useFilter from 'hooks/useHooks/useFilter'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
@@ -112,7 +105,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     filter: filterProp,
     jumpDetail,
     setFatherFilter,
-    type = JobMode.DI,
+    type = JobMode.DI
   } = props
   const { filter, setFilter, pagination, sort } = useFilter<
     {
@@ -127,20 +120,14 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       reverse: boolean
     },
     { pagination: true; sort: true }
-  >(
-    { verbose: 1, sort_by: 'created', reverse: true },
-    { pagination: true, sort: true },
-    settingKey
-  )
+  >({ verbose: 1, sort_by: 'created', reverse: true }, { pagination: true, sort: true }, settingKey)
 
   useEffect(() => {
     if (filterProp) {
-      setFilter((draft: any) => {
-        return {
-          ...draft,
-          ...filterProp,
-        }
-      })
+      setFilter((draft: any) => ({
+        ...draft,
+        ...filterProp
+      }))
     }
   }, [filterProp, setFilter])
 
@@ -166,7 +153,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
             }
           }}
         />
-      ),
+      )
     },
 
     state: {
@@ -184,9 +171,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
       },
       filterAble: true,
       filtersNew: Object.values(jobInstanceStatus) as any,
-      render: (text: keyof typeof jobInstanceStatus) => (
-        <JobInstanceStatusCmp type={text} />
-      ),
+      render: (text: keyof typeof jobInstanceStatus) => <JobInstanceStatusCmp type={text} />
     },
     // alarm_status: {
     //   onFilter: (v: string) => {
@@ -213,8 +198,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     job_id: {
       // width: 180,
       render: (v: string, record: Record<string, any>) => {
-        const getContent = (children?: React.ReactElement) => {
-          return record?.sync_job?.desc ? (
+        const getContent = (children?: React.ReactElement) =>
+          record?.sync_job?.desc ? (
             <div>
               <div>{`发布描述: ${record?.sync_job?.desc}`}</div>
               <div>{children}</div>
@@ -222,7 +207,6 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           ) : (
             children
           )
-        }
         const child = (
           <div
             tw="truncate"
@@ -237,9 +221,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
             <div tw="truncate">
               <TextEllipsis
                 theme="light"
-                content={getContent(
-                  <div>{`${record?.sync_job?.name}(${record.job_id})`}</div>
-                )}
+                content={getContent(<div>{`${record?.sync_job?.name}(${record.job_id})`}</div>)}
               >
                 <span
                   tw="text-white cursor-pointer"
@@ -279,12 +261,12 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           )
         }
         return child
-      },
+      }
     },
     type: {
       render: (text: keyof typeof jobType, record: Record<string, any>) => (
         <JobTypeCmp type={get(record, 'sync_job.type', '')} />
-      ),
+      )
     },
     created: {
       sortable: true,
@@ -292,10 +274,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'created' ? (filter.reverse ? 'asc' : 'desc') : '',
       render: (v: number) => (
-        <span tw="text-neut-8">
-          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
-        </span>
-      ),
+        <span tw="text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+      )
     },
 
     updated: {
@@ -304,11 +284,9 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         // eslint-disable-next-line no-nested-ternary
         filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
       render: (v: number) => (
-        <span tw="text-neut-8">
-          {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}
-        </span>
-      ),
-    },
+        <span tw="text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+      )
+    }
   }
 
   const queryClient = useQueryClient()
@@ -317,16 +295,13 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   }
 
   const mutation = useMutationJobInstance()
-  const { spaceId, regionId } =
-    useParams<{ spaceId: string; regionId: string }>()
+  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
 
   const handleStop = (record: Record<string, any>) => {
     Modal.warning({
       title: `终止作业实例: ${record.id}`,
       content: (
-        <div tw="text-neut-8">
-          实例终止后将取消运行，此操作无法撤回，您确定终止该实例吗？
-        </div>
+        <div tw="text-neut-8">实例终止后将取消运行，此操作无法撤回，您确定终止该实例吗？</div>
       ),
       okType: 'danger',
       okText: '终止',
@@ -335,12 +310,12 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         mutation
           .mutateAsync({
             op: 'terminate',
-            ids: [record.id],
+            ids: [record.id]
           })
           .then(() => {
             refetchData()
           })
-      },
+      }
     })
   }
   const getActions = (
@@ -357,7 +332,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         text: '终止',
         icon: 'q-closeCircleFill',
         key: 'stop',
-        value: record,
+        value: record
       })
     }
     if (type !== JobMode.RT) {
@@ -365,7 +340,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         text: '查看详情',
         icon: 'eye',
         key: 'info',
-        value: record,
+        value: record
       })
     }
     return result
@@ -386,63 +361,51 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   const operations = {
     title: '操作',
     key: 'operation',
-    render: (_: never, record: Record<string, any>) => {
-      return (
-        <FlexBox tw="gap-4">
-          <TextLink
-            disabled={
-              jobInstanceStatus[record.state as 1]?.type ===
-              JobInstanceStatusType.PREPARING
+    render: (_: never, record: Record<string, any>) => (
+      <FlexBox tw="gap-4">
+        <TextLink
+          disabled={jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING}
+          onClick={() => {
+            if (jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING) {
+              return
             }
-            onClick={() => {
-              if (
-                jobInstanceStatus[record.state as 1]?.type ===
-                JobInstanceStatusType.PREPARING
-              ) {
-                return
+            if (type === JobMode.DI) {
+              if (record?.flink_ui) {
+                window.open(`//${record?.flink_ui}`, '_blank')
               }
-              if (type === JobMode.DI) {
-                if (record?.flink_ui) {
-                  window.open(`//${record?.flink_ui}`, '_blank')
-                }
-              } else if (type === JobMode.RT) {
-                describeFlinkUI({
-                  inst_id: record.id,
-                  regionId,
-                  spaceId,
-                }).then((res) => {
-                  window.open(`//${res?.web_ui || ''}`, '_blank')
-                })
-              }
+            } else if (type === JobMode.RT) {
+              describeFlinkUI({
+                inst_id: record.id,
+                regionId,
+                spaceId
+              }).then((res) => {
+                window.open(`//${res?.web_ui || ''}`, '_blank')
+              })
+            }
 
-              // describeFlinkUiByInstanceId({
-              //   instanceId: record.id,
-              //   regionId,
-              //   spaceId,
-              // }).then((web_ui: string) => {
+            // describeFlinkUiByInstanceId({
+            //   instanceId: record.id,
+            //   regionId,
+            //   spaceId,
+            // }).then((web_ui: string) => {
 
-              // })
-            }}
-          >
-            Flink UI
-          </TextLink>
-          {!!getActions(jobInstanceStatus[record.state as 1]?.type, record)
-            .length && (
-            <>
-              <Divider />
-              <MoreAction
-                theme="darker"
-                items={getActions(
-                  jobInstanceStatus[record.state as 1]?.type,
-                  record
-                )}
-                onMenuClick={handleMenuClick as any}
-              />
-            </>
-          )}
-        </FlexBox>
-      )
-    },
+            // })
+          }}
+        >
+          Flink UI
+        </TextLink>
+        {!!getActions(jobInstanceStatus[record.state as 1]?.type, record).length && (
+          <>
+            <Divider />
+            <MoreAction
+              theme="darker"
+              items={getActions(jobInstanceStatus[record.state as 1]?.type, record)}
+              onMenuClick={handleMenuClick as any}
+            />
+          </>
+        )}
+      </FlexBox>
+    )
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -452,19 +415,18 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     operations
   )
 
-  const columnsSetting = useMemo(() => {
-    return {
+  const columnsSetting = useMemo(
+    () => ({
       defaultColumns: dataJobInstanceColumns,
       storageKey: settingKey,
-      onSave: setColumnSettings as any,
-    }
-  }, [setColumnSettings, settingKey])
+      onSave: setColumnSettings as any
+    }),
+    [setColumnSettings, settingKey]
+  )
 
   return (
     <>
-      {showHeader && (
-        <TableHeader columnsSetting={columnsSetting} columns={columns} />
-      )}
+      {showHeader && <TableHeader columnsSetting={columnsSetting} columns={columns} />}
       <Table
         css={!showHeader ? tableStyle : null}
         columns={columns}
@@ -474,7 +436,7 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         onSort={sort}
         pagination={{
           total: get(data, 'total', 0),
-          ...pagination,
+          ...pagination
         }}
       />
     </>

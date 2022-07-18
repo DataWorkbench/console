@@ -51,15 +51,11 @@ const RoleFilter = (props: IRoleFilterProps) => {
               <div>
                 <Checkbox
                   indeterminate={
-                    Array.isArray(value)
-                      ? !!value.length && value.length !== options.length
-                      : false
+                    Array.isArray(value) ? !!value.length && value.length !== options.length : false
                   }
                   onChange={handleCheckAllChange}
                   checked={
-                    Array.isArray(value) &&
-                    !!value.length &&
-                    value.length === options.length
+                    Array.isArray(value) && !!value.length && value.length === options.length
                   }
                   // style={{ marginBottom: 12 }}
                   tw="mb-3 mr-2"

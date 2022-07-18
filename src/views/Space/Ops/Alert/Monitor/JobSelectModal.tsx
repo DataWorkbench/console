@@ -1,12 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import {
-  FlexBox,
-  Icons,
-  Modal,
-  ModalContent,
-  Center,
-  SelectTreeTable,
-} from 'components'
+import { FlexBox, Icons, Modal, ModalContent, Center, SelectTreeTable } from 'components'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { jobColumns } from 'views/Space/Ops/Alert/common/constants'
 import { jobFieldMapping, Mapping } from 'views/Space/Ops/Alert/common/mapping'
@@ -18,8 +11,7 @@ import { useFetchJob } from 'hooks'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 
 type MappingKey<T> = T extends Mapping<infer U> ? U : never
-const getName = (name: MappingKey<typeof jobFieldMapping>) =>
-  jobFieldMapping.get(name)!.apiField
+const getName = (name: MappingKey<typeof jobFieldMapping>) => jobFieldMapping.get(name)!.apiField
 
 const jobSelectModalSetting = 'JOB_SELECT_MODAL'
 
@@ -39,7 +31,7 @@ const roots = {
     jobMode: 'DI',
     title: '数据集成',
     is_directory: true,
-    children: [],
+    children: []
   },
   1: {
     id: 'root',
@@ -49,30 +41,16 @@ const roots = {
     jobMode: 'RT',
     title: '数据开发',
     is_directory: true,
-    children: [],
-  },
+    children: []
+  }
 }
 
-const Item = ({
-  id,
-  onDelete,
-}: {
-  id: string
-  onDelete: (s: string) => void
-}) => {
-  return (
-    <Center tw="gap-3 h-6 bg-neut-13 px-2">
-      <span tw="text-white">{`ID: ${id}`}</span>
-      <Icon
-        clickable
-        onClick={() => onDelete(id)}
-        name="if-close"
-        size={16}
-        type="light"
-      />
-    </Center>
-  )
-}
+const Item = ({ id, onDelete }: { id: string; onDelete: (s: string) => void }) => (
+  <Center tw="gap-3 h-6 bg-neut-13 px-2">
+    <span tw="text-white">{`ID: ${id}`}</span>
+    <Icon clickable onClick={() => onDelete(id)} name="if-close" size={16} type="light" />
+  </Center>
+)
 
 const JobSelectModal = (props: IJobSelectProps) => {
   const { onCancel, type, value: valueProp, onOk } = props
@@ -95,15 +73,13 @@ const JobSelectModal = (props: IJobSelectProps) => {
       pid = ''
     }
     return fetchJob(type === 2 ? 'sync' : 'stream', {
-      pid,
-    }).then((res) => {
-      return (get(res, 'infos') || []).map((i: Record<string, any>) => {
-        return {
-          ...i,
-          isSelected: value.includes(i.id),
-        }
-      })
-    })
+      pid
+    }).then((res) =>
+      (get(res, 'infos') || []).map((i: Record<string, any>) => ({
+        ...i,
+        isSelected: value.includes(i.id)
+      }))
+    )
   }
 
   const root = useMemo(() => [roots[type]], [type])
@@ -150,29 +126,21 @@ const JobSelectModal = (props: IJobSelectProps) => {
             {text}
           </FlexBox>
         )
-      },
+      }
     },
     [getName('ID')]: {
-      render: (text: string) => <span tw="text-neut-8">{text}</span>,
+      render: (text: string) => <span tw="text-neut-8">{text}</span>
     },
     [getName('description')]: {
-      render: (text: string) => <span tw="text-neut-8">{text}</span>,
+      render: (text: string) => <span tw="text-neut-8">{text}</span>
     },
     [getName('last_update_time')]: {
       render: (d: number) =>
-        d && (
-          <span tw="text-neut-8">
-            {dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}
-          </span>
-        ),
-    },
+        d && <span tw="text-neut-8">{dayjs(d * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+    }
   }
 
-  const { columns } = useColumns(
-    jobSelectModalSetting,
-    jobColumns,
-    columnsRender as any
-  )
+  const { columns } = useColumns(jobSelectModalSetting, jobColumns, columnsRender as any)
 
   const renderList = () => {
     if (!value.length) {
@@ -224,12 +192,8 @@ const JobSelectModal = (props: IJobSelectProps) => {
             dataSource={root}
             rowKey="id"
             selectedLevel={10}
-            showItemCheckboxFn={(record) => {
-              return !record.is_directory
-            }}
-            showItemOpenFn={(record) => {
-              return !!record.is_directory
-            }}
+            showItemCheckboxFn={(record) => !record.is_directory}
+            showItemOpenFn={(record) => !!record.is_directory}
             getChildren={fetchJobTreeData}
           />
         </>

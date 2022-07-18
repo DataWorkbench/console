@@ -11,7 +11,7 @@ export class MemberStore {
   spaceItem: { id: string; name: string; regionId: string } = {
     id: '',
     name: '',
-    regionId: '',
+    regionId: ''
   }
 
   set = (params: { [key: string]: any }) => {

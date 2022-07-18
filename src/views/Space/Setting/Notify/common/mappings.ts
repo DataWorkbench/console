@@ -3,10 +3,7 @@ import { PbmodelNotification } from 'types/types'
 
 // eslint-disable-next-line import/prefer-default-export
 export const notifyFieldMapping = (
-  new Map() as Mapping1<
-    'id' | 'email' | 'desc' | 'created',
-    keyof PbmodelNotification
-  >
+  new Map() as Mapping1<'id' | 'email' | 'desc' | 'created', keyof PbmodelNotification>
 )
   .set('id', { label: '消息接收人姓名/ID', apiField: 'owner' })
   .set('email', { label: '邮箱', apiField: 'owner1' })

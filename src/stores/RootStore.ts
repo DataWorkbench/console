@@ -4,6 +4,8 @@ import WorkSpaceStore from 'stores/WorkSpaceStore'
 import DataSourceStore from 'stores/DataSourceStore'
 import WorkFlowStore from 'stores/WorkFlowStore'
 import DmStore from 'stores/DmStore'
+import DtsStore from 'stores/DtsStore'
+import DtsDevStore from 'stores/DtsDevStore'
 
 class RootStore {
   overViewStore: OverViewStore
@@ -18,6 +20,10 @@ class RootStore {
 
   dmStore: DmStore
 
+  dtsStore: DtsStore
+
+  dtsDevStore: DtsDevStore
+
   constructor() {
     this.overViewStore = new OverViewStore(this)
     this.globalStore = new GlobalStore(this)
@@ -25,6 +31,8 @@ class RootStore {
     this.dataSourceStore = new DataSourceStore(this)
     this.workFlowStore = new WorkFlowStore(this)
     this.dmStore = new DmStore(this)
+    this.dtsStore = new DtsStore(this)
+    this.dtsDevStore = new DtsDevStore(this)
   }
 }
 

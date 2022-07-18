@@ -4,11 +4,7 @@ import { AffixLabel } from 'components/AffixLabel'
 import { PopConfirm } from 'components/PopConfirm'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useLayoutEffect, useRef, useState } from 'react'
-import {
-  source$,
-  syncJobOp$,
-  target$,
-} from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { source$, syncJobOp$, target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { css } from 'twin.macro'
 import { Center } from 'components'
 import { pairwise } from 'rxjs'
@@ -67,25 +63,14 @@ const BaseConfigCommon = (props: IBaseConfigCommonProps) => {
           }
         `}
         label={<AffixLabel>数据源</AffixLabel>}
-        help={
-          isSelected &&
-          dbInfo?.networkId && (
-            <div>网络配置名称（ID：{dbInfo?.networkId}）</div>
-          )
-        }
+        help={isSelected && dbInfo?.networkId && <div>网络配置名称（ID：{dbInfo?.networkId}）</div>}
         popConfirm={
           <PopConfirm
             type="warning"
             content="移除数据源会清空所数据源表、条件参数配置、字段映射等所有信息，请确认是否移除？"
           />
         }
-        icon={
-          <Icon
-            name="blockchain"
-            size={16}
-            color={{ secondary: 'rgba(255,255,255,0.4)' }}
-          />
-        }
+        icon={<Icon name="blockchain" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />}
         value={dbInfo?.id}
         validateOnChange
         clearable={isSelected}
@@ -95,8 +80,8 @@ const BaseConfigCommon = (props: IBaseConfigCommonProps) => {
           {
             help: '请选择数据来源',
             status: 'error',
-            rule: (v?: string) => !!v,
-          },
+            rule: (v?: string) => !!v
+          }
         ]}
       >
         <Center tw="space-x-1">

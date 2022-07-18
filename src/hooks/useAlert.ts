@@ -5,18 +5,17 @@ import { apiHooks, queryKeyObj } from './apiHooks'
 import {
   ListAlertLogsRequestType,
   ListAlertPoliciesByJobRequestType,
-  ListAlertPoliciesRequestType,
+  ListAlertPoliciesRequestType
 } from '../types/request'
 import {
   AlertManageListAlertLogsType,
   AlertManageListAlertPoliciesByJobType,
-  AlertManageListAlertPoliciesType,
+  AlertManageListAlertPoliciesType
 } from '../types/response'
 
 export const useMutationAlert = (options?: {}, getQueryKey?: () => string) => {
   const queryClient = useQueryClient()
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   return useMutation(
     async ({ op, ...rest }: Record<string, any>) => {
       if (['update', 'create', 'delete', 'bound', 'unbound'].includes(op)) {
@@ -51,7 +50,7 @@ export const useMutationAlert = (options?: {}, getQueryKey?: () => string) => {
         if (getQueryKey) {
           queryClient.invalidateQueries(getQueryKey())
         }
-      },
+      }
     }
   )
 }
@@ -78,5 +77,4 @@ export const useQueryListAlertPoliciesByJob = apiHooks<
   AlertManageListAlertPoliciesByJobType
 >('alertManage', 'listAlertPoliciesByJob')
 
-export const getQueryKeyListAlertPoliciesByJob = () =>
-  queryKeyObj.listAlertPoliciesByJob
+export const getQueryKeyListAlertPoliciesByJob = () => queryKeyObj.listAlertPoliciesByJob

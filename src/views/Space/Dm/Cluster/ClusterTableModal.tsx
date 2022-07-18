@@ -11,14 +11,14 @@ const Alert = styled('div')(() => [
     svg {
       ${tw`text-white fill-[#2193D3]`}
     }
-  `,
+  `
 ])
 
 const ClusterTableModal = ({
   onCancel,
   onOk,
   selectedIds = [],
-  visible = true,
+  visible = true
 }: {
   onCancel?: () => void
   onOk?: (cluster: any) => void

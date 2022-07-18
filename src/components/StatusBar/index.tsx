@@ -6,6 +6,7 @@ export enum StatusBarEnum {
   red,
   gray,
   green,
+  purple
 }
 
 const statusStyles = [
@@ -16,8 +17,8 @@ const statusStyles = [
       text: tw`text-info`,
       out: tw`bg-[#C5EAFF]`,
       border: tw`border-[#2FB4FF]`,
-      bg: tw`bg-info`,
-    },
+      bg: tw`bg-info`
+    }
   },
   {
     type: StatusBarEnum.yellow,
@@ -26,8 +27,8 @@ const statusStyles = [
       text: tw`text-warning`,
       out: tw`bg-[#fff0ba]`,
       border: tw`border-[#ffe278]`,
-      bg: tw`bg-warning`,
-    },
+      bg: tw`bg-warning`
+    }
   },
   {
     type: StatusBarEnum.red,
@@ -36,8 +37,8 @@ const statusStyles = [
       text: tw`text-error`,
       out: tw`bg-[#f6dbda]`,
       border: tw`border-[#e0a9a8]`,
-      bg: tw`bg-error`,
-    },
+      bg: tw`bg-error`
+    }
   },
   {
     type: StatusBarEnum.gray,
@@ -46,8 +47,8 @@ const statusStyles = [
       text: tw`text-neut-8`,
       out: tw`bg-[#dee7f1]`,
       border: tw`border-[#b7c8d8]`,
-      bg: tw`bg-neut-8`,
-    },
+      bg: tw`bg-neut-8`
+    }
   },
   {
     type: StatusBarEnum.green,
@@ -56,17 +57,28 @@ const statusStyles = [
       text: tw`text-success`,
       out: tw`bg-[#c6f4e4]`,
       border: tw`border-[#47CB9F]`,
-      bg: tw`bg-success`,
-    },
+      bg: tw`bg-success`
+    }
   },
+  {
+    type: StatusBarEnum.purple,
+    style: {
+      text: tw`text-white`,
+      out: tw`bg-[#F6EDFF]`,
+      border: tw`border-[#A855F7]`,
+      bg: tw`bg-[#A855F7]`
+    }
+  }
 ]
 
 export const StatusBar = ({
   type,
   label,
+  isWrapper = true
 }: {
   type: StatusBarEnum
   label: string
+  isWrapper?: boolean
 }) => {
   const styles = statusStyles.find((s) => s.type === type)
   if (!styles) {
@@ -76,7 +88,7 @@ export const StatusBar = ({
   const { wrapper, text: textStyle, out, border, bg } = styles.style
   return (
     <div
-      css={wrapper}
+      css={isWrapper ? wrapper : ''}
       tw="inline-flex gap-2 leading-5 items-center rounded-full px-1"
     >
       <div css={[out]} tw="w-3 h-3 rounded-full p-0.5 inline-flex items-center">

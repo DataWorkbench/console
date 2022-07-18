@@ -17,28 +17,23 @@ const permissionTabs = [
     title: '权限列表',
     description: '通过给空间成员分配不同的角色来实现权限控制管理.',
     icon: 'licenses',
-    helpLink: getHelpCenterLink(
-      '/manual/data_development/flink_cluster/create_cluster/'
-    ),
-  },
+    helpLink: getHelpCenterLink('/manual/data_development/flink_cluster/create_cluster/')
+  }
 ]
 
-const getPermissionList = (infos: Record<string, any>[]) => {
-  return infos.map((item) => {
-    return {
-      ...item,
-      api_lists: (item?.api_lists || []).map((api: Record<string, any>) => {
-        const { permissions, ...rest } = api
-        permissions.forEach((permission: Record<string, any>) => {
-          Object.assign(rest, {
-            [`role_${permission.system_role.type}`]: permission.allowed,
-          })
+const getPermissionList = (infos: Record<string, any>[]) =>
+  infos.map((item) => ({
+    ...item,
+    api_lists: (item?.api_lists || []).map((api: Record<string, any>) => {
+      const { permissions, ...rest } = api
+      permissions.forEach((permission: Record<string, any>) => {
+        Object.assign(rest, {
+          [`role_${permission.system_role.type}`]: permission.allowed
         })
-        return rest
-      }),
-    }
-  })
-}
+      })
+      return rest
+    })
+  }))
 
 const PermissionList = () => {
   const { data: roleList, isFetching: isRoleFetching } = useQueryRoleList()
@@ -78,23 +73,21 @@ const PermissionList = () => {
               placeholder="请输入关键词进行搜索"
               suggestions={(rolePermissionList?.infos ?? []).map((i) => ({
                 label: i.name,
-                key: i.id,
+                key: i.id
               }))}
               tags={tags}
               onChange={setTags}
             />
           </div>
           <Card tw="p-5">
-            {getPermissionList(rolePermissionList?.infos || []).map(
-              (item: Record<string, any>) => (
-                <Permission
-                  data={item}
-                  roles={roleList?.infos || []}
-                  search={tags.find((i) => i.filter === item.id)?.value}
-                  key={item.id}
-                />
-              )
-            )}
+            {getPermissionList(rolePermissionList?.infos || []).map((item: Record<string, any>) => (
+              <Permission
+                data={item}
+                roles={roleList?.infos || []}
+                search={tags.find((i) => i.filter === item.id)?.value}
+                key={item.id}
+              />
+            ))}
           </Card>
         </>
       )}

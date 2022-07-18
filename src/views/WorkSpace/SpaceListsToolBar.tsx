@@ -21,7 +21,7 @@ const SpaceListsToolBar = observer(() => {
     queryKeyWord,
     ifNoData,
     selectedSpaces,
-    isAdmin,
+    isAdmin
   } = stateStore
   const [searchName, setSearchName] = useState(queryKeyWord)
   const curSpacesLen = selectedSpaces.length
@@ -66,7 +66,7 @@ const SpaceListsToolBar = observer(() => {
           value={isAdmin ? 1 : 0}
           onChange={(v) => {
             stateStore.set({
-              isAdmin: !!v,
+              isAdmin: !!v
             })
           }}
         >
@@ -90,9 +90,7 @@ const SpaceListsToolBar = observer(() => {
                 <Menu onClick={handleMenuClick}>
                   <MenuItem
                     value="update"
-                    disabled={
-                      curSpacesLen !== 1 || selectedSpaces[0].status === 2
-                    }
+                    disabled={curSpacesLen !== 1 || selectedSpaces[0].status === 2}
                   >
                     <Icon name="pen" />
                     修改工作空间
@@ -102,9 +100,7 @@ const SpaceListsToolBar = observer(() => {
                     disabled={
                       curSpacesLen === 0 ||
                       curSpacesLen ===
-                        selectedSpaces.filter(
-                          (o: Record<string, any>) => o.status === 2
-                        ).length
+                        selectedSpaces.filter((o: Record<string, any>) => o.status === 2).length
                     }
                   >
                     <i className="if if-minus-square" tw="text-base mr-2" />
@@ -115,9 +111,7 @@ const SpaceListsToolBar = observer(() => {
                     disabled={
                       curSpacesLen === 0 ||
                       curSpacesLen ===
-                        selectedSpaces.filter(
-                          (o: Record<string, any>) => o.status === 1
-                        ).length
+                        selectedSpaces.filter((o: Record<string, any>) => o.status === 1).length
                     }
                   >
                     <Icon name="start" />
@@ -137,7 +131,7 @@ const SpaceListsToolBar = observer(() => {
                     style={{
                       width: '14px',
                       height: '14px',
-                      lineHeight: '14px',
+                      lineHeight: '14px'
                     }}
                     tw="mr-1"
                   />
@@ -167,11 +161,7 @@ const SpaceListsToolBar = observer(() => {
             }}
           />
           <Button loading={queryRefetch} tw="px-[5px]">
-            <Icon
-              name="if-refresh"
-              tw="text-xl"
-              onClick={() => reloadWorkSpace()}
-            />
+            <Icon name="if-refresh" tw="text-xl" onClick={() => reloadWorkSpace()} />
           </Button>
           {!cardView && (
             <ColumnsSetting
@@ -181,11 +171,7 @@ const SpaceListsToolBar = observer(() => {
             />
           )}
           <div tw="border-l h-full border-neut-3" />
-          <RadioGroup
-            value={cardView ? 'card' : 'table'}
-            onChange={toggleViewMode}
-            size="default"
-          >
+          <RadioGroup value={cardView ? 'card' : 'table'} onChange={toggleViewMode} size="default">
             <RadioButton value="card">卡片视图</RadioButton>
             <RadioButton value="table">列表视图</RadioButton>
           </RadioGroup>

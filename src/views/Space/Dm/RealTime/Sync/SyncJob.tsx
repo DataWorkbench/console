@@ -5,7 +5,7 @@ import {
   HelpCenterLink,
   Modal,
   RouterLink,
-  PopConfirm,
+  PopConfirm
   // TextLink,
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
@@ -18,7 +18,7 @@ import {
   useMutationSyncJobConvert,
   useQueryJobSchedule,
   useQuerySyncJobConf,
-  useStore,
+  useStore
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
 import { timeFormat } from 'utils/convert'
@@ -29,7 +29,7 @@ import {
   source$,
   sourceColumns$,
   target$,
-  targetColumns$,
+  targetColumns$
 } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import DatasourceConfig from 'views/Space/Dm/RealTime/Sync/DatasourceConfig'
 import { useImmer } from 'use-immer'
@@ -60,13 +60,13 @@ const CollapseWrapper = styled('div')(() => [
     li:last-child {
       ${tw`mb-1`}
     }
-  `,
+  `
 ])
 
 const styles = {
   stepTag: tw`flex items-center text-left border border-green-11 rounded-r-2xl pr-4 mr-3 h-7 leading-5`,
   stepNum: tw`inline-block text-white bg-green-11 w-5 h-5 text-center rounded-full -ml-2.5`,
-  stepText: tw`ml-2 inline-block border-green-11 text-green-11`,
+  stepText: tw`ml-2 inline-block border-green-11 text-green-11`
 }
 
 const getStepsData = (regionId: string, spaceId: string) => [
@@ -85,17 +85,17 @@ const getStepsData = (regionId: string, spaceId: string) => [
         </RouterLink>
         创建的数据源。
       </>
-    ),
+    )
   },
   {
     key: 'p1',
     title: '字段映射',
-    desc: null,
+    desc: null
   },
   {
     key: 'p2',
     title: '计算集群',
-    desc: null,
+    desc: null
   },
   {
     key: 'p3',
@@ -113,8 +113,8 @@ const getStepsData = (regionId: string, spaceId: string) => [
           数据同步文档
         </HelpCenterLink>
       </>
-    ),
-  },
+    )
+  }
 ]
 
 const removeUndefined = (obj: any) => {
@@ -144,24 +144,19 @@ export const intTypes = new Set([
   'INT2',
   'INT4',
   'INT8',
-  'INT IDENTITY',
+  'INT IDENTITY'
 ])
 
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
   const { workFlowStore } = useStore()
-  const {
-    data: confData,
-    isFetching,
-    refetch: confRefetch,
-  } = useQuerySyncJobConf()
+  const { data: confData, isFetching, refetch: confRefetch } = useQuerySyncJobConf()
 
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
 
   const {
-    workFlowStore: { curJob },
+    workFlowStore: { curJob }
   } = useStore()
 
   useLayoutEffect(() => {
@@ -170,14 +165,12 @@ const SyncJob = () => {
         ...confData,
         sourceType: curJob?.source_type,
         targetType: curJob?.target_type,
-        jobType: curJob?.type,
+        jobType: curJob?.type
       })
     }
   }, [confData, curJob, isFetching])
 
-  const stepsData = useMemo(() => {
-    return getStepsData(regionId, spaceId)
-  }, [regionId, spaceId])
+  const stepsData = useMemo(() => getStepsData(regionId, spaceId), [regionId, spaceId])
 
   const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
   const [showRelaseModal, setShowRelaseModal] = useState(false)
@@ -208,23 +201,19 @@ const SyncJob = () => {
   const [sourceTypeName, targetTypeName] = useMemo(() => {
     const sourceType = curJob?.source_type
     const targetType = curJob?.target_type
-    return [
-      getDataSourceTypes(sourceType, curJob?.type === 3),
-      getDataSourceTypes(targetType),
-    ]
+    return [getDataSourceTypes(sourceType, curJob?.type === 3), getDataSourceTypes(targetType)]
   }, [curJob])
 
   const editorRef = useRef<any>(null)
 
-  const [defaultJobContent, setDefaultJobContent] = useState(
-    get(confData, 'job_content')
-  )
+  const [defaultJobContent, setDefaultJobContent] = useState(get(confData, 'job_content'))
 
-  useLayoutEffect(() => {
-    return () => {
+  useLayoutEffect(
+    () => () => {
       curJobDbConfSubject$.next(null)
-    }
-  }, [])
+    },
+    []
+  )
 
   useEffect(() => {
     if (confData?.job_mode && confData?.job_mode !== mode) {
@@ -236,9 +225,7 @@ const SyncJob = () => {
 
   useEffect(() => {
     if (editorRef.current) {
-      editorRef.current?.setValue(
-        JSON.stringify(JSON.parse(defaultJobContent || '{}'), null, 4)
-      )
+      editorRef.current?.setValue(JSON.stringify(JSON.parse(defaultJobContent || '{}'), null, 4))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultJobContent, editorRef.current])
@@ -253,8 +240,8 @@ const SyncJob = () => {
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': theme('colors.neut.18'),
-      },
+        'editor.background': theme('colors.neut.18')
+      }
     })
   }
 
@@ -268,22 +255,15 @@ const SyncJob = () => {
     Notify.warning({
       title: '操作提示',
       content,
-      placement: 'bottomRight',
+      placement: 'bottomRight'
     })
   }
 
-  const save = (
-    isSubmit?: boolean,
-    cb?: Function,
-    isValidateSource?: boolean
-  ) => {
+  const save = (isSubmit?: boolean, cb?: Function, isValidateSource?: boolean) => {
     if (
       mode === 1 &&
       isSubmit &&
-      (!dbRef.current ||
-        !mappingRef.current ||
-        !clusterRef.current ||
-        !channelRef.current)
+      (!dbRef.current || !mappingRef.current || !clusterRef.current || !channelRef.current)
     ) {
       return
     }
@@ -313,11 +293,7 @@ const SyncJob = () => {
           showConfWarn('未配置数据源信息')
           return
         }
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
-          mapping[0]
-        )
+        set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping[0])
         if (curJob?.target_type === SourceType.HBase) {
           const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
             mappingRef.current!.getOther()
@@ -399,8 +375,8 @@ const SyncJob = () => {
             }
 
             const splitKey = get(
-              Object.entries(resource.sync_resource ?? ({} as any)).find(
-                ([k]) => k.endsWith('_source')
+              Object.entries(resource.sync_resource ?? ({} as any)).find(([k]) =>
+                k.endsWith('_source')
               )?.[1] ?? {},
               'split_pk'
             )
@@ -433,10 +409,10 @@ const SyncJob = () => {
           Notify.success({
             title: '操作提示',
             content: '配置保存成功',
-            placement: 'bottomRight',
+            placement: 'bottomRight'
           })
         }
-      },
+      }
     })
   }
 
@@ -472,7 +448,7 @@ const SyncJob = () => {
 
   const [{ sourceId, targetId }, setSourceId] = useImmer({
     sourceId: confData?.source_id,
-    targetId: confData?.target_id,
+    targetId: confData?.target_id
   })
 
   useLayoutEffect(() => {
@@ -504,71 +480,66 @@ const SyncJob = () => {
     }
   }, [setSourceId])
 
-  const renderGuideMode = () => {
-    return (
-      <CollapseWrapper>
-        <Collapse defaultActiveKey={stepsData.map((step) => step.key)}>
-          {stepsData.map(({ key, title, desc }, index) => (
-            <CollapseItem
-              key={key}
-              label={
-                <>
-                  <div css={styles.stepTag}>
-                    <span css={styles.stepNum}>{index + 1}</span>
-                    <span css={styles.stepText}>{title}</span>
-                  </div>
-                  <div tw="text-neut-13">{desc}</div>
-                </>
-              }
-            >
-              {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob!} />}
+  const renderGuideMode = () => (
+    <CollapseWrapper>
+      <Collapse defaultActiveKey={stepsData.map((step) => step.key)}>
+        {stepsData.map(({ key, title, desc }, index) => (
+          <CollapseItem
+            key={key}
+            label={
+              <>
+                <div css={styles.stepTag}>
+                  <span css={styles.stepNum}>{index + 1}</span>
+                  <span css={styles.stepText}>{title}</span>
+                </div>
+                <div tw="text-neut-13">{desc}</div>
+              </>
+            }
+          >
+            {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob!} />}
 
-              {index === 1 && (
-                <FieldMappings
-                  onReInit={() => {
-                    if (dbRef.current && dbRef.current?.refetchColumns) {
-                      dbRef.current?.refetchColumns()
-                    }
-                  }}
-                  ref={mappingRef}
-                  // mappings={[]}
-                  leftFields={sourceColumns as any}
-                  rightFields={targetColumns as any}
-                  sourceId={sourceId}
-                  targetId={targetId}
-                  leftTypeName={sourceTypeName}
-                  rightTypeName={targetTypeName}
-                  jobType={curJob?.type}
-                  columns={columns}
-                  topHelp={
-                    <HelpCenterLink
-                      href="/manual/integration_job/create_job_offline_1/#配置字段映射"
-                      isIframe={false}
-                    >
-                      字段映射说明文档
-                    </HelpCenterLink>
+            {index === 1 && (
+              <FieldMappings
+                onReInit={() => {
+                  if (dbRef.current && dbRef.current?.refetchColumns) {
+                    dbRef.current?.refetchColumns()
                   }
-                />
-              )}
-              {index === 2 && (
-                <SyncCluster
-                  ref={clusterRef}
-                  clusterId={get(confData, 'cluster_id')}
-                  defaultClusterName={get(confData, 'cluster_info.name')}
-                />
-              )}
-              {index === 3 && (
-                <SyncChannel
-                  ref={channelRef}
-                  channelControl={get(confData, 'channel_control')}
-                />
-              )}
-            </CollapseItem>
-          ))}
-        </Collapse>
-      </CollapseWrapper>
-    )
-  }
+                }}
+                ref={mappingRef}
+                // mappings={[]}
+                leftFields={sourceColumns as any}
+                rightFields={targetColumns as any}
+                sourceId={sourceId}
+                targetId={targetId}
+                leftTypeName={sourceTypeName}
+                rightTypeName={targetTypeName}
+                jobType={curJob?.type}
+                columns={columns}
+                topHelp={
+                  <HelpCenterLink
+                    href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+                    isIframe={false}
+                  >
+                    字段映射说明文档
+                  </HelpCenterLink>
+                }
+              />
+            )}
+            {index === 2 && (
+              <SyncCluster
+                ref={clusterRef}
+                clusterId={get(confData, 'cluster_id')}
+                defaultClusterName={get(confData, 'cluster_info.name')}
+              />
+            )}
+            {index === 3 && (
+              <SyncChannel ref={channelRef} channelControl={get(confData, 'channel_control')} />
+            )}
+          </CollapseItem>
+        ))}
+      </Collapse>
+    </CollapseWrapper>
+  )
 
   const renderScriptMode = () => {
     const step = stepsData[2]
@@ -577,16 +548,12 @@ const SyncJob = () => {
         <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 156px)] overflow-y-auto ">
           <Editor
             language="json"
-            defaultValue={JSON.stringify(
-              JSON.parse(defaultJobContent || '{}'),
-              null,
-              4
-            )}
+            defaultValue={JSON.stringify(JSON.parse(defaultJobContent || '{}'), null, 4)}
             theme="my-theme"
             options={{
               minimap: { enabled: false },
               scrollBeyondLastLine: false,
-              automaticLayout: true,
+              automaticLayout: true
               // readOnly: false,
             }}
             editorWillMount={handleEditorWillMount}
@@ -607,10 +574,7 @@ const SyncJob = () => {
                 </>
               }
             >
-              <SyncCluster
-                ref={clusterRef}
-                clusterId={get(confData, 'cluster_id')}
-              />
+              <SyncCluster ref={clusterRef} clusterId={get(confData, 'cluster_id')} />
             </CollapseItem>
           </Collapse>
         </CollapseWrapper>
@@ -621,12 +585,7 @@ const SyncJob = () => {
 
   // eslint-disable-next-line
   const handleConvert = () => {
-    if (
-      !dbRef.current ||
-      !mappingRef.current ||
-      !clusterRef.current ||
-      !channelRef.current
-    ) {
+    if (!dbRef.current || !mappingRef.current || !clusterRef.current || !channelRef.current) {
       return
     }
 
@@ -637,16 +596,8 @@ const SyncJob = () => {
     const channel = channelRef.current!.getChannel()
 
     try {
-      set(
-        resource,
-        `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
-        mapping?.[0]
-      )
-      set(
-        resource,
-        `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-        mapping?.[1]
-      )
+      set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping?.[0])
+      set(resource, `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`, mapping?.[1])
 
       set(resource, 'cluster_id', cluster?.id)
       set(resource, 'job_mode', 1)
@@ -663,7 +614,7 @@ const SyncJob = () => {
         onSuccess: (resp) => {
           setDefaultJobContent(resp.job)
           setMode(2)
-        },
+        }
       }
     )
   }
@@ -749,7 +700,7 @@ const SyncJob = () => {
           onSuccess={() => {
             setShowRelaseModal(false)
             workFlowStore.set({
-              showNotify: true,
+              showNotify: true
             })
           }}
           onCancel={() => setShowRelaseModal(false)}
@@ -764,23 +715,17 @@ const SyncJob = () => {
           okText="调度配置"
           onOk={() => {
             workFlowStore.set({
-              showScheSetting: true,
+              showScheSetting: true
             })
             // setShowScheSettingModal(true)
             toggleScheModal(false)
           }}
         >
           <div tw="flex">
-            <Icon
-              name="exclamation"
-              color={{ secondary: '#F5C414' }}
-              size={20}
-            />
+            <Icon name="exclamation" color={{ secondary: '#F5C414' }} size={20} />
             <div tw="ml-3">
               <div tw="text-base">尚未配置调度任务</div>
-              <div tw="mt-2 text-neut-8">
-                发布调度任务前，请先完成调度配置，否则无法发布
-              </div>
+              <div tw="mt-2 text-neut-8">发布调度任务前，请先完成调度配置，否则无法发布</div>
             </div>
           </div>
         </Modal>

@@ -1,14 +1,5 @@
 import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react'
-import {
-  Control,
-  Field,
-  Form,
-  Input,
-  InputNumber,
-  Label,
-  Radio,
-  RadioGroup,
-} from '@QCFE/lego-ui'
+import { Control, Field, Form, Input, InputNumber, Label, Radio, RadioGroup } from '@QCFE/lego-ui'
 import { AffixLabel } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useImmer } from 'use-immer'
@@ -35,7 +26,7 @@ const Root = styled('div')(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 const styles = {
@@ -48,7 +39,7 @@ const styles = {
         ${tw`ml-[140px]! w-full`}
       }
     }
-  `,
+  `
 }
 
 interface ChannelControl {
@@ -90,7 +81,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
         return res
       }
       return null
-    },
+    }
   }))
 
   return (
@@ -115,8 +106,8 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               {
                 help: '请输入并行数',
                 status: 'error',
-                rule: { required: true },
-              },
+                rule: { required: true }
+              }
             ]}
             help="范围：1~100"
           />
@@ -131,7 +122,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
                   .field {
                     ${tw`mb-0`}
                   }
-                `,
+                `
               ]}
             >
               <RadioGroup
@@ -149,9 +140,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
                 <>
                   <Input
                     type="text"
-                    className={
-                      channel.rate === 1 && !channel.bytes ? 'is-danger' : ''
-                    }
+                    className={channel.rate === 1 && !channel.bytes ? 'is-danger' : ''}
                     placeholder="请输入速度"
                     value={channel.bytes || ''}
                     onChange={(e, v) => {
@@ -191,9 +180,7 @@ const SyncChannel = forwardRef((props: SyncChannelProps, ref) => {
               <span>条，任务自动结束</span>
             </Control>
             <div className="help">
-              <span>
-                允许的脏数据条数，（写入一致性语义为 exactly-once 时无效）
-              </span>
+              <span>允许的脏数据条数，（写入一致性语义为 exactly-once 时无效）</span>
             </div>
           </Field>
         </Form>

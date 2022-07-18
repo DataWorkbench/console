@@ -8,19 +8,16 @@ const schemas: [string, string][] = [
   ['opTime', 'STRING'],
   ['type', 'STRING'],
   ['before', 'STRING'],
-  ['after', 'STRING'],
+  ['after', 'STRING']
 ]
 
-const useSetRealtimeColumns = (
-  id?: string,
-  list: [string, string][] = schemas
-) => {
+const useSetRealtimeColumns = (id?: string, list: [string, string][] = schemas) => {
   const refetch = useCallback(() => {
     const schemasList = list.map((i) => ({
       type: i[1],
       name: i[0],
       is_primary_key: false,
-      uuid: `source--${i[0]}`,
+      uuid: `source--${i[0]}`
     }))
     if (id) {
       sourceColumns$.next([...schemasList])

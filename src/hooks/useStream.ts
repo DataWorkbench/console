@@ -9,7 +9,7 @@ import {
   offlineReleaseJob,
   resumeReleaseJob,
   suspendReleaseJob,
-  terminateInstances,
+  terminateInstances
 } from 'stores/api'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { apiRequest } from 'utils/api'
@@ -23,28 +23,25 @@ let releaseQueryKey: any = ''
 
 export const getReleaseJobsKey = () => releaseQueryKey
 
-export const useQueryReleaseJobs = (
-  filter: any,
-  options?: { refetchInterval: number }
-) => {
+export const useQueryReleaseJobs = (filter: any, options?: { refetchInterval: number }) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   releaseQueryKey = ['RELEASE_STREAM_JOBS', params]
   return useQuery(releaseQueryKey, async () => listReleaseStreamJobs(params), {
     keepPreviousData: true,
-    refetchInterval: options?.refetchInterval,
+    refetchInterval: options?.refetchInterval
   })
 }
 
 export const useQueryReleaseJobVersions = (filter: any) => {
   const {
-    workFlowStore: { curJob },
+    workFlowStore: { curJob }
   } = useStore()
   const { regionId: region, spaceId } = useParams<IRouteParams>()
   const params = {
@@ -53,18 +50,18 @@ export const useQueryReleaseJobVersions = (filter: any) => {
     jobId: curJob?.id,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   const jobVersionsKey = ['RELEASE_JOB_VERSIONS', params]
   return useQuery(jobVersionsKey, async () => listReleaseJobVersions(params), {
-    keepPreviousData: true,
+    keepPreviousData: true
   })
 }
 
 let infiniteVersionQueryKey: any = ''
 export const useInfiniteQueryJobVersions = (filter?: any) => {
   const {
-    workFlowStore: { curJob },
+    workFlowStore: { curJob }
   } = useStore()
   const { regionId: region, spaceId } = useParams<IRouteParams>()
   const params = {
@@ -73,7 +70,7 @@ export const useInfiniteQueryJobVersions = (filter?: any) => {
     jobId: curJob?.id,
     limit: 100,
     offset: 0,
-    ...filter,
+    ...filter
   }
   infiniteVersionQueryKey = ['RELEASE_JOB_VERSIONS', params]
   return useInfiniteQuery(
@@ -82,22 +79,19 @@ export const useInfiniteQueryJobVersions = (filter?: any) => {
     {
       getNextPageParam: (lastPage, allPages) => {
         if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+          const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
 
           if (nextOffset < lastPage.total) {
             const nextParams = {
               ...params,
-              offset: nextOffset,
+              offset: nextOffset
             }
             return nextParams
           }
         }
 
         return undefined
-      },
+      }
     }
   )
 }
@@ -117,39 +111,24 @@ export const useQueryJobInstances = (
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
-  instanceQueryKey = [
-    type === 'modal' ? 'JOB_INSTANCES' : 'STREAM_JOB_INSTANCES',
-    params,
-  ]
-  return useQuery(
-    instanceQueryKey,
-    async () => listStreamJobInstances(params),
-    {
-      refetchInterval: options?.refetchInterval,
-      keepPreviousData: true,
-      enabled: type === 'modal' ? !!filter.job_id : true,
-    }
-  )
+  instanceQueryKey = [type === 'modal' ? 'JOB_INSTANCES' : 'STREAM_JOB_INSTANCES', params]
+  return useQuery(instanceQueryKey, async () => listStreamJobInstances(params), {
+    refetchInterval: options?.refetchInterval,
+    keepPreviousData: true,
+    enabled: type === 'modal' ? !!filter.job_id : true
+  })
 }
 
 export const useMutationReleaseJobs = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(
-    async ({
-      op,
-      ...rest
-    }: {
-      op: OP
-      jobId: String
-      stopRunning: Boolean
-      type?: JobMode
-    }) => {
+    async ({ op, ...rest }: { op: OP; jobId: String; stopRunning: Boolean; type?: JobMode }) => {
       const params = {
         spaceId,
         regionId,
-        ...rest,
+        ...rest
       }
       let ret = null
       if (op === 'enable') {
@@ -165,8 +144,8 @@ export const useMutationReleaseJobs = () => {
             regionId,
             uri: { space_id: spaceId, job_id: rest.jobId },
             data: {
-              stop_running: rest.stopRunning,
-            },
+              stop_running: rest.stopRunning
+            }
           })
         } else {
           ret = await offlineReleaseJob(params)
@@ -180,18 +159,11 @@ export const useMutationReleaseJobs = () => {
 export const useMutationInstance = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   return useMutation(
-    async ({
-      op,
-      ...rest
-    }: {
-      op: OP
-      inst_id?: String
-      instance_ids?: object[]
-    }) => {
+    async ({ op, ...rest }: { op: OP; inst_id?: String; instance_ids?: object[] }) => {
       const params = {
         spaceId,
         regionId,
-        ...rest,
+        ...rest
       }
       let ret = null
       if (op === 'enable') {
@@ -208,20 +180,16 @@ export const useMutationInstance = () => {
 }
 
 let queryStreamInstanceDetailKey: any = ''
-export const getQueryStreamInstanceDetailKey = () =>
-  queryStreamInstanceDetailKey
+export const getQueryStreamInstanceDetailKey = () => queryStreamInstanceDetailKey
 export const useQueryStreamInstanceDetail = (id: string) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
 
   const params = {
     regionId,
     spaceId,
-    instanceId: id,
+    instanceId: id
   }
 
   queryStreamInstanceDetailKey = ['STREAM_INSTANCE_DETAIL', params]
-  return useQuery(
-    ['STREAM_INSTANCE_DETAIL', params],
-    async () => ({} as Record<string, any>)
-  )
+  return useQuery(['STREAM_INSTANCE_DETAIL', params], async () => ({} as Record<string, any>))
 }

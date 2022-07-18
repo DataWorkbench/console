@@ -22,7 +22,7 @@ const enableResizing = {
   topRight: false,
   bottomRight: false,
   bottomLeft: false,
-  topLeft: false,
+  topLeft: false
 }
 
 function Result({ loading, height, socketId, onClose }: ResultProps) {
@@ -44,19 +44,21 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
         if (t === 1) {
           columns.current = (dataset?.[0]?.message || []).map((r) => ({
             title: r,
-            dataIndex: r,
+            dataIndex: r
           }))
         } else if (t === 2) {
           const header = columns.current
-          const res = dataset.map((item) => {
-            return item.message.reduce(
-              (prev, curr, index) => ({
-                ...prev,
-                [header[index].dataIndex]: curr,
-              }),
-              {}
-            )
-          }, {})
+          const res = dataset.map(
+            (item) =>
+              item.message.reduce(
+                (prev, curr, index) => ({
+                  ...prev,
+                  [header[index].dataIndex]: curr
+                }),
+                {}
+              ),
+            {}
+          )
           setResult(res)
           setCurrDate(dayjs().format('HH:mm:ss.SSS'))
         } else if (t === 4) {
@@ -76,9 +78,7 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
 
   const key = useMemo(() => {
     if (columns.current.length) {
-      return columns.current.find((r) => r.dataIndex === 'id')
-        ? 'id'
-        : columns.current[0].dataIndex
+      return columns.current.find((r) => r.dataIndex === 'id') ? 'id' : columns.current[0].dataIndex
     }
     return 'id'
   }, [])
@@ -94,7 +94,7 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
         width: '100%',
         height: 384,
         x: 0,
-        y: height - 384,
+        y: height - 384
       }}
       dragHandleClassName="runlog-toolbar"
     >
@@ -110,10 +110,7 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
             <Icon name="stop" type="light" />
             结束运行
           </FlexBox>
-          <FlexBox
-            tw="select-text cursor-pointer gap-0.5 items-center"
-            onClick={() => onClose(0)}
-          >
+          <FlexBox tw="select-text cursor-pointer gap-0.5 items-center" onClick={() => onClose(0)}>
             <Icon name="close" type="light" />
             关闭面板
           </FlexBox>
@@ -123,11 +120,11 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
               setFullHeight((isFull) => {
                 rndRef.current.updateSize({
                   height: isFull ? 384 : height,
-                  width: '100%',
+                  width: '100%'
                 })
                 rndRef.current.updatePosition({
                   y: isFull ? height - 384 : 0,
-                  x: 0,
+                  x: 0
                 })
                 return !isFull
               })
@@ -138,16 +135,11 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
           </FlexBox>
         </FlexBox>
       </FlexBox>
-      <FlexBox
-        className="sql-result-wrapper"
-        tw="p-3 flex-1 flex-col overflow-hidden"
-      >
+      <FlexBox className="sql-result-wrapper" tw="p-3 flex-1 flex-col overflow-hidden">
         {type <= 2 && (
           <FlexBox tw="font-bold">
             <span tw="flex-1">SQL Query Result</span>
-            {currDate && (
-              <span style={{ color: '#939EA9' }}>{`Updated: ${currDate}`}</span>
-            )}
+            {currDate && <span style={{ color: '#939EA9' }}>{`Updated: ${currDate}`}</span>}
           </FlexBox>
         )}
         {loading && type <= 1 && (

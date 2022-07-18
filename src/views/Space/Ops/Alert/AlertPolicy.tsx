@@ -4,7 +4,7 @@ import {
   alertPolicyColumns,
   alertPolicySuggestions,
   alertPolicyTabs,
-  monitorObjectTypes,
+  monitorObjectTypes
 } from 'views/Space/Ops/Alert/common/constants'
 import React, { useState } from 'react'
 import { useColumns } from 'hooks/useHooks/useColumns'
@@ -58,21 +58,17 @@ const alertPolicySettingKey = 'ALERT_POLICY_SETTING_KEY'
 
 const AlertPolicy = () => {
   useIcon(icons)
-  const { filter, pagination, sort, getColumnFilter, getColumnSort } =
-    useFilter<
-      {
-        search?: string
-        monitor_object?: number
-      },
-      { pagination: true; sort: true }
-    >({}, { pagination: true, sort: true }, alertPolicySettingKey)
+  const { filter, pagination, sort, getColumnFilter, getColumnSort } = useFilter<
+    {
+      search?: string
+      monitor_object?: number
+    },
+    { pagination: true; sort: true }
+  >({}, { pagination: true, sort: true }, alertPolicySettingKey)
 
   const history = useHistory()
   const [store] = useState(new AlertStore())
-  const { isLoading, mutateAsync } = useMutationAlert(
-    {},
-    getQueryKeyListAlertPolicies
-  )
+  const { isLoading, mutateAsync } = useMutationAlert({}, getQueryKeyListAlertPolicies)
 
   const { columns, setColumnSettings } = useColumns(
     alertPolicySettingKey,
@@ -90,18 +86,14 @@ const AlertPolicy = () => {
             icon="q-bellGearDuotone"
             css={instanceNameStyle}
           />
-        ),
+        )
       },
       [getName('monitor_object')]: {
         ...getColumnFilter(getName('monitor_object'), monitorObjectTypes),
-        render: (type: keyof typeof monitorObjectTypes) => {
-          return monitorObjectTypes[type]?.label
-        },
+        render: (type: keyof typeof monitorObjectTypes) => monitorObjectTypes[type]?.label
       },
       [getName('desc')]: {
-        render: (desc: string) => {
-          return <span tw="text-font-placeholder">{desc} </span>
-        },
+        render: (desc: string) => <span tw="text-font-placeholder">{desc} </span>
       },
       [getName('updated')]: {
         ...getColumnSort(getName('updated')),
@@ -114,8 +106,8 @@ const AlertPolicy = () => {
             )
           }
           return null
-        },
-      },
+        }
+      }
     } as any,
     {
       title: '操作',
@@ -129,7 +121,7 @@ const AlertPolicy = () => {
                 showAddMonitorForm: true,
                 selectedMonitor: record,
                 getQueryListKey: getQueryKeyListAlertPolicies,
-                jobDetail: {},
+                jobDetail: {}
               })
             }}
           >
@@ -142,22 +134,22 @@ const AlertPolicy = () => {
               mutateAsync({
                 op: 'delete',
                 data: {
-                  alert_ids: [record.id],
-                },
+                  alert_ids: [record.id]
+                }
               })
             }}
           >
             <Button type="text">删除</Button>
           </PopConfirm>
         </FlexBox>
-      ),
+      )
     }
   )
 
   const { spaceId } = useParams<{ spaceId: string }>()
   const { data, isFetching, refetch } = useQueryListAlertPolicies({
     uri: { space_id: spaceId },
-    params: filter as any,
+    params: filter as any
   })
 
   const infos = get(data, 'infos', []) ?? []
@@ -175,7 +167,7 @@ const AlertPolicy = () => {
                   showAddMonitorForm: true,
                   selectedMonitor: {},
                   getQueryListKey: getQueryKeyListAlertPolicies,
-                  jobDetail: {},
+                  jobDetail: {}
                 })
               }}
             >
@@ -214,7 +206,7 @@ const AlertPolicy = () => {
             onSort={sort}
             pagination={{
               total: get(data, 'total', 0),
-              ...pagination,
+              ...pagination
             }}
           />
         </FlexBox>

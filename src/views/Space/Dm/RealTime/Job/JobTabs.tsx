@@ -65,16 +65,15 @@ const TabWrapper = styled(Tabs)(() => [
         ${tw`flex h-full`}
       }
     }
-  `,
+  `
 ])
 
 const JobTabs = observer(() => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const notifyTmRef = useRef<any>(null)
   const {
     workFlowStore,
-    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify },
+    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify }
   } = useStore()
 
   const added = curJob && findIndex(panels, (p) => p.id === curJob.id) > -1
@@ -92,7 +91,7 @@ const JobTabs = observer(() => {
       }
       notifyTmRef.current = setTimeout(() => {
         workFlowStore.set({
-          showNotify: false,
+          showNotify: false
         })
       }, 5000)
     }
@@ -119,7 +118,7 @@ const JobTabs = observer(() => {
                   size={20}
                   tw="mr-2"
                   color={{
-                    secondary: theme('colors.green.11'),
+                    secondary: theme('colors.green.11')
                   }}
                 />
                 <div tw="pointer-events-auto">
@@ -147,7 +146,7 @@ const JobTabs = observer(() => {
             workFlowStore.showSaveConfirm(name, 'switch')
           } else {
             workFlowStore.set({
-              curJob: panels.find((p) => p.id === name),
+              curJob: panels.find((p) => p.id === name)
             })
           }
         }}

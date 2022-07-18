@@ -1,8 +1,5 @@
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
-import {
-  ConditionParameterField,
-  TConditionParameterVal,
-} from 'components/ConditionParameter'
+import { ConditionParameterField, TConditionParameterVal } from 'components/ConditionParameter'
 import { AffixLabel } from 'components/AffixLabel'
 import tw, { css } from 'twin.macro'
 import { get, isEmpty, isEqual } from 'lodash-es'
@@ -15,7 +12,7 @@ import {
   useImperativeHandle,
   useLayoutEffect,
   useRef,
-  useState,
+  useState
 } from 'react'
 import { SyncJobType } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { useQuerySourceTableSchema } from 'hooks'
@@ -23,7 +20,7 @@ import { useImmer } from 'use-immer'
 import BaseTableComponent from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseTableComponent'
 import {
   IDataSourceConfigProps,
-  ISourceRef,
+  ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import { baseSource$, source$, sourceColumns$ } from '../common/subjects'
 import BaseConfigCommon from './BaseConfigCommon'
@@ -66,9 +63,9 @@ const styles = {
       .help {
         ${tw`w-full`}
       }
-    `,
+    `
   ],
-  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`],
+  line: [tw`flex-1 border-t border-neut-13 translate-y-1/2`]
 }
 
 const BaseSourceConfig = forwardRef(
@@ -98,7 +95,7 @@ const BaseSourceConfig = forwardRef(
     const sourceColumnRet = useQuerySourceTableSchema(
       {
         sourceId: dbInfo?.id!,
-        tableName: dbInfo?.tableName!,
+        tableName: dbInfo?.tableName!
       },
       {
         enabled: !!(dbInfo?.id && dbInfo?.tableName),
@@ -107,10 +104,10 @@ const BaseSourceConfig = forwardRef(
           sourceColumns$.next(
             columns.map((i) => ({
               ...i,
-              uuid: `source--${i.name}`,
+              uuid: `source--${i.name}`
             }))
           )
-        },
+        }
       },
       'source'
     )
@@ -122,63 +119,56 @@ const BaseSourceConfig = forwardRef(
 
     const hasTable = !isEmpty(dbInfo?.tableName)
 
-    const isOfflineIncrement =
-      get(curJob, 'type') === SyncJobType.OFFLINEINCREMENT
+    const isOfflineIncrement = get(curJob, 'type') === SyncJobType.OFFLINEINCREMENT
 
     const isOffLineFull = get(curJob, 'type') === SyncJobType.OFFLINEFULL
 
-    useImperativeHandle(ref, () => {
-      return {
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
+    useImperativeHandle(ref, () => ({
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
+        }
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => {
+        if (!dbInfo || !dbInfo.tableName) {
+          return undefined
+        }
+        const { condition } = dbInfo
+        return {
+          table: [dbInfo.tableName],
+          schema: '',
+          where: dbInfo.where,
+          split_pk: dbInfo.splitPk,
+          condition_type: condition?.type,
+          visualization: {
+            column: condition?.column,
+            start_condition: condition?.startCondition,
+            start_value: condition?.startValue,
+            end_condition: condition?.endCondition,
+            end_value: condition?.endValue
           }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => {
-          if (!dbInfo || !dbInfo.tableName) {
-            return undefined
-          }
-          const { condition } = dbInfo
-          return {
-            table: [dbInfo.tableName],
-            schema: '',
-            where: dbInfo.where,
-            split_pk: dbInfo.splitPk,
-            condition_type: condition?.type,
-            visualization: {
-              column: condition?.column,
-              start_condition: condition?.startCondition,
-              start_value: condition?.startValue,
-              end_condition: condition?.endCondition,
-              end_value: condition?.endValue,
-            },
-          }
-        },
-        refetchColumn: () => {
-          sourceColumnRet.refetch()
-        },
+        }
+      },
+      refetchColumn: () => {
+        sourceColumnRet.refetch()
       }
-    })
-    const renderCommon = () => {
-      return <BaseConfigCommon from="source" />
-    }
+    }))
+    const renderCommon = () => <BaseConfigCommon from="source" />
 
-    const renderBaseTable = () => {
-      return (
-        <BaseTableComponent
-          from="source"
-          sourceType={sourceType?.label}
-          sourceId={dbInfo?.id}
-          tableName={dbInfo?.tableName}
-          onChange={(v: string) => {
-            setDbInfo((draft) => {
-              draft.tableName = v
-            })
-          }}
-        />
-      )
-    }
+    const renderBaseTable = () => (
+      <BaseTableComponent
+        from="source"
+        sourceType={sourceType?.label}
+        sourceId={dbInfo?.id}
+        tableName={dbInfo?.tableName}
+        onChange={(v: string) => {
+          setDbInfo((draft) => {
+            draft.tableName = v
+          })
+        }}
+      />
+    )
 
     return (
       <Form css={styles.form} ref={sourceForm}>
@@ -224,16 +214,13 @@ const BaseSourceConfig = forwardRef(
                   if (v?.includes('where ')) {
                     return false
                   }
-                  if (
-                    v.trim() &&
-                    v.trim().split(';').filter(Boolean).length > 1
-                  ) {
+                  if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
                     return false
                   }
                   return true
                 },
                 help: '条件参数不能包含 where, 且只能包含一个 SQL 命令',
-                status: 'error',
+                status: 'error'
               },
               {
                 help: '条件参数未配置',
@@ -252,8 +239,8 @@ const BaseSourceConfig = forwardRef(
                   }
 
                   return valid
-                },
-              },
+                }
+              }
             ]}
           />
         )}
@@ -277,10 +264,7 @@ const BaseSourceConfig = forwardRef(
                 tw="px-1 cursor-pointer"
                 onClick={() => setShowSourceAdvance((prev) => !prev)}
               >
-                <Icon
-                  name={`chevron-${showSourceAdvance ? 'up' : 'down'}`}
-                  type="light"
-                />
+                <Icon name={`chevron-${showSourceAdvance ? 'up' : 'down'}`} type="light" />
                 高级配置
               </Center>
               <div css={styles.line} />
@@ -302,21 +286,18 @@ const BaseSourceConfig = forwardRef(
                         return false
                       }
                       return true
-                    },
+                    }
                   },
                   {
                     help: '不能存在多条过滤条件',
                     status: 'error',
                     rule: (v: string) => {
-                      if (
-                        v.trim() &&
-                        v.trim().split(';').filter(Boolean).length > 1
-                      ) {
+                      if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
                         return false
                       }
                       return true
-                    },
-                  },
+                    }
+                  }
                 ]}
                 label="过滤条件"
                 placeholder="where 过滤语句（不要填写 where 关键字）。注：需填写 SQL 合法 where 子句。例：col1>10 and col1<30"

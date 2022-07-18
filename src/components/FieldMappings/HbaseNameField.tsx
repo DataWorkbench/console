@@ -13,7 +13,7 @@ export const HbaseNameInput = (props: {
   const [family = '', name = ''] = valueProp.split(':')
   const [value, setValue] = useImmer<{ family: string; name: string }>({
     family,
-    name,
+    name
   })
   useEffect(() => {
     if (valueProp !== `${value.family}:${value.name}`) {

@@ -26,9 +26,7 @@ export class AlertStore {
 
   getQueryListKey?: () => string
 
-  jobDetail?: Partial<
-    Record<'jobId' | 'jobName' | 'spaceId' | 'regionId' | 'jobType', any>
-  > = {}
+  jobDetail?: Partial<Record<'jobId' | 'jobName' | 'spaceId' | 'regionId' | 'jobType', any>> = {}
 
   constructor() {
     makeAutoObservable(this)
@@ -42,17 +40,9 @@ export class AlertStore {
 export const AlertContext = createContext<AlertStore>({} as AlertStore)
 export const useAlertStore = () => useContext(AlertContext)
 
-export const AlertStoreProvider = ({
-  children,
-}: {
-  children: React.ReactNode
-}) => {
+export const AlertStoreProvider = ({ children }: { children: React.ReactNode }) => {
   const store = useRef(new AlertStore())
-  return (
-    <AlertContext.Provider value={store.current}>
-      {children}
-    </AlertContext.Provider>
-  )
+  return <AlertContext.Provider value={store.current}>{children}</AlertContext.Provider>
 }
 
 export default AlertStore

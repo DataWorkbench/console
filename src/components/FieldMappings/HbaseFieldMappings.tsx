@@ -7,7 +7,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from 'react'
 import { useImmer } from 'use-immer'
 import { Select, Input, Icon } from '@QCFE/qingcloud-portal-ui'
@@ -28,7 +28,7 @@ const styles = {
       .hover-active {
         opacity: 1 !important;
       }
-    `,
+    `
   ],
   table: [
     tw`grid px-3 items-center h-8 border border-line-dark`,
@@ -36,25 +36,25 @@ const styles = {
       &:not(:first-of-type) {
         border-top: none;
       }
-    `,
+    `
   ],
   versions: [
     tw`grid`,
     css`
       grid-template-columns: repeat(3, 1fr);
-    `,
+    `
   ],
   valueColumns: [
     tw`grid`,
     css`
       grid-template-columns: repeat(2, 1fr) 40px;
-    `,
+    `
   ],
   dndWrapper: [
     tw`grid border border-dashed border-neut-13 rounded-[2px]`,
     css`
       grid-column: 1 / -1;
-    `,
+    `
   ],
   hoverShow: [
     css`
@@ -66,9 +66,9 @@ const styles = {
       .hover-active {
         opacity: 0;
       }
-    `,
+    `
   ],
-  iconNumber: tw`w-4 h-4 border rounded-full bg-white text-brand-primary border-brand-primary`,
+  iconNumber: tw`w-4 h-4 border rounded-full bg-white text-brand-primary border-brand-primary`
 }
 
 const Item = (props: any) => {
@@ -82,8 +82,8 @@ const Item = (props: any) => {
       type: dndType,
       item: { ...item, index },
       collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
+        isDragging: monitor.isDragging()
+      })
     }),
     [item.name, index]
   )
@@ -91,7 +91,7 @@ const Item = (props: any) => {
     () => ({
       accept: dndType,
       collect: (monitor) => ({
-        isOver: monitor.isOver(),
+        isOver: monitor.isOver()
       }),
       hover({ index: dragIndex }, monitor) {
         if (!ref.current) {
@@ -104,16 +104,11 @@ const Item = (props: any) => {
         }
 
         const hoverBoundingRect = ref.current?.getBoundingClientRect()
-        const hoverMiddleY =
-          (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
         const clientOffset = monitor.getClientOffset()
         const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
 
-        if (
-          dragIndex > hoverIndex &&
-          hoverClientY < hoverMiddleY &&
-          hoverIndex === 0
-        ) {
+        if (dragIndex > hoverIndex && hoverClientY < hoverMiddleY && hoverIndex === 0) {
           setIsTop(true)
         } else {
           setIsTop(false)
@@ -126,7 +121,7 @@ const Item = (props: any) => {
         if (draggedIndex !== index) {
           moveItem(draggedIndex, index, isTop)
         }
-      },
+      }
     }),
     [item.uuid, index]
   )
@@ -137,7 +132,7 @@ const Item = (props: any) => {
       css={[
         styles.table,
         isOver && isTop && tw`(border-t-green-11 border-t-2)!`,
-        isOver && !isTop && tw`(border-b-green-11 border-b-2)!`,
+        isOver && !isTop && tw`(border-b-green-11 border-b-2)!`
       ]}
     >
       <div
@@ -146,7 +141,7 @@ const Item = (props: any) => {
           styles.versions,
           styles.versionHeader,
           isDragging && tw`bg-green-4/10!`,
-          tw`px-3`,
+          tw`px-3`
         ]}
       >
         <FlexBox tw="gap-1.5 items-center">
@@ -176,7 +171,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   const [{ rowKeyString, versionTime, versionIndex }, setJob] = useState({
     rowKeyString: '',
     versionTime: undefined,
-    versionIndex: -1,
+    versionIndex: -1
   })
 
   useLayoutEffect(() => {
@@ -187,13 +182,13 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
             return {
               rowKeyString: '',
               versionTime: undefined,
-              versionIndex: -1,
+              versionIndex: -1
             }
           }
           return {
             rowKeyString: e.data.rowkey_express ?? '',
             versionIndex: e.data.version_column_index,
-            versionTime: e.data.version_column_value ?? undefined,
+            versionTime: e.data.version_column_value ?? undefined
           }
         })
       )
@@ -209,7 +204,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   const [showVersionMoreAction, setShowVersionMoreAction] = useState(false)
   const [isEditingVersionTime, setIsEditingVersionTime] = useImmer({
     flag: false,
-    time: '',
+    time: ''
   })
 
   const [version, setVersion] = useImmer<{
@@ -224,11 +219,11 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     const r = rowKeyIds.join('_')
     const list = rowKeyString.split('_')
     if (rowKeyString !== r) {
-      setRowKeyIds(() => {
-        return sourceColumns
+      setRowKeyIds(() =>
+        sourceColumns
           .filter((column: Record<string, any>) => list.includes(column.name))
           .map((item: Record<string, any>) => item.uuid)
-      })
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowKeyString, setRowKeyIds, sourceColumns])
@@ -237,44 +232,40 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     if (versionIndex !== -1 && sourceColumns[versionIndex]) {
       setVersion({
         type: 2,
-        column: sourceColumns[versionIndex].uuid,
+        column: sourceColumns[versionIndex].uuid
       })
     } else if (versionTime) {
       setVersion({
         type: 3,
-        time: versionTime,
+        time: versionTime
       })
     } else {
       setVersion({ type: 1 })
     }
   }, [versionIndex, versionTime, setVersion, sourceColumns])
 
-  const rowKeys = useMemo(() => {
-    return rowKeyIds
-      .map((id) => {
-        const item = sourceColumns.find((i) => i.uuid === id)
-        if (item) {
-          return item
-        }
-        return null
-      })
-      .filter(Boolean)
-  }, [rowKeyIds, sourceColumns])
+  const rowKeys = useMemo(
+    () =>
+      rowKeyIds
+        .map((id) => {
+          const item = sourceColumns.find((i) => i.uuid === id)
+          if (item) {
+            return item
+          }
+          return null
+        })
+        .filter(Boolean),
+    [rowKeyIds, sourceColumns]
+  )
 
-  useImperativeHandle(ref, () => {
-    return {
-      getData: () => {
-        return {
-          rowkeyExpress: rowKeys.map((item) => item.name).join('_'),
-          versionColumnIndex:
-            version.type === 2
-              ? sourceColumns.findIndex((i) => i.uuid === version.column)
-              : -1,
-          versionColumnValue: version.type === 3 ? version.time : undefined,
-        }
-      },
-    }
-  })
+  useImperativeHandle(ref, () => ({
+    getData: () => ({
+      rowkeyExpress: rowKeys.map((item) => item.name).join('_'),
+      versionColumnIndex:
+        version.type === 2 ? sourceColumns.findIndex((i) => i.uuid === version.column) : -1,
+      versionColumnValue: version.type === 3 ? version.time : undefined
+    })
+  }))
 
   const [editingValue, setEditingValue] = useImmer<{
     isAdd: boolean
@@ -296,10 +287,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     setIsEditingVersion(true)
   }
 
-  function handleEditValue(
-    value: { index: number; value: ValueItem },
-    key: 'edit' | 'del'
-  ) {
+  function handleEditValue(value: { index: number; value: ValueItem }, key: 'edit' | 'del') {
     if (key === 'edit') {
       setEditingValue({ index: value.index, value: value.value, isAdd: false })
     } else {
@@ -311,9 +299,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
 
   const renderVersionType = () => {
     if (!isEditingVersion) {
-      return (
-        <div>{['', '当前时间', '指定时间列', '指定时间'][version.type]}</div>
-      )
+      return <div>{['', '当前时间', '指定时间列', '指定时间'][version.type]}</div>
     }
     return (
       <Select
@@ -330,7 +316,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
         options={[
           {
             value: 1,
-            label: '当前时间',
+            label: '当前时间'
           },
           {
             value: 2,
@@ -347,7 +333,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
               >
                 指定时间列
               </AffixLabel>
-            ),
+            )
           },
           {
             value: 3,
@@ -360,8 +346,8 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
               >
                 指定时间
               </AffixLabel>
-            ),
-          },
+            )
+          }
         ]}
       />
     )
@@ -374,13 +360,13 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   >(() => ({
     accept: leftDndType,
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      isOver: monitor.isOver()
     }),
     drop: ({ uuid }) => {
       setVersion((draft) => {
         draft.column = uuid
       })
-    },
+    }
   }))
 
   const renderVersionColumn = () => {
@@ -391,19 +377,14 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
       <div css={[styles.versions, styles.table]}>
         <div
           ref={versionRef}
-          css={[
-            styles.dndWrapper,
-            styles.versions,
-            tw`h-6`,
-            isVersionOver && tw`bg-green-4/10!`,
-          ]}
+          css={[styles.dndWrapper, styles.versions, tw`h-6`, isVersionOver && tw`bg-green-4/10!`]}
         >
           {!version.column && (
             <div
               css={[
                 css`
                   grid-column: 1 / -1;
-                `,
+                `
               ]}
             >
               请从左侧拖拽指定时间列到此处
@@ -411,12 +392,8 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           )}
           {version.column && (
             <>
-              <div>
-                {sourceColumns.find((i) => i.uuid === version.column)?.name}
-              </div>
-              <div>
-                {sourceColumns.find((i) => i.uuid === version.column)?.type}
-              </div>
+              <div>{sourceColumns.find((i) => i.uuid === version.column)?.name}</div>
+              <div>{sourceColumns.find((i) => i.uuid === version.column)?.type}</div>
             </>
           )}
         </div>
@@ -591,7 +568,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           styles.table,
           styles.valueColumns,
           styles.hoverShow,
-          showValueIndex === index && styles.show,
+          showValueIndex === index && styles.show
         ]}
       >
         <div>{`${column.family}:${column.name}`}</div>
@@ -608,8 +585,8 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
                 key: 'edit',
                 value: {
                   value: column,
-                  index,
-                },
+                  index
+                }
               },
               {
                 key: 'del',
@@ -617,9 +594,9 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
                 text: '删除',
                 value: {
                   value: column,
-                  index,
-                },
-              },
+                  index
+                }
+              }
             ]}
           />
         </div>
@@ -627,20 +604,16 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     )
   }
 
-  const [{ isOver }, leftRef] = useDrop<
-    { uuid: string },
-    void,
-    { isOver: boolean }
-  >(() => ({
+  const [{ isOver }, leftRef] = useDrop<{ uuid: string }, void, { isOver: boolean }>(() => ({
     accept: leftDndType,
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      isOver: monitor.isOver()
     }),
     drop: ({ uuid }) => {
       setRowKeyIds((draft) => {
         draft.push(uuid)
       })
-    },
+    }
   }))
 
   function renderAddRowKey() {
@@ -650,7 +623,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           styles.dndWrapper,
           styles.versionHeader,
           isOver && tw`bg-green-4/10!`,
-          tw`text-font-placeholder text-center`,
+          tw`text-font-placeholder text-center`
         ]}
         ref={leftRef}
       >
@@ -662,10 +635,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   return (
     <div>
       <div>
-        <div
-          css={[styles.versions, styles.versionHeader, styles.table]}
-          tw="mt-6"
-        >
+        <div css={[styles.versions, styles.versionHeader, styles.table]} tw="mt-6">
           <div tw="ml-3">字段名</div>
           <div>字段值</div>
           <div>Version 来源</div>
@@ -675,7 +645,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
             styles.versions,
             styles.hoverShow,
             styles.table,
-            showVersionMoreAction && styles.show,
+            showVersionMoreAction && styles.show
           ]}
         >
           <div tw="ml-3">version</div>
@@ -692,8 +662,8 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
                     {
                       icon: 'if-pen',
                       text: '编辑 version 来源',
-                      key: 'edit',
-                    },
+                      key: 'edit'
+                    }
                   ]}
                 />
               </span>
@@ -718,9 +688,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
               </AffixLabel>
             </div>
           </div>
-          {values.map((column, index) => {
-            return renderValueItem(column, index)
-          })}
+          {values.map((column, index) => renderValueItem(column, index))}
           {editingValue.isAdd && renderValueItemEdit()}
           <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomField}>
             <Icon name="add" type="light" />
@@ -747,46 +715,38 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           <div>STRING</div>
           <div>-</div>
         </div>
-        {rowKeys.map((column, index) => {
-          return (
-            <Item
-              key={index.toString()}
-              item={column}
-              index={index}
-              deleteItem={(s: number) => {
-                setRowKeyIds((draft) => {
-                  draft.splice(s, 1)
-                })
-              }}
-              moveItem={(s: number, t: number, isTop: boolean) => {
-                setRowKeyIds((draft) => {
-                  const newFields = [...draft]
-                  newFields.splice(s, 1)
-                  newFields.splice(isTop ? 0 : t + 1, 0, draft[s])
-                  setRowKeyIds(newFields)
-                })
-              }}
-            />
-          )
-        })}
+        {rowKeys.map((column, index) => (
+          <Item
+            key={index.toString()}
+            item={column}
+            index={index}
+            deleteItem={(s: number) => {
+              setRowKeyIds((draft) => {
+                draft.splice(s, 1)
+              })
+            }}
+            moveItem={(s: number, t: number, isTop: boolean) => {
+              setRowKeyIds((draft) => {
+                const newFields = [...draft]
+                newFields.splice(s, 1)
+                newFields.splice(isTop ? 0 : t + 1, 0, draft[s])
+                setRowKeyIds(newFields)
+              })
+            }}
+          />
+        ))}
         <div css={[styles.table]}>{renderAddRowKey()}</div>
         <FlexBox css={[styles.table, tw`flex bg-neut-18 items-center`]}>
           <span>原理：</span>
-          {new Array(Math.max(0, 2 * (rowKeys || []).length - 1))
-            .fill(0)
-            .map((_, index) =>
-              index % 2 === 1 ? (
-                <span tw="inline-flex">_</span>
-              ) : (
-                <Center
-                  tw="inline-flex"
-                  key={index.toString()}
-                  css={styles.iconNumber}
-                >
-                  {index / 2 + 1}
-                </Center>
-              )
-            )}
+          {new Array(Math.max(0, 2 * (rowKeys || []).length - 1)).fill(0).map((_, index) =>
+            index % 2 === 1 ? (
+              <span tw="inline-flex">_</span>
+            ) : (
+              <Center tw="inline-flex" key={index.toString()} css={styles.iconNumber}>
+                {index / 2 + 1}
+              </Center>
+            )
+          )}
           <span tw="ml-1">写入到 rowkey</span>
         </FlexBox>
       </div>

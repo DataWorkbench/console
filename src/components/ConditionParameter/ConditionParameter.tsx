@@ -1,18 +1,5 @@
-import React, {
-  ChangeEvent,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from 'react'
-import {
-  Button,
-  Form,
-  Input,
-  RadioButton,
-  RadioGroup,
-  Select,
-  TextArea,
-} from '@QCFE/lego-ui'
+import React, { ChangeEvent, useEffect, useImperativeHandle, useRef } from 'react'
+import { Button, Form, Input, RadioButton, RadioGroup, Select, TextArea } from '@QCFE/lego-ui'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
@@ -31,7 +18,7 @@ type SymbolType = typeof symbols[number]
 enum ConditionType {
   // Unset = 0,
   Visualization = 1,
-  Express = 2,
+  Express = 2
 }
 
 export type TConditionParameterVal = {
@@ -86,12 +73,12 @@ const SimpleWrapper = styled.div`
 const types = [
   {
     label: '可视化',
-    value: ConditionType.Visualization,
+    value: ConditionType.Visualization
   },
   {
     label: '表达式',
-    value: ConditionType.Express,
-  },
+    value: ConditionType.Express
+  }
 ]
 export const ConditionParameter = React.forwardRef(
   (props: IConditionParameterProps, ref: React.ForwardedRef<any>) => {
@@ -104,12 +91,10 @@ export const ConditionParameter = React.forwardRef(
       width,
       columns,
       loading = false,
-      onRefresh,
+      onRefresh
     } = props
 
-    const [value, setValue] = useImmer(
-      defaultValue || { type: ConditionType.Visualization }
-    )
+    const [value, setValue] = useImmer(defaultValue || { type: ConditionType.Visualization })
     const prevValue = useRef(value)
 
     useEffect(() => {
@@ -202,12 +187,7 @@ export const ConditionParameter = React.forwardRef(
           </RadioGroup>
           <div tw="flex flex-auto items-center ml-1">
             {helpStr ? (
-              <Tooltip
-                twChild={tw`inline-flex`}
-                hasPadding
-                theme="light"
-                content={helpStr}
-              >
+              <Tooltip twChild={tw`inline-flex`} hasPadding theme="light" content={helpStr}>
                 <Icon name="information" />
               </Tooltip>
             ) : (
@@ -231,7 +211,7 @@ export const ConditionParameter = React.forwardRef(
                 isLoading={loading}
                 options={(columns || []).map((item) => ({
                   label: item,
-                  value: item,
+                  value: item
                 }))}
               />
               <Button
@@ -265,7 +245,7 @@ export const ConditionParameter = React.forwardRef(
                   }}
                   options={symbols.map((item) => ({
                     label: item,
-                    value: item,
+                    value: item
                   }))}
                 />
                 <Input
@@ -292,7 +272,7 @@ export const ConditionParameter = React.forwardRef(
                   }}
                   options={symbols.map((item) => ({
                     label: item,
-                    value: item,
+                    value: item
                   }))}
                 />
                 <Input
@@ -309,10 +289,9 @@ export const ConditionParameter = React.forwardRef(
             <FlexBox>
               <span>生成条件参数</span>
               <div tw="text-neut-8">
-                [{value?.startValue || '开始条件'}] [
-                {value?.startCondition ?? '关系符号'}] [
-                {value?.column ?? '列名'}] [{value?.endCondition ?? '关系符号'}]
-                [{value?.endValue || '结束条件'}]
+                [{value?.startValue || '开始条件'}] [{value?.startCondition ?? '关系符号'}] [
+                {value?.column ?? '列名'}] [{value?.endCondition ?? '关系符号'}] [
+                {value?.endValue || '结束条件'}]
               </div>
             </FlexBox>
           </SimpleWrapper>
@@ -334,9 +313,7 @@ export const ConditionParameter = React.forwardRef(
   }
 )
 
-export const ConditionParameterField = styled(
-  (Form as any).getFormField(ConditionParameter)
-)`
+export const ConditionParameterField = styled((Form as any).getFormField(ConditionParameter))`
   & > .label {
     ${tw`items-start! flex-none`}
   }

@@ -3,6 +3,8 @@ import request from './request'
 import customRequest from './customRequest'
 import emitter from './emitter'
 
+export * from './createEnhancedEnum'
+
 export * from './convert'
 
 export const getHelpCenterLink = (path: string) => {
@@ -10,8 +12,7 @@ export const getHelpCenterLink = (path: string) => {
   return `${prefix}/bigdata/dataomnis${path}`
 }
 
-export const getHelpCenterLinkWithNullHost = (path: string) =>
-  `/bigdata/dataomnis${path}`
+export const getHelpCenterLinkWithNullHost = (path: string) => `/bigdata/dataomnis${path}`
 
 export const getIsFormalEnv = () => false
 // /console\d*\.qingcloud\.com$/.test(window.location.hostname)
@@ -34,7 +35,7 @@ const autoIncrementKey = new Proxy({} as Record<string, any>, {
       target[p] = 0
     }
     return target[p]
-  },
+  }
 })
 
 export function check(num: number) {

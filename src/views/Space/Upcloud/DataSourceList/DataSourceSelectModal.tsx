@@ -15,14 +15,7 @@ interface DataSourceSelectModalProps {
 }
 
 const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
-  const {
-    title,
-    onCancel,
-    onOk = noop,
-    visible: show,
-    sourceType,
-    selected: selectedProp,
-  } = props
+  const { title, onCancel, onOk = noop, visible: show, sourceType, selected: selectedProp } = props
   const [visible, setVisible] = useState(show)
   const [source, setSource] = useState<Record<string, any>>()
   const [selected, setSelected] = useState<string[]>([])
@@ -50,13 +43,8 @@ const DataSourceSelectModal = (props: DataSourceSelectModalProps) => {
             type="info"
             message={
               <div>
-                <span>
-                  请选择运行当前作业的来源端数据源，请注意保证网络连通性，具体可参考：
-                </span>
-                <HelpCenterLink
-                  isIframe={false}
-                  href="/manual/data_up_cloud/connect/"
-                >
+                <span>请选择运行当前作业的来源端数据源，请注意保证网络连通性，具体可参考：</span>
+                <HelpCenterLink isIframe={false} href="/manual/data_up_cloud/connect/">
                   网络连通文档
                 </HelpCenterLink>
               </div>

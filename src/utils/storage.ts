@@ -23,13 +23,11 @@ const hashCode = function (str: string): number {
 const setStorage = (key: string, value: any, expiresTime: number) => {
   try {
     const hashKey = hashCode(key)
-    const storage: IStorage = JSON.parse(
-      window.localStorage.getItem(storageKey) ?? '{}'
-    )
+    const storage: IStorage = JSON.parse(window.localStorage.getItem(storageKey) ?? '{}')
     storage[hashKey] = {
       value,
       key,
-      expires: expiresTime ? Date.now() + expiresTime : 0,
+      expires: expiresTime ? Date.now() + expiresTime : 0
     }
     window.localStorage.setItem(storageKey, JSON.stringify(storage))
     return true
@@ -42,9 +40,7 @@ const setStorage = (key: string, value: any, expiresTime: number) => {
 const getStorage = (key: string) => {
   try {
     const hashKey = hashCode(key)
-    const storage: IStorage = JSON.parse(
-      window.localStorage.getItem(storageKey) ?? '{}'
-    )
+    const storage: IStorage = JSON.parse(window.localStorage.getItem(storageKey) ?? '{}')
     const data = storage?.[hashKey]
     if (data && data.expires >= Date.now()) {
       return data.value
@@ -62,9 +58,7 @@ const getStorage = (key: string) => {
 
 const clearStorage = () => {
   try {
-    const storage: IStorage = JSON.parse(
-      window.localStorage.getItem(storageKey) ?? '{}'
-    )
+    const storage: IStorage = JSON.parse(window.localStorage.getItem(storageKey) ?? '{}')
     Object.entries(storage).forEach(([key, value]) => {
       if (!value || value.expires < Date.now()) {
         delete storage[key]

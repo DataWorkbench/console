@@ -8,7 +8,7 @@ import {
   loadMemberList,
   loadRoleList,
   loadRolePermissionList,
-  updateMember,
+  updateMember
 } from 'stores/api'
 import { getListAvailableUsers, getListNotifications } from 'stores/api/member'
 import { getNextPageParam } from './apiHooks'
@@ -22,20 +22,17 @@ interface IRouteParams {
 const keys: {
   page: any
 } = {
-  page: '',
+  page: ''
 }
 
 export const getMemberKeys = (kind: keyof typeof keys = 'page') => keys[kind]
 
-export const useQueryMemberList = (
-  filter: Record<string, any>,
-  options = {}
-) => {
+export const useQueryMemberList = (filter: Record<string, any>, options = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
     spaceId,
-    ...filter,
+    ...filter
   }
 
   const queryKey = ['member', params]
@@ -49,13 +46,9 @@ export const useQueryRoleList = (
 ) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const queryKey = ['role', { regionId, spaceId, ...params }]
-  return useQuery(
-    queryKey,
-    async () => loadRoleList({ regionId, spaceId, ...params }),
-    {
-      ...option,
-    }
-  )
+  return useQuery(queryKey, async () => loadRoleList({ regionId, spaceId, ...params }), {
+    ...option
+  })
 }
 
 export const useQueryRolePermissionList = (
@@ -64,13 +57,9 @@ export const useQueryRolePermissionList = (
 ) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const queryKey = ['rolePermissions', { regionId, spaceId, ...params }]
-  return useQuery(
-    queryKey,
-    async () => loadRolePermissionList({ regionId, spaceId, ...params }),
-    {
-      ...option,
-    }
-  )
+  return useQuery(queryKey, async () => loadRolePermissionList({ regionId, spaceId, ...params }), {
+    ...option
+  })
 }
 export const useMutationMember = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
@@ -79,7 +68,7 @@ export const useMutationMember = () => {
     const params = {
       regionId,
       spaceId,
-      ...rest,
+      ...rest
     }
     if (op === 'create') {
       ret = await addMember(params)
@@ -100,12 +89,10 @@ export const useQueryInfiniteMember = (
   const queryKey = ['member', { regionId, spaceId, ...params }]
   return useInfiniteQuery(
     queryKey,
-    async ({ pageParam = params }) => {
-      return loadAllMemberList({ regionId, spaceId, ...pageParam })
-    },
+    async ({ pageParam = params }) => loadAllMemberList({ regionId, spaceId, ...pageParam }),
     {
       ...config,
-      getNextPageParam,
+      getNextPageParam
     }
   )
 }
@@ -114,80 +101,68 @@ let allUsersKey: any = null
 
 export const useQueryListAvailableUsers = (filter: Record<string, any>) => {
   const rest = omit(filter, 'offset')
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const params = {
     regionId,
     spaceId,
     limit: 20,
     offset: 0,
-    ...rest,
+    ...rest
   }
   allUsersKey = ['ListAvailableUsers', params]
 
   return useInfiniteQuery(
     allUsersKey,
-    async ({ pageParam = params }) => {
-      return getListAvailableUsers(pageParam)
-    },
+    async ({ pageParam = params }) => getListAvailableUsers(pageParam),
     {
       getNextPageParam: (lastPage, allPages) => {
         if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+          const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
           if (nextOffset < lastPage.total) {
             const nextFilter = {
               ...params,
-              offset: nextOffset,
+              offset: nextOffset
             }
 
             return nextFilter
           }
         }
         return undefined
-      },
+      }
     }
   )
 }
 
 export const useQueryListNotifications = (filter: Record<string, any>) => {
   const rest = omit(filter, 'offset')
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const params = {
     regionId,
     spaceId,
     limit: 20,
     offset: 0,
-    ...rest,
+    ...rest
   }
   allUsersKey = ['ListAvailableUsers', params]
 
   return useInfiniteQuery(
     allUsersKey,
-    async ({ pageParam = params }) => {
-      return getListNotifications(pageParam)
-    },
+    async ({ pageParam = params }) => getListNotifications(pageParam),
     {
       getNextPageParam: (lastPage, allPages) => {
         if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+          const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
           if (nextOffset < lastPage.total) {
             const nextFilter = {
               ...params,
-              offset: nextOffset,
+              offset: nextOffset
             }
 
             return nextFilter
           }
         }
         return undefined
-      },
+      }
     }
   )
 }

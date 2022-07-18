@@ -13,19 +13,17 @@ const Item = styled.div`
 `
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const Line = () => {
-  return (
-    <FlexBox tw="w-[20%]">
-      <div tw="h-[1px] flex-auto border-none mt-[3px] border-white border-t border-dashed" />
-      <div
-        tw="w-0 h-0 border-4 border-transparent border-l-white "
-        css={css`
-          transform: translateX(2px);
-        `}
-      />
-    </FlexBox>
-  )
-}
+const Line = () => (
+  <FlexBox tw="w-[20%]">
+    <div tw="h-[1px] flex-auto border-none mt-[3px] border-white border-t border-dashed" />
+    <div
+      tw="w-0 h-0 border-4 border-transparent border-l-white "
+      css={css`
+        transform: translateX(2px);
+      `}
+    />
+  </FlexBox>
+)
 
 const DevContentJSON = (props: {
   data?: { job_content?: string }
@@ -35,7 +33,7 @@ const DevContentJSON = (props: {
   const {
     data: { job_content: codeStr = defaultCode } = {},
     showStep = true,
-    language = codeName,
+    language = codeName
   } = props
   const editorRef = useRef(null)
   const [showPlaceholder, setShowPlaceholder] = useState(true)
@@ -47,8 +45,8 @@ const DevContentJSON = (props: {
       inherit: true,
       rules: [],
       colors: {
-        'editor.background': theme('colors.neut.18'),
-      },
+        'editor.background': theme('colors.neut.18')
+      }
     })
   }
 
@@ -88,7 +86,7 @@ const DevContentJSON = (props: {
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             automaticLayout: true,
-            readOnly: true,
+            readOnly: true
           }}
           editorWillMount={handleEditorWillMount}
           editorDidMount={handleEditorDidMount}

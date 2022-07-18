@@ -7,7 +7,7 @@ import {
   FlexBox,
   MoreAction,
   StatusBar,
-  Modal,
+  Modal
 } from 'components'
 import { Button, Collapse } from '@QCFE/lego-ui'
 import { Icon, Loading } from '@QCFE/qingcloud-portal-ui'
@@ -20,10 +20,7 @@ import { networkStatusMap } from 'views/Space/Manage/Network/common/constants'
 import Link from 'components/Link'
 import NetworkModal from './NetworkModal'
 import NetworkList from './NetworkList'
-import {
-  useQueryDescribeNetworkConfig,
-  useQueryFlinkClusters,
-} from '../../../../hooks'
+import { useQueryDescribeNetworkConfig, useQueryFlinkClusters } from '../../../../hooks'
 
 const Root = styled.div`
   ${tw`grid p-5 gap-3`}
@@ -45,7 +42,7 @@ const GridItem = styled.div(({ labelWidth = 88 }: { labelWidth?: number }) => [
         ${tw`text-font!`}
       }
     }
-  `,
+  `
 ])
 
 const ModalWrapper = styled(Modal)(() => [
@@ -62,30 +59,30 @@ const ModalWrapper = styled(Modal)(() => [
     .modal-card-foot {
       border-top: 0;
     }
-  `,
+  `
 ])
 
 const routerType = [
   {
     label: '小型',
-    value: 1,
+    value: 1
   },
   {
     label: '中型',
-    value: 0,
+    value: 0
   },
   {
     label: '大型',
-    value: 2,
+    value: 2
   },
   {
     label: '超大型',
-    value: 3,
+    value: 3
   },
   {
     label: '免费',
-    value: 99,
-  },
+    value: 99
+  }
 ]
 const nameStyle = css`
   &:hover {
@@ -103,12 +100,11 @@ const nameStyle = css`
 const networkSettingKey = 'NETWORK_SETTING'
 const Network = observer(() => {
   const {
-    globalStore: { curRegionInfo },
+    globalStore: { curRegionInfo }
   } = useStore()
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const { data, isFetching } = useQueryDescribeNetworkConfig({
-    uri: { space_id: spaceId },
+    uri: { space_id: spaceId }
   })
   const [isOpen, setOpen] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -138,15 +134,10 @@ const Network = observer(() => {
               <Center
                 tw="inline-flex gap-3 hover:cursor-pointer"
                 onClick={() => {
-                  window.open(
-                    `/${regionId}/routers/${data?.router?.router_id}`,
-                    '_blank'
-                  )
+                  window.open(`/${regionId}/routers/${data?.router?.router_id}`, '_blank')
                 }}
               >
-                <span tw="text-[#334155] leading-5 font-semibold">
-                  {data?.router?.router_name}
-                </span>
+                <span tw="text-[#334155] leading-5 font-semibold">{data?.router?.router_name}</span>
                 <StatusBar
                   type={networkStatusMap.get(data?.router?.status)?.style}
                   label={networkStatusMap.get(data?.router?.status)?.label}
@@ -166,11 +157,7 @@ const Network = observer(() => {
                   text: (
                     <Center>
                       <span tw="mr-1.5">更换 VPC</span>
-                      <Tooltip
-                        hasPadding
-                        content="暂未开放更换 VPC 功能"
-                        theme="instead"
-                      >
+                      <Tooltip hasPadding content="暂未开放更换 VPC 功能" theme="instead">
                         <Icon
                           name="information"
                           css={css`
@@ -190,18 +177,14 @@ const Network = observer(() => {
                     </Center>
                   ),
                   disabled: true,
-                  icon: 'changing-over',
+                  icon: 'changing-over'
                 },
                 {
                   key: 'close',
                   text: (
                     <Center>
                       <span tw="mr-1.5">解绑 VPC</span>
-                      <Tooltip
-                        hasPadding
-                        content="删除工作空间即可解绑 VPC"
-                        theme="instead"
-                      >
+                      <Tooltip hasPadding content="删除工作空间即可解绑 VPC" theme="instead">
                         <Icon
                           name="information"
                           css={css`
@@ -221,8 +204,8 @@ const Network = observer(() => {
                     </Center>
                   ),
                   icon: 'close',
-                  disabled: true,
-                },
+                  disabled: true
+                }
               ]}
               type="button"
               buttonText="更多操作"
@@ -265,22 +248,14 @@ const Network = observer(() => {
 
             <GridItem labelWidth={84}>
               <span>类型</span>
-              <span>
-                {
-                  routerType.find((i) => i.value === data?.router?.router_type)
-                    ?.label
-                }
-              </span>
+              <span>{routerType.find((i) => i.value === data?.router?.router_type)?.label}</span>
             </GridItem>
           </div>
         </CollapsePanel>
       </Card>
 
       <Card tw="p-5">
-        <NetworkList
-          settingKey={networkSettingKey}
-          datasource={data?.vxnets ?? []}
-        />
+        <NetworkList settingKey={networkSettingKey} datasource={data?.vxnets ?? []} />
       </Card>
       {showModal && !hasClusters && (
         <NetworkModal

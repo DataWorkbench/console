@@ -9,7 +9,7 @@ export const useDescribeUser = (userId: string) => {
     async () => {
       const res = await request({
         method: 'GET',
-        url: `/global_api/v1/users/${userId}`,
+        url: `/global_api/v1/users/${userId}`
       })
       return res
     },
@@ -24,7 +24,7 @@ export const useCheckSession = (sessionId: string) => {
     async () => {
       const res = await request({
         method: 'GET',
-        url: `/global_api/v1/sessions/${sessionId}`,
+        url: `/global_api/v1/sessions/${sessionId}`
       })
       return res
     },
@@ -39,7 +39,7 @@ export const useValidateSession = (sessionId: string, options = {}) => {
     async () => {
       const res = await request({
         method: 'GET',
-        url: `/global_api/v1/sessions/${sessionId}`,
+        url: `/global_api/v1/sessions/${sessionId}`
       })
       return res
     },
@@ -47,16 +47,16 @@ export const useValidateSession = (sessionId: string, options = {}) => {
   )
 }
 
-export const useMutationUser = () => {
-  return useMutation(async ({ op, ...rest }: Record<string, any>) => {
+export const useMutationUser = () =>
+  useMutation(async ({ op, ...rest }: Record<string, any>) => {
     let ret
     if (op === 'update') {
       ret = await request({
         method: 'PUT',
         url: `/global_api/v1/users/${rest.userId}`,
         params: {
-          email: rest.email,
-        },
+          email: rest.email
+        }
       })
     } else if (op === 'login') {
       ret = await request({
@@ -65,15 +65,14 @@ export const useMutationUser = () => {
         params: {
           ignore_password: false,
           password: rest.password,
-          user_name: rest.username,
-        },
+          user_name: rest.username
+        }
       })
     } else {
       ret = undefined
     }
     return ret
   })
-}
 
 let notifyListKey: any
 const getNotifyListKey = () => notifyListKey
@@ -83,7 +82,7 @@ export const useListNotifications = (filter: Record<string, any>) => {
     user_id: get(window, 'USER.user_id', ''),
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   const key = ['listNotifications', params]
   notifyListKey = key
@@ -93,7 +92,7 @@ export const useListNotifications = (filter: Record<string, any>) => {
       const res = await request({
         method: 'GET',
         url: '/global_api/v1/notification',
-        params,
+        params
       })
       return res
     },
@@ -112,24 +111,24 @@ export const useMutationNotification = () => {
           url: '/global_api/v1/notification',
           params: {
             ...rest,
-            user_id: get(window, 'USER.user_id', ''),
-          },
+            user_id: get(window, 'USER.user_id', '')
+          }
         })
       } else if (op === 'update') {
         ret = await request({
           method: 'PUT',
           url: `/global_api/v1/notification/${rest.id}`,
           data: {
-            ...rest,
-          },
+            ...rest
+          }
         })
       } else if (op === 'POST') {
         ret = await request({
           method: 'DELETE',
           url: `/global_api/v1/notification/deletes`,
           data: {
-            nf_ids: rest.nf_ids,
-          },
+            nf_ids: rest.nf_ids
+          }
         })
       } else {
         ret = undefined
@@ -139,7 +138,7 @@ export const useMutationNotification = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries(getNotifyListKey())
-      },
+      }
     }
   )
 }

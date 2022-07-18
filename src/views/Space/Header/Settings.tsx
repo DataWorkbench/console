@@ -10,7 +10,7 @@ const menuList = [
   {
     label: '账户设置',
     icon: 'if-default-system',
-    key: 'account',
+    key: 'account'
   },
   // {
   //   label: 'api 密钥',
@@ -20,22 +20,22 @@ const menuList = [
   {
     label: '通知列表',
     icon: 'q-listViewFill',
-    key: 'notify',
+    key: 'notify'
   },
   {
     label: '账户安全',
     icon: 'if-shield',
-    key: 'security',
+    key: 'security'
   },
   {
     label: null,
-    key: 'divider',
+    key: 'divider'
   },
   {
     label: '退出',
     icon: 'q-shutdownFill',
-    key: 'logout',
-  },
+    key: 'logout'
+  }
 ]
 
 // const platformAdminMenuKeys = new Set([''])
@@ -45,25 +45,22 @@ const privateKeys = new Set(['account', 'notify', 'divider', 'logout'])
 // let isPrivate = (process.env.IS_PRIVATE)
 
 const { MenuItem } = Menu as any
-const IconBox = styled(Center)(() => {
-  return [
-    css`
-      &:hover {
-        .icon {
-          .qicon {
-            fill: #9ddfc9;
-            color: #15a675;
-          }
+const IconBox = styled(Center)(() => [
+  css`
+    &:hover {
+      .icon {
+        .qicon {
+          fill: #9ddfc9;
+          color: #15a675;
         }
       }
-    `,
-    tw`cursor-pointer hover:dark:bg-neut-13 hover:bg-neut-1`,
-  ]
-})
+    }
+  `,
+  tw`cursor-pointer hover:dark:bg-neut-13 hover:bg-neut-1`
+])
 
-const IconBoxWithTooltip = styled(Center)(() => {
-  return [
-    css`
+const IconBoxWithTooltip = styled(Center)(() => [
+  css`
       &{
         [aria-expanded='true'] {
           .header-icon-bg-box {
@@ -76,9 +73,8 @@ const IconBoxWithTooltip = styled(Center)(() => {
           }
         }
       }
-    `,
-  ]
-})
+    `
+])
 
 const UserInfoWrapper = styled.div(() => [
   css`
@@ -93,11 +89,9 @@ const UserInfoWrapper = styled.div(() => [
         }
       }
     }
-  `,
+  `
 ])
-const UserInfo = styled(FlexBox)(() => [
-  tw`gap-2 text-font leading-5 pr-10 cursor-pointer`,
-])
+const UserInfo = styled(FlexBox)(() => [tw`gap-2 text-font leading-5 pr-10 cursor-pointer`])
 
 export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   // const handleOpenHelpCenter = (link: string) => {
@@ -126,8 +120,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
     }
   }
 
-  const { spaceId, regionId } =
-    useParams<{ spaceId: string; regionId: string }>()
+  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
 
   const history = useHistory()
   const handleMenu2Page = (key: string) => {
@@ -174,9 +167,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
         <Tooltip
           theme={darkMode ? 'light' : 'dark'}
           hasPadding
-          content={
-            <div tw="text-white dark:text-neut-13 leading-5">帮助中心</div>
-          }
+          content={<div tw="text-white dark:text-neut-13 leading-5">帮助中心</div>}
         >
           <HelpCenterLink href="/intro/introduction/" tw="flex items-center">
             <IconBox
@@ -204,20 +195,12 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
             <Menu onClick={handleMenu}>
               {menus.map((item) => {
                 if (item.key === 'divider') {
-                  return (
-                    <li
-                      key="divider"
-                      tw="h-[1px] my-1 bg-separator pointer-events-none"
-                    />
-                  )
+                  return <li key="divider" tw="h-[1px] my-1 bg-separator pointer-events-none" />
                 }
                 return (
                   <MenuItem key={item.key}>
                     <>
-                      <Icon
-                        name={item.icon}
-                        type={darkMode ? 'light' : 'dark'}
-                      />
+                      <Icon name={item.icon} type={darkMode ? 'light' : 'dark'} />
                       {item.label}
                     </>
                   </MenuItem>
@@ -228,17 +211,11 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
         >
           <UserInfo>
             <Center className="space-user-icon">
-              <Icon
-                name="q-idCardDuotone"
-                theme={darkMode ? 'dark' : 'light'}
-                size={20}
-              />
+              <Icon name="q-idCardDuotone" theme={darkMode ? 'dark' : 'light'} size={20} />
             </Center>
             <div>
               <div>租户管理员</div>
-              <div>
-                {get(window, isPrivate ? 'USER.name' : 'USER.user_name', '')}
-              </div>
+              <div>{get(window, isPrivate ? 'USER.name' : 'USER.user_name', '')}</div>
             </div>
           </UserInfo>
         </Tooltip>

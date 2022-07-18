@@ -3,12 +3,7 @@ import { get, omit, set } from 'lodash-es'
 import { LocaleProvider } from '@QCFE/lego-ui'
 import { Loading, PortalProvider } from '@QCFE/qingcloud-portal-ui'
 import { describeDataomnis } from 'stores/api'
-import {
-  BrowserRouter as Router,
-  Redirect,
-  Route,
-  Switch,
-} from 'react-router-dom'
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import Login from 'views/Space/Ops/Login'
 import { useCookie } from 'react-use'
 import locales from '../../locales'
@@ -16,7 +11,7 @@ import { useValidateSession } from '../../hooks/useGlobalAPI'
 
 const langMapping: { [key: string]: string | undefined } = {
   'zh-cn': 'zh-CN',
-  en: 'en-US',
+  en: 'en-US'
 }
 
 const Auth = ({ children }: { children: ReactElement }) => {
@@ -40,7 +35,7 @@ const Auth = ({ children }: { children: ReactElement }) => {
     },
     onError: () => {
       setLoading(false)
-    },
+    }
   })
 
   const handleGlobalData = async () => {
@@ -48,16 +43,8 @@ const Auth = ({ children }: { children: ReactElement }) => {
     // const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
 
     if (get(window, 'GLOBAL_CONFIG.new_docs_url1')) {
-      set(
-        window,
-        'GLOBAL_CONFIG.new_docs_url',
-        get(window, 'GLOBAL_CONFIG.new_docs_url1')
-      )
-      set(
-        window,
-        'GLOBAL_CONFIG.docs_center_url',
-        get(window, 'GLOBAL_CONFIG.docs_center_url1')
-      )
+      set(window, 'GLOBAL_CONFIG.new_docs_url', get(window, 'GLOBAL_CONFIG.new_docs_url1'))
+      set(window, 'GLOBAL_CONFIG.docs_center_url', get(window, 'GLOBAL_CONFIG.docs_center_url1'))
     }
 
     const currentUser = get(window, 'USER.user_id', '')
@@ -74,22 +61,14 @@ const Auth = ({ children }: { children: ReactElement }) => {
     setLoading(false)
   }
 
-  const renderLogin = () => {
-    return (
-      <Router basename="/dataomnis">
-        <Switch>
-          <Route
-            path="/login"
-            component={() => <Login onLogin={handleLogin} />}
-          />
-          <Route
-            path="/"
-            component={() => (hasLogin ? children : <Redirect to="/login" />)}
-          />
-        </Switch>
-      </Router>
-    )
-  }
+  const renderLogin = () => (
+    <Router basename="/dataomnis">
+      <Switch>
+        <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
+        <Route path="/" component={() => (hasLogin ? children : <Redirect to="/login" />)} />
+      </Switch>
+    </Router>
+  )
 
   const renderChildren = (check: boolean) => {
     if (loading) {

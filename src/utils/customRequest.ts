@@ -4,7 +4,7 @@ import { get, isFunction } from 'lodash-es'
 import emitter from 'utils/emitter'
 
 const baseConfig: AxiosRequestConfig = {
-  method: 'POST',
+  method: 'POST'
   // timeout: 60000,
 }
 
@@ -16,18 +16,16 @@ function getMessage(ret: {}) {
 const client = axios.create(baseConfig)
 
 client.interceptors.response.use(
-  (response) => {
-    return response
-  },
+  (response) => response,
   (error) => {
     if (axios.isCancel(error)) {
       emitter.emit('error', {
-        title: `已取消`,
+        title: `已取消`
       })
     } else if (error.code === 'ECONNABORTED') {
       emitter.emit('error', {
         title: `网络超时: [timeout]`,
-        content: error.message,
+        content: error.message
       })
     } else if (error.response) {
       const msg = getMessage(error.response.data)
@@ -36,11 +34,11 @@ client.interceptors.response.use(
       }
       const {
         response: { status },
-        message,
+        message
       } = error
       emitter.emit('error', {
         title: `网络错误: [${status}]`,
-        content: message,
+        content: message
       })
     }
     return Promise.reject(error)
@@ -63,7 +61,7 @@ const customRequest = async (
     data: params,
     headers,
     ...conf,
-    ...config,
+    ...config
   }
   if (isFunction(cancel)) {
     axiosConfig.cancelToken = new axios.CancelToken(cancel)

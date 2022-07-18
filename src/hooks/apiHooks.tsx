@@ -1,14 +1,11 @@
 import { useParams } from 'react-router-dom'
 import { QueryKey, useQuery, UseQueryOptions } from 'react-query'
-import { merge, omit } from 'lodash-es'
+import { merge } from 'lodash-es'
 import { apiRequest } from 'utils/api'
 import apiList from 'stores/api/apiList'
 import { getStorage, setStorage } from 'utils/storage'
 
-export type IResponse<T> = Omit<
-  UseQueryOptions<T, unknown, T, QueryKey>,
-  'queryKey' | 'queryFn'
->
+export type IResponse<T> = Omit<UseQueryOptions<T, unknown, T, QueryKey>, 'queryKey' | 'queryFn'>
 
 export type RequestParams = {
   uri?: Record<string, any>
@@ -20,18 +17,14 @@ export type RequestParams = {
 export const queryKeyObj: Record<string, any> = {}
 
 export const getNextPageParam =
-  (params: Record<string, any>) =>
-  (lastPage: Record<string, any>, allPages: any[]) => {
+  (params: Record<string, any>) => (lastPage: Record<string, any>, allPages: any[]) => {
     if (lastPage.has_more) {
-      const nextOffset = allPages.reduce(
-        (acc, cur) => acc + cur.infos.length,
-        0
-      )
+      const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
 
       if (nextOffset < lastPage.total) {
         const nextParams = {
           ...params,
-          offset: nextOffset,
+          offset: nextOffset
         }
         return nextParams
       }
@@ -41,21 +34,16 @@ export const getNextPageParam =
   }
 
 export const apiHooks =
-  <
-    T extends keyof typeof apiList,
-    P extends RequestParams,
-    U extends Record<string, any>
-  >(
+  <T extends keyof typeof apiList, P extends RequestParams, U extends Record<string, any>>(
     manage: T,
     item: keyof typeof apiList[T]
   ) =>
   (filter: P, config?: IResponse<U>, storageTime?: number) => {
-    const { regionId, spaceId } =
-      useParams<{ regionId: string; spaceId: string }>()
+    const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
 
     const params = merge({ regionId, uri: { space_id: spaceId } }, filter)
 
-    queryKeyObj[item as string] = [item, omit(params, 'params.offset')]
+    queryKeyObj[item as string] = [item, params]
 
     return useQuery<U>(
       queryKeyObj[item as string],
@@ -68,11 +56,7 @@ export const apiHooks =
         }
         const re = await apiRequest(manage, item)(params)
         if (storageTime) {
-          setStorage(
-            JSON.stringify(queryKeyObj[item as string]),
-            re,
-            storageTime
-          )
+          setStorage(JSON.stringify(queryKeyObj[item as string]), re, storageTime)
         }
         return re
       },

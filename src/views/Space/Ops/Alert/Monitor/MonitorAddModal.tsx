@@ -12,7 +12,7 @@ import {
   getQueryKeyListAlertPolicies,
   getQueryKeyListAlertPoliciesByJob,
   useMutationAlert,
-  useQueryListAlertPolicies,
+  useQueryListAlertPolicies
 } from 'hooks/useAlert'
 
 interface IMonitorAddProps {
@@ -28,23 +28,23 @@ const defaultColumns: IColumn[] = [
   {
     title: '名称/ID',
     dataIndex: 'name',
-    key: 'name',
+    key: 'name'
   },
   {
     title: '监控对象',
     dataIndex: 'monitor_object',
-    key: 'monitor_object',
+    key: 'monitor_object'
   },
   {
     title: '描述',
     dataIndex: 'desc',
-    key: 'desc',
+    key: 'desc'
   },
   {
     title: '最近更新时间',
     dataIndex: 'updated',
-    key: 'updated',
-  },
+    key: 'updated'
+  }
 ]
 
 const instanceNameStyle = css`
@@ -65,7 +65,7 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
   const {
     set,
     jobDetail: { spaceId, regionId, jobId, jobType } = {},
-    disabledIds,
+    disabledIds
   } = useAlertStore()
   const { onCancel } = props
   const { filter, setFilter, sort, pagination } = useFilter<
@@ -76,50 +76,41 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
   const { data, isFetching, refetch } = useQueryListAlertPolicies({
     uri: {
-      space_id: spaceId,
+      space_id: spaceId
     },
     params: filter,
-    regionId,
+    regionId
   } as any)
 
-  const { mutateAsync, isLoading } = useMutationAlert(
-    {},
-    getQueryKeyListAlertPoliciesByJob
-  )
+  const { mutateAsync, isLoading } = useMutationAlert({}, getQueryKeyListAlertPoliciesByJob)
 
   // 带自定义的列
   const columnsRender: Record<string, Partial<IColumn>> = useMemo(
     () => ({
       name: {
-        render: (text: string, record: Record<string, any>) => {
-          return (
-            <InstanceName
-              theme="dark"
-              name={text}
-              desc={record.id}
-              icon="q-bellGearFill"
-              css={instanceNameStyle}
-              onClick={() =>
-                set({
-                  showAddMonitorDetail: true,
-                  selectedMonitor: record,
-                })
-              }
-            />
-          )
-        },
+        render: (text: string, record: Record<string, any>) => (
+          <InstanceName
+            theme="dark"
+            name={text}
+            desc={record.id}
+            icon="q-bellGearFill"
+            css={instanceNameStyle}
+            onClick={() =>
+              set({
+                showAddMonitorDetail: true,
+                selectedMonitor: record
+              })
+            }
+          />
+        )
       },
       monitor_object: {
-        render: (type: 1 | 2) => {
-          return (
-            <span tw="text-neut-8">
-              {{ 1: '数据集成作业', 2: '数据开发作业' }[type]}
-            </span>
-          )
-        },
+        render: (type: 1 | 2) => (
+          <span tw="text-neut-8">{{ 1: '数据集成作业', 2: '数据开发作业' }[type]}</span>
+        )
       },
       desc: {
-        render: (text: string) => <span tw="text-neut-8">{text}</span>,
+        render: (text: string) => <span tw="text-neut-8">{text}</span>
       },
       updated: {
         width: 150,
@@ -129,14 +120,8 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
           // eslint-disable-next-line no-nested-ternary
           filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
         render: (v: number) =>
-          v ? (
-            <span tw="text-neut-8">
-              {dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}{' '}
-            </span>
-          ) : (
-            ''
-          ),
-      },
+          v ? <span tw="text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')} </span> : ''
+      }
     }),
     [filter.reverse, filter.sort_by, set]
   )
@@ -162,7 +147,7 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
           op: 'bound',
           data: { alert_ids: selectedRowKeys },
           uri: { job_id: jobId, space_id: spaceId },
-          regionId,
+          regionId
         }).then(() => {
           onCancel()
         })
@@ -180,7 +165,7 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
               set({
                 showAddMonitorForm: true,
                 getQueryListKey: getQueryKeyListAlertPolicies,
-                selectedMonitor: {},
+                selectedMonitor: {}
               })
             }}
           >
@@ -206,11 +191,7 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
                 })
               }}
             />
-            <Button
-              type="black"
-              loading={!!isFetching}
-              tw="px-[5px] border-line-dark!"
-            >
+            <Button type="black" loading={!!isFetching} tw="px-[5px] border-line-dark!">
               <Icon
                 name="if-refresh"
                 tw="text-xl text-white"
@@ -238,7 +219,7 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
           dataSource={data?.infos || []}
           pagination={{
             total: data?.total || 0,
-            ...pagination,
+            ...pagination
           }}
           rowKey="id"
           onSort={sort}

@@ -6,7 +6,7 @@ import { Center, FlexBox } from 'components/index'
 // import useFilter from 'hooks/useHooks/useFilter'
 import {
   dataJobInstanceColumns,
-  jobInstanceStatus,
+  jobInstanceStatus
 } from 'views/Space/Ops/DataIntegration/constants'
 import React from 'react'
 import { useIsFetching, useQueryClient } from 'react-query'
@@ -20,7 +20,7 @@ const linkInstanceSettingKey = 'LINK_INSTANCE_SETTING'
 const LinkInstance = ({
   jobId,
   version,
-  type = JobMode.DI,
+  type = JobMode.DI
 }: {
   jobId: string
   version: string
@@ -57,8 +57,8 @@ const LinkInstance = ({
               { value: '', label: '全部' },
               ...Object.values(jobInstanceStatus).map((v) => ({
                 value: v.value,
-                label: v.label,
-              })),
+                label: v.label
+              }))
             ]}
             onChange={(value: number) => {
               setFilter((draft) => {
@@ -110,11 +110,7 @@ const LinkInstance = ({
           />
         </Center>
         <div tw="text-right flex-auto">
-          <Button
-            type="black"
-            loading={!!isFetching}
-            tw="w-auto px-[5px] border-line-dark!"
-          >
+          <Button type="black" loading={!!isFetching} tw="w-auto px-[5px] border-line-dark!">
             <Icon
               name="if-refresh"
               tw="text-xl text-white"

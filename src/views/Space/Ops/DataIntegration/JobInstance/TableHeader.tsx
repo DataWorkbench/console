@@ -6,10 +6,7 @@ import { observer } from 'mobx-react-lite'
 import tw, { styled } from 'twin.macro'
 import { useIsFetching, useQueryClient } from 'react-query'
 import { getSyncJobInstanceKey } from 'hooks/useSyncJobInstance'
-import {
-  dataJobInstanceColumns,
-  dataJobInstanceSuggestions,
-} from '../constants'
+import { dataJobInstanceColumns, dataJobInstanceSuggestions } from '../constants'
 
 // const { FilterInput } = Table as any
 const FilterInputWrapper = styled.div`
@@ -35,7 +32,7 @@ interface ITableHeaderProps {
 
 const TableHeader = observer((props: ITableHeaderProps) => {
   const {
-    columnsSetting: { storageKey, onSave },
+    columnsSetting: { storageKey, onSave }
   } = props
 
   const queryClient = useQueryClient()

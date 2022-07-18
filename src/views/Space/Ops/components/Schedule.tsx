@@ -40,44 +40,44 @@ const periodTypes = [
   { value: 'day', label: '日' },
   { value: 'week', label: '周' },
   { value: 'month', label: '月' },
-  { value: 'year', label: '年' },
+  { value: 'year', label: '年' }
 ]
 
 const concurrencys = {
   1: {
     value: 1,
-    label: '“允许”(同一时间，允许运行多个作业实例)',
+    label: '“允许”(同一时间，允许运行多个作业实例)'
   },
   2: {
     value: 2,
     label:
-      '“禁止”(同一时间，只允许运行一个作业实例运行,如果到达调度周期的执行时间点时上一个实例还没有运行完成,则放弃本次实例的运行)',
+      '“禁止”(同一时间，只允许运行一个作业实例运行,如果到达调度周期的执行时间点时上一个实例还没有运行完成,则放弃本次实例的运行)'
   },
   3: {
     value: 3,
     label:
-      '“替换“(同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成,则将这个实例终止,然后启动新的实例)',
-  },
+      '“替换“(同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成,则将这个实例终止,然后启动新的实例)'
+  }
 }
 
 const schedulePolicy = {
   1: {
     value: 1,
-    label: '重复执行',
+    label: '重复执行'
   },
   2: {
     value: 2,
-    label: '按时间执行',
+    label: '按时间执行'
   },
   3: {
     value: 3,
-    label: '立即执行',
-  },
+    label: '立即执行'
+  }
 }
 
 const hourOpts = range(0, 24).map((v) => ({
   value: v.toString(),
-  label: `${v}时`,
+  label: `${v}时`
 }))
 // const minuOpts = range(5, 60, 5).map((v) => ({
 //   value: v.toString(),
@@ -86,12 +86,12 @@ const hourOpts = range(0, 24).map((v) => ({
 
 const yearOpts = range(1, 13).map((v) => ({
   value: v.toString(),
-  label: `${v}月`,
+  label: `${v}月`
 }))
 
 const monthOpts = range(1, 32).map((v) => ({
   value: v.toString(),
-  label: `每月${v}号`,
+  label: `每月${v}号`
 }))
 
 type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -126,7 +126,7 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
     schedulePolicy: 3,
     executed: null,
     parameters: null,
-    parametersStr: '',
+    parametersStr: ''
     // immediately: false,
   })
 
@@ -134,31 +134,31 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
     minute: {
       startHour: 0,
       stampMinu: 5,
-      endHour: 23,
+      endHour: 23
     },
     hour: {
       tp: 1,
       startHour: 0,
       stampMinu: 5,
       endHour: 23,
-      hours: ['0'],
+      hours: ['0']
     },
     day: {
-      scheDate: defCurDate,
+      scheDate: defCurDate
     },
     week: {
       weekly: ['1'],
-      scheDate: defCurDate,
+      scheDate: defCurDate
     },
     month: {
       daily: ['1'],
-      scheDate: defCurDate,
+      scheDate: defCurDate
     },
     year: {
       monthly: ['1'],
       daily: ['1'],
-      scheDate: defCurDate,
-    },
+      scheDate: defCurDate
+    }
   })
 
   useEffect(() => {
@@ -179,10 +179,7 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
         draft.parameters = data.parameters
         draft.parametersStr = data.parameters
           ? data.parameters
-              .map(
-                (item: { key: string; value: string }) =>
-                  `${item.key}=${item.value}`
-              )
+              .map((item: { key: string; value: string }) => `${item.key}=${item.value}`)
               .join('\r\n')
           : ''
         // draft.immediately = data.immediately
@@ -232,14 +229,11 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
           </Title>
           <div tw="mt-3">
             {data?.parameters?.length > 0 ? (
-              data?.parameters?.map(
-                ({ key, value }: Record<string, string>) => (
-                  <FlexBox tw="not-last:mb-2 gap-2 text-white pl-6">
-                    <Param tw="bg-[#2193d34d]">{key}</Param>=
-                    <Param tw="bg-line-dark">{value}</Param>
-                  </FlexBox>
-                )
-              )
+              data?.parameters?.map(({ key, value }: Record<string, string>) => (
+                <FlexBox tw="not-last:mb-2 gap-2 text-white pl-6">
+                  <Param tw="bg-[#2193d34d]">{key}</Param>=<Param tw="bg-line-dark">{value}</Param>
+                </FlexBox>
+              ))
             ) : (
               <FlexBox tw="not-last:mb-2 gap-2  pl-6">
                 <span> 未设置 </span>
@@ -260,29 +254,18 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
               <>
                 <div>生效时间：</div>
                 <div>
-                  <span>
-                    {dayjs(data?.started * 1000).format('YYYY-MM-DD HH:mm')}
-                  </span>
+                  <span>{dayjs(data?.started * 1000).format('YYYY-MM-DD HH:mm')}</span>
                   <span>至</span>
-                  <span>
-                    {dayjs(data?.ended * 1000).format('YYYY-MM-DD HH:mm')}
-                  </span>
+                  <span>{dayjs(data?.ended * 1000).format('YYYY-MM-DD HH:mm')}</span>
                 </div>
                 <div>调度周期：</div>
-                <div>
-                  {
-                    periodTypes.find((i) => i.value === data?.period_type)
-                      ?.label
-                  }
-                </div>
+                <div>{periodTypes.find((i) => i.value === data?.period_type)?.label}</div>
                 {data?.period_type === 'year' && (
                   <>
                     <div>指定月份：</div>
                     <div>
                       {yearOpts
-                        .filter((i) =>
-                          periodData.year.monthly.includes(i.value)
-                        )
+                        .filter((i) => periodData.year.monthly.includes(i.value))
                         .map((i) => i.label)
                         .join('、')}
                     </div>
@@ -294,11 +277,7 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
                         .join('、')}
                     </div>
                     <div>定时调度时间：</div>
-                    <div>
-                      {dayjs(periodData.year.scheDate.getTime()).format(
-                        'HH:mm'
-                      )}
-                    </div>
+                    <div>{dayjs(periodData.year.scheDate.getTime()).format('HH:mm')}</div>
                   </>
                 )}
                 {data?.period_type === 'month' && (
@@ -311,11 +290,7 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
                         .join('、')}
                     </div>
                     <div>定时调度时间：</div>
-                    <div>
-                      {dayjs(periodData.month.scheDate.getTime()).format(
-                        'HH:mm'
-                      )}
-                    </div>
+                    <div>{dayjs(periodData.month.scheDate.getTime()).format('HH:mm')}</div>
                   </>
                 )}
                 {data?.period_type === 'week' && (
@@ -329,28 +304,20 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
                         { label: '星期三', value: 3 },
                         { label: '星期四', value: 4 },
                         { label: '星期五', value: 5 },
-                        { label: '星期六', value: 6 },
+                        { label: '星期六', value: 6 }
                       ]
-                        .filter((i) =>
-                          periodData.week.weekly.includes(i.value.toString())
-                        )
+                        .filter((i) => periodData.week.weekly.includes(i.value.toString()))
                         .map((i) => i.label)
                         .join('、')}
                     </div>
                     <div>定时调度时间：</div>
-                    <div>
-                      {dayjs(periodData.week.scheDate.getTime()).format(
-                        'HH:mm'
-                      )}
-                    </div>
+                    <div>{dayjs(periodData.week.scheDate.getTime()).format('HH:mm')}</div>
                   </>
                 )}
                 {data?.period_type === 'day' && (
                   <>
                     <div>定时调度时间：</div>
-                    <div>
-                      {dayjs(periodData.day.scheDate.getTime()).format('HH:mm')}
-                    </div>
+                    <div>{dayjs(periodData.day.scheDate.getTime()).format('HH:mm')}</div>
                   </>
                 )}
                 {data?.period_type === 'hour' && periodData.hour.tp === 1 && (
@@ -372,9 +339,7 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
                     <div>指定时间:</div>
                     <div>
                       {hourOpts
-                        .filter((i) =>
-                          periodData.hour.hours.includes(i.value.toString())
-                        )
+                        .filter((i) => periodData.hour.hours.includes(i.value.toString()))
                         .map((i) => i.label)
                         .join('、')}
                     </div>
@@ -398,30 +363,22 @@ const Schedule = ({ data }: { data: Record<string, any> }) => {
                 <div>{data?.express}</div>
                 <div>并发策略：</div>
                 <div>
-                  {data?.concurrency_policy &&
-                    concurrencys[data?.concurrency_policy as 1].label}
+                  {data?.concurrency_policy && concurrencys[data?.concurrency_policy as 1].label}
                 </div>
                 <div>超时时间：</div>
-                <div>
-                  {data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}
-                </div>
+                <div>{data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}</div>
               </>
             )}
             {data?.schedule_policy !== 1 && (
               <>
                 <div>执行时间：</div>
-                <div>
-                  {dayjs(data?.executed * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                </div>
+                <div>{dayjs(data?.executed * 1000).format('YYYY-MM-DD HH:mm:ss')}</div>
                 <div>并发策略：</div>
                 <div>
-                  {data?.concurrency_policy &&
-                    concurrencys[data?.concurrency_policy as 1].label}
+                  {data?.concurrency_policy && concurrencys[data?.concurrency_policy as 1].label}
                 </div>
                 <div>超时时间：</div>
-                <div>
-                  {data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}
-                </div>
+                <div>{data?.timeout === 0 ? '永不超时' : `${data?.timeout} 分钟`}</div>
               </>
             )}
           </Grid>

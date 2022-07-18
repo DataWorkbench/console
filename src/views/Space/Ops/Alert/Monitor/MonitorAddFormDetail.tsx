@@ -30,9 +30,7 @@ const MonitorAddFormDetail = observer((props: IMonitorAddProps) => {
   const { onCancel } = props
   const { selectedMonitor: data } = useAlertStore()
   const monitorItem =
-    data?.monitor_object === 1
-      ? data?.monitor_item?.stream_job
-      : data?.monitor_item?.sync_job
+    data?.monitor_object === 1 ? data?.monitor_item?.stream_job : data?.monitor_item?.sync_job
 
   return (
     <Modal
@@ -80,9 +78,7 @@ const MonitorAddFormDetail = observer((props: IMonitorAddProps) => {
               <JobItem key={k.toString()}>
                 <Icons
                   tw="text-green-11"
-                  name={
-                    data?.monitor_object === 1 ? 'DownloadBoxFill' : 'LayerFill'
-                  }
+                  name={data?.monitor_object === 1 ? 'DownloadBoxFill' : 'LayerFill'}
                   size={16}
                 />
                 <div>

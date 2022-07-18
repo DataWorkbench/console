@@ -6,14 +6,7 @@ import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import useFilter from 'hooks/useHooks/useFilter'
 import { observer } from 'mobx-react-lite'
-import {
-  Center,
-  FlexBox,
-  InstanceName,
-  SelectTreeTable,
-  TextEllipsis,
-  Tooltip,
-} from 'components'
+import { Center, FlexBox, InstanceName, SelectTreeTable, TextEllipsis, Tooltip } from 'components'
 import { getJobReleaseKey, useQuerySyncJobRelease } from 'hooks/useJobRelease'
 import { listSyncJobVersions } from 'stores/api/syncJobVersion'
 import { useParams } from 'react-router-dom'
@@ -23,7 +16,7 @@ import {
   dataReleaseColumns,
   DataReleaseDevMode,
   dataReleaseDevModeType,
-  dataReleaseTabs,
+  dataReleaseTabs
 } from '../constants'
 import { getColumnsRender, getOperations } from './utils'
 import { useDataReleaseStore } from './store'
@@ -80,7 +73,7 @@ const DataRelease = observer(() => {
     {
       sort_by: 'updated',
       reverse: true,
-      verbose: 1,
+      verbose: 1
     },
     { pagination: true, sort: true },
     dataReleaseSettingKey
@@ -89,21 +82,16 @@ const DataRelease = observer(() => {
   const jumpDetail = (tab?: string) => (record: Record<string, any>) => {
     // 详情文件位置 views/Space/Ops/DataIntegration/DataRelease/DataReleaseDetail.tsx
     window.open(
-      `./data-release/${record.id}?version=${record.version}${
-        tab ? `&tab=${tab}` : ''
-      }`,
+      `./data-release/${record.id}?version=${record.version}${tab ? `&tab=${tab}` : ''}`,
       '_blank'
     )
   }
 
   const handleDatasource = (record: Record<string, any>) => {
-    if (
-      dataReleaseDevModeType[record.dev_mode as 1]?.type ===
-      DataReleaseDevMode.UI
-    ) {
+    if (dataReleaseDevModeType[record.dev_mode as 1]?.type === DataReleaseDevMode.UI) {
       set({
         showDataSource: true,
-        selectedData: record,
+        selectedData: record
       })
     }
   }
@@ -111,13 +99,10 @@ const DataRelease = observer(() => {
   const columnsRender = getColumnsRender(filter, setFilter, undefined, {
     alarm_status: jumpDetail('alarm'),
     source: handleDatasource,
-    target: handleDatasource,
+    target: handleDatasource
   })
 
-  const handleMenuClick = (
-    record: Record<string, any>,
-    key: DataReleaseActionType
-  ) => {
+  const handleMenuClick = (record: Record<string, any>, key: DataReleaseActionType) => {
     switch (key) {
       case 'link':
       case 'dev':
@@ -129,19 +114,19 @@ const DataRelease = observer(() => {
       case 'offline':
         set({
           showOffline: true,
-          selectedData: record,
+          selectedData: record
         })
         break
       case 'resume':
         set({
           showResume: true,
-          selectedData: record,
+          selectedData: record
         })
         break
       case 'suspend':
         set({
           showSuspend: true,
-          selectedData: record,
+          selectedData: record
         })
         break
       default:
@@ -162,7 +147,7 @@ const DataRelease = observer(() => {
             onClick={() => {
               set({
                 showVersion: true,
-                selectedData: { id: record?.key },
+                selectedData: { id: record?.key }
               })
             }}
           >
@@ -206,7 +191,7 @@ const DataRelease = observer(() => {
         )
       }
       return child
-    },
+    }
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -220,14 +205,14 @@ const DataRelease = observer(() => {
     () => ({
       columns: dataReleaseColumns,
       onSave: setColumnSettings as any,
-      storageKey: dataReleaseSettingKey,
+      storageKey: dataReleaseSettingKey
     }),
     [setColumnSettings]
   )
 
   const { data, isFetching } = useQuerySyncJobRelease(filter, {
     enabled: true,
-    refetchInterval: 1000 * 60,
+    refetchInterval: 1000 * 60
   })
 
   const infos = get(data, 'infos', []) || []
@@ -244,18 +229,18 @@ const DataRelease = observer(() => {
       offset: 0,
       verbose: 1,
       sort_by: 'updated',
-      reverse: filter.reverse,
+      reverse: filter.reverse
     }).then((res) => {
       const arr = res.infos
         ?.filter((item: Record<string, any>) => item.version !== version)
         .map((i: any) => ({
           ...i,
-          uuid: `${i.id}=-=${i.version}=-=${record.__level + 1}`,
+          uuid: `${i.id}=-=${i.version}=-=${record.__level + 1}`
         }))
       if (arr.length >= 11) {
         const value = arr.slice(0, 10).concat({
           key: arr[10].id,
-          hasMore: true,
+          hasMore: true
         })
         return value
       }
@@ -280,18 +265,16 @@ const DataRelease = observer(() => {
             selectedLevel={-1}
             getChildren={getChildren}
             columns={columns}
-            dataSource={infos.map((i: any) => {
-              return {
-                ...i,
-                uuid: `${i.id}=-=${i.version}`,
-              }
-            })}
+            dataSource={infos.map((i: any) => ({
+              ...i,
+              uuid: `${i.id}=-=${i.version}`
+            }))}
             loading={!!isFetching}
             onSort={sort}
             rowKey="uuid"
             pagination={{
               total: get(data, 'total', 0),
-              ...pagination,
+              ...pagination
             }}
           />
         </FlexBox>
@@ -305,7 +288,7 @@ const DataRelease = observer(() => {
         <DataSourceModal
           onCancel={() => {
             set({
-              showDataSource: false,
+              showDataSource: false
             })
           }}
         />

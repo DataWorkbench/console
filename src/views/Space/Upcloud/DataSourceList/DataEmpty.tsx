@@ -38,7 +38,7 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => {
                 isDarkTheme()
                   ? {
                       primary: '#fff',
-                      secondary: '#949ea9',
+                      secondary: '#949ea9'
                     }
                   : {}
               }
@@ -59,7 +59,7 @@ const DataEmpty = ({ onAddClick }: { onAddClick: () => void }) => {
             onClick={() => {
               const openModal = Modal.open(HelpCenterModal, {
                 link: getHelpCenterLink('/manual/data_up_cloud/data_summary/'),
-                onCancel: () => Modal.close(openModal),
+                onCancel: () => Modal.close(openModal)
               })
             }}
           >

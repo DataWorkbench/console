@@ -1,10 +1,4 @@
-import {
-  Center,
-  HelpCenterLink,
-  Modal,
-  ModalContent,
-  PopConfirm,
-} from 'components/index'
+import { Center, HelpCenterLink, Modal, ModalContent, PopConfirm } from 'components/index'
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Alert, Button, Icon } from '@QCFE/qingcloud-portal-ui'
@@ -16,7 +10,7 @@ import useIcon from 'hooks/useHooks/useIcon'
 import {
   getQueryKeyListAlertPoliciesByJob,
   useMutationAlert,
-  useQueryListAlertPoliciesByJob,
+  useQueryListAlertPoliciesByJob
 } from 'hooks/useAlert'
 
 import icons from '../common/icons'
@@ -46,7 +40,7 @@ const collapseStyle = {
       ${tw`block! static`}
     }
   `,
-  itemExpanded: tw`w-6 h-6 bg-transparent hover:bg-neut-13 active:bg-neut-12 border border-neut-13 hover:border-neut-13 active:border-neut-12 rounded-[1px] cursor-pointer`,
+  itemExpanded: tw`w-6 h-6 bg-transparent hover:bg-neut-13 active:bg-neut-12 border border-neut-13 hover:border-neut-13 active:border-neut-12 rounded-[1px] cursor-pointer`
 }
 
 interface IMonitorModalProps {
@@ -55,21 +49,17 @@ interface IMonitorModalProps {
 
 const MonitorModal = observer((props: IMonitorModalProps) => {
   useIcon(icons)
-  const { set, jobDetail: { spaceId, jobId, jobName, regionId } = {} } =
-    useAlertStore()
+  const { set, jobDetail: { spaceId, jobId, jobName, regionId } = {} } = useAlertStore()
   const { onCancel } = props
   const { data, isFetching } = useQueryListAlertPoliciesByJob({
     uri: {
       space_id: spaceId,
-      job_id: jobId,
+      job_id: jobId
     },
-    regionId,
+    regionId
   } as any)
 
-  const { mutateAsync, isLoading } = useMutationAlert(
-    {},
-    getQueryKeyListAlertPoliciesByJob
-  )
+  const { mutateAsync, isLoading } = useMutationAlert({}, getQueryKeyListAlertPoliciesByJob)
 
   const arr = data?.infos ?? []
   const defaultKeys = Array.from({ length: arr.length }, (v, k) => k.toString())
@@ -104,9 +94,7 @@ const MonitorModal = observer((props: IMonitorModalProps) => {
           size="large"
           tw="w-full mt-3 mb-4"
           loading={isLoading || isFetching}
-          onClick={() =>
-            set({ showAddMonitor: true, disabledIds: arr.map((v) => v.id) })
-          }
+          onClick={() => set({ showAddMonitor: true, disabledIds: arr.map((v) => v.id) })}
         >
           <Icon name="add" size={14} type="light" />
           <span tw="text-xs">添加告警策略</span>
@@ -123,16 +111,10 @@ const MonitorModal = observer((props: IMonitorModalProps) => {
               key={item.id}
               label={
                 <div tw="flex items-center flex-auto">
-                  <Center
-                    css={[collapseStyle.itemExpanded, collapseStyle.showIcon]}
-                  >
+                  <Center css={[collapseStyle.itemExpanded, collapseStyle.showIcon]}>
                     <Icon
                       tw="block"
-                      name={
-                        activeKeys.includes(index.toString())
-                          ? 'chevron-up'
-                          : 'chevron-down'
-                      }
+                      name={activeKeys.includes(index.toString()) ? 'chevron-up' : 'chevron-down'}
                       size={16}
                       type="light"
                     />
@@ -146,21 +128,16 @@ const MonitorModal = observer((props: IMonitorModalProps) => {
                         op: 'unbound',
                         uri: {
                           space_id: spaceId,
-                          job_id: jobId,
+                          job_id: jobId
                         },
                         data: {
-                          alert_ids: [item.id],
+                          alert_ids: [item.id]
                         },
-                        regionId,
+                        regionId
                       })
                     }}
                   >
-                    <Button
-                      css={collapseStyle.showIcon}
-                      size="small"
-                      tw="ml-2 pr-0"
-                      type="text"
-                    >
+                    <Button css={collapseStyle.showIcon} size="small" tw="ml-2 pr-0" type="text">
                       <Icon name="close" size={14} type="light" />
                       <span tw="text-xs ml-1!">解绑</span>
                     </Button>
