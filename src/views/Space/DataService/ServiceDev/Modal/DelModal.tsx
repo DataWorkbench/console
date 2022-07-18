@@ -7,7 +7,7 @@ import { get } from 'lodash-es'
 import { ApiProps } from 'stores/DtsDevStore'
 import { useStore } from 'stores'
 
-export interface JobModalData {
+export interface ModalData {
   id: string
   pid: string
   type: number
@@ -20,14 +20,14 @@ interface CurrentGroupApiProps {
   id: string
 }
 
-interface JobModalProps {
+interface DelModalProps {
   isApiGroup?: boolean
   currentGroup?: CurrentGroupApiProps | undefined
   currentApi?: ApiProps | undefined
-  onClose?: (data?: JobModalData) => void
+  onClose?: (data?: ModalData) => void
 }
 
-export const JobModal = observer((props: JobModalProps) => {
+const DelModal = observer((props: DelModalProps) => {
   const { isApiGroup = false, currentGroup, currentApi, onClose } = props
 
   const fetchApi = useFetchApi()
@@ -62,7 +62,6 @@ export const JobModal = observer((props: JobModalProps) => {
               return api
             })
             setTreeData(mapTree)
-            onClose?.()
             removePanelList(apiIds)
             resolve(true)
           },
@@ -88,7 +87,7 @@ export const JobModal = observer((props: JobModalProps) => {
     )
   }
 
-  const handleOK = () => {
+  const handleOK = async () => {
     if (isApiGroup) {
       fetchApi({
         groupId: currentGroup?.id
@@ -102,7 +101,10 @@ export const JobModal = observer((props: JobModalProps) => {
           }
         } else if (currentGroup?.id) deleteApiGroup([currentGroup?.id])
       })
-    } else if (currentApi) deleteApiConfig([currentApi.api_id])
+    } else if (currentApi) {
+      await deleteApiConfig([currentApi.api_id])
+      onClose?.()
+    }
   }
 
   return (
@@ -125,7 +127,7 @@ export const JobModal = observer((props: JobModalProps) => {
       footer={
         <div tw="flex justify-end space-x-2">
           <Button onClick={() => onClose?.()}>取消</Button>
-          <Button type="danger" onClick={handleOK}>
+          <Button type="danger" onClick={handleOK} loading={mutation.isLoading}>
             删除
           </Button>
         </div>
@@ -139,5 +141,4 @@ export const JobModal = observer((props: JobModalProps) => {
     </Confirm>
   )
 })
-
-export default JobModal
+export default DelModal

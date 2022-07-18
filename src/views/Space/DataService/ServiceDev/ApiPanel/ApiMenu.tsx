@@ -34,14 +34,19 @@ const ApiMenu = observer((props: JobMenuProps) => {
   const { spaceId } = useParams<{ spaceId: string }>()
 
   const {
-    dtsDevStore: { setTreeData }
+    dtsDevStore: { setTreeData, loadedKeys }
   } = useStore()
 
   const { data } = useQueryListApiGroups({ uri: { space_id: spaceId } })
 
   useEffect(() => {
     if (data) {
-      const tree = get(data, 'infos', [])?.map((item) => ({
+      const infos = get(data, 'infos', []) || []
+      if (infos.length === 0) {
+        setTreeData([])
+        return
+      }
+      const tree = infos?.map((item) => ({
         ...item,
         key: item.id,
         pid: item.id,
@@ -198,7 +203,7 @@ const ApiMenu = observer((props: JobMenuProps) => {
           </div>
           <div tw="pt-4 flex-1 h-full overflow-y-auto">
             <SimpleBar tw="h-full">
-              <ApiTree ref={apiTree} />
+              <ApiTree ref={apiTree} expandedKeys={loadedKeys as string[]} />
             </SimpleBar>
           </div>
         </>

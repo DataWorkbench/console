@@ -15,6 +15,9 @@ import {
   FieldSettingData
 } from '../constants'
 
+interface IFieldOrderProps {
+  disabled?: boolean
+}
 const Root = styled.div`
   ${tw`text-white space-y-2`}
 `
@@ -23,11 +26,12 @@ const getName = (name: MappingKey<typeof serviceDevVersionFieldSettingMapping>) 
   serviceDevVersionFieldSettingMapping.get(name)!.apiField
 
 const dataServiceDataSettingKey = 'DATA_SERVICE_DATA__SETTING'
-const FieldOrder = observer(() => {
+const FieldOrder = observer((props: IFieldOrderProps) => {
   const {
     dtsDevStore: { fieldSettingData },
     dtsDevStore
   } = useStore()
+  const { disabled = false } = props
 
   const setFieldSettingData = (fn: (fieldData: FieldSettingData[]) => void) => {
     const data = cloneDeep(fieldSettingData)
@@ -107,6 +111,7 @@ const FieldOrder = observer(() => {
     <DargTable
       columns={columns as unknown as any}
       runDarg={false}
+      disabled={disabled}
       dataSource={fieldSettingData}
       rowKey="key"
     />

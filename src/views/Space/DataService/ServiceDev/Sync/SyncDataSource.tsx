@@ -35,10 +35,15 @@ export interface ISourceData {
   source: SourceDataType
 }
 
+interface ISyncDataSourceProps {
+  disabled?: boolean
+}
+
 const { SelectField } = Form
 
 const SyncDataSource = observer(
-  (props, ref) => {
+  (props: ISyncDataSourceProps, ref) => {
+    const { disabled = false } = props
     const [visible, setVisible] = useState<boolean | null>(null)
     const { spaceId } = useParams<IRouteParams>()
     const [sourceData, setSourceData] = useImmer<ISourceData>({
@@ -175,6 +180,7 @@ const SyncDataSource = observer(
               }
             ]}
             validateOnChange
+            disabled={disabled}
             onChange={(v: number) => {
               setSourceData((draft) => {
                 draft.type = v
@@ -199,6 +205,7 @@ const SyncDataSource = observer(
                 <Icon name="blockchain" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />
               }
               onClick={() => handleClick()}
+              disabled={disabled}
               onClear={() => handleClear()}
               value={sourceData.source?.id}
               clearable={!isEmpty(sourceData.source)}
@@ -219,6 +226,7 @@ const SyncDataSource = observer(
               onRefresh={() => {
                 tablesRet.refetch()
               }}
+              disabled={disabled}
               onChange={(v: string) => {
                 setSourceData((draft) => {
                   draft.tableName = v

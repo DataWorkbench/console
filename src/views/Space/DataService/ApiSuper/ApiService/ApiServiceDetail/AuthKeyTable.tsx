@@ -172,15 +172,15 @@ const ApiGroupTable = ({ authKeyId, apiServiceId }: AuthKeyTableProps) => {
               placeholder="请输入关键词进行搜索"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
-                  draft.search = (e.target as HTMLInputElement).value
+                  draft.name = (e.target as HTMLInputElement).value
                   draft.offset = 0
                 })
               }}
               onClear={() => {
                 setFilter((draft) => {
-                  if (draft.search) {
+                  if (draft.name) {
                     draft.offset = 0
-                    draft.search = ''
+                    draft.name = ''
                   }
                 })
               }}

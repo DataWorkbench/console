@@ -14,6 +14,8 @@ export interface ApiProps {
   space_id: string
   status?: number
   group_id?: string
+  is_history?: boolean | undefined // 是否是历史数据 true:历史数据 false:当前数据
+  version_id?: string // 历史数据的版本id
   [key: string]: any
 }
 
@@ -99,24 +101,26 @@ class WorkFlowStore {
   }
 
   addPanel = (panel: ApiProps) => {
-    const idx = findIndex(this.panels, (p) => p.api_id === panel.api_id)
-    if (idx === -1) {
-      this.panels.push(panel)
-    } else if (this.panels.length === 0) {
+    if (this.panels.length === 0) {
       this.panels.push(panel)
       this.curApi = panel
     } else {
-      this.panels[idx] = panel
+      const idx = findIndex(this.panels, (p) => p.key === panel.key)
+      if (idx === -1) {
+        this.panels.push(panel)
+      } else {
+        this.panels[idx] = panel
+      }
     }
   }
 
-  removePanel = (apiId: string) => {
-    const filterPanels = this.panels.filter((p) => p.api_id !== apiId)
+  removePanel = (key: string) => {
+    const filterPanels = this.panels.filter((p) => p.key !== key)
     this.panels = filterPanels
     const len = filterPanels.length
     if (len === 0) {
       this.curApi = null
-    } else if (this.curApi?.api_id === apiId) {
+    } else if (this.curApi?.key === key) {
       this.curApi = filterPanels[len - 1]
     }
   }

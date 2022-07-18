@@ -17,14 +17,6 @@ import {
   serviceDevResponseSettingMapping
 } from '../constants'
 
-export interface JobModalData {
-  id: string
-  pid: string
-  type: number
-  isEdit: boolean
-  pNode?: Record<string, any>
-}
-
 const styles = {
   table: css`
     .darg-table-body {
@@ -91,11 +83,13 @@ const defaultHighSource = [
 
 const { CollapseItem } = Collapse
 
-export const JobModal = observer(() => {
+const ResponseSettingModal = observer(() => {
   const {
-    dtsDevStore: { apiConfigData, fieldSettingData },
+    dtsDevStore: { apiConfigData, fieldSettingData, curApi },
     dtsDevStore
   } = useStore()
+  const isHistory = get(curApi, 'is_history', false) || false
+
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
   const [highDataSource, setHighDataSource] = useImmer(defaultHighSource)
   const mutation = useMutationUpdateApiConfig()
@@ -133,6 +127,21 @@ export const JobModal = observer(() => {
     dtsDevStore.set({ showResponseSetting: false })
   }
 
+  const handleSyncStore = () => {
+    const config = {
+      ...cloneDeep(apiConfigData),
+      api_config: {
+        ...cloneDeep(apiConfigData?.api_config),
+        response_params: {
+          response_params: [...dataSource, ...highDataSource]
+        }
+      }
+    }
+    dtsDevStore.set({
+      apiConfigData: config
+    })
+  }
+
   const handleOK = () => {
     const configSource = cloneDeep(get(apiConfigData, 'data_source'))
     const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
@@ -159,12 +168,13 @@ export const JobModal = observer(() => {
       {
         onSuccess: (res) => {
           if (res.ret_code === 0) {
-            onClose()
             Notify.success({
               title: '操作提示',
               content: '配置保存成功',
               placement: 'bottomRight'
             })
+            handleSyncStore()
+            onClose()
           }
         }
       }
@@ -286,6 +296,7 @@ export const JobModal = observer(() => {
               columns={columns as unknown as any}
               runDarg={false}
               dataSource={dataSource}
+              disabled={isHistory}
               rowKey="key"
             />
           </div>
@@ -303,6 +314,7 @@ export const JobModal = observer(() => {
             columns={totalColumns as unknown as any}
             runDarg={false}
             dataSource={highDataSource}
+            disabled={isHistory}
             rowKey="key"
           />
         </CollapseItem>
@@ -311,4 +323,4 @@ export const JobModal = observer(() => {
   )
 })
 
-export default JobModal
+export default ResponseSettingModal

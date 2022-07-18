@@ -5,19 +5,25 @@ import tw, { css, theme } from 'twin.macro'
 import { useStore } from 'stores'
 import { Center, FlexBox } from 'components'
 import emitter from 'utils/emitter'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
+import qs from 'qs'
+import { useMutationDescribeDataServiceApiVersion } from 'hooks'
+import { get } from 'lodash-es'
 import ApiMenu from './ApiPanel/ApiMenu'
 import ApiTabs from './ApiPanel/ApiTabs'
 import StreamRightMenu from './Stream/StreamRightMenu'
-import VersionDisplay from './Version/VersionDisplay'
 
-const RealTime = observer(() => {
-  const { spaceId } = useParams<{ regionId: string; spaceId: string }>()
+const ServiceDev = observer(() => {
+  const { spaceId, detail } = useParams<{ regionId: string; spaceId: string; detail?: string }>()
+  const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
+
   const {
     dtsDevStore,
-    dtsDevStore: { curApi, curVersion }
+    dtsDevStore: { curApi }
   } = useStore()
   const [sideCollapsed, setSideCollapsed] = useLocalStorage('NAV_SIDER_COLLAPSED', false)
+  const { search } = useLocation()
+  const { verId } = qs.parse(search.slice(1)) as { verId: string }
 
   useUpdateEffect(() => {
     dtsDevStore.set({ panels: [], curApi: null, curVersion: null })
@@ -32,6 +38,40 @@ const RealTime = observer(() => {
     })
   })
   useMount(() => {
+    console.log('detail', detail)
+
+    // 存在历史版本
+    if (detail) {
+      const params = {
+        apiId: detail,
+        verId
+      }
+      mutationApiVersion.mutate(params, {
+        onSuccess: (res) => {
+          const apiConfig = get(res, 'api_version')
+          const VerApi = {
+            key: `${apiConfig.api_id}_${verId}`, // key 和 api_id 是panel 的唯一标识， 区分当前版本和历史版本
+            api_id: apiConfig.api_id,
+            api_name: apiConfig.api_name,
+            api_mode: apiConfig.api_mode,
+            api_path: apiConfig.api_path,
+            space_id: apiConfig.space_id,
+            status: apiConfig.status,
+            group_id: apiConfig.group_id,
+            version_id: verId, // 历史版本号
+            is_history: true
+          }
+
+          // dtsDevStore.set({
+          //   curVersion: verId,
+          //   curApi: VerApi,
+          //   apiConfigData: apiConfig
+          // })
+          dtsDevStore.addPanel({ ...VerApi })
+        }
+      })
+    }
+
     if (!sideCollapsed) {
       setSideCollapsed(true)
       emitter.emit('cancelSaveJob')
@@ -64,14 +104,6 @@ const RealTime = observer(() => {
       )}
     </Center>
   )
-  const showVersion = curVersion && curApi?.id === curVersion.id
-  if (showVersion) {
-    return (
-      <div tw="flex min-h-[600px] w-full h-full overflow-auto pl-3 pt-3 pb-3 space-x-3">
-        <VersionDisplay />
-      </div>
-    )
-  }
 
   return (
     <div tw="flex min-h-[600px] w-full h-full overflow-auto p-2 pr-0 ">
@@ -112,4 +144,4 @@ const RealTime = observer(() => {
   )
 })
 
-export default RealTime
+export default ServiceDev

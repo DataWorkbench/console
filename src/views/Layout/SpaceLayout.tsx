@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { FlexBox } from 'components'
 import { set as lodashSet } from 'lodash-es'
 import { clearStorage } from 'utils/storage'
+// import Header from 'views/Space/Header'
 import { useQueryDescribePlatformConfig } from '../../hooks'
 
 const Header = React.lazy(() => import(/* webpackChunkName: "space" */ 'views/Space/Header'))

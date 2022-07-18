@@ -44,15 +44,8 @@ const FormWrapper = styled('div')(() => [
     }
   `
 ])
-export interface JobModalData {
-  id: string
-  pid: string
-  type: number
-  isEdit: boolean
-  pNode?: Record<string, any>
-}
 
-export const JobModal = observer(() => {
+const ClusterSettingModal = observer(() => {
   const mutation = useMutationUpdateApiConfig()
   const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
@@ -62,8 +55,9 @@ export const JobModal = observer(() => {
 
   const {
     dtsDevStore,
-    dtsDevStore: { apiConfigData }
+    dtsDevStore: { apiConfigData, curApi }
   } = useStore()
+  const isHistory = get(curApi, 'is_history', false) || false
 
   useEffect(() => {
     const serviceCluster = cloneDeep(get(apiConfigData, 'service_cluster'))
@@ -113,13 +107,13 @@ export const JobModal = observer(() => {
         {
           onSuccess: (res) => {
             if (res.ret_code === 0) {
-              onClose()
               Notify.success({
                 title: '操作提示',
                 content: '配置保存成功',
                 placement: 'bottomRight'
               })
               handleSyncStore()
+              onClose()
             }
           }
         }
@@ -161,7 +155,10 @@ export const JobModal = observer(() => {
               icon={<Icon name="pod" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />}
               value={clusterId}
               placeholder="选择服务集群"
-              onClick={() => setVisible(true)}
+              onClick={() => {
+                setVisible(true)
+              }}
+              disabled={isHistory}
               onClear={() => {
                 setCluster(null)
                 mutation.reset()
@@ -190,4 +187,4 @@ export const JobModal = observer(() => {
   )
 })
 
-export default JobModal
+export default ClusterSettingModal

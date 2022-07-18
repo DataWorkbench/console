@@ -29,7 +29,7 @@ export const StopClusterTableFieldMapping: Mapping<
 > = new Map()
   .set('name', { label: 'APP名称 / ID', apiField: 'api_name' })
   .set('api_id', { label: '版本ID', apiField: 'api_id' })
-  .set('api_path', { label: 'API服务组', apiField: 'api_path' })
+  .set('api_path', { label: 'API服务组', apiField: 'group_id' })
   .set('path', { label: 'API访问路径', apiField: 'api_path' })
   .set('desc', { label: '描述', apiField: 'api_description' })
 

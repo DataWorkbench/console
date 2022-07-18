@@ -8,7 +8,7 @@ interface ModeDataProps {
   disabled?: boolean
 }
 
-interface JobModeItemProps {
+interface ModeItemProps {
   selected?: boolean
   onClick?: (modeData: any) => void
   modeData: ModeDataProps
@@ -25,7 +25,7 @@ const Root = styled('div')(
   ]
 )
 
-export const JobModeItem = ({ modeData, selected, onClick }: JobModeItemProps) => {
+const ModeItem = ({ modeData, selected, onClick }: ModeItemProps) => {
   const { title, desc, disabled } = modeData
 
   return (
@@ -52,4 +52,4 @@ export const JobModeItem = ({ modeData, selected, onClick }: JobModeItemProps) =
   )
 }
 
-export default JobModeItem
+export default ModeItem

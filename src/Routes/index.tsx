@@ -14,8 +14,8 @@ import { useDarkMode } from 'hooks'
 // import Ops from 'views/Space/Ops'
 // import Upcloud from 'views/Space/Upcloud'
 // import Manage from 'views/Space/Manage'
+// import DataService from 'views/Space/DataService'
 
-// describeDataOmnis
 const DescribeDataOmnis = lazy(
   () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
 )

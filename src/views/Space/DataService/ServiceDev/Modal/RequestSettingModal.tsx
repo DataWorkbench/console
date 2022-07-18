@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 import { DargTable, ResizeModal, FlexBox } from 'components'
 import { observer } from 'mobx-react-lite'
 import { useStore, DataServiceManageDescribeApiConfig, useMutationUpdateApiConfig } from 'hooks'
@@ -61,16 +61,15 @@ const defaultHighSource = [
 
 const { CollapseItem } = Collapse
 
-export const JobModal = observer(() => {
-  const modal = useRef(null)
-
+const RequestSettingModal = observer(() => {
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
   const [highSource, setHighSource] = useImmer(defaultHighSource)
 
   const {
-    dtsDevStore: { apiConfigData, fieldSettingData },
+    dtsDevStore: { apiConfigData, fieldSettingData, curApi },
     dtsDevStore
   } = useStore()
+  const isHistory = get(curApi, 'is_history', false) || false
 
   const mutation = useMutationUpdateApiConfig()
 
@@ -108,6 +107,21 @@ export const JobModal = observer(() => {
     dtsDevStore.set({ showRequestSetting: false })
   }
 
+  const handleSyncStore = () => {
+    const config = {
+      ...cloneDeep(apiConfigData),
+      api_config: {
+        ...cloneDeep(apiConfigData?.api_config),
+        request_params: {
+          request_params: [...dataSource, ...highSource]
+        }
+      }
+    }
+    dtsDevStore.set({
+      apiConfigData: config
+    })
+  }
+
   const handleOK = () => {
     const configSource = cloneDeep(get(apiConfigData, 'data_source'))
     const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
@@ -134,12 +148,13 @@ export const JobModal = observer(() => {
       {
         onSuccess: (res) => {
           if (res.ret_code === 0) {
-            onClose()
             Notify.success({
               title: '操作提示',
               content: '配置保存成功',
               placement: 'bottomRight'
             })
+            handleSyncStore()
+            onClose()
           }
         }
       }
@@ -323,7 +338,6 @@ export const JobModal = observer(() => {
       orient="fullright"
       maskClosable={false}
       closable={false}
-      ref={modal}
       visible
       maxWidth={1500}
       enableResizing={{ left: true }}
@@ -353,6 +367,7 @@ export const JobModal = observer(() => {
             columns={columns as unknown as any}
             runDarg={false}
             dataSource={dataSource}
+            disabled={isHistory}
             rowKey="param_name"
           />
         </CollapseItem>
@@ -368,6 +383,7 @@ export const JobModal = observer(() => {
           <DargTable
             columns={limitColumns as unknown as any}
             runDarg={false}
+            disabled={isHistory}
             dataSource={highSource}
             rowKey="param_name"
           />
@@ -377,4 +393,4 @@ export const JobModal = observer(() => {
   )
 })
 
-export default JobModal
+export default RequestSettingModal

@@ -1,7 +1,7 @@
-import { useRef, useEffect } from 'react'
-import { DargTable, ResizeModal, FlexBox, ModalContent } from 'components'
+import { useEffect } from 'react'
+import { DargTable, Modal, FlexBox, ModalContent } from 'components'
 import { observer } from 'mobx-react-lite'
-import { useStore, useMutationTestDataServiceApi } from 'hooks'
+import { useStore, useMutationTestDataServiceApi, testApiService } from 'hooks'
 import { Button, Input } from '@QCFE/lego-ui'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
@@ -15,22 +15,12 @@ import {
   ParameterPosition
 } from '../constants'
 
-export interface JobModalData {
-  id: string
-  pid: string
-  type: number
-  isEdit: boolean
-  pNode?: Record<string, any>
-}
-
 const getName = (name: MappingKey<typeof serviceDevRequestSettingMapping>) =>
   serviceDevRequestSettingMapping.get(name)!.apiField
 
 const dataServiceDataLimitSettingKey = 'DATA_SERVICE_DATA_REQUEST_HIGH'
 
-export const JobModal = observer(() => {
-  const modal = useRef(null)
-
+const TestModal = observer(() => {
   const {
     dtsDevStore: { apiConfigData },
     dtsDevStore
@@ -56,30 +46,37 @@ export const JobModal = observer(() => {
   }
 
   const startTest = () => {
-    const params: any = {}
-    testSource.forEach((source: any) => {
-      console.log(source)
+    const data = {
+      clusterId: apiConfig?.cluster_id,
+      groupId: apiConfig?.group_id,
+      apiId: apiConfig?.api_id
+    }
 
-      const keyV = source.param_name
-      const value = source.data_type === 2 ? Number(source.example_value) : source.example_value
-      params[keyV] = value
-    })
+    testApiService(data)
+    // const params: any = {}
+    // testSource.forEach((source: any) => {
+    //   console.log(source)
 
-    testMutation.mutate(
-      { apiId: apiConfig?.api_id, request_content: JSON.stringify(params) },
-      {
-        onSuccess: (res) => {
-          if (res.ret_code === 0) {
-            onClose()
-            // Notify.success({
-            //   title: '操作提示',
-            //   content: '配置保存成功',
-            //   placement: 'bottomRight'
-            // })
-          }
-        }
-      }
-    )
+    //   const keyV = source.param_name
+    //   const value = source.data_type === 2 ? Number(source.example_value) : source.example_value
+    //   params[keyV] = value
+    // })
+
+    // testMutation.mutate(
+    //   { apiId: apiConfig?.api_id, request_content: JSON.stringify(params) },
+    //   {
+    //     onSuccess: (res) => {
+    //       if (res.ret_code === 0) {
+    //         onClose()
+    //         // Notify.success({
+    //         //   title: '操作提示',
+    //         //   content: '配置保存成功',
+    //         //   placement: 'bottomRight'
+    //         // })
+    //       }
+    //     }
+    //   }
+    // )
   }
 
   const renderHighColumns = {
@@ -130,13 +127,10 @@ export const JobModal = observer(() => {
   )
 
   return (
-    <ResizeModal
+    <Modal
       orient="fullright"
       maskClosable={false}
-      ref={modal}
       visible
-      maxWidth={1500}
-      enableResizing={{ left: true }}
       title={`API ID: ${apiConfig?.api_id} 测试`}
       width={1200}
       onCancel={onClose}
@@ -188,8 +182,8 @@ export const JobModal = observer(() => {
           </div>
         </FlexBox>
       </ModalContent>
-    </ResizeModal>
+    </Modal>
   )
 })
 
-export default JobModal
+export default TestModal

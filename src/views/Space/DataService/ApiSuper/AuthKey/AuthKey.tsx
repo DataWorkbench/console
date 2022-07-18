@@ -8,7 +8,7 @@ const pageTabsData = [
     title: '密钥管理',
     description:
       '具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定。',
-    icon: 'earth',
+    icon: 'q-kmsFill',
     helpLink: getHelpCenterLink('/manual/data_development/network/create_network/')
   }
 ]

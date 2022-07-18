@@ -70,8 +70,15 @@ export const TableBody = styled('div')(() => [
   `
 ])
 
-export const DragTable = styled('div')(() => [
-  tw`border-neut-13! border-solid border-[1px]`,
+export const DragTable = styled('div')(({ disabled }: { disabled?: boolean }) => [
+  tw`border-neut-13! border-solid border-[1px] relative`,
+  disabled &&
+    css`
+      ${tw`cursor-not-allowed`}
+      & > * {
+        pointer-events: none;
+      }
+    `,
   css`
     & > div {
       ${tw`dark:border-neut-13`}
@@ -105,7 +112,7 @@ export interface DargTableProps<T = any> {
   type?: string // 拖拽类型
   renderFooter?: () => React.ReactNode // 脚部渲染函数
   rowKey: string // 行key
-  disable?: boolean // 是否可以操作
+  disabled?: boolean // 是否可以操作
 }
 
 export const DargTable = (props: DargTableProps<any>) => {
@@ -116,7 +123,7 @@ export const DargTable = (props: DargTableProps<any>) => {
     moveRow,
     renderFooter,
     runDarg = true,
-    disable = false
+    disabled = false
   } = props
 
   const getData = useCallback(
@@ -128,7 +135,7 @@ export const DargTable = (props: DargTableProps<any>) => {
         return (
           <CheckBoxLabel>
             <Checkbox
-              disabled={disable}
+              disabled={disabled}
               checked={!!data}
               onChange={(_, checked) => {
                 if (column?.onSelect) {
@@ -142,7 +149,7 @@ export const DargTable = (props: DargTableProps<any>) => {
       }
       return data === undefined || data === null || data === '' ? '' : data
     },
-    [disable]
+    [disabled]
   )
 
   const indeterminate = useCallback(
@@ -162,14 +169,14 @@ export const DargTable = (props: DargTableProps<any>) => {
   )
 
   return (
-    <DragTable className="darg-table" tw="border-neut-13!">
+    <DragTable className="darg-table" tw="border-neut-13!" disabled={disabled}>
       <TableHeader className="darg-table-header">
         {columns.map((item, index) => (
           <div key={item.key as string} style={item?.width ? { width: item.width } : { flex: 1 }}>
             {item?.checkbox ? (
               <CheckBoxLabel>
                 <Checkbox
-                  disabled={disable}
+                  disabled={disabled}
                   onChange={(_, checked) => {
                     if (item?.onAllSelect) {
                       item?.onAllSelect(checked, item, index)
@@ -189,7 +196,7 @@ export const DargTable = (props: DargTableProps<any>) => {
       <TableBody className="darg-table-body">
         {dataSource.length > 0 ? (
           dataSource.map((item: any, i) => {
-            if (runDarg && moveRow && !disable) {
+            if (runDarg && moveRow && !disabled) {
               return (
                 <DraggableRow
                   type={type}

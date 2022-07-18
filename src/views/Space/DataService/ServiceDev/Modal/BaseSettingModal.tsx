@@ -38,15 +38,8 @@ const FormWrapper = styled('div')(() => [
     }
   `
 ])
-export interface JobModalData {
-  id: string
-  pid: string
-  type: number
-  isEdit: boolean
-  pNode?: Record<string, any>
-}
 
-export const JobModal = observer(() => {
+const BaseSettingModal = observer(() => {
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
     group_name: '',
@@ -67,10 +60,11 @@ export const JobModal = observer(() => {
   }))
 
   const {
-    dtsDevStore: { apiConfigData, treeData, setTreeData },
+    dtsDevStore: { apiConfigData, treeData, setTreeData, curApi },
     dtsDevStore
   } = useStore()
   const mutation = useMutationUpdateApiConfig()
+  const isHistory = get(curApi, 'is_history', false) || false
 
   const onClose = () => {
     dtsDevStore.set({ showBaseSetting: false })
@@ -123,8 +117,6 @@ export const JobModal = observer(() => {
       return api
     })
 
-    console.log(newTreeData, 'newTreeData')
-
     const config = {
       ...cloneDeep(apiConfigData),
       api_config: {
@@ -161,13 +153,13 @@ export const JobModal = observer(() => {
         {
           onSuccess: (res) => {
             if (res.ret_code === 0) {
-              onClose()
               Notify.success({
                 title: '操作提示',
                 content: '配置保存成功',
                 placement: 'bottomRight'
               })
               handleSyncStore()
+              onClose()
             }
           }
         }
@@ -217,6 +209,7 @@ export const JobModal = observer(() => {
                   draft.api_name = String(v)
                 })
               }
+              disabled={isHistory}
               validateOnChange
               placeholder="请输入API组名称"
               maxLength={50}
@@ -258,6 +251,7 @@ export const JobModal = observer(() => {
                       draft.api_path = String(v)
                     })
                   }
+                  disabled={isHistory}
                   validateOnChange
                   placeholder="请输入API路径"
                   maxLength={50}
@@ -314,6 +308,7 @@ export const JobModal = observer(() => {
                       draft.timeout = Number(v) as unknown as string
                     })
                   }
+                  disabled={isHistory}
                   validateOnChange
                   maxLength={50}
                   schemas={[
@@ -337,6 +332,7 @@ export const JobModal = observer(() => {
               </Label>
               <Control tw="items-center">
                 <Toggle
+                  disabled={isHistory}
                   checked={params.cross_domain}
                   onChange={(checked: boolean) => {
                     setParams((draft) => {
@@ -360,6 +356,7 @@ export const JobModal = observer(() => {
                   draft.request_method = v
                 })
               }}
+              disabled={isHistory}
             >
               <Radio value={RequestMethods.GET}>GET</Radio>
               <Radio value={RequestMethods.POST}>POST</Radio>
@@ -381,6 +378,7 @@ export const JobModal = observer(() => {
                   draft.api_description = String(v)
                 })
               }
+              disabled={isHistory}
               validateOnChange
               placeholder="请输入描述，不超过180字"
               maxLength={180}
@@ -414,4 +412,4 @@ export const JobModal = observer(() => {
   )
 })
 
-export default JobModal
+export default BaseSettingModal

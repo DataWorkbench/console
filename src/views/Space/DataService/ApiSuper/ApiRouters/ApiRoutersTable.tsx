@@ -13,7 +13,7 @@ import { PbmodelRoute } from 'types/types'
 import { apiRoutersTableFieldMapping, apiRouterTableColumns } from '../constants'
 import AbolishApiModal from './AbolishApiModal'
 import { NameWrapper } from '../styles'
-import TestModal from './TestModal'
+import { TestModal } from './TestModal'
 
 interface ApiRouterTableProps {
   apiServiceId?: string
@@ -41,7 +41,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     Record<ReturnType<typeof getName>, number | string | boolean>,
     { pagination: true; sort: true }
   >(
-    { sort_by: getName('create_time'), reverse: true },
+    { sort_by: getName('create_time'), reverse: true, curr_status: 1 },
     { pagination: true, sort: true },
     columnSettingsKey
   )
@@ -55,6 +55,10 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
   // 刷新
   const refetchData = () => {
     queryClient.invalidateQueries(getQueryKeyListRoutes())
+  }
+
+  const toServiceDev = (row: any) => {
+    window.open(`./serviceDev/${row.id}?verId=${row.api_version_id}`)
   }
 
   const handleMenuClick = (row: PbmodelRoute, key: string) => {
@@ -102,7 +106,12 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
   const columnsRender = {
     [getName('name')]: {
       render: (v: any, row: any) => (
-        <NameWrapper isHover={!apiServiceId} onClick={() => {}}>
+        <NameWrapper
+          isHover={!apiServiceId}
+          onClick={() => {
+            toServiceDev(row)
+          }}
+        >
           <FlexBox tw="items-center space-x-1 truncate">
             <Center
               className="clusterIcon"

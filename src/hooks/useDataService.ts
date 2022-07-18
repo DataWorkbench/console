@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query'
 import { apiRequest } from 'utils/api'
 import { merge } from 'lodash-es'
 import { useCallback } from 'react'
-import { request } from 'utils'
+import { request, customRequest } from 'utils'
 import { PbmodelApiConfig, PbmodelApiGroup } from 'types/types'
 import { apiHooks, queryKeyObj } from './apiHooks'
 import {
@@ -297,6 +297,7 @@ export const ListDataServiceApiVersions = apiHooks<
   ListDataServiceApiVersionsRequestType,
   DataServiceManageListDataServiceApiVersionsType
 >('dataServiceManage', 'listDataServiceApiVersions')
+export const getListDataServiceApiVersions = () => queryKeyObj.listDataServiceApiVersions
 
 // 删除api
 export const DeleteApiConfigs = async ({ regionId, spaceId, apiIds, ...rest }: IParams) => {
@@ -404,6 +405,72 @@ export const useMutationPublishDataServiceApi = () => {
   })
 }
 
+// 查看历史api config
+export const DescribeDataServiceApiVersion = async ({
+  regionId,
+  spaceId,
+  apiId,
+  verId,
+  ...rest
+}: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId, api_id: apiId, ver_id: verId } },
+    { data: { ...rest } }
+  )
+  return apiRequest('dataServiceManage', 'describeDataServiceApiVersion')(params)
+}
+
+export const useMutationDescribeDataServiceApiVersion = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiId, verId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      apiId,
+      regionId,
+      spaceId,
+      verId,
+      ...rest
+    }
+
+    ret = await DescribeDataServiceApiVersion(params)
+    return ret
+  })
+}
+
+// 重新发布
+export const RepublishDataServiceApi = async ({
+  regionId,
+  spaceId,
+  apiId,
+  verId,
+  ...rest
+}: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId, api_id: apiId, ver_id: verId } },
+    { data: { ...rest } }
+  )
+  return apiRequest('dataServiceManage', 'republishDataServiceApi')(params)
+}
+
+export const useMutationRepublishDataServiceApi = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiId, verId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      apiId,
+      regionId,
+      spaceId,
+      verId,
+      ...rest
+    }
+
+    ret = await RepublishDataServiceApi(params)
+    return ret
+  })
+}
+
 export const useQueryListDataSources = apiHooks<
   'dataSourceManage',
   ListDataSourcesRequestType,
@@ -452,6 +519,42 @@ export const useQueryListRoutes = apiHooks<
 >('serviceGateway', 'listRoutes')
 
 export const getQueryKeyListRoutes = () => queryKeyObj.listRoutes
+
+export const MutationListRoutes = async ({
+  regionId,
+  spaceId,
+  apiServiceId,
+  apiVersionId,
+  ...rest
+}: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId } },
+    {
+      data: {
+        ...rest,
+        api_service_id: apiServiceId,
+        api_version_id: apiVersionId
+      }
+    }
+  )
+  return apiRequest('serviceGateway', 'listRoutes')(params)
+}
+export const useMutationListRoutes = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiServiceId, apiVersionId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      regionId,
+      spaceId,
+      apiServiceId,
+      apiVersionId,
+      ...rest
+    }
+    ret = await MutationListRoutes(params)
+    return ret
+  })
+}
 
 // 下线api
 export const AbolishDataServiceApis = async ({ regionId, spaceId, ...rest }: IParams) => {
@@ -548,4 +651,33 @@ export const useMutationListApiServices = () => {
     ret = await ListApiServices(params)
     return ret
   })
+}
+
+// 测试api服务
+export const testApiService = ({
+  clusterId,
+  groupId,
+  apiId,
+  headers,
+  cancel,
+  params,
+  queryData
+}: any) => {
+  let query: string = ''
+  if (queryData) {
+    query = '?'
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [key, value] of Object.entries(queryData)) {
+      query += `${key}=${value}&`
+    }
+  }
+
+  return customRequest(
+    {
+      url: `http://api-template-${clusterId}:8088/${groupId}/${apiId}/beta${query}`,
+      headers,
+      params
+    },
+    { cancel }
+  )
 }

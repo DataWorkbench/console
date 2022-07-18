@@ -24,7 +24,7 @@ interface UnBindApiModalProps {
 const getName = (name: MappingKey<typeof StopClusterTableFieldMapping>) =>
   StopClusterTableFieldMapping.get(name)!.apiField
 
-const columnSettingsKey = 'DATA_SERVICE_STOP_CLUSTER'
+const columnSettingsKey = 'DATA_SERVICE_STOP_CLUSTER_TAB'
 
 const UnBindApiModal = (props: UnBindApiModalProps) => {
   const { cluster, onCancel } = props

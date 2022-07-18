@@ -167,7 +167,7 @@ const ApiServiceDetail = (props: { id: string }) => {
             </GridItem>
             <GridItem labelWidth={60}>
               <span>创建时间:</span>
-              <span>{formatDate(detail.create_time)}</span>
+              <span>{formatDate(detail?.create_time)}</span>
             </GridItem>
           </div>
         </CollapsePanel>

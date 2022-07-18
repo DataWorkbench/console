@@ -255,7 +255,10 @@ export const getNewTreeData = (
         jobMode: pNode.jobMode,
         title: api.api_name,
         isLeaf: true,
-        api
+        api: {
+          ...api,
+          key: api.api_id
+        }
       }
     })
     pNode.children = children

@@ -1,12 +1,13 @@
-import { useRef, useEffect } from 'react'
-import { DargTable, ResizeModal, FlexBox, ModalContent } from 'components'
-import { useStore } from 'hooks'
+import { DargTable, Modal, FlexBox, ModalContent } from 'components'
+import { useMutationDescribeDataServiceApiVersion } from 'hooks'
 import { Button, Input } from '@QCFE/lego-ui'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
 import { useImmer } from 'use-immer'
-import { cloneDeep, get } from 'lodash-es'
+import { get } from 'lodash-es'
 import { PbmodelRoute } from 'types/types'
+import { useMount } from 'react-use'
+import { observer } from 'mobx-react-lite'
 import { TitleItem, TestContent } from '../../ServiceDev/styled'
 
 import {
@@ -14,14 +15,6 @@ import {
   ParameterPosition,
   RequestSettingColumns
 } from '../../ServiceDev/constants'
-
-export interface JobModalData {
-  id: string
-  pid: string
-  type: number
-  isEdit: boolean
-  pNode?: Record<string, any>
-}
 
 interface TestModalProps {
   onCancel: () => void
@@ -33,29 +26,34 @@ const getName = (name: MappingKey<typeof serviceDevRequestSettingMapping>) =>
 
 const dataServiceDataLimitSettingKey = 'DATA_SERVICE_API_ROUTER_TEST'
 
-export const JobModal = (props: TestModalProps) => {
-  const modal = useRef(null)
+export const TestModal = observer((props: TestModalProps) => {
   const { onCancel, currentRow } = props
 
-  const {
-    dtsDevStore: { apiConfigData }
-  } = useStore()
   const [testSource, setTestSource] = useImmer<any[]>([])
   const [testAuthKey, setTestAuthKey] = useImmer<string>('')
-  const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
+  const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
 
-  console.log(apiConfig, 'apiConfig')
+  useMount(() => {
+    if (currentRow) {
+      const apiId = get(currentRow, 'id')
+      const verId = get(currentRow, 'api_version_id')
 
-  useEffect(() => {
-    const requestConfig = cloneDeep(get(apiConfigData, 'api_config.request_params.request_params'))
-
-    if (requestConfig) {
-      const config = requestConfig.filter(
-        (item: { column_name: string }) => !['limit', 'offset'].includes(item.column_name)
-      )
-      setTestSource(config)
+      const params = {
+        apiId,
+        verId
+      }
+      mutationApiVersion.mutate(params, {
+        onSuccess: (res) => {
+          const dataSource = get(res, 'api_version.request_params.request_params', []) || []
+          const config = dataSource.filter(
+            (item: { column_name: string }) => !['limit', 'offset'].includes(item.column_name)
+          )
+          console.log(config, '历史版本')
+          setTestSource(config)
+        }
+      })
     }
-  }, [apiConfigData, setTestSource])
+  })
 
   const onClose = () => {
     onCancel()
@@ -118,19 +116,16 @@ export const JobModal = (props: TestModalProps) => {
   )
 
   return (
-    <ResizeModal
+    <Modal
       orient="fullright"
       maskClosable={false}
-      ref={modal}
       visible
-      maxWidth={1500}
-      enableResizing={{ left: true }}
       title={`API ID: ${currentRow?.id} 测试`}
       width={1200}
       onCancel={onClose}
       footer={null}
     >
-      <ModalContent tw="overflow-hidden h-full">
+      <ModalContent tw="h-full">
         <div tw="mb-3">API Path: {currentRow?.proxy_uri}</div>
         <FlexBox tw="h-full">
           <div tw="flex-1 mr-5">
@@ -163,8 +158,8 @@ export const JobModal = (props: TestModalProps) => {
           </div>
         </FlexBox>
       </ModalContent>
-    </ResizeModal>
+    </Modal>
   )
-}
+})
 
-export default JobModal
+export default TestModal

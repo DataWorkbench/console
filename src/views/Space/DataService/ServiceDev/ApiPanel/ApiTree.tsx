@@ -7,10 +7,11 @@ import { useFetchApi } from 'hooks'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { useUnmount } from 'react-use'
-import { cloneDeep, get, pick } from 'lodash-es'
+import { cloneDeep, filter, get, pick } from 'lodash-es'
 import { useStore } from 'stores'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams, useHistory } from 'react-router-dom'
 import { ApiProps } from 'stores/DtsDevStore'
+import qs from 'qs'
 import { getNewTreeData, renderIcon, renderSwitcherIcon } from './ApiUtils'
 import ApiModal from '../Modal/ApiModal'
 import DelModal from '../Modal/DelModal'
@@ -59,6 +60,9 @@ export const ApiTree = observer(
   (props: JobTreeProps, ref) => {
     const { expandedKeys: expandedKeysProp } = props
     const { spaceId } = useParams<{ spaceId: string }>()
+    const { search: query } = useLocation()
+    const history = useHistory()
+    const { verId } = qs.parse(query.slice(1))
     const fetchApi = useFetchApi()
 
     const {
@@ -98,7 +102,13 @@ export const ApiTree = observer(
       search: (v: string) => {
         dtsDevStore.resetTreeData()
         setSearch(v)
-        setExpandedKeys(['di-root', 'rt-root'])
+        const tree = cloneDeep(treeData)
+        if (v) {
+          const findTree = filter(tree, (group) => group.name.includes(v))
+          if (findTree.length > 0) {
+            setExpandedKeys(findTree.map((group: any) => group.key))
+          }
+        }
       }
     }))
 
@@ -271,10 +281,17 @@ export const ApiTree = observer(
                 if (autoExpandParent) {
                   setAutoExpandParent(false)
                 }
-                if (dtsDevStore.curApi?.api_id !== api?.api_id && node.isLeaf) {
+                if (dtsDevStore.curApi?.key !== api?.key && node.isLeaf) {
+                  if (verId) {
+                    // 清空 query 参数
+                    history.push('../serviceDev')
+                  }
                   dtsDevStore.addPanel({ ...api })
-                  dtsDevStore.set({ curApi: api })
-                  dtsDevStore.showSaveConfirm(api.api_id, 'switch')
+                  dtsDevStore.set({
+                    curApi: api,
+                    showClusterErrorTip: false
+                  })
+                  dtsDevStore.showSaveConfirm(api.key, 'switch')
                   return
                 }
                 if (node.isLeaf) {

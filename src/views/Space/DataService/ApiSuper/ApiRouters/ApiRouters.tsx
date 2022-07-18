@@ -8,7 +8,7 @@ const pageTabsData = [
     title: '已发布 API',
     description:
       '具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定具体说明内容待定。',
-    icon: 'earth',
+    icon: 'q-apiDuotone',
     helpLink: getHelpCenterLink('/manual/data_development/network/create_network/')
   }
 ]

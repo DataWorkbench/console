@@ -91,7 +91,7 @@ const modelSource = [
   }
 ]
 
-export const JobModal = observer((props: JobModalProps) => {
+const ApiModal = observer((props: JobModalProps) => {
   const { isEdit = false, onClose, currentApi, currentGroup } = props
   const { spaceId } = useParams<{ spaceId: string }>()
   const queryClient = useQueryClient()
@@ -457,4 +457,4 @@ export const JobModal = observer((props: JobModalProps) => {
   )
 })
 
-export default JobModal
+export default ApiModal

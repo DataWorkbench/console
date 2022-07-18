@@ -3,6 +3,7 @@ import { Mapping } from 'utils/types'
 import { createEnhancedEnum } from 'utils'
 import { DataServiceManageDescribeApiConfigType } from 'types/response'
 import { get } from 'lodash-es'
+import { StatusBarEnum } from 'components/StatusBar'
 
 export interface Schema {
   type: string
@@ -15,6 +16,13 @@ interface SchemaMap {
   type: string
 }
 
+interface IPublishStatusEnum {
+  [key: string]: {
+    label: string
+    value: any
+    style: number
+  }
+}
 interface IStatusEnum {
   [key: string]: {
     label: string
@@ -43,7 +51,7 @@ export const serviceDevVersionFieldMapping: Mapping<
   'apiName' | 'status' | 'versionId' | 'apiPath' | 'createTime'
 > = new Map()
   .set('apiName', { label: 'API 名称', apiField: 'api_name' })
-  .set('status', { label: '状态', apiField: 'status' })
+  .set('status', { label: '状态', apiField: 'publish_status' })
   .set('versionId', { label: '版本 ID', apiField: 'version_id' })
   .set('apiPath', { label: 'API 路径', apiField: 'api_path' })
   .set('createTime', { label: '发布时间', apiField: 'created' })
@@ -199,10 +207,10 @@ export const ParameterOperator = createEnhancedEnum<IStatusEnum>({
 })
 
 export const ParameterPosition = createEnhancedEnum<IStatusEnum>({
-  POSITIONUNSET: {
-    label: 'UNSET',
-    value: 0
-  },
+  // POSITIONUNSET: {
+  //   label: 'UNSET',
+  //   value: 0
+  // },
   BODY: {
     label: 'BODY',
     value: 1
@@ -222,10 +230,10 @@ export const ParameterPosition = createEnhancedEnum<IStatusEnum>({
 })
 
 export const OrderMode = createEnhancedEnum<IStatusEnum>({
-  ORDERMODEUNSET: {
-    label: 'UNSET',
-    value: 0
-  },
+  // ORDERMODEUNSET: {
+  //   label: 'UNSET',
+  //   value: 0
+  // },
   ASE: {
     label: 'ASE',
     value: 1
@@ -279,10 +287,10 @@ export const configMapData = (filedData: SchemaMap[], configData: any[], default
 }
 
 export const FieldCategory = createEnhancedEnum<IStatusEnum>({
-  CATEGORYUNSET: {
-    label: 'UNSET',
-    value: 0
-  },
+  // CATEGORYUNSET: {
+  //   label: 'UNSET',
+  //   value: 0
+  // },
   PAGECONFIG: {
     label: 'pageConfig',
     value: 1
@@ -348,3 +356,21 @@ export const orderMapRequestData = (orderSourceData: any[], responseData: any[])
     }
   })
 }
+
+export const publishStatus = createEnhancedEnum<IPublishStatusEnum>({
+  // UNSET: {
+  //   label: 'UNSET',
+  //   value: 0,
+  //   style: StatusBarEnum.gray
+  // },
+  PUBLISHED: {
+    label: '已发布',
+    value: 1,
+    style: StatusBarEnum.green
+  },
+  ABOLISHED: {
+    label: '已下线',
+    value: 2,
+    style: StatusBarEnum.gray
+  }
+})

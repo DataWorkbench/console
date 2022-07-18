@@ -12,6 +12,7 @@ interface ButtonWithClearProps {
   onClear?: () => void
   onChange?: (value: string) => void
   popConfirm?: React.ReactNode
+  disabled?: boolean
 }
 
 export const ButtonWithClear = React.forwardRef((props: ButtonWithClearProps, ref: any) => {
@@ -24,7 +25,8 @@ export const ButtonWithClear = React.forwardRef((props: ButtonWithClearProps, re
     icon,
     children,
     onChange = noop,
-    popConfirm
+    popConfirm,
+    disabled = false
   } = props
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export const ButtonWithClear = React.forwardRef((props: ButtonWithClearProps, re
   }, [value, onChange])
 
   let clearButton: React.ReactNode | null = (
-    <Button type="black" tw="ml-2 h-8 px-[7px]" className="clear-button">
+    <Button type="black" tw="ml-2 h-8 px-[7px]" className="clear-button" disabled={disabled}>
       <Icon name="close" type="light" size={16} />
     </Button>
   )
@@ -55,7 +57,7 @@ export const ButtonWithClear = React.forwardRef((props: ButtonWithClearProps, re
   }
   return (
     <div>
-      <Button tw="h-8" ref={ref} type="black" onClick={onClick}>
+      <Button tw="h-8" ref={ref} type="black" onClick={onClick} disabled={disabled}>
         {icon}
         {!value ? placeholder : children}
       </Button>

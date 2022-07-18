@@ -51,7 +51,7 @@ interface JobModalProps {
   onClose?: (data?: JobModalData) => void
 }
 
-export const JobModal = observer((props: JobModalProps) => {
+const ApiGroupModal = observer((props: JobModalProps) => {
   const { isEdit = false, onClose } = props
   const {
     dtsDevStore: { resetTreeData }
@@ -193,4 +193,4 @@ export const JobModal = observer((props: JobModalProps) => {
   )
 })
 
-export default JobModal
+export default ApiGroupModal

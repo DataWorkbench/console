@@ -22,7 +22,9 @@ const Root = styled.div`
 
 const getName = (name: MappingKey<typeof serviceDevVersionFieldOrderMapping>) =>
   serviceDevVersionFieldOrderMapping.get(name)!.apiField
-
+interface IFieldOrderProps {
+  disabled?: boolean
+}
 export interface IOrderDataSource {
   name: string
   order: string
@@ -42,7 +44,8 @@ const orderOption = [
 const columnSettingsKey = 'DATA_SERVICE_FIELDORDER'
 
 const FieldOrder = observer(
-  (props: any, ref) => {
+  (props: IFieldOrderProps, ref) => {
+    const { disabled = false } = props
     const [dataSource, setDataSource] = useImmer<IOrderDataSource[]>([])
     const {
       dtsDevStore: { fieldSettingData, apiConfigData }
@@ -162,7 +165,7 @@ const FieldOrder = observer(
           </TitleInformation>
         ),
         width: 120,
-        render: (_: any, record: any, index: number) => <OrderText>{index}</OrderText>
+        render: (_: any, record: any, index: number) => <OrderText>{index + 1}</OrderText>
       },
       [getName('name')]: {
         width: 400,
@@ -238,6 +241,7 @@ const FieldOrder = observer(
         <DargTable
           rowKey="key"
           moveRow={moveRow}
+          disabled={disabled}
           runDarg
           dataSource={dataSource}
           columns={columns as any}

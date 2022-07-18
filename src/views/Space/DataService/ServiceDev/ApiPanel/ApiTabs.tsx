@@ -63,6 +63,12 @@ const TabWrapper = styled(Tabs)(() => [
   `
 ])
 
+const PanelName = styled('div')(() => [
+  css`
+    ${tw` max-w-[60px] whitespace-nowrap overflow-hidden overflow-ellipsis`}
+  `
+])
+
 const ApiTabs = observer(() => {
   const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const notifyTmRef = useRef<any>(null)
@@ -135,13 +141,14 @@ const ApiTabs = observer(() => {
       )}
       <TabWrapper
         type="card"
-        activeName={curApi?.api_id}
+        activeName={curApi?.key}
         onChange={(name) => {
           if (dtsDevStore.isDirty) {
             dtsDevStore.showSaveConfirm(name, 'switch')
           } else {
             dtsDevStore.set({
-              curApi: panels.find((p) => p.api_id === name)
+              curApi: panels.find((p) => p.key === name),
+              showClusterErrorTip: false
             })
           }
         }}
@@ -155,8 +162,8 @@ const ApiTabs = observer(() => {
       >
         {panels.map((api) => (
           <TabPanel
-            key={api.api_id}
-            name={api.api_id}
+            key={api.key}
+            name={api.key}
             closable
             label={
               <div tw="inline-flex items-center justify-center">
@@ -168,7 +175,7 @@ const ApiTabs = observer(() => {
                     color={{ secondary: '#ffd0275d', primary: '#fff' }}
                   />
                 </IconWrapper>
-                <div>{api.api_name}</div>
+                <PanelName>{api.api_name}</PanelName>
               </div>
             }
           >

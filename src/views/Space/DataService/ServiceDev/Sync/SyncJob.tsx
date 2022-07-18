@@ -9,9 +9,12 @@ import {
   useMutationUpdateApiConfig,
   useStore,
   useFetchApiConfig,
-  useMutationPublishDataServiceApi
+  useMutationPublishDataServiceApi,
+  useMutationDescribeDataServiceApiVersion
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { useLocation } from 'react-router-dom'
+import qs from 'qs'
 import { JobToolBar } from '../styled'
 import SyncDataSource, { ISourceData } from './SyncDataSource'
 
@@ -75,6 +78,18 @@ const SyncJobWrapper = styled('div')(() => [
   `
 ])
 
+const VerWarp = styled('div')(() => [
+  tw`text-neut-8`,
+  css`
+    .apiName {
+      ${tw`text-white mr-2`}
+    }
+    .verIcon {
+      ${tw`text-[#FACC15] border-[1px] border-solid border-[#FACC15] ml-2 px-2 py-1  rounded-xl`}
+    }
+  `
+])
+
 const styles = {
   stepTag: tw`flex items-center text-left border border-green-11 rounded-r-2xl pr-4 mr-3 h-7 leading-5`,
   stepNum: tw`inline-block text-white bg-green-11 w-5 h-5 text-center rounded-full -ml-2.5`,
@@ -111,30 +126,50 @@ const SyncJob = observer(() => {
   const mutation = useMutationUpdateApiConfig()
   const fetchApi = useFetchApiConfig()
   const publishMutation = useMutationPublishDataServiceApi()
+  const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
 
   const {
-    dtsDevStore: { curApi, apiConfigData, showClusterErrorTip },
+    dtsDevStore: { curApi, apiConfigData },
     dtsDevStore
   } = useStore()
 
+  const isHistory = get(curApi, 'is_history', false) || false
+
+  const { search } = useLocation()
+  const { verId } = qs.parse(search.slice(1))
+
   useEffect(() => {
+    // 如果存在版本id，则获取版本信息接口
+    if (verId) return
+
     if (curApi) {
-      // 更改完api， 请求api配置
-      const apiId = get(curApi, 'api_id')
-      fetchApi({ apiId }).then((res) => {
-        if (res) {
-          dtsDevStore.set({
-            apiConfigData: res
-          })
+      // 更改完api， 请求api配置, curApi 中判断是历史版本还是在线版本
+      if (isHistory) {
+        const aId = get(curApi, 'api_id')
+        const vId = get(curApi, 'version_id')
+        const params = {
+          apiId: aId,
+          verId: vId
         }
-      })
-      if (showClusterErrorTip) {
-        dtsDevStore.set({
-          showClusterErrorTip: false
+        mutationApiVersion.mutate(params, {
+          onSuccess: (res) => {
+            console.log(res, '历史版本')
+          }
+        })
+      } else {
+        const apiId = get(curApi, 'api_id')
+
+        fetchApi({ apiId }).then((res) => {
+          if (res) {
+            dtsDevStore.set({
+              apiConfigData: res
+            })
+          }
         })
       }
     }
-  }, [curApi, dtsDevStore, fetchApi, showClusterErrorTip])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [curApi, dtsDevStore, fetchApi, verId, isHistory])
 
   const orderRef =
     useRef<{
@@ -153,7 +188,20 @@ const SyncJob = observer(() => {
     })
   }
 
-  console.log('apiConfigData', apiConfigData)
+  const handleSyncStore = (response: any[]) => {
+    const config = {
+      ...cloneDeep(apiConfigData),
+      api_config: {
+        ...cloneDeep(apiConfigData?.api_config),
+        response_params: {
+          response_params: response
+        }
+      }
+    }
+    dtsDevStore.set({
+      apiConfigData: config
+    })
+  }
 
   const save = () => {
     if (!orderRef.current || !dataSourceRef.current) {
@@ -181,6 +229,12 @@ const SyncJob = observer(() => {
       dtsDevStore.set({
         showClusterErrorTip: true
       })
+      Notify.warning({
+        title: '操作提示',
+        content: '请先选择服务集群',
+        placement: 'bottomRight'
+      })
+      return
     }
 
     // 映射字段排序字段到返回参数中
@@ -212,12 +266,15 @@ const SyncJob = observer(() => {
         }
       },
       {
-        onSuccess: () => {
-          Notify.success({
-            title: '操作提示',
-            content: '配置保存成功',
-            placement: 'bottomRight'
-          })
+        onSuccess: (res) => {
+          if (res.ret_code === 0) {
+            Notify.success({
+              title: '操作提示',
+              content: '配置保存成功',
+              placement: 'bottomRight'
+            })
+            handleSyncStore(response)
+          }
         }
       }
     )
@@ -242,6 +299,20 @@ const SyncJob = observer(() => {
   }
 
   const test = () => {
+    // 检测是否有服务集群
+    const clusterId = get(apiConfigData, 'service_cluster.id')
+    if (!clusterId) {
+      dtsDevStore.set({
+        showClusterErrorTip: true
+      })
+      Notify.warning({
+        title: '操作提示',
+        content: '请先选择服务集群',
+        placement: 'bottomRight'
+      })
+      return
+    }
+
     dtsDevStore.set({ showTestModal: true })
   }
 
@@ -261,9 +332,9 @@ const SyncJob = observer(() => {
               </>
             }
           >
-            {index === 0 && <SyncDataSource ref={dataSourceRef} />}
-            {index === 1 && <FieldSetting />}
-            {index === 2 && <FieldOrder ref={orderRef} />}
+            {index === 0 && <SyncDataSource ref={dataSourceRef} disabled={isHistory} />}
+            {index === 1 && <FieldSetting disabled={isHistory} />}
+            {index === 2 && <FieldOrder ref={orderRef} disabled={isHistory} />}
           </CollapseItem>
         ))}
       </Collapse>
@@ -273,18 +344,28 @@ const SyncJob = observer(() => {
   return (
     <SyncJobWrapper>
       <JobToolBar>
-        <Button onClick={save} loading={mutation.isLoading}>
-          <Icon name="data" type="dark" />
-          保存
-        </Button>
-        <Button onClick={test}>
-          <Icon name="data" type="dark" />
-          测试
-        </Button>
-        <Button type="primary" onClick={release}>
-          <Icon name="export" />
-          发布
-        </Button>
+        {!isHistory ? (
+          <>
+            <Button onClick={save} loading={mutation.isLoading}>
+              <Icon name="data" type="dark" />
+              保存
+            </Button>
+            <Button onClick={test}>
+              <Icon name="data" type="dark" />
+              测试
+            </Button>
+            <Button type="primary" onClick={release}>
+              <Icon name="export" />
+              发布
+            </Button>
+          </>
+        ) : (
+          <VerWarp>
+            <span className="apiName"> {get(curApi, 'api_name')}</span>
+            <span>(版本ID: {get(curApi, 'version_id')})</span>
+            <span className="verIcon"> 历史版本</span>
+          </VerWarp>
+        )}
       </JobToolBar>
       <div tw="flex-1 overflow-hidden">
         <SimpleBar tw="h-full">{renderGuideMode()}</SimpleBar>
