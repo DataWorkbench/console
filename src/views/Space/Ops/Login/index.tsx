@@ -10,11 +10,7 @@ import { omit } from 'lodash-es'
 import { useMutationUser } from '../../../../hooks/useGlobalAPI'
 import { InputField, PasswordField } from './components'
 
-const Index = ({
-  onLogin,
-}: {
-  onLogin: (d: Record<string, any>, jump: boolean) => void
-}) => {
+const Login = ({ onLogin }: { onLogin: (d: Record<string, any>, jump: boolean) => void }) => {
   const history = useHistory()
   const [, setSk] = useCookie('sk')
   const [username, setUsername] = useState('')
@@ -24,7 +20,7 @@ const Index = ({
     mutateAsync({
       op: 'login',
       password,
-      username,
+      username
     }).then((e) => {
       setSk(e.session_id)
       onLogin(omit(e.user_set, 'password'), true)
@@ -39,7 +35,7 @@ const Index = ({
   }
 
   return (
-    <FlexBox tw="h-[100%]">
+    <FlexBox tw="h-screen">
       <FlexBox
         tw="w-[50%] h-[100%]"
         css={css`
@@ -58,19 +54,10 @@ const Index = ({
           <div tw="text-[24px] text-[#324558] font-semibold mt-[64px] mb-[32px] ml-auto mr-auto">
             大数据工作台
           </div>
-          <Form
-            onSubmit={onFormSubmit}
-            tw="pl-[40px]! pr-[40px]! min-w-[230px]!"
-          >
-            <InputField
-              onChange={(e: string | number) => handleInputChange(e)}
-            />
+          <Form onSubmit={onFormSubmit} tw="pl-[40px]! pr-[40px]! min-w-[230px]!">
+            <InputField onChange={(e: string | number) => handleInputChange(e)} />
             <PasswordField onChange={(e: string) => handlePasswordChange(e)} />
-            <Button
-              tw="h-[44px] w-[100%] mt-[32px] text-[14px]"
-              type="primary"
-              htmlType="submit"
-            >
+            <Button tw="h-[44px] w-[100%] mt-[32px] text-[14px]" type="primary" htmlType="submit">
               登录
             </Button>
           </Form>
@@ -80,4 +67,4 @@ const Index = ({
   )
 }
 
-export default Index
+export default Login

@@ -1,11 +1,11 @@
-import { ReactElement, useRef, useState } from 'react'
+import { ReactElement, useEffect, useRef, useState } from 'react'
 import { get, omit, set } from 'lodash-es'
 import { LocaleProvider } from '@QCFE/lego-ui'
 import { Loading, PortalProvider } from '@QCFE/qingcloud-portal-ui'
 import { describeDataomnis } from 'stores/api'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
-import Login from 'views/Space/Ops/Login'
 import { useCookie } from 'react-use'
+import Login from 'views/Space/Ops/Login'
 import locales from '../../locales'
 import { useValidateSession } from '../../hooks/useGlobalAPI'
 
@@ -20,6 +20,7 @@ const Auth = ({ children }: { children: ReactElement }) => {
   const [loading, setLoading] = useState(!isLogin.current)
   const [hasLogin, setHasLogin] = useState(false)
 
+  console.log(hasLogin, loading, !isLogin.current)
   const [sk] = useCookie('sk')
 
   const handleLogin = (userInfo: Record<string, any>) => {
@@ -37,6 +38,13 @@ const Auth = ({ children }: { children: ReactElement }) => {
       setLoading(false)
     }
   })
+
+  useEffect(() => {
+    if (!sk) {
+      setLoading(false)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleGlobalData = async () => {
     // const { hostname } = window.location
