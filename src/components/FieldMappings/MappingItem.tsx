@@ -14,6 +14,8 @@ import Tippy from '@tippyjs/react'
 import { useImmer } from 'use-immer'
 import { TextEllipsis } from 'components/TextEllipsis'
 import { isDarkTheme } from 'utils/theme'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { HbaseNameField } from 'components/FieldMappings/HbaseNameField'
 import { fieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
@@ -109,6 +111,7 @@ interface MappingItemProps {
   onOk?: (v: TMappingField, index?: number) => void
   getDeleteField?: (name: string) => TMappingField | undefined
   exist?: (name: string) => boolean
+  isLeft?: boolean
 }
 
 const MappingItem = (props: MappingItemProps) => {
@@ -126,7 +129,8 @@ const MappingItem = (props: MappingItemProps) => {
     onOk = noop,
     onCancel = noop,
     getDeleteField,
-    exist
+    exist,
+    isLeft = true
   } = props
   const [isTop, setIsTop] = useState(false)
   const [item, setItem] = useImmer(itemProps)
@@ -139,7 +143,6 @@ const MappingItem = (props: MappingItemProps) => {
   useEffect(() => {
     setItem(itemProps)
   }, [itemProps, setItem])
-
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: dndType,
@@ -272,11 +275,11 @@ const MappingItem = (props: MappingItemProps) => {
           icon: 'if-pen',
           text: '编辑'
         },
-        {
-          key: 'constant',
-          icon: 'q-counterFill',
-          text: '设置常量'
-        },
+        // {
+        //   key: 'constant',
+        //   icon: 'q-counterFill',
+        //   text: '设置常量',
+        // },
         {
           key: 'parse',
           icon: 'q-textFill',
@@ -388,158 +391,175 @@ const MappingItem = (props: MappingItemProps) => {
       </div>
     </div>
   )
-  const renderEditContent = () => (
-    <Form ref={formRef} tw="pl-0!">
-      <FieldRow isEditing tw="p-0 ">
-        <div>
-          <SelectField
-            placeholder="字段类型"
-            value={item.type}
-            name="fieldType"
-            validateOnChange
-            schemas={[
-              {
-                rule: { required: true },
-                status: 'error'
+  const renderEditContent = () => {
+    const type1 = (
+      <SelectField
+        placeholder="字段类型"
+        value={item.type}
+        name="fieldType"
+        validateOnChange
+        schemas={[
+          {
+            rule: { required: true },
+            status: 'error'
+          }
+        ]}
+        options={
+          typeName
+            ? fieldTypeMapper.get(typeName.toLowerCase())?.map((v) => ({ label: v, value: v }))
+            : []
+        }
+        onChange={(v: string) =>
+          setItem((draft) => {
+            draft.type = v
+          })
+        }
+      />
+    )
+
+    const isHbase = (typeName as any)?.getType() === SourceType.HBase
+    const Cmp = isHbase ? HbaseNameField : TextField
+    const name1 = (
+      <Cmp
+        name="fieldName"
+        placeholder="请输入字段名"
+        defaultValue={item.name}
+        validateOnChange
+        schemas={[
+          {
+            rule: {
+              required: true,
+              matchRegex: isHbase
+                ? /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+:(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/
+                : nameMatchRegex
+            },
+            status: 'error'
+          },
+          {
+            rule: (v: string) => {
+              if (v !== item.name && exist) {
+                return !exist(v)
               }
-            ]}
-            options={
-              typeName
-                ? fieldTypeMapper.get(typeName.toString())?.map((v) => ({ label: v, value: v }))
-                : []
+              return true
+            },
+            status: 'error'
+          }
+        ]}
+        onChange={(v: string) => {
+          setItem((draft) => {
+            draft.name = v
+            if (draft.custom === false) {
+              draft.custom = true
             }
-            onChange={(v: string) =>
-              setItem((draft) => {
-                draft.type = v
-              })
+          })
+          if (getDeleteField) {
+            const delField = getDeleteField(v)
+            if (delField) {
+              onOk(delField, index)
             }
-          />
-        </div>
-        <FlexBox>
-          <TextField
-            name="fieldName"
-            placeholder="请输入字段名"
-            defaultValue={item.name}
-            validateOnChange
-            schemas={[
-              {
-                rule: {
-                  required: true,
-                  matchRegex: nameMatchRegex
-                },
-                status: 'error'
-              },
-              {
-                rule: (v: string) => {
-                  if (v !== item.name && exist) {
-                    return !exist(v)
+          }
+        }}
+      />
+    )
+
+    return (
+      <Form ref={formRef} tw="pl-0!">
+        <FieldRow isEditing tw="p-0 ">
+          <div>{isLeft ? name1 : type1}</div>
+          <FlexBox>{isLeft ? type1 : name1}</FlexBox>
+          <Center css={[tw`space-x-3`, item.custom && tw`translate-y-4`]}>
+            <Tooltip theme="light" content="关闭" hasPadding twChild={tw`flex items-center`}>
+              <Icon
+                name="close"
+                type="light"
+                size={16}
+                clickable
+                onClick={() => onCancel(item, index)}
+              />
+            </Tooltip>
+            <Tooltip theme="light" content="保存" hasPadding twChild={tw`flex items-center`}>
+              <Icon
+                name="check"
+                type="light"
+                clickable
+                size={16}
+                onClick={() => {
+                  if (formRef.current?.validateFields()) {
+                    if (!isEmpty(item.type) && !isEmpty(item.name)) {
+                      onOk(item, index)
+                    }
                   }
-                  return true
-                },
-                status: 'error'
-              }
-            ]}
-            onChange={(v: string) => {
-              setItem((draft) => {
-                draft.name = v
-                if (draft.custom === false) {
-                  draft.custom = true
-                }
-              })
-              if (getDeleteField) {
-                const delField = getDeleteField(v)
-                if (delField) {
-                  onOk(delField, index)
-                }
-              }
-            }}
-          />
-        </FlexBox>
-        <Center css={[tw`space-x-3`, item.custom && tw`translate-y-4`]}>
-          <Tooltip theme="light" content="关闭" hasPadding twChild={tw`flex items-center`}>
-            <Icon
-              name="close"
-              type="light"
-              size={16}
-              clickable
-              onClick={() => onCancel(item, index)}
-            />
-          </Tooltip>
-          <Tooltip theme="light" content="保存" hasPadding twChild={tw`flex items-center`}>
-            <Icon
-              name="check"
-              type="light"
-              clickable
-              size={16}
-              onClick={() => {
-                if (formRef.current?.validateFields()) {
-                  if (!isEmpty(item.type) && !isEmpty(item.name)) {
-                    onOk(item, index)
-                  }
-                }
+                }}
+              />
+            </Tooltip>
+          </Center>
+          {item.custom && (
+            <TextField
+              name="fieldValue"
+              defaultValue={item.default}
+              validateOnChange
+              //   schemas={[
+              //     {
+              //       rule: { required: true },
+              //       status: 'error',
+              //     },
+              //   ]}
+              placeholder="请输入字段值"
+              onChange={(v: string) => {
+                setItem((draft) => {
+                  draft.default = v
+                })
               }}
             />
-          </Tooltip>
-        </Center>
-        {item.custom && (
-          <TextField
-            name="fieldValue"
-            defaultValue={item.default}
-            validateOnChange
-            schemas={[
-              {
-                rule: { required: true },
-                status: 'error'
-              }
-            ]}
-            placeholder="请输入字段值"
-            onChange={(v: string) => {
-              setItem((draft) => {
-                draft.default = v
-              })
-            }}
-          />
-        )}
-      </FieldRow>
-    </Form>
-  )
+          )}
+        </FieldRow>
+      </Form>
+    )
+  }
 
-  const renderContent = () => (
-    <>
-      <div>{item.type}</div>
+  const renderContent = () => {
+    const type1 = <div>{item.type}</div>
+    const name1 = (
       <div tw="truncate">
         <TextEllipsis theme={isDarkTheme() ? 'light' : 'dark'}>{item.name}</TextEllipsis>
       </div>
-      {itemProps.formatter && (
-        <Tooltip
-          hasPadding
-          content={<div>时间转换: {itemProps.formatter} （将字段类型转为日期格式返回）</div>}
-          theme="light"
-        >
-          <span tw="bg-neut-0 rounded-sm px-1 h-5 text-deepblue-12 font-medium inline-block mr-1">
-            时
-          </span>
-        </Tooltip>
-      )}
-      {itemProps.default && (
-        <Tooltip hasPadding content={<div>{itemProps.default}</div>} theme="light">
-          <span tw="bg-[#F1E4FE] rounded-sm px-1 h-5 text-[#A855F7] font-medium inline-block mr-1">
-            常
-          </span>
-        </Tooltip>
-      )}
-      {renderMore()}
-    </>
-  )
-
-  if (anchor === 'Left') {
+    )
     return (
-      <FieldRow ref={ref} className={className} isReverse>
-        <div>{item.type}</div>
-        <div>{item.name}</div>
-      </FieldRow>
+      <>
+        {!isLeft ? type1 : name1}
+        {!isLeft ? name1 : type1}
+
+        {itemProps.formatter && (
+          <Tooltip
+            hasPadding
+            content={<div>时间转换: {itemProps.formatter} （将字段类型转为日期格式返回）</div>}
+            theme="light"
+          >
+            <span tw="bg-neut-0 rounded-sm px-1 h-5 text-deepblue-12 font-medium inline-block mr-1">
+              时
+            </span>
+          </Tooltip>
+        )}
+        {false && (
+          <Tooltip hasPadding content={<div>{itemProps.default}</div>} theme="light">
+            <span tw="bg-[#F1E4FE] rounded-sm px-1 h-5 text-[#A855F7] font-medium inline-block mr-1">
+              常
+            </span>
+          </Tooltip>
+        )}
+        {renderMore()}
+      </>
     )
   }
+
+  // if (anchor === 'Left') {
+  //   return (
+  //     <FieldRow ref={ref} className={className} isReverse>
+  //       <div>{item.type}</div>
+  //       <div>{item.name}</div>
+  //     </FieldRow>
+  //   )
+  // }
   drag(drop(ref))
   return (
     <Tippy

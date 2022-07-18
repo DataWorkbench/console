@@ -4,7 +4,7 @@ import {
   cloneElement,
   PropsWithChildren,
   ReactNode,
-  MouseEventHandler,
+  MouseEventHandler
 } from 'react'
 import { Placement } from 'tippy.js'
 import Tippy, { TippyProps } from '@tippyjs/react'
@@ -20,7 +20,7 @@ import { FlexBox } from '../Box'
 const iconConfig = {
   info: {
     name: 'if-information',
-    color: '#2193d3',
+    color: '#2193d3'
   },
   // success: { // 未发现相关设计需求
   //   name: 'success',
@@ -28,12 +28,12 @@ const iconConfig = {
   // },
   warning: {
     name: 'if-exclamation',
-    color: '#ffd127',
+    color: '#ffd127'
   },
   error: {
     name: 'if-error',
-    color: '#cf3b37',
-  },
+    color: '#cf3b37'
+  }
 }
 
 type PlacementMapper = {
@@ -62,7 +62,7 @@ const placementMapper: PlacementMapper = {
   bottomLeft: 'bottom-start',
   bottomRight: 'bottom-end',
   rightTop: 'right-start',
-  rightBottom: 'right-end',
+  rightBottom: 'right-end'
 }
 
 type PlacementType = keyof PlacementMapper
@@ -87,9 +87,7 @@ interface IPopConfirmProps {
 }
 
 export const PopConfirm = (
-  props: PropsWithChildren<
-    Omit<TippyProps, keyof IPopConfirmProps> & IPopConfirmProps
-  >
+  props: PropsWithChildren<Omit<TippyProps, keyof IPopConfirmProps> & IPopConfirmProps>
 ) => {
   const {
     trigger,
@@ -126,7 +124,7 @@ export const PopConfirm = (
     visible: visibleProp === undefined ? visible : visibleProp,
     className: `${className} popconfirm-box`,
     // arrow: roundArrow,
-    ...omit(rest, 'data-tw'),
+    ...omit(rest, 'data-tw')
   }
 
   const handleCancel: MouseEventHandler = (e) => {
@@ -138,11 +136,11 @@ export const PopConfirm = (
   }
 
   const handleOk: MouseEventHandler = (e) => {
+    e.stopPropagation()
     if (typeof onOk === 'function') {
       onOk()
     }
     hide()
-    e.stopPropagation()
   }
 
   const renderChildren = () => {
@@ -159,7 +157,7 @@ export const PopConfirm = (
               newProps.onMouseMove(e)
             }
             show()
-          },
+          }
         })
         break
       // case 'focus':
@@ -182,7 +180,7 @@ export const PopConfirm = (
 
         Object.assign(newProps, {
           onClick: newProps?.datadone ? newProps.onClick : click,
-          datadone: 'done',
+          datadone: 'done'
         })
         break
       }
@@ -231,7 +229,9 @@ export const PopConfirm = (
         </div>
       }
     >
-      <div css={[tw`inline-block`, [twChild]]}>{renderChildren()}</div>
+      <div onClick={(e) => e.stopPropagation()} css={[tw`inline-block`, [twChild]]}>
+        {renderChildren()}
+      </div>
     </Tippy>
   )
 }

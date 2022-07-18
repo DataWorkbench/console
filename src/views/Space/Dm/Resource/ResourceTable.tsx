@@ -1,8 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Table, ToolBar, localstorage, Icon, InputSearch } from '@QCFE/qingcloud-portal-ui'
 import { Button, Menu } from '@QCFE/lego-ui'
 import tw, { css } from 'twin.macro'
-import { getResourcePageQueryKey, useMutationResource, useQueryResourceByPage } from 'hooks'
+import {
+  getResourcePageQueryKey,
+  useMutationResource,
+  useQueryDescribeWorkspaceConfig,
+  useQueryResourceByPage
+} from 'hooks'
 import { get, omitBy } from 'lodash-es'
 import { FlexBox, Center, Tooltip, TextEllipsis } from 'components'
 import { useQueryClient } from 'react-query'
@@ -10,11 +15,29 @@ import { useImmer } from 'use-immer'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { formatBytes } from 'utils/convert'
+import { useParams } from 'react-router-dom'
 import UploadModal from './UploadModal'
 import DeleteModal from './DeleteModal'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
+const types = [
+  {
+    label: 'JAR',
+    value: 1,
+    icon: 'q-jar-duotone'
+  },
+  {
+    label: 'PYTHON',
+    value: 2,
+    icon: 'q-python-duotone'
+  },
+  {
+    label: 'ZIP',
+    value: 3,
+    icon: 'q-zip-duotone'
+  }
+]
 const columnSettingsKey = 'RESOURCE_TABLE_COLUMN_SETTINGS'
 interface IFilter {
   limit: number
@@ -23,6 +46,7 @@ interface IFilter {
   reverse: boolean
   search?: string
   sort_by: string
+  type: number
 }
 
 const ResourceTable: React.FC<{ className?: string }> = observer(({ className }) => {
@@ -44,7 +68,8 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
     name: '',
     reverse: true,
     search: '',
-    sort_by: ''
+    sort_by: '',
+    type: 0
   })
 
   const queryClient = useQueryClient()
@@ -135,28 +160,62 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
           //  filter.reverse ? 'asc' : 'desc',
           // eslint-disable-next-line no-nested-ternary
           filter.sort_by === 'name' ? (filter.reverse ? 'asc' : 'desc') : '',
-        render: (value: string) => (
-          <FlexBox tw="items-center space-x-1 overflow-hidden">
-            <div tw="w-5 h-5">
-              <Icon
-                tw="w-5! h-5!"
-                name="coding"
-                type="light"
-                color={{
-                  primary: '#219861',
-                  secondary: '#8EDABD'
-                }}
-              />
-            </div>
-            <TextEllipsis twStyle={tw`font-medium`}>{value}</TextEllipsis>
-          </FlexBox>
-        )
+        render: (value: string, record: Record<string, any>) => {
+          const { type } = record
+          return (
+            <FlexBox tw="items-center space-x-1 overflow-hidden">
+              <div tw="w-5 h-5">
+                <Icon
+                  className="is-left"
+                  type="light"
+                  name={types.find((el) => el.value === type)?.icon || 'q-jar-duotone'}
+                />
+              </div>
+              <TextEllipsis twStyle={tw`font-medium`}>{value}</TextEllipsis>
+            </FlexBox>
+          )
+        }
       },
       {
         title: 'ID',
         width: 160,
         dataIndex: 'id',
         render: (value: string) => <div tw="text-neut-8">{value}</div>
+      },
+      {
+        title: (
+          <FlexBox tw="items-center">
+            <span>状态</span>
+            <Tooltip
+              trigger="click"
+              placement="bottom-start"
+              content={
+                <Menu
+                  selectedKey={String(filter?.type || 0)}
+                  onClick={(e: React.SyntheticEvent, k: string, v: number) => {
+                    setFilter((draft) => {
+                      draft.type = v
+                      draft.offset = 0
+                    })
+                  }}
+                >
+                  <MenuItem value="" key={0}>
+                    全部
+                  </MenuItem>
+                  {types.map((st) => (
+                    <MenuItem value={st.value} key={st.value}>
+                      {st.label}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              }
+            >
+              <Icon name="filter" type="light" clickable tw="ml-1 block" />
+            </Tooltip>
+          </FlexBox>
+        ),
+        dataIndex: 'type',
+        render: (v: number) => types.find((st) => st.value === v)?.label
       },
       {
         title: '文件大小',
@@ -234,7 +293,16 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
         )
       }
     ],
-    [filter.reverse, filter.sort_by, handleEdit, handleDownload, handleReupload, handleDelete]
+    [
+      setFilter,
+      filter.type,
+      filter.reverse,
+      filter.sort_by,
+      handleEdit,
+      handleDownload,
+      handleReupload,
+      handleDelete
+    ]
   )
 
   const filterColumn = columnSettings
@@ -248,6 +316,12 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
     setSelectedRows(selectedRowKeys.map((el: string) => selectedMap[el]))
   }, [selectedMap, selectedRowKeys])
 
+  const { spaceId } = useParams<{ spaceId: string }>()
+  const { data: configData } = useQueryDescribeWorkspaceConfig({
+    uri: { space_id: spaceId }
+  })
+
+  const sizeConf = get(configData!, 'file.size_single', 100 * 1024 * 1024)
   return (
     <>
       <div tw="bg-neut-16 p-5" className={className}>
@@ -350,6 +424,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
             setOperation('')
           }}
           handleSuccess={refetchData}
+          size={sizeConf}
         />
       )}
 

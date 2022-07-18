@@ -1,8 +1,9 @@
 import { Icon } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
-import { get, cloneDeep, findKey } from 'lodash-es'
+// eslint-disable-next-line import/no-cycle
+import { Center, Icons } from 'components'
+import { cloneDeep, findKey, get } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
-import { Icons, Center } from 'components'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 export enum JobMode {
@@ -98,22 +99,22 @@ export const datasourceTypeKey = [
 
 export const dataSourceTypes: { [key in string]?: number } = {
   mysql: 1,
-  // TIDB: 2,
-  // Kafka: 3,
+  TIDB: 2,
+  Kafka: 3,
   // S3: 4,
   click_house: 5,
-  // HBase: 6,
-  // FTP: 7,
-  // HDFS: 8,
+  HBase: 6,
+  FTP: 7,
+  HDFS: 8,
   sqlserver: 9,
-  // Oracle: 10,
-  postgresql: 2
+  Oracle: 10,
+  postgresql: 2,
   // DB2: 11,
   // 'SAP HANA': 12,
-  // Hive: 13,
-  // MongoDB: 15,
-  // Redis: 16,
-  // ElasticSearch: 14,
+  Hive: 13,
+  MongoDB: 15,
+  Redis: 16,
+  ElasticSearch: 14
 }
 
 export const datasourceTypeObjs = [
@@ -136,20 +137,84 @@ export const datasourceTypeObjs = [
     type: SourceType.PostgreSQL,
     name: 'postgresql',
     label: 'PostgreSQL'
+  },
+  {
+    type: SourceType.Hive,
+    name: 'hive',
+    label: 'Hive'
+  },
+  {
+    type: SourceType.MongoDB,
+    name: 'mongodb',
+    label: 'MongoDB'
+  },
+  // {
+  //   type: SourceType.Redis,
+  //   name: 'redis',
+  //   label: 'Redis',
+  // },
+  {
+    type: SourceType.ElasticSearch,
+    name: 'elastic_search',
+    label: 'ElasticSearch'
+  },
+  {
+    type: SourceType.HBase,
+    name: 'hbase',
+    label: 'HBase'
+  },
+  {
+    type: SourceType.Kafka,
+    name: 'kafka',
+    label: 'Kafka'
+  },
+  {
+    type: SourceType.HDFS,
+    name: 'hdfs',
+    label: 'HDFS'
   }
 ]
 
-export const getDataSourceTypes = (type?: SourceType): string | undefined => {
+export const datasourceRealtimeTypeObjs = [
+  {
+    type: SourceType.Mysql,
+    name: 'binlog',
+    label: 'MySQL（MySQL Binlog）'
+  },
+
+  {
+    type: SourceType.SqlServer,
+    name: 'sql_server_cdc',
+    label: 'SqlServer（SqlServer CDC）'
+  },
+  {
+    type: SourceType.PostgreSQL,
+    name: 'pg_wal',
+    label: '  Postgres（Postgres CDC）'
+  }
+]
+
+export const getDataSourceTypes = (
+  type?: SourceType,
+  isRealtime: boolean = false
+): string | undefined => {
   if (!type) {
     return ''
   }
-  const item = datasourceTypeObjs.find((i) => i.type === type!)!
+  let obj = datasourceTypeObjs
+  if (isRealtime && datasourceRealtimeTypeObjs.find((i) => i.type === type)) {
+    obj = datasourceRealtimeTypeObjs
+  }
+  const item = obj.find((i) => i.type === type!)!
   return new Proxy(
     { value: item?.label },
     {
       get(target: { value: string | undefined }, p: string | symbol): any {
         if (p === 'toLowerCase') {
           return () => item?.name
+        }
+        if (p === 'getType') {
+          return () => item?.type
         }
         const prim = Reflect.get(target, 'value')
         const value = prim[p]
@@ -180,8 +245,8 @@ export const jobModeData = [
         icon: 'LayerFill',
         title: '实时同步作业',
         desc: '通过实时同步的方式进行数据同步开发作业',
-        value: JobType.REALTIME,
-        disabled: true
+        value: JobType.REALTIME
+        // disabled: true,
       }
     ]
   },
@@ -349,7 +414,7 @@ export const IconWrapper = styled(Center)(({ theme }: { theme: TreeIconTheme }) 
   theme === TreeIconTheme.YELLOW && tw`bg-white bg-opacity-20 text-[#FFD127]`
 ])
 
-export const renderSwitcherIcon = (props) => {
+export const renderSwitcherIcon = (props: any) => {
   const { expanded, isLeaf } = props
   if (isLeaf) {
     return null

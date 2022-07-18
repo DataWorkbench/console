@@ -1,7 +1,9 @@
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { FlexBox } from 'components'
 import { getHelpCenterLink } from 'utils'
+import useIcon from 'hooks/useHooks/useIcon'
 import ResourceTable from './ResourceTable'
+import icons from './icons'
 
 const tabs = [
   {
@@ -13,11 +15,14 @@ const tabs = [
   }
 ]
 
-const Resource = () => (
-  <FlexBox orient="column" tw="p-5 h-full">
-    <PageTab tabs={tabs} />
-    <ResourceTable tw="flex-1" />
-  </FlexBox>
-)
+const Resource = () => {
+  useIcon(icons)
+  return (
+    <FlexBox orient="column" tw="p-5 h-full">
+      <PageTab tabs={tabs} />
+      <ResourceTable tw="flex-1" />
+    </FlexBox>
+  )
+}
 
 export default Resource

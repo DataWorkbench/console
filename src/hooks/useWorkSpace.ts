@@ -13,11 +13,13 @@ import {
 import { apiHooks, queryKeyObj } from './apiHooks'
 import {
   DescribePlatformConfigRequestType,
-  DescribeNetworkConfigRequestType
+  DescribeNetworkConfigRequestType,
+  DescribeWorkspaceConfigRequestType
 } from '../types/request'
 import {
   PlatformManageDescribePlatformConfigType,
-  SpaceManageDescribeNetworkConfigType
+  SpaceManageDescribeNetworkConfigType,
+  SpaceManageDescribeWorkspaceConfigType
 } from '../types/response'
 
 const keys: {
@@ -108,3 +110,9 @@ export const useQueryDescribeNetworkConfig = apiHooks<
 export const getQueryKeyDescribeNetworkConfig = () => queryKeyObj.describeNetworkConfig
 
 export default useQueryWorkSpace
+
+export const useQueryDescribeWorkspaceConfig = apiHooks<
+  'spaceManage',
+  DescribeWorkspaceConfigRequestType,
+  SpaceManageDescribeWorkspaceConfigType
+>('spaceManage', 'describeWorkspaceConfig')

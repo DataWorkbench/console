@@ -38,6 +38,8 @@ export interface IMoreActionProps<T> {
     | 'auto'
     | 'auto-start'
     | 'auto-end'
+  childClick?: () => void
+  onHide?: () => void
 }
 
 const { MenuItem } = Menu as any
@@ -96,7 +98,9 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
     items,
     type = 'icon',
     buttonText,
-    placement = 'bottom-end'
+    placement = 'bottom-end',
+    childClick,
+    onHide = () => {}
   } = props
 
   const theme = getTheme(themeProp)
@@ -113,7 +117,7 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
   switch (type) {
     case 'button':
       children = (
-        <Button type="outlined">
+        <Button type="outlined" onClick={childClick}>
           <Icon
             name="more"
             clickable
@@ -128,7 +132,7 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
       break
     default:
       children = (
-        <div css={styles.icon}>
+        <div css={styles.icon} onClick={childClick}>
           <Icon
             name="more"
             clickable
@@ -147,8 +151,14 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
         arrow={false}
         trigger="click"
         placement={placement}
+        appendTo="parent"
         theme={theme}
         twChild={moreActionStyle.child() as any}
+        onHidden={() => {
+          if (onHide) {
+            onHide()
+          }
+        }}
         content={
           <Menu onClick={handleMenuClick} tw="dark:border-separator dark:border">
             {items.map(({ key, value, text, icon, disabled, help }) => (

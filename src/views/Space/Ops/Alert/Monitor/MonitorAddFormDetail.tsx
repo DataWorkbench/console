@@ -1,6 +1,9 @@
 import { FlexBox, Icons, Modal, ModalContent } from 'components/index'
 import tw, { styled } from 'twin.macro'
 import { UserItem } from 'views/Space/Ops/Alert/Monitor/components'
+import { observer } from 'mobx-react-lite'
+import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
+import { monitorObjectTypes } from 'views/Space/Ops/Alert/common/constants'
 import { JobItem, Tag } from './styles'
 
 interface IMonitorAddProps {
@@ -23,12 +26,12 @@ const FieldItem = styled.div`
   }
 `
 
-const MonitorAddFormDetail = (props: IMonitorAddProps) => {
-  const {
-    onCancel,
-    // eslint-disable-next-line no-empty-pattern
-    data: {},
-  } = props
+const MonitorAddFormDetail = observer((props: IMonitorAddProps) => {
+  const { onCancel } = props
+  const { selectedMonitor: data } = useAlertStore()
+  const monitorItem =
+    data?.monitor_object === 1 ? data?.monitor_item?.stream_job : data?.monitor_item?.sync_job
+
   return (
     <Modal
       visible
@@ -36,26 +39,28 @@ const MonitorAddFormDetail = (props: IMonitorAddProps) => {
       orient="fullright"
       onOk={onCancel}
       onCancel={onCancel}
-      title="创建告警策略"
+      title="告警策略详情"
       appendToBody
     >
       <ModalContent>
         <FieldItem>
           <div>名称</div>
-          <div>2444</div>
+          <div>{data?.name}</div>
         </FieldItem>
         <FieldItem>
           <div>监控对象</div>
-          <div>46666</div>
+          <div>{monitorObjectTypes[data?.monitor_object as 1]?.label}</div>
         </FieldItem>
         <FieldItem>
           <div>监控项</div>
           <div>
-            <div>作业失败时告警</div>
-            <div>
-              <span tw="mr-2">作业实例运行超时时间</span>
-              <Tag>3600</Tag>
-            </div>
+            {monitorItem?.instance_run_failed && <div>作业失败时告警</div>}
+            {monitorItem?.instance_run_timeout && (
+              <div>
+                <span tw="mr-2">作业实例运行超时时间</span>
+                <Tag>{`${monitorItem?.instance_timeout} 秒`}</Tag>
+              </div>
+            )}
           </div>
         </FieldItem>
         <FieldItem>
@@ -69,16 +74,15 @@ const MonitorAddFormDetail = (props: IMonitorAddProps) => {
         <FieldItem>
           <div>绑定作业</div>
           <FlexBox tw="gap-1">
-            {Array.from({ length: 10 }, (v, k) => k).map((v, k) => (
+            {(data?.job_ids ?? []).map((v, k) => (
               <JobItem key={k.toString()}>
                 <Icons
                   tw="text-green-11"
-                  name={k % 2 ? 'DownloadBoxFill' : 'LayerFill'}
+                  name={data?.monitor_object === 1 ? 'DownloadBoxFill' : 'LayerFill'}
                   size={16}
                 />
                 <div>
-                  <span>Abstract</span>
-                  <span>ID:hahaha</span>
+                  <span>{`ID:${v}`}</span>
                 </div>
               </JobItem>
             ))}
@@ -87,18 +91,18 @@ const MonitorAddFormDetail = (props: IMonitorAddProps) => {
         <FieldItem>
           <div>消息接收人</div>
           <FlexBox tw="flex-wrap gap-1">
-            {Array.from({ length: 20 }, (v, k) => k).map((v, k) => (
-              <UserItem name={Math.random().toString(32)} key={k.toString()} />
+            {(data?.notifications ?? []).map((v) => (
+              <UserItem {...v} key={v.id} />
             ))}
           </FlexBox>
         </FieldItem>
         <FieldItem>
           <div>策略描述</div>
-          <div>很长很长</div>
+          <div>{data?.desc}</div>
         </FieldItem>
       </ModalContent>
     </Modal>
   )
-}
+})
 
 export default MonitorAddFormDetail

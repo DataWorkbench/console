@@ -249,7 +249,7 @@ export const JobTree = observer(
             )}
             {isDi && (
               <>
-                <MenuItem value={JobType.REALTIME} onClick={onRightMenuClick} disabled>
+                <MenuItem value={JobType.REALTIME} onClick={onRightMenuClick}>
                   <Icons name="LayerFill" size={14} tw="mr-2" />
                   <span>创建实时同步作业</span>
                 </MenuItem>
@@ -265,7 +265,7 @@ export const JobTree = observer(
                   <Icons name="sql" size={14} tw="mr-2" />
                   <span>SQL 模式</span>
                 </MenuItem>
-                <MenuItem disabled value={JobType.PYTHON} onClick={onRightMenuClick}>
+                <MenuItem value={JobType.PYTHON} onClick={onRightMenuClick}>
                   <Icons name="PythonFill" size={14} tw="mr-2" />
                   <span>Python 模式</span>
                 </MenuItem>
