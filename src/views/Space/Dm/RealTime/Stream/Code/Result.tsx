@@ -2,7 +2,6 @@ import { Rnd } from 'react-rnd'
 import { FlexBox } from 'components'
 import { Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useRef, useState, useEffect, useMemo, memo } from 'react'
-// import tw from 'twin.macro' // { css }
 import { connect as connectSocket } from 'utils/socket'
 import dayjs from 'dayjs'
 import { error } from './config'
@@ -11,7 +10,6 @@ import Table from './Table'
 interface ResultProps {
   loading: boolean
   height: number
-  // width: number
   socketId: string | null
   onClose: () => {}
 }
@@ -37,33 +35,43 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
   const columns = useRef([])
 
   useEffect(() => {
-    const socket = connectSocket('ws://localhost:3030')
+    const socket = connectSocket()
     setType(0)
-    socket.on('message', ({ type: t, dataset }) => {
-      if (t) setType(t)
-      if (t === 1) {
-        columns.current = (dataset?.[0]?.message || []).map((r) => ({
-          title: r,
-          dataIndex: r,
-        }))
-      } else if (t === 2) {
-        const header = columns.current
-        const res = dataset.map((item) => {
-          return item.message.reduce(
-            (prev, curr, index) => ({
-              ...prev,
-              [header[index].dataIndex]: curr,
-            }),
-            {}
-          )
-        }, {})
-        setResult(res)
-        setCurrDate(dayjs().format('HH:mm:ss.SSS'))
-      }
-    })
+
+    if (socket.alive) {
+      socket.on('message', ({ type: t, dataset }) => {
+        if (t) setType(t)
+        if (t === 1) {
+          columns.current = (dataset?.[0]?.message || []).map((r) => ({
+            title: r,
+            dataIndex: r,
+          }))
+        } else if (t === 2) {
+          const header = columns.current
+          const res = dataset.map((item) => {
+            return item.message.reduce(
+              (prev, curr, index) => ({
+                ...prev,
+                [header[index].dataIndex]: curr,
+              }),
+              {}
+            )
+          }, {})
+          setResult(res)
+          setCurrDate(dayjs().format('HH:mm:ss.SSS'))
+        } else if (t === 4) {
+          socket.close()
+        }
+      })
+    }
 
     socketRef.current = socket
     setResult((r) => r)
+    return () => {
+      if (socket.close) {
+        socket.close()
+      }
+    }
   }, [socketId])
 
   const key = useMemo(() => {
