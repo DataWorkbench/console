@@ -159,6 +159,10 @@ let config = {
       progress: true,
     },
     proxy: {
+      '/global_api': {
+        target: apiUrl,
+        changeOrigin: true,
+      },
       '/*_api': {
         target: apiUrl,
         changeOrigin: true,
