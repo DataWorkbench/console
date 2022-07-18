@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "cross-env CURRENT_ENV=qa NODE_ENV=development webpack serve",
     "dev:test": "cross-env CURRENT_ENV=test NODE_ENV=development webpack serve",
-    "dev:pk2": "cross-env CURRENT_ENV=pk2 NODE_ENV=development webpack serve",
     "build": "NODE_ENV=production webpack && cp -r configs ./dist",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
