@@ -5,10 +5,10 @@ import { PbmodelNotification } from 'types/types'
 export const notifyFieldMapping = (
   new Map() as Mapping1<'id' | 'email' | 'desc' | 'created', keyof PbmodelNotification>
 )
-  .set('id', { label: '消息接收人姓名/ID', apiField: 'owner' })
-  .set('email', { label: '邮箱', apiField: 'owner1' })
-  .set('desc', { label: '备注', apiField: 'owner2' })
-  .set('created', { label: '创建时间', apiField: 'create_time' })
+  .set('id', { label: '消息接收人姓名/ID', apiField: 'name' })
+  .set('email', { label: '邮箱', apiField: 'email' })
+  .set('desc', { label: '备注', apiField: 'description' })
+  .set('created', { label: '创建时间', apiField: 'created' })
 
 export const getName = (name: MappingKey<typeof notifyFieldMapping>) =>
   notifyFieldMapping.get(name)!.apiField
