@@ -7,6 +7,8 @@ import { useEvent } from 'react-use'
 import { useImmer } from 'use-immer'
 import { useWorkSpaceContext } from 'contexts'
 import { useQueryWorkSpace } from 'hooks'
+import MemberModal from 'views/Space/Manage/Member/MemberModal'
+import { useMemberStore } from 'views/Space/Manage/Member/store'
 import SpaceItem from './SpaceItem'
 import SpaceListsEmpty from './SpaceListsEmpty'
 
@@ -51,21 +53,27 @@ const SpaceCardView = observer(() => {
     curRegionId: regionId,
     queryKeyWord,
     scrollElem,
-    isModal = false
+    isModal = false,
+    isAdmin
   } = stateStore
   const [filter, setFilter] = useImmer({
     regionId,
     offset: 0,
     reverse: true,
     limit: 10,
-    search: ''
+    search: '',
+    isAdmin
   })
 
   const { status, data, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useQueryWorkSpace(filter)
+    useQueryWorkSpace({ ...filter, isAdmin })
+
+  const memberStore = useMemberStore()
 
   const workspaces = flatten(data?.pages.map((page) => page.infos || []))
-
+  const reloadWorkSpace = () => {
+    stateStore.set({ queryRefetch: true })
+  }
   const ifNoData =
     status === 'success' && filter.offset === 0 && filter.search === '' && workspaces.length === 0
 
@@ -121,6 +129,7 @@ const SpaceCardView = observer(() => {
       <div css={[tw`h-40`, !isFetchingNextPage && tw`hidden`]}>
         <Loading size="medium" />
       </div>
+      {memberStore.op === 'create' && <MemberModal cb={reloadWorkSpace} />}
     </>
   )
 })

@@ -46,11 +46,11 @@ const roots = {
 }
 
 const Item = ({ id, onDelete }: { id: string; onDelete: (s: string) => void }) => (
-    <Center tw="gap-3 h-6 bg-neut-13 px-2">
-      <span tw="text-white">{`ID: ${id}`}</span>
-      <Icon clickable onClick={() => onDelete(id)} name="if-close" size={16} type="light" />
-    </Center>
-  )
+  <Center tw="gap-3 h-6 bg-neut-13 px-2">
+    <span tw="text-white">{`ID: ${id}`}</span>
+    <Icon clickable onClick={() => onDelete(id)} name="if-close" size={16} type="light" />
+  </Center>
+)
 
 const JobSelectModal = (props: IJobSelectProps) => {
   const { onCancel, type, value: valueProp, onOk } = props
@@ -74,10 +74,12 @@ const JobSelectModal = (props: IJobSelectProps) => {
     }
     return fetchJob(type === 2 ? 'sync' : 'stream', {
       pid
-    }).then((res) => (get(res, 'infos') || []).map((i: Record<string, any>) => ({
-          ...i,
-          isSelected: value.includes(i.id)
-        })))
+    }).then((res) =>
+      (get(res, 'infos') || []).map((i: Record<string, any>) => ({
+        ...i,
+        isSelected: value.includes(i.id)
+      }))
+    )
   }
 
   const root = useMemo(() => [roots[type]], [type])

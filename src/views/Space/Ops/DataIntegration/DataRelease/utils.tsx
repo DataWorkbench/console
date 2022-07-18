@@ -60,11 +60,11 @@ export const getColumnsRender = (
       filterAble: true,
       filtersNew: Object.values(alarmStatus) as any,
       render: (text: keyof typeof alarmStatus, record: Record<string, any>) => (
-          <AlarmStatusCmp
-            type={text}
-            onClick={actions?.alert_status ? () => actions.alarm_status(record) : undefined}
-          />
-        )
+        <AlarmStatusCmp
+          type={text}
+          onClick={actions?.alert_status ? () => actions.alarm_status(record) : undefined}
+        />
+      )
     },
     job_mode: {
       // onFilter: (v: string) => {
@@ -85,12 +85,12 @@ export const getColumnsRender = (
       render: (text: string) => <span tw="text-neut-8">{text}</span>
     },
     type: {
-      render: (text: keyof typeof jobType) => 
+      render: (text: keyof typeof jobType) => (
         // if (record.__level > 1) {
         //   return null
         // }
-         <JobTypeCmp type={text} />
-      
+        <JobTypeCmp type={text} />
+      )
     },
     source: {
       // filter: filter.source,
@@ -188,11 +188,11 @@ export const getOperations = (
     key: 'operation',
     width: 64,
     render: (_: never, record: Record<string, any>) => (
-        <MoreAction<DataReleaseActionType>
-          theme="darker"
-          items={getActions(record)}
-          onMenuClick={handleMenuClick}
-        />
-      )
+      <MoreAction<DataReleaseActionType>
+        theme="darker"
+        items={getActions(record)}
+        onMenuClick={handleMenuClick}
+      />
+    )
   }
 }

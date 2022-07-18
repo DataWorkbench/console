@@ -1,7 +1,7 @@
 import { camelCase, get, keys, trim } from 'lodash-es'
 import { BehaviorSubject, pairwise, Subject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
-// eslint-disable-next-line
+// eslint-disable-next-line import/no-cycle
 import {
   datasourceRealtimeTypeObjs,
   datasourceTypeObjs

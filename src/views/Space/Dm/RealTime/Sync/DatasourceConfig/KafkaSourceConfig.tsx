@@ -121,32 +121,32 @@ const KafkaSourceConfig = forwardRef(
     }, [setDbInfo])
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => ({
-            topic: dbInfo.topic,
-            mode: dbInfo.consumer,
-            group_id: dbInfo.consumerId,
-            encoding: dbInfo.charset,
-            codec: dbInfo.readType,
-            config: dbInfo.config
-          }),
-        refetchColumn: () => {
-          if (dbInfo?.id) {
-            refetch()
-          }
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
         }
-      }))
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => ({
+        topic: dbInfo.topic,
+        mode: dbInfo.consumer,
+        group_id: dbInfo.consumerId,
+        encoding: dbInfo.charset,
+        codec: dbInfo.readType,
+        config: dbInfo.config
+      }),
+      refetchColumn: () => {
+        if (dbInfo?.id) {
+          refetch()
+        }
+      }
+    }))
 
     const renderCommon = () => (
-        <>
-          <BaseConfigCommon from="source" />
-        </>
-      )
+      <>
+        <BaseConfigCommon from="source" />
+      </>
+    )
     return (
       <Form css={styles.form} ref={sourceForm}>
         {renderCommon()}

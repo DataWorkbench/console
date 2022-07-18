@@ -11,7 +11,7 @@ const inputStyles = css`
     .input,
     .input-search {
       &:focus {
-        ${tw`caret-white!`}
+        ${tw`caret-[#939ea9]!`}
       }
     }
     .input,

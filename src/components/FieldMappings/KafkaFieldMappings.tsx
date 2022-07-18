@@ -163,19 +163,23 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ids, setRowKeyIds])
 
-  const rowKeys = useMemo(() => Array.from(new Set(rowKeyIds))
-      .map((id) => {
-        const item = sourceColumns.find((i) => i.uuid === id)
-        if (item) {
-          return item
-        }
-        return null
-      })
-      .filter(Boolean), [rowKeyIds, sourceColumns])
+  const rowKeys = useMemo(
+    () =>
+      Array.from(new Set(rowKeyIds))
+        .map((id) => {
+          const item = sourceColumns.find((i) => i.uuid === id)
+          if (item) {
+            return item
+          }
+          return null
+        })
+        .filter(Boolean),
+    [rowKeyIds, sourceColumns]
+  )
 
   useImperativeHandle(ref, () => ({
-      rowMapping: () => [rowKeys, rowKeys]
-    }))
+    rowMapping: () => [rowKeys, rowKeys]
+  }))
 
   const leftDndType = String('Right')
 
@@ -232,25 +236,25 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
           <div>,</div>
         </div>
         {rowKeys.map((column, index) => (
-            <Item
-              key={index.toString()}
-              item={column}
-              index={index}
-              deleteItem={(s: number) => {
-                setRowKeyIds((draft) => {
-                  draft.splice(s, 1)
-                })
-              }}
-              moveItem={(s: number, t: number, isTop: boolean) => {
-                setRowKeyIds((draft) => {
-                  const newFields = [...draft]
-                  newFields.splice(s, 1)
-                  newFields.splice(isTop ? 0 : t + 1, 0, draft[s])
-                  setRowKeyIds(newFields)
-                })
-              }}
-            />
-          ))}
+          <Item
+            key={index.toString()}
+            item={column}
+            index={index}
+            deleteItem={(s: number) => {
+              setRowKeyIds((draft) => {
+                draft.splice(s, 1)
+              })
+            }}
+            moveItem={(s: number, t: number, isTop: boolean) => {
+              setRowKeyIds((draft) => {
+                const newFields = [...draft]
+                newFields.splice(s, 1)
+                newFields.splice(isTop ? 0 : t + 1, 0, draft[s])
+                setRowKeyIds(newFields)
+              })
+            }}
+          />
+        ))}
         <div css={[styles.table]}>{renderAddRowKey()}</div>
         <FlexBox css={[styles.table, tw`flex bg-neut-18 items-center`]}>
           <span>原理：</span>

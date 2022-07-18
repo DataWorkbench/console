@@ -141,32 +141,32 @@ const PgSourceConfig = forwardRef(
     )
 
     const renderCommon = () => (
-        <>
-          <BaseConfigCommon from="source" />
-        </>
-      )
+      <>
+        <BaseConfigCommon from="source" />
+      </>
+    )
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => ({
-            id: dbInfo?.id,
-            lsn: dbInfo?.lsn,
-            slot_name: dbInfo?.slot,
-            table_list: dbInfo?.tableName,
-            cat: dbInfo?.updateType.join(','),
-            allow_create_slot: dbInfo?.autoCreate,
-            temporary: dbInfo?.temp,
-            heart_beat_pack: dbInfo?.heartBeatPack
-          }),
-        refetchColumn: () => {
-          refetchColumns()
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
         }
-      }))
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => ({
+        id: dbInfo?.id,
+        lsn: dbInfo?.lsn,
+        slot_name: dbInfo?.slot,
+        table_list: dbInfo?.tableName,
+        cat: dbInfo?.updateType.join(','),
+        allow_create_slot: dbInfo?.autoCreate,
+        temporary: dbInfo?.temp,
+        heart_beat_pack: dbInfo?.heartBeatPack
+      }),
+      refetchColumn: () => {
+        refetchColumns()
+      }
+    }))
 
     const [showAdvanced, setShowAdvanced] = useState(false)
 

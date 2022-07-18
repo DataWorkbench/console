@@ -47,6 +47,8 @@ const defaultFuncList = [
     title: '运维中心',
     subFuncList: [
       // { name: 'overview', title: '运维大屏', icon: 'blockchain' },
+      // { name: 'login', title: '登录', icon: 'blockchain' },
+      { name: 'general-view', title: '运维概览', icon: 'blockchain' },
       {
         name: 'stream',
         title: '流式计算运维',
@@ -57,7 +59,7 @@ const defaultFuncList = [
         ]
       },
       {
-        name: 'data-integration',
+        name: 'sync',
         title: '数据集成运维',
         icon: 'q-iot2Duotone',
         items: [
@@ -96,11 +98,11 @@ const defaultFuncList = [
     name: 'manage',
     title: '空间管理',
     subFuncList: [
-      { name: 'network', title: '网络管理', icon: 'earth' }
+      { name: 'network', title: '网络管理', icon: 'earth' },
       // { name: 'setting', title: '空间配置', icon: 'blockchain' },
       // { name: 'engine', title: '引擎管理', icon: 'blockchain' },
-      // { name: 'users', title: '成员管理', icon: 'blockchain' },
-      // { name: 'permissions', title: '列表权限', icon: 'blockchain' },
+      { name: 'members', title: '成员管理', icon: 'group' },
+      { name: 'permissions', title: '列表权限', icon: 'passport' }
     ]
   }
 ]
@@ -111,6 +113,12 @@ class WorkSpaceStore {
 
   funcList = defaultFuncList
 
+  space?: { name?: string; id?: string; owner?: string; regionId?: string } = {}
+
+  spaceIndex = 0
+
+  showHeaderNav = true
+
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       rootStore: false
@@ -118,7 +126,7 @@ class WorkSpaceStore {
     this.rootStore = rootStore
   }
 
-  set(params: { [key: string]: any }) {
+  set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }
 }

@@ -169,45 +169,45 @@ const BaseTargetConfig = forwardRef(
     const hasTable = !isEmpty(dbInfo?.tableName)
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!targetForm.current) {
-            return false
-          }
-          return targetForm.current?.validateForm()
-        },
-        getData: () => {
-          const target = baseTarget$.getValue()
-          if (!target || !target.data || !target.data.id) {
-            return undefined
-          }
-          return {
-            table: [target.data.tableName],
-            write_mode: target.data.writeMode,
-            semantic: target.data.semantic,
-            batch_size: target.data.batchSize,
-            pre_sql: target.data.preSql?.filter((v) => v !== ''),
-            post_sql: target.data.postSql?.filter((v) => v !== '')
-          }
-        },
-        refetchColumn: () => {
-          refetch()
+      validate: () => {
+        if (!targetForm.current) {
+          return false
         }
-      }))
+        return targetForm.current?.validateForm()
+      },
+      getData: () => {
+        const target = baseTarget$.getValue()
+        if (!target || !target.data || !target.data.id) {
+          return undefined
+        }
+        return {
+          table: [target.data.tableName],
+          write_mode: target.data.writeMode,
+          semantic: target.data.semantic,
+          batch_size: target.data.batchSize,
+          pre_sql: target.data.preSql?.filter((v) => v !== ''),
+          post_sql: target.data.postSql?.filter((v) => v !== '')
+        }
+      },
+      refetchColumn: () => {
+        refetch()
+      }
+    }))
 
     const renderBaseTable = () => (
-        <BaseTableComponent
-          from="target"
-          sourceType={sourceType?.label}
-          sourceId={dbInfo?.id}
-          tableName={dbInfo?.tableName}
-          onChange={(v) => {
-            console.log(v)
-            setDbInfo((draft) => {
-              draft.tableName = v
-            })
-          }}
-        />
-      )
+      <BaseTableComponent
+        from="target"
+        sourceType={sourceType?.label}
+        sourceId={dbInfo?.id}
+        tableName={dbInfo?.tableName}
+        onChange={(v) => {
+          console.log(v)
+          setDbInfo((draft) => {
+            draft.tableName = v
+          })
+        }}
+      />
+    )
 
     return (
       <Form css={styles.form} ref={targetForm}>
@@ -339,7 +339,8 @@ const BaseTargetConfig = forwardRef(
                   placeholder="请输入写入数据到目的表前执行的一组标准 SQL 语句"
                   schemas={[
                     {
-                      rule: (arr: string[]) => (arr || []).every((v) => {
+                      rule: (arr: string[]) =>
+                        (arr || []).every((v) => {
                           if (!v) {
                             return true
                           }
@@ -365,7 +366,8 @@ const BaseTargetConfig = forwardRef(
                   }}
                   schemas={[
                     {
-                      rule: (arr: string[]) => (arr || []).every((v) => {
+                      rule: (arr: string[]) =>
+                        (arr || []).every((v) => {
                           if (!v) {
                             return true
                           }

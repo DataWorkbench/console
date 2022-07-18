@@ -61,15 +61,15 @@ const AlertHistory = () => {
   const { columns, setColumnSettings } = useColumns(alertHistorySettingKey, alertHistoryColumns, {
     alert_id: {
       render: (text) => (
-          <InstanceName
-            theme="dark"
-            name={text}
-            css={instanceNameStyle}
-            onClick={() => {
-              history.push(`../alert-policy/${text}`)
-            }}
-          />
-        )
+        <InstanceName
+          theme="dark"
+          name={text}
+          css={instanceNameStyle}
+          onClick={() => {
+            history.push(`../alert-policy/${text}`)
+          }}
+        />
+      )
     },
 
     [getName('monitor_object')]: {

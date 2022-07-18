@@ -71,34 +71,34 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
   }, [setDbInfo])
 
   useImperativeHandle(ref, () => ({
-      validate: () => {
-        if (!sourceForm.current) {
-          return false
-        }
-        return sourceForm.current?.validateForm()
-      },
-      getData: () => {
-        const { condition } = dbInfo
-        return {
-          id: dbInfo?.id,
-          collection_name: dbInfo?.collectionName,
-          schema: '',
-          condition_type: condition?.type,
-          visualization: {
-            column: condition?.column,
-            start_condition: condition?.startCondition,
-            start_value: condition?.startValue,
-            end_condition: condition?.endCondition,
-            end_value: condition?.endValue
-          }
-        }
-      },
-      refetchColumn: () => {
-        if (dbInfo?.id && dbInfo?.collectionName) {
-          refetch()
+    validate: () => {
+      if (!sourceForm.current) {
+        return false
+      }
+      return sourceForm.current?.validateForm()
+    },
+    getData: () => {
+      const { condition } = dbInfo
+      return {
+        id: dbInfo?.id,
+        collection_name: dbInfo?.collectionName,
+        schema: '',
+        condition_type: condition?.type,
+        visualization: {
+          column: condition?.column,
+          start_condition: condition?.startCondition,
+          start_value: condition?.startValue,
+          end_condition: condition?.endCondition,
+          end_value: condition?.endValue
         }
       }
-    }))
+    },
+    refetchColumn: () => {
+      if (dbInfo?.id && dbInfo?.collectionName) {
+        refetch()
+      }
+    }
+  }))
 
   const { data: tableList, refetch: tableRefetch } = useQuerySourceTables(
     {

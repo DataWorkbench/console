@@ -56,24 +56,24 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
   const { refetch: refetchColumns } = useTableColumns(dbInfo?.id, dbInfo?.table, 'target')
 
   useImperativeHandle(ref, () => ({
-      validate: () => {
-        if (!sourceForm.current) {
-          return false
-        }
-        return sourceForm.current?.validateForm()
-      },
-      getData: () => ({
-          id: dbInfo?.id,
-          null_mode: dbInfo?.nullMode,
-          encoding: dbInfo?.encoding,
-          wal_flag: dbInfo?.walFlag,
-          write_buffer_size: dbInfo?.writeBufferSize,
-          table: dbInfo?.table
-        }),
-      refetchColumn: () => {
-        refetchColumns()
+    validate: () => {
+      if (!sourceForm.current) {
+        return false
       }
-    }))
+      return sourceForm.current?.validateForm()
+    },
+    getData: () => ({
+      id: dbInfo?.id,
+      null_mode: dbInfo?.nullMode,
+      encoding: dbInfo?.encoding,
+      wal_flag: dbInfo?.walFlag,
+      write_buffer_size: dbInfo?.writeBufferSize,
+      table: dbInfo?.table
+    }),
+    refetchColumn: () => {
+      refetchColumns()
+    }
+  }))
   return (
     <Form css={styles.form} ref={sourceForm}>
       <BaseConfigCommon from="target" />

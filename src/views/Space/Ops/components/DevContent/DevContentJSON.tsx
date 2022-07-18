@@ -14,16 +14,16 @@ const Item = styled.div`
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Line = () => (
-    <FlexBox tw="w-[20%]">
-      <div tw="h-[1px] flex-auto border-none mt-[3px] border-white border-t border-dashed" />
-      <div
-        tw="w-0 h-0 border-4 border-transparent border-l-white "
-        css={css`
-          transform: translateX(2px);
-        `}
-      />
-    </FlexBox>
-  )
+  <FlexBox tw="w-[20%]">
+    <div tw="h-[1px] flex-auto border-none mt-[3px] border-white border-t border-dashed" />
+    <div
+      tw="w-0 h-0 border-4 border-transparent border-l-white "
+      css={css`
+        transform: translateX(2px);
+      `}
+    />
+  </FlexBox>
+)
 
 const DevContentJSON = (props: {
   data?: { job_content?: string }

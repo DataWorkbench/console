@@ -125,9 +125,9 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
   useEffect(() => {
     if (filterProp) {
       setFilter((draft: any) => ({
-          ...draft,
-          ...filterProp
-        }))
+        ...draft,
+        ...filterProp
+      }))
     }
   }, [filterProp, setFilter])
 
@@ -198,7 +198,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     job_id: {
       // width: 180,
       render: (v: string, record: Record<string, any>) => {
-        const getContent = (children?: React.ReactElement) => record?.sync_job?.desc ? (
+        const getContent = (children?: React.ReactElement) =>
+          record?.sync_job?.desc ? (
             <div>
               <div>{`发布描述: ${record?.sync_job?.desc}`}</div>
               <div>{children}</div>
@@ -361,52 +362,50 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     title: '操作',
     key: 'operation',
     render: (_: never, record: Record<string, any>) => (
-        <FlexBox tw="gap-4">
-          <TextLink
-            disabled={
-              jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING
+      <FlexBox tw="gap-4">
+        <TextLink
+          disabled={jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING}
+          onClick={() => {
+            if (jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING) {
+              return
             }
-            onClick={() => {
-              if (jobInstanceStatus[record.state as 1]?.type === JobInstanceStatusType.PREPARING) {
-                return
+            if (type === JobMode.DI) {
+              if (record?.flink_ui) {
+                window.open(`//${record?.flink_ui}`, '_blank')
               }
-              if (type === JobMode.DI) {
-                if (record?.flink_ui) {
-                  window.open(`//${record?.flink_ui}`, '_blank')
-                }
-              } else if (type === JobMode.RT) {
-                describeFlinkUI({
-                  inst_id: record.id,
-                  regionId,
-                  spaceId
-                }).then((res) => {
-                  window.open(`//${res?.web_ui || ''}`, '_blank')
-                })
-              }
+            } else if (type === JobMode.RT) {
+              describeFlinkUI({
+                inst_id: record.id,
+                regionId,
+                spaceId
+              }).then((res) => {
+                window.open(`//${res?.web_ui || ''}`, '_blank')
+              })
+            }
 
-              // describeFlinkUiByInstanceId({
-              //   instanceId: record.id,
-              //   regionId,
-              //   spaceId,
-              // }).then((web_ui: string) => {
+            // describeFlinkUiByInstanceId({
+            //   instanceId: record.id,
+            //   regionId,
+            //   spaceId,
+            // }).then((web_ui: string) => {
 
-              // })
-            }}
-          >
-            Flink UI
-          </TextLink>
-          {!!getActions(jobInstanceStatus[record.state as 1]?.type, record).length && (
-            <>
-              <Divider />
-              <MoreAction
-                theme="darker"
-                items={getActions(jobInstanceStatus[record.state as 1]?.type, record)}
-                onMenuClick={handleMenuClick as any}
-              />
-            </>
-          )}
-        </FlexBox>
-      )
+            // })
+          }}
+        >
+          Flink UI
+        </TextLink>
+        {!!getActions(jobInstanceStatus[record.state as 1]?.type, record).length && (
+          <>
+            <Divider />
+            <MoreAction
+              theme="darker"
+              items={getActions(jobInstanceStatus[record.state as 1]?.type, record)}
+              onMenuClick={handleMenuClick as any}
+            />
+          </>
+        )}
+      </FlexBox>
+    )
   }
 
   const { columns, setColumnSettings } = useColumns(
@@ -416,11 +415,14 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
     operations
   )
 
-  const columnsSetting = useMemo(() => ({
+  const columnsSetting = useMemo(
+    () => ({
       defaultColumns: dataJobInstanceColumns,
       storageKey: settingKey,
       onSave: setColumnSettings as any
-    }), [setColumnSettings, settingKey])
+    }),
+    [setColumnSettings, settingKey]
+  )
 
   return (
     <>

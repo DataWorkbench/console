@@ -199,35 +199,38 @@ const DatasourceConfig = observer(
     }, [])
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          const re = sourceRef.current?.validate()
-          const re1 = targetRef.current?.validate()
-          return re && re1
-        },
-        getResource: () => {
-          const source = source$.getValue()
-          const target = target$.getValue()
-          const config = {
-            source_id: source?.data?.id,
-            target_id: target?.data?.id,
-            sync_resource: {
-              [`${source?.sourceType?.name}_source`]: source?.data?.id
-                ? sourceRef.current?.getData?.()
-                : undefined,
-              [`${target?.sourceType?.name}_target`]: target?.data?.id
-                ? targetRef.current?.getData?.()
-                : undefined
-            }
+      validate: () => {
+        const re = sourceRef.current?.validate()
+        const re1 = targetRef.current?.validate()
+        return re && re1
+      },
+      getResource: () => {
+        const source = source$.getValue()
+        const target = target$.getValue()
+        const config = {
+          source_id: source?.data?.id,
+          target_id: target?.data?.id,
+          sync_resource: {
+            [`${source?.sourceType?.name}_source`]: source?.data?.id
+              ? sourceRef.current?.getData?.()
+              : undefined,
+            [`${target?.sourceType?.name}_target`]: target?.data?.id
+              ? targetRef.current?.getData?.()
+              : undefined
           }
-          return config
-        },
-
-        getTypeNames: () => [source$.getValue()?.sourceType?.name, target$.getValue()?.sourceType?.name],
-        refetchColumns: () => {
-          sourceRef.current?.refetchColumn?.()
-          targetRef.current?.refetchColumn?.()
         }
-      }))
+        return config
+      },
+
+      getTypeNames: () => [
+        source$.getValue()?.sourceType?.name,
+        target$.getValue()?.sourceType?.name
+      ],
+      refetchColumns: () => {
+        sourceRef.current?.refetchColumn?.()
+        targetRef.current?.refetchColumn?.()
+      }
+    }))
 
     return (
       <FormH7Wrapper>

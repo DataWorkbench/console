@@ -162,30 +162,30 @@ const MysqlBinlogSourceConfig = forwardRef(
     )
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => ({
-            source_id: dbInfo?.id,
-            table: dbInfo?.tableName,
-            filter: dbInfo?.filter,
-            cat: dbInfo?.updateType.filter(Boolean)?.join(''),
-            start: {
-              journal_name: dbInfo?.startFile,
-              position: dbInfo?.startPosition,
-              timestamp: parseInt(dbInfo?.startTime, 10)
-            },
-            connection_charset: dbInfo?.charset,
-            parallel_thread_size: dbInfo?.threads,
-            is_gtid_mode: dbInfo?.isGtidMode
-          }),
-        refetchColumn: () => {
-          refetchColumns()
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
         }
-      }))
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => ({
+        source_id: dbInfo?.id,
+        table: dbInfo?.tableName,
+        filter: dbInfo?.filter,
+        cat: dbInfo?.updateType.filter(Boolean)?.join(''),
+        start: {
+          journal_name: dbInfo?.startFile,
+          position: dbInfo?.startPosition,
+          timestamp: parseInt(dbInfo?.startTime, 10)
+        },
+        connection_charset: dbInfo?.charset,
+        parallel_thread_size: dbInfo?.threads,
+        is_gtid_mode: dbInfo?.isGtidMode
+      }),
+      refetchColumn: () => {
+        refetchColumns()
+      }
+    }))
 
     const renderCommon = () => <BaseConfigCommon from="source" />
 

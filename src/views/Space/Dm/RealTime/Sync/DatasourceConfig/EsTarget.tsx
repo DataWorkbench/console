@@ -43,21 +43,21 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
 
   const { data: sourceDetail } = useDescribeDataSource(dbInfo.id)
   useImperativeHandle(ref, () => ({
-      validate: () => {
-        if (!sourceForm.current) {
-          return false
-        }
-        return sourceForm.current?.validateForm()
-      },
-      getData: () => ({
-          id: dbInfo?.id,
-          batch_size: dbInfo?.batchSize,
-          key_delimiter: dbInfo?.keyDelimiter,
-          type: dbInfo?.type,
-          index: dbInfo?.index
-        }),
-      refetchColumn: () => {}
-    }))
+    validate: () => {
+      if (!sourceForm.current) {
+        return false
+      }
+      return sourceForm.current?.validateForm()
+    },
+    getData: () => ({
+      id: dbInfo?.id,
+      batch_size: dbInfo?.batchSize,
+      key_delimiter: dbInfo?.keyDelimiter,
+      type: dbInfo?.type,
+      index: dbInfo?.index
+    }),
+    refetchColumn: () => {}
+  }))
 
   return (
     <Form css={styles.form} ref={sourceForm}>

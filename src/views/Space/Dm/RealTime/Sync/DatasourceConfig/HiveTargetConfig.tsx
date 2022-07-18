@@ -65,28 +65,28 @@ const HiveTargetConfig = forwardRef(
     const { refetch: refetchColumns } = useTableColumns(dbInfo?.id, dbInfo?.tableName, 'target')
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!targetForm.current) {
-            return false
-          }
-          return targetForm.current?.validateForm()
-        },
-        getData: () => ({
-            source_id: dbInfo?.id,
-            compress: dbInfo?.compress === 0 ? undefined : dbInfo?.compress,
-            file_type: dbInfo?.fileType,
-            partition: dbInfo?.partition,
-            partition_type: dbInfo?.type,
-            table: dbInfo?.tableName,
-            use_partition: dbInfo?.usePartition,
-            write_mode: dbInfo?.writeMode,
-            field_delimiter: dbInfo?.fieldDelimiter,
-            encoding: dbInfo?.encoding
-          }),
-        refetchColumn: () => {
-          refetchColumns()
+      validate: () => {
+        if (!targetForm.current) {
+          return false
         }
-      }))
+        return targetForm.current?.validateForm()
+      },
+      getData: () => ({
+        source_id: dbInfo?.id,
+        compress: dbInfo?.compress === 0 ? undefined : dbInfo?.compress,
+        file_type: dbInfo?.fileType,
+        partition: dbInfo?.partition,
+        partition_type: dbInfo?.type,
+        table: dbInfo?.tableName,
+        use_partition: dbInfo?.usePartition,
+        write_mode: dbInfo?.writeMode,
+        field_delimiter: dbInfo?.fieldDelimiter,
+        encoding: dbInfo?.encoding
+      }),
+      refetchColumn: () => {
+        refetchColumns()
+      }
+    }))
 
     return (
       <Form css={styles.form} ref={targetForm}>

@@ -137,16 +137,16 @@ export const InstanceTable = observer(
         dataIndex: 'id',
         width: 200,
         render: (value: string) => (
-            <FlexBox tw="items-center space-x-1">
-              <Center
-                tw="bg-neut-13 rounded-full w-7 h-7 mr-1.5 border-2 border-solid border-neut-16"
-                className="release-icon"
-              >
-                <Icons name="stream-job" size={16} />
-              </Center>
-              <div tw="flex-1 break-all">{value}</div>
-            </FlexBox>
-          )
+          <FlexBox tw="items-center space-x-1">
+            <Center
+              tw="bg-neut-13 rounded-full w-7 h-7 mr-1.5 border-2 border-solid border-neut-16"
+              className="release-icon"
+            >
+              <Icons name="stream-job" size={16} />
+            </Center>
+            <div tw="flex-1 break-all">{value}</div>
+          </FlexBox>
+        )
       },
       {
         title: '状态',
@@ -159,27 +159,27 @@ export const InstanceTable = observer(
         hasAll: false,
         width: 120,
         render: (value: number) => (
-            <div tw="flex items-center">
-              <Icon tw="mr-2" name="radio" color={InstanceState[value].color} />
-              {InstanceState[value].name}
-            </div>
-          )
+          <div tw="flex items-center">
+            <Icon tw="mr-2" name="radio" color={InstanceState[value].color} />
+            {InstanceState[value].name}
+          </div>
+        )
       },
       {
         title: '所属作业/ID',
         dataIndex: 'job_id',
         width: 185,
         render: (value: string, row: Record<string, any>) => (
-            <div>
-              {/* <div>{row.job_name}</div> */}
-              <div
-                tw="text-neut-8 hover:text-green-11 cursor-pointer"
-                onClick={() => handleJobView(row.job_id)}
-              >
-                {value}
-              </div>
+          <div>
+            {/* <div>{row.job_name}</div> */}
+            <div
+              tw="text-neut-8 hover:text-green-11 cursor-pointer"
+              onClick={() => handleJobView(row.job_id)}
+            >
+              {value}
             </div>
-          )
+          </div>
+        )
       },
       {
         title: '作业版本',
@@ -214,61 +214,64 @@ export const InstanceTable = observer(
         title: '操作',
         dataIndex: 'table_actions',
         render: (_: any, row: Record<string, any>) => (
-            <FlexBox tw="items-center">
-              <Button type="text">
-                <TextLink onClick={() => handleFinkUI(row)} disabled={row.state === 1}>
-                  Flink UI
-                </TextLink>
-              </Button>
-              <Divider
-                type="vertical"
-                height={20}
-                style={{ borderColor: '#475569', margin: '0 14px 0 5px' }}
-              />
-              <Center>
-                <Tooltip
-                  trigger="click"
-                  placement="bottom-end"
-                  arrow={false}
-                  twChild={
-                    css`
-                      &[aria-expanded='true'] {
-                        ${tw`bg-line-dark`}
-                      }
-                      svg {
-                        ${tw`text-white! bg-transparent! fill-[transparent]!`}
-                      }
-                    ` as any
-                  }
-                  content={
-                    <Menu onClick={(e: any, key: OP) => handleMenuClick(key, row)}>
-                      {[1, 2, 3].includes(row.state) && <MenuItem key="stop">终止</MenuItem>}
-                      <MenuItem key="view">查看详情</MenuItem>
-                    </Menu>
-                  }
-                >
-                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
-                    <Icon name="more" clickable changeable type="light" />
-                  </div>
-                </Tooltip>
-              </Center>
-            </FlexBox>
-          )
+          <FlexBox tw="items-center">
+            <Button type="text">
+              <TextLink onClick={() => handleFinkUI(row)} disabled={row.state === 1}>
+                Flink UI
+              </TextLink>
+            </Button>
+            <Divider
+              type="vertical"
+              height={20}
+              style={{ borderColor: '#475569', margin: '0 14px 0 5px' }}
+            />
+            <Center>
+              <Tooltip
+                trigger="click"
+                placement="bottom-end"
+                arrow={false}
+                twChild={
+                  css`
+                    &[aria-expanded='true'] {
+                      ${tw`bg-line-dark`}
+                    }
+                    svg {
+                      ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                    }
+                  ` as any
+                }
+                content={
+                  <Menu onClick={(e: any, key: OP) => handleMenuClick(key, row)}>
+                    {[1, 2, 3].includes(row.state) && <MenuItem key="stop">终止</MenuItem>}
+                    <MenuItem key="view">查看详情</MenuItem>
+                  </Menu>
+                }
+              >
+                <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
+                  <Icon name="more" clickable changeable type="light" />
+                </div>
+              </Tooltip>
+            </Center>
+          </FlexBox>
+        )
       }
     ]
 
     const handleFilterChange = useCallback(
       (filters: { state: number }) => {
         setFilter((draft: any) => ({
-            ...draft,
-            state: Number(filters.state)
-          }))
+          ...draft,
+          state: Number(filters.state)
+        }))
       },
       [setFilter]
     )
 
     const filterColumn = columnSettings
-      .map((o: { key: string; checked: boolean }) => o.checked && columns.find((col) => col.dataIndex === o.key))
+      .map(
+        (o: { key: string; checked: boolean }) =>
+          o.checked && columns.find((col) => col.dataIndex === o.key)
+      )
       .filter((o: any) => o)
 
     return (

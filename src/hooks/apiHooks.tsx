@@ -16,6 +16,23 @@ export type RequestParams = {
 
 export const queryKeyObj: Record<string, any> = {}
 
+export const getNextPageParam =
+  (params: Record<string, any>) => (lastPage: Record<string, any>, allPages: any[]) => {
+    if (lastPage.has_more) {
+      const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
+
+      if (nextOffset < lastPage.total) {
+        const nextParams = {
+          ...params,
+          offset: nextOffset
+        }
+        return nextParams
+      }
+    }
+
+    return undefined
+  }
+
 export const apiHooks =
   <T extends keyof typeof apiList, P extends RequestParams, U extends Record<string, any>>(
     manage: T,

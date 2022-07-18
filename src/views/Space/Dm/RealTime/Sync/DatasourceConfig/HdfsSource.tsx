@@ -55,13 +55,13 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
 
   useImperativeHandle(ref, () => ({
     getData: () => ({
-        encoding: dbInfo?.encoding,
-        field_delimiter: dbInfo?.fieldDelimiter,
-        file_type: dbInfo?.fileType,
-        filter_regex: dbInfo?.filterRegex,
-        id: dbInfo?.id,
-        path: dbInfo?.path
-      }),
+      encoding: dbInfo?.encoding,
+      field_delimiter: dbInfo?.fieldDelimiter,
+      file_type: dbInfo?.fileType,
+      filter_regex: dbInfo?.filterRegex,
+      id: dbInfo?.id,
+      path: dbInfo?.path
+    }),
     validate: () => {
       if (!sourceRef.current) {
         return false

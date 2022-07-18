@@ -218,7 +218,9 @@ function connectSocket() {
   let socket = null
   let memoUrl = null
 
-  return async (url, protocols, immediately) => {
+  return (url, protocols, immediately) => {
+    if (!url) return socket
+
     if (memoUrl !== url || !socket || !socket.alive || immediately) {
       socket = new Socket({ url, protocols })
       memoUrl = url
