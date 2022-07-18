@@ -10,11 +10,11 @@ const { MenuItem } = Menu as any
 
 const tableStyles = {
   withHidden: ({ hidden }: { hidden: boolean }) => [
-      tw`transition-[max-height, opacity] duration-300 ease-in-out`,
-      css`
-        ${hidden ? tw`opacity-0 max-h-0` : tw`opacity-100 max-h-[500px]`}
-      `
-    ],
+    tw`transition-[max-height, opacity] duration-300 ease-in-out`,
+    css`
+      ${hidden ? tw`opacity-0 max-h-0` : tw`opacity-100 max-h-[500px]`}
+    `
+  ],
   withBorder: css`
     & {
       .grid-table-header {
@@ -97,15 +97,15 @@ const Permission = (props: IPermissionProps) => {
               >
                 <div />
                 {permissionTypes.map((o) => (
-                    <MenuItem value={o.value} key={o.value || 'all'}>
-                      <FlexBox tw="w-full items-center w-full justify-between">
-                        <span>{o.text}</span>
-                        {o.value === filter && (
-                          <i className="if if-check" tw="text-green-11 text-sm" />
-                        )}
-                      </FlexBox>
-                    </MenuItem>
-                  ))}
+                  <MenuItem value={o.value} key={o.value || 'all'}>
+                    <FlexBox tw="w-full items-center w-full justify-between">
+                      <span>{o.text}</span>
+                      {o.value === filter && (
+                        <i className="if if-check" tw="text-green-11 text-sm" />
+                      )}
+                    </FlexBox>
+                  </MenuItem>
+                ))}
               </Menu>
             }
           >
@@ -118,26 +118,27 @@ const Permission = (props: IPermissionProps) => {
       dataIndex: 'perm_type',
       key: 'perm_type',
       render: (type: number) => (
-          <Center tw="w-full">
-            <div css={[typeStyle.wrapper, type === 1 ? typeStyle.read : typeStyle.write]}>
-              {type === 1 ? '读' : '写'}
-            </div>
-          </Center>
-        )
+        <Center tw="w-full">
+          <div css={[typeStyle.wrapper, type === 1 ? typeStyle.read : typeStyle.write]}>
+            {type === 1 ? '读' : '写'}
+          </div>
+        </Center>
+      )
     }
   ]
 
   const renderStatus = (status: boolean) => (
-      <Center tw="w-full">
-        <Icon
-          size={20}
-          name={status ? 'if-check' : 'if-close'}
-          css={[status ? tw`text-[#059669]` : tw`text-neut-15`, tw`text-lg`]}
-        />
-      </Center>
-    )
+    <Center tw="w-full">
+      <Icon
+        size={20}
+        name={status ? 'if-check' : 'if-close'}
+        css={[status ? tw`text-[#059669]` : tw`text-neut-15`, tw`text-lg`]}
+      />
+    </Center>
+  )
 
-  const columns = (roles || []).reduce((acc: Record<string, any>[], cur) => [
+  const columns = (roles || []).reduce(
+    (acc: Record<string, any>[], cur) => [
       ...acc,
       {
         title: <Center tw="w-full">{cur.name}</Center>,
@@ -145,7 +146,9 @@ const Permission = (props: IPermissionProps) => {
         key: cur.type,
         render: renderStatus
       }
-    ], defaultColumns)
+    ],
+    defaultColumns
+  )
   return (
     <div css={tw`mb-5 last:mb-0`}>
       <div css={permissionStyle.title}>

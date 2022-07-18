@@ -71,28 +71,28 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
   const { refetch: refetchColumns } = useTableColumns(dbInfo?.id, dbInfo?.table, 'source')
 
   useImperativeHandle(ref, () => ({
-      validate: () => {
-        if (!sourceForm.current) {
-          return false
-        }
-        return sourceForm.current?.validateForm()
-      },
-      getData: () => ({
-          id: dbInfo?.id,
-          table: dbInfo?.table,
-          custom_range: dbInfo?.customRange,
-          start_row_key: dbInfo?.startRowKey,
-          end_row_key: dbInfo?.endRowKey,
-          is_binary_rowkey: dbInfo?.isBinaryRowKey,
-          encoding: dbInfo?.encoding,
-          scan_cache_size: dbInfo?.scanCacheSize,
-          scan_batch_size: dbInfo?.scanBatchSize,
-          read_mode: dbInfo?.readMode
-        }),
-      refetchColumn: () => {
-        refetchColumns()
+    validate: () => {
+      if (!sourceForm.current) {
+        return false
       }
-    }))
+      return sourceForm.current?.validateForm()
+    },
+    getData: () => ({
+      id: dbInfo?.id,
+      table: dbInfo?.table,
+      custom_range: dbInfo?.customRange,
+      start_row_key: dbInfo?.startRowKey,
+      end_row_key: dbInfo?.endRowKey,
+      is_binary_rowkey: dbInfo?.isBinaryRowKey,
+      encoding: dbInfo?.encoding,
+      scan_cache_size: dbInfo?.scanCacheSize,
+      scan_batch_size: dbInfo?.scanBatchSize,
+      read_mode: dbInfo?.readMode
+    }),
+    refetchColumn: () => {
+      refetchColumns()
+    }
+  }))
 
   return (
     <Form css={styles.form} ref={sourceForm}>

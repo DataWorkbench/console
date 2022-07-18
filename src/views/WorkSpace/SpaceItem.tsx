@@ -52,25 +52,25 @@ const RoleIcons = ({ list }: { list: Record<string, any>[] }) => {
   return (
     <div tw="flex" onMouseLeave={() => setHoverIndex(0)}>
       {list.slice(0, 3).map((item, idx) => (
-          <div
-            key={item.id}
-            css={roleIcon.item({
-              zIndex: list.length - Math.abs(hoverIndex - idx),
-              index: idx
-            })}
-            onMouseMove={() => setHoverIndex(idx)}
-          >
-            <Tooltip content={item.email} hasPadding theme="darker" twChild={tw`flex`}>
-              <Center tw="h-6 w-6">
-                {item.icon ? (
-                  <img src={item.icon} alt="" width={24} />
-                ) : (
-                  <Icon name="human" size={14} />
-                )}
-              </Center>
-            </Tooltip>
-          </div>
-        ))}
+        <div
+          key={item.id}
+          css={roleIcon.item({
+            zIndex: list.length - Math.abs(hoverIndex - idx),
+            index: idx
+          })}
+          onMouseMove={() => setHoverIndex(idx)}
+        >
+          <Tooltip content={item.email} hasPadding theme="darker" twChild={tw`flex`}>
+            <Center tw="h-6 w-6">
+              {item.icon ? (
+                <img src={item.icon} alt="" width={24} />
+              ) : (
+                <Icon name="human" size={14} />
+              )}
+            </Center>
+          </Tooltip>
+        </div>
+      ))}
       {list.length > 3 && (
         <div
           key="others"

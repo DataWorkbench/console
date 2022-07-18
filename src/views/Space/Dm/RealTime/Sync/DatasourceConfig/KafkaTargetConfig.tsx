@@ -78,17 +78,17 @@ const KafkaTargetConfig = forwardRef(
         .subscribe((e) => setDbInfo(e))
     }, [setDbInfo])
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!targetForm.current) {
-            return false
-          }
-          return targetForm.current?.validateForm()
-        },
-        getData: () => ({
-            ...dbInfo
-          }),
-        refetchColumn: () => {}
-      }))
+      validate: () => {
+        if (!targetForm.current) {
+          return false
+        }
+        return targetForm.current?.validateForm()
+      },
+      getData: () => ({
+        ...dbInfo
+      }),
+      refetchColumn: () => {}
+    }))
 
     const renderCommon = () => <BaseConfigCommon from="target" />
 

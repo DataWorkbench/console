@@ -124,51 +124,51 @@ const BaseSourceConfig = forwardRef(
     const isOffLineFull = get(curJob, 'type') === SyncJobType.OFFLINEFULL
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => {
-          if (!dbInfo || !dbInfo.tableName) {
-            return undefined
-          }
-          const { condition } = dbInfo
-          return {
-            table: [dbInfo.tableName],
-            schema: '',
-            where: dbInfo.where,
-            split_pk: dbInfo.splitPk,
-            condition_type: condition?.type,
-            visualization: {
-              column: condition?.column,
-              start_condition: condition?.startCondition,
-              start_value: condition?.startValue,
-              end_condition: condition?.endCondition,
-              end_value: condition?.endValue
-            }
-          }
-        },
-        refetchColumn: () => {
-          sourceColumnRet.refetch()
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
         }
-      }))
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => {
+        if (!dbInfo || !dbInfo.tableName) {
+          return undefined
+        }
+        const { condition } = dbInfo
+        return {
+          table: [dbInfo.tableName],
+          schema: '',
+          where: dbInfo.where,
+          split_pk: dbInfo.splitPk,
+          condition_type: condition?.type,
+          visualization: {
+            column: condition?.column,
+            start_condition: condition?.startCondition,
+            start_value: condition?.startValue,
+            end_condition: condition?.endCondition,
+            end_value: condition?.endValue
+          }
+        }
+      },
+      refetchColumn: () => {
+        sourceColumnRet.refetch()
+      }
+    }))
     const renderCommon = () => <BaseConfigCommon from="source" />
 
     const renderBaseTable = () => (
-        <BaseTableComponent
-          from="source"
-          sourceType={sourceType?.label}
-          sourceId={dbInfo?.id}
-          tableName={dbInfo?.tableName}
-          onChange={(v: string) => {
-            setDbInfo((draft) => {
-              draft.tableName = v
-            })
-          }}
-        />
-      )
+      <BaseTableComponent
+        from="source"
+        sourceType={sourceType?.label}
+        sourceId={dbInfo?.id}
+        tableName={dbInfo?.tableName}
+        onChange={(v: string) => {
+          setDbInfo((draft) => {
+            draft.tableName = v
+          })
+        }}
+      />
+    )
 
     return (
       <Form css={styles.form} ref={sourceForm}>

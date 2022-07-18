@@ -6,7 +6,8 @@ import { FlexBox, ContentBox } from 'components'
 import { useStore } from 'stores'
 import { MenuType } from 'stores/GlobalStore'
 
-const getLinks = (items: MenuType[]): any => items.map((item) => item.items ? getLinks(item.items) : `/${item.name}`)
+const getLinks = (items: MenuType[]): any =>
+  items.map((item) => (item.items ? getLinks(item.items) : `/${item.name}`))
 
 const MainLayout = observer(({ children }) => {
   const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)

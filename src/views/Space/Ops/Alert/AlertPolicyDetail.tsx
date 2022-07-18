@@ -259,19 +259,19 @@ const AlertPolicyDetail = ({
               dataIndex: 'name',
               key: 'name',
               render: (name: string) => (
-                  <FlexBox tw="items-center">
-                    <Icon
-                      name="q-downloadBoxFill"
-                      type="light"
-                      css={css`
-                        & .qicon {
-                          ${tw`text-white! fill-[#fff]!`}
-                        }
-                      `}
-                    />
-                    <span tw="text-white">{name}</span>
-                  </FlexBox>
-                )
+                <FlexBox tw="items-center">
+                  <Icon
+                    name="q-downloadBoxFill"
+                    type="light"
+                    css={css`
+                      & .qicon {
+                        ${tw`text-white! fill-[#fff]!`}
+                      }
+                    `}
+                  />
+                  <span tw="text-white">{name}</span>
+                </FlexBox>
+              )
             },
             {
               title: 'ID',

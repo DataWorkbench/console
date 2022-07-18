@@ -4,7 +4,7 @@ import { LocaleProvider } from '@QCFE/lego-ui'
 import { Loading, PortalProvider } from '@QCFE/qingcloud-portal-ui'
 import { describeDataomnis } from 'stores/api'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
-import Login from 'views/Auth/Login'
+import Login from 'views/Space/Ops/Login'
 import { useCookie } from 'react-use'
 import locales from '../../locales'
 import { useValidateSession } from '../../hooks/useGlobalAPI'
@@ -62,13 +62,13 @@ const Auth = ({ children }: { children: ReactElement }) => {
   }
 
   const renderLogin = () => (
-      <Router basename="/dataomnis">
-        <Switch>
-          <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
-          <Route path="/" component={() => (hasLogin ? children : <Redirect to="/login" />)} />
-        </Switch>
-      </Router>
-    )
+    <Router basename="/dataomnis">
+      <Switch>
+        <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
+        <Route path="/" component={() => (hasLogin ? children : <Redirect to="/login" />)} />
+      </Switch>
+    </Router>
+  )
 
   const renderChildren = (check: boolean) => {
     if (loading) {

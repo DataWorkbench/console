@@ -53,17 +53,17 @@ const Tags = (props: ITagsProps) => {
   return (
     <FlexBox tw="gap-1">
       {systemRoles.slice(0, 2).map((role: any) => (
-          <Tag
-            closable
-            css={[tw`text-neut-15! text-sm`]}
-            onClose={(e: { preventDefault: Function }) =>
-              handleRemove(data, role.id, () => e.preventDefault())
-            }
-            key={role.id}
-          >
-            {role.name}
-          </Tag>
-        ))}
+        <Tag
+          closable
+          css={[tw`text-neut-15! text-sm`]}
+          onClose={(e: { preventDefault: Function }) =>
+            handleRemove(data, role.id, () => e.preventDefault())
+          }
+          key={role.id}
+        >
+          {role.name}
+        </Tag>
+      ))}
       <Tooltip
         key={systemRoles.length}
         theme="light"
@@ -81,19 +81,19 @@ const Tags = (props: ITagsProps) => {
             }}
           >
             {systemRoles.slice(2).map((role: Record<string, any>) => (
-                <div tw="flex items-center pl-3 hover:bg-neut-1 h-8" key={role.id}>
-                  <Tag
-                    closable
-                    css={[tw`text-neut-15! text-sm`]}
-                    onClose={(e: { preventDefault: Function }) =>
-                      handleRemove(data, role.id, () => e.preventDefault())
-                    }
-                    key={role.id}
-                  >
-                    {role.name}
-                  </Tag>
-                </div>
-              ))}
+              <div tw="flex items-center pl-3 hover:bg-neut-1 h-8" key={role.id}>
+                <Tag
+                  closable
+                  css={[tw`text-neut-15! text-sm`]}
+                  onClose={(e: { preventDefault: Function }) =>
+                    handleRemove(data, role.id, () => e.preventDefault())
+                  }
+                  key={role.id}
+                >
+                  {role.name}
+                </Tag>
+              </div>
+            ))}
 
             {!!rest.length && (
               <Tooltip
@@ -117,19 +117,19 @@ const Tags = (props: ITagsProps) => {
                     // }}
                   >
                     {xorBy(systemRoles, list, 'id').map((role: Record<string, any>) => (
-                        <div tw="flex items-center pl-3 hover:bg-neut-1 h-8" key={role.id}>
-                          <Tag
-                            css={[tw`text-neut-15! text-sm`, addTagStyle]}
-                            key={role.id}
-                            onClick={() => {
-                              handleAdd(data, role.id)
-                            }}
-                          >
-                            <Icon name="add" size={14} css={[tw`text-neut-15! m-0!`]} />
-                            {role.name}
-                          </Tag>
-                        </div>
-                      ))}
+                      <div tw="flex items-center pl-3 hover:bg-neut-1 h-8" key={role.id}>
+                        <Tag
+                          css={[tw`text-neut-15! text-sm`, addTagStyle]}
+                          key={role.id}
+                          onClick={() => {
+                            handleAdd(data, role.id)
+                          }}
+                        >
+                          <Icon name="add" size={14} css={[tw`text-neut-15! m-0!`]} />
+                          {role.name}
+                        </Tag>
+                      </div>
+                    ))}
                   </div>
                 }
               >

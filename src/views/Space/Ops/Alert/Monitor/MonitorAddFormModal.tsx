@@ -27,11 +27,11 @@ const HiddenTextField = styled(TextField)`
 `
 
 const Item = ({ id, onDelete }: { id: string; onDelete: (s: string) => void }) => (
-    <Center tw="gap-3 h-6 bg-neut-13 px-2">
-      <span tw="text-white">{`ID: ${id}`}</span>
-      <Icon clickable onClick={() => onDelete(id)} name="if-close" size={16} type="light" />
-    </Center>
-  )
+  <Center tw="gap-3 h-6 bg-neut-13 px-2">
+    <span tw="text-white">{`ID: ${id}`}</span>
+    <Icon clickable onClick={() => onDelete(id)} name="if-close" size={16} type="light" />
+  </Center>
+)
 
 interface IMonitorAddProps {
   onCancel: () => void
@@ -71,8 +71,8 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
   const { getQueryListKey, jobDetail } = useAlertStore()
 
   const form = useRef<Form>()
-  const [value, setValue] = useImmer<Partial<Record<keyof PbmodelAlertPolicy | string, any>>>(
-    () => getData(data as any)
+  const [value, setValue] = useImmer<Partial<Record<keyof PbmodelAlertPolicy | string, any>>>(() =>
+    getData(data as any)
   )
 
   useEffect(() => {

@@ -27,19 +27,19 @@ interface ResourceSelectProps {
 }
 
 const renderLabel = (label: string, icon: ReactElement, search: string) => (
-    <FlexBox tw="items-center gap-1" key={label}>
-      {icon}
-      <TextHighlight key={label} text={label} filterText={search} />
-    </FlexBox>
-  )
+  <FlexBox tw="items-center gap-1" key={label}>
+    {icon}
+    <TextHighlight key={label} text={label} filterText={search} />
+  </FlexBox>
+)
 
 const renderReadOnlyOption = (label: string, icon: ReactElement, id?: string) => (
-    <div tw="inline-flex items-center rounded-sm bg-neut-13 px-2 mr-1 tracking-wider text-2xs">
-      {icon}
-      <TextHighlight key={label} text={label} tw="ml-1" />
-      <span tw="text-neut-8">ID: {id}</span>
-    </div>
-  )
+  <div tw="inline-flex items-center rounded-sm bg-neut-13 px-2 mr-1 tracking-wider text-2xs">
+    {icon}
+    <TextHighlight key={label} text={label} tw="ml-1" />
+    <span tw="text-neut-8">ID: {id}</span>
+  </div>
+)
 
 const ResourceOption = ({ files }: { files: string[] }) => {
   const { data } = useQueryResource({ limit: 100 })
@@ -87,14 +87,14 @@ const ResourceSelect = (props: ResourceSelectProps) => {
   const { status, data, fetchNextPage, hasNextPage } = v
   const options = flatten(data?.pages.map((page: Record<string, any>) => page.infos || [])).map(
     (i) => ({
-        label: (
-          <Fragment key={i[key]}>
-            {renderLabel(i.name, icon, filter.search)}
-            <span tw="text-neut-8">ID:{i[key]}</span>
-          </Fragment>
-        ),
-        value: i[key]
-      })
+      label: (
+        <Fragment key={i[key]}>
+          {renderLabel(i.name, icon, filter.search)}
+          <span tw="text-neut-8">ID:{i[key]}</span>
+        </Fragment>
+      ),
+      value: i[key]
+    })
   )
 
   const loadData = () => {

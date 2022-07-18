@@ -47,7 +47,8 @@ export const useValidateSession = (sessionId: string, options = {}) => {
   )
 }
 
-export const useMutationUser = () => useMutation(async ({ op, ...rest }: Record<string, any>) => {
+export const useMutationUser = () =>
+  useMutation(async ({ op, ...rest }: Record<string, any>) => {
     let ret
     if (op === 'update') {
       ret = await request({

@@ -227,15 +227,15 @@ const Member = observer(
             />
           ),
           render: (_: any, record: Record<string, any>) => (
-              <div tw="overflow-auto">
-                <Tags
-                  data={record}
-                  list={roleList?.infos || []}
-                  handleAdd={handleAddRole}
-                  handleRemove={handleRemoveRole}
-                />
-              </div>
-            )
+            <div tw="overflow-auto">
+              <Tags
+                data={record}
+                list={roleList?.infos || []}
+                handleAdd={handleAddRole}
+                handleRemove={handleRemoveRole}
+              />
+            </div>
+          )
         },
         created: {
           sortable: true,
@@ -299,7 +299,10 @@ const Member = observer(
 
     const filterColumn = columnSettings.length
       ? columnSettings
-          .map((o: { key: string; checked: boolean }) => o.checked && columnsWithRender.find((col: any) => col.key === o.key))
+          .map(
+            (o: { key: string; checked: boolean }) =>
+              o.checked && columnsWithRender.find((col: any) => col.key === o.key)
+          )
           .filter(Boolean)
       : columnsWithRender
 

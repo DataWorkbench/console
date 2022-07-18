@@ -16,10 +16,10 @@ export const pageTabsData = [
 
 function getField<T extends string, K extends string>(mapping: Mapping1<T, K>): IColumn[] {
   return Array.from(mapping.entries()).map(([, i]) => ({
-      title: i.label,
-      dataIndex: i.apiField,
-      key: i.apiField
-    }))
+    title: i.label,
+    dataIndex: i.apiField,
+    key: i.apiField
+  }))
 }
 
 export const columnsRender = {

@@ -89,23 +89,25 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
     () => ({
       name: {
         render: (text: string, record: Record<string, any>) => (
-            <InstanceName
-              theme="dark"
-              name={text}
-              desc={record.id}
-              icon="q-bellGearFill"
-              css={instanceNameStyle}
-              onClick={() =>
-                set({
-                  showAddMonitorDetail: true,
-                  selectedMonitor: record
-                })
-              }
-            />
-          )
+          <InstanceName
+            theme="dark"
+            name={text}
+            desc={record.id}
+            icon="q-bellGearFill"
+            css={instanceNameStyle}
+            onClick={() =>
+              set({
+                showAddMonitorDetail: true,
+                selectedMonitor: record
+              })
+            }
+          />
+        )
       },
       monitor_object: {
-        render: (type: 1 | 2) => <span tw="text-neut-8">{{ 1: '数据集成作业', 2: '数据开发作业' }[type]}</span>
+        render: (type: 1 | 2) => (
+          <span tw="text-neut-8">{{ 1: '数据集成作业', 2: '数据开发作业' }[type]}</span>
+        )
       },
       desc: {
         render: (text: string) => <span tw="text-neut-8">{text}</span>

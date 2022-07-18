@@ -15,6 +15,7 @@ export * from './useStreamVersion'
 export * from './useSyncJobInstance'
 export * from './useJobVersion'
 export * from './useJobRelease'
+export * from './useGeneralView'
 export * from './useDataService'
 export * from './useMember'
 

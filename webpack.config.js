@@ -205,6 +205,10 @@ let config = {
         target: apiUrl,
         changeOrigin: true,
       },
+      '/global_api': {
+        target: apiUrl,
+        changeOrigin: true,
+      },
     },
   },
   cache: {

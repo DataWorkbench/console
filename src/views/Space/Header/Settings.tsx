@@ -46,21 +46,21 @@ const privateKeys = new Set(['account', 'notify', 'divider', 'logout'])
 
 const { MenuItem } = Menu as any
 const IconBox = styled(Center)(() => [
-    css`
-      &:hover {
-        .icon {
-          .qicon {
-            fill: #9ddfc9;
-            color: #15a675;
-          }
+  css`
+    &:hover {
+      .icon {
+        .qicon {
+          fill: #9ddfc9;
+          color: #15a675;
         }
       }
-    `,
-    tw`cursor-pointer hover:dark:bg-neut-13 hover:bg-neut-1`
-  ])
+    }
+  `,
+  tw`cursor-pointer hover:dark:bg-neut-13 hover:bg-neut-1`
+])
 
 const IconBoxWithTooltip = styled(Center)(() => [
-    css`
+  css`
       &{
         [aria-expanded='true'] {
           .header-icon-bg-box {
@@ -74,7 +74,7 @@ const IconBoxWithTooltip = styled(Center)(() => [
         }
       }
     `
-  ])
+])
 
 const UserInfoWrapper = styled.div(() => [
   css`

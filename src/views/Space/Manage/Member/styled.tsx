@@ -33,18 +33,18 @@ export const TextAreaFieldWrapper = styled(TextAreaField)(() => [
 
 export const checkboxButtonStyles = {
   wrapper: ({ checked = false }: { checked: boolean }) => [
-      // tw`inline-flex items-center h-9 rounded-sm gap-2 px-2 cursor-pointer`,
-      tw`h-9`,
-      checked
-        ? tw`text-green-11! bg-green-0! border-green-11! border hover:bg-green-1! active:bg-green-2! `
-        : tw``,
-      checked &&
-        css`
-          & .icon .qicon {
-            ${tw`text-green-11 fill-[#9DDFC9]`}
-          }
-        `
-    ]
+    // tw`inline-flex items-center h-9 rounded-sm gap-2 px-2 cursor-pointer`,
+    tw`h-9`,
+    checked
+      ? tw`text-green-11! bg-green-0! border-green-11! border hover:bg-green-1! active:bg-green-2! `
+      : tw``,
+    checked &&
+      css`
+        & .icon .qicon {
+          ${tw`text-green-11 fill-[#9DDFC9]`}
+        }
+      `
+  ]
 }
 
 export const ModalWrapper = styled(Modal)(() => [
@@ -70,12 +70,12 @@ export const ModalWrapper = styled(Modal)(() => [
 
 export const OwnerWrapper = {
   isOwner: ({ isOwner = true }: { isOwner: boolean }) => [
-      !isOwner &&
-        css`
-          .tag .icon.close,
-          .tag-no-more {
-            ${tw`hidden`}
-          }
-        `
-    ]
+    !isOwner &&
+      css`
+        .tag .icon.close,
+        .tag-no-more {
+          ${tw`hidden`}
+        }
+      `
+  ]
 }

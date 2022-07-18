@@ -30,12 +30,13 @@ const TextAreaWrapper = styled(TextAreaField)(() => [
 
 const division = ':'
 const mapProps = (props: Record<string, any>) => ({
-    ...props,
-    theme: 'light',
-    addText: '添加地址'
-  })
+  ...props,
+  theme: 'light',
+  addText: '添加地址'
+})
 
-export const str2Arr = (v: string) => trim(v)
+export const str2Arr = (v: string) =>
+  trim(v)
     .split(/[\r\n]/)
     .filter((item) => item !== '')
     .map((item) => {
@@ -539,15 +540,15 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
       break
     case SourceType.HDFS: {
       const help = (error?: ReactElement | string) => (
-          <div>
-            {error && <span tw="mr-0.5">{error}</span>}
-            <span tw="mr-0.5 text-neut-8">可参考</span>
-            {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
-            <HelpCenterLink href={hadoopLink} isIframe={false}>
-              Hadoop 参数说明文档
-            </HelpCenterLink>
-          </div>
-        )
+        <div>
+          {error && <span tw="mr-0.5">{error}</span>}
+          <span tw="mr-0.5 text-neut-8">可参考</span>
+          {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
+          <HelpCenterLink href={hadoopLink} isIframe={false}>
+            Hadoop 参数说明文档
+          </HelpCenterLink>
+        </div>
+      )
       fieldsInfo = [
         {
           fieldType: 'dbUrl',
@@ -932,7 +933,8 @@ export const sourceStrategy = [
   },
   {
     key: 'elastic_search.esAuth',
-    check: (type: SourceType, name: string) => type === SourceType.ElasticSearch && name === 'esAuth',
+    check: (type: SourceType, name: string) =>
+      type === SourceType.ElasticSearch && name === 'esAuth',
     value: (sourceInfo: Record<string, any>) => {
       if (
         get(sourceInfo, 'url.elastic_search.host') &&
@@ -955,7 +957,8 @@ export const sourceStrategy = [
   },
   {
     key: 'kafka.kafka_brokers',
-    check: (type: SourceType, name: string) => type === SourceType.Kafka && name === 'kafka_brokers',
+    check: (type: SourceType, name: string) =>
+      type === SourceType.Kafka && name === 'kafka_brokers',
     value: (sourceInfo: Record<string, any>) => {
       if (get(sourceInfo, 'url.kafka.kafka_brokers')) {
         return arr2str(get(sourceInfo, 'url.kafka.kafka_brokers'))

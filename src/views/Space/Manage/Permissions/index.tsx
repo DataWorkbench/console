@@ -21,18 +21,19 @@ const permissionTabs = [
   }
 ]
 
-const getPermissionList = (infos: Record<string, any>[]) => infos.map((item) => ({
-      ...item,
-      api_lists: (item?.api_lists || []).map((api: Record<string, any>) => {
-        const { permissions, ...rest } = api
-        permissions.forEach((permission: Record<string, any>) => {
-          Object.assign(rest, {
-            [`role_${permission.system_role.type}`]: permission.allowed
-          })
+const getPermissionList = (infos: Record<string, any>[]) =>
+  infos.map((item) => ({
+    ...item,
+    api_lists: (item?.api_lists || []).map((api: Record<string, any>) => {
+      const { permissions, ...rest } = api
+      permissions.forEach((permission: Record<string, any>) => {
+        Object.assign(rest, {
+          [`role_${permission.system_role.type}`]: permission.allowed
         })
-        return rest
       })
-    }))
+      return rest
+    })
+  }))
 
 const PermissionList = () => {
   const { data: roleList, isFetching: isRoleFetching } = useQueryRoleList()

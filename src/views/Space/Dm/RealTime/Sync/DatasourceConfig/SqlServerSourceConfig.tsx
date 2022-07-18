@@ -134,26 +134,26 @@ const SqlServerSourceConfig = forwardRef(
     }, [setDbInfo])
 
     useImperativeHandle(ref, () => ({
-        validate: () => {
-          if (!sourceForm.current) {
-            return false
-          }
-          return sourceForm.current?.validateForm()
-        },
-        getData: () => ({
-            id: dbInfo?.id,
-            lsn: dbInfo?.lsn,
-            poll_interval: dbInfo?.time,
-            slot_name: dbInfo?.slot,
-            table_list: dbInfo?.tableName,
-            cat: dbInfo?.updateType.join(',')
-            // allow_create_slot: dbInfo?.autoCreate,
-            // temporary: dbInfo?.temp,
-          }),
-        refetchColumn: () => {
-          refetchColumns()
+      validate: () => {
+        if (!sourceForm.current) {
+          return false
         }
-      }))
+        return sourceForm.current?.validateForm()
+      },
+      getData: () => ({
+        id: dbInfo?.id,
+        lsn: dbInfo?.lsn,
+        poll_interval: dbInfo?.time,
+        slot_name: dbInfo?.slot,
+        table_list: dbInfo?.tableName,
+        cat: dbInfo?.updateType.join(',')
+        // allow_create_slot: dbInfo?.autoCreate,
+        // temporary: dbInfo?.temp,
+      }),
+      refetchColumn: () => {
+        refetchColumns()
+      }
+    }))
 
     const { data: tableList, refetch } = useQuerySourceTables(
       {
@@ -163,10 +163,10 @@ const SqlServerSourceConfig = forwardRef(
     )
 
     const renderCommon = () => (
-        <>
-          <BaseConfigCommon from="source" />
-        </>
-      )
+      <>
+        <BaseConfigCommon from="source" />
+      </>
+    )
 
     const [showAdvanced, setShowAdvanced] = useState(false)
 

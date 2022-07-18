@@ -27,15 +27,13 @@ export function isRoot(tree: TreeNode): boolean {
 
 function renderTreeNode(tree: TreeNode) {
   const map: TreeKeyChildrenMap = new Map()
-  const getItem = (t: TreeNode) => 
-     omit(t, 'children')
-    // {
-    //   t
-    // value: t.value,
-    // key: t.key, // isOpen: s.openedAll.has(t.key as string),
-    // isSelected: s.selectedAll.has(t.key as string)
-    // }
-  
+  const getItem = (t: TreeNode) => omit(t, 'children')
+  // {
+  //   t
+  // value: t.value,
+  // key: t.key, // isOpen: s.openedAll.has(t.key as string),
+  // isSelected: s.selectedAll.has(t.key as string)
+  // }
 
   map.set(tree.key, {
     pid: outSy,
