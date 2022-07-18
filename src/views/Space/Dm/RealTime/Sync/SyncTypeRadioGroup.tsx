@@ -1,10 +1,11 @@
 import React, { forwardRef, useCallback, useEffect } from 'react'
 import { Control, Form, Select } from '@QCFE/lego-ui'
 import tw, { styled } from 'twin.macro'
-import { isFunction, keys } from 'lodash-es'
+import { isFunction } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import { ArrowLine } from 'components'
-import { dataSourceTypes } from '../Job/JobUtils'
+import { ArrowLine, HelpCenterLink } from 'components'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { datasourceTypeObjs } from '../Job/JobUtils'
 
 type SyncType = 'full' | 'incr'
 type SyncSourceType = 'fullSource' | 'fullSink' | 'incrSource' | 'incrSink'
@@ -29,36 +30,99 @@ export interface SyncTypeRadioGroupProps {
 
 const SyncItem = styled('div')(({ selected = true }: { selected: boolean }) => [
   tw`px-3 py-1.5 border rounded-sm mb-2 cursor-pointer`,
-  selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`,
+  selected ? tw`border-green-11 bg-green-11 bg-opacity-10` : tw`border-neut-13`
 ])
 
-const sources = keys(dataSourceTypes)
-const filterfullSources = ['TiDB', 'Hive', 'Redis', 'Kafka']
-const filterIncrSources = [
-  'TiDB',
-  'Hive',
-  'HBase',
-  'HDFS',
-  'FTP',
-  'Redis',
-  'ElasticSearch',
-  'Kafka',
+/**
+ * 二、全量、增量同步
+ * 1、 全量同步
+ *
+ * 支持 source： MySQL、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、HBase、HDFS、FTP、MongoDB、ElasticSearch
+ *
+ * 支持 sink：MySQL、TiDB、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、Hive、HBase、HDFS、FTP、MongoDB、Redis、ElasticSearch
+ *
+ * 2、增量同步
+ *
+ * 支持 source： MySQL、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、MongoDB
+ *
+ * 支持 sink：MySQL、TiDB、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、Hive、HBase、HDFS、FTP、MongoDB、Redis、ElasticSearch
+ */
+const sources = datasourceTypeObjs
+const filterfullSources: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.HBase,
+  SourceType.HDFS,
+  SourceType.Ftp,
+  SourceType.MongoDB,
+  SourceType.ElasticSearch
 ]
-const fullSources = sources.filter((s) => !filterfullSources.includes(s))
-const incrSources = sources.filter((s) => !filterIncrSources.includes(s))
+const filterFullTargets: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.TiDB,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.Hive,
+  SourceType.HBase,
+  SourceType.HDFS,
+  SourceType.Ftp,
+  SourceType.MongoDB,
+  SourceType.Redis,
+  SourceType.ElasticSearch,
+  SourceType.Kafka
+]
 
-const SyncTypeRadioGroup = forwardRef<
-  React.ReactElement,
-  SyncTypeRadioGroupProps
->(
+const filterIncrSources: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.MongoDB
+]
+
+const filterIncrTargets: SourceType[] = [
+  SourceType.Mysql,
+  SourceType.TiDB,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.PostgreSQL,
+  SourceType.DB2,
+  SourceType.SapHana,
+  SourceType.ClickHouse,
+  SourceType.Hive,
+  SourceType.HBase,
+  SourceType.HDFS,
+  SourceType.Ftp,
+  SourceType.MongoDB,
+  SourceType.Redis,
+  SourceType.ElasticSearch
+]
+const fullSources = sources.filter((s) => filterfullSources.includes(s.type))
+const fullTargets = sources.filter((s) => filterFullTargets.includes(s.type))
+const incrSources = sources.filter((s) => filterIncrSources.includes(s.type))
+const incrTargets = sources.filter((s) => filterIncrTargets.includes(s.type))
+
+const SyncTypeRadioGroup = forwardRef<React.ReactElement, SyncTypeRadioGroupProps>(
   (
     {
       value,
       fullSourceData = fullSources,
-      fullSinkData = sources,
+      fullSinkData = fullTargets,
       incrSourceData = incrSources,
-      incrSinkData = sources,
-      onChange,
+      incrSinkData = incrTargets,
+      onChange
     },
     ref
   ) => {
@@ -68,13 +132,10 @@ const SyncTypeRadioGroup = forwardRef<
         fullSource: '',
         fullSink: '',
         incrSource: '',
-        incrSink: '',
+        incrSink: ''
       }
     )
-    const handleChange = (
-      v: SyncType | SyncSourceType,
-      valueType: 'type' | SyncSourceType
-    ) => {
+    const handleChange = (v: SyncType | SyncSourceType, valueType: 'type' | SyncSourceType) => {
       if (valueType === 'type' && v === params.type) {
         return
       }
@@ -104,25 +165,27 @@ const SyncTypeRadioGroup = forwardRef<
     }, [value, setParams])
 
     const geneOpts = useCallback(
-      (data: string[]) =>
-        data.map((v) => ({ label: v, value: dataSourceTypes[v] })),
+      (data) =>
+        data.map((v: Record<string, any>) => ({
+          label: v.label,
+          value: v.type
+        })),
       []
     )
 
+    console.log('geneOpts(incrSourceData)', geneOpts(incrSourceData))
+
     return (
       <Control tw="flex-col w-[556px]! max-w-[556px]!" ref={ref}>
-        <SyncItem
-          selected={params.type === 'full'}
-          onClick={() => handleChange('full', 'type')}
-        >
+        <SyncItem selected={params.type === 'full'} onClick={() => handleChange('full', 'type')}>
           <div tw="font-medium mb-1">全量同步</div>
           <div tw="text-neut-8 mb-1">
-            全量同步的简短说明（文案暂时占位文案暂时占位文案暂时占位）
+            周期性或一次性将来源数据源中全量数据同步到目标数据源中。
+            <HelpCenterLink href="/manual/integration_job/sync_type/#全量同步" isIframe={false}>
+              了解更多
+            </HelpCenterLink>
           </div>
-          <div
-            tw="flex py-4 items-center space-x-2"
-            css={params.type !== 'full' && tw`hidden`}
-          >
+          <div tw="flex py-4 items-center space-x-2" css={params.type !== 'full' && tw`hidden`}>
             <Select
               placeholder="请选择来源端数据源类型"
               options={geneOpts(fullSourceData)}
@@ -140,18 +203,15 @@ const SyncTypeRadioGroup = forwardRef<
             />
           </div>
         </SyncItem>
-        <SyncItem
-          selected={params.type === 'incr'}
-          onClick={() => handleChange('incr', 'type')}
-        >
+        <SyncItem selected={params.type === 'incr'} onClick={() => handleChange('incr', 'type')}>
           <div tw="font-medium mb-1">增量同步</div>
           <div tw="text-neut-8 mb-1">
-            增量同步的简短说明（文案暂时占位文案暂时占位文案暂时占位）
+            增量的基础是全量，先将数据全量同步，再周期性将来源数据源中新增及变化的数据同步到目标数据源中。
+            <HelpCenterLink href="/manual/integration_job/sync_type/#增量同步" isIframe={false}>
+              了解更多
+            </HelpCenterLink>
           </div>
-          <div
-            tw="flex py-4 items-center space-x-2"
-            css={params.type !== 'incr' && tw`hidden`}
-          >
+          <div tw="flex py-4 items-center space-x-2" css={params.type !== 'incr' && tw`hidden`}>
             <Select
               placeholder="请选择来源端数据源类型"
               options={geneOpts(incrSourceData)}
@@ -174,6 +234,6 @@ const SyncTypeRadioGroup = forwardRef<
 
 export default SyncTypeRadioGroup
 
-export const SyncTypeRadioGroupField: (props: any) => any = (
-  Form as any
-).getFormField(SyncTypeRadioGroup)
+export const SyncTypeRadioGroupField: (props: any) => any = (Form as any).getFormField(
+  SyncTypeRadioGroup
+)

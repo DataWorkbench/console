@@ -5,23 +5,19 @@ import tw, { styled, css } from 'twin.macro'
 const orientationMap = {
   left: {
     before: '5%',
-    after: '95%',
+    after: '95%'
   },
   center: {
     before: '50%',
-    after: '50%',
+    after: '50%'
   },
   right: {
     before: '95%',
-    after: '5%',
-  },
+    after: '5%'
+  }
 }
 const DividerWarp = styled.div(
-  ({
-    orientation = 'center',
-  }: {
-    orientation?: keyof typeof orientationMap
-  }) => [
+  ({ orientation = 'center' }: { orientation?: keyof typeof orientationMap }) => [
     css`
       ${tw`flex whitespace-nowrap leading-5`}
       &::after,
@@ -37,7 +33,7 @@ const DividerWarp = styled.div(
       &::before {
         width: ${orientationMap[orientation].before};
       }
-    `,
+    `
   ]
 )
 
@@ -53,21 +49,19 @@ export const Divider = styled((props: PropsWithChildren<DividerPropsType>) => {
     <>
       <Global
         styles={css`
-      .light {
-        .pitrix-divider {
-          ${tw`border-neut-3 text-neut-15`}
-        }
-        
-      }
-      .dark {
-        .pitrix-divider {
-          ${tw`border-line-dark text-white`}}
-        }
-        
-        .icon .qicon {
-          ${tw`text-white`}
+          .pitrix-divider {
+            ${tw`border-neut-3 text-neut-15`}
           }
-        }`}
+
+          .dark {
+            .pitrix-divider {
+              ${tw`border-line-dark text-white`}
+              .icon .qicon {
+                ${tw`text-white`}
+              }
+            }
+          }
+        `}
       />
       <DividerWarp
         theme={theme}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { useWindowSize } from 'react-use'
+// import { useWindowSize } from 'react-use'
 import { observer } from 'mobx-react-lite'
 import { get, omitBy } from 'lodash-es'
 import { useImmer } from 'use-immer'
@@ -13,27 +13,28 @@ import { Tooltip, FlexBox, TextEllipsis } from 'components'
 import { useHistory } from 'react-router-dom'
 import TableRowOpt from './TableRowOpt'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
+
+const isNetworkInit = (platform: Record<string, any>, space: Record<string, any>) =>
+  platform &&
+  platform.work_in_iaas &&
+  platform.enable_network &&
+  space.status !== 2 &&
+  !space.network_is_init
 
 const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
-  const {
-    defaultColumns,
-    columnSettings,
-    selectedSpaces,
-    queryKeyWord,
-    queryRefetch,
-  } = stateStore
+  const { defaultColumns, columnSettings, selectedSpaces, queryKeyWord, queryRefetch } = stateStore
   // const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const selectedRowKeys = selectedSpaces.map((i: Record<string, any>) => i.id)
-  const { width: winW } = useWindowSize()
+  // const { width: winW } = useWindowSize()
   const [sort, setSort] = useImmer<{
     name: string
     created: string
     [p: string]: unknown
   }>({
     name: 'asc',
-    created: 'desc',
+    created: 'desc'
   })
 
   const history = useHistory()
@@ -56,21 +57,20 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     reverse: true,
     search: '',
     sort_by: '',
-    status: '',
+    status: ''
   })
+  // const ifExceedMaxWidth = winW > 1535
 
-  const ifExceedMaxWidth = winW > 1535
-
-  const columns = useMemo(() => {
-    return defaultColumns.map(
-      ({ title, dataIndex }: { title: string; dataIndex: string }) => {
+  const columns = useMemo(
+    () =>
+      defaultColumns.map(({ title, dataIndex }: { title: string; dataIndex: string }) => {
         if (dataIndex === 'id') {
           return {
             title,
             dataIndex,
             sortable: true,
             sortKey: 'name',
-            width: 200,
+            // width: 200,
             sortOrder: sort.name,
             render: (field: string, row: any) => (
               <div tw="flex items-center w-full">
@@ -83,11 +83,8 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                 <div tw="ml-2 flex-1 overflow-hidden">
                   <TextEllipsis>
                     <span
-                      className={row.status === 1 && 'row-name'}
-                      css={[
-                        tw`font-semibold`,
-                        row.status === 1 && tw`cursor-pointer`,
-                      ]}
+                      className={row.status === 1 ? 'row-name' : ''}
+                      css={[tw`font-semibold`, row.status === 1 && tw`cursor-pointer`]}
                       onClick={() => {
                         if (row.status === 1) {
                           history.push(`${regionId}/workspace/${field}/upcloud`)
@@ -100,16 +97,17 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                   <div tw="text-neut-8">{field}</div>
                 </div>
               </div>
-            ),
+            )
           }
         }
         if (dataIndex === 'status') {
           const filterMenus = [
             { value: '', text: '全部' },
             { value: 1, text: '活跃' },
-            { value: 2, text: '已禁用' },
+            { value: 2, text: '已禁用' }
           ]
           return {
+            width: 130,
             title: (
               <FlexBox tw="items-center">
                 <span>{title}</span>
@@ -121,11 +119,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                   content={
                     <Menu
                       selectedKey={String(filter.status || 'all')}
-                      onClick={(
-                        e: React.SyntheticEvent,
-                        k: string,
-                        v: number
-                      ) => {
+                      onClick={(e: React.SyntheticEvent, k: string, v: number) => {
                         setFilter((draft) => {
                           draft.status = k === 'all' ? '' : v
                           draft.offset = 0
@@ -133,21 +127,16 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                       }}
                     >
                       <div />
-                      {filterMenus.map((o) => {
-                        return (
-                          <MenuItem value={o.value} key={o.value || 'all'}>
-                            <FlexBox tw="items-center w-full justify-between">
-                              <span>{o.text}</span>
-                              {o.value === filter.status && (
-                                <i
-                                  className="if if-check"
-                                  tw="text-green-11 text-sm"
-                                />
-                              )}
-                            </FlexBox>
-                          </MenuItem>
-                        )
-                      })}
+                      {filterMenus.map((o) => (
+                        <MenuItem value={o.value} key={o.value || 'all'}>
+                          <FlexBox tw="items-center w-full justify-between">
+                            <span>{o.text}</span>
+                            {o.value === filter.status && (
+                              <i className="if if-check" tw="text-green-11 text-sm" />
+                            )}
+                          </FlexBox>
+                        </MenuItem>
+                      ))}
                     </Menu>
                   }
                 >
@@ -162,28 +151,26 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             render: (field: number) => (
               <div
                 css={[
-                  field === 1
-                    ? tw`bg-green-0 text-green-13`
-                    : tw`bg-[#FFFDED] text-[#A16207]`,
-                  tw`px-2 py-0.5 rounded-[20px] flex items-center`,
+                  field === 1 ? tw`bg-green-0 text-green-13` : tw`bg-[#FFFDED] text-[#A16207]`,
+                  tw`px-2 py-0.5 rounded-[20px] flex items-center`
                 ]}
               >
                 <div
                   css={[
                     field === 1 ? tw`bg-green-1` : tw`bg-[#FFD127]`,
-                    tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`,
+                    tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`
                   ]}
                 >
                   <div
                     css={[
                       field === 1 ? tw`bg-green-13` : tw`bg-[#A48A19]`,
-                      tw`w-1.5 h-1.5 rounded-full`,
+                      tw`w-1.5 h-1.5 rounded-full`
                     ]}
                   />
                 </div>
                 {field === 1 ? '活跃' : '已禁用'}
               </div>
-            ),
+            )
           }
         }
         if (dataIndex === 'owner') {
@@ -196,14 +183,14 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
                 {/* <div>xxx@test.com</div> */}
                 <div tw="text-neut-8">{field}</div>
               </div>
-            ),
+            )
           }
         }
         if (dataIndex === 'name') {
           return {
             title,
             dataIndex,
-            render: () => {},
+            render: () => {}
           }
         }
         if (dataIndex === 'desc') {
@@ -215,7 +202,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
               <div tw="truncate">
                 <TextEllipsis>{field || '暂无描述'}</TextEllipsis>
               </div>
-            ),
+            )
           }
         }
         if (dataIndex === 'created') {
@@ -223,45 +210,35 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
             title,
             dataIndex,
             sortable: true,
+            width: 200,
             sortKey: 'created',
             sortOrder: sort.created,
-            render: (filed: number) => formatDate(filed),
+            render: (filed: number) => formatDate(filed)
           }
         }
         if (dataIndex === 'updated') {
           return {
             title,
             dataIndex,
+            width: 400,
             // width: ifExceedMaxWidth ? 380 : 330,
-            width: ifExceedMaxWidth ? 320 : 280,
-            render: (filed: any, row: any) => (
-              <TableRowOpt space={row} regionId={regionId} />
-            ),
+            // width: ifExceedMaxWidth ? 320 : 280,
+            render: (filed: any, row: any) => <TableRowOpt space={row} regionId={regionId} />
           }
         }
         return null
-      }
-    )
-  }, [
-    defaultColumns,
-    sort.name,
-    sort.created,
-    filter.status,
-    ifExceedMaxWidth,
-    history,
-    regionId,
-    setFilter,
-  ])
+      }),
+    [defaultColumns, sort.name, sort.created, filter.status, history, regionId, setFilter]
+  )
 
   const filterColumn = columnSettings
-    .map((o: { key: string; checked: boolean }) => {
-      return o.checked && columns.find((col: any) => col.dataIndex === o.key)
-    })
+    .map(
+      (o: { key: string; checked: boolean }) =>
+        o.checked && columns.find((col: any) => col.dataIndex === o.key)
+    )
     .filter((o: any) => o)
 
-  const { isFetching, data, refetch } = useQueryPageWorkSpace(
-    omitBy(filter, (v) => v === '')
-  )
+  const { isFetching, data, refetch } = useQueryPageWorkSpace(omitBy(filter, (v) => v === ''))
 
   useEffect(() => {
     if (queryRefetch) {
@@ -301,17 +278,48 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     })
   }
 
-  const handleSelect = (keys, rows) => {
+  const handleSelect = (_: string[], rows: Record<string, any>[]) => {
     stateStore.set({ selectedSpaces: rows })
     // setSelectedRowKeys(keys)
   }
 
+  const columnsWithNetwork = useMemo(() => {
+    const defaultColumns1: Record<string, any>[] = filterColumn.length > 0 ? filterColumn : columns
+    return defaultColumns1.map((column) => ({
+      ...column,
+      render: (i: any, record: Record<string, any>) => {
+        const child = column.render ? column.render(i, record) : i
+        if (isNetworkInit(stateStore.platformConfig, record)) {
+          return (
+            <div tw="relative w-full h-full flex items-center">
+              <div
+                tw="absolute inset-0 z-50"
+                title="请单击以绑定网络信息"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  stateStore.set({
+                    curSpaceOpt: 'network',
+                    optSpaces: [record]
+                  })
+                }}
+              />
+              {child}
+            </div>
+          )
+        }
+        return child
+      }
+    }))
+  }, [filterColumn, columns, stateStore])
   return (
     <Table
       rowKey="id"
       loading={isFetching}
       selectType="checkbox"
       selectedRowKeys={selectedRowKeys}
+      disabledRowKeys={(data?.infos || [])
+        .filter((i) => isNetworkInit(stateStore.platformConfig, i))
+        .map((i) => i.id)}
       onSelect={handleSelect}
       css={[
         tw`table-auto`,
@@ -328,17 +336,17 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
               fill: #31cd88;
             }
           }
-        `,
+        `
       ]}
       dataSource={data?.infos || []}
-      columns={filterColumn.length > 0 ? filterColumn : columns}
+      columns={columnsWithNetwork}
       onSort={handleSort}
       pagination={{
         total: get(data, 'total', 0),
         current: Math.floor(filter.offset / filter.limit) + 1,
         pageSize: filter.limit,
         onPageChange: handlePageChange,
-        onShowSizeChange: handleShowSizeChange,
+        onShowSizeChange: handleShowSizeChange
       }}
     />
   )

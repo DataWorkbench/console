@@ -4,11 +4,14 @@ const inputStyles = css`
   .input-search {
     ${tw`text-base`}
   }
+  .textarea[disabled] {
+    opacity: 0.5;
+  }
   .dark {
     .input,
     .input-search {
       &:focus {
-        ${tw`caret-white!`}
+        ${tw`caret-[#939ea9]!`}
       }
     }
     .input,

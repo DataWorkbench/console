@@ -9,15 +9,15 @@ import { DndProvider } from 'react-dnd'
 import tw, { theme, css, styled } from 'twin.macro'
 
 import { useStore } from 'stores'
-import { RouterLink, Icons } from 'components'
+import { RouterLink } from 'components'
 
 import StreamOperator from '../Stream/StreamOperator'
 import StreamCode from '../Stream/StreamCode'
 import StreamJAR from '../Stream/StreamJAR'
 import SyncJob from '../Sync/SyncJob'
-import { getDiJobType, JobMode, JobType, IconWrapper } from './JobUtils'
+import { JobMode, getTag } from './JobUtils'
 
-const { TabPanel } = Tabs
+const { TabPanel } = Tabs as any
 
 const TabWrapper = styled(Tabs)(() => [
   tw`bg-neut-18 h-full flex flex-col`,
@@ -65,16 +65,15 @@ const TabWrapper = styled(Tabs)(() => [
         ${tw`flex h-full`}
       }
     }
-  `,
+  `
 ])
 
 const JobTabs = observer(() => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const notifyTmRef = useRef<any>(null)
   const {
     workFlowStore,
-    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify },
+    workFlowStore: { curJob, panels, addPanel, removePanel, showNotify }
   } = useStore()
 
   const added = curJob && findIndex(panels, (p) => p.id === curJob.id) > -1
@@ -92,7 +91,7 @@ const JobTabs = observer(() => {
       }
       notifyTmRef.current = setTimeout(() => {
         workFlowStore.set({
-          showNotify: false,
+          showNotify: false
         })
       }, 5000)
     }
@@ -105,34 +104,6 @@ const JobTabs = observer(() => {
   useUnmount(() => {
     workFlowStore.set({ panels: [], curJob: null, curViewJobId: null })
   })
-
-  const getTag = (job) => {
-    const { jobMode } = job
-    if (jobMode === JobMode.RT) {
-      return get(
-        {
-          1: '算子',
-          2: 'Sql',
-          3: 'Jar',
-          4: 'Python',
-          5: 'Scala',
-        },
-        job.type
-      )
-    }
-    if (jobMode === JobMode.DI) {
-      const tp = getDiJobType(job.type)
-      return (
-        <IconWrapper theme="grey">
-          <Icons
-            name={tp === JobType.OFFLINE ? 'DownloadBoxFill' : 'LayerFill'}
-            size={16}
-          />
-        </IconWrapper>
-      )
-    }
-    return null
-  }
 
   return (
     <div tw="flex-1 w-full overflow-x-hidden">
@@ -147,7 +118,7 @@ const JobTabs = observer(() => {
                   size={20}
                   tw="mr-2"
                   color={{
-                    secondary: theme('colors.green.11'),
+                    secondary: theme('colors.green.11')
                   }}
                 />
                 <div tw="pointer-events-auto">
@@ -175,7 +146,7 @@ const JobTabs = observer(() => {
             workFlowStore.showSaveConfirm(name, 'switch')
           } else {
             workFlowStore.set({
-              curJob: panels.find((p) => p.id === name),
+              curJob: panels.find((p) => p.id === name)
             })
           }
         }}
@@ -195,7 +166,7 @@ const JobTabs = observer(() => {
             label={
               <div tw="inline-flex items-center justify-center">
                 <div
-                  tw="scale-75"
+                  tw="scale-75 h-4! w-4! mr-1"
                   className={job.jobMode === JobMode.RT ? 'tag' : ''}
                 >
                   {getTag(job)}

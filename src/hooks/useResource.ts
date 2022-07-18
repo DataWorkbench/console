@@ -8,7 +8,7 @@ import {
   deleteResource,
   updateResource,
   downloadFile,
-  reuploadResource,
+  reuploadResource
 } from 'stores/api'
 
 interface IRouteParams {
@@ -20,12 +20,14 @@ interface IRouteParams {
 const keys: {
   infinite: any
   page: any
+  detail: any
 } = {
   infinite: '',
   page: '',
+  detail: ''
 }
 
-export const getResourceKey = (kind: 'infinite' | 'page' = 'page') => keys[kind]
+export const getResourceKey = (kind: 'infinite' | 'page' | 'detail' = 'page') => keys[kind]
 
 export const useQueryResource = (filter: Record<string, any>, options = {}) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
@@ -36,7 +38,7 @@ export const useQueryResource = (filter: Record<string, any>, options = {}) => {
     regionId,
     spaceId,
     limit: 10,
-    ...rest,
+    ...rest
   }
 
   const queryKey = ['resource', params]
@@ -44,9 +46,7 @@ export const useQueryResource = (filter: Record<string, any>, options = {}) => {
 
   return useInfiniteQuery(
     queryKey,
-    async ({ pageParam = filter }) => {
-      return loadResourceList({ ...pageParam, regionId, spaceId })
-    },
+    async ({ pageParam = filter }) => loadResourceList({ ...pageParam, regionId, spaceId }),
     {
       getNextPageParam: (lastPage: any, allPages: any) => {
         if (lastPage.has_more) {
@@ -57,14 +57,14 @@ export const useQueryResource = (filter: Record<string, any>, options = {}) => {
           if (nextOffset < lastPage.total) {
             const nextFilter = {
               ...filter,
-              offset: nextOffset,
+              offset: nextOffset
             }
             return nextFilter
           }
         }
         return undefined
       },
-      ...options,
+      ...options
     }
   )
 }
@@ -74,17 +74,19 @@ let resourcePageKey: any = ''
 export const getResourcePageQueryKey = () => resourcePageKey
 
 export const useQueryResourceByPage = (filter: any) => {
+  const types = filter.type ? [filter.type] : undefined
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    types,
+    ...filter
   }
   resourcePageKey = ['resourcePageList', params]
   return useQuery(resourcePageKey, async () => loadResourceList(params), {
-    keepPreviousData: true,
+    keepPreviousData: true
   })
 }
 
@@ -105,7 +107,7 @@ export const useMutationResource = () => {
       const params: any = {
         ...rest,
         regionId,
-        spaceId,
+        spaceId
       }
       let ret = null
       let endpoint = ''
@@ -116,7 +118,7 @@ export const useMutationResource = () => {
             regionId,
             spaceId,
             name: formParams.name,
-            type: formParams.type,
+            type: formParams.type
           },
           { cancel }
         )
@@ -137,8 +139,8 @@ export const useMutationResource = () => {
             uri,
             method: op === 'enable' ? 'GET' : 'POST',
             headers: {
-              'Content-Type': op === 'enable' ? '' : 'multipart/form-data',
-            },
+              'Content-Type': op === 'enable' ? '' : 'multipart/form-data'
+            }
           },
           { cancel }
         )
@@ -150,7 +152,7 @@ export const useMutationResource = () => {
           cancel,
           endpoint,
           headers,
-          ...formParams,
+          ...formParams
         })
       } else if (op === 'edit') {
         params.type = undefined
@@ -164,7 +166,7 @@ export const useMutationResource = () => {
           cancel,
           endpoint,
           headers,
-          ...formParams,
+          ...formParams
         })
       }
       return ret

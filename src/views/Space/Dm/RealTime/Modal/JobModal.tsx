@@ -1,40 +1,44 @@
-import { useRef, useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useImmer } from 'use-immer'
 import {
-  Modal,
-  ModalStep,
-  ModalContent,
   AffixLabel,
+  Modal,
+  ModalContent,
+  ModalStep,
   SelectTreeField,
+  HelpCenterLink,
+  Center
 } from 'components'
-import { Icon, Form, Button } from '@QCFE/qingcloud-portal-ui'
-import { get, cloneDeep } from 'lodash-es'
+import { Button, Form, Icon } from '@QCFE/qingcloud-portal-ui'
+import { cloneDeep, get } from 'lodash-es'
 import { useWindowSize } from 'react-use'
 import tw, { css, styled } from 'twin.macro'
 import { TreeNodeProps } from 'rc-tree'
 import { observer } from 'mobx-react-lite'
-import { useStore, useMutationStreamJob, useFetchJob } from 'hooks'
+import { useFetchJob, useMutationStreamJob, useStore } from 'hooks'
 import { Control, Field, Label } from '@QCFE/lego-ui'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { nameMatchRegex, strlen } from 'utils/convert'
+import {
+  RealTimeRadioGroupField,
+  RealTimeSyncTypeVal
+} from 'views/Space/Dm/RealTime/Sync/RealTimeRadioGroup'
+// import { sourceTypes } from 'views/Space/Ops/DataIntegration/constants'
 import { JobModeItem } from './JobModeItem'
 import {
-  JobMode,
-  JobType,
-  jobModeData,
-  renderIcon,
-  getJobMode,
-  renderSwitcherIcon,
-  isRootNode,
-  getNewTreeData,
   filterFolderOfTreeData,
   getDiJobType,
-  SyncJobType,
+  getJobMode,
+  getNewTreeData,
+  isRootNode,
+  JobMode,
+  jobModeData,
+  JobType,
+  renderIcon,
+  renderSwitcherIcon,
+  SyncJobType
 } from '../Job/JobUtils'
-import {
-  SyncTypeRadioGroupField,
-  SyncTypeVal,
-} from '../Sync/SyncTypeRadioGroup'
+import { SyncTypeRadioGroupField, SyncTypeVal } from '../Sync/SyncTypeRadioGroup'
 
 const { TextField, TextAreaField } = Form
 
@@ -61,7 +65,7 @@ const FormWrapper = styled('div')(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 export interface JobModalData {
@@ -85,7 +89,7 @@ export const JobModal = observer((props: JobModalProps) => {
   const fetchJob = useFetchJob()
   const {
     workFlowStore,
-    workFlowStore: { treeData, loadedKeys },
+    workFlowStore: { treeData, loadedKeys }
   } = useStore()
   const form = useRef<Form>(null)
   const [showCluster, setShowCluster] = useState(false)
@@ -104,13 +108,17 @@ export const JobModal = observer((props: JobModalProps) => {
       jobType: type,
       pid: jobNode ? get(jobNode, isEdit ? 'pid' : 'key') : '',
       job: isEdit ? get(jobNode, 'job') : null,
+      realTimeInfo: {
+        targetType: '',
+        sourceType: ''
+      },
       syncTypeInfo: {
         type: 'full',
         fullSource: '',
         fullSink: '',
         incrSource: '',
-        incrSink: '',
-      } as SyncTypeVal,
+        incrSink: ''
+      } as SyncTypeVal
     }
   })
 
@@ -136,13 +144,13 @@ export const JobModal = observer((props: JobModalProps) => {
   const fetchJobTreeData = (node: any) => {
     const tp = params.jobMode === JobMode.DI ? 'sync' : 'stream'
     return fetchJob(tp, {
-      pid: isRootNode(node.key) ? '' : node.key,
+      pid: isRootNode(node.key) ? '' : node.key
     }).then((data) => {
       const jobs = get(data, 'infos') || []
       const newTreeData = getNewTreeData(treeData, node, jobs)
       workFlowStore.set({
         treeData: newTreeData,
-        loadedKeys: [...loadedKeys, node.key],
+        loadedKeys: [...loadedKeys, node.key]
       })
     })
   }
@@ -167,11 +175,15 @@ export const JobModal = observer((props: JobModalProps) => {
       })
     } else if (form.current?.validateForm()) {
       const fields = form.current.getFieldsValue()
-      const { syncTypeInfo, ...rest }: { syncTypeInfo: SyncTypeVal } = fields
+      const {
+        syncTypeInfo,
+        realTimeInfo,
+        ...rest
+      }: { syncTypeInfo: SyncTypeVal; realTimeInfo: RealTimeSyncTypeVal } = fields
       const data: any = {
         op: isEdit ? 'edit' : 'create',
         jobMode: params.jobMode,
-        ...rest,
+        ...rest
       }
       if (isEdit) {
         data.jobId = job.id
@@ -184,19 +196,10 @@ export const JobModal = observer((props: JobModalProps) => {
         }
         if (params.jobMode === JobMode.RT) {
           data.type = params.jobType
-        } else if (params.jobMode === JobMode.DI) {
-          if (params.jobType === JobType.OFFLINE) {
-            data.type =
-              syncTypeInfo.type === 'full'
-                ? SyncJobType.OFFLINEFULL
-                : SyncJobType.OFFLINEINCREMENT
-          }
-          if (params.jobType === JobType.REALTIME) {
-            data.type =
-              syncTypeInfo.type === 'full'
-                ? SyncJobType.REALTIME
-                : SyncJobType.REALTIME
-          }
+        } else if (params.jobMode === JobMode.DI && params.jobType === JobType.OFFLINE) {
+          data.type =
+            syncTypeInfo.type === 'full' ? SyncJobType.OFFLINEFULL : SyncJobType.OFFLINEINCREMENT
+
           if (syncTypeInfo.type === 'full') {
             data.source_type = syncTypeInfo.fullSource
             data.target_type = syncTypeInfo.fullSink
@@ -204,6 +207,10 @@ export const JobModal = observer((props: JobModalProps) => {
             data.source_type = syncTypeInfo.incrSource
             data.target_type = syncTypeInfo.incrSink
           }
+        } else if (params.jobMode === JobMode.DI && params.jobType === JobType.REALTIME) {
+          data.type = SyncJobType.REALTIME
+          data.source_type = realTimeInfo.sourceType
+          data.target_type = realTimeInfo.targetType
         }
       }
       mutation.mutate(data, {
@@ -214,9 +221,9 @@ export const JobModal = observer((props: JobModalProps) => {
             pNode,
             jobMode: params.jobMode,
             type: data.type,
-            isEdit,
+            isEdit
           })
-        },
+        }
       })
     }
   }
@@ -275,9 +282,7 @@ export const JobModal = observer((props: JobModalProps) => {
           )}
           <ModalContent>
             <div css={params.step !== 0 && tw`hidden`}>
-              <div tw="mb-4 text-sm leading-6">
-                请选择您要进行作业开发的模式：
-              </div>
+              <div tw="mb-4 text-sm leading-6">请选择您要进行作业开发的模式：</div>
               <div tw="flex justify-between space-x-3 2xl:space-x-5 mb-5">
                 {jobModeData.map((modeItem) => {
                   const selected = params.jobMode === modeItem.mode
@@ -315,20 +320,32 @@ export const JobModal = observer((props: JobModalProps) => {
                             <AffixLabel>开发模式</AffixLabel>
                           </Label>
                           <Control>
-                            {params.jobType === JobType.OFFLINE && (
-                              <span>数据集成-离线同步</span>
-                            )}
-                            {params.jobType === JobType.REALTIME && (
-                              <span>数据集成-实时同步</span>
-                            )}
+                            {params.jobType === JobType.OFFLINE && <span>数据集成-离线同步</span>}
+                            {params.jobType === JobType.REALTIME && <span>数据集成-实时同步</span>}
                           </Control>
                         </Field>
-                        {!isEdit && (
+                        {!isEdit && params.jobType === JobType.REALTIME && (
+                          <Field>
+                            <Label>
+                              <AffixLabel>同步类型</AffixLabel>
+                            </Label>
+                            <Control>
+                              <span>实时同步</span>
+                            </Control>
+                          </Field>
+                        )}
+
+                        {!isEdit && params.jobType === JobType.OFFLINE && (
                           <SyncTypeRadioGroupField
+                            css={css`
+                              .label {
+                                ${tw`items-start!`}
+                              }
+                            `}
                             label={<AffixLabel>同步类型</AffixLabel>}
                             name="syncTypeInfo"
                             value={params.syncTypeInfo}
-                            onChange={(v) => {
+                            onChange={(v: SyncTypeVal) => {
                               setParams((draft) => {
                                 draft.syncTypeInfo = v
                               })
@@ -339,24 +356,65 @@ export const JobModal = observer((props: JobModalProps) => {
                                 rule: (value: SyncTypeVal) => {
                                   if (
                                     (value.type === 'full' &&
-                                      (value.fullSource === '' ||
-                                        value.fullSink === '')) ||
+                                      (value.fullSource === '' || value.fullSink === '')) ||
                                     (value.type === 'incr' &&
-                                      (value.incrSource === '' ||
-                                        value.incrSink === ''))
+                                      (value.incrSource === '' || value.incrSink === ''))
                                   ) {
                                     return false
                                   }
                                   return true
                                 },
+                                help: (
+                                  <Center>
+                                    <div tw="mr-1.5 pt-[1px]">请选择同步数据源信息</div>
+                                    <HelpCenterLink
+                                      hasIcon
+                                      isIframe={false}
+                                      href="/manual/integration_job/sync_type/#全量同步与增量同步支持的数据源类型"
+                                    >
+                                      支持数据源
+                                    </HelpCenterLink>
+                                  </Center>
+                                ),
+                                status: 'error'
+                              }
+                            ]}
+                          />
+                        )}
+                        {!isEdit && params.jobType === JobType.REALTIME && (
+                          <RealTimeRadioGroupField
+                            name="realTimeInfo"
+                            label={<AffixLabel>数据源类型</AffixLabel>}
+                            value={params.realTimeInfo}
+                            onChange={(v: RealTimeSyncTypeVal) => {
+                              setParams((draft) => {
+                                draft.realTimeInfo = v
+                              })
+                            }}
+                            validateOnChange
+                            schemas={[
+                              {
+                                rule: ({
+                                  sourceType,
+                                  targetType
+                                }: {
+                                  sourceType?: string
+                                  targetType?: string
+                                } = {}) => {
+                                  if (!sourceType || !targetType) {
+                                    return false
+                                  }
+                                  return true
+                                },
                                 help: '请选择同步数据源信息',
-                                status: 'error',
-                              },
+                                status: 'error'
+                              }
                             ]}
                           />
                         )}
                       </>
                     )}
+
                     <TextField
                       autoComplete="off"
                       name="name"
@@ -368,10 +426,10 @@ export const JobModal = observer((props: JobModalProps) => {
                         {
                           rule: {
                             required: true,
-                            matchRegex: nameMatchRegex,
+                            matchRegex: nameMatchRegex
                           },
                           help: '允许包含字母、数字或下划线（_）,不能以（_）开始结尾',
-                          status: 'error',
+                          status: 'error'
                         },
                         {
                           rule: (value: string) => {
@@ -379,8 +437,8 @@ export const JobModal = observer((props: JobModalProps) => {
                             return l >= 2 && l <= 128
                           },
                           help: '允许包含字母、数字 及 "_"，长度2～128',
-                          status: 'error',
-                        },
+                          status: 'error'
+                        }
                       ]}
                     />
                     <SelectTreeField
@@ -391,27 +449,19 @@ export const JobModal = observer((props: JobModalProps) => {
                       disabled={isEdit}
                       schemas={[
                         {
-                          rule: (v: string) => {
-                            return v !== ''
-                          },
+                          rule: (v: string) => v !== '',
                           help: '请选择作业所在目录',
-                          status: 'error',
-                        },
+                          status: 'error'
+                        }
                       ]}
                       icon={renderIcon}
                       switcherIcon={renderSwitcherIcon}
                       treeData={filterFolderOfTreeData(
-                        cloneDeep(
-                          treeData.filter(
-                            (item) => item.jobMode === params.jobMode
-                          )
-                        )
+                        cloneDeep(treeData.filter((item) => item.jobMode === params.jobMode))
                       )}
                       loadData={fetchJobTreeData}
                       loadedKeys={loadedKeys}
-                      onLoad={(keys: string | number) =>
-                        workFlowStore.set({ loadedKeys: keys })
-                      }
+                      onLoad={(keys: string | number) => workFlowStore.set({ loadedKeys: keys })}
                       value={params.pid}
                       onChange={(v: string, node: Record<string, any>) => {
                         setParams((draft) => {
@@ -446,7 +496,7 @@ export const JobModal = observer((props: JobModalProps) => {
                                   .icon:hover {
                                     ${tw`bg-neut-13!`}
                                   }
-                                `,
+                                `
                               ]}
                             >
                               <Icon name="close" size={20} />
@@ -468,8 +518,8 @@ export const JobModal = observer((props: JobModalProps) => {
                             return l <= 1024
                           },
                           help: '最大字符长度1024字节',
-                          status: 'error',
-                        },
+                          status: 'error'
+                        }
                       ]}
                     />
                   </Form>

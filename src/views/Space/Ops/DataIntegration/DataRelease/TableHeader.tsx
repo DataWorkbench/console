@@ -20,7 +20,7 @@ interface ITableHeaderProps {
 
 const TableHeader = observer((props: ITableHeaderProps) => {
   const {
-    columnsSetting: { storageKey, onSave, columns },
+    columnsSetting: { storageKey, onSave, columns }
   } = props
 
   const queryClient = useQueryClient()
@@ -36,8 +36,8 @@ const TableHeader = observer((props: ITableHeaderProps) => {
         filterLinkKey={storageKey}
         suggestions={dataReleaseSuggestions}
         tw="border-line-dark!"
-        searchKey="job_name"
-        placeholder="通过指定属性的关键词进行搜索"
+        searchKey="search"
+        placeholder="搜索关键字或输入过滤条件"
         // isMultiKeyword
         defaultKeywordLabel="作业名称"
       />
@@ -52,11 +52,7 @@ const TableHeader = observer((props: ITableHeaderProps) => {
       >
         <Icon name="if-refresh" tw="text-xl text-white" type="light" />
       </Button>
-      <ColumnsSetting
-        defaultColumns={columns}
-        storageKey={storageKey}
-        onSave={onSave}
-      />
+      <ColumnsSetting defaultColumns={columns} storageKey={storageKey} onSave={onSave} />
     </FlexBox>
   )
 })

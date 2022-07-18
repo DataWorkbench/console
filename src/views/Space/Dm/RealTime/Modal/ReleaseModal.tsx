@@ -10,7 +10,7 @@ import {
   useMutationReleaseSyncJob,
   useQueryStreamJobSchedule,
   useQuerySyncJobSchedule,
-  useStore,
+  useStore
 } from 'hooks'
 import { strlen } from 'utils'
 
@@ -21,56 +21,51 @@ const ModalWrapper = styled(Modal)(() => [
     .modal-card-body {
       ${tw`py-0`}
     }
-  `,
+  `
 ])
 
 const ReleaseModal = ({
   onCancel,
-  onSuccess,
+  onSuccess
 }: {
   onCancel?: () => void
   onSuccess?: () => void
+  // onOk: (isSubmit?: boolean, cb?: Function) => void
 }) => {
   const {
-    workFlowStore: { curJob },
+    workFlowStore: { curJob }
   } = useStore()
   const form = useRef<Form>(null)
   const useMutationReleaseJob =
-    curJob?.jobMode === 'RT'
-      ? useMutationReleaseStreamJob
-      : useMutationReleaseSyncJob
+    curJob?.jobMode === 'RT' ? useMutationReleaseStreamJob : useMutationReleaseSyncJob
   const releaseMutation = useMutationReleaseJob()
   const useQueryJobSchedule =
-    curJob?.jobMode === 'RT'
-      ? useQueryStreamJobSchedule
-      : useQuerySyncJobSchedule
+    curJob?.jobMode === 'RT' ? useQueryStreamJobSchedule : useQuerySyncJobSchedule
   const { data: scheData } = useQueryJobSchedule()
 
   const [params, setParams] = useImmer({
     desc: '',
-    stopRunning: false,
+    stopRunning: false
   })
   const concurrency = [
     {
       value: 1,
       text: '允许',
       desc: '同一时间，允许运行多个作业实例',
-      ntEndDesc:
-        '如有实例正在运行，本次发布并执行后，新生成的实例会与当前正在运行中的实例同时运行',
+      ntEndDesc: '如有实例正在运行，本次发布并执行后，新生成的实例会与当前正在运行中的实例同时运行'
     },
     {
       value: 2,
       text: '禁止',
       desc: '同一时间，只允许运行一个作业实例, 如果到达调度周期的执行时间点时上一个实例还没有运行完成, 则放弃本次实例的运行',
-      ntEndDesc: '如有实例正在运行，本次发布成功后，会被忽略执行',
+      ntEndDesc: '如有实例正在运行，本次发布成功后，会被忽略执行'
     },
     {
       value: 3,
       text: '替换',
       desc: '同一时间，只允许运行一个作业实例，如果到达调度周期的执行点时上一个实例还没运行完成, 则将这个实例终止, 然后启动新的实例',
-      ntEndDesc:
-        '如有实例正在运行，本次发布并执行后，当前运行中的实例会被强制终止, 并启动新的实例',
-    },
+      ntEndDesc: '如有实例正在运行，本次发布并执行后，当前运行中的实例会被强制终止, 并启动新的实例'
+    }
   ].find((o) => o.value === get(scheData, 'concurrency_policy'))
 
   const onOk = () => {
@@ -78,14 +73,14 @@ const ReleaseModal = ({
       releaseMutation.mutate(
         {
           desc: params.desc,
-          stop_running: params.stopRunning,
+          stop_running: params.stopRunning
         },
         {
           onSuccess: () => {
             if (onSuccess) {
               onSuccess()
             }
-          },
+          }
         }
       )
     }
@@ -102,11 +97,7 @@ const ReleaseModal = ({
       maskClosable={!releaseMutation.isLoading}
     >
       <div tw="flex">
-        <Icon
-          name="exclamation"
-          color={{ secondary: '#F5C414', primary: '' }}
-          size={20}
-        />
+        <Icon name="exclamation" color={{ secondary: '#F5C414', primary: '' }} size={20} />
         <div tw="ml-3">
           <div tw="text-base">发布此作业至调度系统</div>
           <div tw="mt-2 text-neut-8">
@@ -130,8 +121,8 @@ const ReleaseModal = ({
                   return l <= 1024
                 },
                 help: '最大字符长度1024字节',
-                status: 'error',
-              },
+                status: 'error'
+              }
             ]}
             value={params.desc}
             onChange={(v: string | number) =>
@@ -160,25 +151,25 @@ const ReleaseModal = ({
             }}
             options={[
               {
+                // @ts-ignore
                 label: (
                   <>
                     <span>不终止 当前作业正在运行中的实例</span>
                     <div tw="ml-5 text-neut-8">{concurrency?.ntEndDesc}</div>
                   </>
                 ),
-                value: false,
+                value: false
               },
               {
+                // @ts-ignore
                 label: (
                   <>
                     <span>终止 当前作业正在运行中的实例</span>
-                    <div tw="ml-5 text-neut-8">
-                      如有实例正在运行 ，此运行中的实例会被强制终止
-                    </div>
+                    <div tw="ml-5 text-neut-8">如有实例正在运行 ，此运行中的实例会被强制终止</div>
                   </>
                 ),
-                value: true,
-              },
+                value: true
+              }
             ]}
           />
         </div>

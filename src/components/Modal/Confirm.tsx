@@ -7,7 +7,7 @@ enum ConfirmType {
   'INFO' = 'info',
   'WARN' = 'warn',
   'ERROR' = 'error',
-  'SUCCESS' = 'success',
+  'SUCCESS' = 'success'
 }
 
 export interface ConfirmProps {
@@ -18,22 +18,16 @@ export interface ConfirmProps {
 
 export const ModalWrapper = styled(Modal)(() => [
   css`
-    .modal-card-head,
     .modal-card-foot {
       ${tw`border-none`}
     }
     .modal-card-body {
       ${tw`pt-0 px-6`}
     }
-  `,
+  `
 ])
 
-export const Confirm = ({
-  title,
-  children,
-  type,
-  ...otherProps
-}: ConfirmProps & ModalProps) => {
+export const Confirm = ({ title, children, type, ...otherProps }: ConfirmProps & ModalProps) => {
   const getIcon = () => {
     switch (type) {
       case ConfirmType.INFO:
@@ -43,7 +37,7 @@ export const Confirm = ({
           <Icon
             name="exclamation"
             color={{
-              secondary: '#FFD127',
+              secondary: '#FFD127'
             }}
             size={24}
           />
@@ -55,7 +49,7 @@ export const Confirm = ({
             size={24}
             color={{
               primary: theme('colors.white'),
-              secondary: theme('colors.red.10'),
+              secondary: theme('colors.red.10')
             }}
           />
         )

@@ -3,6 +3,25 @@ import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
 import type RootStore from './RootStore'
 
+enum SourceType {
+  Mysql = 1,
+  PostgreSQL = 2,
+  Kafka = 3,
+  ClickHouse = 5,
+  HBase = 6,
+  Ftp = 7,
+  HDFS = 8,
+  SqlServer = 9,
+  Oracle = 10,
+  DB2 = 11,
+  SapHana = 12,
+  Hive = 13,
+  ElasticSearch = 14,
+  MongoDB = 15,
+  Redis = 16,
+  TiDB = 1000000000000
+}
+
 interface IJob {
   id: string
   name: string
@@ -12,8 +31,8 @@ interface IJob {
   type: 1 | 2 | 3
   desc: string
   version: string
-  source_type?: number
-  target_type?: number
+  source_type?: SourceType
+  target_type?: SourceType
   jobMode?: 'DI' | 'RT' | 'OLE'
 }
 
@@ -24,16 +43,16 @@ const initTreeData = [
     jobMode: 'DI',
     title: '数据集成',
     isLeaf: false,
-    children: [],
+    children: []
   },
   {
     key: 'rt-root',
     pid: 'rt-root',
     jobMode: 'RT',
-    title: '实时-流式开发',
+    title: '数据开发',
     isLeaf: false,
-    children: [],
-  },
+    children: []
+  }
 ]
 class WorkFlowStore {
   rootStore
@@ -82,7 +101,7 @@ class WorkFlowStore {
     makeAutoObservable(this, {
       rootStore: false,
       treeData: observable.ref,
-      loadedKeys: observable.ref,
+      loadedKeys: observable.ref
     })
     this.rootStore = rootStore
   }
@@ -111,8 +130,7 @@ class WorkFlowStore {
     if (this.tabOp === 'close') {
       this.removePanel(this.opTabName)
     } else if (this.tabOp === 'switch') {
-      const job =
-        this.panels.find((p) => p.id === this.opTabName) || this.nextJob
+      const job = this.panels.find((p) => p.id === this.opTabName) || this.nextJob
       if (job) {
         this.curJob = job
       }
@@ -128,10 +146,7 @@ class WorkFlowStore {
     this.nextJob = null
   }
 
-  showSaveConfirm = (
-    opTabName: string,
-    op: 'switch' | 'close' | 'leave' = 'switch'
-  ) => {
+  showSaveConfirm = (opTabName: string, op: 'switch' | 'close' | 'leave' = 'switch') => {
     this.showSaveJobConfirm = true
     this.opTabName = opTabName
     this.tabOp = op
@@ -144,7 +159,7 @@ class WorkFlowStore {
     this.tabOp = ''
   }
 
-  set(params: { [key: string]: any }) {
+  set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }
 

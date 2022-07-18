@@ -22,7 +22,7 @@ const ModalWrapper = styled(Modal)(() => [
       border-top: 0;
       ${tw`pb-4!`}
     }
-  `,
+  `
 ])
 
 const OfflineModal = observer(({ refetch }: { refetch?: Function }) => {
@@ -46,7 +46,7 @@ const OfflineModal = observer(({ refetch }: { refetch?: Function }) => {
           appendToBody
           onCancel={() => {
             set({
-              showOffline: false,
+              showOffline: false
             })
             checkRef.current = false
           }}
@@ -57,19 +57,18 @@ const OfflineModal = observer(({ refetch }: { refetch?: Function }) => {
               mutation.mutateAsync({
                 op: 'offline',
                 jobId: selectedData?.id,
-                stop_running: checkRef.current,
-              }),
+                stop_running: checkRef.current
+              })
               // mutation.mutateAsync({
               //   op: checkRef.current ? 'suspend' : '',
               //   jobId: selectedData?.id,
               // }),
             ]).then(() => {
               set({
-                showOffline: false,
+                showOffline: false
               })
               checkRef.current = false
               if (refetch) {
-                console.log(11111)
                 refetch()
               } else {
                 refetchData()
@@ -79,15 +78,9 @@ const OfflineModal = observer(({ refetch }: { refetch?: Function }) => {
         >
           <div>
             <FlexBox tw="gap-3">
-              <Icon
-                name="if-exclamation"
-                size={24}
-                tw="text-[24px] text-[#FFD127] leading-6"
-              />
+              <Icon name="if-exclamation" size={24} tw="text-[24px] text-[#FFD127] leading-6" />
               <div tw="grid gap-2">
-                <div tw="text-white text-[16px] leading-6">
-                  下线作业 {selectedData?.name}
-                </div>
+                <div tw="text-white text-[16px] leading-6">下线作业 {selectedData?.name}</div>
                 <div tw="text-neut-8 leading-5">
                   作业下线后，相关实例需要手动恢复执行，确认从调度系统移除作业么?
                 </div>

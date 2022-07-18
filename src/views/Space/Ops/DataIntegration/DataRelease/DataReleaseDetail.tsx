@@ -4,17 +4,17 @@ import { Card, Center, FlexBox, MoreAction, Tooltip } from 'components'
 import { useHistory, useLocation } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
-import icons from 'views/Space/Ops/DataIntegration/icons'
+import icons from 'views/Space/Ops/icons'
 import { Collapse, Tabs } from '@QCFE/lego-ui'
 import dayjs from 'dayjs'
 import qs from 'qs'
 import { HorizonTabs } from 'views/Space/Dm/styled'
-import Cluster from 'views/Space/Ops/DataIntegration/components/Cluster'
+import Cluster from 'views/Space/Ops/components/Cluster'
 import useIcon from 'hooks/useHooks/useIcon'
-import Schedule from 'views/Space/Ops/DataIntegration/components/Schedule'
+import Schedule from 'views/Space/Ops/components/Schedule'
 // import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
-import LinkInstance from 'views/Space/Ops/DataIntegration/components/LinkInstance'
-import DevContent from 'views/Space/Ops/DataIntegration/components/DevContent'
+import LinkInstance from 'views/Space/Ops/components/LinkInstance'
+import DevContent from 'views/Space/Ops/components/DevContent'
 import { observer } from 'mobx-react-lite'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
 import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSourceModal'
@@ -22,22 +22,18 @@ import { useDataReleaseStore } from 'views/Space/Ops/DataIntegration/DataRelease
 import {
   useQuerySyncJobVersionConf,
   useQuerySyncJobVersionDetail,
-  useQuerySyncJobVersionSchedule,
+  useQuerySyncJobVersionSchedule
 } from 'hooks/useJobVersion'
 import OfflineModal from 'views/Space/Ops/DataIntegration/DataRelease/OfflineModal'
-import {
-  AlarmStatusCmp,
-  Circle,
-  DbTypeCmp,
-  JobInstanceStatusCmp,
-  JobTypeCmp,
-} from '../styledComponents'
+import { useMutationJobRelease } from 'hooks'
+import { Circle, DbTypeCmp, JobTypeCmp, JobInstanceStatusCmp } from '../../styledComponents'
 import {
   dataReleaseDetailActions,
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
   DataReleaseSchedule,
-  dataReleaseScheduleType,
+  dataReleaseScheduleType
 } from '../constants'
-import { useMutationJobRelease } from '../../../../../hooks/useJobRelease'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -61,7 +57,7 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
         ${tw`text-white!`}
       }
     }
-  `,
+  `
 ])
 
 const Root = styled.div`
@@ -78,7 +74,7 @@ const Root = styled.div`
     }
 
     & .tab-panel.is-active {
-      ${tw`h-full`}
+      ${tw`min-h-full`}
     }
   }
 `
@@ -111,7 +107,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
   // const { regionId, spaceId } = useParams<IRouteParams>()
 
-  const { showDataSource, set } = useDataReleaseStore()
+  const { showDataSource, set, datasourceId, datasourceType } = useDataReleaseStore()
 
   const history = useHistory()
   const { search } = useLocation()
@@ -123,27 +119,20 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
     history.push('../data-release')
   }
 
-  const { data, isFetching, refetch } = useQuerySyncJobVersionDetail<
-    Record<string, any>
-  >({
+  const { data, isFetching, refetch } = useQuerySyncJobVersionDetail<Record<string, any>>({
     jobId: id,
-    versionId: version,
+    versionId: version
   })
 
   const { data: scheduleData } = useQuerySyncJobVersionSchedule({
     jobId: id,
-    versionId: version,
+    versionId: version
   })
 
   const { data: config } = useQuerySyncJobVersionConf({
     jobId: id,
-    versionId: version,
+    versionId: version
   })
-
-  const handleClickDb = (datasourceId: string) => {
-    // loadDataSource()
-    console.log(datasourceId)
-  }
 
   const mutation = useMutationJobRelease()
 
@@ -152,14 +141,14 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
       case 'offline':
         set({
           showOffline: true,
-          selectedData: data,
+          selectedData: data
         })
         break
       case 're-publish':
         mutation
           .mutateAsync({
             op: 'release',
-            jobId: id,
+            jobId: id
           })
           .then(() => {
             refetch()
@@ -174,10 +163,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
   const filterActionFn = (item: { key: string }) => {
     let filterActionKey = ''
 
-    if (
-      dataReleaseScheduleType[data?.status as 2]?.type ===
-      DataReleaseSchedule.DOWNED
-    ) {
+    if (dataReleaseScheduleType[data?.status as 2]?.type === DataReleaseSchedule.DOWNED) {
       filterActionKey = 'offline'
     } else {
       filterActionKey = 're-publish'
@@ -199,12 +185,12 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
             onClick={() => toList()}
             css={css`
-            &:hover {
-              ${tw`bg-white cursor-pointer`}
-            .icon svg.qicon {
-              ${tw`text-neut-15!`}
-            }
-          `}
+              &:hover {
+                ${tw`bg-white cursor-pointer`}
+                .icon svg.qicon {
+                  ${tw`text-neut-15!`}
+                }
+            `}
           >
             <Icon
               name="previous"
@@ -219,10 +205,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             />
           </div>
         </Tooltip>
-        <CopyTextWrapper
-          text={`${data?.name ?? ''}(ID: ${id})`}
-          theme="light"
-        />
+        <CopyTextWrapper text={`${data?.name ?? ''}(ID: ${id})`} theme="light" />
       </FlexBox>
 
       <Card hasBoxShadow tw="bg-neut-16 relative">
@@ -233,13 +216,14 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
-            <Circle>
+            <Circle tw="w-10! h-10!">
               <Icon
                 name="q-downloadBoxFill"
                 type="light"
+                size={28}
                 css={css`
                   & .qicon {
-                    ${tw`text-white! fill-[#fff]!`}
+                    ${tw`text-white! fill-[#fff]! `}
                   }
                 `}
               />
@@ -247,27 +231,25 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             <div tw="flex-auto">
               <div tw="text-white">
                 <span tw="mr-3">{data?.name}</span>
-                <JobInstanceStatusCmp
-                  type={data?.status as 1}
-                  tw="inline-flex"
-                />
+                {/* // NOTE: 历史版本没有调度信息 */}
+                <JobInstanceStatusCmp type={data?.status as 1} tw="inline-flex" />
               </div>
               <div tw="text-neut-8">{data?.id}</div>
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            <MoreAction
-              items={dataReleaseDetailActions
-                .filter(filterActionFn)
-                .map((i) => ({
+            {false && (
+              <MoreAction
+                items={dataReleaseDetailActions.filter(filterActionFn).map((i) => ({
                   ...i,
-                  value: data,
+                  value: data
                 }))}
-              type="button"
-              buttonText="更多操作"
-              placement="bottom-start"
-              onMenuClick={handleAction}
-            />
+                type="button"
+                buttonText="更多操作"
+                placement="bottom-start"
+                onMenuClick={handleAction}
+              />
+            )}
 
             <Button
               onClick={() => {
@@ -289,19 +271,10 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>告警状态:</span>
-              <span>
-                <AlarmStatusCmp type={data?.alert_status} />
-              </span>
               <span>版本 ID:</span>
               <span>{data?.version}</span>
               <span>作业模式:</span>
-              <span>
-                {
-                  // TODO: 作业模式字段
-                  ''
-                }
-              </span>
+              <span>{dataReleaseDevModeType[config?.job_mode as 1]?.label}</span>
               <span>作业类型:</span>
               <span>
                 <JobTypeCmp type={data?.type} />
@@ -311,47 +284,65 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
             <GridItem>
               <span>数据来源:</span>
               <span tw="inline-block">
-                <div
-                  tw="align-middle"
-                  css={
-                    [
-                      // tw`cursor-pointer  hover:text-green-11`
-                    ]
-                  }
-
-                  // onClick={() => set({ showDataSource: true })}
-                >
-                  <DbTypeCmp
-                    devMode={config?.job_type}
-                    type={data?.source_type}
-                    onClick={() => handleClickDb(data?.source_id)}
-                  />
-                  <span tw="ml-1">{data?.source_name}</span>
-                </div>
-                <div tw="text-neut-8">{data?.source_id}</div>
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type === DataReleaseDevMode.UI &&
+                  config?.source_id && (
+                    <div tw="align-middle" css={[tw`cursor-pointer  hover:text-green-11`]}>
+                      <DbTypeCmp
+                        devMode={config?.job_type}
+                        type={data?.source_type}
+                        onClick={() =>
+                          set({
+                            showDataSource: true,
+                            datasourceType: data?.source_type,
+                            datasourceId: config?.source_id
+                          })
+                        }
+                      />
+                      <span tw="ml-1">{config?.source_name}</span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
+                  DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp devMode={config?.job_type} type={data?.source_type} />
+                )}
+                <div tw="text-neut-8">{config?.source_id}</div>
               </span>
               <span>数据目的:</span>
+
               <span tw="inline-block">
-                <div tw="align-middle">
-                  <DbTypeCmp
-                    devMode={config?.job_type}
-                    type={data?.target_type}
-                    onClick={() => handleClickDb(data?.target_id)}
-                  />
-                </div>
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type === DataReleaseDevMode.UI &&
+                  config?.target_id && (
+                    <div tw="align-middle" css={[tw`cursor-pointer  hover:text-green-11`]}>
+                      <DbTypeCmp
+                        devMode={config?.job_type}
+                        type={data?.target_type}
+                        onClick={() =>
+                          set({
+                            showDataSource: true,
+                            datasourceType: data?.target_type,
+                            datasourceId: config?.target_id
+                          })
+                        }
+                      />
+                      <span tw="ml-1">{config?.target_name}</span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[config?.job_mode as 1]?.type ===
+                  DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp devMode={config?.job_type} type={data?.target_type} />
+                )}
+                <div tw="text-neut-8">{config?.target_id}</div>
               </span>
             </GridItem>
 
             <GridItem labelWidth={84}>
-              <span>生效时间:</span>
-              <span>
-                {dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
-              </span>
-              <span>最近发布时间:</span>
-              <span>
-                {dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
-              </span>
-              <span>发布描述:</span>
+              {/* <span>生效时间:</span> */}
+              {/* <span> */}
+              {/*   {dayjs(data?.created * 1000).format('YYYY-MM-DD HH:mm:ss')} */}
+              {/* </span> */}
+              <span>更新时间:</span>
+              <span>{dayjs(data?.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>作业描述:</span>
               <span>{data?.desc}</span>
             </GridItem>
           </div>
@@ -360,12 +351,17 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
 
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent flex-auto"
+        tw="bg-transparent"
         // @ts-ignore
         activeName={activeName}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
         }}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
       >
         <TabPanel label="关联实例" name="link">
           <LinkInstance jobId={id} version={version} />
@@ -386,11 +382,9 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
       <AlertModal />
       {showDataSource && (
         <DataSourceModal
-          onCancel={() => {
-            set({
-              showDataSource: false,
-            })
-          }}
+          datasourceId={datasourceId}
+          datasourceType={datasourceType}
+          onCancel={() => set({ showDataSource: false })}
         />
       )}
       <OfflineModal refetch={refetch} />

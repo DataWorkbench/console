@@ -14,9 +14,10 @@ const AlertModal = observer(() => {
     showAddMonitorDetail,
     showAddMonitorForm,
     showMonitor,
+    selectedMonitor,
+    getQueryListKey
   } = useAlertStore()
   useIcon(icons)
-  console.log(222233333, showMonitor)
   return (
     <>
       {showMonitor && (
@@ -38,6 +39,8 @@ const AlertModal = observer(() => {
           onCancel={() => {
             set({ showAddMonitorForm: false })
           }}
+          data={selectedMonitor as any}
+          getQueryListKey={getQueryListKey}
         />
       )}
       {showAddMonitorDetail && (
@@ -45,7 +48,7 @@ const AlertModal = observer(() => {
           onCancel={() => {
             set({ showAddMonitorDetail: false })
           }}
-          data={{}}
+          data={selectedMonitor!}
         />
       )}
     </>

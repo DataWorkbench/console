@@ -11,7 +11,8 @@ const baseConfig: AxiosRequestConfig = {
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
     'X-CSRFToken': Cookies.get('csrftoken'),
-  },
+    'Content-Type': 'application/json;charset=UTF-8'
+  }
 }
 
 function getMessage(ret: {}) {
@@ -35,7 +36,7 @@ client.interceptors.response.use(
       response.data.message = message1
       emitter.emit('error', {
         title: `请求错误: 登录会话已过期，请重新登录`,
-        content: message1,
+        content: message1
       })
       axiosList.forEach((cancel) => {
         cancel()
@@ -52,7 +53,7 @@ client.interceptors.response.use(
       response.data.message = message
       emitter.emit('error', {
         title: `请求错误: [${status || retCode}]`,
-        content: message,
+        content: message
       })
       throw new Error(message)
     }
@@ -61,21 +62,21 @@ client.interceptors.response.use(
   (error) => {
     if (axios.isCancel(error)) {
       emitter.emit('error', {
-        title: `已取消`,
+        title: `已取消`
       })
     } else if (error.code === 'ECONNABORTED') {
       emitter.emit('error', {
         title: `网络超时: [timeout]`,
-        content: error.message,
+        content: error.message
       })
     } else if (error.response) {
       const {
         response: { status },
-        message,
+        message
       } = error
       emitter.emit('error', {
         title: `网络错误: [${status}]`,
-        content: message,
+        content: message
       })
     }
     return Promise.reject(error)
@@ -98,9 +99,9 @@ const request = async (
       action,
       userId,
       method,
-      ...params,
+      ...params
     },
-    ...config,
+    ...config
   }
   let tempCancel
 
@@ -110,11 +111,10 @@ const request = async (
       cancel(c)
     }
   })
+
   axiosList.set(axiosConfig, tempCancel)
 
-  return client.request(axiosConfig).then((response) => {
-    return response.data
-  })
+  return client.request(axiosConfig).then((response) => response.data)
   // .catch((e) => {
   //   if (axios.isCancel(e)) {
   //     return null

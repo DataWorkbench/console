@@ -22,6 +22,7 @@ specifiers:
   '@svgdotjs/svg.js': ^3.0.16
   '@svgr/webpack': ^5.5.0
   '@tippyjs/react': ^4.2.5
+  '@types/crypto-js': ^4.1.1
   '@types/lodash-es': ^4.17.4
   '@types/qs': ^6.9.7
   '@types/react': ^17.0.43
@@ -37,11 +38,13 @@ specifiers:
   babel-plugin-transform-remove-console: ^6.9.4
   babel-plugin-twin: ^1.0.2
   core-js: ^3.13.1
+  cross-env: ^7.0.3
+  crypto-js: ^4.1.1
   css-loader: ^5.2.6
   css-minimizer-webpack-plugin: ^3.0.1
   dayjs: ^1.10.6
   dotenv: ^10.0.0
-  echarts: ^5.1.2
+  echarts: ^5.3.3
   eslint: ^7.27.0
   eslint-config-airbnb: ^18.2.1
   eslint-config-airbnb-typescript: ^14.0.0
@@ -58,6 +61,7 @@ specifiers:
   html-webpack-plugin: ^5.3.1
   husky: ^4.3.8
   immer: ^9.0.5
+  immutability-helper: ^3.1.1
   jest: ^27.0.6
   js-cookie: ^2.2.1
   jsplumb: ^2.15.6
@@ -85,6 +89,7 @@ specifiers:
   react-router-dom: ^5.2.0
   react-table: ^7.7.0
   react-use: ^17.2.4
+  rxjs: ^7.5.5
   simplebar-react: ^2.3.6
   style-loader: ^2.0.0
   stylelint: ^13.13.1
@@ -113,12 +118,16 @@ dependencies:
   '@emotion/styled': 11.3.0_641e62f6e37299f7a3026653d92f1d07
   '@svgdotjs/svg.js': 3.0.16
   '@tippyjs/react': 4.2.5_react-dom@17.0.2+react@17.0.2
+  '@types/crypto-js': 4.1.1
   axios: 0.21.1
   core-js: 3.13.1
+  cross-env: 7.0.3
+  crypto-js: 4.1.1
   dayjs: 1.10.6
-  echarts: 5.1.2
+  echarts: 5.3.3
   framer-motion: 4.1.17_react-dom@17.0.2+react@17.0.2
   immer: 9.0.5
+  immutability-helper: 3.1.1
   js-cookie: 2.2.1
   jsplumb: 2.15.6
   lodash-es: 4.17.21
@@ -140,6 +149,7 @@ dependencies:
   react-router-dom: 5.2.0_react@17.0.2
   react-table: 7.7.0_react@17.0.2
   react-use: 17.2.4_react-dom@17.0.2+react@17.0.2
+  rxjs: 7.5.5
   simplebar-react: 2.3.6_react-dom@17.0.2+react@17.0.2
   tippy.js: 6.3.1
   twin.macro: 2.8.2
@@ -2308,6 +2318,10 @@ packages:
       '@babel/types': 7.15.4
     dev: true
 
+  /@types/crypto-js/4.1.1:
+    resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==}
+    dev: false
+
   /@types/eslint-scope/3.7.1:
     resolution: {integrity: sha512-SCFeogqiptms4Fg29WpOTk5nHIzfpKCemSN63ksBQYKTcXoJEmJagV+DhVmbapZzY4/5YaOV1nZwrsU79fFm1g==}
     dependencies:
@@ -4031,6 +4045,14 @@ packages:
       path-type: 4.0.0
       yaml: 1.10.2
 
+  /cross-env/7.0.3:
+    resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
+    engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
+    dev: false
+
   /cross-spawn/7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
@@ -4038,7 +4060,10 @@ packages:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-    dev: true
+
+  /crypto-js/4.1.1:
+    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
+    dev: false
 
   /css-color-names/0.0.4:
     resolution: {integrity: sha512-zj5D7X1U2h2zsXOAM8EyUREBnnts6H+Jm+d1M2DbiQQcUtnqgQsMrdo8JW9R80YFUmIdBZeMu5wvYM7hcgWP/Q==}
@@ -4614,11 +4639,11 @@ packages:
       zrender: 4.3.2
     dev: false
 
-  /echarts/5.1.2:
-    resolution: {integrity: sha512-okUhO4sw22vwZp+rTPNjd/bvTdpug4K4sHNHyrV8NdAncIX9/AarlolFqtJCAYKGFYhUBNjIWu1EznFrSWTFxg==}
+  /echarts/5.3.3:
+    resolution: {integrity: sha512-BRw2serInRwO5SIwRviZ6Xgm5Lb7irgz+sLiFMmy/HOaf4SQ+7oYqxKzRHAKp4xHQ05AuHw1xvoQWJjDQq/FGw==}
     dependencies:
-      tslib: 2.0.3
-      zrender: 5.1.1
+      tslib: 2.3.0
+      zrender: 5.3.2
     dev: false
 
   /ee-first/1.1.1:
@@ -6130,6 +6155,10 @@ packages:
     resolution: {integrity: sha512-2WuIehr2y4lmYz9gaQzetPR2ECniCifk4ORaQbU3g5EalLt+0IVTosEPJ5BoYl/75ky2mivzdRzV8wWgQGOSYQ==}
     dev: false
 
+  /immutability-helper/3.1.1:
+    resolution: {integrity: sha512-Q0QaXjPjwIju/28TsugCHNEASwoCcJSyJV3uO1sOIQGI0jKgm9f41Lvz0DZj3n46cNCyAZTsEYoY4C2bVRUzyQ==}
+    dev: false
+
   /import-cwd/3.0.0:
     resolution: {integrity: sha512-4pnzH16plW+hgvRECbDWpQl3cqtvSofHWh44met7ESfZ8UZOWWddm8hEyDTqREJ9RbYHY8gi8DqmaelApoOGMg==}
     engines: {node: '>=8'}
@@ -6651,7 +6680,6 @@ packages:
 
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
-    dev: true
 
   /isobject/2.1.0:
     resolution: {integrity: sha512-+OUdGJlgjOBZDfxnDjYYG6zp487z0JGNQq3cYQYg5f5hKR+syHMsaztzGeml/4kGG55CSpKSpWTY+jYGgsHLgA==}
@@ -8549,7 +8577,6 @@ packages:
   /path-key/3.1.1:
     resolution: {integrity: sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==}
     engines: {node: '>=8'}
-    dev: true
 
   /path-parse/1.0.7:
     resolution: {integrity: sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==}
@@ -10086,6 +10113,12 @@ packages:
       tslib: 1.14.1
     dev: true
 
+  /rxjs/7.5.5:
+    resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
+    dependencies:
+      tslib: 2.3.0
+    dev: false
+
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
 
@@ -10279,12 +10312,10 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       shebang-regex: 3.0.0
-    dev: true
 
   /shebang-regex/3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
-    dev: true
 
   /side-channel/1.0.4:
     resolution: {integrity: sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==}
@@ -11384,10 +11415,6 @@ packages:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
 
-  /tslib/2.0.3:
-    resolution: {integrity: sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==}
-    dev: false
-
   /tslib/2.3.0:
     resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
 
@@ -12030,7 +12057,6 @@ packages:
     hasBin: true
     dependencies:
       isexe: 2.0.0
-    dev: true
 
   /wildcard/2.0.0:
     resolution: {integrity: sha512-JcKqAHLPxcdb9KM49dufGXn2x3ssnfjbcaQdLlfZsL9rH9wgDQjUtDxbo8NE0F6SFvydeu1VhZe7hZuHsB2/pw==}
@@ -12171,10 +12197,10 @@ packages:
     resolution: {integrity: sha512-bIusJLS8c4DkIcdiK+s13HiQ/zjQQVgpNohtd8d94Y2DnJqgM1yjh/jpDb8DoL6hd7r8Awagw8e3qK/oLaWr3g==}
     dev: false
 
-  /zrender/5.1.1:
-    resolution: {integrity: sha512-oeWlmUZPQdS9f5hK4pV21tHPqA3wgQ7CkKkw7l0CCBgWlJ/FP+lRgLFtUBW6yam4JX8y9CdHJo1o587VVrbcoQ==}
+  /zrender/5.3.2:
+    resolution: {integrity: sha512-8IiYdfwHj2rx0UeIGZGGU4WEVSDEdeVCaIg/fomejg1Xu6OifAL1GVzIPHg2D+MyUkbNgPWji90t0a8IDk+39w==}
     dependencies:
-      tslib: 2.0.3
+      tslib: 2.3.0
     dev: false
 
   /zwitch/1.0.5:

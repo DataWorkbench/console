@@ -15,7 +15,7 @@ import { NetworkContext } from '../NetworkProvider'
 export const DataSourcePingModal = () => {
   const {
     dataSourceStore: { opSourceList, mutateOperation },
-    dmStore: { setNetWorkOp },
+    dmStore: { setNetWorkOp }
   } = useStore()
 
   // const sourceType = get(opSourceList, `[0].type`)
@@ -26,11 +26,11 @@ export const DataSourcePingModal = () => {
   const [network, setNetwork] = useImmer({
     id: networkId,
     name: networkName,
-    network_info: toJS(get(opSourceList, `[0].last_connection.network_info`)),
+    network_info: toJS(get(opSourceList, `[0].last_connection.network_info`))
   })
 
   const [validate, setValidate] = useState<'error'>()
-  const { networks, refreshNetworks, networkMap } = useContext(NetworkContext)
+  const { networks, refreshNetworks } = useContext(NetworkContext)
 
   const [defaultStatus, setDefaultStatus] = useState<
     { status: boolean; message?: string } | undefined
@@ -40,11 +40,11 @@ export const DataSourcePingModal = () => {
       ? undefined
       : get(opSourceList, '[0].last_connection.result') === 1
       ? {
-          status: true,
+          status: true
         }
       : {
           status: false,
-          message: get(opSourceList, '[0].last_connection.message'),
+          message: get(opSourceList, '[0].last_connection.message')
         }
   )
 
@@ -57,7 +57,7 @@ export const DataSourcePingModal = () => {
     return merge(res, {
       source_id: get(opSourceList[0], 'id'),
       network_id: network.id,
-      stage: 2,
+      stage: 2
     })
   }, [opSourceList, network])
   return (
@@ -85,7 +85,7 @@ export const DataSourcePingModal = () => {
             setNetwork((_) => {
               _.id = id
               _.name = option?.label
-              _.network_info = networkMap.get(id)
+              _.network_info = option
             })
             setValidate(undefined)
           }}
@@ -103,10 +103,7 @@ export const DataSourcePingModal = () => {
                 <span tw="mr-0.5">
                   选择网络后可测试对应此网络的数据源可用性，如需选择新的网络配置，您可
                 </span>
-                <span
-                  tw="text-green-11 cursor-pointer"
-                  onClick={() => setNetWorkOp('create')}
-                >
+                <span tw="text-green-11 cursor-pointer" onClick={() => setNetWorkOp('create')}>
                   绑定VPC
                 </span>
               </div>
@@ -115,7 +112,7 @@ export const DataSourcePingModal = () => {
           onRefresh={refreshNetworks}
           options={networks.map(({ name, id }) => ({
             label: name,
-            value: id,
+            value: id
           }))}
           searchable={false}
         />
@@ -131,7 +128,6 @@ export const DataSourcePingModal = () => {
             network={network}
             sourceId={get(opSourceList[0], 'id', '')}
             hasPing={!!get(opSourceList[0], 'last_connection')}
-            withNetwork={false}
           />
         </Field>
       </Form>

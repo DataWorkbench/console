@@ -8,14 +8,28 @@ import {
   deleteWorkSpaces,
   createWorkSpace,
   updateWorkSpace,
+  attachWorkSpacesNetwork
 } from 'stores/api'
+import { apiHooks, queryKeyObj } from './apiHooks'
+import {
+  DescribePlatformConfigRequestType,
+  DescribeNetworkConfigRequestType,
+  ListNotificationsRequestType,
+  DescribeWorkspaceConfigRequestType
+} from '../types/request'
+import {
+  PlatformManageDescribePlatformConfigType,
+  SpaceManageDescribeNetworkConfigType,
+  NotifierManageListNotificationsType,
+  SpaceManageDescribeWorkspaceConfigType
+} from '../types/response'
 
 const keys: {
   infinite: any
   page: any
 } = {
   infinite: '',
-  page: '',
+  page: ''
 }
 
 export const getWorkSpaceKey = (kind: 'infinite' | 'page') => keys[kind]
@@ -23,42 +37,35 @@ export const getWorkSpaceKey = (kind: 'infinite' | 'page') => keys[kind]
 export const useQueryWorkSpace = (filter: IListWorkSpaceParams) => {
   const queryKey = ['workspaces', omit(filter, 'offset')]
   keys.infinite = queryKey
-  return useInfiniteQuery(
-    queryKey,
-    async ({ pageParam = filter }) => loadWorkSpace(pageParam),
-    {
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
-          if (nextOffset < lastPage.total) {
-            const nextFilter = {
-              ...filter,
-              offset: nextOffset,
-            }
-
-            return nextFilter
+  return useInfiniteQuery(queryKey, async ({ pageParam = filter }) => loadWorkSpace(pageParam), {
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.has_more) {
+        const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
+        if (nextOffset < lastPage.total) {
+          const nextFilter = {
+            ...filter,
+            offset: nextOffset
           }
+
+          return nextFilter
         }
-        return undefined
-      },
+      }
+      return undefined
     }
-  )
+  })
 }
 
 export const useQueryPageWorkSpace = (filter: any) => {
   const queryKey = ['workspaces', filter]
   keys.page = queryKey
   return useQuery(queryKey, async () => loadWorkSpace(filter), {
-    keepPreviousData: true,
+    keepPreviousData: true
   })
 }
 // {IWorkSpaceParams, 'disable' | 'enable' | 'delete' | 'create'}
-interface MutationWorkSpaceParams {
+export interface MutationWorkSpaceParams {
   regionId: string
-  op: 'disable' | 'enable' | 'delete' | 'create' | 'update'
+  op: 'disable' | 'enable' | 'delete' | 'create' | 'update' | 'network'
   spaceIds?: string[]
   space?: {
     id: string
@@ -66,9 +73,9 @@ interface MutationWorkSpaceParams {
   }
 }
 
-export const useMutationWorkSpace = (options?: {}) => {
-  return useMutation(async ({ op, ...rest }: MutationWorkSpaceParams) => {
-    if (['disable', 'enable', 'delete', 'create', 'update'].includes(op)) {
+export const useMutationWorkSpace = (options?: {}) =>
+  useMutation(async ({ op, ...rest }: MutationWorkSpaceParams) => {
+    if (['disable', 'enable', 'delete', 'create', 'update', 'network'].includes(op)) {
       let ret
       if (op === 'create') {
         ret = await createWorkSpace(rest)
@@ -80,11 +87,44 @@ export const useMutationWorkSpace = (options?: {}) => {
         ret = await enableWorkSpaces(rest)
       } else if (op === 'delete') {
         ret = await deleteWorkSpaces(rest)
+      } else if (op === 'network') {
+        ret = await attachWorkSpacesNetwork(rest)
       }
       return ret
     }
     return undefined
   }, options)
-}
+
+export const useQueryDescribePlatformConfig = apiHooks<
+  'platformManage',
+  DescribePlatformConfigRequestType,
+  PlatformManageDescribePlatformConfigType
+>('platformManage', 'describePlatformConfig')
+
+export const getQueryKeyDescribePlatformConfig = () => queryKeyObj.describePlatformConfig
+
+export const useQueryDescribeNetworkConfig = apiHooks<
+  'spaceManage',
+  DescribeNetworkConfigRequestType,
+  SpaceManageDescribeNetworkConfigType
+>('spaceManage', 'describeNetworkConfig')
+
+export const getQueryKeyDescribeNetworkConfig = () => queryKeyObj.describeNetworkConfig
 
 export default useQueryWorkSpace
+
+export const useQueryListNotifications1 = apiHooks<
+  'notifierManage',
+  ListNotificationsRequestType,
+  NotifierManageListNotificationsType
+>('notifierManage', 'listNotifications')
+
+export const getQueryKeyListNotifications = () => queryKeyObj.listNotifications
+
+export const useQueryDescribeWorkspaceConfig = apiHooks<
+  'spaceManage',
+  DescribeWorkspaceConfigRequestType,
+  SpaceManageDescribeWorkspaceConfigType
+>('spaceManage', 'describeWorkspaceConfig')
+
+export const getQueryKeyDescribeWorkspaceConfig = () => queryKeyObj.describeWorkspaceConfig

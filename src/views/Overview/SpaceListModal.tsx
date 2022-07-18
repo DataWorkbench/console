@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { observer } from 'mobx-react-lite'
 import { useHistory } from 'react-router-dom'
-import { Modal, Button } from '@QCFE/qingcloud-portal-ui'
+import { Button } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import { useStore } from 'stores'
-import { FlexBox } from 'components'
+import { FlexBox, PortalModal } from 'components'
 import WorkSpace from 'views/WorkSpace'
 
 const SpaceListModal = observer(() => {
@@ -14,7 +14,7 @@ const SpaceListModal = observer(() => {
   const { curRegionId, curSpaceId } = state
   const {
     overViewStore,
-    overViewStore: { showSpaceModal, curItemName },
+    overViewStore: { showSpaceModal, curItemName }
   } = useStore()
 
   const handleHide = () => {
@@ -33,7 +33,7 @@ const SpaceListModal = observer(() => {
   }
 
   return (
-    <Modal
+    <PortalModal
       title="选择要进入的工作空间"
       visible={showSpaceModal}
       appendToBody
@@ -45,10 +45,7 @@ const SpaceListModal = observer(() => {
         <FlexBox tw="w-full justify-between">
           <div tw="text-neut-15 mr-4">
             若无合适的工作空间，您也可以
-            <span
-              tw="text-link ml-1 cursor-pointer"
-              onClick={() => setShowCreate(true)}
-            >
+            <span tw="text-link ml-1 cursor-pointer" onClick={() => setShowCreate(true)}>
               创建新工作空间
             </span>
           </div>
@@ -75,7 +72,7 @@ const SpaceListModal = observer(() => {
           setShowCreate(false)
         }}
       />
-    </Modal>
+    </PortalModal>
   )
 })
 

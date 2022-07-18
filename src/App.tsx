@@ -1,16 +1,15 @@
-import { useState, Suspense } from 'react'
-import { useMount } from 'react-use'
+import { Suspense, useEffect } from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from 'react-query'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
 import { ReactQueryDevtools } from 'react-query/devtools'
-import { Notification as Notify, Loading } from '@QCFE/qingcloud-portal-ui'
+import { Loading, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { RootStore, StoreContext } from 'stores'
+import { set } from 'lodash-es'
 import emitter from 'utils/emitter'
-import { LocaleProvider } from '@QCFE/lego-ui'
-import locales from './locales'
+import { apiRequest } from 'utils/api'
 import Routes from './Routes'
+import { loadRegion } from './stores/api/region'
 
 emitter.off('error')
 emitter.on('error', ({ title, content }: any) =>
@@ -18,68 +17,65 @@ emitter.on('error', ({ title, content }: any) =>
     title,
     content,
     placement: 'bottomRight',
-    type: 'error',
+    type: 'error'
   })
 )
 
 const store = new RootStore()
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-    },
-  },
-})
 
 const App = () => {
-  const [loading, setLoading] = useState(true)
-  const handleGlobalData = async () => {
-    // const { hostname } = window.location
-    // const isOnlineEnv = /^console\.qingcloud\.com$/.test(hostname)
-
-    // if (!isOnlineEnv) {
-    //   const docsUrl = 'https://deploy-preview-654--qingcloud-docs.netlify.app'
-    //   set(window, 'GLOBAL_CONFIG.new_docs_url', docsUrl)
-    //   set(window, 'GLOBAL_CONFIG.docs_center_url', docsUrl)
-    // }
-
-    setLoading(false)
-  }
-
-  useMount(() => {
-    handleGlobalData()
-  })
+  useEffect(() => {
+    loadRegion()
+      .then((res) => {
+        if (!res.ret_code && res.infos) {
+          return res.infos[0].id
+        }
+        throw new Error()
+      })
+      .then(
+        (id) => apiRequest('platformManage', 'describePlatformConfig')({ regionId: id }),
+        () => {}
+      )
+      .then((platform: Record<string, any>) => {
+        let url = platform?.documents_address
+        if (url) {
+          if (!url.includes('//')) {
+            url = `//${url}`
+          }
+          set(window, 'GLOBAL_CONFIG.new_docs_url', url)
+          set(window, 'GLOBAL_CONFIG.docs_center_url', url)
+          set(window, 'GLOBAL_CONFIG.new_docs_url1', url)
+          set(window, 'GLOBAL_CONFIG.docs_center_url1', url)
+        }
+      })
+  }, [])
 
   return (
-    <LocaleProvider locales={locales} currentLocale="zh-CN" ignoreWarnings>
-      <DndProvider backend={HTML5Backend}>
-        <StoreContext.Provider value={store}>
-          <QueryClientProvider client={queryClient}>
-            <ReactQueryDevtools
-              initialIsOpen={false}
-              toggleButtonProps={{ style: { bottom: '36px' } }}
-            />
-            {loading ? (
-              <div tw="flex justify-center h-screen items-center">
-                <Loading size="large" />
-              </div>
-            ) : (
-              <Router basename="/dataomnis">
-                <Suspense
-                  fallback={
-                    <div tw="flex justify-center h-screen items-center">
-                      <Loading />
-                    </div>
-                  }
-                >
-                  <Routes />
-                </Suspense>
-              </Router>
-            )}
-          </QueryClientProvider>
-        </StoreContext.Provider>
-      </DndProvider>
-    </LocaleProvider>
+    <DndProvider backend={HTML5Backend}>
+      <StoreContext.Provider value={store}>
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          toggleButtonProps={{ style: { bottom: '36px' } }}
+        />
+        {false ? (
+          <div tw="flex justify-center h-screen items-center">
+            <Loading size="large" />
+          </div>
+        ) : (
+          <Router basename="/dataomnis">
+            <Suspense
+              fallback={
+                <div tw="flex justify-center h-screen items-center">
+                  <Loading />
+                </div>
+              }
+            >
+              <Routes />
+            </Suspense>
+          </Router>
+        )}
+      </StoreContext.Provider>
+    </DndProvider>
   )
 }
 

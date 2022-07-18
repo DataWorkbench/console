@@ -4,6 +4,7 @@ import { get, isEmpty } from 'lodash-es'
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import tw, { css, theme } from 'twin.macro'
 import { useMutationPingSyncJobConnection } from 'hooks'
+import { FormH7Wrapper } from 'views/Space/Dm/RealTime/styled'
 import ClusterTableModal from '../../Cluster/ClusterTableModal'
 
 interface SyncClusterProps {
@@ -11,14 +12,15 @@ interface SyncClusterProps {
   sourceId?: string
   targetId?: string
   clusterId?: string
+  defaultClusterName?: string
 }
 
 const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
-  const { onChange, sourceId, targetId, clusterId: clusterIdProps } = props
+  const { onChange, sourceId, targetId, clusterId: clusterIdProps, defaultClusterName = '' } = props
   const [visible, setVisible] = useState(false)
   const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
-  const clusterName = get(cluster, 'name', '')
+  const clusterName = get(cluster, 'name', defaultClusterName)
   const enablePing = !!(sourceId && targetId && clusterId)
   const mutation = useMutationPingSyncJobConnection()
   useEffect(() => {
@@ -29,7 +31,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
 
   useImperativeHandle(ref, () => ({
     getCluster: () => cluster,
-    checkPingSuccess: () => mutation.isSuccess,
+    checkPingSuccess: () => mutation.isSuccess
   }))
 
   const handlePingConnection = () => {
@@ -39,12 +41,12 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
     mutation.mutate({
       clusterId,
       sourceId,
-      targetId,
+      targetId
     })
   }
 
   return (
-    <>
+    <FormH7Wrapper>
       <Form
         tw="pl-0!"
         css={css`
@@ -56,13 +58,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         <ButtonWithClearField
           clearable={!!cluster}
           name="cluster"
-          icon={
-            <Icon
-              name="pod"
-              size={16}
-              color={{ secondary: 'rgba(255,255,255,0.4)' }}
-            />
-          }
+          icon={<Icon name="pod" size={16} color={{ secondary: 'rgba(255,255,255,0.4)' }} />}
           value={clusterId}
           placeholder="选择集群"
           onClick={() => setVisible(true)}
@@ -74,56 +70,55 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         >
           {clusterName || clusterId}
         </ButtonWithClearField>
-        <Field>
-          <Label>
-            <AffixLabel
-              help="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
-              theme="light"
-            >
-              计算集群连通性
-            </AffixLabel>
-          </Label>
-          <Control tw="flex-wrap">
-            <Tooltip
-              disabled={enablePing}
-              theme="light"
-              content="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
-              hasPadding
-            >
-              <Button
-                type="outlined"
-                loading={mutation.isLoading}
-                css={[
-                  tw`text-green-11!`,
-                  !enablePing && tw`cursor-not-allowed opacity-50`,
-                ]}
-                onClick={() => {
-                  if (enablePing) {
-                    handlePingConnection()
-                  }
-                }}
+        {false && (
+          <Field>
+            <Label>
+              <AffixLabel
+                help="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
+                theme="light"
               >
-                连通性测试
-              </Button>
-            </Tooltip>
-          </Control>
-          {clusterId && mutation.isSuccess && (
-            <FlexBox
-              className="help"
-              tw="w-full ml-[132px]! items-center text-green-11! space-x-0.5"
-            >
-              <Icon
-                name="clock"
-                size={16}
-                color={{
-                  primary: theme('colors.transparent'),
-                  secondary: theme('colors.green.11'),
-                }}
-              />
-              <span>测试通过</span>
-            </FlexBox>
-          )}
-        </Field>
+                计算集群连通性
+              </AffixLabel>
+            </Label>
+            <Control tw="flex-wrap">
+              <Tooltip
+                disabled={enablePing}
+                theme="light"
+                content="数据来源、数据目的、计算集群均选择完成后，可以测试连通性"
+                hasPadding
+              >
+                <Button
+                  type="outlined"
+                  loading={mutation.isLoading}
+                  css={[tw`text-green-11!`, !enablePing && tw`cursor-not-allowed opacity-50`]}
+                  onClick={() => {
+                    if (enablePing) {
+                      handlePingConnection()
+                    }
+                  }}
+                >
+                  连通性测试
+                </Button>
+              </Tooltip>
+            </Control>
+            {clusterId && mutation.isSuccess && (
+              <FlexBox
+                className="help"
+                tw="w-full ml-[132px]! items-center text-green-11! space-x-0.5"
+              >
+                <Icon
+                  name="clock"
+                  size={16}
+                  color={{
+                    primary: theme('colors.transparent'),
+                    secondary: theme('colors.green.11')
+                  }}
+                />
+                <span>测试通过</span>
+              </FlexBox>
+            )}
+          </Field>
+        )}
       </Form>
       <ClusterTableModal
         visible={visible}
@@ -138,7 +133,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
         selectedIds={isEmpty(clusterId) ? [] : [clusterId]}
         onCancel={() => setVisible(false)}
       />
-    </>
+    </FormH7Wrapper>
   )
 })
 

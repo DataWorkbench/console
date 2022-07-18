@@ -4,17 +4,22 @@ import { noop, isEmpty } from 'lodash-es'
 import { useDrag, useDrop, XYCoord } from 'react-dnd'
 import { useUnmount } from 'react-use'
 import tw, { styled, css } from 'twin.macro'
-import { Button, Form, Icon, Input, Menu } from '@QCFE/lego-ui'
+import { Button, Form, Input, Menu } from '@QCFE/lego-ui'
+import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Center } from 'components/Center'
 import { FlexBox } from 'components/Box'
 import { Tooltip } from 'components/Tooltip'
 import { nameMatchRegex } from 'utils/convert'
 import Tippy from '@tippyjs/react'
 import { useImmer } from 'use-immer'
+import { TextEllipsis } from 'components/TextEllipsis'
+import { isDarkTheme } from 'utils/theme'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { HbaseNameField } from 'components/FieldMappings/HbaseNameField'
 import { fieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
 
 export type TMappingField = {
   type: string
@@ -38,7 +43,7 @@ export const FieldRow = styled('div')(
     isOver,
     isTop,
     isEditing,
-    isReverse,
+    isReverse
   }: {
     isHeader?: boolean
     isDragging?: boolean
@@ -48,6 +53,7 @@ export const FieldRow = styled('div')(
     isReverse?: boolean
   }) => [
     tw`flex flex-wrap border-b border-neut-13 last:border-b-0 p-1.5`,
+    !isEditing && tw`flex-nowrap`,
     isReverse && tw`flex-row-reverse`,
     isHeader ? tw`bg-neut-16` : tw`hover:bg-[#1E2F41] `,
     isDragging && tw`bg-green-4/10!`,
@@ -87,7 +93,7 @@ export const FieldRow = styled('div')(
               }
             }
           }
-        `,
+        `
   ]
 )
 
@@ -105,6 +111,7 @@ interface MappingItemProps {
   onOk?: (v: TMappingField, index?: number) => void
   getDeleteField?: (name: string) => TMappingField | undefined
   exist?: (name: string) => boolean
+  isLeft?: boolean
 }
 
 const MappingItem = (props: MappingItemProps) => {
@@ -123,11 +130,11 @@ const MappingItem = (props: MappingItemProps) => {
     onCancel = noop,
     getDeleteField,
     exist,
+    isLeft = true
   } = props
   const [isTop, setIsTop] = useState(false)
   const [item, setItem] = useImmer(itemProps)
-  const [popuState, setPopuState] =
-    useState<'delete' | 'parse' | 'constant' | null>(null)
+  const [popuState, setPopuState] = useState<'delete' | 'parse' | 'constant' | null>(null)
   const [showMoreMenu, setShowMoreMenu] = useState(false)
 
   const endPointRef = useRef<Endpoint | null>(null)
@@ -136,15 +143,14 @@ const MappingItem = (props: MappingItemProps) => {
   useEffect(() => {
     setItem(itemProps)
   }, [itemProps, setItem])
-
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: dndType,
       item: { ...item, index },
       collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
+        isDragging: monitor.isDragging()
       }),
-      canDrag: () => !item.isEditing,
+      canDrag: () => !item.isEditing
     }),
     [item.name, index, item.isEditing]
   )
@@ -152,7 +158,7 @@ const MappingItem = (props: MappingItemProps) => {
   const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>({
     accept: dndType,
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      isOver: monitor.isOver()
     }),
     hover({ index: dragIndex }, monitor) {
       if (!ref.current) {
@@ -165,16 +171,11 @@ const MappingItem = (props: MappingItemProps) => {
       }
 
       const hoverBoundingRect = ref.current?.getBoundingClientRect()
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
       const clientOffset = monitor.getClientOffset()
       const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
 
-      if (
-        dragIndex > hoverIndex &&
-        hoverClientY < hoverMiddleY &&
-        hoverIndex === 0
-      ) {
+      if (dragIndex > hoverIndex && hoverClientY < hoverMiddleY && hoverIndex === 0) {
         setIsTop(true)
       } else {
         setIsTop(false)
@@ -188,7 +189,7 @@ const MappingItem = (props: MappingItemProps) => {
         moveItem(draggedId, item.uuid, isTop)
         jsplumb?.repaintEverything()
       }
-    },
+    }
   })
 
   useEffect(() => {
@@ -209,29 +210,29 @@ const MappingItem = (props: MappingItemProps) => {
             gradient: {
               stops: [
                 [0, '#229CE9'],
-                [1, '#15A675'],
-              ],
+                [1, '#15A675']
+              ]
             },
             strokeWidth: 2,
-            stroke: '#fff',
+            stroke: '#fff'
           },
           connectorHoverStyle: {
-            strokeWidth: 4,
+            strokeWidth: 4
           },
           endpoint: [
             'Dot',
             {
               cssClass: `point-${anchor}`,
-              radius: 6,
-            },
+              radius: 6
+            }
           ],
           paintStyle: {
             fill: anchor === 'Left' ? '#9DDFC9' : '#BAE6FD',
             stroke: '#fff',
-            strokeWidth: 2,
+            strokeWidth: 2
           },
           'connector-pointer-events': 'visible',
-          uuid: itemProps.uuid,
+          uuid: itemProps.uuid
         } as any) as Endpoint
         endPointRef.current = endPoint
       }
@@ -266,29 +267,41 @@ const MappingItem = (props: MappingItemProps) => {
   }
 
   const renderMore = () => {
+    let menuItems: { key: string; icon: string; text: string }[] = []
+    if (item.custom) {
+      menuItems = [
+        {
+          key: 'edit',
+          icon: 'if-pen',
+          text: '编辑'
+        },
+        // {
+        //   key: 'constant',
+        //   icon: 'q-counterFill',
+        //   text: '设置常量',
+        // },
+        {
+          key: 'parse',
+          icon: 'q-textFill',
+          text: '时间转换'
+        }
+      ]
+    }
+    menuItems.push({
+      key: 'delete',
+      icon: 'if-trash',
+      text: '删除'
+    })
     return (
       <Tippy
         content={
-          <Menu
-            tw="bg-neut-16"
-            onClick={(_: any, key: string) => handleMoreClick(key)}
-          >
-            <MenuItem key="edit" disabled={item.custom !== true}>
-              <Icon name="pen" />
-              编辑
-            </MenuItem>
-            <MenuItem key="constant" disabled={item.custom !== true}>
-              <Icon name="pen" />
-              设置常量
-            </MenuItem>
-            <MenuItem key="parse" disabled={item.custom !== true}>
-              <Icon name="pen" />
-              时间转换
-            </MenuItem>
-            <MenuItem key="delete">
-              <Icon name="pen" />
-              删除
-            </MenuItem>
+          <Menu tw="bg-neut-16" onClick={(_: any, key: string) => handleMoreClick(key)}>
+            {menuItems.map((i) => (
+              <MenuItem key={i.key}>
+                <Icon name={i.icon} type="light" />
+                {i.text}
+              </MenuItem>
+            ))}
           </Menu>
         }
         arrow={false}
@@ -311,158 +324,151 @@ const MappingItem = (props: MappingItemProps) => {
     )
   }
 
-  const renderConfirmContent = () => {
-    return (
-      <div tw="p-3 space-y-2 w-[264px]">
-        {popuState === 'delete' && (
-          <FlexBox>
-            <Icon
-              name="exclamation"
-              size={20}
-              tw="mr-1.5 flex-shrink-0 inline-block"
-              color={{
-                primary: '#000',
-                secondary: '#FFD127',
-              }}
-            />
-            <div>
-              删除字段后，无法撤回，如误删需手动添加，确认删除此字段么？
-            </div>
-          </FlexBox>
-        )}
-        {(popuState === 'parse' || popuState === 'constant') && (
-          <>
-            <Input
-              type="text"
-              placeholder={
-                popuState === 'constant' ? '' : 'yyyy-MM-dd hh:mm:ss'
-              }
-              tw="w-60"
-              defaultValue={
-                (popuState === 'parse' ? item.formatter : item.default) || ''
-              }
-              onChange={(e, v) => {
-                setItem((draft) => {
-                  if (popuState === 'parse') {
-                    draft.formatter = String(v)
-                  } else {
-                    draft.default = String(v)
-                  }
-                })
-              }}
-            />
-            <div tw="text-neut-8">
-              {popuState === 'constant'
-                ? '常量字段值'
-                : '将字段类型转为日期格式返回'}
-            </div>
-          </>
-        )}
-        <div tw="flex justify-end space-x-2">
-          <Button tw="h-6" onClick={() => setPopuState(null)}>
-            取消
-          </Button>
-          <Button
-            type="primary"
-            tw="h-6"
-            onClick={() => {
-              if (popuState === 'delete') {
-                deleteItem(item)
-                setPopuState(null)
-              } else if (popuState === 'parse') {
+  const renderConfirmContent = () => (
+    <div tw="p-3 space-y-2 w-[264px]">
+      {popuState === 'delete' && (
+        <FlexBox>
+          <Icon
+            name="exclamation"
+            size={20}
+            tw="mr-1.5 flex-shrink-0 inline-block"
+            color={{
+              primary: '#000',
+              secondary: '#FFD127'
+            }}
+          />
+          <div>删除字段后，无法撤回，如误删需手动添加，确认删除此字段么？</div>
+        </FlexBox>
+      )}
+      {(popuState === 'parse' || popuState === 'constant') && (
+        <>
+          <Input
+            type="text"
+            placeholder={popuState === 'constant' ? '' : 'yyyy-MM-dd hh:mm:ss'}
+            tw="w-60"
+            defaultValue={(popuState === 'parse' ? item.formatter : item.default) || ''}
+            onChange={(e, v) => {
+              setItem((draft) => {
+                if (popuState === 'parse') {
+                  draft.formatter = String(v)
+                } else {
+                  draft.default = String(v)
+                }
+              })
+            }}
+          />
+          <div tw="text-neut-8">
+            {popuState === 'constant'
+              ? '当字段值为 null 时，会返回此 value 值'
+              : '将字段类型转为日期格式返回'}
+          </div>
+        </>
+      )}
+      <div tw="flex justify-end space-x-2">
+        <Button tw="h-6" onClick={() => setPopuState(null)}>
+          取消
+        </Button>
+        <Button
+          type="primary"
+          tw="h-6"
+          onClick={() => {
+            if (popuState === 'delete') {
+              deleteItem(item)
+              setPopuState(null)
+            } else if (popuState === 'parse') {
+              onOk(item, index)
+              setPopuState(null)
+            } else if (popuState === 'constant') {
+              if (!isEmpty(item.default)) {
                 onOk(item, index)
                 setPopuState(null)
-              } else if (popuState === 'constant') {
-                if (!isEmpty(item.default)) {
-                  onOk(item, index)
-                  setPopuState(null)
-                }
               }
-            }}
-          >
-            确认
-          </Button>
-        </div>
+            }
+          }}
+        >
+          确认
+        </Button>
       </div>
-    )
-  }
+    </div>
+  )
   const renderEditContent = () => {
+    const type1 = (
+      <SelectField
+        placeholder="字段类型"
+        value={item.type}
+        name="fieldType"
+        validateOnChange
+        schemas={[
+          {
+            rule: { required: true },
+            status: 'error'
+          }
+        ]}
+        options={
+          typeName
+            ? fieldTypeMapper.get(typeName.toLowerCase())?.map((v) => ({ label: v, value: v }))
+            : []
+        }
+        onChange={(v: string) =>
+          setItem((draft) => {
+            draft.type = v
+          })
+        }
+      />
+    )
+
+    const isHbase = (typeName as any)?.getType() === SourceType.HBase
+    const Cmp = isHbase ? HbaseNameField : TextField
+    const name1 = (
+      <Cmp
+        name="fieldName"
+        placeholder="请输入字段名"
+        defaultValue={item.name}
+        validateOnChange
+        schemas={[
+          {
+            rule: {
+              required: true,
+              matchRegex: isHbase
+                ? /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+:(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/
+                : nameMatchRegex
+            },
+            status: 'error'
+          },
+          {
+            rule: (v: string) => {
+              if (v !== item.name && exist) {
+                return !exist(v)
+              }
+              return true
+            },
+            status: 'error'
+          }
+        ]}
+        onChange={(v: string) => {
+          setItem((draft) => {
+            draft.name = v
+            if (draft.custom === false) {
+              draft.custom = true
+            }
+          })
+          if (getDeleteField) {
+            const delField = getDeleteField(v)
+            if (delField) {
+              onOk(delField, index)
+            }
+          }
+        }}
+      />
+    )
+
     return (
       <Form ref={formRef} tw="pl-0!">
         <FieldRow isEditing tw="p-0 ">
-          <div>
-            <SelectField
-              placeholder="字段类型"
-              value={item.type}
-              name="fieldType"
-              validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  status: 'error',
-                },
-              ]}
-              options={
-                typeName
-                  ? fieldTypeMapper
-                      .get(typeName)
-                      ?.map((v) => ({ label: v, value: v }))
-                  : []
-              }
-              onChange={(v: string) =>
-                setItem((draft) => {
-                  draft.type = v
-                })
-              }
-            />
-          </div>
-          <FlexBox>
-            <TextField
-              name="fieldName"
-              placeholder="请输入字段名"
-              defaultValue={item.name}
-              validateOnChange
-              schemas={[
-                {
-                  rule: {
-                    required: true,
-                    matchRegex: nameMatchRegex,
-                  },
-                  status: 'error',
-                },
-                {
-                  rule: (v: string) => {
-                    if (exist) {
-                      return !exist(v)
-                    }
-                    return true
-                  },
-                  status: 'error',
-                },
-              ]}
-              onChange={(v: string) => {
-                setItem((draft) => {
-                  draft.name = v
-                  if (draft.custom === false) {
-                    draft.custom = true
-                  }
-                })
-                if (getDeleteField) {
-                  const delField = getDeleteField(v)
-                  if (delField) {
-                    onOk(delField, index)
-                  }
-                }
-              }}
-            />
-          </FlexBox>
+          <div>{isLeft ? name1 : type1}</div>
+          <FlexBox>{isLeft ? type1 : name1}</FlexBox>
           <Center css={[tw`space-x-3`, item.custom && tw`translate-y-4`]}>
-            <Tooltip
-              theme="light"
-              content="关闭"
-              hasPadding
-              twChild={tw`flex items-center`}
-            >
+            <Tooltip theme="light" content="关闭" hasPadding twChild={tw`flex items-center`}>
               <Icon
                 name="close"
                 type="light"
@@ -471,12 +477,7 @@ const MappingItem = (props: MappingItemProps) => {
                 onClick={() => onCancel(item, index)}
               />
             </Tooltip>
-            <Tooltip
-              theme="light"
-              content="保存"
-              hasPadding
-              twChild={tw`flex items-center`}
-            >
+            <Tooltip theme="light" content="保存" hasPadding twChild={tw`flex items-center`}>
               <Icon
                 name="check"
                 type="light"
@@ -497,12 +498,12 @@ const MappingItem = (props: MappingItemProps) => {
               name="fieldValue"
               defaultValue={item.default}
               validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  status: 'error',
-                },
-              ]}
+              //   schemas={[
+              //     {
+              //       rule: { required: true },
+              //       status: 'error',
+              //     },
+              //   ]}
               placeholder="请输入字段值"
               onChange={(v: string) => {
                 setItem((draft) => {
@@ -517,18 +518,21 @@ const MappingItem = (props: MappingItemProps) => {
   }
 
   const renderContent = () => {
+    const type1 = <div>{item.type}</div>
+    const name1 = (
+      <div tw="truncate">
+        <TextEllipsis theme={isDarkTheme() ? 'light' : 'dark'}>{item.name}</TextEllipsis>
+      </div>
+    )
     return (
       <>
-        <div>{item.type}</div>
-        <div>{item.name}</div>
+        {!isLeft ? type1 : name1}
+        {!isLeft ? name1 : type1}
+
         {itemProps.formatter && (
           <Tooltip
             hasPadding
-            content={
-              <div>
-                时间转换: {itemProps.formatter} （将字段类型转为日期格式返回）
-              </div>
-            }
+            content={<div>时间转换: {itemProps.formatter} （将字段类型转为日期格式返回）</div>}
             theme="light"
           >
             <span tw="bg-neut-0 rounded-sm px-1 h-5 text-deepblue-12 font-medium inline-block mr-1">
@@ -536,12 +540,8 @@ const MappingItem = (props: MappingItemProps) => {
             </span>
           </Tooltip>
         )}
-        {itemProps.default && (
-          <Tooltip
-            hasPadding
-            content={<div>{itemProps.default}</div>}
-            theme="light"
-          >
+        {false && (
+          <Tooltip hasPadding content={<div>{itemProps.default}</div>} theme="light">
             <span tw="bg-[#F1E4FE] rounded-sm px-1 h-5 text-[#A855F7] font-medium inline-block mr-1">
               常
             </span>
@@ -552,23 +552,19 @@ const MappingItem = (props: MappingItemProps) => {
     )
   }
 
-  if (anchor === 'Left') {
-    return (
-      <FieldRow ref={ref} className={className} isReverse>
-        <div>{item.type}</div>
-        <div>{item.name}</div>
-      </FieldRow>
-    )
-  }
+  // if (anchor === 'Left') {
+  //   return (
+  //     <FieldRow ref={ref} className={className} isReverse>
+  //       <div>{item.type}</div>
+  //       <div>{item.name}</div>
+  //     </FieldRow>
+  //   )
+  // }
   drag(drop(ref))
   return (
     <Tippy
       content={renderConfirmContent()}
-      visible={
-        popuState === 'delete' ||
-        popuState === 'parse' ||
-        popuState === 'constant'
-      }
+      visible={popuState === 'delete' || popuState === 'parse' || popuState === 'constant'}
       onClickOutside={() => setPopuState(null)}
       theme="popconfirm"
       animation="fade"

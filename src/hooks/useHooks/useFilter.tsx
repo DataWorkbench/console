@@ -55,11 +55,10 @@ const useFilter = <T extends Object, P extends ITableConfig>(
   const pagination = useMemo(() => {
     if (config.pagination) {
       return {
-        current:
-          Math.floor((filter as any).offset / (filter as any)!.limit) + 1,
+        current: Math.floor((filter as any).offset / (filter as any)!.limit) + 1,
         pageSize: (filter as any).limit,
         onPageChange: handlePageChange,
-        onShowSizeChange: handleShowSizeChange,
+        onShowSizeChange: handleShowSizeChange
       }
     }
     return {}
@@ -79,18 +78,44 @@ const useFilter = <T extends Object, P extends ITableConfig>(
   }, [filter, tableLinkKey])
 
   useEffect(() => {
-    emitter.on(`${tableLinkKey}-get`, (d) => {
-      setFilter((draft: any) => {
-        return { ...draft, ...d }
-      })
-    })
+    const handler = (d: Record<string, any>) => {
+      setFilter((draft: any) => ({ ...draft, ...d }))
+    }
+    emitter.on(`${tableLinkKey}-get`, handler)
+    return () => {
+      emitter.off(`${tableLinkKey}-get`, handler)
+    }
   }, [tableLinkKey, setFilter])
+
+  const getFilter = (key: string, types: Record<string, any>) => ({
+    filter: (filter as any)[key],
+    onFilter: (v: string | number) => {
+      setFilter((draft) => {
+        ;(draft as any)[key] = v
+        if (config.pagination) {
+          ;(draft as any).offset = 0
+        }
+      })
+    },
+    filterAble: true,
+    filtersNew: Object.values(types).filter((i) => !i.hidden) as any
+  })
+
+  const getSort = (key: string) => ({
+    sortable: true,
+    sortKey: (filter as any).sort_by,
+    sortOrder:
+      // eslint-disable-next-line no-nested-ternary
+      (filter as any).sort_by === key ? ((filter as any).reverse ? 'asc' : 'desc') : ''
+  })
 
   return {
     filter,
     setFilter,
     pagination,
     sort,
+    getColumnFilter: getFilter,
+    getColumnSort: getSort
   }
 }
 

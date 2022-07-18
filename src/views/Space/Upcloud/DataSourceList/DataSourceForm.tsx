@@ -1,22 +1,15 @@
-import React, {
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import React, { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Collapse, Control, Field, Label } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { get, omit, toLower } from 'lodash-es'
 import { useImmer } from 'use-immer'
-import { useMount } from 'react-use'
 import { Form, Icon } from '@QCFE/qingcloud-portal-ui'
 import { AffixLabel, Center, Divider } from 'components'
 import { nameMatchRegex, strlen } from 'utils'
 // import HdfsNodeField from './HdfsNodeField'
 import { toJS } from 'mobx'
+import { compose } from 'utils/functions'
 import { DataSourcePingButton } from './DataSourcePing'
 import {
   esAnonymousFilters,
@@ -26,12 +19,12 @@ import {
   ftpProtocolValue,
   hiveAnonymousFilters,
   hivePwdFilters,
-  sftpFilters,
+  sftpFiltersWithKey,
+  sftpFiltersWithPwd,
   sFtpProtocolValue,
-  SourceType,
-  // urlType2Api,
+  SourceType
 } from './constant'
-import getFieldsInfo from './getDatasourceFormConfig'
+import getFieldsInfo, { source2DBStrategy, sourceStrategy } from './getDatasourceFormConfig'
 
 const { CollapseItem } = Collapse
 const { TextField, TextAreaField } = Form
@@ -57,7 +50,7 @@ const Root = styled('div')(() => [
     .collapse-item-content {
       ${tw`pl-0`}
     }
-  `,
+  `
 ])
 
 const CollapseWrapper = styled(Collapse)(() => [
@@ -71,7 +64,7 @@ const CollapseWrapper = styled(Collapse)(() => [
         ${tw`relative top-0 right-0`}
       }
     }
-  `,
+  `
 ])
 
 const MultiFieldWrapper = styled.div(() => [
@@ -86,12 +79,10 @@ const MultiFieldWrapper = styled.div(() => [
         ${tw`w-full`}
       }
     }
-  `,
+  `
 ])
 
-const parseRemoteData = (data: Record<'url' & string, any>) => {
-  return data
-}
+const parseRemoteData = (data: Record<'url' & string, any>) => data
 
 /**
  * 新建场景默认值
@@ -109,13 +100,13 @@ const getInitValue = (path: string) => {
   "dfs.namenode.http-address.ns.nn1": "ip1:50070",
   "dfs.namenode.rpc-address.ns.nn2": "ip2:9000",
   "dfs.namenode.http-address.ns.nn2": "ip2:50070"
-}`,
+}`
       },
       ftp: {
-        port: 21,
+        port: 21
       },
       sftp: {
-        port: 22,
+        port: 22
       },
       hbase: {
         config: `{
@@ -124,13 +115,17 @@ const getInitValue = (path: string) => {
    "hbase.cluster.distributed": "true",
    "hbase.zookeeper.quorum": "node01,node02,node03",
    "zookeeper.znode.parent": "/hbase"
-}`,
+}`
       },
       hive: {
         auth01: 1,
-        auth02: 2,
+        auth02: 2
       },
-    },
+      elastic_search: {
+        version: '7',
+        port: 9200
+      }
+    }
   }
   return get(initValues, path, '')
 }
@@ -147,7 +142,7 @@ interface IFormProps {
   onFieldValueChange?: (fieldValue: string, formModel: any) => void
   op: string
   opSourceList: Record<string, any>[]
-  theme: 'dark' | 'light'
+  theme?: 'dark' | 'light'
   className?: string
 }
 
@@ -158,19 +153,8 @@ const DataSourceForm = ({
   op,
   opSourceList,
   theme = 'light',
-  className,
+  className
 }: IFormProps) => {
-  const [network, setNetWork] = useImmer<{
-    type: 'vpc' | 'eip'
-    id: string
-    name: string
-    network_info: Record<string, any>
-  }>({
-    type: 'vpc',
-    id: '',
-    name: '',
-    network_info: {},
-  })
   const ref = useRef<Form>(null)
 
   // const {
@@ -178,23 +162,27 @@ const DataSourceForm = ({
   // } = useStore()
 
   const urlType = resInfo?.urlType ?? resInfo.name.toLowerCase()
+  const { source_type: sourceType } = resInfo
   const sourceInfo =
-    ['update', 'view'].includes(op) &&
-    opSourceList.length > 0 &&
-    parseRemoteData(opSourceList[0])
+    ['update', 'view'].includes(op) && opSourceList.length > 0
+      ? parseRemoteData(opSourceList[0])
+      : {}
 
   const [filters, setFilters] = useState<Set<string> | undefined>(() => {
     if (urlType === 'ftp') {
       if (get(sourceInfo, 'url.ftp.protocol') === sFtpProtocolValue) {
-        return sftpFilters
+        if (get(sourceInfo, 'url.ftp.auth_mode') !== 2) {
+          return sftpFiltersWithPwd
+        }
+        return sftpFiltersWithKey
       }
       return ftpFilters
     }
     if (urlType === 'hive') {
-      if (get(sourceInfo, 'url.hive.hadoop_config')) {
-        return hiveAnonymousFilters
+      if (get(sourceInfo, 'url.hive.user')) {
+        return hivePwdFilters
       }
-      return hivePwdFilters
+      return hiveAnonymousFilters
     }
     if (urlType === 'elastic_search') {
       if (
@@ -212,37 +200,32 @@ const DataSourceForm = ({
 
   const isViewMode = op === 'view'
 
-  const defaultStatus = useMemo<
-    { status: boolean; message?: string } | undefined
-  >(() => {
-    if (
-      op === 'create' ||
-      !get(opSourceList, '[0].last_connection.network_id')
-    ) {
+  const defaultStatus = useMemo<{ status: boolean; message?: string } | undefined>(() => {
+    if (op === 'create' || !get(opSourceList, '[0].last_connection.network_id')) {
       return undefined
     }
     return get(opSourceList, '[0].last_connection.result') === 1
       ? {
-          status: true,
+          status: true
         }
       : {
           status: false,
-          message: toJS(get(opSourceList, '[0].last_connection.message')),
+          message: toJS(get(opSourceList, '[0].last_connection.message'))
         }
   }, [op, opSourceList])
 
   const [showPing, setShowPing] = useState(false)
-  const [ftpProtocolType, setFtpProtocol] = useState(() => {
-    return get(opSourceList, 'url.ftp.protocol', ftpProtocolValue)
-  })
+  const [ftpProtocolType, setFtpProtocol] = useState(() =>
+    get(opSourceList, 'url.ftp.protocol', ftpProtocolValue)
+  )
   const [ftpPortConfig, setFtpPortConfig] = useImmer({
     key: ftpProtocolType,
-    changed: false,
+    changed: false
   })
 
   const handleChange = {
     ftp_protocol: (onChange?: Function) => (type: number) => {
-      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFilters)
+      setFilters(type === ftpProtocolValue ? ftpFilters : sftpFiltersWithPwd)
       setFtpProtocol(type)
       if (!ftpPortConfig.changed) {
         setFtpPortConfig((_) => {
@@ -250,6 +233,13 @@ const DataSourceForm = ({
         })
       }
       onChange?.(type)
+    },
+    ftp_auth_mode: () => (type: number) => {
+      if (type === 2) {
+        setFilters(sftpFiltersWithKey)
+      } else {
+        setFilters(sftpFiltersWithPwd)
+      }
     },
     ftp_port: (onChange?: Function) => (v: number) => {
       setFtpPortConfig((_) => {
@@ -272,18 +262,8 @@ const DataSourceForm = ({
         setFilters(esPwdFilters)
       }
       onChange?.(v)
-    },
-  }
-
-  useMount(() => {
-    if (sourceInfo) {
-      setNetWork((draft) => {
-        draft.id = get(sourceInfo, `last_connection.network_id`)
-        draft.name = get(sourceInfo, 'last_connection.network_info.name')
-        draft.type = 'vpc'
-      })
     }
-  })
+  }
 
   const parseFormData = useCallback(
     (needValid = true) => {
@@ -292,17 +272,16 @@ const DataSourceForm = ({
         return formElem?.getFieldsValue()
       }
       if (formElem?.validateForm()) {
-        const {
-          name,
-          desc,
-          network_id: netWorkId,
-          ...others
-        } = formElem.getFieldsValue()
-        const rest = omit(others, 'utype')
+        const { name, desc, network_id: netWorkId, ...others } = formElem.getFieldsValue()
+        let rest = omit(others, 'utype')
         if (urlType === 'hdfs') {
           Object.assign(rest, {
-            default_fs: `hdfs://${rest.name_node}:${rest.port}`,
+            default_fs: `hdfs://${rest.name_node}:${rest.port}`
           })
+        }
+        const strategy = source2DBStrategy.filter((i) => i.check(sourceType!)).map((i) => i.value)
+        if (strategy.length) {
+          rest = compose(...strategy)(rest)
         }
         // if (urlType === 'hdfs') {
         //   const shiftArr = ['name_node', 'port']
@@ -314,13 +293,13 @@ const DataSourceForm = ({
           desc,
           type: resInfo.source_type,
           url: {
-            [urlType]: rest,
-          },
+            [urlType]: rest
+          }
         }
       }
       return null
     },
-    [ref, urlType, resInfo]
+    [urlType, resInfo.source_type, sourceType]
   )
 
   useEffect(() => {
@@ -330,21 +309,9 @@ const DataSourceForm = ({
   }, [getFormData, parseFormData])
 
   function getDefaultValue(name: string) {
-    // 如果 hive ，有 hadoop config auth 取 2， 后端未存储值。 默认为 1
-    if (urlType === 'hive' && name === 'hiveAuth') {
-      if (get(sourceInfo, 'url.hive.hadoop_config')) {
-        return 2
-      }
-      return 1
-    }
-    if (urlType === 'elastic_search' && name === 'esAuth') {
-      if (
-        get(sourceInfo, 'url.elastic_search.host') &&
-        !get(sourceInfo, 'url.elastic_search.user')
-      ) {
-        return 2
-      }
-      return 1
+    const strategy = sourceStrategy.find((i) => i.check(sourceType!, name))
+    if (strategy) {
+      return strategy.value(sourceInfo as Record<string, any>)
     }
 
     const defaultPath =
@@ -356,12 +323,7 @@ const DataSourceForm = ({
 
   return (
     <Root className={className}>
-      <Form
-        tw="max-w-full!"
-        layout="vertical"
-        ref={ref}
-        onFieldValueChange={onFieldValueChange}
-      >
+      <Form tw="max-w-full!" layout="vertical" ref={ref} onFieldValueChange={onFieldValueChange}>
         <CollapseWrapper defaultActiveKey={['p0', 'p1']}>
           <CollapseItem
             key="p0"
@@ -396,13 +358,9 @@ const DataSourceForm = ({
                 >
                   <div tw="font-medium flex items-center">
                     <Icon name="container" tw="mr-2" size={20} />
-                    <span tw="text-green-11 text-sm leading-[22px]">
-                      连接串模式
-                    </span>
+                    <span tw="text-green-11 text-sm leading-[22px]">连接串模式</span>
                   </div>
-                  <div tw="text-neut-8">
-                    连接串模式是通过IP端口用户名密码进行连接的方式。
-                  </div>
+                  <div tw="text-neut-8">连接串模式是通过IP端口用户名密码进行连接的方式。</div>
                 </div>
               </Control>
             </Field>
@@ -420,7 +378,7 @@ const DataSourceForm = ({
                 {
                   rule: { matchRegex: nameMatchRegex },
                   help: '允许包含字母、数字 及 "_"，不能以（_）开始结尾，长度 2-64',
-                  status: 'error',
+                  status: 'error'
                 },
                 {
                   rule: (value: string) => {
@@ -428,8 +386,8 @@ const DataSourceForm = ({
                     return l >= 2 && l <= 64
                   },
                   help: '最小长度2,最大长度64',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
             <TextAreaField
@@ -449,8 +407,8 @@ const DataSourceForm = ({
                     return l <= 256
                   },
                   help: '数据库的长度在0-256字节之间',
-                  status: 'error',
-                },
+                  status: 'error'
+                }
               ]}
             />
           </CollapseItem>
@@ -506,9 +464,7 @@ const DataSourceForm = ({
                     }
                     label={
                       label ? (
-                        <AffixLabel required={rest.required !== false}>
-                          {label}
-                        </AffixLabel>
+                        <AffixLabel required={rest.required !== false}>{label}</AffixLabel>
                       ) : undefined
                     }
                     placeholder={placeholder}
@@ -519,7 +475,9 @@ const DataSourceForm = ({
                 return (
                   <Field key={field.name} tw="mb-0!">
                     <label htmlFor="__" className="label">
-                      <AffixLabel required>{field.label}</AffixLabel>
+                      <AffixLabel required help={field.labelHelp}>
+                        {field.label}
+                      </AffixLabel>
                     </label>
                     <MultiFieldWrapper>
                       {field.items.reduce(
@@ -554,10 +512,7 @@ const DataSourceForm = ({
             })}
             <Field>
               <Divider>
-                <Center
-                  tw="cursor-pointer"
-                  onClick={() => setShowPing((_) => !_)}
-                >
+                <Center tw="cursor-pointer" onClick={() => setShowPing((_) => !_)}>
                   <Icon
                     name={showPing ? 'chevron-up' : 'chevron-down'}
                     type={theme === 'light' ? 'dark' : 'light'}
@@ -567,12 +522,24 @@ const DataSourceForm = ({
               </Divider>
             </Field>
             <Field css={showPing ? visibleStyle : hiddenStyle}>
+              {/* <AffixLabel */}
+              {/*   help={ */}
+              {/*     <div> */}
+              {/*       <span tw="mr-1">详情请查看</span> */}
+              {/*       <HelpCenterLink href="##" hasIcon> */}
+              {/*         网络连通方案 */}
+              {/*       </HelpCenterLink> */}
+              {/*     </div> */}
+              {/*   } */}
+              {/*   theme="darker" */}
+              {/* > */}
+              {/*   数据源可用性测试 */}
+              {/* </AffixLabel> */}
               <DataSourcePingButton
+                sourceId={get(sourceInfo, 'id')}
                 getValue={parseFormData}
                 defaultStatus={defaultStatus}
-                network={network}
                 hasPing={!!get(sourceInfo, 'last_connection')}
-                withNetwork
               />
             </Field>
           </CollapseItem>

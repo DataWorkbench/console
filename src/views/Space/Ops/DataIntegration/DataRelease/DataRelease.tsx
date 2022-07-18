@@ -2,7 +2,7 @@ import DataReleaseDetail from 'views/Space/Ops/DataIntegration/DataRelease/DataR
 import qs from 'qs'
 import { useHistory, useLocation } from 'react-router-dom'
 import emitter from 'utils/emitter'
-import { AlertStore, AlertContext } from '../../Alert/AlertStore'
+import { AlertStoreProvider } from '../../Alert/AlertStore'
 import { DataReleaseContext, DataReleaseStore } from './store'
 
 const DataRelease = (props: Record<string, any>) => {
@@ -12,7 +12,7 @@ const DataRelease = (props: Record<string, any>) => {
   const { version } = qs.parse(search.slice(1))
   if (!version) {
     emitter.emit('error', {
-      title: `请选择具体版本的已发布作业`,
+      title: `请选择具体版本的已发布作业`
     })
     setTimeout(() => {
       history.goBack()
@@ -21,9 +21,9 @@ const DataRelease = (props: Record<string, any>) => {
   }
   return (
     <DataReleaseContext.Provider value={new DataReleaseStore()}>
-      <AlertContext.Provider value={new AlertStore()}>
+      <AlertStoreProvider>
         <DataReleaseDetail id={id} version={version as string} />
-      </AlertContext.Provider>
+      </AlertStoreProvider>
     </DataReleaseContext.Provider>
   )
 }

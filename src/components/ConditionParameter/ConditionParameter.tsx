@@ -1,23 +1,11 @@
-import React, {
-  ChangeEvent,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-} from 'react'
-import {
-  Button,
-  Form,
-  Input,
-  RadioButton,
-  RadioGroup,
-  Select,
-  TextArea,
-} from '@QCFE/lego-ui'
+import React, { ChangeEvent, useEffect, useImperativeHandle, useRef } from 'react'
+import { Button, Form, Input, RadioButton, RadioGroup, Select, TextArea } from '@QCFE/lego-ui'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
-import { isEqual } from 'lodash-es'
+import { isEqual, isNil, pick, values } from 'lodash-es'
 
+import { PopConfirm } from '../PopConfirm'
 import { FlexBox } from '../Box'
 import { Tooltip } from '../Tooltip'
 import { HelpCenterLink } from '../Link'
@@ -30,7 +18,7 @@ type SymbolType = typeof symbols[number]
 enum ConditionType {
   // Unset = 0,
   Visualization = 1,
-  Express = 2,
+  Express = 2
 }
 
 export type TConditionParameterVal = {
@@ -46,7 +34,7 @@ export type TConditionParameterVal = {
 interface IConditionParameterProps {
   value?: TConditionParameterVal
   onChange?: (value: TConditionParameterVal) => void
-  help?: React.ReactElement
+  helpStr?: string
   helpLink?: string
   className?: string
   width?: number
@@ -56,7 +44,7 @@ interface IConditionParameterProps {
 }
 
 const SimpleWrapper = styled.div`
-  ${tw`bg-neut-16 p-2 max-w-[376px]`}
+  ${tw`bg-neut-16 p-2 w-[376px]`}
   ${css`
     & > div {
       ${tw`flex-auto!`}
@@ -85,30 +73,28 @@ const SimpleWrapper = styled.div`
 const types = [
   {
     label: '可视化',
-    value: ConditionType.Visualization,
+    value: ConditionType.Visualization
   },
   {
     label: '表达式',
-    value: ConditionType.Express,
-  },
+    value: ConditionType.Express
+  }
 ]
 export const ConditionParameter = React.forwardRef(
   (props: IConditionParameterProps, ref: React.ForwardedRef<any>) => {
     const {
-      value: defaultValue = { type: ConditionType.Visualization },
+      value: defaultValue,
       onChange,
-      help,
+      helpStr,
       helpLink,
       className,
       width,
       columns,
       loading = false,
-      onRefresh,
+      onRefresh
     } = props
 
-    const [value, setValue] = useImmer(
-      defaultValue || { type: ConditionType.Visualization }
-    )
+    const [value, setValue] = useImmer(defaultValue || { type: ConditionType.Visualization })
     const prevValue = useRef(value)
 
     useEffect(() => {
@@ -119,7 +105,7 @@ export const ConditionParameter = React.forwardRef(
       }
     }, [defaultValue, setValue])
 
-    useImperativeHandle(ref, () => {})
+    useImperativeHandle(ref, () => ({}))
 
     useEffect(() => {
       if (value && onChange) {
@@ -134,53 +120,74 @@ export const ConditionParameter = React.forwardRef(
         //         'endCondition',
         //       ])
         //     : (pick(value, ['type', 'column', 'expression']) as any)
-        onChange(value)
         prevValue.current = value
+        onChange(value)
       }
     }, [onChange, value])
 
     const handleTypeChange = (v: ConditionType) => {
-      setValue((draft) => {
-        draft.type = v
-        if (v !== ConditionType.Visualization && draft.column) {
-          const hasStart = draft.startValue && draft.startCondition
-          const hasEnd = draft.endValue && draft.endCondition
-          const start = hasStart
-            ? `${draft?.startValue ?? ''} ${draft?.startCondition ?? ''} {${
-                draft?.column
-              }}`
-            : ''
-          const end = hasEnd
-            ? `${draft?.endValue ?? ''} ${draft?.endCondition ?? ''} {${
-                draft?.column
-              }}`
-            : ''
-          if (hasEnd || hasStart) {
-            draft.expression = `${start} ${
-              hasStart && hasEnd ? ' and ' : ''
-            } ${end}`
-          }
-        }
-      })
+      setValue({ type: v })
+      // setValue((draft) => {
+      //   draft.type = v
+      //   if (v !== ConditionType.Visualization && draft.column) {
+      //     const hasStart = draft.startValue && draft.startCondition
+      //     const hasEnd = draft.endValue && draft.endCondition
+      //     const start = hasStart
+      //       ? `${draft?.startValue ?? ''} ${draft?.startCondition ?? ''} {${
+      //           draft?.column
+      //         }}`
+      //       : ''
+      //     const end = hasEnd
+      //       ? `${draft?.endValue ?? ''} ${draft?.endCondition ?? ''} {${
+      //           draft?.column
+      //         }}`
+      //       : ''
+      //     if (hasEnd || hasStart) {
+      //       draft.expression = `${start} ${
+      //         hasStart && hasEnd ? ' and ' : ''
+      //       } ${end}`
+      //     }
+      //   }
+      // })
     }
 
+    const keys =
+      value.type === ConditionType.Visualization
+        ? ['endValue', 'startValue', 'startCondition', 'endCondition', 'column']
+        : ['expression']
+    const hasChange = !!values(pick(value, keys)).find((i) => !isNil(i))
     return (
       <div className={className} tw="flex-auto" style={{ width }}>
-        <FlexBox>
+        <FlexBox tw="mb-1">
           <RadioGroup
             value={value?.type}
-            onChange={handleTypeChange}
-            style={{ marginBottom: 4 }}
+            onChange={hasChange ? undefined : handleTypeChange}
+            style={{ marginBottom: 0 }}
           >
-            {types.map((item) => (
-              <RadioButton key={item.value} value={item.value}>
-                {item.label}
-              </RadioButton>
-            ))}
+            {types.map((item) => {
+              if (!hasChange) {
+                return (
+                  <RadioButton key={item.value} value={item.value}>
+                    {item.label}
+                  </RadioButton>
+                )
+              }
+              return (
+                <PopConfirm
+                  content={<div>切换输入模式会清空已输入内容，确认切换？</div>}
+                  type="warning"
+                  onOk={() => handleTypeChange(item.value)}
+                >
+                  <RadioButton key={item.value} value={item.value}>
+                    {item.label}
+                  </RadioButton>
+                </PopConfirm>
+              )
+            })}
           </RadioGroup>
-          <div>
-            {help ? (
-              <Tooltip hasPadding theme="light" content={help}>
+          <div tw="flex flex-auto items-center ml-1">
+            {helpStr ? (
+              <Tooltip twChild={tw`inline-flex`} hasPadding theme="light" content={helpStr}>
                 <Icon name="information" />
               </Tooltip>
             ) : (
@@ -204,11 +211,11 @@ export const ConditionParameter = React.forwardRef(
                 isLoading={loading}
                 options={(columns || []).map((item) => ({
                   label: item,
-                  value: item,
+                  value: item
                 }))}
               />
               <Button
-                tw="w-8 ml-3 p-0 dark:bg-neut-16!"
+                tw="w-8 ml-3 p-0 dark:bg-neut-16! flex-none"
                 disabled={loading}
                 onClick={() => onRefresh && onRefresh()}
               >
@@ -238,7 +245,7 @@ export const ConditionParameter = React.forwardRef(
                   }}
                   options={symbols.map((item) => ({
                     label: item,
-                    value: item,
+                    value: item
                   }))}
                 />
                 <Input
@@ -265,7 +272,7 @@ export const ConditionParameter = React.forwardRef(
                   }}
                   options={symbols.map((item) => ({
                     label: item,
-                    value: item,
+                    value: item
                   }))}
                 />
                 <Input
@@ -282,10 +289,9 @@ export const ConditionParameter = React.forwardRef(
             <FlexBox>
               <span>生成条件参数</span>
               <div tw="text-neut-8">
-                [{value?.startValue || '开始条件'}] [
-                {value?.startCondition ?? '关系符号'}] [
-                {value?.column ?? '列名'}] [{value?.endCondition ?? '关系符号'}]
-                [{value?.endValue || '结束条件'}]
+                [{value?.startValue || '开始条件'}] [{value?.startCondition ?? '关系符号'}] [
+                {value?.column ?? '列名'}] [{value?.endCondition ?? '关系符号'}] [
+                {value?.endValue || '结束条件'}]
               </div>
             </FlexBox>
           </SimpleWrapper>
@@ -307,9 +313,7 @@ export const ConditionParameter = React.forwardRef(
   }
 )
 
-export const ConditionParameterField = styled(
-  (Form as any).getFormField(ConditionParameter)
-)`
+export const ConditionParameterField = styled((Form as any).getFormField(ConditionParameter))`
   & > .label {
     ${tw`items-start! flex-none`}
   }

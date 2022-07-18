@@ -1,6 +1,9 @@
 import tw, { css } from 'twin.macro'
 
 const modalStyles = css`
+  .modal-wrapper .modal {
+    z-index: 120;
+  }
   .dark {
     .modal.is-active {
       .modal-card-head,

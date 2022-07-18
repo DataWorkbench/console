@@ -10,17 +10,9 @@ import {
   ToolBar,
   localstorage,
   Loading,
-  Modal as LegoModal,
+  Modal as LegoModal
 } from '@QCFE/qingcloud-portal-ui'
-import {
-  FlexBox,
-  Center,
-  Modal,
-  Tooltip,
-  AffixLabel,
-  TextLink,
-  RouterLink,
-} from 'components'
+import { FlexBox, Center, Modal, Tooltip, AffixLabel, TextLink, RouterLink } from 'components'
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
 import {
@@ -29,15 +21,27 @@ import {
   getFlinkClusterKey,
   useMutationCluster,
   useMutationReleaseJobs,
-  useQueryBindResouce,
+  useQueryBindResouce
 } from 'hooks'
 import { get, omitBy, pick, concat } from 'lodash-es'
 import dayjs from 'dayjs'
 import tw, { styled, css, theme } from 'twin.macro'
 import { useWindowSize } from 'react-use'
+import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import ClusterModal from './ClusterModal'
 
-const { MenuItem } = Menu
+const { MenuItem } = Menu as any
+
+const jobType = Symbol('jobType')
+const setStreamJob = (record: object) => ({
+  ...record,
+  [jobType]: JobMode.RT
+})
+
+const setSyncJob = (record: object) => ({
+  ...record,
+  [jobType]: JobMode.DI
+})
 
 const TableWrapper = styled(Table)(() => [
   css`
@@ -53,7 +57,7 @@ const TableWrapper = styled(Table)(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 const statusFilters = [
@@ -70,41 +74,41 @@ const statusFilters = [
     value: 2,
     color: {
       primary: '#15A675',
-      secondary: '#C6F4E4',
-    },
+      secondary: '#C6F4E4'
+    }
   },
   {
     text: '停止',
     value: 3,
     color: {
       primary: '#939EA9',
-      secondary: '#DEE7F1',
-    },
+      secondary: '#DEE7F1'
+    }
   },
   {
     text: '启动中',
     value: 4,
     color: {
       primary: '#2193D3',
-      secondary: '#C1E9FF',
-    },
+      secondary: '#C1E9FF'
+    }
   },
   {
     text: '异常',
     value: 5,
     color: {
       primary: '#CF3B37',
-      secondary: '#FEF2F2',
-    },
+      secondary: '#FEF2F2'
+    }
   },
   {
     text: '欠费',
     value: 6,
     color: {
       primary: '#A855F7',
-      secondary: '#F6EDFF',
-    },
-  },
+      secondary: '#F6EDFF'
+    }
+  }
 ]
 
 interface IFilter {
@@ -122,7 +126,7 @@ const ClusterTable = observer(
   ({
     selectMode = false,
     onSelect,
-    selectedIds = [],
+    selectedIds = []
   }: {
     selectMode?: boolean
     onSelect?: (clusterId?: any[]) => void
@@ -130,16 +134,14 @@ const ClusterTable = observer(
   }) => {
     const { width } = useWindowSize()
     const {
-      dmStore: { setOp, op },
+      dmStore: { setOp, op }
     } = useStore()
-    const { regionId, spaceId } =
-      useParams<{ regionId: string; spaceId: string }>()
+    const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
     const [opclusterList, setOpClusterList] = useState<any[]>([])
-    const [selectedRowKeys, setSelectedRowKeys] =
-      useState<string[]>(selectedIds)
+    const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>(selectedIds)
     const offLineRef = useRef({
       stopRunning: false,
-      jobId: null,
+      jobId: null
     })
     const [columnSettings, setColumnSettings] = useState(
       localstorage.getItem(columnSettingsKey) || []
@@ -148,7 +150,7 @@ const ClusterTable = observer(
     const { ret: bindResourceRet, key: bindResKey } = useQueryBindResouce(
       opclusterList.map((row) => row.id),
       {
-        enabled: (op === 'delete' || op === 'stop') && opclusterList.length > 0,
+        enabled: (op === 'delete' || op === 'stop') && opclusterList.length > 0
       }
     )
 
@@ -159,7 +161,7 @@ const ClusterTable = observer(
       search: '',
       sort_by: '',
       status: selectMode ? 2 : '',
-      verbose: 1,
+      verbose: 1
     })
     const queryClient = useQueryClient()
     const mutation = useMutationCluster()
@@ -179,200 +181,158 @@ const ClusterTable = observer(
 
     const isSmallScreen = useMemo(() => width < 1280, [width])
 
-    const columns = useMemo(() => {
-      return [
-        {
-          title: '名称/ID',
-          dataIndex: 'name',
-          width: 192,
-          fixedInSetting: true,
-          render: (v: any, row: any) => (
-            <FlexBox
-              tw="items-center cursor-pointer"
-              onClick={() => {
-                setOp('view')
-                setOpClusterList([row])
-              }}
-            >
-              <Center
-                className="cluster-icon"
-                tw="bg-neut-13 rounded-full box-content border-2 border-neut-16 w-6 h-6 mr-1.5"
+    const columns = useMemo(
+      () =>
+        [
+          {
+            title: '名称/ID',
+            dataIndex: 'name',
+            width: 192,
+            fixedInSetting: true,
+            render: (v: any, row: any) => (
+              <FlexBox
+                tw="items-center cursor-pointer"
+                onClick={() => {
+                  setOp('view')
+                  setOpClusterList([row])
+                }}
               >
-                <Icon name="pod" type="light" size={16} />
-              </Center>
-              <div tw="flex-1 break-all">
-                <div tw="font-semibold" className="cluster-name">
-                  {row.name}
-                </div>
-                <div tw="text-neut-8">{row.id}</div>
-              </div>
-            </FlexBox>
-          ),
-        },
-        {
-          title: (
-            <FlexBox tw="items-center">
-              <span>状态</span>
-              {!selectMode && (
-                <Tooltip
-                  trigger="click"
-                  placement="bottom-start"
-                  content={
-                    <Menu
-                      selectedKey={String(filter.status || 'all')}
-                      onClick={(
-                        e: React.SyntheticEvent,
-                        k: string,
-                        v: number
-                      ) => {
-                        setFilter((draft) => {
-                          draft.status = v
-                          draft.offset = 0
-                        })
-                      }}
-                    >
-                      <MenuItem value="" key="all">
-                        全部
-                      </MenuItem>
-                      {statusFilters.map((st) => (
-                        <MenuItem value={st.value} key={st.value}>
-                          {st.text}
-                        </MenuItem>
-                      ))}
-                    </Menu>
-                  }
+                <Center
+                  className="cluster-icon"
+                  tw="bg-neut-13 rounded-full box-content border-2 border-neut-16 w-6 h-6 mr-1.5"
                 >
-                  <Icon name="filter" type="light" clickable tw="ml-1 block" />
-                </Tooltip>
-              )}
-            </FlexBox>
-          ),
-          width: 90,
-          dataIndex: 'status',
-          render: (v: number) => {
-            const statusObj = statusFilters.find((o) => o.value === v)
-            return (
-              <FlexBox tw="items-center space-x-1">
-                <Icon name="radio" color={statusObj?.color} />
-                <span>{statusObj?.text}</span>
+                  <Icon name="pod" type="light" size={16} />
+                </Center>
+                <div tw="flex-1 break-all">
+                  <div tw="font-semibold" className="cluster-name">
+                    {row.name}
+                  </div>
+                  <div tw="text-neut-8">{row.id}</div>
+                </div>
               </FlexBox>
             )
           },
-        },
-        {
-          title: '网络配置名称/ID',
-          width: 160,
-          dataIndex: 'network_id',
-          render: (v: string, row: any) => {
-            const networkInfo = get(row, 'network_info')
-            return (
-              <>
-                {networkInfo ? (
-                  <div tw="cursor-pointer text-white hover:text-green-11">
-                    <Tooltip
-                      content={
-                        <>
-                          <div>VPC: {get(row, 'network_info.router_id')}</div>
-                          <div>Vxnet: {get(row, 'network_info.vxnet_id')}</div>
-                        </>
-                      }
-                      theme="light"
-                      hasPadding
-                    >
-                      <div>{get(row, 'network_info.name')}</div>
-                    </Tooltip>
-                    <div tw="text-neut-8">{get(row, 'network_id')}</div>
-                  </div>
-                ) : (
-                  <div tw="text-neut-8">{get(row, 'network_id')}</div>
+          {
+            title: (
+              <FlexBox tw="items-center">
+                <span>状态</span>
+                {!selectMode && (
+                  <Tooltip
+                    trigger="click"
+                    placement="bottom-start"
+                    content={
+                      <Menu
+                        selectedKey={String(filter.status || 'all')}
+                        onClick={(e: React.SyntheticEvent, k: string, v: number) => {
+                          setFilter((draft) => {
+                            draft.status = v
+                            draft.offset = 0
+                          })
+                        }}
+                      >
+                        <MenuItem value="" key="all">
+                          全部
+                        </MenuItem>
+                        {statusFilters.map((st) => (
+                          <MenuItem value={st.value} key={st.value}>
+                            {st.text}
+                          </MenuItem>
+                        ))}
+                      </Menu>
+                    }
+                  >
+                    <Icon name="filter" type="light" clickable tw="ml-1 block" />
+                  </Tooltip>
                 )}
-              </>
-            )
+              </FlexBox>
+            ),
+            width: 90,
+            dataIndex: 'status',
+            render: (v: number) => {
+              const statusObj = statusFilters.find((o) => o.value === v)
+              return (
+                <FlexBox tw="items-center space-x-1">
+                  <Icon name="radio" color={statusObj?.color} />
+                  <span>{statusObj?.text}</span>
+                </FlexBox>
+              )
+            }
           },
-        },
-        {
-          title: '版本',
-          width: !isSmallScreen && 160,
-          dataIndex: 'version',
-        },
-        {
-          title: (
-            <AffixLabel
-              help="Flink 的 TaskManager 的数量"
-              required={false}
-              theme="green"
-            >
-              TM 数量
-            </AffixLabel>
-          ),
-          dataIndex: 'task_num',
-          render: (v: number) => v,
-        },
-        {
-          title: (
-            <AffixLabel
-              help={
-                <>
-                  <div>Flink 的 TaskManager 的 CPU 和内存设置</div>
-                  <div>每 CU 为 1 核 4 GB</div>
-                </>
-              }
-              required={false}
-              theme="green"
-            >
-              TM 规格
-            </AffixLabel>
-          ),
-          dataIndex: 'task_cu',
-          render: (v: number) => `${v} CU`,
-        },
-        {
-          title: (
-            <AffixLabel
-              help={
-                <>
-                  <div>Flink 的 JobManager 的 CPU 和内存设置</div>
-                  <div>每 CU 为 1 核 4 GB</div>
-                </>
-              }
-              required={false}
-              theme="green"
-            >
-              JM 规格
-            </AffixLabel>
-          ),
-          dataIndex: 'job_cu',
-          render: (v: number) => `${v} CU`,
-        },
-        {
-          title: '最近更新时间',
-          dataIndex: 'updated',
-          sortable: true,
-          width: !isSmallScreen && 150,
-          // filter.reverse ? 'asc' : 'desc',
-          sortOrder:
-            // eslint-disable-next-line no-nested-ternary
-            filter.sort_by === 'updated'
-              ? filter.reverse
-                ? 'asc'
-                : 'desc'
-              : '',
-          render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss'),
-        },
-        !selectMode && {
-          title: '操作',
-          dataIndex: 'id',
-          hiddenInSetting: true,
-          width: 150,
-          render: (v: any, row: any) => (
-            <FlexBox tw="items-center">
-              <Button type="text">
-                <TextLink href={`//${row.web_ui}`} target="_blank">
-                  Flink UI
-                </TextLink>
-              </Button>
-              <div tw="text-neut-8 mr-2">|</div>
-              {/* <Button
+          {
+            title: '版本',
+            width: !isSmallScreen && 160,
+            dataIndex: 'version'
+          },
+          {
+            title: (
+              <AffixLabel help="Flink 的 TaskManager 的数量" required={false} theme="green">
+                TM 数量
+              </AffixLabel>
+            ),
+            dataIndex: 'task_num',
+            render: (v: number) => v
+          },
+          {
+            title: (
+              <AffixLabel
+                help={
+                  <>
+                    <div>Flink 的 TaskManager 的 CPU 和内存设置</div>
+                    <div>每 CU 为 1 核 4 GB</div>
+                  </>
+                }
+                required={false}
+                theme="green"
+              >
+                TM 规格
+              </AffixLabel>
+            ),
+            dataIndex: 'task_cu',
+            render: (v: number) => `${v} CU`
+          },
+          {
+            title: (
+              <AffixLabel
+                help={
+                  <>
+                    <div>Flink 的 JobManager 的 CPU 和内存设置</div>
+                    <div>每 CU 为 1 核 4 GB</div>
+                  </>
+                }
+                required={false}
+                theme="green"
+              >
+                JM 规格
+              </AffixLabel>
+            ),
+            dataIndex: 'job_cu',
+            render: (v: number) => `${v} CU`
+          },
+          {
+            title: '最近更新时间',
+            dataIndex: 'updated',
+            sortable: true,
+            width: !isSmallScreen && 150,
+            // filter.reverse ? 'asc' : 'desc',
+            sortOrder:
+              // eslint-disable-next-line no-nested-ternary
+              filter.sort_by === 'updated' ? (filter.reverse ? 'asc' : 'desc') : '',
+            render: (v: number) => dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')
+          },
+          !selectMode && {
+            title: '操作',
+            dataIndex: 'id',
+            hiddenInSetting: true,
+            width: 150,
+            render: (v: any, row: any) => (
+              <FlexBox tw="items-center">
+                <Button type="text">
+                  <TextLink href={`//${row.web_ui}`} target="_blank">
+                    Flink UI
+                  </TextLink>
+                </Button>
+                <div tw="text-neut-8 mr-2">|</div>
+                {/* <Button
                 type="text"
                 disabled={[2, 4].includes(row.status)}
                 onClick={() => {
@@ -382,94 +342,75 @@ const ClusterTable = observer(
               >
                 修改
               </Button> */}
-              <Center>
-                <Tooltip
-                  trigger="click"
-                  placement="bottom"
-                  arrow={false}
-                  twChild={
-                    css`
-                      &[aria-expanded='true'] {
-                        ${tw`bg-line-dark`}
-                      }
-                      svg {
-                        ${tw`text-white! bg-transparent! fill-[transparent]!`}
-                      }
-                    ` as any
-                  }
-                  content={
-                    <Menu
-                      onClick={(e: any, key: any) => {
-                        setOp(key)
-                        setOpClusterList([row])
-                      }}
-                    >
-                      <MenuItem key="view">查看详情</MenuItem>
-                      {(row.status === 2 || row.status === 4) && (
-                        <MenuItem key="stop">停用</MenuItem>
-                      )}
-                      {row.status === 3 && (
-                        <MenuItem key="start">启动</MenuItem>
-                      )}
-                      <MenuItem
-                        key="update"
-                        disabled={[2, 4].includes(row.status)}
+                <Center>
+                  <Tooltip
+                    trigger="click"
+                    placement="bottom"
+                    arrow={false}
+                    twChild={
+                      css`
+                        &[aria-expanded='true'] {
+                          ${tw`bg-line-dark`}
+                        }
+                        svg {
+                          ${tw`text-white! bg-transparent! fill-[transparent]!`}
+                        }
+                      ` as any
+                    }
+                    content={
+                      <Menu
+                        onClick={(e: any, key: any) => {
+                          setOp(key)
+                          setOpClusterList([row])
+                        }}
                       >
-                        <AffixLabel
-                          required={false}
-                          // help="如需修改，请先停用计算集群"
-                          help={
-                            [2, 4].includes(row.status) &&
-                            '如需修改，请先停用计算集群'
-                          }
-                          theme="light"
-                        >
-                          修改
-                        </AffixLabel>
-                      </MenuItem>
-                      <MenuItem
-                        key="delete"
-                        disabled={[2, 4].includes(row.status)}
-                      >
-                        <AffixLabel
-                          required={false}
-                          help={
-                            [2, 4].includes(row.status) &&
-                            '如需删除，请先停用计算集群'
-                          }
-                          theme="light"
-                        >
-                          删除
-                        </AffixLabel>
-                      </MenuItem>
-                    </Menu>
-                  }
-                >
-                  <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
-                    <Icon
-                      name="more"
-                      clickable
-                      changeable
-                      type="light"
-                      size={20}
-                    />
-                  </div>
-                </Tooltip>
-              </Center>
-            </FlexBox>
-          ),
-        },
-      ].filter(Boolean)
-    }, [
-      setOp,
-      setOpClusterList,
-      filter.reverse,
-      filter.sort_by,
-      filter.status,
-      setFilter,
-      selectMode,
-      isSmallScreen,
-    ])
+                        <MenuItem key="view">查看详情</MenuItem>
+                        {(row.status === 2 || row.status === 4) && (
+                          <MenuItem key="stop">停用</MenuItem>
+                        )}
+                        {row.status === 3 && <MenuItem key="start">启动</MenuItem>}
+                        <MenuItem key="update" disabled={[2, 4].includes(row.status)}>
+                          <AffixLabel
+                            required={false}
+                            // help="如需修改，请先停用计算集群"
+                            help={[2, 4].includes(row.status) && '如需修改，请先停用计算集群'}
+                            theme="light"
+                          >
+                            修改
+                          </AffixLabel>
+                        </MenuItem>
+                        <MenuItem key="delete" disabled={[2, 4].includes(row.status)}>
+                          <AffixLabel
+                            required={false}
+                            help={[2, 4].includes(row.status) && '如需删除，请先停用计算集群'}
+                            theme="light"
+                          >
+                            删除
+                          </AffixLabel>
+                        </MenuItem>
+                      </Menu>
+                    }
+                  >
+                    <div tw="flex items-center p-0.5 cursor-pointer hover:bg-line-dark rounded-sm">
+                      <Icon name="more" clickable changeable type="light" size={20} />
+                    </div>
+                  </Tooltip>
+                </Center>
+              </FlexBox>
+            )
+          }
+        ].filter(Boolean),
+      [
+        setOp,
+        setOpClusterList,
+        filter.reverse,
+        filter.sort_by,
+        filter.status,
+        setFilter,
+        selectMode,
+        isSmallScreen
+      ]
+    )
 
     const refetchData = () => {
       queryClient.invalidateQueries(getFlinkClusterKey())
@@ -480,18 +421,16 @@ const ClusterTable = observer(
       mutation.mutate(
         {
           op,
-          clusterIds,
+          clusterIds
         },
         {
           onSuccess: () => {
             setOp('')
             refetchData()
             if (op === 'delete') {
-              setSelectedRowKeys(
-                selectedRowKeys.filter((k) => !clusterIds.includes(k))
-              )
+              setSelectedRowKeys(selectedRowKeys.filter((k) => !clusterIds.includes(k)))
             }
-          },
+          }
         }
       )
     }
@@ -536,29 +475,31 @@ const ClusterTable = observer(
               op: 'stop',
               jobId: job.id,
               stopRunning: get(offLineRef.current, 'stopRunning') || false,
+              type: job[jobType]
             },
             {
               onSuccess: () => {
                 queryClient.invalidateQueries(bindResKey)
-              },
+              }
             }
           )
-        },
+        }
       })
     }
 
     // console.log('onRender offLineRef: ', offLineRef.current)
     const filterColumn = columnSettings
-      .map((o: { key: string; checked: boolean }) => {
-        return o.checked && columns.find((col) => col.dataIndex === o.key)
-      })
+      .map(
+        (o: { key: string; checked: boolean }) =>
+          o.checked && columns.find((col) => col.dataIndex === o.key)
+      )
       .filter((o) => o)
     const opWordInfo = { start: '启动', stop: '停用', delete: '删除' }
     const { data: bindResData } = bindResourceRet
 
     const bindResDataJobs = useMemo(() => {
-      const streamJob = get(bindResData, 'infos[0].stream_job_release') || []
-      const syncJob = get(bindResData, 'infos[0].sync_job_release') || []
+      const streamJob = (get(bindResData, 'infos[0].stream_job_release') || []).map(setStreamJob)
+      const syncJob = (get(bindResData, 'infos[0].sync_job_release') || []).map(setSyncJob)
       return concat(streamJob, syncJob)
     }, [bindResData])
     const hasBindRes = bindResDataJobs.length > 0
@@ -569,7 +510,7 @@ const ClusterTable = observer(
             {selectMode ? (
               <div tw="text-neut-8">
                 如需选择新的计算集群，您可以到
-                <RouterLink to={`/${regionId}/workspace/${spaceId}/dm/cluster`}>
+                <RouterLink to={`/${regionId}/workspace/${spaceId}/dm/cluster`} tw="px-1">
                   计算集群列表
                 </RouterLink>
                 进行创建
@@ -630,11 +571,7 @@ const ClusterTable = observer(
                   })
                 }}
               />
-              <Button
-                type="black"
-                loading={isRefetching}
-                tw="px-[5px] border-line-dark!"
-              >
+              <Button type="black" loading={isRefetching} tw="px-[5px] border-line-dark!">
                 <Icon
                   name="if-refresh"
                   tw="text-xl text-white"
@@ -673,7 +610,7 @@ const ClusterTable = observer(
                 draft.offset = 0
                 draft.limit = size
               })
-            },
+            }
           }}
           selectedRowKeys={selectedRowKeys}
           onSelect={(keys: string[]) => {
@@ -698,16 +635,11 @@ const ClusterTable = observer(
             noBorder
             visible
             draggable
-            width={
-              opclusterList.length > 1 || (op !== 'start' && hasBindRes)
-                ? 800
-                : 400
-            }
+            width={opclusterList.length > 1 || (op !== 'start' && hasBindRes) ? 800 : 400}
             onCancel={() => setOp('')}
             footer={
               <>
-                {(op === 'start' ||
-                  (!bindResourceRet.isFetching && !hasBindRes)) && (
+                {(op === 'start' || (!bindResourceRet.isFetching && !hasBindRes)) && (
                   <div tw="flex justify-end">
                     <Button onClick={() => setOp('')}>取消</Button>
                     <Button
@@ -745,9 +677,7 @@ const ClusterTable = observer(
                     opclusterLen === 1 ? (
                       <>
                         {opText}计算集群{opclusterList[0].name}
-                        <span tw="text-neut-8 break-all">
-                          ({opclusterList[0].id})
-                        </span>
+                        <span tw="text-neut-8 break-all">({opclusterList[0].id})</span>
                       </>
                     ) : (
                       <>
@@ -757,9 +687,7 @@ const ClusterTable = observer(
                   if (op === 'start') {
                     return (
                       <>
-                        <div tw="font-medium mb-2 text-base break-all">
-                          {clusterText}
-                        </div>
+                        <div tw="font-medium mb-2 text-base break-all">{clusterText}</div>
                         <div className="modal-content-message" tw="break-all">
                           确定启动{clusterText}吗？
                         </div>
@@ -773,10 +701,7 @@ const ClusterTable = observer(
                         {clusterText}
                         {hasBindRes && '注意事项'}
                       </div>
-                      <div
-                        className="modal-content-message"
-                        tw="break-all text-neut-8"
-                      >
+                      <div className="modal-content-message" tw="break-all text-neut-8">
                         {bindResourceRet.isFetching ? (
                           <div tw="h-20">
                             <Loading />
@@ -802,10 +727,7 @@ const ClusterTable = observer(
                                         render: (field, row) => (
                                           <Button
                                             loading={
-                                              get(
-                                                offLineRef,
-                                                'current.jobId'
-                                              ) === row.id &&
+                                              get(offLineRef, 'current.jobId') === row.id &&
                                               releaseMutation.isLoading
                                             }
                                             onClick={() => {
@@ -814,8 +736,8 @@ const ClusterTable = observer(
                                           >
                                             下线
                                           </Button>
-                                        ),
-                                      },
+                                        )
+                                      }
                                     ]}
                                   />
                                   {/* <div tw="border-b border-b-neut-13 pl-4">
@@ -850,10 +772,7 @@ const ClusterTable = observer(
                                   ? `确认${opText}计算集群`
                                   : `${opText}后无法恢复，确认删除计算集群`}
                                 {opclusterList
-                                  .map(
-                                    (cluster) =>
-                                      `${cluster.name}(${cluster.id})`
-                                  )
+                                  .map((cluster) => `${cluster.name}(${cluster.id})`)
                                   .join(' ')}
                                 {` ?`}
                               </>
@@ -872,9 +791,7 @@ const ClusterTable = observer(
                   dataSource={opclusterList}
                   rowKey="id"
                   columns={columns
-                    .filter((col) =>
-                      ['name', 'version', 'updated'].includes(col.dataIndex)
-                    )
+                    .filter((col) => ['name', 'version', 'updated'].includes(col.dataIndex))
                     .map((col) => pick(col, ['title', 'dataIndex', 'render']))}
                 />
               )}

@@ -1,20 +1,6 @@
 import { Fragment, ReactElement, useEffect, useMemo, useState } from 'react'
-import {
-  DarkModal,
-  FlexBox,
-  TextHighlight,
-  Icons,
-  HelpCenterLink,
-} from 'components'
-import {
-  Icon,
-  Form,
-  Collapse,
-  Loading,
-  Field,
-  Label,
-  Control,
-} from '@QCFE/lego-ui'
+import { DarkModal, FlexBox, TextHighlight, Icons, HelpCenterLink } from 'components'
+import { Icon, Form, Collapse, Loading, Field, Label, Control } from '@QCFE/lego-ui'
 import { Button } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import { flatten, get } from 'lodash-es'
@@ -24,7 +10,7 @@ import {
   useQueryResource,
   useQueryUdf,
   useQueryStreamJobArgs,
-  useStore,
+  useStore
 } from 'hooks'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import tw, { css } from 'twin.macro'
@@ -40,28 +26,20 @@ interface ResourceSelectProps {
   [propName: string]: any
 }
 
-const renderLabel = (label: string, icon: ReactElement, search: string) => {
-  return (
-    <FlexBox tw="items-center gap-1" key={label}>
-      {icon}
-      <TextHighlight key={label} text={label} filterText={search} />
-    </FlexBox>
-  )
-}
+const renderLabel = (label: string, icon: ReactElement, search: string) => (
+  <FlexBox tw="items-center gap-1" key={label}>
+    {icon}
+    <TextHighlight key={label} text={label} filterText={search} />
+  </FlexBox>
+)
 
-const renderReadOnlyOption = (
-  label: string,
-  icon: ReactElement,
-  id?: string
-) => {
-  return (
-    <div tw="inline-flex items-center rounded-sm bg-neut-13 px-2 mr-1 tracking-wider text-2xs">
-      {icon}
-      <TextHighlight key={label} text={label} tw="ml-1" />
-      <span tw="text-neut-8">ID: {id}</span>
-    </div>
-  )
-}
+const renderReadOnlyOption = (label: string, icon: ReactElement, id?: string) => (
+  <div tw="inline-flex items-center rounded-sm bg-neut-13 px-2 mr-1 tracking-wider text-2xs">
+    {icon}
+    <TextHighlight key={label} text={label} tw="ml-1" />
+    <span tw="text-neut-8">ID: {id}</span>
+  </div>
+)
 
 const ResourceOption = ({ files }: { files: string[] }) => {
   const { data } = useQueryResource({ limit: 100 })
@@ -70,16 +48,14 @@ const ResourceOption = ({ files }: { files: string[] }) => {
     <div tw="w-[620px]">
       {flatten(data?.pages.map((page: Record<string, any>) => page.infos || []))
         .filter((i) => files.includes(i.id))
-        .map((i) =>
-          renderReadOnlyOption(i.name, <Icons name="icon_dependency" />, i.id)
-        )}
+        .map((i) => renderReadOnlyOption(i.name, <Icons name="icon_dependency" />, i.id))}
     </div>
   )
 }
 
 const ConnectorOption = ({
   builtInConnectors,
-  value,
+  value
 }: {
   builtInConnectors: string[]
   value: string[]
@@ -87,14 +63,12 @@ const ConnectorOption = ({
   <div tw="w-[620px]">
     {builtInConnectors
       .filter((i: any) => value?.includes(i.value))
-      .map((i: any) =>
-        renderReadOnlyOption(i.value, <Icons name="connector" />)
-      )}
+      .map((i: any) => renderReadOnlyOption(i.value, <Icons name="connector" />))}
   </div>
 )
 
 const ResourceSelect = (props: ResourceSelectProps) => {
-  const { icon, isUdf = false } = props
+  const { icon, isUdf = false, type } = props
   const [filter, setFilter] = useImmer<{
     limit: number
     offset: number
@@ -104,26 +78,24 @@ const ResourceSelect = (props: ResourceSelectProps) => {
     limit: 15,
     offset: 0,
     search: '',
-    // ...(isUdf ? { udf_type: type } : { type }),
+    ...(isUdf ? { udf_type: type } : { types: [type] })
   })
 
   const fn = !isUdf ? useQueryResource : useQueryUdf
   const key = !isUdf ? 'id' : 'udf_id'
   const v = fn(filter)
   const { status, data, fetchNextPage, hasNextPage } = v
-  const options = flatten(
-    data?.pages.map((page: Record<string, any>) => page.infos || [])
-  ).map((i) => {
-    return {
+  const options = flatten(data?.pages.map((page: Record<string, any>) => page.infos || [])).map(
+    (i) => ({
       label: (
         <Fragment key={i[key]}>
           {renderLabel(i.name, icon, filter.search)}
           <span tw="text-neut-8">ID:{i[key]}</span>
         </Fragment>
       ),
-      value: i[key],
-    }
-  })
+      value: i[key]
+    })
+  )
 
   const loadData = () => {
     if (hasNextPage) {
@@ -167,9 +139,10 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   const [params, setParams] = useImmer({
     clusterId: '',
     files: [] as string[],
+    pyFiles: [] as string[],
     connectors: [] as string[],
     parallelism: 0,
-    builtInConnectors: [] as string[],
+    builtInConnectors: [] as string[]
   })
   const [showCluster, setShowCluster] = useState(false)
   const [cluster, setCluster] = useState(null)
@@ -179,12 +152,11 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
   const { data, isFetching } = useQueryStreamJobArgs()
 
   const {
-    workFlowStore: { curJob, curVersion },
+    workFlowStore: { curJob, curVersion }
   } = useStore()
 
   const [connectorsKeyword, setConnectorsKeyword] = useState('')
-  const { isFetching: conIsFetching, data: builtInConnectorsRes } =
-    useQueryInConnectorsQuery()
+  const { isFetching: conIsFetching, data: builtInConnectorsRes } = useQueryInConnectorsQuery()
   const builtInConnectors = useMemo(
     () =>
       !conIsFetching && builtInConnectorsRes.ret_code === 0
@@ -192,11 +164,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
             .filter((i: string) => i.indexOf(connectorsKeyword) !== -1)
             .map((i: string) => ({
               value: i,
-              label: renderLabel(
-                i,
-                <Icons name="connector" />,
-                connectorsKeyword
-              ),
+              label: renderLabel(i, <Icons name="connector" />, connectorsKeyword)
             })) || []
         : [],
     [builtInConnectorsRes, conIsFetching, connectorsKeyword]
@@ -207,6 +175,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
       draft.clusterId = get(data, 'cluster_id', '')
       draft.parallelism = get(data, 'parallelism', 0)
       draft.files = get(data, 'files', [])
+      draft.pyFiles = get(data, 'py_files', [])
       draft.connectors = get(data, 'connectors', [])
       draft.builtInConnectors = get(data, 'built_in_connectors', [])
     })
@@ -226,15 +195,16 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
         cluster_id: params.clusterId,
         // connectors: params.connectors,
         files: params.files,
+        py_files: params.pyFiles,
         parallelism: params.parallelism,
-        built_in_connectors: params.builtInConnectors,
+        built_in_connectors: params.builtInConnectors
       },
       {
         onSuccess: () => {
           if (onCancel) {
             onCancel()
           }
-        },
+        }
       }
     )
   }
@@ -257,11 +227,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
               key="p1"
               label={
                 <FlexBox tw="items-center space-x-1">
-                  <Icon
-                    name="record"
-                    tw="(relative top-0 left-0)!"
-                    type="dark"
-                  />
+                  <Icon name="record" tw="(relative top-0 left-0)!" type="dark" />
                   <span>基础设置</span>
                 </FlexBox>
               }
@@ -279,16 +245,8 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                             setShowCluster(true)
                             setShowMsg(true)
                           }}
-                          type={
-                            showMsg && !params.clusterId
-                              ? 'outlined'
-                              : 'default'
-                          }
-                          css={[
-                            showMsg && !params.clusterId
-                              ? tw`border-red-10! border`
-                              : '',
-                          ]}
+                          type={showMsg && !params.clusterId ? 'outlined' : 'default'}
+                          css={[showMsg && !params.clusterId ? tw`border-red-10! border` : '']}
                         >
                           <Icon name="pod" />
                           {(() => {
@@ -308,9 +266,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     )}
                   </Control>
                   {showMsg && !params.clusterId && (
-                    <div className="help is-danger has-danger-help">
-                      请选择集群
-                    </div>
+                    <div className="help is-danger has-danger-help">请选择集群</div>
                   )}
                 </Field>
                 {readOnly ? (
@@ -340,11 +296,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
               key="p2"
               label={
                 <FlexBox tw="items-center space-x-1">
-                  <Icon
-                    name="record"
-                    tw="(relative top-0 left-0)!"
-                    type="light"
-                  />
+                  <Icon name="record" tw="(relative top-0 left-0)!" type="light" />
                   <span>依赖资源</span>
                 </FlexBox>
               }
@@ -358,25 +310,47 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     </Control>
                   </Field>
                 ) : (
-                  <ResourceSelect
-                    name="connectors"
-                    label="资源引用"
-                    icon={<Icons name="icon_dependency" />}
-                    placeholder={
-                      curJob?.type === 2
-                        ? '请选择运行所需的函数包及自定义 connector 包'
-                        : '请选择运行所需依赖资源'
-                    }
-                    value={params.files}
-                    multi
-                    closeOnSelect={false}
-                    onChange={(files: string[]) =>
-                      setParams((draft) => {
-                        draft.files = files
-                      })
-                    }
-                    type={3}
-                  />
+                  <>
+                    <ResourceSelect
+                      name="connectors"
+                      label="JAR 类型资源"
+                      icon={<Icons name="icon_dependency" />}
+                      placeholder={
+                        curJob?.type === 2
+                          ? '请选择运行所需的函数包及自定义 connector 包'
+                          : '请选择运行所需依赖资源'
+                      }
+                      value={params.files}
+                      multi
+                      closeOnSelect={false}
+                      onChange={(files: string[]) =>
+                        setParams((draft) => {
+                          draft.files = files
+                        })
+                      }
+                      type={1}
+                    />
+
+                    <ResourceSelect
+                      name="connectors"
+                      label="Python 类型资源"
+                      icon={<Icons name="icon_dependency" />}
+                      placeholder={
+                        curJob?.type === 2
+                          ? '请选择运行所需的函数包及自定义 connector 包'
+                          : '请选择运行所需依赖资源'
+                      }
+                      value={params.pyFiles}
+                      multi
+                      closeOnSelect={false}
+                      onChange={(files: string[]) =>
+                        setParams((draft) => {
+                          draft.pyFiles = files
+                        })
+                      }
+                      type={2}
+                    />
+                  </>
                 )}
                 {/* eslint-disable-next-line no-nested-ternary */}
                 {curJob?.type === 2 ? (
@@ -416,10 +390,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                       help={
                         <div>
                           详细说明见
-                          <HelpCenterLink
-                            href="/developer_sql/summary/"
-                            isIframe={false}
-                          >
+                          <HelpCenterLink href="/developer_sql/summary/" isIframe={false}>
                             帮助文档
                           </HelpCenterLink>
                         </div>

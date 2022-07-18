@@ -14,7 +14,7 @@ import {
   Select,
   Loading,
   DatePicker,
-  Button,
+  Button
 } from '@QCFE/lego-ui'
 import { DarkModal, FlexBox, AffixLabel, KVTextAreaField } from 'components'
 import { useImmer } from 'use-immer'
@@ -27,7 +27,7 @@ import {
   useMutationStreamJobSchedule,
   useMutationSyncJobSchedule,
   useQueryStreamJobSchedule,
-  useQuerySyncJobSchedule,
+  useQuerySyncJobSchedule
   // useQueryJobSchedule,
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
@@ -35,7 +35,7 @@ import {
   ScheSettingForm,
   SmallDatePicker,
   SmallDatePickerField,
-  HorizonFiledsWrapper,
+  HorizonFiledsWrapper
 } from '../styled'
 import { JobMode } from '../Job/JobUtils'
 
@@ -44,7 +44,7 @@ const {
   // DatePickerField,
   SliderField,
   SelectField,
-  RadioGroupField,
+  RadioGroupField
 } = Form
 const { CollapseItem } = Collapse
 
@@ -53,6 +53,7 @@ interface IScheSettingModal {
   origin?: string
   onCancel?: () => void
   onSuccess?: () => void
+  defaultschedulePolicy?: number
 }
 
 type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -62,6 +63,7 @@ const ScheSettingModal = ({
   origin = '',
   onCancel,
   onSuccess,
+  defaultschedulePolicy = 3
 }: IScheSettingModal) => {
   const queryClient = useQueryClient()
   const [disabled, setDisabled] = useState(Boolean(origin === 'ops'))
@@ -73,31 +75,31 @@ const ScheSettingModal = ({
     minute: {
       startHour: 0,
       stampMinu: 5,
-      endHour: 23,
+      endHour: 23
     },
     hour: {
       tp: 1,
       startHour: 0,
       stampMinu: 5,
       endHour: 23,
-      hours: [0],
+      hours: [0]
     },
     day: {
-      scheDate: defCurDate,
+      scheDate: defCurDate
     },
     week: {
       weekly: [1],
-      scheDate: defCurDate,
+      scheDate: defCurDate
     },
     month: {
       daily: [1],
-      scheDate: defCurDate,
+      scheDate: defCurDate
     },
     year: {
       monthly: [1],
       daily: [1],
-      scheDate: defCurDate,
-    },
+      scheDate: defCurDate
+    }
   })
   const [params, setParams] = useImmer<{
     concurrencyPolicy: number | string
@@ -124,22 +126,20 @@ const ScheSettingModal = ({
     retryPolicy: 1,
     timeout: 0,
     periodType: 'minute',
-    schedulePolicy: 3,
+    schedulePolicy: defaultschedulePolicy,
     executed: null,
     parameters: null,
-    parametersStr: '',
+    parametersStr: ''
     // immediately: false,
   })
 
   const {
-    workFlowStore: { curJob },
+    workFlowStore: { curJob }
   } = useStore()
 
   const isStreamJob = curJob!.jobMode === JobMode.RT
 
-  const useQueryJobSchedule = isStreamJob
-    ? useQueryStreamJobSchedule
-    : useQuerySyncJobSchedule
+  const useQueryJobSchedule = isStreamJob ? useQueryStreamJobSchedule : useQuerySyncJobSchedule
 
   const useMutationJobSchedule = isStreamJob
     ? useMutationStreamJobSchedule
@@ -159,15 +159,12 @@ const ScheSettingModal = ({
           draft.retryPolicy = data.retry_policy
           draft.periodType = periodType || 'minute'
           draft.timeout = data.timeout
-          draft.schedulePolicy = data.schedule_policy || 3
+          draft.schedulePolicy = data.schedule_policy || defaultschedulePolicy
           draft.executed = data.executed
           draft.parameters = data.parameters
           draft.parametersStr = data.parameters
             ? data.parameters
-                .map(
-                  (item: { key: string; value: string }) =>
-                    `${item.key}=${item.value}`
-                )
+                .map((item: { key: string; value: string }) => `${item.key}=${item.value}`)
                 .join('\r\n')
             : ''
           // draft.immediately = data.immediately
@@ -182,8 +179,7 @@ const ScheSettingModal = ({
               if (hour.indexOf('-') > -1) {
                 let hourRange
                 ;[hourRange, draft.hour.stampMinu] = hour.split('/')
-                ;[draft.hour.startHour, draft.hour.endHour] =
-                  hourRange.split('-')
+                ;[draft.hour.startHour, draft.hour.endHour] = hourRange.split('-')
               } else {
                 draft.hour.hours = hour.split(',')
                 draft.hour.tp = 2
@@ -204,7 +200,7 @@ const ScheSettingModal = ({
           })
         }
       }
-    },
+    }
   })
   const mutation = useMutationJobSchedule()
 
@@ -217,8 +213,7 @@ const ScheSettingModal = ({
     let express = ''
     let scheDate = null
     let daily = null
-    const sortFormatNum = (arr: number[]) =>
-      [...arr].sort((a, b) => a - b).join(',')
+    const sortFormatNum = (arr: number[]) => [...arr].sort((a, b) => a - b).join(',')
     if (periodType === 'minute') {
       curPeriod = periodData[periodType]
       express = `*/${curPeriod.stampMinu} ${curPeriod.startHour}-${curPeriod.endHour} * * *`
@@ -237,16 +232,12 @@ const ScheSettingModal = ({
       curPeriod = periodData[periodType]
       scheDate = curPeriod.scheDate
       const { weekly } = curPeriod
-      express = `${scheDate.getMinutes()} ${scheDate.getHours()} * * ${sortFormatNum(
-        weekly
-      )}`
+      express = `${scheDate.getMinutes()} ${scheDate.getHours()} * * ${sortFormatNum(weekly)}`
     } else if (periodType === 'month') {
       curPeriod = periodData[periodType]
       scheDate = curPeriod.scheDate
       daily = curPeriod.daily
-      express = `${scheDate.getMinutes()} ${scheDate.getHours()} ${sortFormatNum(
-        daily
-      )} * *`
+      express = `${scheDate.getMinutes()} ${scheDate.getHours()} ${sortFormatNum(daily)} * *`
     } else if (periodType === 'year') {
       curPeriod = periodData[periodType]
       scheDate = curPeriod.scheDate
@@ -282,7 +273,7 @@ const ScheSettingModal = ({
         started: params.started,
         timeout: params.timeout,
         schedule_policy: params.schedulePolicy,
-        executed: params.executed || dayjs().unix(),
+        executed: params.executed || dayjs().unix()
         // immediately: params.immediately,
       }
       if (!isStreamJob && params.parametersStr !== undefined) {
@@ -296,7 +287,7 @@ const ScheSettingModal = ({
               const o = v.split('=')
               return {
                 key: o[0],
-                value: o[1],
+                value: o[1]
               }
             })
         )
@@ -311,7 +302,7 @@ const ScheSettingModal = ({
           if (origin === 'ops') {
             if (onSuccess) onSuccess()
           }
-        },
+        }
       })
     }
   }
@@ -320,9 +311,7 @@ const ScheSettingModal = ({
     <DarkModal
       orient="fullright"
       onCancel={handleCancel}
-      title={`${
-        origin === 'ops' ? `数据开发作业 ${curJob?.version} ` : ''
-      }调度配置`}
+      title={`${origin === 'ops' ? `数据开发作业 ${curJob?.version} ` : ''}调度配置`}
       width={800}
       visible={visible}
       onOk={save}
@@ -362,11 +351,7 @@ const ScheSettingModal = ({
                 key="p1"
                 label={
                   <FlexBox tw="items-center space-x-1">
-                    <Icon
-                      name="record"
-                      tw="(relative top-0 left-0)!"
-                      type="light"
-                    />
+                    <Icon name="record" tw="(relative top-0 left-0)!" type="light" />
                     <span>基础属性</span>
                   </FlexBox>
                 }
@@ -433,11 +418,7 @@ const ScheSettingModal = ({
                   key="p3"
                   label={
                     <FlexBox tw="items-center space-x-1">
-                      <Icon
-                        name="coding"
-                        tw="(relative top-0 left-0)!"
-                        type="light"
-                      />
+                      <Icon name="coding" tw="(relative top-0 left-0)!" type="light" />
                       <span>参数配置</span>
                     </FlexBox>
                   }
@@ -473,6 +454,26 @@ var2=\${yyyy-mm-dd HH-1H}`}
                     validateOnChange
                     schemas={[
                       {
+                        help: '变量名长度不能超过 64 个字符',
+                        status: 'error',
+                        rule: (v: string) => {
+                          return v
+                            .split(/[\r\n]/)
+                            .filter((str) => !isEmpty(str))
+                            .every((str) => {
+                              const [key, vv] = str.split('=')
+                              if (key && key.length > 64) {
+                                return false
+                              }
+                              if (vv && vv.length > 64) {
+                                return false
+                              }
+                              return true
+                            })
+                          return true
+                        }
+                      },
+                      {
                         help: '不能为空，且变量名必须唯一',
                         status: 'error',
                         rule: (v: string) => {
@@ -482,7 +483,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             .filter((str) => !isEmpty(str))
                             .every((str) => {
                               const [key, val] = str.split('=')
-                              if (val === undefined || isEmpty(val)) {
+                              if (isEmpty(key) || val === undefined || isEmpty(val)) {
                                 return false
                               }
                               if (keys.includes(key)) {
@@ -491,8 +492,8 @@ var2=\${yyyy-mm-dd HH-1H}`}
                               keys.push(key)
                               return true
                             })
-                        },
-                      },
+                        }
+                      }
                     ]}
                   />
                 </CollapseItem>
@@ -501,11 +502,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                 key="p2"
                 label={
                   <FlexBox tw="items-center space-x-1">
-                    <Icon
-                      name="clock"
-                      tw="(relative top-0 left-0)!"
-                      type="dark"
-                    />
+                    <Icon name="clock" tw="(relative top-0 left-0)!" type="dark" />
                     <span>调度设置</span>
                   </FlexBox>
                 }
@@ -526,8 +523,8 @@ var2=\${yyyy-mm-dd HH-1H}`}
                         {
                           rule: { required: true },
                           help: '请选择调度策略',
-                          status: 'error',
-                        },
+                          status: 'error'
+                        }
                       ]}
                     >
                       <Radio value={2}>执行一次</Radio>
@@ -543,11 +540,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             <SmallDatePicker
                               dateFormat="Y-m-d H:i"
                               enableTime
-                              value={
-                                params.started
-                                  ? new Date(params.started * 1000)
-                                  : ''
-                              }
+                              value={params.started ? new Date(params.started * 1000) : ''}
                               onClear={() => {
                                 setParams((draft) => {
                                   draft.started = 0
@@ -556,9 +549,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                               onChange={(d: Date[]) => {
                                 if (d.length) {
                                   setParams((draft) => {
-                                    draft.started = Math.floor(
-                                      d[0].getTime() / 1000
-                                    )
+                                    draft.started = Math.floor(d[0].getTime() / 1000)
                                     if (draft.started > draft.ended) {
                                       draft.ended = draft.started + 60
                                     }
@@ -570,11 +561,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             <SmallDatePicker
                               dateFormat="Y-m-d H:i"
                               enableTime
-                              value={
-                                params.ended
-                                  ? new Date(params.ended * 1000)
-                                  : ''
-                              }
+                              value={params.ended ? new Date(params.ended * 1000) : ''}
                               onClear={() => {
                                 setParams((draft) => {
                                   draft.ended = 0
@@ -583,9 +570,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                               onChange={(d: Date[]) => {
                                 if (d.length) {
                                   setParams((draft) => {
-                                    draft.ended = Math.floor(
-                                      d[0].getTime() / 1000
-                                    )
+                                    draft.ended = Math.floor(d[0].getTime() / 1000)
                                     if (draft.started > draft.ended) {
                                       draft.started = draft.ended - 60
                                     }
@@ -654,25 +639,25 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             { value: 'day', label: '日' },
                             { value: 'week', label: '周' },
                             { value: 'month', label: '月' },
-                            { value: 'year', label: '年' },
+                            { value: 'year', label: '年' }
                           ]}
                         />
                         {(() => {
                           const hourOpts = range(0, 24).map((v) => ({
                             value: v,
-                            label: `${v}时`,
+                            label: `${v}时`
                           }))
                           const minuOpts = range(5, 60, 5).map((v) => ({
                             value: v,
-                            label: v,
+                            label: v
                           }))
                           const monthOpts = range(1, 32).map((v) => ({
                             value: v,
-                            label: `每月${v}号`,
+                            label: `每月${v}号`
                           }))
                           const yearOpts = range(1, 13).map((v) => ({
                             value: v,
-                            label: `${v}月`,
+                            label: `${v}月`
                           }))
                           let curPeriodData: any = null
                           if (periodType === 'minute') {
@@ -700,9 +685,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                     />
                                     {/* <div tw="leading-8 ml-2">时</div> */}
                                   </Control>
-                                  <div className="help">
-                                    0~23 从指定时间的 0 分 0 秒开始
-                                  </div>
+                                  <div className="help">0~23 从指定时间的 0 分 0 秒开始</div>
                                 </Field>
                                 <Field>
                                   <Label>
@@ -731,13 +714,10 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                     <Select
                                       disabled={disabled}
                                       backspaceRemoves={false}
-                                      options={hourOpts.map((opt) => {
-                                        return {
-                                          ...opt,
-                                          disabled:
-                                            opt.value < curPeriodData.startHour,
-                                        }
-                                      })}
+                                      options={hourOpts.map((opt) => ({
+                                        ...opt,
+                                        disabled: opt.value < curPeriodData.startHour
+                                      }))}
                                       value={curPeriodData.endHour}
                                       onChange={(v: number) =>
                                         setPeriodData((draft) => {
@@ -747,9 +727,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                     />
                                     {/* <div tw="leading-8 ml-2">时</div> */}
                                   </Control>
-                                  <div className="help">
-                                    0~23 到指定时间的 59 分 59 秒结束
-                                  </div>
+                                  <div className="help">0~23 到指定时间的 59 分 59 秒结束</div>
                                 </Field>
                               </>
                             )
@@ -800,7 +778,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                             backspaceRemoves={false}
                                             options={range(1, 24).map((v) => ({
                                               value: v,
-                                              label: `${v}`,
+                                              label: `${v}`
                                             }))}
                                             value={curPeriodData.stampMinu}
                                             onChange={(v: number) => {
@@ -819,14 +797,10 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                         <Control>
                                           <Select
                                             backspaceRemoves={false}
-                                            options={hourOpts.map((opt) => {
-                                              return {
-                                                ...opt,
-                                                disabled:
-                                                  opt.value <
-                                                  curPeriodData.startHour,
-                                              }
-                                            })}
+                                            options={hourOpts.map((opt) => ({
+                                              ...opt,
+                                              disabled: opt.value < curPeriodData.startHour
+                                            }))}
                                             value={curPeriodData.endHour}
                                             onChange={(v: number) => {
                                               setPeriodData((draft) => {
@@ -851,9 +825,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                       onChange={(v: []) => {
                                         if (v.length > 0) {
                                           setPeriodData((draft) => {
-                                            draft.hour.hours = v.sort(
-                                              (a, b) => a - b
-                                            )
+                                            draft.hour.hours = v.sort((a, b) => a - b)
                                           })
                                         }
                                       }}
@@ -909,7 +881,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                     { label: '星期三', value: 3 },
                                     { label: '星期四', value: 4 },
                                     { label: '星期五', value: 5 },
-                                    { label: '星期六', value: 6 },
+                                    { label: '星期六', value: 6 }
                                   ]}
                                 />
                                 <SmallDatePickerField
@@ -1066,11 +1038,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                                     enableTime
                                     enableSeconds
                                     minDate={curDate}
-                                    defaultValue={
-                                      executedDate < curDate
-                                        ? curDate
-                                        : executedDate
-                                    }
+                                    defaultValue={executedDate < curDate ? curDate : executedDate}
                                     onChange={(d: Date[]) => {
                                       if (d.length) {
                                         setParams((draft) => {
@@ -1123,84 +1091,87 @@ var2=\${yyyy-mm-dd HH-1H}`}
                       options={[
                         { value: 1, label: '允许' },
                         { value: 2, label: '禁止' },
-                        { value: 3, label: '替换' },
+                        { value: 3, label: '替换' }
                       ]}
                       schemas={[
                         {
                           rule: { required: true, isInteger: true },
                           help: '请选择依赖策略',
-                          status: 'error',
-                        },
+                          status: 'error'
+                        }
                       ]}
                     />
                     {false && (
-                      <Field>
-                        <Label>
-                          <AffixLabel>重试策略</AffixLabel>
-                        </Label>
-                        <Control>
-                          <Toggle
+                      <>
+                        <Field>
+                          <Label>
+                            <AffixLabel>重试策略</AffixLabel>
+                          </Label>
+                          <Control>
+                            <Toggle
+                              disabled={disabled}
+                              checked={params.retryPolicy === 2}
+                              onChange={(checked: boolean) => {
+                                setParams((draft) => {
+                                  draft.retryPolicy = checked ? 2 : 1
+                                })
+                              }}
+                            />
+                          </Control>
+                          <div tw="leading-6 ml-2">出错自动重试</div>
+                        </Field>
+                        <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
+                          <SliderField
+                            key={disabled ? 'initSlider' : 'updateSlider'}
                             disabled={disabled}
-                            checked={params.retryPolicy === 2}
-                            onChange={(checked: boolean) => {
-                              setParams((draft) => {
-                                draft.retryPolicy = checked ? 2 : 1
-                              })
-                            }}
-                          />
-                        </Control>
-                        <div tw="leading-6 ml-2">出错自动重试</div>
-                      </Field>
-                    )}
-                    <div css={params.retryPolicy === 1 && tw`hidden`} tw="mb-6">
-                      <SliderField
-                        key={disabled ? 'initSlider' : 'updateSlider'}
-                        disabled={disabled}
-                        name="p2"
-                        label="出错重试最大次数"
-                        hasTooltip
-                        value={params.retryLimit}
-                        markDots
-                        min={1}
-                        max={99}
-                        onChange={(v: string) => {
-                          setParams((draft) => {
-                            draft.retryLimit = +v
-                          })
-                        }}
-                        marks={{
-                          1: '1',
-                          20: '20',
-                          40: '40',
-                          60: '60',
-                          80: '80',
-                          99: '99',
-                        }}
-                        hasInput
-                        inputProps={{ disabled }}
-                      />
-                      <Field>
-                        <Label>
-                          <AffixLabel>出错重试间隔</AffixLabel>
-                        </Label>
-                        <Control>
-                          <InputNumber
-                            key={disabled ? 'initInput' : 'updateInput'}
-                            disabled={disabled}
-                            isMini
+                            name="p2"
+                            label="出错重试最大次数"
+                            hasTooltip
+                            value={params.retryLimit}
+                            markDots
                             min={1}
-                            max={30}
-                            value={params.retryInterval}
-                            onChange={(v: number) => {
+                            max={99}
+                            onChange={(v: string) => {
                               setParams((draft) => {
-                                draft.retryInterval = v
+                                draft.retryLimit = +v
                               })
                             }}
+                            marks={{
+                              1: '1',
+                              20: '20',
+                              40: '40',
+                              60: '60',
+                              80: '80',
+                              99: '99'
+                            }}
+                            hasInput
+                            inputProps={{ disabled }}
                           />
-                        </Control>
-                        <div tw="leading-8 ml-2">分钟</div>
-                      </Field>
-                    </div>
+                          <Field>
+                            <Label>
+                              <AffixLabel>出错重试间隔</AffixLabel>
+                            </Label>
+                            <Control>
+                              <InputNumber
+                                key={disabled ? 'initInput' : 'updateInput'}
+                                disabled={disabled}
+                                isMini
+                                min={1}
+                                max={30}
+                                value={params.retryInterval}
+                                onChange={(v: number) => {
+                                  setParams((draft) => {
+                                    draft.retryInterval = v
+                                  })
+                                }}
+                              />
+                            </Control>
+                            <div tw="leading-8 ml-2">分钟</div>
+                          </Field>
+                        </div>
+                      </>
+                    )}
+
                     <Field>
                       <Label>超时时间</Label>
                       <Control>
@@ -1219,9 +1190,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                         />
                       </Control>
                       <div tw="leading-8 ml-2">分钟</div>
-                      {params.timeout === 0 && (
-                        <div className="help">注：0表示不超时</div>
-                      )}
+                      {params.timeout === 0 && <div className="help">注：0表示不超时</div>}
                     </Field>
                   </>
                 </Loading>

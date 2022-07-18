@@ -1,19 +1,11 @@
 /* eslint-disable no-bitwise */
 // @ts-ignore
 import { Button, CopyText, Icon } from '@QCFE/qingcloud-portal-ui'
-import {
-  Card,
-  Center,
-  FlexBox,
-  IMoreActionItem,
-  MoreAction,
-  TextLink,
-  Tooltip,
-} from 'components'
-import { useHistory, useParams } from 'react-router-dom'
+import { Card, Center, FlexBox, IMoreActionItem, MoreAction, TextLink, Tooltip } from 'components'
+import { useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
 import React, { useState } from 'react'
-import icons from 'views/Space/Ops/DataIntegration/icons'
+import icons from 'views/Space/Ops/icons'
 import { Collapse, Loading, Tabs } from '@QCFE/lego-ui'
 import dayjs from 'dayjs'
 import { HorizonTabs } from 'views/Space/Dm/styled'
@@ -22,24 +14,22 @@ import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSou
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
 import {
+  DataReleaseDevMode,
+  dataReleaseDevModeType,
   jobInstanceStatus,
-  JobInstanceStatusType,
+  JobInstanceStatusType
 } from 'views/Space/Ops/DataIntegration/constants'
-import { describeFlinkUiByInstanceId } from 'stores/api'
 import { useQueryClient } from 'react-query'
 import {
-  AlarmStatusCmp,
-  Circle,
-  DbTypeCmp,
-  JobInstanceStatusCmp,
-  JobTypeCmp,
-} from '../styledComponents'
-import AlertModal from '../../Alert/Modal'
-import {
   getSyncJobInstanceKey,
-  useMutationJobInstance,
-  useQuerySyncJobInstances,
-} from '../../../../../hooks/useJobInstance'
+  useDescribeInstanceWithFlinkUIByInstanceId,
+  useMutationJobInstance
+} from 'hooks'
+import DevContent from 'views/Space/Ops/components/DevContent'
+import { Circle, DbTypeCmp, JobInstanceStatusCmp, JobTypeCmp } from '../../styledComponents'
+import AlertModal from '../../Alert/Modal'
+import Schedule from '../../components/Schedule'
+import Cluster from '../../components/Cluster'
 
 interface IDataJobInstanceDetailProps {
   id: string
@@ -64,7 +54,7 @@ const GridItem = styled.div(({ labelWidth = 60 }: { labelWidth?: number }) => [
         ${tw`text-white!`}
       }
     }
-  `,
+  `
 ])
 
 const Root = styled.div`
@@ -107,22 +97,16 @@ const CopyTextWrapper = styled(CopyText)`
   }
 `
 
-interface IRouteParams {
-  regionId: string
-  spaceId: string
-}
-
 const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
   useIcon(icons)
   const { id } = props
 
   const history = useHistory()
 
-  const { regionId, spaceId } = useParams<IRouteParams>()
-
-  const [{ showDataSource }, setDataSource] = useImmer({
+  const [{ showDataSource, datasourceId, datasourceType }, setDataSource] = useImmer({
     showDataSource: false,
-    dataSourceData: undefined,
+    datasourceId: undefined as string | undefined,
+    datasourceType: undefined as number | undefined
   })
   const [isOpen, setOpen] = useState(true)
   const [activeName, setActiveName] = useState('Message')
@@ -130,10 +114,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
     history.push('../data-job')
   }
 
-  const { data: list, isFetching } = useQuerySyncJobInstances({
-    instance_id: id,
-  })
-  const data = get(list, 'infos[0]', {})
+  const { data, isFetching } = useDescribeInstanceWithFlinkUIByInstanceId(id)
 
   const stopAble =
     JobInstanceStatusType.RUNNING |
@@ -147,10 +128,10 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
     const result = []
     if (status & stopAble) {
       result.push({
-        text: '中止',
+        text: '终止',
         icon: 'q-closeCircleFill',
         key: 'stop',
-        value: record,
+        value: record
       })
     }
     return result
@@ -163,13 +144,17 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
 
   const mutation = useMutationJobInstance()
 
+  const jumpDataReleaseDetail = ({ jobId, version }: { jobId: string; version: string }) => {
+    window.open(`../data-release/${jobId}?version=${version}`, '_blank')
+  }
+
   const handleMenuClick = (record: Record<string, any>, key: any) => {
     switch (key) {
       case 'stop':
         mutation
           .mutateAsync({
             op: 'terminate',
-            ids: [record.id],
+            ids: [record.id]
           })
           .then(() => {
             refetchData()
@@ -214,10 +199,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
             />
           </div>
         </Tooltip>
-        <CopyTextWrapper
-          text={`${data?.name ?? ''}(ID: ${id})`}
-          theme="light"
-        />
+        <CopyTextWrapper text={`${get(data, 'sync_job.name', '')}(ID: ${id})`} theme="light" />
       </FlexBox>
       <Card hasBoxShadow tw="bg-neut-16">
         {isFetching && (
@@ -227,10 +209,11 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         )}
         <div tw="flex justify-between items-center px-4 h-[72px]">
           <Center tw="flex-auto">
-            <Circle>
+            <Circle tw="w-10! h-10!">
               <Icon
                 name="q-mergeFillDuotone"
                 type="light"
+                size={28}
                 css={css`
                   & .qicon {
                     ${tw`text-white! fill-[#fff]!`}
@@ -241,26 +224,21 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
             <div tw="flex-1">
               <div tw="text-white">
                 <span tw="mr-3">{data?.id}</span>
-                <JobInstanceStatusCmp
-                  type={data?.state as 1}
-                  tw="inline-flex"
-                />
+                <JobInstanceStatusCmp type={data?.state as 1} tw="inline-flex" />
               </div>
             </div>
           </Center>
           <FlexBox tw="gap-4">
-            {data.state & stopAble && (
-              <MoreAction
-                items={getActions(
-                  jobInstanceStatus[data.state as 1]?.type,
-                  data
-                )}
-                onMenuClick={handleMenuClick as any}
-                type="button"
-                placement="bottom-start"
-                buttonText="更多操作"
-              />
-            )}
+            {data?.state & stopAble &&
+              !!getActions(jobInstanceStatus[data?.state as 1]?.type, data).length && (
+                <MoreAction
+                  items={getActions(jobInstanceStatus[data?.state as 1]?.type, data)}
+                  onMenuClick={handleMenuClick as any}
+                  type="button"
+                  placement="bottom-start"
+                  buttonText="更多操作"
+                />
+              )}
             <Button
               onClick={() => {
                 setOpen(!isOpen)
@@ -281,59 +259,131 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem>
-              <span>告警状态:</span>
-              <span>
-                <AlarmStatusCmp type={data?.alarm_status} />
-              </span>
               <span>所属作业:</span>
               <span tw="inline-block">
-                <Tooltip
-                  theme="light"
-                  hasPadding
-                  content={`发布描述：${data?.desc}`}
-                >
+                {get(data, 'sync_job.desc') ? (
+                  <Tooltip
+                    theme="light"
+                    hasPadding
+                    content={`发布描述：${get(data, 'sync_job.desc', '')}`}
+                  >
+                    <div
+                      onClick={() => {
+                        window.open(
+                          `../data-release/${get(data, 'job_id', '')}?version=${get(
+                            data,
+                            'version'
+                          )}`,
+                          '_blank'
+                        )
+                      }}
+                    >
+                      <div>
+                        <span tw="text-white font-semibold hover:text-green-11 mr-1 hover:cursor-pointer">
+                          {get(data, 'sync_job.name')}
+                        </span>
+                        <span tw="text-neut-8">({data?.job_id})</span>
+                      </div>
+                      <div tw="text-neut-8">版本 ID: {data?.version}</div>
+                    </div>
+                  </Tooltip>
+                ) : (
                   <div>
                     <div>
-                      <span tw="text-white font-semibold mr-1">
-                        {data?.job_name}
+                      <span
+                        tw="text-white font-semibold mr-1 cursor-pointer"
+                        onClick={() =>
+                          jumpDataReleaseDetail({
+                            jobId: data?.job_id,
+                            version: data?.version
+                          })
+                        }
+                      >
+                        {get(data, 'sync_job.name')}
                       </span>
                       <span tw="text-neut-8">({data?.job_id})</span>
                     </div>
                     <div tw="text-neut-8">版本 ID: {data?.version}</div>
                   </div>
-                </Tooltip>
+                )}
               </span>
               <span>作业模式:</span>
-              <span />
+              <span>
+                {dataReleaseDevModeType[get(data, 'sync_job_property.conf.job_mode') as 1]?.label}
+              </span>
             </GridItem>
 
             <GridItem>
               <span>作业类型:</span>
               <span>
-                <JobTypeCmp type={data?.type as 2} />
+                <JobTypeCmp type={get(data, 'sync_job.type') as 2} />
               </span>
               <span>数据来源:</span>
               <span tw="inline-block">
-                <div
-                  tw="align-middle"
-                  css={
-                    [
-                      // tw`cursor-pointer  hover:text-green-11`
-                    ]
-                  }
-
-                  // onClick={() => set({ showDataSource: true })}
-                >
-                  <DbTypeCmp type={data?.source_type} onClick={() => {}} />
-                  <span tw="ml-1">{data?.source_name}</span>
-                </div>
-                <div tw="text-neut-8">{data?.source_id}</div>
+                {dataReleaseDevModeType[get(data, 'sync_job_property.conf.job_mode') as 1]?.type ===
+                  DataReleaseDevMode.UI &&
+                  get(data, 'sync_job_property.conf.source_id') && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                      onClick={() =>
+                        setDataSource({
+                          showDataSource: true,
+                          datasourceType: get(data, 'sync_job.source_type'),
+                          datasourceId: get(data, 'sync_job_property.conf.source_id')
+                        })
+                      }
+                    >
+                      <DbTypeCmp
+                        devMode={get(data, 'sync_job_property.conf.job_mode') as 1}
+                        type={get(data, 'sync_job.source_type') as 1}
+                        onClick={() => {}}
+                      />
+                      <span tw="ml-1">{get(data, 'sync_job_property.conf.source_name')}</span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[get(data, 'sync_job_property.conf.job_mode') as 1]?.type ===
+                  DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp
+                    devMode={get(data, 'sync_job_property.conf.job_mode')}
+                    type={get(data, 'sync_job.source_type') as 1}
+                  />
+                )}
+                <div tw="text-neut-8">{get(data, 'sync_job_property.conf.source_id')}</div>
               </span>
               <span>数据目的:</span>
+
               <span tw="inline-block">
-                <div tw="align-middle">
-                  <DbTypeCmp type={data?.target_type} onClick={undefined} />
-                </div>
+                {dataReleaseDevModeType[get(data, 'sync_job_property.conf.job_mode') as 1]?.type ===
+                  DataReleaseDevMode.UI &&
+                  get(data, 'sync_job_property.conf.target_id') && (
+                    <div
+                      tw="align-middle"
+                      css={[tw`cursor-pointer  hover:text-green-11`]}
+                      onClick={() =>
+                        setDataSource({
+                          showDataSource: true,
+                          datasourceType: get(data, 'sync_job.target_type') as number,
+                          datasourceId: get(data, 'sync_job_property.conf.target_id') as string
+                        })
+                      }
+                    >
+                      <DbTypeCmp
+                        devMode={get(data, 'sync_job_property.conf.job_mode')}
+                        type={get(data, 'sync_job.target_type') as 1}
+                        onClick={() => {}}
+                      />
+                      <span tw="ml-1">{get(data, 'sync_job_property.conf.target_name')}</span>
+                    </div>
+                  )}
+                {dataReleaseDevModeType[get(data, 'sync_job_property.conf.job_mode') as 1]?.type ===
+                  DataReleaseDevMode.SCRIPT && (
+                  <DbTypeCmp
+                    devMode={get(data, 'sync_job_property.conf.job_mode')}
+                    type={get(data, 'sync_job.target_type') as 1}
+                  />
+                )}
+                <div tw="text-neut-8">{get(data, 'sync_job_property.conf.target_id')}</div>
               </span>
             </GridItem>
 
@@ -342,36 +392,40 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
               <span>
                 <TextLink
                   disabled={
-                    jobInstanceStatus[data.state as 1]?.type ===
-                    JobInstanceStatusType.PREPARING
+                    jobInstanceStatus[data?.state as 1]?.type === JobInstanceStatusType.PREPARING
                   }
                   onClick={() => {
-                    describeFlinkUiByInstanceId({
-                      regionId,
-                      spaceId,
-                      instanceId: id,
-                    }).then((web_ui: string) => {
-                      if (web_ui) {
-                        window.open(web_ui, '_blank')
-                      }
-                    })
+                    // describeFlinkUiByInstanceId({
+                    //   regionId,
+                    //   spaceId,
+                    //   instanceId: id,
+                    // }).then((web_ui: string) => {
+                    if (data?.flink_ui) {
+                      window.open(`//${data?.flink_ui}`, '_blank')
+                    }
+                    // })
                   }}
                 >
                   Flink UI
                 </TextLink>
               </span>
               <span>开始时间:</span>
-              <span>{dayjs(data?.created).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>{dayjs(get(data, 'created') * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
               <span>更新时间:</span>
-              <span>{dayjs(data?.updated).format('YYYY-MM-DD HH:mm:ss')}</span>
+              <span>{dayjs(get(data, 'updated') * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
             </GridItem>
           </div>
         </CollapsePanel>
       </Card>
       <HorizonTabs
         defaultActiveName=""
-        tw="overflow-hidden bg-transparent"
+        tw="bg-transparent"
         activeName={activeName}
+        css={css`
+          .tab-content {
+            ${tw`p-0`}
+          }
+        `}
         onChange={(activeName1: string) => {
           setActiveName(activeName1)
         }}
@@ -391,22 +445,25 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         </TabPanel>
         <TabPanel label="开发内容" name="Develop">
           {/* <div>3</div> */}
+
+          <DevContent data={get(data, 'sync_job_property.conf')} curJob={get(data, 'sync_job')} />
         </TabPanel>
         <TabPanel label="计算集群" name="Cluster">
-          {/* <Cluster /> */}
+          <Cluster clusterId={get(data, 'sync_job_property.conf.cluster_id')} />
         </TabPanel>
         <TabPanel label="调度信息" name="Schedule">
-          {/* <Schedule data={{}} /> */}
+          <Schedule data={get(data, 'sync_job_property.schedule')} />
         </TabPanel>
       </HorizonTabs>
       {showDataSource && (
         <DataSourceModal
           onCancel={() => {
-            setDataSource({
-              showDataSource: false,
-              dataSourceData: undefined,
+            setDataSource((draft) => {
+              draft.showDataSource = false
             })
           }}
+          datasourceType={datasourceType}
+          datasourceId={datasourceId}
         />
       )}
       <AlertModal />
