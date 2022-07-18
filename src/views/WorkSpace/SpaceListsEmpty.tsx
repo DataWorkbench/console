@@ -27,7 +27,7 @@ const guideData: GuideProps = {
 
 const SpaceListsEmpty = () => {
   const stateStore = useWorkSpaceContext()
-  const { isModal } = stateStore
+  const { isModal, isAdmin } = stateStore
   return (
     <div>
       <div css={[tw`bg-white`, !isModal && tw`pb-2`]}>
@@ -43,7 +43,9 @@ const SpaceListsEmpty = () => {
               <Icon name="project" size={40} tw="absolute left-4 top-5" />
             </div>
             <div css={[tw`font-medium text-xl mt-5`, isModal && tw`mt-1`]}>
-              {isModal ? '当前没有相关「工作空间」的数据' : '暂无工作空间'}
+              {isModal && '当前没有相关「工作空间」的数据'}
+              {isAdmin && '暂无已创建的工作空间'}
+              {!isModal && !isAdmin && '暂无已加入的工作空间'}
             </div>
             {isModal && (
               <div tw="mt-1 text-neut-8">

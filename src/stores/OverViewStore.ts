@@ -89,7 +89,7 @@ class OverViewStore {
     },
   ]
 
-  set(params: { [key: string]: any }) {
+  set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }
 }

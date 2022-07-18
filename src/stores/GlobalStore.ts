@@ -94,7 +94,7 @@ class GlobalStore {
     this.rootStore = rootStore
   }
 
-  set(params: { [key: string]: any }) {
+  set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }
 }

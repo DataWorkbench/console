@@ -17,20 +17,23 @@ export interface IListWorkSpaceParams extends IWorkSpace {
   search?: string
   sort_by?: string
   status?: number
+  isAdmin?: boolean
 }
 
 export const loadWorkSpace = (
-  { regionId, ...rest }: IListWorkSpaceParams,
+  { regionId, isAdmin = true, ...rest }: IListWorkSpaceParams,
   options = {}
-) =>
-  request(
+) => {
+  const url = isAdmin ? '/v1/workspace' : '/v1/workspace/members'
+  return request(
     {
       region: regionId,
-      uri: '/v1/workspace',
+      uri: url,
       query: rest,
     },
     options
   )
+}
 
 export const createWorkSpace = ({ regionId, ...rest }: IWorkSpaceParams) =>
   request({

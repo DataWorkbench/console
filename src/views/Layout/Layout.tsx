@@ -1,5 +1,5 @@
 import { useRouteMatch } from 'react-router-dom'
-import { flattenDeep } from 'lodash-es'
+import { flattenDeep, get } from 'lodash-es'
 import { GlobalNav, SideMenu } from '@QCFE/qingcloud-portal-ui'
 import { observer } from 'mobx-react-lite'
 import { FlexBox, ContentBox } from 'components'
@@ -13,6 +13,7 @@ const getLinks = (items: MenuType[]): any => {
 }
 
 const MainLayout = observer(({ children }) => {
+  const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
   const {
     globalStore: {
       menuInfo: { title, menus, relationMenus },
@@ -22,7 +23,7 @@ const MainLayout = observer(({ children }) => {
   const match = useRouteMatch(flattenDeep(getLinks(menus)))
   return (
     <FlexBox orient="column" tw="h-screen bg-neut-2">
-      <GlobalNav zoneNotSwitch />
+      {!isPrivate && <GlobalNav zoneNotSwitch />}
       <FlexBox flex="1" tw="overflow-y-auto">
         {match && (
           <SideMenu title={title} menus={menus} relationMenus={relationMenus} />

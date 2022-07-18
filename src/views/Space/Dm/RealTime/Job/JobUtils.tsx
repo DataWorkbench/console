@@ -2,6 +2,7 @@ import { Icon } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { cloneDeep, findKey, get } from 'lodash-es'
 import tw, { styled } from 'twin.macro'
+// eslint-disable-next-line import/no-cycle
 import { Center, Icons } from 'components'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 

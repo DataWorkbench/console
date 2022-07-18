@@ -8,6 +8,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const WebpackBar = require('webpackbar')
 const path = require('path')
 const dotenv = require('dotenv')
+
 dotenv.config()
 
 const resolve = (dir) => path.join(__dirname, dir)
@@ -20,9 +21,8 @@ const getTheme = () => {
   // if (!themeStr) {
   //   return {theme: 'default'}
   // }
-  return {theme: process.env.THEME || 'default'}
+  return { THEME: process.env.THEME || 'default' }
 }
-
 
 let config = {
   mode: NODE_ENV,
@@ -59,11 +59,14 @@ let config = {
       {
         test: /\.tpl$/,
         use: [
-          {loader: 'babel-loader'},
-          {loader: resolve('./loaders/tpl-loader.js'), options: {
-               tplValue: getTheme(),
-            }},
-        ]
+          { loader: 'babel-loader' },
+          {
+            loader: resolve('./loaders/tpl-loader.js'),
+            options: {
+              tplValue: { ...process.env, ...getTheme() },
+            },
+          },
+        ],
       },
       {
         test: /\.svg$/i,
@@ -156,6 +159,10 @@ let config = {
       progress: true,
     },
     proxy: {
+      '/global_api': {
+        target: apiUrl,
+        changeOrigin: true,
+      },
       '/*_api': {
         target: apiUrl,
         changeOrigin: true,
