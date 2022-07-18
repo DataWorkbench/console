@@ -35,10 +35,6 @@ export const columnsRender = {
       <InstanceName theme="light" name={text} icon="q-humanAppDuotone" />
     ),
   },
-  // [getName('email')]: {
-  //   render: (_: never, record: PbmodelNotification) => '',
-  //   // record.items.find((i) => i.notification_item_type === 'email')?.content,
-  // },
   [getName('desc')]: {
     render: () => <div tw="text-font-placeholder">asdfasfd</div>,
   },

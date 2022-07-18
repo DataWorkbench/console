@@ -10,6 +10,7 @@ import {
   notifyColumns,
 } from 'views/Space/Setting/Notify/common/constants'
 import { getName } from 'views/Space/Setting/Notify/common/mappings'
+import { AffixLabel } from 'components/AffixLabel'
 import { useColumns } from '../../../../hooks/useHooks/useColumns'
 import { useMutationNotification } from '../../../../hooks/useGlobalAPI'
 
@@ -78,7 +79,7 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
       >
         <Form css={formModalStyle} ref={form}>
           <TextField
-            label="接收人"
+            lablel={<AffixLabel>接收人</AffixLabel>}
             name="name"
             placeholder="请输入接收人姓名"
             defaultValue={selected[0]?.receiver}
@@ -99,14 +100,14 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
             ]}
           />
           <TextField
-            label="邮箱"
+            label={<AffixLabel>邮箱</AffixLabel>}
             name="email"
             defaultValue={selected[0]?.email}
             placeholder="请输入接收人邮箱"
             validataOnChange
             schemas={[
               {
-                rule: ['required'],
+                rule: ['required', 'isEmail'],
                 help: '请输入接收人邮箱',
                 status: 'error',
               },
