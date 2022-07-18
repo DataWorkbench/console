@@ -24,14 +24,6 @@ dotenv.config({
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
-const getTheme = () => {
-  // const themeStr = process.argv.find(arg => arg.startsWith('theme='))
-  // if (!themeStr) {
-  //   return {theme: 'default'}
-  // }
-  return { THEME: process.env.THEME || 'default' }
-}
-
 let config = {
   mode: NODE_ENV,
   target: 'web',
@@ -86,7 +78,7 @@ let config = {
             }
           },
           {loader: resolve('./loaders/tpl-loader.js'), options: {
-               tplValue: { ...process.env, ...getTheme() },
+               tplValue: { ...process.env },
             }},
         ]
       },
