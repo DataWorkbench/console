@@ -16,7 +16,24 @@ function getMessage(ret: {}) {
 const client = axios.create(baseConfig)
 
 client.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const { ret_code: retCode } = response.data
+    if (retCode === 2000) {
+      const message1 = getMessage(response.data)
+      response.data.message = message1
+      emitter.emit('error', {
+        title: `请求错误: 登录会话已过期，请重新登录`,
+        content: message1
+      })
+
+      setTimeout(() => {
+        emitter.emit('logout')
+        // window.location.href = `/login?redirect_uri=${window.location.pathname}`
+      }, 1200)
+      throw new Error(message1)
+    }
+    return response
+  },
   (error) => {
     if (axios.isCancel(error)) {
       emitter.emit('error', {

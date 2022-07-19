@@ -44,7 +44,8 @@ client.interceptors.response.use(
 
       axiosList.clear()
       setTimeout(() => {
-        window.location.href = `/login?redirect_uri=${window.location.pathname}`
+        emitter.emit('logout')
+        // window.location.href = `/login?redirect_uri=${window.location.pathname}`
       }, 1200)
       throw new Error(message1)
     }
