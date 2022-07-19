@@ -19,7 +19,9 @@
       href="<%=htmlWebpackPlugin.files.css[css] %>"
     />
     <% } %>
-    <script src="<%=htmlWebpackPlugin.files.publicPath %>config.js" />
+    <% if (process.env.NODE_ENV === 'production') { %>
+    <script src="<%=htmlWebpackPlugin.files.publicPath %>static/js/config.js" />
+    <% } %>
   </head>
   <body>
     <div id="root"></div>

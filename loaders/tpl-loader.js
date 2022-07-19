@@ -29,7 +29,6 @@ function compileTpl(tpl, params) {
       }
     }
   }
-  console.log(re)
   return re
 }
 
