@@ -22,9 +22,11 @@ const Login = ({ onLogin }: { onLogin: (d: Record<string, any>, jump: boolean) =
       password,
       username
     }).then((e) => {
-      setSk(e.session_id)
-      onLogin(omit(e.user_set, 'password'), true)
-      history.push('/overview')
+      if (e.session_id) {
+        setSk(e.session_id)
+        onLogin(omit(e.user_set, 'password'), true)
+        history.push('/overview')
+      }
     })
   }
   const handleInputChange = (value: string | number) => {
