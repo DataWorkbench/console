@@ -161,7 +161,7 @@ let config = {
   optimization: {},
   devServer: {
     host: '0.0.0.0',
-    allowedHosts: ['local.testing.com', 'local.qacloud.com'],
+    allowedHosts: ['local.testing.com', 'local.qacloud.com', 'local.test.data.qingcloud.link'],
     compress: true,
     hot: true,
     historyApiFallback: {
