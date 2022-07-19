@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import request from 'utils/customRequest'
-import { get } from 'lodash-es'
+import { get, omit } from 'lodash-es'
 
 export const useDescribeUser = (userId: string) => {
   const key = ['describeUser', userId]
@@ -118,15 +118,15 @@ export const useMutationNotification = () => {
         ret = await request({
           method: 'PUT',
           url: `/global_api/v1/notification/${rest.id}`,
-          data: {
-            ...rest
+          params: {
+            ...(omit(rest, 'id') as any)
           }
         })
-      } else if (op === 'POST') {
+      } else if (op === 'delete') {
         ret = await request({
-          method: 'DELETE',
+          method: 'POST',
           url: `/global_api/v1/notification/deletes`,
-          data: {
+          params: {
             nf_ids: rest.nf_ids
           }
         })
