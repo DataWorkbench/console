@@ -8,6 +8,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const WebpackBar = require('webpackbar')
 const path = require('path')
 const dotenv = require('dotenv')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 dotenv.config()
 
@@ -241,6 +242,12 @@ if (isDev) {
 } else {
   config = merge(config, {
     plugins: [
+      new CopyWebpackPlugin({patterns:[
+          {
+            from: ('./config.js'),
+            to: ('./static/js/config.js'),
+          }
+        ]}),
       new MiniCssExtractPlugin({
         filename: 'static/css/[name].[contenthash:7].css',
         chunkFilename: 'static/css/[id].[contenthash:7].css',
