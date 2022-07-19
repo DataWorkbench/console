@@ -51,6 +51,7 @@ const enfiBlue = {
   11: '#024D8E',
   4: '#85B0D6',
   3: '#9FC2E0',
+  2: '#D2E9FF',
   1: '#D8E7F5',
   0: '#F7FBFF',
 }
