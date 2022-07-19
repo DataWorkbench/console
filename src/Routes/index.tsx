@@ -3,6 +3,7 @@ import { lazy, useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
 import { useDarkMode } from 'hooks'
+import { get } from 'lodash-es'
 
 // import DescribeDataOmnis from 'views/DataOmnis/DescribeDataOmnis'
 // import ActivateDataOmnis from 'views/DataOmnis/ActivateDataOmnis'
@@ -60,8 +61,8 @@ const Routes = () => {
   }, [matched, setDarkMode, globalStore])
 
   const isActivated = localStorage.getItem('DATA_OMNIS_OPENED')
-
-  if (!isActivated) {
+  const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
+  if (!isPrivate && !isActivated) {
     return (
       <Route>
         <Layout>
