@@ -36,7 +36,7 @@ const Notify = observer(() => {
   const operations = {
     title: '操作',
     key: 'operation',
-    render: (record: PbmodelNotification) => (
+    render: (_: never, record: PbmodelNotification) => (
       <Center>
         <Button
           type="text"
@@ -78,7 +78,7 @@ const Notify = observer(() => {
     refetch()
   }
 
-  const infos = get(data, 'notification_lists', [])
+  const infos = get(data, 'infos', []) ?? []
   return (
     <div tw="py-5">
       <PageTab tabs={pageTabsData} />
@@ -150,6 +150,7 @@ const Notify = observer(() => {
               selectedRowKeys: keys
             })
           }}
+          rowKey="id"
           columns={columns}
           dataSource={infos}
           pagination={{
