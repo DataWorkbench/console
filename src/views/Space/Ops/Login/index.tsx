@@ -1,5 +1,5 @@
 import { FlexBox } from 'components/Box'
-import { Form, Button } from '@QCFE/lego-ui'
+import { Form, Button, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { useState } from 'react'
 import LoginBg from 'assets/LoginBg.png'
 import LoginGroup from 'assets/loginGroup.svg'
@@ -25,7 +25,14 @@ const Login = ({ onLogin }: { onLogin: (d: Record<string, any>, jump: boolean) =
       if (e.session_id) {
         setSk(e.session_id)
         onLogin(omit(e.user_set, 'password'), true)
-        history.push('/overview')
+        Notify.open({
+          title: '登录成功',
+          placement: 'bottomRight',
+          type: 'success'
+        })
+        setTimeout(() => {
+          history.push('/overview')
+        }, 2000)
       }
     })
   }
