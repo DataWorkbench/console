@@ -1,5 +1,5 @@
-import { FilterInput, FlexBox, InstanceName, PopConfirm } from 'components'
-import { PageTab, ToolBar, Button, Icon } from '@QCFE/qingcloud-portal-ui'
+import { FilterInput, FlexBox, InstanceName } from 'components'
+import { PageTab, ToolBar, Button, Icon, Modal } from '@QCFE/qingcloud-portal-ui'
 import {
   alertPolicyColumns,
   alertPolicySuggestions,
@@ -127,20 +127,32 @@ const AlertPolicy = () => {
           >
             修改
           </Button>
-          <PopConfirm
-            type="warning"
-            content={`确定删除 ${record.name} ?`}
-            onOk={() => {
-              mutateAsync({
-                op: 'delete',
-                data: {
-                  alert_ids: [record.id]
+
+          <Button
+            type="text"
+            onClick={() => {
+              Modal.warning({
+                title: `确认删除告警策略: ${record?.name}?`,
+                content: (
+                  <div tw="text-neut-8">删除后，此操作无法撤回，您确定删除该告警策略吗？</div>
+                ),
+                width: 600,
+                okType: 'danger',
+                okText: '删除',
+                confirmLoading: isLoading,
+                onOk: () => {
+                  mutateAsync({
+                    op: 'delete',
+                    data: {
+                      alert_ids: [record?.id]
+                    }
+                  })
                 }
               })
             }}
           >
-            <Button type="text">删除</Button>
-          </PopConfirm>
+            删除
+          </Button>
         </FlexBox>
       )
     }
