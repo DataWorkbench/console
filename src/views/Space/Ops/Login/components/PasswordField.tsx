@@ -1,4 +1,4 @@
-import { Icon, Form } from '@QCFE/lego-ui'
+import { Form } from '@QCFE/qingcloud-portal-ui'
 import { css } from 'twin.macro'
 import sha256 from 'crypto-js/sha256'
 
@@ -16,8 +16,9 @@ export const PasswordField = ({ onChange }: Props) => {
       name="password"
       placeholder="密码"
       help="忘记密码，请联系管理员"
-      showPrefixIcon={<Icon name="key" size={24} />}
+      showPrefixIcon
       onChange={handleChange}
+      defaultValue=""
       css={css`
         height: 44px !important;
         width: 100% !important;
@@ -57,18 +58,18 @@ export const PasswordField = ({ onChange }: Props) => {
         {
           rule: { required: true },
           help: '请输入密码',
-          status: 'error',
+          status: 'error'
         },
         {
           rule: { minLength: 5 },
           help: '最短为5个字符',
-          status: 'error',
+          status: 'error'
         },
         {
           rule: { maxLength: 50 },
           help: '最长为50个字符',
-          status: 'error',
-        },
+          status: 'error'
+        }
       ]}
     />
   )
