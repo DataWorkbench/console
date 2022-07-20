@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { DargTable, Modal, FlexBox, ModalContent } from 'components'
 import { observer } from 'mobx-react-lite'
-import { useStore, useMutationTestDataServiceApi, testApiService } from 'hooks'
+import { useStore, useMutationTestDataServiceApi } from 'hooks'
 import { Button, Input } from '@QCFE/lego-ui'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
@@ -35,6 +35,8 @@ const TestModal = observer(() => {
       const config = requestConfig.filter(
         (item: { column_name: string }) => !['limit', 'offset'].includes(item.column_name)
       )
+      console.log('config', config)
+
       setTestSource(config)
     }
   }, [apiConfigData, setTestSource])
@@ -46,13 +48,8 @@ const TestModal = observer(() => {
   }
 
   const startTest = () => {
-    const data = {
-      clusterId: apiConfig?.cluster_id,
-      groupId: apiConfig?.group_id,
-      apiId: apiConfig?.api_id
-    }
+    // testApiService(data)
 
-    testApiService(data)
     // const params: any = {}
     // testSource.forEach((source: any) => {
     //   console.log(source)
@@ -61,22 +58,23 @@ const TestModal = observer(() => {
     //   const value = source.data_type === 2 ? Number(source.example_value) : source.example_value
     //   params[keyV] = value
     // })
+    console.log(testSource, 'testSource')
 
-    // testMutation.mutate(
-    //   { apiId: apiConfig?.api_id, request_content: JSON.stringify(params) },
-    //   {
-    //     onSuccess: (res) => {
-    //       if (res.ret_code === 0) {
-    //         onClose()
-    //         // Notify.success({
-    //         //   title: '操作提示',
-    //         //   content: '配置保存成功',
-    //         //   placement: 'bottomRight'
-    //         // })
-    //       }
-    //     }
-    //   }
-    // )
+    testMutation.mutate(
+      { apiId: apiConfig?.api_id, request_params: testSource },
+      {
+        onSuccess: (res) => {
+          if (res.ret_code === 0) {
+            // onClose()
+            // Notify.success({
+            //   title: '操作提示',
+            //   content: '配置保存成功',
+            //   placement: 'bottomRight'
+            // })
+          }
+        }
+      }
+    )
   }
 
   const renderHighColumns = {
@@ -96,14 +94,14 @@ const TestModal = observer(() => {
       width: 60,
       render: (text: string) => <span>{ParameterPosition.getLabel(text)}</span>
     },
-    [getName('example_value')]: {
+    [getName('default_value')]: {
       title: '值',
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
           onChange={(_, value) => {
             setTestSource((draft) => {
-              draft[index].example_value = `${value}`
+              draft[index].default_value = `${value}`
             })
           }}
         />
@@ -114,7 +112,7 @@ const TestModal = observer(() => {
   const excludeColumns = [
     getName('column_name'),
     getName('param_operator'),
-    getName('default_value'),
+    getName('example_value'),
     getName('param_description')
   ]
   const RequestColumns = RequestSettingColumns.filter(
