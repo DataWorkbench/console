@@ -133,7 +133,7 @@ const MysqlBinlogSourceConfig = forwardRef(
               id: e?.data?.id,
               filter: get(e, 'data.filter', ''),
               filterType: e?.data?.filter ? 2 : 1,
-              tableName: get(e, 'data.table', []),
+              tableName: get(e, 'data.table', ''),
               updateType: get(e, 'data.cat', '').split(','),
               charset: get(e, 'data.connection-charset', 1),
               bufNumber: get(e, 'data.buffer-size', 1024),
@@ -276,7 +276,7 @@ const MysqlBinlogSourceConfig = forwardRef(
                   </Label>
                 }
                 onRefresh={refetch}
-                multi
+                // multi
                 options={tableList?.items?.map((i) => ({ label: i, value: i })) ?? []}
                 value={dbInfo?.tableName ?? []}
                 onChange={(e) => {
