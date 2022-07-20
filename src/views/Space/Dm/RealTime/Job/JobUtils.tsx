@@ -155,6 +155,11 @@ export const datasourceTypeObjs = [
   //   label: 'Redis',
   // },
   {
+    type: SourceType.Oracle,
+    name: 'oracle',
+    label: 'Oracle'
+  },
+  {
     type: SourceType.ElasticSearch,
     name: 'elastic_search',
     label: 'ElasticSearch'

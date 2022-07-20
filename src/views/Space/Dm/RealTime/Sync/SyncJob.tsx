@@ -172,30 +172,36 @@ const SyncJob = () => {
 
   const stepsData = useMemo(() => getStepsData(regionId, spaceId), [regionId, spaceId])
 
-  const [mode, setMode] = useState<1 | 2>(get(confData, 'job_mode', 1) || 1)
+  const getInitMode = () => {
+    if (confData?.job_mode) {
+      return confData.job_mode
+    }
+    if (curJob?.source_type === SourceType.Oracle || curJob?.target_type === SourceType.Oracle) {
+      return 2
+    }
+    return 1
+  }
+
+  const [mode, setMode] = useState<1 | 2>(getInitMode())
   const [showRelaseModal, setShowRelaseModal] = useState(false)
 
-  const dbRef =
-    useRef<{
-      getResource: () => Record<string, string>
-      getTypeNames: () => string[]
-      refetchColumns: () => void
-      validate: () => boolean
-    }>(null)
-  const mappingRef =
-    useRef<{
-      rowMapping: () => [Record<string, string>, Record<string, string>]
-      getOther: () => Record<string, string>
-    }>(null)
-  const clusterRef =
-    useRef<{
-      getCluster: () => Record<string, string>
-      checkPingSuccess: () => boolean
-    }>(null)
-  const channelRef =
-    useRef<{
-      getChannel: () => Record<string, string>
-    }>(null)
+  const dbRef = useRef<{
+    getResource: () => Record<string, string>
+    getTypeNames: () => string[]
+    refetchColumns: () => void
+    validate: () => boolean
+  }>(null)
+  const mappingRef = useRef<{
+    rowMapping: () => [Record<string, string>, Record<string, string>]
+    getOther: () => Record<string, string>
+  }>(null)
+  const clusterRef = useRef<{
+    getCluster: () => Record<string, string>
+    checkPingSuccess: () => boolean
+  }>(null)
+  const channelRef = useRef<{
+    getChannel: () => Record<string, string>
+  }>(null)
   const enableRelease = get(scheData, 'schedule_policy') !== 0
 
   const [sourceTypeName, targetTypeName] = useMemo(() => {
@@ -225,7 +231,9 @@ const SyncJob = () => {
 
   useEffect(() => {
     if (editorRef.current) {
-      editorRef.current?.setValue(JSON.stringify(JSON.parse(defaultJobContent || '{}'), null, 4))
+      editorRef.current?.setValue(
+        defaultJobContent ? JSON.stringify(JSON.parse(defaultJobContent || '{}'), null, 4) : ''
+      )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultJobContent, editorRef.current])

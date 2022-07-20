@@ -13,7 +13,7 @@ const useTableColumns = (sourceId: string, tableName: string, type: 'source' | '
       tableName
     },
     {
-      enabled: !!(sourceId && tableName),
+      enabled: sourceId && tableName,
       onSuccess: (data: any) => {
         const columns = get(data, 'schema.columns') || []
         const subject = type === 'source' ? sourceColumns$ : targetColumns$

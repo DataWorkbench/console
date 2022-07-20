@@ -18,9 +18,9 @@ export interface SyncTypeVal {
 }
 
 export interface SyncTypeRadioGroupProps {
-  name: string
+  // name: string
   value?: SyncTypeVal
-  label?: React.ReactElement
+  // label?: React.ReactElement
   fullSourceData?: string[]
   fullSinkData?: string[]
   incrSourceData?: string[]
@@ -37,9 +37,9 @@ const SyncItem = styled('div')(({ selected = true }: { selected: boolean }) => [
  * 二、全量、增量同步
  * 1、 全量同步
  *
- * 支持 source： MySQL、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、HBase、HDFS、FTP、MongoDB、ElasticSearch
+ * 支持 source： MySQL、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、HBase、HDFS、FTP、MongoDB、ElasticSearch, Oracle
  *
- * 支持 sink：MySQL、TiDB、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、Hive、HBase、HDFS、FTP、MongoDB、Redis、ElasticSearch
+ * 支持 sink：MySQL、TiDB、Oracle、SqlServer、PostgreSQL、DB2、SAP HANA、ClickHouse、Hive、HBase、HDFS、FTP、MongoDB、Redis、ElasticSearch, Oracle
  *
  * 2、增量同步
  *
@@ -60,7 +60,8 @@ const filterfullSources: SourceType[] = [
   SourceType.HDFS,
   SourceType.Ftp,
   SourceType.MongoDB,
-  SourceType.ElasticSearch
+  SourceType.ElasticSearch,
+  SourceType.Oracle
 ]
 const filterFullTargets: SourceType[] = [
   SourceType.Mysql,
@@ -78,7 +79,8 @@ const filterFullTargets: SourceType[] = [
   SourceType.MongoDB,
   SourceType.Redis,
   SourceType.ElasticSearch,
-  SourceType.Kafka
+  SourceType.Kafka,
+  SourceType.Oracle
 ]
 
 const filterIncrSources: SourceType[] = [
@@ -172,8 +174,6 @@ const SyncTypeRadioGroup = forwardRef<React.ReactElement, SyncTypeRadioGroupProp
         })),
       []
     )
-
-    console.log('geneOpts(incrSourceData)', geneOpts(incrSourceData))
 
     return (
       <Control tw="flex-col w-[556px]! max-w-[556px]!" ref={ref}>
