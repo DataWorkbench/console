@@ -1,76 +1,96 @@
 import { Icon, InputSearch, Button } from '@QCFE/qingcloud-portal-ui'
-import { FlexBox } from 'components/index'
-import { IColumn, useColumns } from 'hooks/useHooks/useColumns'
-import { Circle } from 'views/Space/Ops/styledComponents'
+import { FlexBox } from 'components'
+import { useColumns, IColumn } from 'hooks/useHooks/useColumns'
 import { Table } from 'views/Space/styled'
 import dayjs from 'dayjs'
+import { Circle } from 'views/Space/Ops/styledComponents'
 import tw, { css } from 'twin.macro'
+import { apiHooks } from 'hooks/apiHooks'
+import { AlertManageListAlertPoliciesType } from 'types/response'
+import { ListAlertPoliciesRequestType } from 'types/request'
 import useFilter from 'hooks/useHooks/useFilter'
+import { useParams } from 'react-router-dom'
+import { Mapping, MappingKey } from 'utils/types'
+import { historyFiledMapping } from 'views/Space/Ops/Alert/common/mapping'
+import { get } from 'lodash-es'
 
-const defaultColumns: IColumn[] = [
-  {
-    title: '告警内容',
-    key: 'id',
-    dataIndex: 'id',
-  },
-  {
-    title: '告警时间',
-    key: 'time',
-    dataIndex: 'time',
-  },
-]
+function getField<T>(mapping: Mapping<T>): IColumn[] {
+  return Array.from(mapping.values()).map((i) => ({
+    title: i.label,
+    dataIndex: i.apiField,
+    key: i.apiField
+  }))
+}
+
+export const ClusterFieldMapping: Mapping<'name' | 'updated'> = new Map([
+  ['name', { label: '告警内容', apiField: 'job_id' }],
+  ['updated', { label: '告警时间', apiField: 'updated' }]
+])
+
+export const alertHistoryColumns: IColumn[] = getField(ClusterFieldMapping)
+const getName = (name: MappingKey<typeof historyFiledMapping>) =>
+  historyFiledMapping.get(name)!.apiField
+
+const useQueryListAlertLogs = apiHooks<
+  'alertManage',
+  ListAlertPoliciesRequestType,
+  AlertManageListAlertPoliciesType
+>('alertManage', 'listAlertLogs')
 
 const itemSettingKey = 'ITEM_MONITOR_HISTORY'
 
 const MonitorHistory = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { filter, setFilter, pagination } = useFilter<
+  const { spaceId, detail } = useParams<{ spaceId: string; detail: string }>()
+
+  const {
+    filter,
+    setFilter,
+    pagination,
+    sort,
+    getColumnSort: getSort
+  } = useFilter<
+    Record<ReturnType<typeof getName>, number | string | boolean>,
+    { pagination: true; sort: false }
+  >(
     {
-      reverse?: 'asc' | 'desc'
-      sort_by?: string
-      search?: string
-      offset: number
-      limit: number
+      sort_by: getName('updated'),
+      reverse: true,
+      offset: 0,
+      limit: 10,
+      job_id: detail
     },
-    { pagination: true }
-  >({})
+    { pagination: true },
+    itemSettingKey
+  )
+
+  const { data, isFetching, refetch } = useQueryListAlertLogs({
+    uri: { space_id: spaceId },
+    params: filter as any
+  })
 
   const renderColumns = {
-    id: {
-      render: (text: string, record: Record<string, any>) => {
-        console.log(text, record)
-        return (
-          <FlexBox tw="items-center gap-2">
-            <Circle>
-              <Icon name="q-bellLightningFill" size={16} type="light" />
-            </Circle>
-            <div>
-              <div tw="text-white font-semibold">实例运行超时： 7200 秒</div>
-              <div tw="text-neut-8"> stj-g0ljvp7ed1r1dmxg</div>
-            </div>
-          </FlexBox>
-        )
-      },
+    [getName('job_id')]: {
+      render: (text: string, record: Record<string, any>) => (
+        <FlexBox tw="items-center gap-2">
+          <Circle>
+            <Icon name="q-bellLightningFill" size={16} type="light" />
+          </Circle>
+          <div>
+            <div tw="text-neut-8">{record.job_id}</div>
+          </div>
+        </FlexBox>
+      )
     },
-    time: {
-      render: (text: number) => {
-        return dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
-      },
-    },
+    [getName('updated')]: {
+      ...getSort(getName('updated')),
+      render: (v: number) => (
+        <span tw="text-neut-8">{dayjs(v * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
+      )
+    }
   }
 
-  const { columns } = useColumns(itemSettingKey, defaultColumns, renderColumns)
-  const data = {
-    total: 9,
-    infos: [
-      {
-        id: '1',
-      },
-    ],
-  }
-  const isFetching = false
-  const refetch = () => {}
-
+  const { columns } = useColumns(itemSettingKey, alertHistoryColumns, renderColumns)
+  const infos = get(data, 'infos', []) || []
   return (
     <div>
       <FlexBox tw="justify-end gap-2">
@@ -92,11 +112,7 @@ const MonitorHistory = () => {
             })
           }}
         />
-        <Button
-          type="black"
-          loading={!!isFetching}
-          tw="w-auto px-[5px] border-line-dark!"
-        >
+        <Button type="black" loading={!!isFetching} tw="w-auto px-[5px] border-line-dark!">
           <Icon
             name="if-refresh"
             tw="text-xl text-white"
@@ -114,12 +130,13 @@ const MonitorHistory = () => {
             ${tw`bg-[#1e2f41]!`}
           }
         `}
+        onSort={sort}
         columns={columns}
-        dataSource={data?.infos ?? []}
+        dataSource={infos}
         rowKey="id"
         pagination={{
           total: data?.total || 0,
-          ...pagination,
+          ...pagination
         }}
       />
     </div>

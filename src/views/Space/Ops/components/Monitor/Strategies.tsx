@@ -6,6 +6,11 @@ import tw, { css } from 'twin.macro'
 import { HelpCenterLink } from 'components/Link'
 import { observer } from 'mobx-react-lite'
 import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
+import { AlertManageListAlertPoliciesType } from 'types/response'
+import { ListAlertPoliciesByJobRequestType } from 'types/request'
+import { apiHooks } from 'hooks/apiHooks'
+import { useParams } from 'react-router-dom'
+import { get } from 'lodash-es'
 
 const { CollapseItem } = Collapse
 
@@ -29,15 +34,29 @@ const collapseStyle = {
       ${tw`block! static`}
     }
   `,
-  itemExpanded: tw`w-6 h-6 bg-transparent hover:bg-neut-13 active:bg-neut-12 border border-neut-13 hover:border-neut-13 active:border-neut-12 rounded-[1px] cursor-pointer`,
+  itemExpanded: tw`w-6 h-6 bg-transparent hover:bg-neut-13 active:bg-neut-12 border border-neut-13 hover:border-neut-13 active:border-neut-12 rounded-[1px] cursor-pointer`
 }
 
+const useQueryListAlertPoliciesByJob = apiHooks<
+  'alertManage',
+  ListAlertPoliciesByJobRequestType,
+  AlertManageListAlertPoliciesType
+>('alertManage', 'listAlertPoliciesByJob')
+
 const Strategies = observer(() => {
-  const arr = [{ name: '1 xxxx' }, { name: '2 asdfasdf' }]
+  // const arr = [{ name: '1 xxxx' }, { name: '2 asdfasdf' }]
+
+  const { spaceId, detail } = useParams<{ spaceId: string; detail: string }>()
+  const { data } = useQueryListAlertPoliciesByJob({
+    uri: { space_id: spaceId, job_id: detail }
+  })
+  const arr = get(data, 'infos', []) || []
   const defaultKeys = Array.from({ length: arr.length }, (v, k) => k.toString())
+
   const [activeKeys, setActiveKeys] = useState(defaultKeys)
 
   const { set } = useAlertStore()
+
   return (
     <>
       <div tw="w-full">
@@ -56,11 +75,7 @@ const Strategies = observer(() => {
           }
           type="info"
         />
-        <Button
-          size="large"
-          tw="w-full mt-3 mb-4"
-          onClick={() => set({ showAddMonitor: true })}
-        >
+        <Button size="large" tw="w-full mt-3 mb-4" onClick={() => set({ showAddMonitor: true })}>
           <Icon name="add" size={14} type="light" />
           <span tw="text-xs">添加告警策略</span>
         </Button>
@@ -90,10 +105,10 @@ const Strategies = observer(() => {
                     />
                     <div>
                       <div>告警策略 {item.name}</div>
-                      <div tw="text-neut-8">11 </div>
+                      <div tw="text-neut-8">描述: {item.desc} </div>
                     </div>
                   </div>
-                  <Button
+                  {/* <Button
                     css={collapseStyle.showIcon}
                     size="small"
                     tw="ml-2 pr-0"
@@ -101,17 +116,11 @@ const Strategies = observer(() => {
                   >
                     <Icon name="close" size={14} type="light" />
                     <span tw="text-xs ml-1!">解绑</span>
-                  </Button>
-                  <Center
-                    css={[collapseStyle.itemExpanded, collapseStyle.showIcon]}
-                  >
+                  </Button> */}
+                  <Center css={[collapseStyle.itemExpanded, collapseStyle.showIcon]}>
                     <Icon
                       tw="block"
-                      name={
-                        activeKeys.includes(index.toString())
-                          ? 'chevron-up'
-                          : 'chevron-down'
-                      }
+                      name={activeKeys.includes(index.toString()) ? 'chevron-up' : 'chevron-down'}
                       size={16}
                       type="light"
                     />
@@ -119,7 +128,7 @@ const Strategies = observer(() => {
                 </div>
               }
             >
-              <MonitorItem />
+              <MonitorItem data={item} />
             </CollapseItem>
           ))}
         </Collapse>
