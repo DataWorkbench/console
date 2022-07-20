@@ -9,7 +9,7 @@ import {
 } from 'react'
 import tw, { css } from 'twin.macro'
 import { Form } from '@QCFE/qingcloud-portal-ui'
-import { Field, Icon, Label, RadioButton } from '@QCFE/lego-ui'
+import { Icon, Label } from '@QCFE/lego-ui'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import { useImmer } from 'use-immer'
 import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
@@ -267,52 +267,14 @@ const MysqlBinlogSourceConfig = forwardRef(
         {renderCommon()}
         {!!dbInfo?.id && (
           <>
-            <Field>
-              <Label>
-                <AffixLabel required>数据源表</AffixLabel>
-              </Label>
-              <Center
-                css={css`
-                  .field.radio-group-field {
-                    ${tw`mb-0!`}
-                  }
-                `}
-              >
-                <RadioGroupField
-                  label={null}
-                  name="filterType"
-                  value={dbInfo?.filterType ?? 1}
-                  onChange={(e) => {
-                    setDbInfo((draft) => {
-                      draft.filterType = e
-                    })
-                  }}
-                >
-                  <RadioButton key="table" value={1}>
-                    表名
-                  </RadioButton>
-                  <RadioButton key="filter" value={2}>
-                    过滤规则
-                  </RadioButton>
-                </RadioGroupField>
-                <AffixLabel
-                  required={false}
-                  help={
-                    <div tw="whitespace-pre-line">
-                      {`Perl 正则表达式，例：
-所有表：.* or .*\\\\..* 
-canal schema下所有表： canal\\\\..* 
-canal下的以 canal 打头的表：canal\\\\.canal.* 
-canal schema下的一张表：canal.test1 `}
-                    </div>
-                  }
-                  theme="green"
-                />
-              </Center>
-            </Field>
-            {dbInfo?.filterType !== 2 && (
+            {true && (
               <SelectWithRefresh
                 name="tableName"
+                label={
+                  <Label>
+                    <AffixLabel required>数据源表</AffixLabel>
+                  </Label>
+                }
                 onRefresh={refetch}
                 multi
                 options={tableList?.items?.map((i) => ({ label: i, value: i })) ?? []}
