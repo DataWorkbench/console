@@ -82,11 +82,14 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
     }
   }, [getValue, mutation, sourceId])
 
-  const pingHistory = useMemo(() => (
+  const pingHistory = useMemo(
+    () => (
       <TextLink color="green" hasIcon={false} onClick={onOpen} tw="ml-1">
         测试记录
       </TextLink>
-    ), [onOpen])
+    ),
+    [onOpen]
+  )
 
   const actionButton = useMemo(() => {
     const tempButton = (

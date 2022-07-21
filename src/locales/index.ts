@@ -5,7 +5,7 @@ import zh from './zh-CN'
 
 const locales = {
   'en-US': merge(en, LegoUILocales.en),
-  'zh-CN': merge(zh, LegoUILocales['zh-cn']),
+  'zh-CN': merge(zh, LegoUILocales['zh-cn'])
 }
 
 export default locales

@@ -52,10 +52,13 @@ export const FilterInput = (props: IFilterInput) => {
     }
 
     if (filterLinkKey) {
-      const temp = rest.suggestions.reduce((acc: Record<string, any>, cur: ISuggestion) => ({
+      const temp = rest.suggestions.reduce(
+        (acc: Record<string, any>, cur: ISuggestion) => ({
           ...acc,
           [cur.key]: result.find((i) => i.filter === cur.key)?.value
-        }), {})
+        }),
+        {}
+      )
       tempRef.current = temp
       emitter.emit(`${filterLinkKey}-get`, temp)
     }

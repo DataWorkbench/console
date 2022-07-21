@@ -99,40 +99,40 @@ const JoinUs = () => {
 }
 
 const FAQ: FC = ({ className }: { className?: string }) => (
-    <Card className={className} tw="leading-5" hasBoxShadow>
-      <FlexBox tw="justify-between">
-        <CardHeader title="常见问题" />
-        <JoinUs />
-      </FlexBox>
-      <CardContent>
-        <div tw="rounded-sm border border-neut-2">
-          <div tw="text-neut-15 p-4 space-y-2">
-            {questions.map((quest) => (
-              <Question key={quest.title}>
-                <Icon name="file" tw="mr-2" />
-                <HelpCenterLink
-                  tw="text-neut-15 no-underline font-normal hover:text-green-11 hover:font-medium"
-                  href={quest.link}
-                >
-                  {quest.title}
-                </HelpCenterLink>
-              </Question>
-            ))}
-          </div>
-          <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center border-t border-[#DEE6ED]">
-            <Question>
+  <Card className={className} tw="leading-5" hasBoxShadow>
+    <FlexBox tw="justify-between">
+      <CardHeader title="常见问题" />
+      <JoinUs />
+    </FlexBox>
+    <CardContent>
+      <div tw="rounded-sm border border-neut-2">
+        <div tw="text-neut-15 p-4 space-y-2">
+          {questions.map((quest) => (
+            <Question key={quest.title}>
+              <Icon name="file" tw="mr-2" />
               <HelpCenterLink
-                tw="mr-2 text-neut-15 no-underline font-medium hover:text-green-11"
-                href="/intro/introduction/"
+                tw="text-neut-15 no-underline font-normal hover:text-green-11 hover:font-medium"
+                href={quest.link}
               >
-                更多帮助指引
+                {quest.title}
               </HelpCenterLink>
-              <Icon name="next" />
             </Question>
-          </div>
+          ))}
         </div>
-      </CardContent>
-    </Card>
-  )
+        <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center border-t border-[#DEE6ED]">
+          <Question>
+            <HelpCenterLink
+              tw="mr-2 text-neut-15 no-underline font-medium hover:text-green-11"
+              href="/intro/introduction/"
+            >
+              更多帮助指引
+            </HelpCenterLink>
+            <Icon name="next" />
+          </Question>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)
 
 export default FAQ

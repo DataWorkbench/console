@@ -85,14 +85,14 @@ export const TestModal = observer((props: TestModalProps) => {
       width: 60,
       render: (text: string) => <span>{ParameterPosition.getLabel(text)}</span>
     },
-    [getName('example_value')]: {
+    [getName('default_value')]: {
       title: '值',
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
           onChange={(_, value) => {
             setTestSource((draft) => {
-              draft[index].example_value = `${value}`
+              draft[index].default_value = `${value}`
             })
           }}
         />
@@ -103,7 +103,7 @@ export const TestModal = observer((props: TestModalProps) => {
   const excludeColumns = [
     getName('column_name'),
     getName('param_operator'),
-    getName('default_value'),
+    getName('example_value'),
     getName('param_description')
   ]
   const RequestColumns = RequestSettingColumns.filter(
