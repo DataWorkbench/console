@@ -17,13 +17,6 @@ import { getNewTreeData } from '../ApiPanel/ApiUtils'
 
 const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
 
-const styles = {
-  timeout: css`
-    .control > input {
-      ${tw`w-[50px]!`}
-    }
-  `
-}
 const FormWrapper = styled('div')(() => [
   css`
     ${tw`w-full`}
@@ -366,30 +359,37 @@ const ApiModal = observer((props: JobModalProps) => {
                 </Checkbox> */}
               </Control>
             </Field>
-            <TextField
-              name="api_name"
-              label={<AffixLabel>超时时间</AffixLabel>}
-              help="请输入范围0-300"
-              css={styles.timeout}
-              value={params.timeout}
-              onChange={(_: any, v: any) =>
-                setParams((draft) => {
-                  draft.timeout = (Number(v) || 0) as unknown as string
-                })
-              }
-              validateOnBlur
-              maxLength={3}
-              schemas={[
-                {
-                  rule: (value: string) => {
-                    const l = Number(value)
-                    return l >= 1 && l <= 300
-                  },
-                  help: '请输入范围1-300',
-                  status: 'error'
-                }
-              ]}
-            />
+            <Field>
+              <Label tw="items-start!">
+                <AffixLabel required>超时时间</AffixLabel>
+              </Label>
+              <Control tw="items-center">
+                <Input
+                  name="timeout"
+                  tw="w-[60px]! block! items-center! space-x-1 mr-2"
+                  value={get(params, 'timeout', '')}
+                  onChange={(_, v: any) =>
+                    setParams((draft) => {
+                      draft.timeout = (Number(v) || 0) as unknown as string
+                    })
+                  }
+                  validateOnChange
+                  maxLength={3}
+                  schemas={[
+                    {
+                      rule: (value: number) => {
+                        const l = Number(value)
+                        return l >= 0 && l <= 300
+                      },
+                      help: '请输入范围0-300',
+                      status: 'error'
+                    }
+                  ]}
+                />
+                <div tw="ml-1">S</div>
+              </Control>
+              <div className="help">0-300</div>
+            </Field>
             <Field>
               <Label>
                 <AffixLabel>跨域功能</AffixLabel>

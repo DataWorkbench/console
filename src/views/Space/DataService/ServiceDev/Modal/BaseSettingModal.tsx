@@ -10,17 +10,8 @@ import { Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE
 import { HelpCenterLink } from 'components/Link'
 import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
-import { PathInput } from '../styled'
 
-const { TextField, RadioGroupField, TextAreaField, TextGroupField } = Form
-
-const styles = {
-  timeout: css`
-    .control > input {
-      ${tw`w-[50px]!`}
-    }
-  `
-}
+const { TextField, RadioGroupField, TextAreaField } = Form
 
 const FormWrapper = styled('div')(() => [
   css`
@@ -175,7 +166,6 @@ const BaseSettingModal = observer(() => {
       )
     }
   }
-  console.log('params', params)
 
   return (
     <DarkModal
@@ -240,37 +230,48 @@ const BaseSettingModal = observer(() => {
                 </>
               }
             />
-            <TextGroupField
-              label={<AffixLabel>API路径</AffixLabel>}
-              help="填入路径将作为 API
-                二级路径。支持英文、数字、下划线（_）、连字符（-），且只能以正斜线（/）开头，不超过
-                200 个字符"
-            >
-              <PathInput tw="w-[150px]! mr-2">{get(params, 'group_path', '')}</PathInput>
-              <PathInput>/</PathInput>
-              <Input
-                name="api_path"
-                value={get(params, 'api_path')}
-                onChange={(_, v: string | number) =>
-                  setParams((draft) => {
-                    draft.api_path = String(v)
-                  })
-                }
-                validateOnBlur
-                placeholder="请输入API路径"
-                maxLength={50}
-                schemas={[
-                  {
-                    rule: (value: string) => {
-                      const l = strlen(value)
-                      return l >= 4 && l <= 50
-                    },
-                    help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
-                    status: 'error'
+            <Field>
+              <Label tw="items-start!">
+                <AffixLabel required>API路径</AffixLabel>
+              </Label>
+              <Control tw="items-center">
+                <Input
+                  name="group_path"
+                  value={get(params, 'group_path', '')}
+                  disabled
+                  tw="w-[150px]! block! items-center! space-x-1 mr-2"
+                />
+
+                <Input value="/" disabled tw="w-[40px]! block!" />
+                <Input
+                  name="api_path"
+                  value={get(params, 'api_path', '')}
+                  onChange={(_: any, v: string | number) =>
+                    setParams((draft) => {
+                      draft.api_path = String(v)
+                    })
                   }
-                ]}
-              />
-            </TextGroupField>
+                  validateOnChange
+                  placeholder="请输入API路径"
+                  maxLength={50}
+                  schemas={[
+                    {
+                      rule: (value: string) => {
+                        const l = strlen(value)
+                        return l >= 4 && l <= 50
+                      },
+                      help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
+                      status: 'error'
+                    }
+                  ]}
+                />
+              </Control>
+              <div className="help">
+                填入路径将作为 API
+                二级路径。支持英文、数字、下划线（_）、连字符（-），且只能以正斜线（/）开头，不超过
+                200 个字符
+              </div>
+            </Field>
             <Field>
               <Label tw="items-start!">
                 <AffixLabel required>协议</AffixLabel>
@@ -292,30 +293,37 @@ const BaseSettingModal = observer(() => {
                 </Checkbox> */}
               </Control>
             </Field>
-            <TextField
-              name="api_name"
-              label={<AffixLabel>超时时间</AffixLabel>}
-              help="请输入范围0-300"
-              css={styles.timeout}
-              value={params.timeout}
-              onChange={(_: any, v: any) =>
-                setParams((draft) => {
-                  draft.timeout = (Number(v) || 0) as unknown as string
-                })
-              }
-              validateOnBlur
-              maxLength={3}
-              schemas={[
-                {
-                  rule: (value: string) => {
-                    const l = Number(value)
-                    return l >= 1 && l <= 300
-                  },
-                  help: '请输入范围1-300',
-                  status: 'error'
-                }
-              ]}
-            />
+            <Field>
+              <Label tw="items-start!">
+                <AffixLabel required>超时时间</AffixLabel>
+              </Label>
+              <Control tw="items-center">
+                <Input
+                  name="timeout"
+                  tw="w-[60px]! block! items-center! space-x-1 mr-2"
+                  value={get(params, 'timeout', '')}
+                  onChange={(_, v: any) =>
+                    setParams((draft) => {
+                      draft.timeout = (Number(v) || 0) as unknown as string
+                    })
+                  }
+                  validateOnChange
+                  maxLength={3}
+                  schemas={[
+                    {
+                      rule: (value: number) => {
+                        const l = Number(value)
+                        return l >= 0 && l <= 300
+                      },
+                      help: '请输入范围0-300',
+                      status: 'error'
+                    }
+                  ]}
+                />
+                <div tw="ml-1">S</div>
+              </Control>
+              <div className="help">0-300</div>
+            </Field>
             <Field>
               <Label>
                 <AffixLabel>跨域功能</AffixLabel>
@@ -384,15 +392,11 @@ const BaseSettingModal = observer(() => {
               ]}
             />
             <Field>
-              <Label tw="items-start!">
-                <AffixLabel>创建时间</AffixLabel>
-              </Label>
+              <Label tw="items-start!">创建时间</Label>
               <Control tw="items-center">{formatDate(params.created)}</Control>
             </Field>
             <Field>
-              <Label tw="items-start!">
-                <AffixLabel>最后修改时间</AffixLabel>
-              </Label>
+              <Label tw="items-start!">最后修改时间</Label>
               <Control tw="items-center">{formatDate(params.updated)}</Control>
             </Field>
           </Form>
