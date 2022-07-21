@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useImperativeHandle,
   useRef,
-  useState,
+  useState
 } from 'react'
 import { Control, Input as LInput, InputProps } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
@@ -24,23 +24,21 @@ interface IControlRef {
   getControlRef: () => IElement
 }
 
-const InputWrapper = styled(Control)(
-  ({ 'data-focused': focused }: { 'data-focused': boolean }) => [
-    css`
-      &.is-danger {
-        ${tw`border-red-10`}
+const InputWrapper = styled(Control)(({ 'data-focused': focused }: { 'data-focused': boolean }) => [
+  css`
+    &.is-danger {
+      ${tw`border-red-10`}
+    }
+    ${tw`flex px-3 space-x-1 hover:border-neut-5 border border-neut-3 bg-white focus:border-green-11 dark:bg-neut-16 `},
+    & {
+      & input.input {
+        ${tw`border-none p-0 bg-transparent h-[30px]`}
       }
-      ${tw`flex px-3 space-x-1 hover:border-neut-5 border border-neut-3 bg-white focus:border-green-11 dark:bg-neut-16 `},
-      & {
-        & input.input {
-          ${tw`border-none p-0 bg-transparent h-[30px]`}
-        }
-      }
-    `,
-    focused && tw`border-green-11`,
-    tw`dark:bg-neut-13 dark:border-neut-13`,
-  ]
-)
+    }
+  `,
+  focused && tw`border-green-11`,
+  tw`dark:bg-neut-13 dark:border-neut-13`
+])
 
 export const Input = forwardRef<IControlRef, IInputProps>((props, ref) => {
   const [focused, setFocused] = useState(false)
@@ -65,7 +63,7 @@ export const Input = forwardRef<IControlRef, IInputProps>((props, ref) => {
   useImperativeHandle(ref, () => ({
     getControlRef(): IElement {
       return inputRef.current!
-    },
+    }
   }))
 
   return (

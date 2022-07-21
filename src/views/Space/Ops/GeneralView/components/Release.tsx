@@ -30,7 +30,7 @@ export const Release = ({ iconName, name, amount, id, statusData }: Props) => {
                     <span style="color:${param.color}">${param.value}</span>
                   </div>`
           return res
-        },
+        }
       },
       legend: {
         icon: 'circle',
@@ -56,10 +56,10 @@ export const Release = ({ iconName, name, amount, id, statusData }: Props) => {
           rich: {
             value: {
               color: '#fff',
-              fontSize: 16,
-            },
-          },
-        },
+              fontSize: 16
+            }
+          }
+        }
       },
       color: ['#0284C7', '#F97316', '#14B8A6'],
       series: [
@@ -70,19 +70,19 @@ export const Release = ({ iconName, name, amount, id, statusData }: Props) => {
           center: ['24%', '50%'],
           avoidLabelOverlap: false,
           label: {
-            show: false,
+            show: false
           },
           hoverAnimation: false,
           emphasis: {
             itemStyle: {
               shadowBlur: 10,
               shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-            },
+              shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
           },
-          data: statusData,
-        },
-      ],
+          data: statusData
+        }
+      ]
     }
     myChart.setOption(option)
   })

@@ -24,7 +24,7 @@ export const TableHeader = observer((props: ITableHeaderProps) => {
     columnsSetting: { storageKey, onSave, columns },
     filterLinkKey,
     queryKey,
-    suggestions,
+    suggestions
   } = props
 
   const isFetching = useIsFetching()
@@ -56,11 +56,7 @@ export const TableHeader = observer((props: ITableHeaderProps) => {
       >
         <Icon name="if-refresh" tw="text-xl text-white" type="light" />
       </Button>
-      <ColumnsSetting
-        defaultColumns={columns}
-        storageKey={storageKey}
-        onSave={onSave}
-      />
+      <ColumnsSetting defaultColumns={columns} storageKey={storageKey} onSave={onSave} />
     </FlexBox>
   )
 })

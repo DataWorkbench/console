@@ -18,13 +18,7 @@ export interface SelectTreeProps {
 }
 
 const SelectInputWrapper = styled('div')(
-  ({
-    focused = false,
-    disabled,
-  }: {
-    focused?: boolean
-    disabled?: boolean
-  }) => [
+  ({ focused = false, disabled }: { focused?: boolean; disabled?: boolean }) => [
     tw`flex-1 flex max-w-[328px] items-center w-full px-3 py-2 rounded-sm cursor-pointer h-8 border border-neut-13  border-solid hover:border-neut-5`,
     focused && tw`border-green-11!`,
     disabled && tw`bg-neut-11 cursor-not-allowed`,
@@ -37,7 +31,7 @@ const SelectInputWrapper = styled('div')(
           ? tw`(bg-neut-11 text-neut-8)! focus:outline-none cursor-not-allowed`
           : tw`flex-1 cursor-pointer (bg-neut-16 text-white)! focus:outline-none`}
       }
-    `,
+    `
   ]
 )
 
@@ -47,8 +41,8 @@ const TreeWrapper = styled('div')(
     !show && tw`hidden`,
     treeHeight && {
       maxHeight: `${treeHeight}px`,
-      overflowY: 'auto',
-    },
+      overflowY: 'auto'
+    }
   ]
 )
 
@@ -165,6 +159,4 @@ export const SelectTree = forwardRef<SelectTreeProps, any>(
 
 export default SelectTree
 
-export const SelectTreeField: (props: any) => any = (Form as any).getFormField(
-  SelectTree
-)
+export const SelectTreeField: (props: any) => any = (Form as any).getFormField(SelectTree)

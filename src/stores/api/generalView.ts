@@ -15,7 +15,7 @@ export const getGeneraView = ({ regionId, spaceId }: Params) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/op/observable/overview`,
-    method: 'GET',
+    method: 'GET'
   })
 
 export default getGeneraView

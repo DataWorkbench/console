@@ -155,6 +155,11 @@ export const datasourceTypeObjs = [
   //   label: 'Redis',
   // },
   {
+    type: SourceType.Oracle,
+    name: 'oracle',
+    label: 'Oracle'
+  },
+  {
     type: SourceType.ElasticSearch,
     name: 'elastic_search',
     label: 'ElasticSearch'
@@ -274,8 +279,7 @@ export const jobModeData = [
         icon: 'PythonFill',
         title: 'Python 模式',
         desc: '通过 Flink Python 语言进行数据作业开发',
-        value: JobType.PYTHON,
-        disabled: true
+        value: JobType.PYTHON
       }
       // {
       //   icon: 'scala',

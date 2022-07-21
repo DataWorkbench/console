@@ -12,7 +12,7 @@ const DataRelease = (props: Record<string, any>) => {
   const { version } = qs.parse(search.slice(1))
   if (!version) {
     emitter.emit('error', {
-      title: `请选择具体版本的已发布作业`,
+      title: `请选择具体版本的已发布作业`
     })
     setTimeout(() => {
       history.goBack()

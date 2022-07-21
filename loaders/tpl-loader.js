@@ -10,11 +10,22 @@ function compileTpl(tpl, params) {
     if (tpl[i] === '{') {
       start = i + 1
       end = i + 1
-    } else if (tpl[i] === '}') {
+    } else if (tpl[i] === '}' && start < i) {
       end = i
-      const item = tpl.slice(start, end)
+      const tplItem = tpl.slice(start, end)
+      let defaultValue
+      let item
+      if (tplItem.includes('|')) {
+       [item,  defaultValue] = tplItem.split('|')
+      } else {
+        [item,  defaultValue] = [tplItem, undefined]
+      }
       if (params[item] !== undefined) {
-        re = re.replace(`{${item}}`, params[item])
+        re = re.replace(`{${tplItem}}`, params[item])
+        start = tpl.length
+      } else if (defaultValue !== undefined) {
+        re = re.replace(`{${tplItem}}`, defaultValue)
+        start = tpl.length
       }
     }
   }

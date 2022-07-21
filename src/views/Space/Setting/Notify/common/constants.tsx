@@ -27,7 +27,7 @@ export const columnsRender = {
     render: (text: string) => <InstanceName theme="light" name={text} icon="q-humanAppDuotone" />
   },
   [getName('desc')]: {
-    render: () => <div tw="text-font-placeholder">asdfasfd</div>
+    render: (desc: string) => <div tw="text-font-placeholder">{desc}</div>
   },
   [getName('created')]: {
     render: (text: string) => <div tw="text-font-placeholder">{text}</div>

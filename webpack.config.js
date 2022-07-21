@@ -8,6 +8,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const WebpackBar = require('webpackbar')
 const path = require('path')
 const dotenv = require('dotenv')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 dotenv.config()
 
@@ -23,14 +24,6 @@ dotenv.config({
 })
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
-
-const getTheme = () => {
-  // const themeStr = process.argv.find(arg => arg.startsWith('theme='))
-  // if (!themeStr) {
-  //   return {theme: 'default'}
-  // }
-  return { THEME: process.env.THEME || 'default' }
-}
 
 let config = {
   mode: NODE_ENV,
@@ -86,7 +79,7 @@ let config = {
             }
           },
           {loader: resolve('./loaders/tpl-loader.js'), options: {
-               tplValue: { ...process.env, ...getTheme() },
+               tplValue: { ...process.env },
             }},
         ]
       },
@@ -168,7 +161,7 @@ let config = {
   optimization: {},
   devServer: {
     host: '0.0.0.0',
-    allowedHosts: ['local.testing.com', 'local.qacloud.com'],
+    allowedHosts: ['local.testing.com', 'local.qacloud.com', 'local.test.data.qingcloud.link'],
     compress: true,
     hot: true,
     historyApiFallback: {
@@ -221,6 +214,7 @@ let config = {
     },
   plugins: [
     new HtmlWebpackPlugin({
+      favicon: path.resolve(__dirname, 'favicon.ico'),
       filename: 'index.html',
       inject: false,
       template: path.resolve(__dirname, 'index.html'),
@@ -248,6 +242,12 @@ if (isDev) {
 } else {
   config = merge(config, {
     plugins: [
+      new CopyWebpackPlugin({patterns:[
+          {
+            from: ('./config.js'),
+            to: ('./static/js/config.js'),
+          }
+        ]}),
       new MiniCssExtractPlugin({
         filename: 'static/css/[name].[contenthash:7].css',
         chunkFilename: 'static/css/[id].[contenthash:7].css',

@@ -8,8 +8,9 @@ import { Box, Card, Center, FlexBox, TextEllipsis, Tooltip, TextLink } from 'com
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
 
-import { useMemberStore } from 'views/Space/Manage/Member/store'
+// import { useMemberStore } from 'views/Space/Manage/Member/store'
 
+import { get } from 'lodash-es'
 import { OptButton, roleIcon, RoleNameWrapper } from './styled'
 
 const { MenuItem, SubMenu } = Menu as any
@@ -146,7 +147,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     workSpaceStore: { funcList }
   } = useStore()
 
-  const memberStore = useMemberStore()
+  // const memberStore = useMemberStore()
 
   const handleCardClick = () => {
     if (space.status !== 1) {
@@ -220,39 +221,43 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           </div>
         </FlexBox>
 
-        <FlexBox tw="justify-between mt-3 cursor-auto" onClick={(e) => e.stopPropagation()}>
-          <div>
-            <div tw="inline">我的角色：</div>
-            <RoleNameWrapper>空间所有者</RoleNameWrapper>
-          </div>
-          <div tw="flex items-center w-[180px] justify-end">
-            <div tw="inline">空间成员：</div>
-            {/* <RoleNameWrapper>空间所有者</RoleNameWrapper> */}
-            {space.roles ? (
-              <RoleIcons list={space.roles ?? roleList} />
-            ) : (
-              <FlexBox tw="gap-1">
-                <span>无成员</span>
-                <TextLink
-                  hasIcon={false}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    memberStore.set({
-                      op: 'create',
-                      spaceItem: {
-                        id: space.id,
-                        name: space.name,
-                        regionId
-                      }
-                    })
-                  }}
-                >
-                  添加
-                </TextLink>
-              </FlexBox>
+        {space.owner === get(window, 'USER.user_id') && (
+          <FlexBox tw="justify-between mt-3 cursor-auto">
+            <div>
+              <div tw="inline">我的角色：</div>
+              <RoleNameWrapper>空间所有者</RoleNameWrapper>
+            </div>
+            {false && (
+              <div tw="flex items-center w-[180px] justify-end">
+                <div tw="inline">空间成员：</div>
+                {/* <RoleNameWrapper>空间所有者</RoleNameWrapper> */}
+                {space.roles ? (
+                  <RoleIcons list={space.roles ?? roleList} />
+                ) : (
+                  <FlexBox tw="gap-1">
+                    <span>无成员</span>
+                    <TextLink
+                      hasIcon={false}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        // memberStore.set({
+                        //   op: 'create',
+                        //   spaceItem: {
+                        //     id: space.id,
+                        //     name: space.name,
+                        //     regionId
+                        //   }
+                        // })
+                      }}
+                    >
+                      添加
+                    </TextLink>
+                  </FlexBox>
+                )}
+              </div>
             )}
-          </div>
-        </FlexBox>
+          </FlexBox>
+        )}
       </>
     )
   }

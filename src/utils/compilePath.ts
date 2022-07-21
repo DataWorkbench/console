@@ -14,10 +14,7 @@ export function toHump(name: string): string {
  * @param path
  * @param params
  */
-function compilePath(
-  path: string,
-  params: Record<string, any>
-): [string, Record<string, any>] {
+function compilePath(path: string, params: Record<string, any>): [string, Record<string, any>] {
   const keys = []
   let start = 0
   let end = 0

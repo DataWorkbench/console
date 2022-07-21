@@ -4,7 +4,7 @@ import {
   describeFlinkUiByInstanceId,
   listSyncInstances,
   syncJobInstanceManage,
-  terminateSyncInstances,
+  terminateSyncInstances
 } from 'stores/api'
 import { isNull, omitBy } from 'lodash-es'
 import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
@@ -17,11 +17,10 @@ interface IRouteParams {
 const queryKey = {
   list: '' as any,
   detail: '' as any,
-  flinkUi: '' as any,
+  flinkUi: '' as any
 }
 
-export const getSyncJobInstanceKey = (key: keyof typeof queryKey = 'list') =>
-  queryKey[key]
+export const getSyncJobInstanceKey = (key: keyof typeof queryKey = 'list') => queryKey[key]
 
 export const useQuerySyncJobInstances = (
   filter: any,
@@ -49,37 +48,30 @@ export const useQuerySyncJobInstances = (
       limit: 10,
       offset: 0,
       ...filter,
-      apiType: typePath,
+      apiType: typePath
     },
     isNull
   )
   queryKey.list = ['syncJobInstances', params]
-  return useQuery(
-    queryKey.list,
-    async ({ pageParam = params }) => listSyncInstances(pageParam),
-    {
-      enabled,
-      ...config,
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+  return useQuery(queryKey.list, async ({ pageParam = params }) => listSyncInstances(pageParam), {
+    enabled,
+    ...config,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.has_more) {
+        const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
 
-          if (nextOffset < lastPage.total) {
-            const nextParams = {
-              ...params,
-              offset: nextOffset,
-            }
-            return nextParams
+        if (nextOffset < lastPage.total) {
+          const nextParams = {
+            ...params,
+            offset: nextOffset
           }
+          return nextParams
         }
+      }
 
-        return undefined
-      },
+      return undefined
     }
-  )
+  })
 }
 
 export const useQueryDescribeFlinkUIByInstanceId = (
@@ -88,13 +80,9 @@ export const useQueryDescribeFlinkUIByInstanceId = (
 ) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const qryKey = ['syncJobInstance', { regionId, spaceId, id }]
-  return useQuery(
-    qryKey,
-    async () => describeFlinkUiByInstanceId({ regionId, spaceId, id }),
-    {
-      enabled,
-    }
-  )
+  return useQuery(qryKey, async () => describeFlinkUiByInstanceId({ regionId, spaceId, id }), {
+    enabled
+  })
 }
 
 export const useMutationJobInstance = (options?: {}) => {
@@ -114,17 +102,14 @@ export const useMutationJobInstance = (options?: {}) => {
 }
 
 export const useDescribeInstanceWithFlinkUIByInstanceId = (id: string) => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   const params = {
     space_id: spaceId,
     regionId,
     verbose: 1,
-    instance_id: id,
+    instance_id: id
   }
 
   const key: any = ['describeSyncInstance', params]
-  return useQuery(key, async () =>
-    syncJobInstanceManage.describeSyncInstance(params)
-  )
+  return useQuery(key, async () => syncJobInstanceManage.describeSyncInstance(params))
 }

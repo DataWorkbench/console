@@ -1,25 +1,19 @@
 import { apiConfig } from 'utils/api'
 
 export const auditManage = apiConfig({
-  ListOpAudits: ['get', '/v1/audit'],
+  ListOpAudits: ['get', '/v1/audit']
 })
 
 export const notifierManage = apiConfig({
-  ListNotifications: ['get', '/v1/workspace/{space_id}/op/notice'],
+  ListNotifications: ['get', '/v1/workspace/{space_id}/op/notice']
 })
 
 export const convertSyncJobMode = apiConfig({
-  GenerateJobJson: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/convert',
-  ],
+  GenerateJobJson: ['post', '/v1/workspace/{space_id}/sync/job/{job_id}/convert']
 })
 
 export const uDFManage = apiConfig({
-  '/v1/workspace/{space_id}/udf/{udf_id}': [
-    'get',
-    '/v1/workspace/{space_id}/udf/{udf_id}',
-  ],
+  '/v1/workspace/{space_id}/udf/{udf_id}': ['get', '/v1/workspace/{space_id}/udf/{udf_id}'],
 
   CreateUDF: ['post', '/v1/workspace/{space_id}/udf'],
 
@@ -27,21 +21,15 @@ export const uDFManage = apiConfig({
 
   ListUDFs: ['get', '/v1/workspace/{space_id}/udf'],
 
-  UpdateUDF: ['put', '/v1/workspace/{space_id}/udf/{udf_id}'],
+  UpdateUDF: ['put', '/v1/workspace/{space_id}/udf/{udf_id}']
 })
 
 export const resourceManage = apiConfig({
   DeleteFiles: ['post', '/v1/workspace/{space_id}/resource/deletes'],
 
-  DescribeFileMeta: [
-    'get',
-    '/v1/workspace/{space_id}/resource/{resource_id}/describe',
-  ],
+  DescribeFileMeta: ['get', '/v1/workspace/{space_id}/resource/{resource_id}/describe'],
 
-  DownloadFile: [
-    'get',
-    '/v1/workspace/{space_id}/resource/{resource_id}/download',
-  ],
+  DownloadFile: ['get', '/v1/workspace/{space_id}/resource/{resource_id}/download'],
 
   ListFileMetas: ['get', '/v1/workspace/{space_id}/resource'],
 
@@ -49,7 +37,7 @@ export const resourceManage = apiConfig({
 
   UpdateFileMeta: ['put', '/v1/workspace/{space_id}/resource/{resource_id}'],
 
-  UploadFile: ['post', '/v1/workspace/{space_id}/resource'],
+  UploadFile: ['post', '/v1/workspace/{space_id}/resource']
 })
 
 export const fileManage = apiConfig({
@@ -65,88 +53,55 @@ export const fileManage = apiConfig({
 
   UpdateFileMeta: ['put', '/v1/workspace/{space_id}/file/{file_id}'],
 
-  UploadFile: ['post', '/v1/workspace/{space_id}/file'],
+  UploadFile: ['post', '/v1/workspace/{space_id}/file']
 })
 
 export const syncJobInstanceManage = apiConfig({
-  DescribeSyncInstance: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/instance/{instance_id}',
-  ],
+  DescribeSyncInstance: ['get', '/v1/workspace/{space_id}/sync/job/instance/{instance_id}'],
 
   ListSyncInstances: ['get', '/v1/workspace/{space_id}/sync/job/instance'],
 
-  TerminateSyncInstances: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/instance/terminates',
-  ],
+  TerminateSyncInstances: ['post', '/v1/workspace/{space_id}/sync/job/instance/terminates']
 })
 
 export const syncJobReleaseManage = apiConfig({
   ListReleaseSyncJobs: ['get', '/v1/workspace/{space_id}/sync/job/release'],
 
-  OfflineReleaseSyncJob: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/release/{job_id}/offline',
-  ],
+  OfflineReleaseSyncJob: ['post', '/v1/workspace/{space_id}/sync/job/release/{job_id}/offline'],
 
-  ReleaseSyncJob: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/release',
-  ],
+  ReleaseSyncJob: ['post', '/v1/workspace/{space_id}/sync/job/{job_id}/release'],
 
-  ResumeReleaseSyncJobs: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/release/{job_id}/resume',
-  ],
+  ResumeReleaseSyncJobs: ['post', '/v1/workspace/{space_id}/sync/job/release/{job_id}/resume'],
 
-  SuspendReleaseSyncJob: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/release/{job_id}/suspend',
-  ],
+  SuspendReleaseSyncJob: ['post', '/v1/workspace/{space_id}/sync/job/release/{job_id}/suspend']
 })
 
 export const syncJobVersionManage = apiConfig({
-  DescribeSyncJobVersion: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}',
-  ],
+  DescribeSyncJobVersion: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}'],
 
   GetSyncJobVersionConf: [
     'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/conf',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/conf'
   ],
 
   GetSyncJobVersionSchedule: [
     'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/schedule',
+    '/v1/workspace/{space_id}/sync/job/{job_id}/version/{ver_id}/schedule'
   ],
 
-  ListSyncJobVersions: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/version',
-  ],
+  ListSyncJobVersions: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}/version']
 })
 
 export const syncJobDevManage = apiConfig({
-  GetSyncJobSchedule: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
-  ],
+  GetSyncJobSchedule: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}/schedule'],
 
   CreateSyncJob: ['post', '/v1/workspace/{space_id}/sync/job'],
 
-  DescribeSyncConnection: [
-    'get',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
-  ],
+  DescribeSyncConnection: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}/conn'],
 
   DescribeSyncJob: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}'],
 
-  GenerateJobJson: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/generate',
-  ],
+  GenerateJobJson: ['post', '/v1/workspace/{space_id}/sync/job/{job_id}/generate'],
 
   GetSyncJobConf: ['get', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
 
@@ -156,28 +111,19 @@ export const syncJobDevManage = apiConfig({
 
   MoveSyncJobs: ['post', '/v1/workspace/{space_id}/sync/job/moves'],
 
-  PingSyncJobConnection: [
-    'post',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/conn',
-  ],
+  PingSyncJobConnection: ['post', '/v1/workspace/{space_id}/sync/job/{job_id}/conn'],
 
   SetSyncJobConf: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}/conf'],
 
-  SetSyncJobSchedule: [
-    'put',
-    '/v1/workspace/{space_id}/sync/job/{job_id}/schedule',
-  ],
+  SetSyncJobSchedule: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}/schedule'],
 
-  UpdateSyncJob: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}'],
+  UpdateSyncJob: ['put', '/v1/workspace/{space_id}/sync/job/{job_id}']
 })
 
 export const roleManage = apiConfig({
-  ListSystemRolePermissions: [
-    'get',
-    '/v1/workspace/{space_id}/role/system/permission',
-  ],
+  ListSystemRolePermissions: ['get', '/v1/workspace/{space_id}/role/system/permission'],
 
-  ListSystemRoles: ['get', '/v1/workspace/{space_id}/role/system'],
+  ListSystemRoles: ['get', '/v1/workspace/{space_id}/role/system']
 })
 
 export const streamJobDevMange = apiConfig({
@@ -187,133 +133,82 @@ export const streamJobDevMange = apiConfig({
 
   DescribeStreamJob: ['get', '/v1/workspace/{space_id}/stream/job/{job_id}'],
 
-  GetStreamJobArgs: [
-    'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/args',
-  ],
+  GetStreamJobArgs: ['get', '/v1/workspace/{space_id}/stream/job/{job_id}/args'],
 
-  GetStreamJobCode: [
-    'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/code',
-  ],
+  GetStreamJobCode: ['get', '/v1/workspace/{space_id}/stream/job/{job_id}/code'],
 
-  GetStreamJobSchedule: [
-    'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/schedule',
-  ],
+  GetStreamJobSchedule: ['get', '/v1/workspace/{space_id}/stream/job/{job_id}/schedule'],
 
-  ListBuiltInConnectors: [
-    'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/args/connectors',
-  ],
+  ListBuiltInConnectors: ['get', '/v1/workspace/{space_id}/stream/job/{job_id}/args/connectors'],
 
   DeleteStreamJobs: ['post', '/v1/workspace/{space_id}/stream/job/deletes'],
 
   MoveStreamJobs: ['post', '/v1/workspace/{space_id}/stream/job/moves'],
 
-  SetStreamJobArgs: [
-    'put',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/args',
-  ],
+  SetStreamJobArgs: ['put', '/v1/workspace/{space_id}/stream/job/{job_id}/args'],
 
-  SetStreamJobCode: [
-    'put',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/code',
-  ],
+  SetStreamJobCode: ['put', '/v1/workspace/{space_id}/stream/job/{job_id}/code'],
 
-  SetStreamJobSchedule: [
-    'put',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/schedule',
-  ],
+  SetStreamJobSchedule: ['put', '/v1/workspace/{space_id}/stream/job/{job_id}/schedule'],
 
-  StreamJobCodeRun: [
-    'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/code/run',
-  ],
+  StreamJobCodeRun: ['get', '/v1/workspace/{space_id}/stream/job/{job_id}/code/run'],
 
-  StreamJobCodeSyntax: [
-    'post',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/code/syntax',
-  ],
+  StreamJobCodeSyntax: ['post', '/v1/workspace/{space_id}/stream/job/{job_id}/code/syntax'],
 
-  UpdateStreamJob: ['put', '/v1/workspace/{space_id}/stream/job/{job_id}'],
+  UpdateStreamJob: ['put', '/v1/workspace/{space_id}/stream/job/{job_id}']
 })
 
 export const streamJobVersionManage = apiConfig({
   DescribeStreamJobVersion: [
     'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}',
+    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}'
   ],
 
   GetStreamJobVersionArgs: [
     'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/args',
+    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/args'
   ],
 
   GetStreamJobVersionCode: [
     'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/code',
+    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/code'
   ],
 
   GetStreamJobVersionSchedule: [
     'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/schedule',
+    '/v1/workspace/{space_id}/stream/job/{job_id}/version/{ver_id}/schedule'
   ],
 
-  ListStreamJobVersions: [
-    'get',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/version',
-  ],
+  ListStreamJobVersions: ['get', '/v1/workspace/{space_id}/stream/job/{job_id}/version']
 })
 
 export const streamJobInstanceManage = apiConfig({
   DescribeFlinkUIByInstanceId: [
     'get',
-    '/v1/workspace/{space_id}/stream/job/instance/{instance_id}/flink-ui',
+    '/v1/workspace/{space_id}/stream/job/instance/{instance_id}/flink-ui'
   ],
 
   ListStreamInstances: ['get', '/v1/workspace/{space_id}/stream/job/instance'],
 
-  TerminateStreamInstances: [
-    'post',
-    '/v1/workspace/{space_id}/stream/job/instance/terminates',
-  ],
+  TerminateStreamInstances: ['post', '/v1/workspace/{space_id}/stream/job/instance/terminates']
 })
 
 export const streamJobReleaseManage = apiConfig({
   ListReleaseStreamJobs: ['get', '/v1/workspace/{space_id}/stream/job/release'],
 
-  OfflineReleaseStreamJob: [
-    'post',
-    '/v1/workspace/{space_id}/stream/job/release/{job_id}/offline',
-  ],
+  OfflineReleaseStreamJob: ['post', '/v1/workspace/{space_id}/stream/job/release/{job_id}/offline'],
 
-  ReleaseStreamJob: [
-    'post',
-    '/v1/workspace/{space_id}/stream/job/{job_id}/release',
-  ],
+  ReleaseStreamJob: ['post', '/v1/workspace/{space_id}/stream/job/{job_id}/release'],
 
-  ResumeReleaseStreamJobs: [
-    'post',
-    '/v1/workspace/{space_id}/stream/job/release/{job_id}/resume',
-  ],
+  ResumeReleaseStreamJobs: ['post', '/v1/workspace/{space_id}/stream/job/release/{job_id}/resume'],
 
-  SuspendReleaseStreamJob: [
-    'post',
-    '/v1/workspace/{space_id}/stream/job/release/{job_id}/suspend',
-  ],
+  SuspendReleaseStreamJob: ['post', '/v1/workspace/{space_id}/stream/job/release/{job_id}/suspend']
 })
 
 export const alertManage = apiConfig({
-  JobBoundAlertPolicies: [
-    'post',
-    '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/bound',
-  ],
+  JobBoundAlertPolicies: ['post', '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/bound'],
 
-  AlertPolicyBoundJobs: [
-    'post',
-    '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/bound',
-  ],
+  AlertPolicyBoundJobs: ['post', '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/bound'],
 
   CreateAlertPolicy: ['post', '/v1/workspace/{space_id}/op/alert'],
 
@@ -323,31 +218,22 @@ export const alertManage = apiConfig({
 
   AlertPolicyUnboundJobs: [
     'post',
-    '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/unbound',
+    '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}/unbound'
   ],
 
-  JobUnboundAlertPolicies: [
-    'post',
-    '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/unbound',
-  ],
+  JobUnboundAlertPolicies: ['post', '/v1/workspace/{space_id}/op/alert/map/job/{job_id}/unbound'],
 
   ListAlertPolicies: ['get', '/v1/workspace/{space_id}/op/alert'],
 
-  ListAlertPoliciesByJob: [
-    'get',
-    '/v1/workspace/{space_id}/op/alert/map/job/{job_id}',
-  ],
+  ListAlertPoliciesByJob: ['get', '/v1/workspace/{space_id}/op/alert/map/job/{job_id}'],
 
-  ListJobsByAlertPolicy: [
-    'get',
-    '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}',
-  ],
+  ListJobsByAlertPolicy: ['get', '/v1/workspace/{space_id}/op/alert/map/policy/{alert_id}'],
 
-  UpdateAlertPolicy: ['put', '/v1/workspace/{space_id}/op/alert/{alert_id}'],
+  UpdateAlertPolicy: ['put', '/v1/workspace/{space_id}/op/alert/{alert_id}']
 })
 
 export const platformManage = apiConfig({
-  DescribePlatformConfig: ['get', '/v1/platform/config'],
+  DescribePlatformConfig: ['get', '/v1/platform/config']
 })
 
 export const spaceManage = apiConfig({
@@ -355,10 +241,7 @@ export const spaceManage = apiConfig({
 
   CreateWorkspace: ['post', '/v1/workspace'],
 
-  DescribeResourceBinding: [
-    'get',
-    '/v1/workspace/{space_id}/binding/resources',
-  ],
+  DescribeResourceBinding: ['get', '/v1/workspace/{space_id}/binding/resources'],
 
   DescribeWorkspace: ['get', '/v1/workspace/{space_id}'],
 
@@ -374,7 +257,7 @@ export const spaceManage = apiConfig({
 
   UpdateWorkspace: ['put', '/v1/workspace/{space_id}'],
 
-  UpsertWorkspaceQuota: ['post', '/v1/workspace/{space_id}/quota'],
+  UpsertWorkspaceQuota: ['post', '/v1/workspace/{space_id}/quota']
 })
 
 export const memberManage = apiConfig({
@@ -384,46 +267,28 @@ export const memberManage = apiConfig({
 
   DescribeMember: ['get', '/v1/workspace/{space_id}/member/{user_id}'],
 
-  DescribeMemberQuota: [
-    'get',
-    '/v1/workspace/{space_id}/member/{user_id}/quota',
-  ],
+  DescribeMemberQuota: ['get', '/v1/workspace/{space_id}/member/{user_id}/quota'],
 
   ListMembers: ['get', '/v1/workspace/{space_id}/member'],
 
   UpdateMember: ['post', '/v1/workspace/{space_id}/member/{user_id}'],
 
-  UpsertMemberQuota: [
-    'post',
-    '/v1/workspace/{space_id}/member/{user_id}/quota',
-  ],
+  UpsertMemberQuota: ['post', '/v1/workspace/{space_id}/member/{user_id}/quota']
 })
 
 export const statManage = apiConfig({
-  GetPeriodicTasksDispatchCount: [
-    'get',
-    '/v1/workspace/:space_id/statistics/periodic/tasks',
-  ],
+  GetPeriodicTasksDispatchCount: ['get', '/v1/workspace/:space_id/statistics/periodic/tasks'],
 
-  GetPeriodicTasksErrorRanking: [
-    'get',
-    '/v1/workspace/:space_id/statistics/periodic/error',
-  ],
+  GetPeriodicTasksErrorRanking: ['get', '/v1/workspace/:space_id/statistics/periodic/error'],
 
   GetPeriodicTasksExecutingStatistics: [
     'get',
-    '/v1/workspace/:space_id/statistics/periodic/execution',
+    '/v1/workspace/:space_id/statistics/periodic/execution'
   ],
 
-  GetPeriodicTasksRuntimeRanking: [
-    'get',
-    '/v1/workspace/:space_id/statistics/periodic/runtime',
-  ],
+  GetPeriodicTasksRuntimeRanking: ['get', '/v1/workspace/:space_id/statistics/periodic/runtime'],
 
-  GetPeriodicTasksStatusStatistics: [
-    'get',
-    '/v1/workspace/:space_id/statistics/periodic/status',
-  ],
+  GetPeriodicTasksStatusStatistics: ['get', '/v1/workspace/:space_id/statistics/periodic/status']
 })
 
 export const dataSourceManage = apiConfig({
@@ -431,59 +296,38 @@ export const dataSourceManage = apiConfig({
 
   CreateDataSource: ['post', '/v1/workspace/{space_id}/datasource'],
 
-  DescribeDataSource: [
-    'get',
-    '/v1/workspace/{space_id}/datasource/{source_id}',
-  ],
+  DescribeDataSource: ['get', '/v1/workspace/{space_id}/datasource/{source_id}'],
 
   DescribeDataSourceKinds: ['get', '/v1/workspace/{space_id}/datasource/kinds'],
 
   DescribeDataSourceTableSchema: [
     'get',
-    '/v1/workspace/{space_id}/datasource/{source_id}/table/{table_name}/schema',
+    '/v1/workspace/{space_id}/datasource/{source_id}/table/{table_name}/schema'
   ],
 
-  DescribeDataSourceTables: [
-    'get',
-    '/v1/workspace/{space_id}/datasource/{source_id}/tables',
-  ],
+  DescribeDataSourceTables: ['get', '/v1/workspace/{space_id}/datasource/{source_id}/tables'],
 
   DeleteDataSources: ['post', '/v1/workspace/{space_id}/datasource/deletes'],
 
   EnableDataSources: ['post', '/v1/workspace/{space_id}/datasource/enables'],
 
-  ListDataSourceConnections: [
-    'get',
-    '/v1/workspace/{space_id}/datasource/{source_id}/conn',
-  ],
+  ListDataSourceConnections: ['get', '/v1/workspace/{space_id}/datasource/{source_id}/conn'],
 
   ListDataSources: ['get', '/v1/workspace/{space_id}/datasource'],
 
-  PingDataSourceConnection: [
-    'post',
-    '/v1/workspace/{space_id}/datasource/ping',
-  ],
+  PingDataSourceConnection: ['post', '/v1/workspace/{space_id}/datasource/ping'],
 
-  UpdateDataSource: ['put', '/v1/workspace/{space_id}/datasource/{source_id}'],
+  UpdateDataSource: ['put', '/v1/workspace/{space_id}/datasource/{source_id}']
 })
 
 export const clusterManage = apiConfig({
   CreateFlinkCluster: ['post', '/v1/workspace/{space_id}/cluster/flink'],
 
-  DeleteFlinkClusters: [
-    'post',
-    '/v1/workspace/{space_id}/cluster/flink/deletes',
-  ],
+  DeleteFlinkClusters: ['post', '/v1/workspace/{space_id}/cluster/flink/deletes'],
 
-  DescribeFlinkCluster: [
-    'get',
-    '/v1/workspace/{space_id}/cluster/flink/{cluster_id}',
-  ],
+  DescribeFlinkCluster: ['get', '/v1/workspace/{space_id}/cluster/flink/{cluster_id}'],
 
-  ListAvailableFlinkVersions: [
-    'get',
-    '/v1/workspace/{space_id}/cluster/flink/versions',
-  ],
+  ListAvailableFlinkVersions: ['get', '/v1/workspace/{space_id}/cluster/flink/versions'],
 
   ListFlinkClusters: ['get', '/v1/workspace/{space_id}/cluster/flink'],
 
@@ -491,10 +335,7 @@ export const clusterManage = apiConfig({
 
   StopFlinkClusters: ['post', '/v1/workspace/{space_id}/cluster/flink/stops'],
 
-  UpdateFlinkCluster: [
-    'put',
-    '/v1/workspace/{space_id}/cluster/flink/{cluster_id}',
-  ],
+  UpdateFlinkCluster: ['put', '/v1/workspace/{space_id}/cluster/flink/{cluster_id}']
 })
 
 export const networkMange = apiConfig({
@@ -506,5 +347,5 @@ export const networkMange = apiConfig({
 
   ListNetworks: ['get', '/v1/workspace/{space_id}/network'],
 
-  UpdateNetwork: ['put', '/v1/workspace/{space_id}/network/{network_id}'],
+  UpdateNetwork: ['put', '/v1/workspace/{space_id}/network/{network_id}']
 })

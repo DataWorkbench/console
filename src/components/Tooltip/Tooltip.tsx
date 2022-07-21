@@ -32,15 +32,7 @@ export const Tooltip = (
   }
 ) => {
   const [instance, setInstance] = useState<Instance | null>(null)
-  const {
-    content,
-    children,
-    hasPadding = false,
-    childStyle,
-    twChild,
-    theme,
-    ...rest
-  } = props
+  const { content, children, hasPadding = false, childStyle, twChild, theme, ...rest } = props
 
   const combProps: TippyProps = {
     interactive: true,
@@ -59,7 +51,7 @@ export const Tooltip = (
       >
         {content}
       </div>
-    ),
+    )
   }
   return (
     <Tippy {...combProps} onCreate={(o) => setInstance(o)}>

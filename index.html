@@ -4,10 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <!--     <meta-->
-    <!--      http-equiv="Content-Security-Policy"-->
-    <!--      content="upgrade-insecure-requests"-->
-    <!--    />-->
+    <link
+      rel="icon"
+      href="<%=htmlWebpackPlugin.files.favicon %>"
+      type="image/x-icon"
+    />
+    <!-- <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    /> -->
     <link rel=icon href="/static/images/favicon.ico?v=1" type=image/x-icon>
     <title>大数据工作台</title>
     <% for (var css in htmlWebpackPlugin.files.css) { %>
@@ -18,6 +23,9 @@
       onload="this.rel = 'stylesheet'"
       href="<%=htmlWebpackPlugin.files.css[css] %>"
     />
+    <% } %>
+    <% if (process.env.NODE_ENV === 'production') { %>
+      <script src="<%=htmlWebpackPlugin.files.publicPath %>static/js/config.js" ></script>
     <% } %>
   </head>
   <body>
