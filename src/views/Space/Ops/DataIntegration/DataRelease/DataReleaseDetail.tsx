@@ -12,7 +12,7 @@ import { HorizonTabs } from 'views/Space/Dm/styled'
 import Cluster from 'views/Space/Ops/components/Cluster'
 import useIcon from 'hooks/useHooks/useIcon'
 import Schedule from 'views/Space/Ops/components/Schedule'
-// import Monitor from 'views/Space/Ops/DataIntegration/components/Monitor'
+import Monitor from 'views/Space/Ops/components/Monitor'
 import LinkInstance from 'views/Space/Ops/components/LinkInstance'
 import DevContent from 'views/Space/Ops/components/DevContent'
 import { observer } from 'mobx-react-lite'
@@ -367,7 +367,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           <LinkInstance jobId={id} version={version} />
         </TabPanel>
         <TabPanel label="监控告警" name="alarm">
-          {/* <Monitor /> */}
+          <Monitor />
         </TabPanel>
         <TabPanel label="开发内容" name="dev">
           <DevContent data={config} curJob={data} />

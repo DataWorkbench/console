@@ -11,6 +11,7 @@ import dayjs from 'dayjs'
 import { HorizonTabs } from 'views/Space/Dm/styled'
 import useIcon from 'hooks/useHooks/useIcon'
 import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSourceModal'
+import Monitor from 'views/Space/Ops/components/Monitor'
 import { useImmer } from 'use-immer'
 import { get } from 'lodash-es'
 import {
@@ -441,7 +442,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
           </div>
         </TabPanel>
         <TabPanel label="监控告警" name="Monitor">
-          {/* <Monitor /> */}
+          <Monitor />
         </TabPanel>
         <TabPanel label="开发内容" name="Develop">
           {/* <div>3</div> */}

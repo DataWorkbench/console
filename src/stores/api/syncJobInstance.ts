@@ -6,13 +6,15 @@ export interface ISyncInstanceParams {
   [k: string]: unknown
 }
 
-export const listSyncInstances = ({ regionId, spaceId, apiType, ...rest }: ISyncInstanceParams) => request({
+export const listSyncInstances = ({ regionId, spaceId, apiType, ...rest }: ISyncInstanceParams) =>
+  request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/${apiType}/job/instance`,
     query: rest
   })
 
-export const terminateSyncInstances = ({ regionId, spaceId, ids }: ISyncInstanceParams) => request({
+export const terminateSyncInstances = ({ regionId, spaceId, ids }: ISyncInstanceParams) =>
+  request({
     region: regionId,
     method: 'POST',
     uri: `/v1/workspace/${spaceId}/sync/job/instance/terminates`,
@@ -25,7 +27,8 @@ export const describeFlinkUiByInstanceId = ({
   regionId,
   spaceId,
   instanceId
-}: ISyncInstanceParams) => request({
+}: ISyncInstanceParams) =>
+  request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/sync/job/instance/${instanceId}/flink-ui`
   })

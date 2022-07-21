@@ -11,7 +11,7 @@ export const EnFiHeader = () => (
           tw`w-28 h-7 bg-no-repeat bg-contain bg-center ml-4`,
           css`
             background-image: url(${enFiLogo as any});
-          `,
+          `
         ]}
       >
         &nbsp;

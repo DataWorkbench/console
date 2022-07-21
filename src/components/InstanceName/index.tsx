@@ -25,11 +25,11 @@ const Circle = styled(Center)(
     theme: 'dark' | 'light'
     iconHasBorder: boolean
   }) => [
-      tw`box-content rounded-full w-6 h-6`,
-      theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
-      theme === 'light' && tw`bg-neut-2 border-white`,
-      iconHasBorder && tw`border`
-    ]
+    tw`box-content rounded-full w-6 h-6`,
+    theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
+    theme === 'light' && tw`bg-neut-2 border-white`,
+    iconHasBorder && tw`border`
+  ]
 )
 
 const getIconSize = ({ size }: { size: 'small' | 'medium' | 'large' }) =>

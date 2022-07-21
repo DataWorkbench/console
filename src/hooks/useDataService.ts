@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query'
 import { apiRequest } from 'utils/api'
 import { merge } from 'lodash-es'
 import { useCallback } from 'react'
-import { request, customRequest } from 'utils'
+import { request } from 'utils'
 import { PbmodelApiConfig, PbmodelApiGroup } from 'types/types'
 import { apiHooks, queryKeyObj } from './apiHooks'
 import {
@@ -651,33 +651,4 @@ export const useMutationListApiServices = () => {
     ret = await ListApiServices(params)
     return ret
   })
-}
-
-// 测试api服务
-export const testApiService = ({
-  clusterId,
-  groupId,
-  apiId,
-  headers,
-  cancel,
-  params,
-  queryData
-}: any) => {
-  let query: string = ''
-  if (queryData) {
-    query = '?'
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [key, value] of Object.entries(queryData)) {
-      query += `${key}=${value}&`
-    }
-  }
-
-  return customRequest(
-    {
-      url: `http://api-template-${clusterId}:8088/${groupId}/${apiId}/beta${query}`,
-      headers,
-      params
-    },
-    { cancel }
-  )
 }

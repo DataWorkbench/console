@@ -9,6 +9,7 @@ import { Center } from 'components/Center'
 import { Circle } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
 import LinkInstance from 'views/Space/Ops/components/LinkInstance'
+import Monitor from 'views/Space/Ops/components/Monitor'
 import Cluster from 'views/Space/Ops/components/Cluster'
 import Schedule from 'views/Space/Ops/components/Schedule'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
@@ -271,7 +272,7 @@ const StreamReleaseDetail = observer(({ id, version }: { id: string; version: st
           <LinkInstance jobId={id} version={version} type={JobMode.RT} />
         </TabPanel>
         <TabPanel label="监控告警" name="alarm">
-          {/* <Monitor /> */}
+          <Monitor />
         </TabPanel>
         <TabPanel label="开发内容" name="dev">
           <StreamDevContent data={code} language="sql" />
