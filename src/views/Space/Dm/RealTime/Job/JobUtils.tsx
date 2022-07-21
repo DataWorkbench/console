@@ -274,8 +274,7 @@ export const jobModeData = [
         icon: 'PythonFill',
         title: 'Python 模式',
         desc: '通过 Flink Python 语言进行数据作业开发',
-        value: JobType.PYTHON,
-        disabled: true
+        value: JobType.PYTHON
       }
       // {
       //   icon: 'scala',
