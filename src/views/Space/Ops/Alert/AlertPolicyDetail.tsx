@@ -412,7 +412,7 @@ const AlertPolicyDetail = observer(
                 items={[
                   {
                     icon: 'if-pen',
-                    text: '编辑 version 来源',
+                    text: '编辑',
                     key: 'edit'
                   },
                   {
