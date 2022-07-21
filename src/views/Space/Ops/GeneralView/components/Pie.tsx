@@ -31,10 +31,10 @@ export const Pie = ({ id, title, amount, pieData }: Props) => {
                     <span style="color:${param.color}">${param.value}</span>
                   </div>`
           return res
-        },
+        }
       },
       legend: {
-        show: false,
+        show: false
       },
       color: ['#14B8A6', '#b7c8d8', '#0284C7', '#CF3B37', '#A855F7'],
       series: [
@@ -44,19 +44,19 @@ export const Pie = ({ id, title, amount, pieData }: Props) => {
           avoidLabelOverlap: true,
           data: pieData,
           label: {
-            show: false,
+            show: false
           },
           hoverAnimation: false,
           itemStyle: {
-            opacity: 0.4,
+            opacity: 0.4
           },
           emphasis: {
             itemStyle: {
-              opacity: 1,
-            },
-          },
-        },
-      ],
+              opacity: 1
+            }
+          }
+        }
+      ]
     }
     myChart.setOption(option)
   })
@@ -70,9 +70,7 @@ export const Pie = ({ id, title, amount, pieData }: Props) => {
             id === 'cu' ? (cuName ? `${title}(${cuName})` : title) : title
           }
         </div>
-        <div tw="text-[20px] ml-[16px]">
-          {id === 'cu' ? cuValue || amount : amount}
-        </div>
+        <div tw="text-[20px] ml-[16px]">{id === 'cu' ? cuValue || amount : amount}</div>
       </div>
     </div>
   )

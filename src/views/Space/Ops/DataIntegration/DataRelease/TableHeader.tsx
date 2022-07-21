@@ -20,7 +20,7 @@ interface ITableHeaderProps {
 
 const TableHeader = observer((props: ITableHeaderProps) => {
   const {
-    columnsSetting: { storageKey, onSave, columns },
+    columnsSetting: { storageKey, onSave, columns }
   } = props
 
   const queryClient = useQueryClient()
@@ -52,11 +52,7 @@ const TableHeader = observer((props: ITableHeaderProps) => {
       >
         <Icon name="if-refresh" tw="text-xl text-white" type="light" />
       </Button>
-      <ColumnsSetting
-        defaultColumns={columns}
-        storageKey={storageKey}
-        onSave={onSave}
-      />
+      <ColumnsSetting defaultColumns={columns} storageKey={storageKey} onSave={onSave} />
     </FlexBox>
   )
 })

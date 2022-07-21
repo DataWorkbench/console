@@ -351,7 +351,7 @@ const MysqlBinlogSourceConfig = forwardRef(
             />
             {dbInfo?.startType === 1 && (
               <TextField
-                label={<AffixLabel required>指定时间戳</AffixLabel>}
+                label={<AffixLabel required={false}>指定时间戳</AffixLabel>}
                 name="startTime"
                 value={dbInfo?.startTime}
                 onChange={(e: string) => {
@@ -361,13 +361,13 @@ const MysqlBinlogSourceConfig = forwardRef(
                 }}
                 placeholder="时间戳（timestamp），采集起点从指定的时间戳处消费"
                 validateOnChange
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请输入时间戳',
-                    status: 'error'
-                  }
-                ]}
+                // schemas={[
+                //   {
+                //     rule: { required: true },
+                //     help: '请输入时间戳',
+                //     status: 'error'
+                //   }
+                // ]}
               />
             )}
             {dbInfo?.startType === 2 && (

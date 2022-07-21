@@ -1,8 +1,7 @@
 import { css } from 'twin.macro'
 import { Icon } from '@QCFE/lego-ui'
 
-export const Hexagon = () => {
-  return (
+export const Hexagon = () => (
     <div
       css={css`
         width: 90px;
@@ -40,7 +39,7 @@ export const Hexagon = () => {
           size={42}
           color={{
             primary: '#fff',
-            secondary: 'rgba(255, 255, 255, 0.4)',
+            secondary: 'rgba(255, 255, 255, 0.4)'
           }}
           css={css`
             position: absolute;
@@ -67,6 +66,5 @@ export const Hexagon = () => {
       />
     </div>
   )
-}
 
 export default Hexagon

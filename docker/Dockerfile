@@ -1,4 +1,4 @@
-FROM dataomnis/console-builder:v0.9.0 as builder
+FROM dataomnis/console-builder:v1.0.0 as builder
 
 WORKDIR /root
 

@@ -44,18 +44,12 @@ export class DataReleaseStore {
   // }
 }
 
-export const DataReleaseContext = createContext<DataReleaseStore>(
-  {} as DataReleaseStore
-)
+export const DataReleaseContext = createContext<DataReleaseStore>({} as DataReleaseStore)
 export const useDataReleaseStore = () => useContext(DataReleaseContext)
 
 export const DataReleaseStoreProvider: React.FC = ({ children }) => {
   const store = useRef(new DataReleaseStore())
-  return (
-    <DataReleaseContext.Provider value={store.current}>
-      {children}
-    </DataReleaseContext.Provider>
-  )
+  return <DataReleaseContext.Provider value={store.current}>{children}</DataReleaseContext.Provider>
 }
 
 export default DataReleaseStore

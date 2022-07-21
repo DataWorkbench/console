@@ -12,7 +12,7 @@ console npm编译的时候需要从公司内网下载依赖，但内网需要 bo
 构建命令：
 
 ```bash
-docker build -t dockerhub.dev.data.qingcloud.link/dataomnis/console-builder:v0.9.0 -f ./docker/Dockerfile.builder .
+docker build -t dockerhub.dev.data.qingcloud.link/dataomnis/console-builder:v1.0.0 -f ./docker/Dockerfile.builder .
 ```
 
 
@@ -21,5 +21,5 @@ docker build -t dockerhub.dev.data.qingcloud.link/dataomnis/console-builder:v0.9
 此镜像是基于上面的 builder 构建的，命令：
 
 ```bash
-docker build -t dockerhub.dev.data.qingcloud.link/dataomnis/console:v0.9.0 -f ./docker/Dockerfile .
+docker build -t dockerhub.dev.data.qingcloud.link/dataomnis/console:v1.0.0 -f ./docker/Dockerfile .
 ```

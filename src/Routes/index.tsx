@@ -1,4 +1,3 @@
-/* eslint-disable import/no-named-as-default */
 import { lazy, useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
@@ -17,14 +16,15 @@ import { get } from 'lodash-es'
 // import Manage from 'views/Space/Manage'
 // import DataService from 'views/Space/DataService'
 
-const DescribeDataOmnis = lazy(
-  () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
-)
-
-// activateDataOmnis
-const ActivateDataOmnis = lazy(
-  () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
-)
+// const DescribeDataOmnis = lazy(
+//   () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
+// )
+//
+// // activateDataOmnis
+// const ActivateDataOmnis = lazy(
+//   () =>
+//     import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
+// )
 
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))

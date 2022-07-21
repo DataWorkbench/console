@@ -4,19 +4,13 @@ import { css } from 'twin.macro'
 interface Props {
   dataStatus: { value: number; name: string; color: string }[]
 }
-export const StatusCard = ({ dataStatus }: Props) => {
-  return (
+export const StatusCard = ({ dataStatus }: Props) => (
     <FlexBox tw="justify-between pl-[49px] w-[50%]">
-      {dataStatus.map((item, index) => {
-        return (
+      {dataStatus.map((item, index) => (
           <FlexBox key={String(index + 1)} tw="relative">
             <FlexBox
               css={css`
-                background: linear-gradient(
-                  135deg,
-                  ${item.color} 0%,
-                  ${item.color}66 100%
-                );
+                background: linear-gradient(135deg, ${item.color} 0%, ${item.color}66 100%);
                 opacity: 0.1;
                 height: 80px;
                 width: 80px;
@@ -40,9 +34,7 @@ export const StatusCard = ({ dataStatus }: Props) => {
                   margin: 0 auto;
                 `}
               />
-              <div tw="text-[#939EA9] text-[12px] mt-[15px] mb-[6px]">
-                {item.name}
-              </div>
+              <div tw="text-[#939EA9] text-[12px] mt-[15px] mb-[6px]">{item.name}</div>
               <div
                 css={css`
                   color: ${item.color};
@@ -53,10 +45,8 @@ export const StatusCard = ({ dataStatus }: Props) => {
               </div>
             </FlexBox>
           </FlexBox>
-        )
-      })}
+        ))}
     </FlexBox>
   )
-}
 
 export default StatusCard

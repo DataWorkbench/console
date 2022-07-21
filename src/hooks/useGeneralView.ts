@@ -34,13 +34,13 @@ export const useQueryGeneraView = () => {
     'GENERA_VIEW',
     {
       regionId,
-      spaceId,
-    },
+      spaceId
+    }
   ]
   return useQuery(key, async () =>
     getGeneraView({
       regionId,
-      spaceId,
+      spaceId
     })
   )
 }

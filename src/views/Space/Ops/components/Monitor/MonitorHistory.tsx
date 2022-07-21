@@ -11,13 +11,13 @@ const defaultColumns: IColumn[] = [
   {
     title: '告警内容',
     key: 'id',
-    dataIndex: 'id',
+    dataIndex: 'id'
   },
   {
     title: '告警时间',
     key: 'time',
-    dataIndex: 'time',
-  },
+    dataIndex: 'time'
+  }
 ]
 
 const itemSettingKey = 'ITEM_MONITOR_HISTORY'
@@ -50,13 +50,11 @@ const MonitorHistory = () => {
             </div>
           </FlexBox>
         )
-      },
+      }
     },
     time: {
-      render: (text: number) => {
-        return dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
-      },
-    },
+      render: (text: number) => dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
+    }
   }
 
   const { columns } = useColumns(itemSettingKey, defaultColumns, renderColumns)
@@ -64,9 +62,9 @@ const MonitorHistory = () => {
     total: 9,
     infos: [
       {
-        id: '1',
-      },
-    ],
+        id: '1'
+      }
+    ]
   }
   const isFetching = false
   const refetch = () => {}
@@ -92,11 +90,7 @@ const MonitorHistory = () => {
             })
           }}
         />
-        <Button
-          type="black"
-          loading={!!isFetching}
-          tw="w-auto px-[5px] border-line-dark!"
-        >
+        <Button type="black" loading={!!isFetching} tw="w-auto px-[5px] border-line-dark!">
           <Icon
             name="if-refresh"
             tw="text-xl text-white"
@@ -119,7 +113,7 @@ const MonitorHistory = () => {
         rowKey="id"
         pagination={{
           total: data?.total || 0,
-          ...pagination,
+          ...pagination
         }}
       />
     </div>
