@@ -16,14 +16,14 @@ import { get } from 'lodash-es'
 // import Manage from 'views/Space/Manage'
 // import DataService from 'views/Space/DataService'
 
-const DescribeDataOmnis = lazy(
-  () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
-)
-
-// activateDataOmnis
-const ActivateDataOmnis = lazy(
-  () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
-)
+// const DescribeDataOmnis = lazy(
+//   () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
+// )
+//
+// // activateDataOmnis
+// const ActivateDataOmnis = lazy(
+//   () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
+// )
 
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
