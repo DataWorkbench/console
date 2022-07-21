@@ -4,24 +4,26 @@ import { AffixLabel, Modal, ModalContent, TextLink } from 'components'
 import { get, merge, pickBy } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import {
-  useMutationApiService,
-  useQueryListApiGroups,
-  getQueryKeyListApiGroups,
-  useStore
-} from 'hooks'
+import { useMutationApiService, useQueryListApiGroups, useStore, useFetchApi } from 'hooks'
 import { strlen } from 'utils'
 import { Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
 import { useParams } from 'react-router-dom'
 import { ApiProps } from 'stores/DtsDevStore'
-import { useQueryClient } from 'react-query'
 import ModelItem from './ModeItem'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 import type { CurrentGroupApiProps } from '../ApiPanel/ApiTree'
+import { getNewTreeData } from '../ApiPanel/ApiUtils'
 
 const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
 
+const styles = {
+  timeout: css`
+    .control > input {
+      ${tw`w-[50px]!`}
+    }
+  `
+}
 const FormWrapper = styled('div')(() => [
   css`
     ${tw`w-full`}
@@ -94,10 +96,20 @@ const modelSource = [
 const ApiModal = observer((props: JobModalProps) => {
   const { isEdit = false, onClose, currentApi, currentGroup } = props
   const { spaceId } = useParams<{ spaceId: string }>()
-  const queryClient = useQueryClient()
   const {
-    dtsDevStore: { resetTreeData }
+    dtsDevStore: { setTreeData, treeData }
   } = useStore()
+  const fetchApi = useFetchApi()
+
+  const refetchApiGroup = (groupId: string) => {
+    fetchApi({
+      groupId
+    }).then((data) => {
+      const apis = get(data, 'infos', []) || []
+      const newTreeData = getNewTreeData(treeData, { key: groupId }, apis, null)
+      setTreeData(newTreeData)
+    })
+  }
 
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
@@ -111,7 +123,7 @@ const ApiModal = observer((props: JobModalProps) => {
     request_method: RequestMethods.GET,
     response_type: ResponseMethods.JSON,
     api_description: '',
-    timeout: ''
+    timeout: '0'
   }))
 
   const mutation = useMutationApiService()
@@ -120,12 +132,13 @@ const ApiModal = observer((props: JobModalProps) => {
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
+      const groupId = apiGroupList.find((item) => item.name === params.group_name)?.id || ''
       const paramsData = merge(
         {
           option: isEdit ? 'updateApi' : ('createApi' as const),
           ...pickBy(params, (v, k) => !['group_path', 'group_name'].includes(k)),
           api_path: params.api_path,
-          group_id: apiGroupList.find((item) => item.name === params.group_name)?.id,
+          group_id: groupId,
           space_id: spaceId
         },
         isEdit && { apiId: currentApi?.api_id }
@@ -133,8 +146,7 @@ const ApiModal = observer((props: JobModalProps) => {
 
       mutation.mutate(paramsData, {
         onSuccess: () => {
-          queryClient.invalidateQueries(getQueryKeyListApiGroups())
-          resetTreeData()
+          refetchApiGroup(groupId)
           onClose?.()
         }
       })
@@ -307,7 +319,7 @@ const ApiModal = observer((props: JobModalProps) => {
                 <Input
                   name="api_path"
                   value={get(params, 'api_path', '')}
-                  onChange={(_, v: string | number) =>
+                  onChange={(_: any, v: string | number) =>
                     setParams((draft) => {
                       draft.api_path = String(v)
                     })
@@ -354,38 +366,30 @@ const ApiModal = observer((props: JobModalProps) => {
                 </Checkbox> */}
               </Control>
             </Field>
-
-            <Field>
-              <Label tw="items-start!">
-                <AffixLabel required>超时时间</AffixLabel>
-              </Label>
-              <Control tw="items-center">
-                <Input
-                  name="timeout"
-                  tw="w-[60px]! block! items-center! space-x-1 mr-2"
-                  value={get(params, 'timeout', '')}
-                  onChange={(_, v: any) =>
-                    setParams((draft) => {
-                      draft.timeout = (Number(v) || 0) as unknown as string
-                    })
-                  }
-                  validateOnBlur
-                  maxLength={3}
-                  schemas={[
-                    {
-                      rule: (value: string) => {
-                        const l = Number(value)
-                        return l >= 0 && l <= 300
-                      },
-                      help: '请输入范围0-300',
-                      status: 'error'
-                    }
-                  ]}
-                />
-                <div tw="ml-1">S</div>
-              </Control>
-              <div className="help">0-300</div>
-            </Field>
+            <TextField
+              name="api_name"
+              label={<AffixLabel>超时时间</AffixLabel>}
+              help="请输入范围0-300"
+              css={styles.timeout}
+              value={params.timeout}
+              onChange={(_: any, v: any) =>
+                setParams((draft) => {
+                  draft.timeout = (Number(v) || 0) as unknown as string
+                })
+              }
+              validateOnBlur
+              maxLength={3}
+              schemas={[
+                {
+                  rule: (value: string) => {
+                    const l = Number(value)
+                    return l >= 1 && l <= 300
+                  },
+                  help: '请输入范围1-300',
+                  status: 'error'
+                }
+              ]}
+            />
             <Field>
               <Label>
                 <AffixLabel>跨域功能</AffixLabel>

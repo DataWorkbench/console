@@ -34,7 +34,7 @@ async function fetchData(url = '', data = {}) {
   return response.json() // parses JSON response into native JavaScript objects
 }
 
-const regExp = /(service|gateway)/g
+const regExp = /(service|alert)/g
 const isMock = false // TODO: 是否使用mock
 export const apiRequest =
   <T extends keyof typeof apiList>(manage: T, item: keyof typeof apiList[T]) =>
