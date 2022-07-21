@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from 'react'
+import { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 import { get, omit, set } from 'lodash-es'
 import { LocaleProvider } from '@QCFE/lego-ui'
 import { Loading, PortalProvider } from '@QCFE/qingcloud-portal-ui'
@@ -6,6 +6,7 @@ import { describeDataomnis } from 'stores/api'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { useCookie } from 'react-use'
 import Login from 'views/Space/Ops/Login'
+import emitter from 'utils/emitter'
 import locales from '../../locales'
 import { useValidateSession } from '../../hooks/useGlobalAPI'
 
@@ -16,12 +17,11 @@ const langMapping: { [key: string]: string | undefined } = {
 
 const Auth = ({ children }: { children: ReactElement }) => {
   const isLogin = useRef(window.location.pathname === '/dataomnis/login')
-  const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
+  const isPrivate = useMemo(() => get(window, 'CONFIG_ENV.IS_PRIVATE', false), [])
   const [loading, setLoading] = useState(!isLogin.current)
   const [hasLogin, setHasLogin] = useState(false)
 
-  console.log(hasLogin, loading, !isLogin.current)
-  const [sk] = useCookie('sk')
+  const [sk, setSk] = useCookie('sk')
 
   const handleLogin = (userInfo: Record<string, any>) => {
     set(window, 'USER', userInfo)
@@ -66,19 +66,22 @@ const Auth = ({ children }: { children: ReactElement }) => {
         localStorage.removeItem('DATA_OMNIS_OPENED')
       }
     }
+    setHasLogin(true)
     setLoading(false)
   }
 
-  const renderLogin = () => (
-    <Router basename="/dataomnis">
-      <Switch>
-        <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
-        <Route path="/" component={() => (hasLogin ? children : <Redirect to="/login" />)} />
-      </Switch>
-    </Router>
-  )
+  useEffect(() => {
+    emitter.on('logout', () => {
+      if (isPrivate) {
+        setSk('')
+        setHasLogin(false)
+      } else {
+        window.location.href = `/login?redirect_uri=${window.location.pathname}`
+      }
+    })
+  }, [isPrivate, setSk])
 
-  const renderChildren = (check: boolean) => {
+  const renderChildren = () => {
     if (loading) {
       return (
         <div tw="flex justify-center h-screen items-center">
@@ -86,14 +89,17 @@ const Auth = ({ children }: { children: ReactElement }) => {
         </div>
       )
     }
-    if (check && !hasLogin) {
-      return renderLogin()
-    }
-    return children
-  }
-
-  if (isLogin.current) {
-    return renderLogin()
+    return (
+      <Router basename="/dataomnis">
+        {!hasLogin && (
+          <Switch>
+            <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
+            <Route path="/" component={() => <Redirect to="/login" />} />
+          </Switch>
+        )}
+        {hasLogin && children}
+      </Router>
+    )
   }
 
   if (!isPrivate) {
@@ -105,14 +111,14 @@ const Auth = ({ children }: { children: ReactElement }) => {
         currentLocale={langMapping[window.USER?.lang] || 'zh-CN'}
         handleGlobalData={handleGlobalData}
       >
-        {renderChildren(false)}
+        {renderChildren()}
       </PortalProvider>
     )
   }
 
   return (
     <LocaleProvider locales={locales} currentLocale="zh-CN" ignoreWarnings>
-      {renderChildren(true)}
+      {renderChildren()}
     </LocaleProvider>
   )
 }

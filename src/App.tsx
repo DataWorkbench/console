@@ -1,5 +1,4 @@
 import { Suspense, useEffect } from 'react'
-import { BrowserRouter as Router } from 'react-router-dom'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { DndProvider } from 'react-dnd'
 import { ReactQueryDevtools } from 'react-query/devtools'
@@ -62,17 +61,15 @@ const App = () => {
             <Loading size="large" />
           </div>
         ) : (
-          <Router basename="/dataomnis">
-            <Suspense
-              fallback={
-                <div tw="flex justify-center h-screen items-center">
-                  <Loading />
-                </div>
-              }
-            >
-              <Routes />
-            </Suspense>
-          </Router>
+          <Suspense
+            fallback={
+              <div tw="flex justify-center h-screen items-center">
+                <Loading />
+              </div>
+            }
+          >
+            <Routes />
+          </Suspense>
         )}
       </StoreContext.Provider>
     </DndProvider>

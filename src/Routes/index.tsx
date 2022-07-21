@@ -2,6 +2,7 @@ import { lazy, useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'
 import { useDarkMode } from 'hooks'
+import { get } from 'lodash-es'
 
 // import DescribeDataOmnis from 'views/DataOmnis/DescribeDataOmnis'
 // import ActivateDataOmnis from 'views/DataOmnis/ActivateDataOmnis'
@@ -59,21 +60,21 @@ const Routes = () => {
     globalStore.set({ darkMode: matched })
   }, [matched, setDarkMode, globalStore])
 
-  // const isActivated = localStorage.getItem('DATA_OMNIS_OPENED')
-
-  // if (!isActivated) {
-  //   return (
-  //     <Route>
-  //       <Layout>
-  //         <Switch>
-  //           <Route path="/describe" component={DescribeDataOmnis} />
-  //           <Route path="/activate" component={ActivateDataOmnis} />
-  //           <Route path="/" component={() => <Redirect to="/describe" />} />
-  //         </Switch>
-  //       </Layout>
-  //     </Route>
-  //   )
-  // }
+  const isActivated = localStorage.getItem('DATA_OMNIS_OPENED')
+  const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
+  if (!isPrivate && !isActivated) {
+    return (
+      <Route>
+        <Layout>
+          <Switch>
+            <Route path="/describe" component={DescribeDataOmnis} />
+            <Route path="/activate" component={ActivateDataOmnis} />
+            <Route path="/" component={() => <Redirect to="/describe" />} />
+          </Switch>
+        </Layout>
+      </Route>
+    )
+  }
 
   return (
     <Switch>
