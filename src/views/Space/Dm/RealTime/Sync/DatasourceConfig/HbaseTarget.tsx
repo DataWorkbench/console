@@ -129,10 +129,10 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                * empty：写入HConstants.EMPTY_BYTE_ARRAY
                */
               [
-                { label: 'skip: 不向hbase写这列', value: 'skip' },
+                { label: 'skip: 不向hbase写这列', value: 1 },
                 {
                   label: 'empty: 写入HConstants.EMPTY_BYTE_ARRAY，即new byte [0]',
-                  value: 'empty'
+                  value: 2
                 }
               ]
             }

@@ -185,8 +185,8 @@ const BaseTargetConfig = forwardRef(
           write_mode: target.data.writeMode,
           semantic: target.data.semantic,
           batch_size: target.data.batchSize,
-          pre_sql: target.data.preSql?.filter((v) => v !== ''),
-          post_sql: target.data.postSql?.filter((v) => v !== '')
+          pre_sql: target.data.preSql,
+          post_sql: target.data.postSql
         }
       },
       refetchColumn: () => {

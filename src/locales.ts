@@ -9,4 +9,9 @@ const legoLocales = {
   'zh-cn': LegoUILocales['zh-CN']
 }
 
-export default merge(legoLocales, PortalUILocales, {})
+const portalUILocales = {
+  'en-US': PortalUILocales.en,
+  'zh-CN': PortalUILocales['zh-cn']
+}
+
+export default merge(legoLocales, PortalUILocales, LegoUILocales, portalUILocales, {})

@@ -66,6 +66,7 @@ const Auth = ({ children }: { children: ReactElement }) => {
         localStorage.removeItem('DATA_OMNIS_OPENED')
       }
     }
+    setHasLogin(true)
     setLoading(false)
   }
 
@@ -80,16 +81,7 @@ const Auth = ({ children }: { children: ReactElement }) => {
     })
   }, [isPrivate, setSk])
 
-  const renderLogin = () => (
-    <Router basename="/dataomnis">
-      <Switch>
-        <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
-        <Route path="/" component={() => (hasLogin ? children : <Redirect to="/login" />)} />
-      </Switch>
-    </Router>
-  )
-
-  const renderChildren = (check: boolean) => {
+  const renderChildren = () => {
     if (loading) {
       return (
         <div tw="flex justify-center h-screen items-center">
@@ -97,14 +89,17 @@ const Auth = ({ children }: { children: ReactElement }) => {
         </div>
       )
     }
-    if (check && !hasLogin) {
-      return renderLogin()
-    }
-    return children
-  }
-
-  if (isLogin.current) {
-    return renderLogin()
+    return (
+      <Router basename="/dataomnis">
+        {!hasLogin && (
+          <Switch>
+            <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
+            <Route path="/" component={() => <Redirect to="/login" />} />
+          </Switch>
+        )}
+        {hasLogin && children}
+      </Router>
+    )
   }
 
   if (!isPrivate) {
@@ -116,14 +111,14 @@ const Auth = ({ children }: { children: ReactElement }) => {
         currentLocale={langMapping[window.USER?.lang] || 'zh-CN'}
         handleGlobalData={handleGlobalData}
       >
-        {renderChildren(false)}
+        {renderChildren()}
       </PortalProvider>
     )
   }
 
   return (
     <LocaleProvider locales={locales} currentLocale="zh-CN" ignoreWarnings>
-      {renderChildren(true)}
+      {renderChildren()}
     </LocaleProvider>
   )
 }

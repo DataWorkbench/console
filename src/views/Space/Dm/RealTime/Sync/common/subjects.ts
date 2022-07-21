@@ -137,8 +137,8 @@ target$
           writeMode: get(dbTarget, 'write_mode', ''),
           semantic: get(dbTarget, 'semantic', ''),
           batchSize: get(dbTarget, 'batch_size', ''),
-          postSql: get(dbTarget, 'post_sql', []),
-          preSql: get(dbTarget, 'pre_sql', [])
+          postSql: get(dbTarget, 'post_sql', ['']),
+          preSql: get(dbTarget, 'pre_sql', [''])
         }
       }
     })
