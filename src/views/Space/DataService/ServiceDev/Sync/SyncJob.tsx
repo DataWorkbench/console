@@ -171,14 +171,12 @@ const SyncJob = observer(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [curApi, dtsDevStore, fetchApi, verId, isHistory])
 
-  const orderRef =
-    useRef<{
-      getDataSource: () => IOrderDataSource[]
-    }>(null)
-  const dataSourceRef =
-    useRef<{
-      getDataSource: () => ISourceData
-    }>(null)
+  const orderRef = useRef<{
+    getDataSource: () => IOrderDataSource[]
+  }>(null)
+  const dataSourceRef = useRef<{
+    getDataSource: () => ISourceData
+  }>(null)
 
   const showConfWarn = (content: string) => {
     Notify.warning({
