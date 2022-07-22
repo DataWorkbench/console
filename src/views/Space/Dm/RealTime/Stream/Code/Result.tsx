@@ -163,7 +163,7 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
           />
         )}
         {type === 4 && (
-          <code tw="flex-1 overflow-auto break-words whitespace-pre-line bg-transparent text-white">
+          <code tw="flex-1 overflow-auto break-words whitespace-pre-wrap bg-transparent text-white">
             {errorMsg}
           </code>
         )}

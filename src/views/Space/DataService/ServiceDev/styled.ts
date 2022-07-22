@@ -237,7 +237,7 @@ export const TitleItem = styled('div')(() => [
 
 export const TestContent = styled('div')(() => [
   css`
-    ${tw`h-[370px] w-full my-5 p-2 bg-neut-19 text-neut-7 rounded overflow-y-auto`}
+    ${tw`h-[370px] w-full whitespace-pre-wrap my-5 p-2 bg-neut-19 text-neut-7 rounded overflow-y-auto`}
   `
 ])
 
@@ -250,4 +250,8 @@ export const MessageBox = styled('div')(({ color = 'green' }: { color?: 'red' | 
       ${tw`mr-1`}
     }
   `
+])
+
+export const PathInput = styled('div')(() => [
+  tw`block! items-center! space-x-1 bg-[rgba(76, 94, 112)] h-8 px-3 py-2 box-border`
 ])
