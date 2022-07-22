@@ -20,34 +20,32 @@ export interface IInstanceNameProps {
 const Circle = styled(Center)(
   ({
     theme = 'dark',
-    iconHasBorder = true,
+    iconHasBorder = true
   }: {
     theme: 'dark' | 'light'
     iconHasBorder: boolean
-  }) => {
-    return [
-      tw`box-content rounded-full w-6 h-6`,
-      theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
-      theme === 'light' && tw`bg-neut-2 border-white`,
-      iconHasBorder && tw`border`,
-    ]
-  }
+  }) => [
+    tw`box-content rounded-full w-6 h-6`,
+    theme === 'dark' && tw`bg-neut-13  border-neut-16 `,
+    theme === 'light' && tw`bg-neut-2 border-white`,
+    iconHasBorder && tw`border`
+  ]
 )
 
 const getIconSize = ({ size }: { size: 'small' | 'medium' | 'large' }) =>
   ({
     small: {
       container: tw`w-4 h-4`,
-      icon: 12,
+      icon: 12
     },
     medium: {
       container: tw`w-6 h-6`,
-      icon: 16,
+      icon: 16
     },
     large: {
       container: tw`w-10 h-10`,
-      icon: 22,
-    },
+      icon: 22
+    }
   }[size])
 
 export const InstanceName: FC<IInstanceNameProps> = (props) => {
@@ -60,7 +58,7 @@ export const InstanceName: FC<IInstanceNameProps> = (props) => {
     iconClassName,
     onClick,
     iconSize = 'medium',
-    iconHasBorder = true,
+    iconHasBorder = true
   } = props
   return (
     <FlexBox

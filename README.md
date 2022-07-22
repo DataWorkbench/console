@@ -98,3 +98,11 @@ git checkout -b feat/dataomnis
 cd src
 python manage.py runserver 8888
 ```
+
+docker build
+```
+docker build -t dockerhub.dev.data.qingcloud.link/dataomnis/console:v1.0.0 -f ./docker/Dockerfile.no-builder .
+
+docker push dockerhub.dev.data.qingcloud.link/dataomnis/console:v1.0.0
+```
+

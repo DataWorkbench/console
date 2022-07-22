@@ -5,6 +5,7 @@ import tw, { styled, css } from 'twin.macro'
 
 import { Center, Tooltip, HelpCenterLink, FlexBox } from 'components'
 import { useHistory, useParams } from 'react-router-dom'
+import { emitter } from 'utils/index'
 
 const menuList = [
   {
@@ -115,6 +116,9 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
       case 'security':
         window.location.href = '/account/security/center/'
         break
+      case 'logout':
+        emitter.emit('logout')
+        break
       default:
         break
     }
@@ -130,6 +134,9 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
         break
       case 'account':
         history.push(`/${regionId}/workspace/${spaceId}/settings/account`)
+        break
+      case 'logout':
+        emitter.emit('logout')
         break
       default:
         break

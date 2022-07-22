@@ -14,7 +14,7 @@ const SpaceListModal = observer(() => {
   const { curRegionId, curSpaceId } = state
   const {
     overViewStore,
-    overViewStore: { showSpaceModal, curItemName },
+    overViewStore: { showSpaceModal, curItemName }
   } = useStore()
 
   const handleHide = () => {
@@ -45,10 +45,7 @@ const SpaceListModal = observer(() => {
         <FlexBox tw="w-full justify-between">
           <div tw="text-neut-15 mr-4">
             若无合适的工作空间，您也可以
-            <span
-              tw="text-link ml-1 cursor-pointer"
-              onClick={() => setShowCreate(true)}
-            >
+            <span tw="text-link ml-1 cursor-pointer" onClick={() => setShowCreate(true)}>
               创建新工作空间
             </span>
           </div>

@@ -44,7 +44,7 @@ const CollapseWrapper = styled(Collapse)(() => [
         ${tw`relative top-0 right-0`}
       }
     }
-  `,
+  `
 ])
 
 const SpaceEditModal = observer((props: ISpaceEditProps) => {
@@ -60,7 +60,7 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
         const params1 = {
           regionId,
           op: curSpaceOpt,
-          ...fields,
+          ...fields
         }
         if (curSpaceOpt === 'update') {
           params1.spaceId = curSpace?.id
@@ -91,21 +91,13 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
               key="p0"
               label={
                 <Center tw="gap-2">
-                  <Icon
-                    name="file"
-                    size={20}
-                    type={isDarkTheme() ? 'light' : 'dark'}
-                  />
+                  <Icon name="file" size={20} type={isDarkTheme() ? 'light' : 'dark'} />
                   <span>基本信息</span>
                 </Center>
               }
             >
               {curSpaceOpt === 'create' && (
-                <RadioGroupField
-                  name="regionId"
-                  label="区域"
-                  defaultValue={regionId}
-                >
+                <RadioGroupField name="regionId" label="区域" defaultValue={regionId}>
                   <RadioButton value={regionId}>
                     <Icon name="zone" />
                     {region.name}
@@ -123,10 +115,10 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                   {
                     rule: {
                       required: true,
-                      matchRegex: nameMatchRegex,
+                      matchRegex: nameMatchRegex
                     },
                     help: '字母、数字或下划线（_）,不能以（_）开始结尾',
-                    status: 'error',
+                    status: 'error'
                   },
                   {
                     rule: (value: string) => {
@@ -134,8 +126,8 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                       return l >= 2 && l <= 128
                     },
                     help: '最小长度2,最大长度128',
-                    status: 'error',
-                  },
+                    status: 'error'
+                  }
                 ]}
                 defaultValue={curSpaceOpt === 'create' ? '' : curSpace?.name}
               />
@@ -149,36 +141,29 @@ const SpaceEditModal = observer((props: ISpaceEditProps) => {
                   {
                     rule: (value: string) => strlen(value) <= 1024,
                     help: '超过最大长度1024字节',
-                    status: 'error',
-                  },
+                    status: 'error'
+                  }
                 ]}
-                defaultValue={
-                  curSpaceOpt === 'create' ? '' : curSpace?.desc || '暂无描述'
-                }
+                defaultValue={curSpaceOpt === 'create' ? '' : curSpace?.desc || '暂无描述'}
               />
             </CollapseItem>
-            {stateStore.platformConfig?.enable_network &&
-              curSpaceOpt === 'create' && (
-                <CollapseItem
-                  key="p1"
-                  label={
-                    <Center tw="gap-2">
-                      <Icon
-                        name="earth"
-                        size={20}
-                        type={isDarkTheme() ? 'light' : 'dark'}
-                      />
-                      <span>网络信息</span>
-                    </Center>
-                  }
-                >
-                  <NetworkFormItem
-                    spaceId={curSpace?.id}
-                    regionId={regionId}
-                    regionName={region?.name}
-                  />
-                </CollapseItem>
-              )}
+            {stateStore.platformConfig?.enable_network && curSpaceOpt === 'create' && (
+              <CollapseItem
+                key="p1"
+                label={
+                  <Center tw="gap-2">
+                    <Icon name="earth" size={20} type={isDarkTheme() ? 'light' : 'dark'} />
+                    <span>网络信息</span>
+                  </Center>
+                }
+              >
+                <NetworkFormItem
+                  spaceId={curSpace?.id}
+                  regionId={regionId}
+                  regionName={region?.name}
+                />
+              </CollapseItem>
+            )}
           </CollapseWrapper>
         </Form>
       </Root>

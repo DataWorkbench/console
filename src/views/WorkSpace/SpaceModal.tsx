@@ -7,11 +7,7 @@ import { Modal, RouterLink } from 'components'
 import { useQueryClient } from 'react-query'
 import { useWorkSpaceContext } from 'contexts'
 import { formatDate } from 'utils/convert'
-import {
-  getWorkSpaceKey,
-  MutationWorkSpaceParams,
-  useMutationWorkSpace,
-} from 'hooks'
+import { getWorkSpaceKey, MutationWorkSpaceParams, useMutationWorkSpace } from 'hooks'
 import SpaceEditModal from 'views/WorkSpace/SapceEditModal'
 import NetworkModal from 'views/Space/Manage/Network/NetworkModal'
 
@@ -30,7 +26,7 @@ const columns = [
           <div tw="text-neut-8">{field}</div>
         </div>
       </div>
-    ),
+    )
   },
   {
     title: '空间状态',
@@ -39,35 +35,30 @@ const columns = [
     render: (field: number) => (
       <div
         css={[
-          field === 1
-            ? tw`bg-green-0 text-green-13`
-            : tw`bg-[#FFFDED] text-[#A16207]`,
-          tw`px-2 py-0.5 rounded-[20px] flex items-center`,
+          field === 1 ? tw`bg-green-0 text-green-13` : tw`bg-[#FFFDED] text-[#A16207]`,
+          tw`px-2 py-0.5 rounded-[20px] flex items-center`
         ]}
       >
         <div
           css={[
             field === 1 ? tw`bg-green-1` : tw`bg-[#FFD127]`,
-            tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`,
+            tw`w-3 h-3 rounded-full flex items-center justify-center mr-1`
           ]}
         >
           <div
-            css={[
-              field === 1 ? tw`bg-green-13` : tw`bg-[#A48A19]`,
-              tw`w-1.5 h-1.5 rounded-full`,
-            ]}
+            css={[field === 1 ? tw`bg-green-13` : tw`bg-[#A48A19]`, tw`w-1.5 h-1.5 rounded-full`]}
           />
         </div>
         {field === 1 ? '活跃' : '已禁用'}
       </div>
-    ),
+    )
   },
   { title: '空间所有者', dataIndex: 'owner' },
   {
     title: '创建时间',
     dataIndex: 'created',
-    render: (field: number) => formatDate(field),
-  },
+    render: (field: number) => formatDate(field)
+  }
 ]
 
 interface SpaceModalProps {
@@ -93,9 +84,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
     }
     return true
   })
-  const filterOptSpaceIds = filterOptSpaces.map(
-    (o: Record<string, any>) => o.id
-  )
+  const filterOptSpaceIds = filterOptSpaces.map((o: Record<string, any>) => o.id)
 
   useEffect(() => {
     setDelBtnEnable(stateStore.curSpaceOpt !== 'delete')
@@ -120,7 +109,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
             const queryKey = getWorkSpaceKey(cardView ? 'infinite' : 'page')
             await queryClient.invalidateQueries(queryKey)
             stateStore.set({ optSpaces: [] })
-          },
+          }
         }
       )
     }
@@ -131,7 +120,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
       const params = {
         regionId,
         op: curSpaceOpt,
-        spaceIds: filterOptSpaceIds,
+        spaceIds: filterOptSpaceIds
       }
       handleOk(params)
     } else {
@@ -144,7 +133,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
     const operateObj: any = {
       enable: {
         opName: '启动',
-        desc: '是否确认启用工作空间？',
+        desc: '是否确认启用工作空间？'
       },
       disable: {
         opName: '禁用',
@@ -165,12 +154,12 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
             </div>
             <div>是否确认禁用工作空间？</div>
           </>
-        ),
+        )
       },
       delete: {
         opName: '删除',
-        desc: '该工作空间删除后无法恢复，请谨慎操作。',
-      },
+        desc: '该工作空间删除后无法恢复，请谨慎操作。'
+      }
     }
     const { opName, desc } = operateObj[curSpaceOpt]
     return (
@@ -181,9 +170,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
         onCancel={handleModalClose}
         footer={
           <>
-            <Button onClick={handleModalClose}>
-              {window.getText('LEGO_UI_CANCEL')}
-            </Button>
+            <Button onClick={handleModalClose}>{window.getText('LEGO_UI_CANCEL')}</Button>
             <Button
               type={curSpaceOpt === 'enable' ? 'primary' : 'danger'}
               disabled={!delBtnEnable}
@@ -207,7 +194,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
                       ${tw`text-white fill-[#2193D3]`}
                     }
                   `
-                : tw`text-red-10`,
+                : tw`text-red-10`
             ]}
           />
           <div tw="flex-1 overflow-hidden">
@@ -220,11 +207,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
               <div tw="mb-2">{desc}</div>
               {filterOptSpaces.length > 1 && (
                 <div tw="space-y-3">
-                  <Table
-                    dataSource={filterOptSpaces}
-                    columns={columns}
-                    rowKey="id"
-                  />
+                  <Table dataSource={filterOptSpaces} columns={columns} rowKey="id" />
                 </div>
               )}
               {curSpaceOpt === 'delete' && (
@@ -240,9 +223,7 @@ const SpaceModal = observer(({ region, onHide }: SpaceModalProps) => {
                       type="text"
                       tw="w-40"
                       placeholder={filterOptSpaces[0].name}
-                      onChange={(e, value) =>
-                        setDelBtnEnable(value === filterOptSpaces[0].name)
-                      }
+                      onChange={(e, value) => setDelBtnEnable(value === filterOptSpaces[0].name)}
                     />
                   </div>
                 </div>

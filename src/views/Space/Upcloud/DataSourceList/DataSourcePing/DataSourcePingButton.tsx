@@ -6,11 +6,7 @@ import { merge, now, pick } from 'lodash-es'
 import emitter from 'utils/emitter'
 import { useMutationSource, useStore } from 'hooks'
 import { AffixLabel, HelpCenterLink, TextLink } from 'components'
-import {
-  DATASOURCE_PING_STAGE,
-  SOURCE_PING_RESULT,
-  SOURCE_PING_START,
-} from '../constant'
+import { DATASOURCE_PING_STAGE, SOURCE_PING_RESULT, SOURCE_PING_START } from '../constant'
 
 interface IDataSourcePingButtonProps {
   getValue: () => Record<string, any> | undefined
@@ -26,7 +22,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
   const { getValue, defaultStatus, sourceId, hasPing = false } = props
   const mutation = useMutationSource()
   const {
-    dataSourceStore: { setShowPingHistories },
+    dataSourceStore: { setShowPingHistories }
   } = useStore()
 
   const onOpen = useCallback(() => {
@@ -52,10 +48,8 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
         uuid: Math.random().toString(32).substring(2),
         created: now() / 1000,
         sourceId,
-        stage: sourceId
-          ? DATASOURCE_PING_STAGE.UPDATE
-          : DATASOURCE_PING_STAGE.CREATE,
-        result: -1, // 测试中
+        stage: sourceId ? DATASOURCE_PING_STAGE.UPDATE : DATASOURCE_PING_STAGE.CREATE,
+        result: -1 // 测试中
       }
       try {
         emitter.emit(SOURCE_PING_START, item)
@@ -63,9 +57,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           op: 'ping',
           ...pick(formData, 'type', 'url'),
           source_id: sourceId,
-          stage: sourceId
-            ? DATASOURCE_PING_STAGE.UPDATE
-            : DATASOURCE_PING_STAGE.CREATE,
+          stage: sourceId ? DATASOURCE_PING_STAGE.UPDATE : DATASOURCE_PING_STAGE.CREATE
         })
         if (ret.ret_code === 0) {
           pingStatus = ret.result === 1
@@ -73,33 +65,31 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           emitter.emit(
             SOURCE_PING_RESULT,
             merge(item, pick(ret, ['created', 'elapse', 'message', 'result']), {
-              last_connection: ret,
+              last_connection: ret
             })
           )
         }
       } catch (e: any) {
         pingStatus = false
         msg = e.message
-        emitter.emit(
-          SOURCE_PING_RESULT,
-          merge(item, { message: msg, result: pingStatus ? 1 : 2 })
-        )
+        emitter.emit(SOURCE_PING_RESULT, merge(item, { message: msg, result: pingStatus ? 1 : 2 }))
       }
       setHasPingStatus(true)
       setStatus({
         status: pingStatus,
-        message: msg,
+        message: msg
       })
     }
   }, [getValue, mutation, sourceId])
 
-  const pingHistory = useMemo(() => {
-    return (
+  const pingHistory = useMemo(
+    () => (
       <TextLink color="green" hasIcon={false} onClick={onOpen} tw="ml-1">
         测试记录
       </TextLink>
-    )
-  }, [onOpen])
+    ),
+    [onOpen]
+  )
 
   const actionButton = useMemo(() => {
     const tempButton = (
@@ -166,12 +156,7 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
               不可用，{status.message ? `${status.message}，` : ''}
               如需查看更多可点击
             </span>
-            <HelpCenterLink
-              tw="mr-1"
-              hasIcon
-              href="/manual/connect/"
-              isIframe={false}
-            >
+            <HelpCenterLink tw="mr-1" hasIcon href="/manual/connect/" isIframe={false}>
               网络连通方案
             </HelpCenterLink>
             {pingHistory}
@@ -189,17 +174,13 @@ export const DataSourcePingButton = (props: IDataSourcePingButtonProps) => {
           `}
         >
           <Icon name="success" size={16} />
-          <span tw="ml-1 text-neut-15 dark:text-neut-8">
-            测试通过，如需查看更多可点击
-          </span>
+          <span tw="ml-1 text-neut-15 dark:text-neut-8">测试通过，如需查看更多可点击</span>
           {pingHistory}
         </div>
       )}
       {!mutation.isLoading && !status && hasPingStatus && (
         <div className="help">
-          <span tw="ml-1 text-neut-15 dark:text-neut-8">
-            已有测试记录，如需查看可点击
-          </span>
+          <span tw="ml-1 text-neut-15 dark:text-neut-8">已有测试记录，如需查看可点击</span>
           {pingHistory}
         </div>
       )}
