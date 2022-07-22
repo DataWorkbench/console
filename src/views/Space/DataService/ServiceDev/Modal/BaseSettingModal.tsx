@@ -1,15 +1,16 @@
 import { useEffect, useRef } from 'react'
 import { useImmer } from 'use-immer'
-import { AffixLabel, DarkModal, ModalContent } from 'components'
+import { AffixLabel, DarkModal, ModalContent, InputField } from 'components'
 import { cloneDeep, get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useStore, useMutationUpdateApiConfig } from 'hooks'
 import { strlen, formatDate } from 'utils'
-import { Control, Field, Form, Label, Radio, Input, Button, Toggle } from '@QCFE/lego-ui'
+import { Control, Field, Form, Label, Radio, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
 import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
+import ApiPathField from '../components/ApiPathField'
 
 const { TextField, RadioGroupField, TextAreaField } = Form
 
@@ -33,6 +34,14 @@ const FormWrapper = styled('div')(() => [
         }
         > .help {
           ${tw`w-full  ml-28`}
+        }
+      }
+      .inputField {
+        .control {
+          ${tw`dark:bg-neut-16! border-0 p-0!`}
+          input {
+            ${tw`w-[60px] border! border-solid hover:border-neut-5 border-neut-13 focus:border-green-13 px-3 py-2`}
+          }
         }
       }
     }
@@ -230,48 +239,33 @@ const BaseSettingModal = observer(() => {
                 </>
               }
             />
-            <Field>
-              <Label tw="items-start!">
-                <AffixLabel required>API路径</AffixLabel>
-              </Label>
-              <Control tw="items-center">
-                <Input
-                  name="group_path"
-                  value={get(params, 'group_path', '')}
-                  disabled
-                  tw="w-[150px]! block! items-center! space-x-1 mr-2"
-                />
-
-                <Input value="/" disabled tw="w-[40px]! block!" />
-                <Input
-                  name="api_path"
-                  value={get(params, 'api_path', '')}
-                  onChange={(_: any, v: string | number) =>
-                    setParams((draft) => {
-                      draft.api_path = String(v)
-                    })
-                  }
-                  validateOnChange
-                  placeholder="请输入API路径"
-                  maxLength={50}
-                  schemas={[
-                    {
-                      rule: (value: string) => {
-                        const l = strlen(value)
-                        return l >= 4 && l <= 50
-                      },
-                      help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
-                      status: 'error'
-                    }
-                  ]}
-                />
-              </Control>
-              <div className="help">
-                填入路径将作为 API
+            <ApiPathField
+              label={<AffixLabel required>API路径</AffixLabel>}
+              groupPath={get(params, 'group_path', '')}
+              name="api_path"
+              value={get(params, 'api_path', '')}
+              onChange={(v) =>
+                setParams((draft) => {
+                  draft.api_path = String(v)
+                })
+              }
+              validateOnChange
+              placeholder="请输入API路径"
+              maxLength={50}
+              schemas={[
+                {
+                  rule: (value: string) => {
+                    const l = strlen(value)
+                    return l >= 4 && l <= 50
+                  },
+                  help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
+                  status: 'error'
+                }
+              ]}
+              help="填入路径将作为 API
                 二级路径。支持英文、数字、下划线（_）、连字符（-），且只能以正斜线（/）开头，不超过
-                200 个字符
-              </div>
-            </Field>
+                200 个字符"
+            />
             <Field>
               <Label tw="items-start!">
                 <AffixLabel required>协议</AffixLabel>
@@ -293,37 +287,31 @@ const BaseSettingModal = observer(() => {
                 </Checkbox> */}
               </Control>
             </Field>
-            <Field>
-              <Label tw="items-start!">
-                <AffixLabel required>超时时间</AffixLabel>
-              </Label>
-              <Control tw="items-center">
-                <Input
-                  name="timeout"
-                  tw="w-[60px]! block! items-center! space-x-1 mr-2"
-                  value={get(params, 'timeout', '')}
-                  onChange={(_, v: any) =>
-                    setParams((draft) => {
-                      draft.timeout = (Number(v) || 0) as unknown as string
-                    })
-                  }
-                  validateOnChange
-                  maxLength={3}
-                  schemas={[
-                    {
-                      rule: (value: number) => {
-                        const l = Number(value)
-                        return l >= 0 && l <= 300
-                      },
-                      help: '请输入范围0-300',
-                      status: 'error'
-                    }
-                  ]}
-                />
-                <div tw="ml-1">S</div>
-              </Control>
-              <div className="help">0-300</div>
-            </Field>
+            <InputField
+              name="timeout"
+              className="inputField"
+              label={<AffixLabel required>超时时间</AffixLabel>}
+              validateOnChange
+              value={get(params, 'timeout', '')}
+              onChange={(v) =>
+                setParams((draft) => {
+                  draft.timeout = (Number(v) || 0) as unknown as string
+                })
+              }
+              maxLength={3}
+              schemas={[
+                {
+                  rule: (value: number) => {
+                    const l = Number(value)
+                    return l >= 2 && l <= 300
+                  },
+                  help: '请输入范围0-300',
+                  status: 'error'
+                }
+              ]}
+              help="0-300"
+              suffix={<div tw="ml-1">S</div>}
+            />
             <Field>
               <Label>
                 <AffixLabel>跨域功能</AffixLabel>
