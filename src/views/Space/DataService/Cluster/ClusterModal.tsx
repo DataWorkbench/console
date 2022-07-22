@@ -51,12 +51,19 @@ const formStyle = {
   CURadioGroup: css`
     .radio-button {
       ${tw`w-[164px]! h-[125px]! mr-2 rounded-sm`}
+      .label-value {
+        ${tw`h-full`}
+      }
       .radioBox {
+        ${tw`flex-row h-full`}
         .title {
           ${tw`text-lg w-[164px] h-[53px]  text-neut-0 mb-0 text-left border-neut-13 border-b leading-[53px] mb-[8px]`}
         }
         div {
           ${tw`text-left pl-3 text-neut-8`}
+        }
+        .desc {
+          ${tw`flex-auto`}
         }
       }
     }

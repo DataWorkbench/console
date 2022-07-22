@@ -157,7 +157,11 @@ const FieldOrder = observer(
         title: (
           <TitleInformation>
             <span>序号</span>
-            <Tooltip theme="light" hasPadding content="序号序号序号序号序号序号">
+            <Tooltip
+              theme="light"
+              hasPadding
+              content="您可以根据数据表中的指定字段对 API 的返回结果进行排序。当您的排序列表中有多个字段时，序号越小的字段，排序的优先级越高，您可直接拖拽整行来调整字段序号。"
+            >
               <Center>
                 <Icon name="information" size={16} />
               </Center>
@@ -218,7 +222,7 @@ const FieldOrder = observer(
       <FlexBox tw="h-11 items-center justify-center border-t-[1px]! border-neut-13!">
         <Button type="text" onClick={addRow}>
           <Icon name="add" type="light" />
-          添加
+          添加字段
         </Button>
       </FlexBox>
     ))

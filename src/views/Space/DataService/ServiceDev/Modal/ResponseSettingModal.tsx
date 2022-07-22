@@ -16,6 +16,7 @@ import {
   ResponseSettingColumns,
   serviceDevResponseSettingMapping
 } from '../constants'
+import { CollapseWrapper } from '../styled'
 
 const styles = {
   table: css`
@@ -286,7 +287,7 @@ const ResponseSettingModal = observer(() => {
         </div>
       }
     >
-      <Collapse defaultActiveKey={['p1', 'p2']}>
+      <CollapseWrapper defaultActiveKey={['p1', 'p2']}>
         <CollapseItem
           key="p1"
           label={
@@ -315,15 +316,18 @@ const ResponseSettingModal = observer(() => {
             </FlexBox>
           }
         >
-          <DargTable
-            columns={totalColumns as unknown as any}
-            runDarg={false}
-            dataSource={highDataSource}
-            disabled={isHistory}
-            rowKey="key"
-          />
+          <>
+            <div tw="mb-3">分页设置</div>
+            <DargTable
+              columns={totalColumns as unknown as any}
+              runDarg={false}
+              dataSource={highDataSource}
+              disabled={isHistory}
+              rowKey="key"
+            />
+          </>
         </CollapseItem>
-      </Collapse>
+      </CollapseWrapper>
     </ResizeModal>
   )
 })
