@@ -35,7 +35,7 @@ const defaultHighSource = [
     column_name: 'limit',
     param_name: 'limit',
     data_type: 1,
-    type: 'INt',
+    type: 'INT',
     param_operator: ParameterOperator.EQUAL,
     param_position: ParameterPosition.QUERY,
     is_required: true,
@@ -48,7 +48,7 @@ const defaultHighSource = [
     column_name: 'offset',
     param_name: 'offset',
     data_type: 1,
-    type: 'INt',
+    type: 'INT',
     param_operator: ParameterOperator.EQUAL,
     param_position: ParameterPosition.QUERY,
     is_required: true,
@@ -98,7 +98,8 @@ const RequestSettingModal = observer(() => {
         setDataSource(newRequestData)
       }
       if (hightConfig.length) {
-        setHighSource(hightConfig)
+        const hConfig = hightConfig.map((item: any) => ({ ...item, type: 'INT' }))
+        setHighSource(hConfig)
       }
     }
   }, [apiConfigData, setDataSource, fieldSettingData, setHighSource])
@@ -224,6 +225,7 @@ const RequestSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入示例值"
           onChange={(_, value) => {
             setDataSource((draft) => {
               draft[index].example_value = `${value}`
@@ -236,6 +238,7 @@ const RequestSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入默认值"
           onChange={(_, value) => {
             setDataSource((draft) => {
               draft[index].default_value = `${value}`
@@ -248,6 +251,7 @@ const RequestSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入描述内容"
           onChange={(_, value) => {
             setDataSource((draft) => {
               draft[index].param_description = `${value}`
@@ -292,6 +296,7 @@ const RequestSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入示例值"
           onChange={(_, value) => {
             setHighSource((draft) => {
               draft[index].example_value = `${value}`
@@ -304,6 +309,7 @@ const RequestSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入默认值"
           onChange={(_, value) => {
             setHighSource((draft) => {
               draft[index].default_value = `${value}`
@@ -316,6 +322,7 @@ const RequestSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入描述内容"
           onChange={(_, value) => {
             setHighSource((draft) => {
               draft[index].param_description = `${value}`

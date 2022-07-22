@@ -246,12 +246,11 @@ const BaseSettingModal = observer(() => {
                 <Input
                   name="api_path"
                   value={get(params, 'api_path', '')}
-                  onChange={(_, v: string | number) =>
+                  onChange={(_: any, v: string | number) =>
                     setParams((draft) => {
                       draft.api_path = String(v)
                     })
                   }
-                  disabled={isHistory}
                   validateOnChange
                   placeholder="请输入API路径"
                   maxLength={50}
@@ -305,12 +304,11 @@ const BaseSettingModal = observer(() => {
                   value={get(params, 'timeout', '')}
                   onChange={(_, v: any) =>
                     setParams((draft) => {
-                      draft.timeout = Number(v) as unknown as string
+                      draft.timeout = (Number(v) || 0) as unknown as string
                     })
                   }
-                  disabled={isHistory}
                   validateOnChange
-                  maxLength={50}
+                  maxLength={3}
                   schemas={[
                     {
                       rule: (value: number) => {
@@ -394,15 +392,11 @@ const BaseSettingModal = observer(() => {
               ]}
             />
             <Field>
-              <Label tw="items-start!">
-                <AffixLabel>创建时间</AffixLabel>
-              </Label>
+              <Label tw="items-start!">创建时间</Label>
               <Control tw="items-center">{formatDate(params.created)}</Control>
             </Field>
             <Field>
-              <Label tw="items-start!">
-                <AffixLabel>最后修改时间</AffixLabel>
-              </Label>
+              <Label tw="items-start!">最后修改时间</Label>
               <Control tw="items-center">{formatDate(params.updated)}</Control>
             </Field>
           </Form>
