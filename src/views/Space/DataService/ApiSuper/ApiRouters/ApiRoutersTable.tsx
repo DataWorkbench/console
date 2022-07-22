@@ -127,6 +127,11 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
         </NameWrapper>
       )
     },
+    [getName('uri')]: {
+      render: (v: number, row: any) => (
+        <span tw="dark:text-neut-0">{`${row?.host}/${row?.uri}`}</span>
+      )
+    },
     [getName('create_time')]: {
       ...getSort(getName('create_time')),
       render: (v: number) => <span tw="dark:text-neut-0">{formatDate(v)}</span>

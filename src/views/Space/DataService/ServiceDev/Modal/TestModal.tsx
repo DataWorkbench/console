@@ -26,6 +26,7 @@ const TestModal = observer(() => {
     dtsDevStore
   } = useStore()
   const [testSource, setTestSource] = useImmer<any[]>([])
+  const [testApiContent, setApiTestContent] = useImmer<any>(null)
   const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
 
   useEffect(() => {
@@ -35,8 +36,6 @@ const TestModal = observer(() => {
       const config = requestConfig.filter(
         (item: { column_name: string }) => !['limit', 'offset'].includes(item.column_name)
       )
-      console.log('config', config)
-
       setTestSource(config)
     }
   }, [apiConfigData, setTestSource])
@@ -48,29 +47,12 @@ const TestModal = observer(() => {
   }
 
   const startTest = () => {
-    // testApiService(data)
-
-    // const params: any = {}
-    // testSource.forEach((source: any) => {
-    //   console.log(source)
-
-    //   const keyV = source.param_name
-    //   const value = source.data_type === 2 ? Number(source.example_value) : source.example_value
-    //   params[keyV] = value
-    // })
-    console.log(testSource, 'testSource')
-
     testMutation.mutate(
       { apiId: apiConfig?.api_id, request_params: testSource },
       {
         onSuccess: (res) => {
           if (res.ret_code === 0) {
-            // onClose()
-            // Notify.success({
-            //   title: '操作提示',
-            //   content: '配置保存成功',
-            //   placement: 'bottomRight'
-            // })
+            setApiTestContent(res)
           }
         }
       }
@@ -170,11 +152,17 @@ const TestModal = observer(() => {
             <FlexBox orient="column" tw="h-full overflow-hidden">
               <div tw="flex-1">
                 <TitleItem>请求详情</TitleItem>
-                <TestContent>点击开始测试后会有返回详情</TestContent>
+                <TestContent>
+                  {testApiContent?.logs ? testApiContent?.logs : '点击开始测试后会有返回详情'}
+                </TestContent>
               </div>
               <div tw="flex-1">
                 <TitleItem>响应详情</TitleItem>
-                <TestContent>点击开始测试后会有返回详情</TestContent>
+                <TestContent>
+                  {testApiContent?.response_content
+                    ? testApiContent?.response_content
+                    : '点击开始测试后会有返回详情'}
+                </TestContent>
               </div>
             </FlexBox>
           </div>

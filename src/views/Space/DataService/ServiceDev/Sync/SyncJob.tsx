@@ -303,6 +303,8 @@ const SyncJob = observer(() => {
   const test = () => {
     // 检测是否有服务集群
     const clusterId = get(apiConfigData, 'service_cluster.id')
+    const requestParams = get(apiConfigData, 'api_config.request_params')
+    const responseParams = get(apiConfigData, 'api_config.response_params')
     if (!clusterId) {
       dtsDevStore.set({
         showClusterErrorTip: true
@@ -310,6 +312,14 @@ const SyncJob = observer(() => {
       Notify.warning({
         title: '操作提示',
         content: '请先选择服务集群',
+        placement: 'bottomRight'
+      })
+      return
+    }
+    if (!requestParams || !responseParams) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请配置亲请求参数和返回参数',
         placement: 'bottomRight'
       })
       return
