@@ -100,7 +100,8 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
     buttonText,
     placement = 'bottom-end',
     childClick,
-    onHide = () => {}
+    onHide = () => {},
+    ...rest
   } = props
 
   const theme = getTheme(themeProp)
@@ -148,10 +149,11 @@ export const MoreAction = <T extends string>(props: IMoreActionProps<T>) => {
   return (
     <Center>
       <Tooltip
+        {...rest}
         arrow={false}
         trigger="click"
         placement={placement}
-        appendTo="parent"
+        // appendToBody
         theme={theme}
         twChild={moreActionStyle.child() as any}
         onHidden={() => {
