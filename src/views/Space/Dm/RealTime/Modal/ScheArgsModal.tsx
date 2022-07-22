@@ -1,12 +1,11 @@
-import { Fragment, ReactElement, useEffect, useMemo, useState } from 'react'
-import { DarkModal, FlexBox, TextHighlight, Icons, HelpCenterLink } from 'components'
+import { Fragment, ReactElement, useEffect, useState } from 'react'
+import { DarkModal, FlexBox, TextHighlight, Icons } from 'components'
 import { Icon, Form, Collapse, Loading, Field, Label, Control } from '@QCFE/lego-ui'
 import { Button } from '@QCFE/qingcloud-portal-ui'
 import { useImmer } from 'use-immer'
 import { flatten, get } from 'lodash-es'
 import {
   useMutationStreamJobArgs,
-  useQueryInConnectorsQuery,
   useQueryResource,
   useQueryUdf,
   useQueryStreamJobArgs,
@@ -52,20 +51,6 @@ const ResourceOption = ({ files }: { files: string[] }) => {
     </div>
   )
 }
-
-const ConnectorOption = ({
-  builtInConnectors,
-  value
-}: {
-  builtInConnectors: string[]
-  value: string[]
-}) => (
-  <div tw="w-[620px]">
-    {builtInConnectors
-      .filter((i: any) => value?.includes(i.value))
-      .map((i: any) => renderReadOnlyOption(i.value, <Icons name="connector" />))}
-  </div>
-)
 
 const ResourceSelect = (props: ResourceSelectProps) => {
   const { icon, isUdf = false, type } = props
@@ -155,21 +140,6 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
     workFlowStore: { curJob, curVersion }
   } = useStore()
 
-  const [connectorsKeyword, setConnectorsKeyword] = useState('')
-  const { isFetching: conIsFetching, data: builtInConnectorsRes } = useQueryInConnectorsQuery()
-  const builtInConnectors = useMemo(
-    () =>
-      !conIsFetching && builtInConnectorsRes.ret_code === 0
-        ? builtInConnectorsRes?.items
-            .filter((i: string) => i.indexOf(connectorsKeyword) !== -1)
-            .map((i: string) => ({
-              value: i,
-              label: renderLabel(i, <Icons name="connector" />, connectorsKeyword)
-            })) || []
-        : [],
-    [builtInConnectorsRes, conIsFetching, connectorsKeyword]
-  )
-
   useEffect(() => {
     setParams((draft) => {
       draft.clusterId = get(data, 'cluster_id', '')
@@ -181,10 +151,6 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
     })
   }, [data, setParams])
 
-  const onFilterConnectors = (_input: string) => {
-    const input = _input.toLowerCase()
-    setConnectorsKeyword(input)
-  }
   const save = () => {
     setShowMsg(true)
     if (!params.clusterId) {
@@ -352,52 +318,6 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
                     />
                   </>
                 )}
-                {/* eslint-disable-next-line no-nested-ternary */}
-                {curJob?.type === 2 ? (
-                  readOnly ? (
-                    <Field>
-                      <Label>内置 Connector</Label>
-                      <Control>
-                        <ConnectorOption
-                          builtInConnectors={builtInConnectors}
-                          value={params.builtInConnectors}
-                        />
-                      </Control>
-                    </Field>
-                  ) : (
-                    <SelectField
-                      clearable
-                      name="builtInConnectors"
-                      label="内置 Connector"
-                      placeholder="请选择运行所需内置 Connector 包"
-                      multi
-                      searchable
-                      css={css`
-                        .select-control {
-                          ${tw`w-[620px]`}
-                        }
-                      `}
-                      closeOnSelect={false}
-                      openOnClick
-                      onInputChange={onFilterConnectors}
-                      value={params.builtInConnectors}
-                      onChange={(_builtInConnectors: string[]) =>
-                        setParams((draft) => {
-                          draft.builtInConnectors = _builtInConnectors
-                        })
-                      }
-                      options={builtInConnectors || []}
-                      help={
-                        <div>
-                          详细说明见
-                          <HelpCenterLink href="/developer_sql/summary/" isIframe={false}>
-                            帮助文档
-                          </HelpCenterLink>
-                        </div>
-                      }
-                    />
-                  )
-                ) : null}
               </ScheForm>
             </CollapseItem>
           </Collapse>

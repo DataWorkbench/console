@@ -186,7 +186,7 @@ source$
 
 const changeTableName = () =>
   filter(([pervValue, value]) => {
-    if (!pervValue || !value) {
+    if (!pervValue || !value || !value?.data?.tableName) {
       return true
     }
     if (value?.data?.tableName && value?.data?.tableName !== pervValue?.data?.tableName) {
