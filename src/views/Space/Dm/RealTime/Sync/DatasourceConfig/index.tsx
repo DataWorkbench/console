@@ -82,7 +82,7 @@ const getJobTypeName = (type: 1 | 2 | 3) => {
   const typeNameMap = new Map([
     [1, '离线 - 全量'],
     [2, '离线 - 增量'],
-    [3, '实时']
+    [3, '实时同步']
   ])
   return typeNameMap.get(type)
 }
@@ -109,7 +109,10 @@ const DatasourceConfig = observer(
     const [sourceTypeName, targetTypeName] = useMemo(() => {
       const sourceType = curJob?.source_type
       const targetType = curJob?.target_type
-      return [getDataSourceTypes(sourceType), getDataSourceTypes(targetType)]
+      return [
+        getDataSourceTypes(sourceType, curJob?.type === 3),
+        getDataSourceTypes(targetType, curJob?.type === 3)
+      ]
     }, [curJob])
 
     const handleVisible = (v: boolean) => {
