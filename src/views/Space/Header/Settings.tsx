@@ -203,7 +203,7 @@ export const Settings = ({
                 name="documentation"
                 type={darkMode ? 'light' : 'dark'}
                 changeable
-                size={40}
+                size={20}
                 tw="cursor-pointer"
               />
             </IconBox>

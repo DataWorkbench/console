@@ -41,7 +41,10 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
     setType(0)
 
     if (socket.alive) {
-      socket.on('message', ({ type: t, dataset, error_message }) => {
+      socket.on('message', ({ type: t, dataset, error_message }: Record<string, any>) => {
+        if (t === 3) {
+          return
+        }
         if (t) setType(t)
         if (t === 1) {
           columns.current = (dataset?.[0]?.message || []).map((r) => ({
