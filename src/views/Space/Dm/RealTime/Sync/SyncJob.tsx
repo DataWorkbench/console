@@ -185,6 +185,11 @@ const SyncJob = () => {
   const [mode, setMode] = useState<1 | 2>(getInitMode())
   const [showRelaseModal, setShowRelaseModal] = useState(false)
 
+  const [showScheModal, toggleScheModal] = useState(false)
+  const [sourceColumns, setSourceColumns] = useState<Record<string, any>[]>([])
+  const [targetColumns, setTargetColumns] = useState<Record<string, any>[]>([])
+  const [columns, setColumns] = useState([[], []])
+
   const dbRef = useRef<{
     getResource: () => Record<string, string>
     getTypeNames: () => string[]
@@ -388,19 +393,15 @@ const SyncJob = () => {
               )?.[1] ?? {},
               'split_pk'
             )
-            // TODO
-            // if (
-            //   splitKey &&
-            //   !db?.source?.fields?.some(
-            //     (f) =>
-            //       f.name === splitKey &&
-            //       intTypes.has(f.type) &&
-            //       f.is_primary_key
-            //   )
-            // ) {
-            //   showConfWarn('切分键必须为主键且为整型')
-            //   return
-            // }
+            if (
+              splitKey &&
+              !sourceColumns?.some(
+                (f) => f.name === splitKey && intTypes.has(f.type) && f.is_primary_key
+              )
+            ) {
+              showConfWarn('切分键必须为主键且为整型')
+              return
+            }
 
             // 如果并发数大于1  则切分键不能为空
             const parallelism = get(resource, 'channel_control.parallelism', 0)
@@ -424,10 +425,6 @@ const SyncJob = () => {
     })
   }
 
-  const [showScheModal, toggleScheModal] = useState(false)
-  const [sourceColumns, setSourceColumns] = useState<Record<string, any>[]>([])
-  const [targetColumns, setTargetColumns] = useState<Record<string, any>[]>([])
-  const [columns, setColumns] = useState([[], []])
   useLayoutEffect(() => {
     const sourceColumnsSub = sourceColumns$.subscribe((e) => {
       setSourceColumns(e)
