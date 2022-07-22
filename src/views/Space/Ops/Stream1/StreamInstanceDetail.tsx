@@ -267,7 +267,7 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
             css={css`
               overflow-wrap: anywhere;
             `}
-            tw="whitespace-pre-line bg-transparent"
+            tw="whitespace-pre-wrap bg-transparent"
           >
             {data?.message}
           </div>

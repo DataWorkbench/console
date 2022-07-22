@@ -89,7 +89,7 @@ export default function MessageModal({ visible, cancel, webUI, row = {} }: any) 
           <CollapseItem key="p2" label="message">
             <SimpleBar tw="px-5 py-3 bg-neut-17 h-full overflow-y-scroll">
               {row.message ? (
-                <div tw="break-normal whitespace-pre-line">{row.message}</div>
+                <div tw="break-normal whitespace-pre-wrap">{row.message}</div>
               ) : (
                 <div tw="text-neut-13">暂无 message</div>
               )}
