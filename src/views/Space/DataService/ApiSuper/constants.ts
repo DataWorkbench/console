@@ -56,7 +56,7 @@ export const apiRoutersTableFieldMapping: Mapping<
   'name' | 'proxy_uri' | 'uri' | 'desc' | 'create_time'
 > = new Map()
   .set('name', { label: 'API 名称 / ID', apiField: 'name' })
-  .set('proxy_uri', { label: 'API 服务组', apiField: 'proxy_uri' })
+  .set('proxy_uri', { label: 'API 服务组', apiField: 'api_service_id' })
   .set('uri', { label: '访问路径', apiField: 'uri' })
   .set('desc', { label: '描述', apiField: 'desc' })
   .set('create_time', { label: '发布时间', apiField: 'create_time' })
