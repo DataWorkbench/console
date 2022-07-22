@@ -18,7 +18,8 @@ const RoleFilter = (props: IRoleFilterProps) => {
     if (valueProp !== undefined && valueProp !== value) {
       setValue(valueProp)
     }
-  }, [value, valueProp])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valueProp])
 
   const handleCheckAllChange = (_: any, checked: boolean) => {
     if (checked) {
@@ -29,9 +30,11 @@ const RoleFilter = (props: IRoleFilterProps) => {
   }
 
   const handleChange = (v: string[]) => {
+    console.log(v)
     setValue(v)
   }
 
+  console.log(value)
   const [visible, setVisible] = useState(false)
   const ref = React.useRef<HTMLDivElement>(null)
   return (
