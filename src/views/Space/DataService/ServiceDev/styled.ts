@@ -237,7 +237,7 @@ export const TitleItem = styled('div')(() => [
 
 export const TestContent = styled('div')(() => [
   css`
-    ${tw`h-[370px] w-full whitespace-pre-line my-5 p-2 bg-neut-19 text-neut-7 rounded overflow-y-auto`}
+    ${tw`h-[370px] w-full whitespace-pre-wrap my-5 p-2 bg-neut-19 text-neut-7 rounded overflow-y-auto`}
   `
 ])
 
