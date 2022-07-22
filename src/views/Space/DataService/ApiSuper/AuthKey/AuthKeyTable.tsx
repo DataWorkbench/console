@@ -17,13 +17,13 @@ import {
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
 import { assign, get } from 'lodash-es'
+import { useHistory, useParams } from 'react-router-dom'
 
 import { useQueryClient } from 'react-query'
 import tw, { css } from 'twin.macro'
 import { MappingKey } from 'utils/types'
 import { PbmodelAuthKeyEntity } from 'types/types'
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { formatDate } from 'utils'
 import { authKeyTableFieldMapping, authKeyTableColumns } from '../constants'
 import AuthKeyModal from './AuthKeyModal'
@@ -43,6 +43,7 @@ const getName = (name: MappingKey<typeof authKeyTableFieldMapping>) =>
 const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
   const queryClient = useQueryClient()
   const { spaceId } = useParams<{ spaceId: string }>()
+  const history = useHistory()
 
   const {
     filter,
@@ -96,7 +97,7 @@ const ApiGroupTable = ({ onSelect }: AuthKeyTableProps) => {
   }
 
   const goDetail = (id: string) => {
-    window.open(`./authKey/${id}`, '_blank')
+    history.push(`./authKey/${id}`)
   }
 
   const handleMenuClick = (row: PbmodelAuthKeyEntity, key: string) => {

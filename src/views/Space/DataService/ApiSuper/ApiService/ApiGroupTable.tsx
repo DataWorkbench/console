@@ -6,7 +6,7 @@ import useFilter from 'hooks/useHooks/useFilter'
 import { assign, get, omitBy } from 'lodash-es'
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { formatDate } from 'utils'
 import { MappingKey } from 'utils/types'
 import { apiGroupTableFieldMapping, apiGroupTableColumns } from '../constants'
@@ -34,6 +34,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
 
   const queryClient = useQueryClient()
   const { spaceId } = useParams<IRouteParams>()
+  const history = useHistory()
 
   const {
     filter,
@@ -76,7 +77,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
   }
 
   const goDetail = ({ id, key = 'api' }: { id: string; key?: string }) => {
-    window.open(`./apiService/${id}?tab=${key === 'bingKey' ? 'authKey' : 'api'}`, '_blank')
+    history.push(`./apiService/${id}?tab=${key === 'bingKey' ? 'authKey' : 'api'}`)
   }
 
   const handleMenuClick = (row: Record<string, any>, key: string) => {

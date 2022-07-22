@@ -165,7 +165,6 @@ const BaseTargetConfig = forwardRef(
 
     const renderCommon = () => <BaseConfigCommon from="target" />
 
-    console.log(dbInfo?.tableName)
     const hasTable = !isEmpty(dbInfo?.tableName)
 
     useImperativeHandle(ref, () => ({
