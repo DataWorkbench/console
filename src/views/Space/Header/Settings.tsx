@@ -6,6 +6,7 @@ import tw, { styled, css } from 'twin.macro'
 import { Center, Tooltip, HelpCenterLink, FlexBox } from 'components'
 import { useHistory, useParams } from 'react-router-dom'
 import { emitter } from 'utils/index'
+import { isDarkTheme } from 'utils/theme'
 
 const menuList = [
   {
@@ -42,6 +43,7 @@ const menuList = [
 // const platformAdminMenuKeys = new Set([''])
 const iaasKeys = new Set(['account', 'security', 'notify', 'divider', 'logout'])
 const privateKeys = new Set(['account', 'notify', 'divider', 'logout'])
+const privateKeys1 = new Set(['account', 'divider', 'logout'])
 
 // let isPrivate = (process.env.IS_PRIVATE)
 
@@ -92,9 +94,18 @@ const UserInfoWrapper = styled.div(() => [
     }
   `
 ])
-const UserInfo = styled(FlexBox)(() => [tw`gap-2 text-font leading-5 pr-10 cursor-pointer`])
+const UserInfo = styled(FlexBox)(({ darkMode }: { darkMode: boolean }) => [
+  tw`gap-2 text-font leading-5 pr-10 cursor-pointer`,
+  darkMode && tw`text-white!`
+])
 
-export const Settings = ({ darkMode }: { darkMode: boolean }) => {
+export const Settings = ({
+  darkMode,
+  overview = false
+}: {
+  darkMode: boolean
+  overview?: boolean
+}) => {
   // const handleOpenHelpCenter = (link: string) => {
   //   const openModal = Modal.open(HelpCenterModal, {
   //     link,
@@ -103,7 +114,10 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   // }
 
   const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
-  const filter = isPrivate ? privateKeys : iaasKeys
+  let filter = isPrivate ? privateKeys : iaasKeys
+  if (isPrivate && overview) {
+    filter = privateKeys1
+  }
   const menus = menuList.filter((item) => filter.has(item.key))
   const handleMenu2Iaas = (key: string) => {
     switch (key) {
@@ -151,7 +165,6 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
     }
   }
 
-  console.log(isPrivate, filter, menus)
   return (
     <Center>
       <IconBoxWithTooltip tw="mr-3">
@@ -174,7 +187,11 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
         <Tooltip
           theme={darkMode ? 'light' : 'dark'}
           hasPadding
-          content={<div tw="text-white dark:text-neut-13 leading-5">帮助中心</div>}
+          content={
+            <div css={[darkMode ? tw`text-neut-13` : tw`text-white`]} tw=" leading-5">
+              帮助中心
+            </div>
+          }
         >
           <HelpCenterLink href="/intro/introduction/" tw="flex items-center">
             <IconBox
@@ -186,7 +203,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
                 name="documentation"
                 type={darkMode ? 'light' : 'dark'}
                 changeable
-                size={40}
+                size={20}
                 tw="cursor-pointer"
               />
             </IconBox>
@@ -207,7 +224,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
                 return (
                   <MenuItem key={item.key}>
                     <>
-                      <Icon name={item.icon} type={darkMode ? 'light' : 'dark'} />
+                      <Icon name={item.icon} type={isDarkTheme() ? 'light' : 'dark'} />
                       {item.label}
                     </>
                   </MenuItem>
@@ -216,7 +233,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
             </Menu>
           }
         >
-          <UserInfo>
+          <UserInfo darkMode={darkMode}>
             <Center className="space-user-icon">
               <Icon name="q-idCardDuotone" theme={darkMode ? 'dark' : 'light'} size={20} />
             </Center>

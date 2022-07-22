@@ -1,4 +1,3 @@
-/* eslint-disable import/no-named-as-default */
 import { lazy, useEffect } from 'react'
 import { Redirect, Switch, Route, useRouteMatch } from 'react-router-dom'
 import { useStore } from 'stores'

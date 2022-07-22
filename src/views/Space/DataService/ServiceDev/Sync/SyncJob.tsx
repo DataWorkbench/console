@@ -1,6 +1,6 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Notification as Notify, Message } from '@QCFE/qingcloud-portal-ui'
 import { HelpCenterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useRef } from 'react'
@@ -203,104 +203,108 @@ const SyncJob = observer(() => {
     })
   }
 
-  const save = () => {
-    if (!orderRef.current || !dataSourceRef.current) {
-      return
-    }
-
-    const dataSourceData = dataSourceRef.current.getDataSource()
-    const orderSourceData = orderRef.current.getDataSource()
-
-    if (!dataSourceData.tableName) {
-      showConfWarn('未配置数据源表信息')
-      return
-    }
-
-    if (orderSourceData) {
-      if (orderSourceData?.some((item) => item.name === '')) {
-        showConfWarn('字段名称不能为空')
+  const save = () =>
+    new Promise((resolve) => {
+      if (!orderRef.current || !dataSourceRef.current) {
         return
       }
-    }
 
-    // 检测是否有服务集群
-    const clusterId = get(apiConfigData, 'service_cluster.id')
-    if (!clusterId) {
-      dtsDevStore.set({
-        showClusterErrorTip: true
-      })
-      Notify.warning({
-        title: '操作提示',
-        content: '请先选择服务集群',
-        placement: 'bottomRight'
-      })
-      return
-    }
+      const dataSourceData = dataSourceRef.current.getDataSource()
+      const orderSourceData = orderRef.current.getDataSource()
 
-    // 映射字段排序字段到返回参数中
-    const responseConfig = cloneDeep(
-      get(apiConfigData, 'api_config.response_params.response_params', [])
-    )
-    const response = orderMapRequestData(orderSourceData, responseConfig)
+      if (!dataSourceData.tableName) {
+        showConfWarn('未配置数据源表信息')
+        return
+      }
 
-    const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
-    const apiId = get(curApi, 'api_id')
-
-    if (!dataSourceData?.source?.id) {
-      Notify.warning({
-        title: '操作提示',
-        content: '请先选择数据源',
-        placement: 'bottomRight'
-      })
-      return
-    }
-
-    mutation.mutate(
-      {
-        ...apiConfig,
-        apiId,
-        datasource_id: dataSourceData?.source?.id,
-        table_name: dataSourceData?.tableName,
-        response_params: {
-          response_params: response
-        }
-      },
-      {
-        onSuccess: (res) => {
-          if (res.ret_code === 0) {
-            Notify.success({
-              title: '操作提示',
-              content: '配置保存成功',
-              placement: 'bottomRight'
-            })
-            handleSyncStore(response)
-          }
+      if (orderSourceData) {
+        if (orderSourceData?.some((item) => item.name === '')) {
+          showConfWarn('字段名称不能为空')
+          return
         }
       }
-    )
-  }
-  const release = () => {
-    const apiId = get(curApi, 'api_id')
 
-    publishMutation.mutate(
-      { apiId },
-      {
-        onSuccess: (res) => {
-          if (res.ret_code === 0) {
-            Notify.success({
-              title: '操作提示',
-              content: '发布成功',
-              placement: 'bottomRight'
-            })
+      // 检测是否有服务集群
+      const clusterId = get(apiConfigData, 'service_cluster.id')
+      if (!clusterId) {
+        dtsDevStore.set({
+          showClusterErrorTip: true
+        })
+        Notify.warning({
+          title: '操作提示',
+          content: '请先选择服务集群',
+          placement: 'bottomRight'
+        })
+        return
+      }
+
+      // 映射字段排序字段到返回参数中
+      const responseConfig = cloneDeep(
+        get(apiConfigData, 'api_config.response_params.response_params', [])
+      )
+      const response = orderMapRequestData(orderSourceData, responseConfig)
+
+      const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
+      const apiId = get(curApi, 'api_id')
+
+      if (!dataSourceData?.source?.id) {
+        Notify.warning({
+          title: '操作提示',
+          content: '请先选择数据源',
+          placement: 'bottomRight'
+        })
+        return
+      }
+
+      mutation.mutate(
+        {
+          ...apiConfig,
+          apiId,
+          datasource_id: dataSourceData?.source?.id,
+          table_name: dataSourceData?.tableName,
+          response_params: {
+            response_params: response
+          }
+        },
+        {
+          onSuccess: (res) => {
+            if (res.ret_code === 0) {
+              Notify.success({
+                title: '操作提示',
+                content: '配置保存成功',
+                placement: 'bottomRight'
+              })
+              handleSyncStore(response)
+            }
+            resolve(res)
           }
         }
-      }
-    )
+      )
+    })
+  const release = async () => {
+    const saveRes: any = await save()
+    if (saveRes.ret_code === 0) {
+      const apiId = get(curApi, 'api_id')
+      publishMutation.mutate(
+        { apiId },
+        {
+          onSuccess: (res) => {
+            if (res.ret_code === 0) {
+              Message.success({
+                content: `API 发布成功，您可前往API 管理-已发布API 查看详情`
+              })
+            }
+          }
+        }
+      )
+    }
   }
 
   const test = () => {
     // 检测是否有服务集群
     const clusterId = get(apiConfigData, 'service_cluster.id')
+    const requestParams = get(apiConfigData, 'api_config.request_params')
+    const responseParams = get(apiConfigData, 'api_config.response_params')
     if (!clusterId) {
       dtsDevStore.set({
         showClusterErrorTip: true
@@ -308,6 +312,14 @@ const SyncJob = observer(() => {
       Notify.warning({
         title: '操作提示',
         content: '请先选择服务集群',
+        placement: 'bottomRight'
+      })
+      return
+    }
+    if (!requestParams || !responseParams) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请配置亲请求参数和返回参数',
         placement: 'bottomRight'
       })
       return
@@ -351,7 +363,7 @@ const SyncJob = observer(() => {
               保存
             </Button>
             <Button onClick={test}>
-              <Icon name="data" type="dark" />
+              <Icon name="q-upCircleFill" />
               测试
             </Button>
             <Button type="primary" onClick={release}>

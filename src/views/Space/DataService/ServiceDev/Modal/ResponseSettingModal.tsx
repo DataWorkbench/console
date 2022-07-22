@@ -117,8 +117,9 @@ const ResponseSettingModal = observer(() => {
         const newRequestData = configMapData(filedData, config, defaultValue)
         setDataSource(newRequestData)
       }
-      if (hightConfig.length) {
-        setHighDataSource(hightConfig)
+      if (hightConfig?.length) {
+        const hConfig = hightConfig.map((item: any) => ({ ...item, type: 'INT' }))
+        setHighDataSource(hConfig)
       }
     }
   }, [apiConfigData, setDataSource, fieldSettingData, setHighDataSource])
@@ -198,6 +199,7 @@ const ResponseSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入示例值"
           onChange={(_, value) => {
             setDataSource((draft) => {
               draft[index].example_value = `${value}`
@@ -210,6 +212,7 @@ const ResponseSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入描述内容"
           onChange={(_, value) => {
             setDataSource((draft) => {
               draft[index].param_description = `${value}`
@@ -231,6 +234,7 @@ const ResponseSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入示例值"
           onChange={(_, value) => {
             setHighDataSource((draft) => {
               draft[index].example_value = `${value}`
@@ -243,6 +247,7 @@ const ResponseSettingModal = observer(() => {
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
+          placeholder="请输入描述内容"
           onChange={(_, value) => {
             setHighDataSource((draft) => {
               draft[index].param_description = `${value}`

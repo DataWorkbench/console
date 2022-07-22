@@ -5,7 +5,7 @@ export const TextTitle = styled('div')(() => [
     color: #fff;
     font-size: 14px;
     font-weight: 600;
-  `,
+  `
 ])
 
 export default TextTitle

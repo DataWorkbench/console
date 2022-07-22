@@ -6,21 +6,14 @@ import {
   getAllVxnetsKey,
   getRoutersKey,
   useQueryDescribeRouters,
-  useQueryDescribeRoutersAllVxnets,
+  useQueryDescribeRoutersAllVxnets
 } from 'hooks'
 import { flatten } from 'lodash-es'
 import { useImmer } from 'use-immer'
 import tw, { css, styled } from 'twin.macro'
 import { useQueryClient } from 'react-query'
 import { useDebounce } from 'react-use'
-import {
-  AffixLabel,
-  FlexBox,
-  HelpCenterLink,
-  Modal,
-  SelectWithRefresh,
-  TextLink,
-} from 'components'
+import { AffixLabel, FlexBox, HelpCenterLink, Modal, SelectWithRefresh, TextLink } from 'components'
 
 interface ISpaceEditProps {
   spaceId: string
@@ -60,18 +53,15 @@ const FormWrapper = styled('div')(() => [
         }
       }
     }
-  `,
+  `
 ])
 
 const WarnWrapper = styled('div')(() => [
-  tw`w-full border rounded border-info-border bg-info-bg mt-2 px-4 py-2 text-info`,
+  tw`w-full border rounded border-info-border bg-info-bg mt-2 px-4 py-2 text-info`
 ])
 
 export const NetworkFormItem = (
-  props: Pick<
-    ISpaceEditProps,
-    'spaceId' | 'vpcId' | 'regionId' | 'regionName' | 'xnetId'
-  >
+  props: Pick<ISpaceEditProps, 'spaceId' | 'vpcId' | 'regionId' | 'regionName' | 'xnetId'>
 ) => {
   const { spaceId, vpcId, regionId, regionName, xnetId } = props
 
@@ -80,7 +70,7 @@ export const NetworkFormItem = (
     vxnet_id?: string
   }>({
     router_id: vpcId,
-    vxnet_id: xnetId,
+    vxnet_id: xnetId
   })
 
   const [xnetSearch, setXnetSearch] = useState('')
@@ -99,19 +89,17 @@ export const NetworkFormItem = (
     limit: 10,
     regionId,
     spaceId,
-    search_word: routerSearch1,
+    search_word: routerSearch1
   })
   const vxnetsRet = useQueryDescribeRoutersAllVxnets({
     // offset: 0,
     // limit: 200,
     router: params.router_id || '',
-    regionId,
+    regionId
   })
 
   const queryClient = useQueryClient()
-  const routers = flatten(
-    routersRet.data?.pages.map((page) => page.router_set || [])
-  )
+  const routers = flatten(routersRet.data?.pages.map((page) => page.router_set || []))
 
   const vxnets = vxnetsRet?.data?.router_vxnet_set || []
   const refetctNetwork = useCallback(
@@ -167,7 +155,7 @@ export const NetworkFormItem = (
         value={params.router_id}
         options={routers.map(({ router_id, router_name }) => ({
           value: router_id,
-          label: router_name,
+          label: router_name
         }))}
         optionRenderer={(option: { label: string; value: string }) => (
           <FlexBox tw="items-center">
@@ -212,7 +200,7 @@ export const NetworkFormItem = (
           {
             rule: {
               required: true,
-              isExisty: false,
+              isExisty: false
             },
             status: 'error',
             help: (
@@ -224,8 +212,8 @@ export const NetworkFormItem = (
                 </TextLink>
                 {renderVpcWarn()}
               </>
-            ),
-          },
+            )
+          }
         ]}
       />
 
@@ -241,12 +229,9 @@ export const NetworkFormItem = (
           options={vxnets
             .map(({ vxnet_id, vxnet_name }) => ({
               value: vxnet_id,
-              label: vxnet_name,
+              label: vxnet_name
             }))
-            .filter(
-              (v) =>
-                v.value.includes(xnetSearch) || v.label.includes(xnetSearch)
-            )}
+            .filter((v) => v.value.includes(xnetSearch) || v.label.includes(xnetSearch))}
           optionRenderer={(option: { label: string; value: string }) => (
             <FlexBox tw="items-center">
               <Icon name="network" tw="mr-2.5" size={18} type="light" />
@@ -272,7 +257,7 @@ export const NetworkFormItem = (
             {
               rule: {
                 required: true,
-                isExisty: false,
+                isExisty: false
               },
               status: 'error',
               help: (
@@ -293,8 +278,8 @@ export const NetworkFormItem = (
                   </TextLink>
                   {renderVxnetWarn()}
                 </>
-              ),
-            },
+              )
+            }
           ]}
           help={
             <>
@@ -332,7 +317,7 @@ const NetworkModal = observer((props: ISpaceEditProps) => {
     xnetId,
     actionName = '更换',
     onOk,
-    confirmLoading,
+    confirmLoading
   } = props
 
   const form = useRef<Form>()
@@ -348,7 +333,7 @@ const NetworkModal = observer((props: ISpaceEditProps) => {
         if (form.current?.validateFields()) {
           onOk({
             ...form.current?.getFieldsValue(),
-            spaceId,
+            spaceId
           })
         }
       }}

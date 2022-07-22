@@ -88,7 +88,6 @@ const StreamCode = observer(({ tp }: IProp) => {
   const socketRef = useRef(null)
   const [resultType, setResultType] = useState(0)
   const [socketId, setSocketId] = useState()
-  console.log(jobId, spaceId)
   const [socketUrl, setSocketUrl] = useState()
   const [btnDisabled, setDisabled] = useState(false)
 
@@ -193,7 +192,7 @@ const StreamCode = observer(({ tp }: IProp) => {
     }
     opMutation.mutate(
       {
-        [codeName]: {
+        [{ sql: 'sql', python: 'python_code' }[codeName as 'sql']]: {
           code
         },
         type: tp
@@ -591,7 +590,7 @@ const StreamCode = observer(({ tp }: IProp) => {
                     <div tw="text-center">发现语法检查错误，具体内容如下：</div>
                     {syntaxState.errMsg.split(/\n\t/).map((line, i) => {
                       if (line) {
-                        return <div key={String(i)}>{line}</div>
+                        return <div key={`${i.toString()}key`}>{line}</div>
                       }
                       return null
                     })}

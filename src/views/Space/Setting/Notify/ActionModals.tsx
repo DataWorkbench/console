@@ -105,7 +105,7 @@ const ActionModals = observer(({ store }: { store: INotifyStore }) => {
             validateOnChange
             schemas={[
               {
-                rule: { required: true, isEmail: true },
+                rule: { required: true },
                 help: '请输入接收人邮箱',
                 status: 'error'
               },

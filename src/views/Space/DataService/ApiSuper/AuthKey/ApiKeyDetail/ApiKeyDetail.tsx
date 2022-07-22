@@ -8,7 +8,7 @@ import { useQueryListAuthKeys, useMutationListApiServices, useMutationAuthKey } 
 import { get } from 'lodash-es'
 import { PbmodelAuthKeyEntity } from 'types/types'
 
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { formatDate } from 'utils'
 import { ApiKeyDetailActions } from '../../constants'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
@@ -24,6 +24,7 @@ const ApiServiceDetail = (props: { id: string }) => {
   const { id } = props
 
   const { spaceId } = useParams<{ spaceId: string }>()
+  const history = useHistory()
 
   const [isOpen, setOpen] = useState(true)
   const [isDeleteKey, setIsDeleteKey] = useState<boolean>(false)
@@ -90,7 +91,12 @@ const ApiServiceDetail = (props: { id: string }) => {
           placement="bottom"
           twChild={tw`inline-flex`}
         >
-          <div tw="inline-flex items-center justify-center w-6 h-6 rounded-full">
+          <div
+            tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
+            onClick={() => {
+              history.goBack()
+            }}
+          >
             <Icon
               name="previous"
               size={20}

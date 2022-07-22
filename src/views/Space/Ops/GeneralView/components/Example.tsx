@@ -29,9 +29,7 @@ export const Example = ({ textTitle, statusData, total }: Props) => {
               css={css`
                 width: ${total === 0 ? '14.3%' : toPercent(item.value)};
                 height: 100%;
-                background: ${tabIndex === String(index)
-                  ? item.color
-                  : `${item.color}66`};
+                background: ${tabIndex === String(index) ? item.color : `${item.color}66`};
                 :hover {
                   background: ${item.color};
                 }
@@ -55,8 +53,7 @@ export const Example = ({ textTitle, statusData, total }: Props) => {
                 width: 49%;
                 height: 56px;
                 padding: 0 16px;
-                border: 1px solid
-                  ${tabIndex === String(index) ? item.color : '#4c5e70'};
+                border: 1px solid ${tabIndex === String(index) ? item.color : '#4c5e70'};
                 border-radius: 4px;
                 background: linear-gradient(
                   68.65deg,
@@ -88,9 +85,7 @@ export const Example = ({ textTitle, statusData, total }: Props) => {
                   <span
                     css={css`
                       font-size: 16px;
-                      color: ${tabIndex === String(index)
-                        ? item.color
-                        : '#fff'};
+                      color: ${tabIndex === String(index) ? item.color : '#fff'};
                     `}
                   >
                     {item.value}

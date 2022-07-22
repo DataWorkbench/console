@@ -3,7 +3,6 @@ import { sourceColumns$, targetColumns$ } from 'views/Space/Dm/RealTime/Sync/com
 import { useQuerySourceTableSchema } from 'hooks'
 
 const useTableColumns = (sourceId: string, tableName: string, type: 'source' | 'target') => {
-  console.log(sourceId, tableName, type)
   const {
     data: re,
     isFetching,

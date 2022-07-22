@@ -4,7 +4,7 @@ import { Icon, Loading } from '@QCFE/qingcloud-portal-ui'
 import { useRef, useState, useEffect, useMemo, memo } from 'react'
 import { connect as connectSocket } from 'utils/socket'
 import dayjs from 'dayjs'
-import { error } from './config'
+// import { error } from './config'
 import Table from './Table'
 
 interface ResultProps {
@@ -34,12 +34,17 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
   const socketRef = useRef(null)
   const columns = useRef([])
 
+  const [errorMsg, setErrorMsg] = useState('')
+
   useEffect(() => {
     const socket = connectSocket()
     setType(0)
 
     if (socket.alive) {
-      socket.on('message', ({ type: t, dataset }) => {
+      socket.on('message', ({ type: t, dataset, error_message }: Record<string, any>) => {
+        if (t === 3) {
+          return
+        }
         if (t) setType(t)
         if (t === 1) {
           columns.current = (dataset?.[0]?.message || []).map((r) => ({
@@ -62,6 +67,7 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
           setResult(res)
           setCurrDate(dayjs().format('HH:mm:ss.SSS'))
         } else if (t === 4) {
+          setErrorMsg(error_message)
           socket.close()
         }
       })
@@ -158,7 +164,7 @@ function Result({ loading, height, socketId, onClose }: ResultProps) {
         )}
         {type === 4 && (
           <code tw="flex-1 overflow-auto break-words whitespace-pre-line bg-transparent text-white">
-            {error}
+            {errorMsg}
           </code>
         )}
       </FlexBox>

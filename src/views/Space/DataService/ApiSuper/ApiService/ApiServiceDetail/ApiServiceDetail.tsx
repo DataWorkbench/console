@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useQueryListApiServices } from 'hooks'
 import { get } from 'lodash-es'
 import { PbmodelApiServiceEntity } from 'types/types'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams, useHistory } from 'react-router-dom'
 import qs from 'qs'
 import { formatDate } from 'utils'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
@@ -21,6 +21,7 @@ const ApiServiceDetail = (props: { id: string }) => {
   const { id } = props
 
   const { spaceId } = useParams<{ spaceId: string }>()
+  const history = useHistory()
   const { search } = useLocation()
   const { tab = 'api' } = qs.parse(search.slice(1))
 
@@ -44,7 +45,12 @@ const ApiServiceDetail = (props: { id: string }) => {
           placement="bottom"
           twChild={tw`inline-flex`}
         >
-          <div tw="inline-flex items-center justify-center w-6 h-6 rounded-full">
+          <div
+            tw="inline-flex items-center justify-center w-6 h-6 rounded-full"
+            onClick={() => {
+              history.goBack()
+            }}
+          >
             <Icon
               name="previous"
               size={20}

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { DargTable, Modal, FlexBox, ModalContent } from 'components'
 import { observer } from 'mobx-react-lite'
-import { useStore, useMutationTestDataServiceApi, testApiService } from 'hooks'
+import { useStore, useMutationTestDataServiceApi } from 'hooks'
 import { Button, Input } from '@QCFE/lego-ui'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
@@ -26,6 +26,7 @@ const TestModal = observer(() => {
     dtsDevStore
   } = useStore()
   const [testSource, setTestSource] = useImmer<any[]>([])
+  const [testApiContent, setApiTestContent] = useImmer<any>(null)
   const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
 
   useEffect(() => {
@@ -46,37 +47,16 @@ const TestModal = observer(() => {
   }
 
   const startTest = () => {
-    const data = {
-      clusterId: apiConfig?.cluster_id,
-      groupId: apiConfig?.group_id,
-      apiId: apiConfig?.api_id
-    }
-
-    testApiService(data)
-    // const params: any = {}
-    // testSource.forEach((source: any) => {
-    //   console.log(source)
-
-    //   const keyV = source.param_name
-    //   const value = source.data_type === 2 ? Number(source.example_value) : source.example_value
-    //   params[keyV] = value
-    // })
-
-    // testMutation.mutate(
-    //   { apiId: apiConfig?.api_id, request_content: JSON.stringify(params) },
-    //   {
-    //     onSuccess: (res) => {
-    //       if (res.ret_code === 0) {
-    //         onClose()
-    //         // Notify.success({
-    //         //   title: '操作提示',
-    //         //   content: '配置保存成功',
-    //         //   placement: 'bottomRight'
-    //         // })
-    //       }
-    //     }
-    //   }
-    // )
+    testMutation.mutate(
+      { apiId: apiConfig?.api_id, request_params: testSource },
+      {
+        onSuccess: (res) => {
+          if (res.ret_code === 0) {
+            setApiTestContent(res)
+          }
+        }
+      }
+    )
   }
 
   const renderHighColumns = {
@@ -96,14 +76,14 @@ const TestModal = observer(() => {
       width: 60,
       render: (text: string) => <span>{ParameterPosition.getLabel(text)}</span>
     },
-    [getName('example_value')]: {
+    [getName('default_value')]: {
       title: '值',
       render: (text: string, __: any, index: number) => (
         <Input
           value={text}
           onChange={(_, value) => {
             setTestSource((draft) => {
-              draft[index].example_value = `${value}`
+              draft[index].default_value = `${value}`
             })
           }}
         />
@@ -114,7 +94,7 @@ const TestModal = observer(() => {
   const excludeColumns = [
     getName('column_name'),
     getName('param_operator'),
-    getName('default_value'),
+    getName('example_value'),
     getName('param_description')
   ]
   const RequestColumns = RequestSettingColumns.filter(
@@ -172,11 +152,17 @@ const TestModal = observer(() => {
             <FlexBox orient="column" tw="h-full overflow-hidden">
               <div tw="flex-1">
                 <TitleItem>请求详情</TitleItem>
-                <TestContent>点击开始测试后会有返回详情</TestContent>
+                <TestContent>
+                  {testApiContent?.logs ? testApiContent?.logs : '点击开始测试后会有返回详情'}
+                </TestContent>
               </div>
               <div tw="flex-1">
                 <TitleItem>响应详情</TitleItem>
-                <TestContent>点击开始测试后会有返回详情</TestContent>
+                <TestContent>
+                  {testApiContent?.response_content
+                    ? testApiContent?.response_content
+                    : '点击开始测试后会有返回详情'}
+                </TestContent>
               </div>
             </FlexBox>
           </div>
