@@ -9,12 +9,7 @@ import {
   useState
 } from 'react'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
-import {
-  baseTarget$,
-  confColumns$,
-  target$,
-  targetColumns$
-} from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { baseTarget$, target$, targetColumns$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { AffixLabel, Center, FlexBox, SqlGroupField } from 'components'
 import { DbType, sourceKinds, SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
@@ -159,8 +154,8 @@ const BaseTargetConfig = forwardRef(
     )
 
     const handleUpdate = (e: Record<string, any>) => {
-      baseTarget$.next({ data: { ...dbInfo, ...e }, sourceType })
-      confColumns$.next([])
+      const v = { ...dbInfo, ...e }
+      setDbInfo(() => v)
     }
 
     const renderCommon = () => <BaseConfigCommon from="target" />
@@ -200,10 +195,11 @@ const BaseTargetConfig = forwardRef(
         sourceId={dbInfo?.id}
         tableName={dbInfo?.tableName}
         onChange={(v) => {
-          console.log(v)
-          setDbInfo((draft) => {
-            draft.tableName = v
-          })
+          baseTarget$.next({ data: { ...dbInfo, tableName: v }, sourceType })
+          // setDbInfo((draft) => {
+          //   console.log(v)
+          //   draft.tableName = v
+          // })
         }}
       />
     )
