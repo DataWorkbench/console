@@ -34,15 +34,10 @@ const CollapseWrap = styled(Collapse)(() => [
     .collapse-item-content {
       ${tw`p-0 rounded-b`}
     }
-  `,
+  `
 ])
 
-export default function MessageModal({
-  visible,
-  cancel,
-  webUI,
-  row = {},
-}: any) {
+export default function MessageModal({ visible, cancel, webUI, row = {} }: any) {
   return (
     <DarkModal
       orient="fullright"
@@ -53,10 +48,7 @@ export default function MessageModal({
       footer={<div tw="h-8" />}
     >
       <SimpleBar tw="h-full">
-        <CollapseWrap
-          tw="px-5 pt-3 pb-1 h-full"
-          defaultActiveKey={['p1', 'p2']}
-        >
+        <CollapseWrap tw="px-5 pt-3 pb-1 h-full" defaultActiveKey={['p1', 'p2']}>
           <CollapseItem key="p1" label="基本信息">
             <FlexBox tw="py-3">
               <div tw="w-80">
@@ -67,11 +59,7 @@ export default function MessageModal({
                 <div tw="flex mb-1">
                   <span tw="text-neut-8 w-[60px] mr-2">状态: </span>
                   <div tw="flex items-center">
-                    <Icon
-                      tw="mr-2"
-                      name="radio"
-                      color={InstanceState[row.state]?.color}
-                    />
+                    <Icon tw="mr-2" name="radio" color={InstanceState[row.state]?.color} />
                     {InstanceState[row.state]?.name}
                   </div>
                 </div>
@@ -83,16 +71,12 @@ export default function MessageModal({
               <div>
                 <div tw="mb-1">
                   <span tw="text-neut-8 w-14 mr-3">开始时间: </span>
-                  <span>
-                    {dayjs(row.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                  </span>
+                  <span>{dayjs(row.created * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
                 </div>
 
                 <div tw="mb-1">
                   <span tw="text-neut-8 w-14 mr-3">更新时间: </span>
-                  <span>
-                    {dayjs(row.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                  </span>
+                  <span>{dayjs(row.updated * 1000).format('YYYY-MM-DD HH:mm:ss')}</span>
                 </div>
 
                 <div>
@@ -105,7 +89,7 @@ export default function MessageModal({
           <CollapseItem key="p2" label="message">
             <SimpleBar tw="px-5 py-3 bg-neut-17 h-full overflow-y-scroll">
               {row.message ? (
-                <div tw="break-normal">{row.message}</div>
+                <div tw="break-normal whitespace-pre-line">{row.message}</div>
               ) : (
                 <div tw="text-neut-13">暂无 message</div>
               )}
