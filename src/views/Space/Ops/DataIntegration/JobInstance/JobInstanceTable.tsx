@@ -15,7 +15,7 @@ import {
 import tw, { css } from 'twin.macro'
 import dayjs from 'dayjs'
 import { useQueryClient } from 'react-query'
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import TableHeader from 'views/Space/Ops/DataIntegration/JobInstance/TableHeader'
 import { Table } from 'views/Space/styled'
 import { tuple } from 'utils/functions'
@@ -31,6 +31,7 @@ import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { describeFlinkUI } from 'stores/api'
 import { useParams } from 'react-router-dom'
 import { Modal } from '@QCFE/qingcloud-portal-ui'
+import MessageModal from 'views/Space/Ops/Stream/Release/MessageModal'
 
 interface IJobInstanceTable {
   showHeader?: boolean
@@ -335,15 +336,35 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         value: record
       })
     }
-    if (type !== JobMode.RT) {
-      result.push({
-        text: '查看详情',
-        icon: 'eye',
-        key: 'info',
-        value: record
-      })
-    }
+    // if (type !== JobMode.RT) {
+    result.push({
+      text: '查看详情',
+      icon: 'eye',
+      key: 'info',
+      value: record
+    })
+    // }
     return result
+  }
+
+  const [messageVisible, setMessageVisible] = useState(false)
+  const [currentRow, setCurrentRow] = useState<Record<string, any>>()
+
+  const handleFinkUI = (row: any) => {
+    if (row.state === 1) return
+    describeFlinkUI({
+      inst_id: row.id,
+      regionId,
+      spaceId
+    }).then((res) => {
+      const ele = document.createElement('a')
+      ele.style.display = 'none'
+      ele.target = '_blank'
+      ele.href = `//${res?.web_ui || ''}`
+      document.body.appendChild(ele)
+      ele.click()
+      document.body.removeChild(ele)
+    })
   }
 
   const handleMenuClick = (record: Record<string, any>, key: ActionsType) => {
@@ -352,7 +373,12 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         handleStop(record)
         break
       case 'info':
-        jumpDetail()(record)
+        if (type !== JobMode.RT) {
+          jumpDetail()(record)
+        } else {
+          setCurrentRow(record)
+          setMessageVisible(true)
+        }
         break
       default:
         break
@@ -374,22 +400,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
                 window.open(`//${record?.flink_ui}`, '_blank')
               }
             } else if (type === JobMode.RT) {
-              describeFlinkUI({
-                inst_id: record.id,
-                regionId,
-                spaceId
-              }).then((res) => {
-                window.open(`//${res?.web_ui || ''}`, '_blank')
-              })
+              handleFinkUI(record)
             }
-
-            // describeFlinkUiByInstanceId({
-            //   instanceId: record.id,
-            //   regionId,
-            //   spaceId,
-            // }).then((web_ui: string) => {
-
-            // })
           }}
         >
           Flink UI
@@ -438,6 +450,12 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
           total: get(data, 'total', 0),
           ...pagination
         }}
+      />
+      <MessageModal
+        visible={messageVisible}
+        row={currentRow}
+        cancel={() => setMessageVisible(false)}
+        webUI={handleFinkUI}
       />
     </>
   )
