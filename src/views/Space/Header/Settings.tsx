@@ -186,7 +186,7 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
                 name="documentation"
                 type={darkMode ? 'light' : 'dark'}
                 changeable
-                size={40}
+                size={20}
                 tw="cursor-pointer"
               />
             </IconBox>

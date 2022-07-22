@@ -28,7 +28,7 @@ const defaultFuncList = [
     name: 'dts',
     title: '数据服务',
     subFuncList: [
-      { name: 'cluster', title: '服务集群', icon: 'q-dockerHubDuotone' },
+      { name: 'cluster', title: '服务集群', icon: 'q-dockerHubDuotone2' },
       { name: 'serviceDev', title: '服务开发', icon: 'q-inferenceEnginDuotone' },
       {
         name: 'serviceGateWay',

@@ -211,9 +211,6 @@ const ClusterModal = observer(
                     <div className="sla">
                       SLA: <span>99.5%</span>
                     </div>
-                    <div className="maximumLink">
-                      最大连接数：<span>500</span>
-                    </div>
                   </div>
                 </RadioButton>
                 <RadioButton value={2}>
@@ -225,9 +222,6 @@ const ClusterModal = observer(
                     <div className="sla">
                       SLA: <span>99.5%</span>
                     </div>
-                    <div className="maximumLink">
-                      最大连接数：<span>1000</span>
-                    </div>
                   </div>
                 </RadioButton>
                 <RadioButton value={3}>
@@ -238,9 +232,6 @@ const ClusterModal = observer(
                     </div>
                     <div className="sla">
                       SLA: <span>99.5%</span>
-                    </div>
-                    <div className="maximumLink">
-                      最大连接数：<span>2000</span>
                     </div>
                   </div>
                 </RadioButton>
