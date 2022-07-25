@@ -3,11 +3,11 @@ import { observer } from 'mobx-react-lite'
 import { Icon, Menu } from '@QCFE/lego-ui'
 import { Tree } from 'components'
 import tw, { css, styled } from 'twin.macro'
-import { useFetchApi } from 'hooks'
+import { useFetchApi, useFetchApiConfig } from 'hooks'
 import { followCursor } from 'tippy.js'
 import Tippy from '@tippyjs/react'
 import { useUnmount } from 'react-use'
-import { cloneDeep, filter, get, pick } from 'lodash-es'
+import { cloneDeep, filter, get, merge, pick } from 'lodash-es'
 import { useStore } from 'stores'
 import { useLocation, useParams, useHistory } from 'react-router-dom'
 import { ApiProps } from 'stores/DtsDevStore'
@@ -64,6 +64,7 @@ export const ApiTree = observer(
     const history = useHistory()
     const { verId } = qs.parse(query.slice(1))
     const fetchApi = useFetchApi()
+    const fetchApiConfig = useFetchApiConfig()
 
     const {
       dtsDevStore,
@@ -126,7 +127,17 @@ export const ApiTree = observer(
           const groupData = pick(Group, ['name', 'id', 'group_path'])
           setCurrentGroup(groupData)
         }
-        if (api) setCurrentApi(api)
+        if (api) {
+          setCurrentApi(api)
+
+          const apiId = get(api, 'api_id')
+
+          fetchApiConfig({ apiId }).then((res) => {
+            const dataSource = cloneDeep(get(res, 'data_source'))
+            const Api = merge(get(res, 'api_config'), { datasource_id: dataSource.id })
+            setCurrentApi(Api)
+          })
+        }
         setCurOp(val)
         if (val === 'createAPI') {
           setShowApiModal(true)
@@ -147,7 +158,7 @@ export const ApiTree = observer(
         }
         setVisible(false)
       },
-      [dtsDevStore]
+      [dtsDevStore, fetchApiConfig]
     )
 
     const fetchJobTreeData = (node: any, movingNode = null) => {
