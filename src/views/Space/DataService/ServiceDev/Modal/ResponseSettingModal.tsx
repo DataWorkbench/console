@@ -3,7 +3,6 @@ import { DargTable, ResizeModal, FlexBox } from 'components'
 import { observer } from 'mobx-react-lite'
 import { DataServiceManageDescribeApiConfig, useMutationUpdateApiConfig, useStore } from 'hooks'
 import { Button, Collapse, Icon, Input } from '@QCFE/lego-ui'
-import tw, { css } from 'twin.macro'
 import { MappingKey } from 'utils/types'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { useImmer } from 'use-immer'
@@ -16,16 +15,7 @@ import {
   ResponseSettingColumns,
   serviceDevResponseSettingMapping
 } from '../constants'
-
-const styles = {
-  table: css`
-    .darg-table-body {
-      .group {
-        ${tw` bg-neut-17! hover:bg-neut-16!`}
-      }
-    }
-  `
-}
+import { CollapseWrapper, TableWrapper } from '../styled'
 
 type DataSourceProp = DataServiceManageDescribeApiConfig['response_params']['response_params']
 
@@ -286,7 +276,7 @@ const ResponseSettingModal = observer(() => {
         </div>
       }
     >
-      <Collapse defaultActiveKey={['p1', 'p2']}>
+      <CollapseWrapper defaultActiveKey={['p1', 'p2']}>
         <CollapseItem
           key="p1"
           label={
@@ -296,15 +286,14 @@ const ResponseSettingModal = observer(() => {
             </FlexBox>
           }
         >
-          <div css={styles.table}>
+          <TableWrapper>
             <DargTable
               columns={columns as unknown as any}
               runDarg={false}
               dataSource={dataSource}
               disabled={isHistory}
-              rowKey="key"
             />
-          </div>
+          </TableWrapper>
         </CollapseItem>
         <CollapseItem
           key="p2"
@@ -315,15 +304,19 @@ const ResponseSettingModal = observer(() => {
             </FlexBox>
           }
         >
-          <DargTable
-            columns={totalColumns as unknown as any}
-            runDarg={false}
-            dataSource={highDataSource}
-            disabled={isHistory}
-            rowKey="key"
-          />
+          <>
+            <div tw="mb-3">分页设置</div>
+            <TableWrapper>
+              <DargTable
+                columns={totalColumns as unknown as any}
+                runDarg={false}
+                dataSource={highDataSource}
+                disabled={isHistory}
+              />
+            </TableWrapper>
+          </>
         </CollapseItem>
-      </Collapse>
+      </CollapseWrapper>
     </ResizeModal>
   )
 })

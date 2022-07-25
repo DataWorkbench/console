@@ -8,7 +8,7 @@ import { MappingKey } from 'utils/types'
 import { useImmer } from 'use-immer'
 import { cloneDeep, get } from 'lodash-es'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
-import { TitleItem, TestContent, MessageBox } from '../styled'
+import { TitleItem, TestContent, MessageBox, TableWrapper } from '../styled'
 import {
   RequestSettingColumns,
   serviceDevRequestSettingMapping,
@@ -121,14 +121,13 @@ const TestModal = observer(() => {
         <FlexBox tw="h-full">
           <div tw="flex-1 mr-5">
             <TitleItem>请求参数</TitleItem>
-            <div tw="my-3">
+            <TableWrapper tw="my-3">
               <DargTable
                 columns={limitColumns as unknown as any}
                 runDarg={false}
                 dataSource={testSource}
-                rowKey="key"
               />
-            </div>
+            </TableWrapper>
             <Button
               type="primary"
               size="small"

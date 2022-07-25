@@ -8,7 +8,6 @@ import {
 import { Form, Icon } from '@QCFE/lego-ui'
 import {
   AffixLabel,
-  FlexBox,
   Center,
   ButtonWithClearField,
   PopConfirm,
@@ -21,7 +20,7 @@ import { cloneDeep, findKey, get, isEmpty, pick } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
 import { configMapFieldData, dataSourceTypes } from '../constants'
-import { tableSelectStyled } from '../styled'
+import { tableSelectStyled, FormWrapper } from '../styled'
 
 type SourceDataType = { id: string; name: string; networkId?: string } | null
 interface IRouteParams {
@@ -163,7 +162,7 @@ const SyncDataSource = observer(
     }))
 
     return (
-      <FlexBox tw="flex-col">
+      <FormWrapper tw="flex-col">
         <Form ref={ref} tw="px-0">
           <SelectField
             label={<AffixLabel>数据源类型</AffixLabel>}
@@ -283,7 +282,7 @@ const SyncDataSource = observer(
             }
           }}
         />
-      </FlexBox>
+      </FormWrapper>
     )
   },
   { forwardRef: true }

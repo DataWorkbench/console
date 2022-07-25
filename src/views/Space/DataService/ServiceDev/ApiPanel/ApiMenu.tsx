@@ -108,11 +108,11 @@ const ApiMenu = observer((props: JobMenuProps) => {
           <div tw="border border-neut-13 rounded-sm">
             <Menu onClick={onRightMenuClick}>
               <MenuItem value="createApiGroup">
-                <Icon name="edit" size={14} type="light" />
+                <Icon name="q-apps3Fill" size={14} type="light" />
                 <span>创建API服务组</span>
               </MenuItem>
               <MenuItem value="createApi">
-                <Icon name="edit" size={14} type="light" />
+                <Icon name="q-apiFill" size={14} type="light" />
                 <span>创建API</span>
               </MenuItem>
             </Menu>
@@ -194,7 +194,7 @@ const ApiMenu = observer((props: JobMenuProps) => {
               <button
                 type="button"
                 onClick={() => showCreateModal()}
-                tw="py-1 rounded-sm w-48 bg-neut-13 focus:outline-none hover:bg-neut-10 ring-opacity-50"
+                tw="rounded-sm  w-52 h-7 bg-neut-13 focus:outline-none hover:bg-neut-10 ring-opacity-50"
               >
                 <Icon name="add" type="light" tw="align-middle" />
                 <span tw="align-middle">新建</span>

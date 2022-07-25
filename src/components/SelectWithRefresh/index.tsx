@@ -34,7 +34,7 @@ const SelectWithRefreshCmp = forwardRef<
       <>
         <Select clearable {...rest} id={domId} onChange={onChange} ref={selectRef} type="small" />
         <Button
-          tw="w-8 ml-3 p-0 dark:bg-neut-16!"
+          tw="w-8 ml-2 p-0 dark:bg-neut-16!"
           className="refresh-button"
           disabled={disabled}
           onClick={() => onRefresh && onRefresh()}

@@ -28,12 +28,12 @@ const CollapseWrapper = styled('div')(() => [
   tw`flex-1 px-2 py-2 bg-neut-18`,
   css`
     li.collapse-item {
-      ${tw`mt-2 rounded-[3px] overflow-hidden`}
+      ${tw`mb-2 rounded-[3px] overflow-hidden`}
       .collapse-item-label {
-        ${tw`h-11 border-none hover:bg-neut-16`}
+        ${tw`h-11 border-none hover:bg-neut-16 pl-[10px]`}
       }
       .collapse-item-content {
-        ${tw`bg-neut-17`}
+        ${tw`bg-neut-17 pt-2 pb-3`}
       }
     }
     li:last-child {
