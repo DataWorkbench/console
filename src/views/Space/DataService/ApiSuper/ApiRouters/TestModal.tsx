@@ -8,7 +8,7 @@ import { get } from 'lodash-es'
 import { PbmodelRoute } from 'types/types'
 import { useMount } from 'react-use'
 import { observer } from 'mobx-react-lite'
-import { TitleItem, TestContent } from '../../ServiceDev/styled'
+import { TitleItem, TestContent, TableWrapper } from '../../ServiceDev/styled'
 
 import {
   serviceDevRequestSettingMapping,
@@ -130,14 +130,13 @@ export const TestModal = observer((props: TestModalProps) => {
         <FlexBox tw="h-full">
           <div tw="flex-1 mr-5">
             <TitleItem>请求参数</TitleItem>
-            <div tw="my-3">
+            <TableWrapper tw="my-3">
               <DargTable
                 columns={limitColumns as unknown as any}
                 runDarg={false}
                 dataSource={testSource}
-                rowKey="key"
               />
-            </div>
+            </TableWrapper>
             <Input
               tw="mb-3"
               placeholder="请输入密钥（API所属API服务组详情可查看已绑密钥）"

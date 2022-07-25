@@ -51,12 +51,19 @@ const formStyle = {
   CURadioGroup: css`
     .radio-button {
       ${tw`w-[164px]! h-[125px]! mr-2 rounded-sm`}
+      .label-value {
+        ${tw`h-full`}
+      }
       .radioBox {
+        ${tw`flex-row h-full`}
         .title {
           ${tw`text-lg w-[164px] h-[53px]  text-neut-0 mb-0 text-left border-neut-13 border-b leading-[53px] mb-[8px]`}
         }
         div {
           ${tw`text-left pl-3 text-neut-8`}
+        }
+        .desc {
+          ${tw`flex-auto`}
         }
       }
     }
@@ -211,9 +218,6 @@ const ClusterModal = observer(
                     <div className="sla">
                       SLA: <span>99.5%</span>
                     </div>
-                    <div className="maximumLink">
-                      最大连接数：<span>500</span>
-                    </div>
                   </div>
                 </RadioButton>
                 <RadioButton value={2}>
@@ -225,9 +229,6 @@ const ClusterModal = observer(
                     <div className="sla">
                       SLA: <span>99.5%</span>
                     </div>
-                    <div className="maximumLink">
-                      最大连接数：<span>1000</span>
-                    </div>
                   </div>
                 </RadioButton>
                 <RadioButton value={3}>
@@ -238,9 +239,6 @@ const ClusterModal = observer(
                     </div>
                     <div className="sla">
                       SLA: <span>99.5%</span>
-                    </div>
-                    <div className="maximumLink">
-                      最大连接数：<span>2000</span>
                     </div>
                   </div>
                 </RadioButton>

@@ -16,6 +16,7 @@ import {
   configMapData,
   FieldCategory
 } from '../constants'
+import { CollapseWrapper, TableWrapper } from '../styled'
 
 type DataSourceProp = DataServiceManageDescribeApiConfig['request_params']['request_params']
 export interface JobModalData {
@@ -360,42 +361,36 @@ const RequestSettingModal = observer(() => {
         </div>
       }
     >
-      <Collapse defaultActiveKey={['p1', 'p2']}>
-        <CollapseItem
-          key="p1"
-          label={
-            <FlexBox tw="items-center space-x-1">
-              <Icon name="record" tw="(relative top-0 left-0)!" type="light" />
-              <span>基本设置</span>
-            </FlexBox>
-          }
-        >
+      <>
+        <TableWrapper tw="p-5">
           <DargTable
             columns={columns as unknown as any}
             runDarg={false}
             dataSource={dataSource}
             disabled={isHistory}
-            rowKey="param_name"
           />
-        </CollapseItem>
-        <CollapseItem
-          key="p2"
-          label={
-            <FlexBox tw="items-center space-x-1">
-              <Icon name="record" tw="(relative top-0 left-0)!" type="light" />
-              <span>高级设置</span>
-            </FlexBox>
-          }
-        >
-          <DargTable
-            columns={limitColumns as unknown as any}
-            runDarg={false}
-            disabled={isHistory}
-            dataSource={highSource}
-            rowKey="param_name"
-          />
-        </CollapseItem>
-      </Collapse>
+        </TableWrapper>
+        <CollapseWrapper defaultActiveKey={['p1']}>
+          <CollapseItem
+            key="p1"
+            label={
+              <FlexBox tw="items-center space-x-1">
+                <Icon name="record" tw="(relative top-0 left-0)!" type="light" />
+                <span>高级设置</span>
+              </FlexBox>
+            }
+          >
+            <TableWrapper>
+              <DargTable
+                columns={limitColumns as unknown as any}
+                runDarg={false}
+                disabled={isHistory}
+                dataSource={highSource}
+              />
+            </TableWrapper>
+          </CollapseItem>
+        </CollapseWrapper>
+      </>
     </ResizeModal>
   )
 })
