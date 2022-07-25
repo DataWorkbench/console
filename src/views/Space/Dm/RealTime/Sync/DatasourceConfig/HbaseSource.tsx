@@ -53,7 +53,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
             encoding: get(e, 'data.encoding', 'UTF-8'),
             scanCacheSize: get(e, 'data.scan_cache_size', 256),
             scanBatchSize: get(e, 'data.scan_batch_size', 100),
-            readMode: get(e, 'data.read_mode', 'NORMAL')
+            readMode: get(e, 'data.read_mode', 'normal')
           }
         })
       )
@@ -171,7 +171,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
             </>
           )}
           <RadioGroupField
-            label={<AffixLabel required>起始主键类型</AffixLabel>}
+            label={<AffixLabel required>起止主键类型</AffixLabel>}
             name="isBinaryRowKey"
             value={dbInfo?.isBinaryRowKey}
             onChange={(e) => {
@@ -189,7 +189,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                 {
                   label: (
                     <AffixLabel
-                      required
+                      required={false}
                       theme="green"
                       help="在读取时，将 starkRowkey 、endRowkey 填写的字符串转为二进制格式进行比对"
                     >
@@ -332,7 +332,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                         横表
                       </AffixLabel>
                     ),
-                    value: 1
+                    value: 'normal'
                   },
                   {
                     label: (
@@ -344,7 +344,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                         竖表
                       </AffixLabel>
                     ),
-                    value: 2
+                    value: 'multiVersionFixedColumn'
                   }
                 ]}
                 validateOnChange
