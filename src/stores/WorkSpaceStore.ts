@@ -37,7 +37,7 @@ const defaultFuncList = [
         items: [
           { name: 'apiService', title: 'API 服务组' },
           { name: 'routers', title: '已发布 API' },
-          { name: 'authKey', title: '秘钥管理' }
+          { name: 'authKey', title: '密钥管理' }
         ]
       }
     ]
