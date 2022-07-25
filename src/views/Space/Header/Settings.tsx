@@ -4,7 +4,7 @@ import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 
 import { Center, FlexBox, HelpCenterLink, Tooltip } from 'components'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { emitter } from 'utils/index'
 import { isDarkTheme } from 'utils/theme'
 
@@ -131,16 +131,14 @@ export const Settings = ({ darkMode }: { darkMode: boolean }) => {
     }
   }
 
-  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
-
   const history = useHistory()
   const handleMenu2Page = (key: string) => {
     switch (key) {
       case 'notify':
-        history.push(`/${regionId}/workspace/${spaceId}/settings/notify`)
+        history.push(`/settings/notify`)
         break
       case 'account':
-        history.push(`/${regionId}/workspace/${spaceId}/settings/account`)
+        history.push(`/settings/account`)
         break
       case 'logout':
         emitter.emit('logout')
