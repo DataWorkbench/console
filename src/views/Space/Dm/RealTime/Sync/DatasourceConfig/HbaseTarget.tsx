@@ -5,16 +5,14 @@ import { useImmer } from 'use-immer'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import { map } from 'rxjs'
 import { get } from 'lodash-es'
-import { AffixLabel, Center, FlexBox, HelpCenterLink, SelectWithRefresh } from 'components'
+import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
 import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
-import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { target$ } from '../common/subjects'
-import { useQuerySourceTables } from '../../../../../../hooks'
 
 type FieldKeys = 'id' | 'nullMode' | 'encoding' | 'walFlag' | 'writeBufferSize' | 'table'
 
-const { SelectField, RadioGroupField, ToggleField } = Form
+const { SelectField, RadioGroupField, ToggleField, TextField } = Form
 const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => {
   const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
   const sourceForm = useRef<Form>()
@@ -43,18 +41,6 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
     }
   }, [setDbInfo])
 
-  const {
-    data: tableList,
-    refetch,
-    isFetching
-  } = useQuerySourceTables(
-    {
-      sourceId: dbInfo?.id
-    },
-    { enabled: !!dbInfo?.id }
-  )
-  const { refetch: refetchColumns } = useTableColumns(dbInfo?.id, dbInfo?.table, 'target')
-
   useImperativeHandle(ref, () => ({
     validate: () => {
       if (!sourceForm.current) {
@@ -70,21 +56,16 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
       write_buffer_size: dbInfo?.writeBufferSize,
       table: dbInfo?.table
     }),
-    refetchColumn: () => {
-      refetchColumns()
-    }
+    refetchColumn: () => {}
   }))
   return (
     <Form css={styles.form} ref={sourceForm}>
       <BaseConfigCommon from="target" />
       {dbInfo?.id && (
         <>
-          <SelectWithRefresh
+          <TextField
             label={<AffixLabel>数据源表</AffixLabel>}
             name="table"
-            onRefresh={refetch}
-            lsLoading={isFetching}
-            options={tableList?.items?.map((i) => ({ label: i, value: i })) ?? []}
             value={dbInfo?.table}
             onChange={(e) => {
               setDbInfo((draft) => {
@@ -110,7 +91,7 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
             ]}
             help={
               <HelpCenterLink isIframe={false} hasIcon href="###">
-                HBase Source 配置文档
+                HBase Sink 配置文档
               </HelpCenterLink>
             }
           />

@@ -5,10 +5,8 @@ import { useImmer } from 'use-immer'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import { map } from 'rxjs'
 import { get } from 'lodash-es'
-import { useQuerySourceTables } from 'hooks'
-import { AffixLabel, Center, FlexBox, HelpCenterLink, SelectWithRefresh } from 'components'
+import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
 import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
-import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { source$ } from '../common/subjects'
 
@@ -57,19 +55,6 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
     }
   }, [setDbInfo])
 
-  const {
-    data: tableList,
-    refetch,
-    isFetching
-  } = useQuerySourceTables(
-    {
-      sourceId: dbInfo?.id
-    },
-    { enabled: !!dbInfo?.id }
-  )
-
-  const { refetch: refetchColumns } = useTableColumns(dbInfo?.id, dbInfo?.table, 'source')
-
   useImperativeHandle(ref, () => ({
     validate: () => {
       if (!sourceForm.current) {
@@ -89,9 +74,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
       scan_batch_size: dbInfo?.scanBatchSize,
       read_mode: dbInfo?.readMode
     }),
-    refetchColumn: () => {
-      refetchColumns()
-    }
+    refetchColumn: () => {}
   }))
 
   return (
@@ -99,12 +82,9 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
       <BaseConfigCommon from="source" />
       {dbInfo?.id && (
         <>
-          <SelectWithRefresh
+          <TextField
             label={<AffixLabel>数据源表</AffixLabel>}
             name="table"
-            onRefresh={refetch}
-            isLoading={isFetching}
-            options={tableList?.items?.map((i) => ({ label: i, value: i })) ?? []}
             value={dbInfo?.table}
             onChange={(e) => {
               setDbInfo((draft) => {
