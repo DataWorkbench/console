@@ -65,9 +65,16 @@ const MemberModal = observer((props: IMemberModalProps) => {
     }
   )
 
-  const { data: users, fetchNextPage, hasNextPage, isFetching } = useQueryListAvailableUsers({})
+  const [filter, setFilter] = useImmer({
+    search: ''
+  })
 
-  const userOptions = flatten(users?.pages.map((page: Record<string, any>) => page.infos || []))
+  const { data: users, fetchNextPage, hasNextPage, isFetching } = useQueryListAvailableUsers(filter)
+
+  const userId = get(window, 'USER.user_id')
+  const userOptions = flatten(
+    users?.pages.map((page: Record<string, any>) => page.infos || [])
+  ).filter((i) => i.user_id !== userId)
 
   const loadData = () => {
     if (hasNextPage) {
@@ -115,9 +122,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
   }
 
   const [show] = useState(true)
-  const [, setFilter] = useImmer({
-    search: ''
-  })
+
   const [search, setSearch] = useState('')
 
   useDebounce(
