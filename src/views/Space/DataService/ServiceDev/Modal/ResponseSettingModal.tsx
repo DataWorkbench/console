@@ -292,6 +292,7 @@ const ResponseSettingModal = observer(() => {
               runDarg={false}
               dataSource={dataSource}
               disabled={isHistory}
+              rowKey="column_name"
             />
           </TableWrapper>
         </CollapseItem>
@@ -312,6 +313,7 @@ const ResponseSettingModal = observer(() => {
                 runDarg={false}
                 dataSource={highDataSource}
                 disabled={isHistory}
+                rowKey="column_name"
               />
             </TableWrapper>
           </>

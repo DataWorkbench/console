@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query'
 import { apiRequest } from 'utils/api'
 import { merge } from 'lodash-es'
 import { useCallback } from 'react'
-import { request } from 'utils'
+import { request, customRequest } from 'utils'
 import { PbmodelApiConfig, PbmodelApiGroup } from 'types/types'
 import { apiHooks, queryKeyObj } from './apiHooks'
 import {
@@ -469,6 +469,59 @@ export const useMutationRepublishDataServiceApi = () => {
     ret = await RepublishDataServiceApi(params)
     return ret
   })
+}
+
+// 已发布api 测试详情
+export const DescribePublishedApiHttpDetails = async ({
+  regionId,
+  spaceId,
+  verId,
+  ...rest
+}: IParams) => {
+  const params = merge(
+    { regionId, uri: { space_id: spaceId, ver_id: verId } },
+    { data: { ...rest } }
+  )
+  return apiRequest('dataServiceManage', 'describePublishedApiHttpDetails')(params)
+}
+
+export const useMutationPublishedApiHttpDetails = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ verId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      verId,
+      regionId,
+      spaceId,
+      ...rest
+    }
+    ret = await DescribePublishedApiHttpDetails(params)
+    return ret
+  })
+}
+
+// 公网测试接口
+
+export const testPublishApi = ({
+  host,
+  uri,
+  headers,
+  method,
+  requestContent,
+  cancel,
+  ...rest
+}: any) => {
+  const url = `http://${host}/${uri}`
+  return customRequest({
+    url,
+    method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    params: requestContent,
+    ...rest
+  }).catch(() => null)
 }
 
 export const useQueryListDataSources = apiHooks<
