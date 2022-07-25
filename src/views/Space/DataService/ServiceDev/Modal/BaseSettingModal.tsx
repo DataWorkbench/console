@@ -157,7 +157,8 @@ const BaseSettingModal = observer(() => {
           apiId: params.api_id,
           datasource_id: dataSource.id,
           table_name: apiConfig?.table_name,
-          ...params
+          ...params,
+          api_path: `/${params.api_path.trim()}`
         },
         {
           onSuccess: (res) => {
@@ -255,15 +256,15 @@ const BaseSettingModal = observer(() => {
               schemas={[
                 {
                   rule: (value: string) => {
-                    const l = strlen(value)
-                    return l >= 4 && l <= 50
+                    const reg = /^[a-zA-Z0-9_]{4,50}$/
+                    return reg.test(value)
                   },
-                  help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
+                  help: '请输入4~50 个字符，英文字母、数字、英文格式的下划线',
                   status: 'error'
                 }
               ]}
               help="填入路径将作为 API
-                二级路径。支持英文、数字、下划线（_）、连字符（-），且只能以正斜线（/）开头，不超过
+                二级路径。支持英文、数字、下划线（_）、连字符（-），不超过
                 200 个字符"
             />
             <Field>
