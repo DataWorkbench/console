@@ -189,7 +189,7 @@ const changeTableName = () =>
     const oldId = get(pervValue, 'data.id', '')
     const id = get(value, 'data.id', '')
     const name = get(value, 'data.table[0]') || get(value, 'data.table_list[0]')
-    const oldName = get(pervValue, 'data.tableName') || get(pervValue, 'data.table_list[0]')
+    const oldName = get(pervValue, 'data.table[0]') || get(pervValue, 'data.table_list[0]')
 
     if (!name || !oldName) {
       return true
