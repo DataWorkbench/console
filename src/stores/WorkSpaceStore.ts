@@ -102,7 +102,7 @@ const defaultFuncList = [
       // { name: 'setting', title: '空间配置', icon: 'blockchain' },
       // { name: 'engine', title: '引擎管理', icon: 'blockchain' },
       { name: 'members', title: '成员管理', icon: 'group' },
-      { name: 'permissions', title: '列表权限', icon: 'passport' }
+      { name: 'permissions', title: '权限列表', icon: 'passport' }
     ]
   }
 ]
