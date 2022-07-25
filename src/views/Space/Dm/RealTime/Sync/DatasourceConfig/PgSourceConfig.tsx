@@ -315,32 +315,32 @@ const PgSourceConfig = forwardRef(
                 }
               ]}
             />
-            {!!dbInfo?.slot && (
-              <>
-                <ToggleField
-                  name="autoCreate"
-                  label="自动创建 slot"
-                  value={dbInfo?.autoCreate}
-                  onChange={(e) => {
-                    setDbInfo((draft) => {
-                      draft.autoCreate = e
-                    })
-                  }}
-                  help="按照 slot 名称自动创建 slot"
-                />
-                <ToggleField
-                  value={dbInfo?.temp}
-                  name="temp"
-                  label={<AffixLabel required>临时 slot</AffixLabel>}
-                  onChange={(e) => {
-                    setDbInfo((draft) => {
-                      draft.temp = e
-                    })
-                  }}
-                  help="临时的 slot 当实时同步结束后删除"
-                />
-              </>
-            )}
+            <>
+              <ToggleField
+                name="autoCreate"
+                label="自动创建 slot"
+                value={dbInfo?.autoCreate}
+                onChange={(e) => {
+                  setDbInfo((draft) => {
+                    draft.autoCreate = e
+                  })
+                }}
+                help={
+                  dbInfo?.autoCreate ? '按照 slot 名称自动创建 slot' : '使用已有的 slotName 的 slot'
+                }
+              />
+              <ToggleField
+                value={dbInfo?.temp}
+                name="temp"
+                label={<AffixLabel required>临时 slot</AffixLabel>}
+                onChange={(e) => {
+                  setDbInfo((draft) => {
+                    draft.temp = e
+                  })
+                }}
+                help="临时的 slot 当实时同步结束后删除"
+              />
+            </>
             <FlexBox>
               <div css={styles.line} />
               <Center tw="px-1 cursor-pointer" onClick={() => setShowAdvanced((prev) => !prev)}>
