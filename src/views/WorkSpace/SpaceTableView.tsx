@@ -24,7 +24,9 @@ const isNetworkInit = (platform: Record<string, any>, space: Record<string, any>
 
 const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
   const stateStore = useWorkSpaceContext()
-  const { defaultColumns, columnSettings, selectedSpaces, queryKeyWord, queryRefetch } = stateStore
+  const { defaultColumns, columnSettings, selectedSpaces, queryKeyWord, queryRefetch, isAdmin } =
+    stateStore
+
   // const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const selectedRowKeys = selectedSpaces.map((i: Record<string, any>) => i.id)
   // const { width: winW } = useWindowSize()
@@ -48,6 +50,7 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     search: string
     sort_by: string
     status: string | number
+    isAdmin: boolean
   }
   const [filter, setFilter] = useImmer<IFilter>({
     regionId,
@@ -57,9 +60,16 @@ const SpaceTableView = observer(({ regionId }: { regionId: string }) => {
     reverse: true,
     search: '',
     sort_by: '',
-    status: ''
+    status: '',
+    isAdmin
   })
   // const ifExceedMaxWidth = winW > 1535
+
+  useEffect(() => {
+    setFilter((draft) => {
+      draft.isAdmin = isAdmin
+    })
+  }, [isAdmin, setFilter])
 
   const columns = useMemo(
     () =>

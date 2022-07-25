@@ -109,7 +109,7 @@ interface Column {
 }
 
 export interface IFieldMappingsProps {
-  onChange?: (value: Record<string, any>) => void
+  // onChange?: (value: Record<string, any>) => void
   leftFields: TMappingField[]
   rightFields: TMappingField[]
   leftTypeName?: string
@@ -122,7 +122,7 @@ export interface IFieldMappingsProps {
   onReInit: () => void
   sourceId?: string
   targetId?: string
-  jobType: 1 | 2 | 3
+  // jobType: 1 | 2 | 3
 }
 
 export interface IFieldMappingsRecord {
@@ -636,9 +636,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     if (
       [
         SourceType.HBase,
-        SourceType.Kafka,
-        SourceType.SqlServer,
-        SourceType.MongoDB
+        SourceType.Kafka
+        // SourceType.SqlServer,
+        // SourceType.MongoDB
         // @ts-ignore
       ].includes(rightTypeName?.getType?.())
     ) {

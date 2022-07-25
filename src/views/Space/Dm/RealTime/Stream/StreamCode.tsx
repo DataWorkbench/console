@@ -588,9 +588,16 @@ const StreamCode = observer(({ tp }: IProp) => {
                     tw="text-left px-6 break-all overflow-y-auto"
                   >
                     <div tw="text-center">发现语法检查错误，具体内容如下：</div>
-                    {syntaxState.errMsg.split(/\n\t/).map((line, i) => {
+                    {syntaxState.errMsg.split(/\n/).map((line, i) => {
                       if (line) {
-                        return <div key={`${i.toString()}key`}>{line}</div>
+                        return (
+                          <div
+                            key={`${i.toString()}key`}
+                            tw="whitespace-pre-wrap bg-transparent text-neut-8"
+                          >
+                            {line}
+                          </div>
+                        )
                       }
                       return null
                     })}

@@ -16,15 +16,14 @@ import { get } from 'lodash-es'
 // import Manage from 'views/Space/Manage'
 // import DataService from 'views/Space/DataService'
 
-// const DescribeDataOmnis = lazy(
-//   () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
-// )
-//
-// // activateDataOmnis
-// const ActivateDataOmnis = lazy(
-//   () =>
-//     import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
-// )
+const DescribeDataOmnis = lazy(
+  () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/DescribeDataOmnis')
+)
+
+// activateDataOmnis
+const ActivateDataOmnis = lazy(
+  () => import(/* webpackChunkName: "grant" */ 'views/DataOmnis/ActivateDataOmnis')
+)
 
 // home
 const Layout = lazy(() => import(/* webpackChunkName: "home" */ 'views/Layout'))
@@ -89,7 +88,6 @@ const Routes = () => {
               component={DataService}
             />
             <Route path="/:regionId/workspace/:spaceId/manage/:mod?" component={Manage} />
-            <Route path="/:regionId/workspace/:spaceId/settings/:mod?" component={Setting} />
             <Route path="/:regionId/workspace/:spaceId/member" component={Member} />
             <Route component={Upcloud} />
           </Switch>
@@ -100,6 +98,7 @@ const Routes = () => {
           <Switch>
             <Route path="/overview" component={Overview} />
             <Route path="/workspace" component={WorkSpace} />
+            <Route path="/settings/:mod?" component={Setting} />
             <Route path="/" exact component={() => <Redirect to="/overview" />} />
           </Switch>
         </Layout>

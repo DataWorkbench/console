@@ -45,11 +45,12 @@ class OverViewStore {
       // moreLink: '##',
     },
     {
+      name: 'dts',
       text: '数据服务',
       icon: 'resist',
       xlink: 'icon_service_3',
       desc: '根据企业数据仓库的结构，数据服务可生成自定义、可扩展的restfulAPI，提供数据权限、数据操作、数据查询等服务，助力企业构建轻量化的业务中台。',
-      enabled: false
+      enabled: true
       // moreLink: '##',
     },
     {

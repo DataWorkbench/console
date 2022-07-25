@@ -163,9 +163,10 @@ const BaseSourceConfig = forwardRef(
         sourceId={dbInfo?.id}
         tableName={dbInfo?.tableName}
         onChange={(v: string) => {
-          setDbInfo((draft) => {
-            draft.tableName = v
-          })
+          // setDbInfo((draft) => {
+          //   draft.tableName = v
+          // })
+          baseSource$.next({ data: { ...dbInfo, tableName: v }, sourceType })
         }}
       />
     )
