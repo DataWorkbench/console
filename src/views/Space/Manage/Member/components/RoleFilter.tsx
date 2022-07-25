@@ -30,11 +30,9 @@ const RoleFilter = (props: IRoleFilterProps) => {
   }
 
   const handleChange = (v: string[]) => {
-    console.log(v)
     setValue(v)
   }
 
-  console.log(value)
   const [visible, setVisible] = useState(false)
   const ref = React.useRef<HTMLDivElement>(null)
   return (
@@ -44,12 +42,12 @@ const RoleFilter = (props: IRoleFilterProps) => {
         trigger="click"
         theme="light"
         arrow={false}
-        placement="bottom"
         visible={visible}
-        appendTo={() => document.body}
+        placement="bottom"
+        // appendTo={() => document.body}
         onClickOutside={() => setVisible(false)}
         content={
-          <div ref={ref}>
+          <div ref={ref} onClick={(e) => e.stopPropagation()}>
             <div tw="pl-4 py-2 mt-0.5">
               <div>
                 <Checkbox
@@ -73,12 +71,18 @@ const RoleFilter = (props: IRoleFilterProps) => {
               />
             </div>
             <FlexBox tw="gap-2 p-2 border-t-neut-2 border-t">
-              <Button onClick={() => setVisible(false)}>取消</Button>
+              <Button
+                onClick={() => {
+                  setVisible(false)
+                }}
+              >
+                取消
+              </Button>
               <Button
                 type="primary"
                 onClick={() => {
-                  setVisible(false)
                   onChange(value)
+                  setVisible(false)
                 }}
               >
                 确定
@@ -87,14 +91,17 @@ const RoleFilter = (props: IRoleFilterProps) => {
           </div>
         }
       >
-        <Icon
-          name="filter"
-          type="dark"
-          clickable
-          tw="ml-1 block"
-          onClick={() => setVisible(true)}
-        />
+        <span> </span>
       </Tooltip>
+      <Icon
+        name="filter"
+        type="dark"
+        clickable
+        tw="ml-1 block"
+        onClick={() => {
+          setVisible(true)
+        }}
+      />
     </FlexBox>
   )
 }
