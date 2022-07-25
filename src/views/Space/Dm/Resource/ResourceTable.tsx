@@ -185,7 +185,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
       {
         title: (
           <FlexBox tw="items-center">
-            <span>状态</span>
+            <span>文件格式</span>
             <Tooltip
               trigger="click"
               placement="bottom-start"
@@ -321,7 +321,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
     uri: { space_id: spaceId }
   })
 
-  const sizeConf = get(configData!, 'file.size_single', 100 * 1024 * 1024)
+  const sizeConf = get(configData!, 'quota_set.file.size_single', 100 * 1024 * 1024)
   return (
     <>
       <div tw="bg-neut-16 p-5" className={className}>

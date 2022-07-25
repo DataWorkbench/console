@@ -84,7 +84,7 @@ const SpaceListsToolBar = observer(() => {
               创建工作空间
             </Button>
           )}
-          {!cardView && (
+          {!cardView && isAdmin && (
             <Dropdown
               content={
                 <Menu onClick={handleMenuClick}>
