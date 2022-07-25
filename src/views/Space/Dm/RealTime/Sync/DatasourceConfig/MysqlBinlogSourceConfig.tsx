@@ -138,7 +138,7 @@ const MysqlBinlogSourceConfig = forwardRef(
               filter: get(e, 'data.filter', ''),
               filterType: e?.data?.filter ? 2 : 1,
               tableName: get(e, 'data.table[0]', ''),
-              updateType: get(e, 'data.cat', '').split(','),
+              updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
               charset: get(e, 'data.connection-charset', 1),
               bufNumber: get(e, 'data.buffer-size', 1024),
               threads: get(e, 'data.parallel-thread-size', 2),
