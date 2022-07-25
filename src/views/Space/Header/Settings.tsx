@@ -1,10 +1,10 @@
 import { Menu } from '@QCFE/lego-ui'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
-import tw, { styled, css } from 'twin.macro'
+import tw, { css, styled } from 'twin.macro'
 
-import { Center, Tooltip, HelpCenterLink, FlexBox } from 'components'
-import { useHistory, useParams } from 'react-router-dom'
+import { Center, FlexBox, HelpCenterLink, Tooltip } from 'components'
+import { useHistory } from 'react-router-dom'
 import { emitter } from 'utils/index'
 import { isDarkTheme } from 'utils/theme'
 
@@ -43,7 +43,6 @@ const menuList = [
 // const platformAdminMenuKeys = new Set([''])
 const iaasKeys = new Set(['account', 'security', 'notify', 'divider', 'logout'])
 const privateKeys = new Set(['account', 'notify', 'divider', 'logout'])
-const privateKeys1 = new Set(['account', 'divider', 'logout'])
 
 // let isPrivate = (process.env.IS_PRIVATE)
 
@@ -64,11 +63,12 @@ const IconBox = styled(Center)(() => [
 
 const IconBoxWithTooltip = styled(Center)(() => [
   css`
-      &{
-        [aria-expanded='true'] {
-          .header-icon-bg-box {
-            ${tw`cursor-pointer dark:bg-neut-13 bg-neut-1`}
-          }
+    & {
+      [aria-expanded='true'] {
+        .header-icon-bg-box {
+          ${tw`cursor-pointer dark:bg-neut-13 bg-neut-1`}
+        }
+
         .icon {
           .qicon {
             fill: #9ddfc9;
@@ -76,7 +76,7 @@ const IconBoxWithTooltip = styled(Center)(() => [
           }
         }
       }
-    `
+  `
 ])
 
 const UserInfoWrapper = styled.div(() => [
@@ -84,6 +84,7 @@ const UserInfoWrapper = styled.div(() => [
     .space-user-icon {
       ${tw`w-10 h-10 rounded-full bg-[#E2E8F0] dark:bg-[#4C5E70]`}
     }
+
     & {
       [aria-expanded='true'],
       &:hover {
@@ -99,13 +100,7 @@ const UserInfo = styled(FlexBox)(({ darkMode }: { darkMode: boolean }) => [
   darkMode && tw`text-white!`
 ])
 
-export const Settings = ({
-  darkMode,
-  overview = false
-}: {
-  darkMode: boolean
-  overview?: boolean
-}) => {
+export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   // const handleOpenHelpCenter = (link: string) => {
   //   const openModal = Modal.open(HelpCenterModal, {
   //     link,
@@ -114,10 +109,8 @@ export const Settings = ({
   // }
 
   const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
-  let filter = isPrivate ? privateKeys : iaasKeys
-  if (isPrivate && overview) {
-    filter = privateKeys1
-  }
+  const filter = isPrivate ? privateKeys : iaasKeys
+
   const menus = menuList.filter((item) => filter.has(item.key))
   const handleMenu2Iaas = (key: string) => {
     switch (key) {
@@ -138,16 +131,14 @@ export const Settings = ({
     }
   }
 
-  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
-
   const history = useHistory()
   const handleMenu2Page = (key: string) => {
     switch (key) {
       case 'notify':
-        history.push(`/${regionId}/workspace/${spaceId}/settings/notify`)
+        history.push(`/settings/notify`)
         break
       case 'account':
-        history.push(`/${regionId}/workspace/${spaceId}/settings/account`)
+        history.push(`/settings/account`)
         break
       case 'logout':
         emitter.emit('logout')
@@ -215,22 +206,41 @@ export const Settings = ({
         <Tooltip
           theme="auto"
           trigger="click"
+          arrow={false}
           content={
-            <Menu onClick={handleMenu}>
-              {menus.map((item) => {
-                if (item.key === 'divider') {
-                  return <li key="divider" tw="h-[1px] my-1 bg-separator pointer-events-none" />
-                }
-                return (
-                  <MenuItem key={item.key}>
-                    <>
-                      <Icon name={item.icon} type={isDarkTheme() ? 'light' : 'dark'} />
-                      {item.label}
-                    </>
-                  </MenuItem>
-                )
-              })}
-            </Menu>
+            <div
+              css={[
+                isDarkTheme()
+                  ? css`
+                      & {
+                        border: 1px solid #4c5e70;
+                        box-shadow: 0px 1px 6px rgba(50, 69, 88, 0.2);
+                      }
+                    `
+                  : css`
+                      & {
+                        border: 1px solid #e5e9ee;
+                        box-shadow: 0px 1px 6px rgba(50, 69, 88, 0.2);
+                      }
+                    `
+              ]}
+            >
+              <Menu onClick={handleMenu}>
+                {menus.map((item) => {
+                  if (item.key === 'divider') {
+                    return <li key="divider" tw="h-[1px] my-1 bg-separator pointer-events-none" />
+                  }
+                  return (
+                    <MenuItem key={item.key}>
+                      <>
+                        <Icon name={item.icon} type={isDarkTheme() ? 'light' : 'dark'} />
+                        {item.label}
+                      </>
+                    </MenuItem>
+                  )
+                })}
+              </Menu>
+            </div>
           }
         >
           <UserInfo darkMode={darkMode}>

@@ -3,6 +3,7 @@ import { getName, notifyFieldMapping } from 'views/Space/Setting/Notify/common/m
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { InstanceName } from 'components/InstanceName'
 import React from 'react'
+import { formatDate } from 'utils/convert'
 // import { PbmodelNotification } from 'types/types'
 
 export const pageTabsData = [
@@ -30,7 +31,7 @@ export const columnsRender = {
     render: (desc: string) => <div tw="text-font-placeholder">{desc}</div>
   },
   [getName('created')]: {
-    render: (text: string) => <div tw="text-font-placeholder">{text}</div>
+    render: (text: number) => <div tw="text-font-placeholder">{formatDate(text)}</div>
   }
 }
 

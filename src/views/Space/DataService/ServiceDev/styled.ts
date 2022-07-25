@@ -1,6 +1,7 @@
 import tw, { styled, css } from 'twin.macro'
-import { Form, DatePicker, Alert } from '@QCFE/lego-ui'
+import { Form, DatePicker, Alert, Collapse } from '@QCFE/lego-ui'
 import { Table as LegoTable } from '@QCFE/qingcloud-portal-ui'
+import { FlexBox } from 'components'
 
 const { DatePickerField } = Form
 
@@ -16,7 +17,7 @@ export const Tag = styled('div')(({ selected }: { selected?: boolean }) => [
 ])
 
 export const JobToolBar = styled('div')(
-  () => [tw`flex px-2 pt-4 space-x-2`],
+  () => [tw`flex px-2 pt-2 space-x-2`],
   css`
     button.button {
       ${tw`h-7`}
@@ -237,7 +238,7 @@ export const TitleItem = styled('div')(() => [
 
 export const TestContent = styled('div')(() => [
   css`
-    ${tw`h-[370px] w-full whitespace-pre-line my-5 p-2 bg-neut-19 text-neut-7 rounded overflow-y-auto`}
+    ${tw`h-[370px] w-full whitespace-pre-wrap my-5 p-2 bg-neut-19 text-neut-7 rounded overflow-y-auto`}
   `
 ])
 
@@ -254,4 +255,30 @@ export const MessageBox = styled('div')(({ color = 'green' }: { color?: 'red' | 
 
 export const PathInput = styled('div')(() => [
   tw`block! items-center! space-x-1 bg-[rgba(76, 94, 112)] h-8 px-3 py-2 box-border`
+])
+
+export const FormWrapper = styled(FlexBox)(() => [
+  css`
+    .field {
+      ${tw`mb-3`}
+    }
+  `
+])
+
+export const CollapseWrapper = styled(Collapse)(() => [
+  css`
+    .collapse-item-label {
+      ${tw` h-[52px]`}
+    }
+  `
+])
+
+export const TableWrapper = styled('div')(() => [
+  css`
+    .darg-table-body {
+      .group {
+        ${tw` bg-neut-17! hover:bg-neut-16!`}
+      }
+    }
+  `
 ])

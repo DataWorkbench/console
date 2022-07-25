@@ -88,7 +88,6 @@ const Routes = () => {
               component={DataService}
             />
             <Route path="/:regionId/workspace/:spaceId/manage/:mod?" component={Manage} />
-            <Route path="/:regionId/workspace/:spaceId/settings/:mod?" component={Setting} />
             <Route path="/:regionId/workspace/:spaceId/member" component={Member} />
             <Route component={Upcloud} />
           </Switch>
@@ -99,6 +98,7 @@ const Routes = () => {
           <Switch>
             <Route path="/overview" component={Overview} />
             <Route path="/workspace" component={WorkSpace} />
+            <Route path="/settings/:mod?" component={Setting} />
             <Route path="/" exact component={() => <Redirect to="/overview" />} />
           </Switch>
         </Layout>

@@ -9,12 +9,7 @@ import {
   useState
 } from 'react'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
-import {
-  baseTarget$,
-  confColumns$,
-  target$,
-  targetColumns$
-} from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { baseTarget$, target$, targetColumns$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { AffixLabel, Center, FlexBox, SqlGroupField } from 'components'
 import { DbType, sourceKinds, SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
@@ -159,8 +154,8 @@ const BaseTargetConfig = forwardRef(
     )
 
     const handleUpdate = (e: Record<string, any>) => {
-      baseTarget$.next({ data: { ...dbInfo, ...e }, sourceType })
-      confColumns$.next([])
+      const v = { ...dbInfo, ...e }
+      setDbInfo(() => v)
     }
 
     const renderCommon = () => <BaseConfigCommon from="target" />
@@ -169,23 +164,19 @@ const BaseTargetConfig = forwardRef(
 
     useImperativeHandle(ref, () => ({
       validate: () => {
-        if (!targetForm.current) {
-          return false
-        }
-        return targetForm.current?.validateForm()
+        return !!targetForm.current?.validateForm()
       },
       getData: () => {
-        const target = baseTarget$.getValue()
-        if (!target || !target.data || !target.data.id) {
+        if (!dbInfo || !dbInfo.id) {
           return undefined
         }
         return {
-          table: [target.data.tableName],
-          write_mode: target.data.writeMode,
-          semantic: target.data.semantic,
-          batch_size: target.data.batchSize,
-          pre_sql: target.data.preSql,
-          post_sql: target.data.postSql
+          table: [dbInfo.tableName],
+          write_mode: dbInfo.writeMode,
+          semantic: dbInfo.semantic,
+          batch_size: dbInfo.batchSize,
+          pre_sql: dbInfo.preSql,
+          post_sql: dbInfo.postSql
         }
       },
       refetchColumn: () => {
@@ -200,10 +191,11 @@ const BaseTargetConfig = forwardRef(
         sourceId={dbInfo?.id}
         tableName={dbInfo?.tableName}
         onChange={(v) => {
-          console.log(v)
-          setDbInfo((draft) => {
-            draft.tableName = v
-          })
+          baseTarget$.next({ data: { ...dbInfo, tableName: v }, sourceType })
+          // setDbInfo((draft) => {
+          //   console.log(v)
+          //   draft.tableName = v
+          // })
         }}
       />
     )
@@ -216,7 +208,7 @@ const BaseTargetConfig = forwardRef(
           <>
             <SelectField
               label={<AffixLabel>写入模式</AffixLabel>}
-              name="write_mode"
+              name="writeMode"
               options={[
                 { label: 'insert 插入', value: WriteMode.Insert },
                 { label: 'replace 替换', value: WriteMode.Replace },
@@ -235,6 +227,7 @@ const BaseTargetConfig = forwardRef(
               ]}
               validateOnChange
               onChange={(v: WriteMode) => {
+                console.log(v)
                 handleUpdate({ writeMode: +v })
               }}
               help={(() => {

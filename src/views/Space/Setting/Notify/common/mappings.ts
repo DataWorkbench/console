@@ -5,7 +5,7 @@ import { PbmodelNotification } from 'types/types'
 export const notifyFieldMapping = (
   new Map() as Mapping1<'id' | 'email' | 'desc' | 'created', keyof PbmodelNotification>
 )
-  .set('id', { label: '消息接收人姓名/ID', apiField: 'name' })
+  .set('id', { label: '消息接收人姓名', apiField: 'name' })
   .set('email', { label: '邮箱', apiField: 'email' })
   .set('desc', { label: '备注', apiField: 'description' })
   .set('created', { label: '创建时间', apiField: 'created' })

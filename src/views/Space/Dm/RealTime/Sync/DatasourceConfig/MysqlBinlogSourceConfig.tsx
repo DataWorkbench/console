@@ -76,15 +76,15 @@ const styles = {
 const updateTypes = [
   {
     label: 'insert',
-    value: 1
+    value: 'insert'
   },
   {
     label: 'update',
-    value: 2
+    value: 'update'
   },
   {
     label: 'delete',
-    value: 3
+    value: 'delete'
   }
 ]
 
@@ -133,7 +133,7 @@ const MysqlBinlogSourceConfig = forwardRef(
               id: e?.data?.id,
               filter: get(e, 'data.filter', ''),
               filterType: e?.data?.filter ? 2 : 1,
-              tableName: get(e, 'data.table', ''),
+              tableName: get(e, 'data.table[0]', ''),
               updateType: get(e, 'data.cat', '').split(','),
               charset: get(e, 'data.connection-charset', 1),
               bufNumber: get(e, 'data.buffer-size', 1024),
@@ -168,20 +168,25 @@ const MysqlBinlogSourceConfig = forwardRef(
         }
         return sourceForm.current?.validateForm()
       },
-      getData: () => ({
-        source_id: dbInfo?.id,
-        table: dbInfo?.tableName,
-        filter: dbInfo?.filter,
-        cat: dbInfo?.updateType.filter(Boolean)?.join(''),
-        start: {
-          journal_name: dbInfo?.startFile,
-          position: dbInfo?.startPosition,
-          timestamp: parseInt(dbInfo?.startTime, 10)
-        },
-        connection_charset: dbInfo?.charset,
-        parallel_thread_size: dbInfo?.threads,
-        is_gtid_mode: dbInfo?.isGtidMode
-      }),
+      getData: () => {
+        if (!dbInfo?.id) {
+          return undefined
+        }
+        return {
+          source_id: dbInfo?.id,
+          table: [dbInfo?.tableName],
+          filter: dbInfo?.filter,
+          cat: dbInfo?.updateType.filter(Boolean)?.join(','),
+          start: {
+            journal_name: dbInfo?.startFile,
+            position: dbInfo?.startPosition,
+            timestamp: parseInt(dbInfo?.startTime, 10)
+          },
+          connection_charset: dbInfo?.charset,
+          parallel_thread_size: dbInfo?.threads,
+          is_gtid_mode: dbInfo?.isGtidMode
+        }
+      },
       refetchColumn: () => {
         refetchColumns()
       }

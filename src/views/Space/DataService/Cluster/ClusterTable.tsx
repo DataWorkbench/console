@@ -205,7 +205,7 @@ const ClusterTable = observer((props: ClusterTableProps) => {
             className="clusterIcon"
             tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
           >
-            <Icon name="q-dockerHubDuotone" type="light" />
+            <Icon name="q-dockerHubDuotone2" type="light" color={{ primary: '#fff' }} />
           </Center>
           <div tw="truncate">
             <TextEllipsis twStyle={tw`font-semibold`}>{row.name}</TextEllipsis>

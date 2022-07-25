@@ -48,7 +48,7 @@ const SideMenuWrapper = styled('div')(() => [
             }
           }
           .level-row {
-            ${tw`border-0`}
+            ${tw`border-0 `}
           }
         }
         .selected-row {
@@ -67,7 +67,7 @@ const SideMenuWrapper = styled('div')(() => [
         }
       }
       .side-menu-collapse .side-menu-pickup .side-content .icon-li.selected span.icon > svg {
-        ${tw`text-green-11 fill-[#9ddfc9]`}
+        ${tw`fill-[#9ddfc9]`}
       }
       .side-menu-pickup {
         box-shadow: none;
