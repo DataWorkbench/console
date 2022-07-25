@@ -6,9 +6,17 @@ import { Form } from '@QCFE/qingcloud-portal-ui'
 import { map } from 'rxjs'
 import { get } from 'lodash-es'
 import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
-import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
+import { Control, Field, Icon, InputNumber, Label, Notification as Notify } from '@QCFE/lego-ui'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { source$ } from '../common/subjects'
+
+const showConfWarn = (content: string) => {
+  Notify.warning({
+    title: '操作提示',
+    content,
+    placement: 'bottomRight'
+  })
+}
 
 type FieldKeys =
   | 'id'
@@ -57,23 +65,32 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
 
   useImperativeHandle(ref, () => ({
     validate: () => {
+      if (dbInfo?.startRowKey && dbInfo?.endRowKey && dbInfo?.startRowKey > dbInfo?.endRowKey) {
+        showConfWarn('开始主键不能大于结束主键')
+        return false
+      }
       if (!sourceForm.current) {
         return false
       }
       return sourceForm.current?.validateForm()
     },
-    getData: () => ({
-      id: dbInfo?.id,
-      table: dbInfo?.table,
-      custom_range: dbInfo?.customRange,
-      start_row_key: dbInfo?.startRowKey,
-      end_row_key: dbInfo?.endRowKey,
-      is_binary_rowkey: dbInfo?.isBinaryRowKey,
-      encoding: dbInfo?.encoding,
-      scan_cache_size: dbInfo?.scanCacheSize,
-      scan_batch_size: dbInfo?.scanBatchSize,
-      read_mode: dbInfo?.readMode
-    }),
+    getData: () => {
+      if (!dbInfo?.id) {
+        return undefined
+      }
+      return {
+        id: dbInfo?.id,
+        table: dbInfo?.table,
+        custom_range: dbInfo?.customRange,
+        start_row_key: dbInfo?.startRowKey,
+        end_row_key: dbInfo?.endRowKey,
+        is_binary_rowkey: dbInfo?.isBinaryRowKey,
+        encoding: dbInfo?.encoding,
+        scan_cache_size: dbInfo?.scanCacheSize,
+        scan_batch_size: dbInfo?.scanBatchSize,
+        read_mode: dbInfo?.readMode
+      }
+    },
     refetchColumn: () => {}
   }))
 
@@ -128,7 +145,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
           {dbInfo?.customRange && (
             <>
               <TextField
-                label={<AffixLabel required>开始主键</AffixLabel>}
+                label={<AffixLabel required={false}>开始主键</AffixLabel>}
                 name="startRowKey"
                 value={dbInfo?.startRowKey}
                 onChange={(e) => {
@@ -138,16 +155,9 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                 }}
                 placeholder="请指定开始主键"
                 validateOnChange
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请输入开始主键',
-                    status: 'error'
-                  }
-                ]}
               />
               <TextField
-                label={<AffixLabel required>结束主键</AffixLabel>}
+                label={<AffixLabel required={false}>结束主键</AffixLabel>}
                 name="endRowKey"
                 value={dbInfo?.endRowKey}
                 onChange={(e) => {
@@ -157,13 +167,6 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                 }}
                 placeholder="请指定结束主键"
                 validateOnChange
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请输入结束主键',
-                    status: 'error'
-                  }
-                ]}
               />
             </>
           )}
