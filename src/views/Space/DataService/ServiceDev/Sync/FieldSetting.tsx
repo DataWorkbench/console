@@ -113,7 +113,6 @@ const FieldOrder = observer((props: IFieldOrderProps) => {
       runDarg={false}
       disabled={disabled}
       dataSource={fieldSettingData}
-      rowKey="key"
     />
   )
 })

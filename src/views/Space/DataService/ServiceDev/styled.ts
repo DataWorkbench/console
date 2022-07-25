@@ -272,3 +272,13 @@ export const CollapseWrapper = styled(Collapse)(() => [
     }
   `
 ])
+
+export const TableWrapper = styled('div')(() => [
+  css`
+    .darg-table-body {
+      .group {
+        ${tw` bg-neut-17! hover:bg-neut-16!`}
+      }
+    }
+  `
+])

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Checkbox, Icon, Label } from '@QCFE/lego-ui'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import tw, { css, styled } from 'twin.macro'
 
 import DraggableRow, { Row } from './DraggableRow'

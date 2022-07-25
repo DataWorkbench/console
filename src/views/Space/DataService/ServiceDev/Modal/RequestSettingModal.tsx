@@ -16,7 +16,7 @@ import {
   configMapData,
   FieldCategory
 } from '../constants'
-import { CollapseWrapper } from '../styled'
+import { CollapseWrapper, TableWrapper } from '../styled'
 
 type DataSourceProp = DataServiceManageDescribeApiConfig['request_params']['request_params']
 export interface JobModalData {
@@ -362,15 +362,14 @@ const RequestSettingModal = observer(() => {
       }
     >
       <>
-        <div tw="p-5">
+        <TableWrapper tw="p-5">
           <DargTable
             columns={columns as unknown as any}
             runDarg={false}
             dataSource={dataSource}
             disabled={isHistory}
-            rowKey="param_name"
           />
-        </div>
+        </TableWrapper>
         <CollapseWrapper defaultActiveKey={['p1']}>
           <CollapseItem
             key="p1"
@@ -381,13 +380,14 @@ const RequestSettingModal = observer(() => {
               </FlexBox>
             }
           >
-            <DargTable
-              columns={limitColumns as unknown as any}
-              runDarg={false}
-              disabled={isHistory}
-              dataSource={highSource}
-              rowKey="param_name"
-            />
+            <TableWrapper>
+              <DargTable
+                columns={limitColumns as unknown as any}
+                runDarg={false}
+                disabled={isHistory}
+                dataSource={highSource}
+              />
+            </TableWrapper>
           </CollapseItem>
         </CollapseWrapper>
       </>
