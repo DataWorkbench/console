@@ -368,6 +368,7 @@ const RequestSettingModal = observer(() => {
             runDarg={false}
             dataSource={dataSource}
             disabled={isHistory}
+            rowKey="column_name"
           />
         </TableWrapper>
         <CollapseWrapper defaultActiveKey={['p1']}>
@@ -386,6 +387,7 @@ const RequestSettingModal = observer(() => {
                 runDarg={false}
                 disabled={isHistory}
                 dataSource={highSource}
+                rowKey="column_name"
               />
             </TableWrapper>
           </CollapseItem>

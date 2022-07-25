@@ -104,6 +104,7 @@ interface Columns<T = any> {
 export interface DargTableProps<T = any> {
   columns: Columns<T>[] // 列配置
   dataSource: T[] // 数据源
+  rowKey: string // 行key
   moveRow?: (dragIndex: number, hoverIndex: number) => void // 拖拽回调
   runDarg?: boolean // 是否可拖拽
   type?: string // 拖拽类型
@@ -119,7 +120,8 @@ export const DargTable = (props: DargTableProps<any>) => {
     moveRow,
     renderFooter,
     runDarg = true,
-    disabled = false
+    disabled = false,
+    rowKey
   } = props
 
   const getData = useCallback(
@@ -164,6 +166,19 @@ export const DargTable = (props: DargTableProps<any>) => {
     [dataSource]
   )
 
+  const comptedKey: (item: any) => string = useCallback(
+    (item: any) => {
+      let keyStr = ''
+      try {
+        keyStr = item[rowKey]
+      } catch (error) {
+        throw new Error('rowKey必须是字符串')
+      }
+      return keyStr
+    },
+    [rowKey]
+  )
+
   return (
     <DragTable className="darg-table" tw="border-neut-13!" disabled={disabled}>
       <TableHeader className="darg-table-header">
@@ -198,7 +213,7 @@ export const DargTable = (props: DargTableProps<any>) => {
                     type={type}
                     index={i}
                     moveRow={moveRow}
-                    key={item}
+                    key={comptedKey(item)}
                     className="group"
                   >
                     {columns.map((k, j) => (
@@ -212,7 +227,7 @@ export const DargTable = (props: DargTableProps<any>) => {
                 )
               }
               return (
-                <Row key={item} className="group">
+                <Row key={comptedKey(item)} className="group">
                   {columns.map((k, j) => (
                     <div style={k?.width ? { width: k.width } : { flex: 1 }} key={j as number}>
                       {k.render

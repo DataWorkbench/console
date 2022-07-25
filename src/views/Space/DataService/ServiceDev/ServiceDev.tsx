@@ -62,11 +62,9 @@ const ServiceDev = observer(() => {
             is_history: true
           }
 
-          // dtsDevStore.set({
-          //   curVersion: verId,
-          //   curApi: VerApi,
-          //   apiConfigData: apiConfig
-          // })
+          dtsDevStore.set({
+            apiConfigData: res
+          })
           dtsDevStore.addPanel({ ...VerApi })
         }
       })

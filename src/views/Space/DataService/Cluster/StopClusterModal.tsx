@@ -105,7 +105,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
             className="clusterIcon"
             tw="bg-neut-13 border-2 box-content border-neut-16 rounded-full w-6 h-6 mr-1.5"
           >
-            <Icon name="q-dockerHubDuotone" type="light" />
+            <Icon name="q-dockerHubDuotone2" type="light" />
           </Center>
           <div tw="truncate">
             <TextEllipsis twStyle={tw`font-semibold`}>{row.api_name}</TextEllipsis>
@@ -132,7 +132,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           }
         `}
         type="warn"
-        width={publishApi?.length === 0 ? 400 : 800}
+        width={publishApi?.length === 0 ? 400 : 1000}
         maskClosable={false}
         appendToBody
         draggable

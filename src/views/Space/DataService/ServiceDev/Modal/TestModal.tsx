@@ -126,6 +126,7 @@ const TestModal = observer(() => {
                 columns={limitColumns as unknown as any}
                 runDarg={false}
                 dataSource={testSource}
+                rowKey="column_name"
               />
             </TableWrapper>
             <Button

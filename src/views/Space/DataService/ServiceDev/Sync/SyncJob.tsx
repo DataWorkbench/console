@@ -153,12 +153,15 @@ const SyncJob = observer(() => {
         }
         mutationApiVersion.mutate(params, {
           onSuccess: (res) => {
-            console.log(res, '历史版本')
+            if (res.ret_code === 0) {
+              dtsDevStore.set({
+                apiConfigData: res
+              })
+            }
           }
         })
       } else {
         const apiId = get(curApi, 'api_id')
-
         fetchApi({ apiId }).then((res) => {
           if (res) {
             dtsDevStore.set({

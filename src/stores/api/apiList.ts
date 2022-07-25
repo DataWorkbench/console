@@ -60,6 +60,11 @@ export default {
       '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}'
     ],
 
+    describePublishedApiHttpDetails: [
+      'GET',
+      '/v1/workspace/{space_id}/dataservice/version/httpdetails/{ver_id}'
+    ],
+
     describeServiceDataSourceKinds: ['GET', '/v1/workspace/{space_id}/dataservice/kinds'],
 
     createApiConfig: ['POST', '/v1/workspace/{space_id}/dataservice/config'],
