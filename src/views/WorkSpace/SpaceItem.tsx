@@ -316,7 +316,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 <TextEllipsis twStyle={tw`text-neut-8`}>{space.desc || '暂无描述'}</TextEllipsis>
               </div>
             </Box>
-            {!isModal && (
+            {!isModal && space.owner === get(window, 'USER.user_id') && (
               <div
                 tw="self-baseline"
                 onClick={(e: React.SyntheticEvent) => {
