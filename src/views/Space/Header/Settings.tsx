@@ -4,7 +4,7 @@ import { get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 
 import { Center, FlexBox, HelpCenterLink, Tooltip } from 'components'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { emitter } from 'utils/index'
 import { isDarkTheme } from 'utils/theme'
 
@@ -43,7 +43,6 @@ const menuList = [
 // const platformAdminMenuKeys = new Set([''])
 const iaasKeys = new Set(['account', 'security', 'notify', 'divider', 'logout'])
 const privateKeys = new Set(['account', 'notify', 'divider', 'logout'])
-const privateKeys1 = new Set(['account', 'divider', 'logout'])
 
 // let isPrivate = (process.env.IS_PRIVATE)
 
@@ -101,13 +100,7 @@ const UserInfo = styled(FlexBox)(({ darkMode }: { darkMode: boolean }) => [
   darkMode && tw`text-white!`
 ])
 
-export const Settings = ({
-  darkMode,
-  overview = false
-}: {
-  darkMode: boolean
-  overview?: boolean
-}) => {
+export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   // const handleOpenHelpCenter = (link: string) => {
   //   const openModal = Modal.open(HelpCenterModal, {
   //     link,
@@ -116,10 +109,8 @@ export const Settings = ({
   // }
 
   const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
-  let filter = isPrivate ? privateKeys : iaasKeys
-  if (isPrivate && overview) {
-    filter = privateKeys1
-  }
+  const filter = isPrivate ? privateKeys : iaasKeys
+
   const menus = menuList.filter((item) => filter.has(item.key))
   const handleMenu2Iaas = (key: string) => {
     switch (key) {
@@ -140,16 +131,14 @@ export const Settings = ({
     }
   }
 
-  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
-
   const history = useHistory()
   const handleMenu2Page = (key: string) => {
     switch (key) {
       case 'notify':
-        history.push(`/${regionId}/workspace/${spaceId}/settings/notify`)
+        history.push(`/settings/notify`)
         break
       case 'account':
-        history.push(`/${regionId}/workspace/${spaceId}/settings/account`)
+        history.push(`/settings/account`)
         break
       case 'logout':
         emitter.emit('logout')
