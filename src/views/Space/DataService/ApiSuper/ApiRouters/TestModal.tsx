@@ -1,10 +1,14 @@
 import { DargTable, Modal, FlexBox, ModalContent } from 'components'
-import { useMutationDescribeDataServiceApiVersion } from 'hooks'
+import {
+  useMutationDescribeDataServiceApiVersion,
+  useMutationPublishedApiHttpDetails,
+  testPublishApi
+} from 'hooks'
 import { Button, Input } from '@QCFE/lego-ui'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
 import { useImmer } from 'use-immer'
-import { get } from 'lodash-es'
+import { get, isEmpty, omitBy } from 'lodash-es'
 import { PbmodelRoute } from 'types/types'
 import { useMount } from 'react-use'
 import { observer } from 'mobx-react-lite'
@@ -32,6 +36,7 @@ export const TestModal = observer((props: TestModalProps) => {
   const [testSource, setTestSource] = useImmer<any[]>([])
   const [testAuthKey, setTestAuthKey] = useImmer<string>('')
   const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
+  const mutationPublishApiDetail = useMutationPublishedApiHttpDetails()
 
   useMount(() => {
     if (currentRow) {
@@ -60,12 +65,30 @@ export const TestModal = observer((props: TestModalProps) => {
   }
 
   const startTest = () => {
-    const params: any = {}
-    testSource.forEach((source: any) => {
-      const keyV = source.param_name
-      const value = source.data_type === 2 ? Number(source.example_value) : source.example_value
-      params[keyV] = value
-    })
+    const verId = get(currentRow, 'api_version_id')
+    mutationPublishApiDetail.mutate(
+      { verId, request_params: testSource },
+      {
+        onSuccess: (res) => {
+          try {
+            console.log(res, '历史版本22')
+            const method = get(res, 'request_method') === 1 ? 'GET' : 'POST'
+            const requestContent = JSON.parse(get(res, 'request_content', ''))
+            const host = get(currentRow, 'host', '')
+            const uri = get(res, 'uri', '')
+            const params = {
+              uri,
+              host,
+              method,
+              requestContent
+            }
+            testPublishApi(omitBy(params, isEmpty))
+          } catch (error) {
+            console.log(error)
+          }
+        }
+      }
+    )
   }
 
   const renderHighColumns = {
@@ -135,6 +158,7 @@ export const TestModal = observer((props: TestModalProps) => {
                 columns={limitColumns as unknown as any}
                 runDarg={false}
                 dataSource={testSource}
+                rowKey="column_name"
               />
             </TableWrapper>
             <Input

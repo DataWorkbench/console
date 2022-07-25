@@ -119,7 +119,7 @@ export const NameWrapper = styled('div')(({ isHover = true }: { isHover?: boolea
         .clusterIcon {
           ${tw`bg-[#13966a80] border-[#9ddfc966]`}
           .icon svg.qicon {
-            ${tw`text-green-11`}
+            ${tw`text-[#9ddfc966] `}
           }
         }
         .name {

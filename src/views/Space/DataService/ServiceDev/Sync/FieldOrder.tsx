@@ -243,7 +243,7 @@ const FieldOrder = observer(
           </Root>
         )}
         <DargTable
-          rowKey="key"
+          rowKey="name"
           moveRow={moveRow}
           disabled={disabled}
           runDarg

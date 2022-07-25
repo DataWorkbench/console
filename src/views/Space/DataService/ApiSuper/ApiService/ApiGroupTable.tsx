@@ -93,7 +93,7 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
         value: row
       },
       {
-        text: '绑定秘钥',
+        text: '绑定密钥',
         icon: 'q-kmsFill',
         key: 'bingKey',
         value: row
