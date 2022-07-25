@@ -43,7 +43,6 @@ const menuList = [
 // const platformAdminMenuKeys = new Set([''])
 const iaasKeys = new Set(['account', 'security', 'notify', 'divider', 'logout'])
 const privateKeys = new Set(['account', 'notify', 'divider', 'logout'])
-const privateKeys1 = new Set(['account', 'divider', 'logout'])
 
 // let isPrivate = (process.env.IS_PRIVATE)
 
@@ -101,13 +100,7 @@ const UserInfo = styled(FlexBox)(({ darkMode }: { darkMode: boolean }) => [
   darkMode && tw`text-white!`
 ])
 
-export const Settings = ({
-  darkMode,
-  overview = false
-}: {
-  darkMode: boolean
-  overview?: boolean
-}) => {
+export const Settings = ({ darkMode }: { darkMode: boolean }) => {
   // const handleOpenHelpCenter = (link: string) => {
   //   const openModal = Modal.open(HelpCenterModal, {
   //     link,
@@ -116,10 +109,8 @@ export const Settings = ({
   // }
 
   const isPrivate = get(window, 'CONFIG_ENV.IS_PRIVATE', false)
-  let filter = isPrivate ? privateKeys : iaasKeys
-  if (isPrivate && overview) {
-    filter = privateKeys1
-  }
+  const filter = isPrivate ? privateKeys : iaasKeys
+
   const menus = menuList.filter((item) => filter.has(item.key))
   const handleMenu2Iaas = (key: string) => {
     switch (key) {
