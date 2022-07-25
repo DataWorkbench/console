@@ -96,6 +96,10 @@ const startTypes = [
   {
     label: '从指定文件的指定位置处消费',
     value: 2
+  },
+  {
+    label: '从作业运行时开始采集',
+    value: 3
   }
 ]
 
@@ -139,7 +143,8 @@ const MysqlBinlogSourceConfig = forwardRef(
               bufNumber: get(e, 'data.buffer-size', 1024),
               threads: get(e, 'data.parallel-thread-size', 2),
               isGtidMode: get(e, 'data.is_gtid_mode', false),
-              startType: e?.data?.start?.journal_name ? 2 : 1,
+              // eslint-disable-next-line no-nested-ternary
+              startType: e?.data?.start?.journal_name ? 2 : e?.data?.start?.timestamp ? 1 : 3,
               startTime: get(e, 'data.start.timestamp'),
               startFile: get(e, 'data.start.journal_name'),
               startPosition: get(e, 'data.start.position')
