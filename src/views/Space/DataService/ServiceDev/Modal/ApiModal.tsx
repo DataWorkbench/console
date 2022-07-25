@@ -10,6 +10,7 @@ import { Control, Field, Form, Label, Radio, Button, Toggle } from '@QCFE/lego-u
 import { HelpCenterLink } from 'components/Link'
 import { useParams } from 'react-router-dom'
 import { ApiProps } from 'stores/DtsDevStore'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import ModelItem from './ModeItem'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 import type { CurrentGroupApiProps } from '../ApiPanel/ApiTree'
@@ -135,6 +136,15 @@ const ApiModal = observer((props: JobModalProps) => {
   const handleOK = () => {
     if (form.current?.validateForm()) {
       const groupId = apiGroupList.find((item) => item.name === params.group_name)?.id || ''
+      if (isEdit && !currentApi?.datasource_id) {
+        Notify.warning({
+          title: '操作提示',
+          content: '请先选择数据源',
+          placement: 'bottomRight'
+        })
+        return
+      }
+
       const paramsData = merge(
         {
           option: isEdit ? 'updateApi' : ('createApi' as const),
@@ -143,7 +153,11 @@ const ApiModal = observer((props: JobModalProps) => {
           group_id: groupId,
           space_id: spaceId
         },
-        isEdit && { apiId: currentApi?.api_id }
+        isEdit && {
+          apiId: currentApi?.api_id,
+          datasource_id: currentApi?.datasource_id,
+          table_name: currentApi?.table_name
+        }
       )
 
       mutation.mutate(paramsData, {
@@ -158,13 +172,14 @@ const ApiModal = observer((props: JobModalProps) => {
   useEffect(() => {
     if (currentApi) {
       const group = apiGroupList.find((item) => item.id === currentApi.group_id)
+      const path = get(currentApi, 'api_path', '').split('/').splice(-1).join()
 
       setParams((date) => {
         date.api_mode = currentApi.api_mode
         date.group_path = group?.group_path || '/'
         date.group_name = group?.name || ''
         date.api_name = currentApi.api_name
-        date.api_path = currentApi.api_path
+        date.api_path = path
         date.protocols = currentApi.protocols
         date.cross_domain = currentApi.cross_domain
         date.request_method = currentApi.request_method
@@ -193,7 +208,7 @@ const ApiModal = observer((props: JobModalProps) => {
         <div tw="flex justify-end space-x-2">
           <Button onClick={() => onClose?.()}>取消</Button>
           <Button type="primary" loading={mutation.isLoading} onClick={handleOK}>
-            创建并配置
+            {isEdit ? '保存' : '创建并配置'}
           </Button>
         </div>
       }
