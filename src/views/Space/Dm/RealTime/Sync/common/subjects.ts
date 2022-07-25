@@ -186,15 +186,21 @@ source$
 
 const changeTableName = () =>
   filter(([pervValue, value]) => {
-    if (!pervValue || !value || !value?.data?.tableName) {
+    const oldId = get(pervValue, 'data.id', '')
+    const id = get(value, 'data.id', '')
+    const name = get(value, 'data.table[0]') || get(value, 'data.table_list[0]')
+    const oldName = get(pervValue, 'data.tableName') || get(pervValue, 'data.table_list[0]')
+
+    if (!name || !oldName) {
       return true
     }
-    if (value?.data?.tableName && value?.data?.tableName !== pervValue?.data?.tableName) {
+    if (oldId !== id || oldName !== name) {
       return true
     }
     return false
   })
-const clearTargetColumns$ = baseTarget$.pipe(
+
+const clearTargetColumns$ = target$.pipe(
   pairwise(),
   changeTableName(),
   map(() => [])
@@ -202,10 +208,13 @@ const clearTargetColumns$ = baseTarget$.pipe(
 clearTargetColumns$.subscribe(targetColumns$)
 clearTargetColumns$.subscribe(mapping$)
 
-const clearSourceColumns$ = baseSource$.pipe(
+const clearSourceColumns$ = source$.pipe(
   pairwise(),
   changeTableName(),
-  map(() => [])
+  map(() => {
+    console.log(3333333333)
+    return []
+  })
 )
 clearSourceColumns$.subscribe(sourceColumns$)
 clearSourceColumns$.subscribe(mapping$)
