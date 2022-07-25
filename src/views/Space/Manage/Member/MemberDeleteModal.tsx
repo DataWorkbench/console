@@ -18,7 +18,7 @@ const MemberDeleteModal = (props: IMemberDeleteModal) => {
   return (
     <ModalWrapper
       visible
-      width={justOne ? 400 : 800}
+      width={justOne ? 400 : 880}
       onOk={onOk}
       onCancel={onClose}
       okText="移除"
