@@ -366,7 +366,7 @@ const UploadModal = (props: any) => {
                   }}
                 />
                 {fileTip === 'size'
-                  ? '已选文件超过 100 MB，请重新添加'
+                  ? `已选文件超过 ${Math.floor(sizeConf / (1024 * 1024))} MB，请重新添加`
                   : '已选文件格式不合规，请重新添加'}
               </div>
             )}
