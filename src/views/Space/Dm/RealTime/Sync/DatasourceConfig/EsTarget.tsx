@@ -114,7 +114,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                   status: 'error'
                 }
               ]}
-              placeholder="ElasticSearch 中的 Index 名"
+              placeholder="index 下的 type 名称"
             />
           )}
           <TextField
