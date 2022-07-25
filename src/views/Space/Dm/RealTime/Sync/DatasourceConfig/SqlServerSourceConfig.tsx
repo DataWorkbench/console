@@ -115,8 +115,8 @@ const SqlServerSourceConfig = forwardRef(
             }
             return {
               id: e?.data?.id,
-              tableName: get(e, 'data.table_list'),
-              updateType: get(e, 'data.cat', ['insert,update,delete']).split(','),
+              tableName: get(e, 'data.table_list[0]'),
+              updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
               slot: get(e, 'data.slot_name'),
               lsn: get(e, 'data.lsn', 0),
               time: get(e, 'data.poll_interval', 120),
@@ -142,10 +142,10 @@ const SqlServerSourceConfig = forwardRef(
       },
       getData: () => ({
         id: dbInfo?.id,
-        lsn: dbInfo?.lsn,
+        lsn: dbInfo?.lsn.toString(),
         poll_interval: dbInfo?.time,
         slot_name: dbInfo?.slot,
-        table_list: dbInfo?.tableName,
+        table_list: [dbInfo?.tableName],
         cat: dbInfo?.updateType.join(',')
         // allow_create_slot: dbInfo?.autoCreate,
         // temporary: dbInfo?.temp,
