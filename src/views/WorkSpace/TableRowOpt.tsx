@@ -97,38 +97,40 @@ const TableRowOpt = observer(({ space, regionId }: { space: any; regionId: strin
           </Link>
         </Tooltip>
       ))}
-      <Tooltip
-        theme="light"
-        trigger="click"
-        placement="bottom-start"
-        arrow={false}
-        content={
-          <Menu onClick={handleClick}>
-            <MenuItem value="update" disabled={disableStatus}>
-              <Icon name="pen" />
-              修改工作空间
-            </MenuItem>
-            {!disableStatus && (
-              <MenuItem value="disable" disabled={disableStatus}>
-                <i className="if if-minus-square" tw="text-base mr-2" />
-                禁用工作空间
+      {stateStore.isAdmin && (
+        <Tooltip
+          theme="light"
+          trigger="click"
+          placement="bottom-start"
+          arrow={false}
+          content={
+            <Menu onClick={handleClick}>
+              <MenuItem value="update" disabled={disableStatus}>
+                <Icon name="pen" />
+                修改工作空间
               </MenuItem>
-            )}
-            {space.status !== 1 && (
-              <MenuItem value="enable" disabled={space.status === 1}>
-                <Icon name="start" />
-                启动工作空间
+              {!disableStatus && (
+                <MenuItem value="disable" disabled={disableStatus}>
+                  <i className="if if-minus-square" tw="text-base mr-2" />
+                  禁用工作空间
+                </MenuItem>
+              )}
+              {space.status !== 1 && (
+                <MenuItem value="enable" disabled={space.status === 1}>
+                  <Icon name="start" />
+                  启动工作空间
+                </MenuItem>
+              )}
+              <MenuItem value="delete">
+                <Icon name="trash" />
+                删除
               </MenuItem>
-            )}
-            <MenuItem value="delete">
-              <Icon name="trash" />
-              删除
-            </MenuItem>
-          </Menu>
-        }
-      >
-        <Icon name="more" clickable changeable size={18} tw="align-middle" />
-      </Tooltip>
+            </Menu>
+          }
+        >
+          <Icon name="more" clickable changeable size={18} tw="align-middle" />
+        </Tooltip>
+      )}
     </div>
   )
 })
