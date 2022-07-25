@@ -1,4 +1,4 @@
-import { FlexBox, HelpCenterLink, Modal, ModalContent, PopConfirm } from 'components'
+import { AffixLabel, FlexBox, HelpCenterLink, Modal, ModalContent, PopConfirm } from 'components'
 import { Icon } from '@QCFE/qingcloud-portal-ui'
 import { Button, Field, Form, Label } from '@QCFE/lego-ui'
 // import tw, { css } from 'twin.macro'
@@ -50,7 +50,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
   } = useStore()
   const { op, setOp, spaceItem } = useMemberStore()
   const { roleList: roleListProp, data, cb } = props
-  const ref = useRef()
+  const ref = useRef<Form>()
   const [value, setValue] = useImmer({
     user_ids: data ? [data.user_id] : [],
     system_role_ids: data ? data.system_roles.map((i) => i.id) : [],
@@ -90,6 +90,9 @@ const MemberModal = observer((props: IMemberModalProps) => {
     queryClient.invalidateQueries(getMemberKeys())
   }, [queryClient])
   const handleOk = useCallback(() => {
+    if (!ref.current?.validateForm()) {
+      return
+    }
     mutation.mutate(
       {
         op,
@@ -213,7 +216,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
             </Field>
           ) : (
             <SelectField
-              label="成员"
+              label={<AffixLabel>成员</AffixLabel>}
               name="user_ids"
               placeholder="请选择或搜索账户名称、邮箱"
               multi
@@ -233,6 +236,14 @@ const MemberModal = observer((props: IMemberModalProps) => {
                   draft.user_ids = arr
                 })
               }}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择成员',
+                  status: 'error'
+                }
+              ]}
             />
             // <ArrayInputField
             //   label="成员"
@@ -266,7 +277,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
           />
           <Field>
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-            <label className="label" htmlFor="###">
+            <label className="label " tw="label-required" htmlFor="###">
               角色
             </label>
             <div className="help">
@@ -279,23 +290,28 @@ const MemberModal = observer((props: IMemberModalProps) => {
               <div tw="my-4 flex-1 border-t border-neut-2 translate-y-1/2" />
             </FlexBox>
             {show && (
-              <div tw="flex gap-3">
-                {(roleList || []).map((item: Record<string, any>) => {
-                  const checked = value.system_role_ids.includes(item.id)
-                  return (
-                    <Button
-                      key={item.id}
-                      css={checkboxButtonStyles.wrapper({
-                        checked
-                      })}
-                      onClick={() => handleClickRole(item.id)}
-                    >
-                      <Icon name={item.type === RoleType.SpaceAdmin ? 'admin' : 'human'} />
-                      {item.name}
-                    </Button>
-                  )
-                })}
-              </div>
+              <>
+                <div tw="flex gap-3">
+                  {(roleList || []).map((item: Record<string, any>) => {
+                    const checked = value.system_role_ids.includes(item.id)
+                    return (
+                      <Button
+                        key={item.id}
+                        css={checkboxButtonStyles.wrapper({
+                          checked
+                        })}
+                        onClick={() => handleClickRole(item.id)}
+                      >
+                        <Icon name={item.type === RoleType.SpaceAdmin ? 'admin' : 'human'} />
+                        {item.name}
+                      </Button>
+                    )
+                  })}
+                </div>
+                {!value.system_role_ids.length && (
+                  <div className="help is-danger has-danger-help">请至少选择一个角色</div>
+                )}
+              </>
             )}
           </Field>
         </FormWrapper>
