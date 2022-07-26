@@ -70,7 +70,7 @@ export const ApiTree = observer(
 
     const {
       dtsDevStore,
-      dtsDevStore: { treeData, loadedKeys, curApi }
+      dtsDevStore: { treeData, loadedKeys, curApi, addPanel }
     } = useStore()
 
     const [expandedKeys, setExpandedKeys] = useState<string[]>(expandedKeysProp || [])
@@ -131,6 +131,9 @@ export const ApiTree = observer(
           setCurrentGroup(groupData)
         }
         if (api) {
+          // 操作 api 时, panel 选中当前 api
+          addPanel(api)
+          dtsDevStore.set({ curApi: api })
           const apiId = get(api, 'api_id')
           fetchApiConfig({ apiId }).then((res) => {
             const dataSource = cloneDeep(get(res, 'data_source'))
@@ -146,7 +149,7 @@ export const ApiTree = observer(
         } else if (val === 'deleteApi') {
           setShowDeleteModal(true)
         } else if (val === 'editAPI') {
-          setShowApiModal(true)
+          dtsDevStore.set({ showBaseSetting: true })
         } else if (val === 'showCluster') {
           dtsDevStore.set({ showClusterSetting: true })
         } else if (val === 'showRequest') {
@@ -160,7 +163,7 @@ export const ApiTree = observer(
         }
         setVisible(false)
       },
-      [dtsDevStore, fetchApiConfig]
+      [addPanel, dtsDevStore, fetchApiConfig]
     )
 
     const fetchJobTreeData = (node: any, movingNode = null) => {
