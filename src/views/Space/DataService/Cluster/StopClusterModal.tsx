@@ -152,7 +152,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           <div tw=" mt-3 ml-9 mb-3">
             {publishApi && publishApi?.length > 0
               ? `当前集群存在以下已发布 API ，如需停用服务集群，将以下已发布 API 下线，否则以下 API 将不能测试、访问，请谨慎操作。`
-              : `确认停用服务集群名称${cluster.name}（${cluster.id}）?`}
+              : `确认停用服务集群${cluster.name}（${cluster.id}）?`}
           </div>
           {publishApi && publishApi?.length > 0 && (
             <Table

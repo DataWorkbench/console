@@ -45,19 +45,19 @@ const getOptionText = (option: OP, id: string | undefined, name: string | undefi
   switch (option) {
     case 'start':
       text = '启动'
-      desc = `确认启用服务集群名称${name}（ID: ${id}）`
+      desc = `确认启用服务集群${name}（${id}）`
       break
     case 'stop':
       text = '停用'
-      desc = `确认停用服务集群名称${name}（ID: ${id}）`
+      desc = `确认停用服务集群${name}（${id}）`
       break
     case 'reload':
       text = '重启'
-      desc = `重启过程中相关 API 不可访问，确认重启服务集群名称${name}（ID :${id}）`
+      desc = `重启过程中相关 API 不可访问，确认重启服务集群${name}（${id}）`
       break
     default:
       text = '删除'
-      desc = `删除后无法恢复，确认删除服务集群名称${name}（ID :${id}）`
+      desc = `删除后无法恢复，确认删除服务集群${name}（${id}）`
       break
   }
   return { text, desc }
@@ -368,7 +368,7 @@ const ClusterTable = observer((props: ClusterTableProps) => {
                 <>
                   <div tw="font-medium mb-2 text-base">{`${
                     getOptionText(dataServiceOp, opClusterList?.id, opClusterList?.name).text
-                  }服务集群${opClusterList?.id}(ID)`}</div>
+                  }服务集群${opClusterList?.name}（${opClusterList?.id}）`}</div>
                   <div className="modal-content-message" tw="text-neut-9">
                     {getOptionText(dataServiceOp, opClusterList?.id, opClusterList?.name).desc}
                   </div>
