@@ -111,8 +111,8 @@ const AlertPolicy = () => {
     } as any,
     {
       title: '操作',
-      dataIndex: 'id',
-      render: (v: any, record: any) => (
+      key: 'action',
+      render: (_: any, record: any) => (
         <FlexBox tw="items-center">
           <Button
             type="text"
@@ -214,6 +214,7 @@ const AlertPolicy = () => {
           <Table
             columns={columns}
             dataSource={infos}
+            rowKey="id"
             loading={!!isFetching || !!isLoading}
             onSort={sort}
             pagination={{

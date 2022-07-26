@@ -71,8 +71,11 @@ const inputStyles = css`
     label.checkbox {
       &:hover {
         &::before {
-          ${tw`bg-transparent`}
+          ${tw`bg-transparent border-green-11!`}
         }
+      }
+      & .label-value {
+        ${tw`text-white`}
       }
       &.checkbox-wrapper.indeterminate::after {
         left: 5px;
@@ -88,7 +91,7 @@ const inputStyles = css`
       }
 
       &.checked::before {
-        ${tw`bg-green-11`}
+        ${tw`bg-green-11!`}
         border-color: transparent;
         box-shadow: 0px 1px 2px rgba(0, 41, 27, 0.1);
         border-radius: 2px;
