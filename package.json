@@ -5,8 +5,7 @@
   "author": "QingCloud F2E Group",
   "private": true,
   "scripts": {
-    "dev": "cross-env CURRENT_ENV=qa NODE_ENV=development webpack serve",
-    "dev:test": "cross-env CURRENT_ENV=test NODE_ENV=development webpack serve",
+    "dev": "NODE_ENV=development webpack serve",
     "build": "NODE_ENV=production webpack && cp -r configs ./dist",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
@@ -111,7 +110,6 @@
     "@types/crypto-js": "^4.1.1",
     "axios": "^0.21.1",
     "core-js": "^3.13.1",
-    "cross-env": "^7.0.3",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.10.6",
     "echarts": "^5.3.3",

@@ -9,7 +9,7 @@ module.exports = {
     placeholder: 'var(--dw-color-text-placeholder)',
     white: 'var(--dw-color-text-white)',
     black: 'var(--dw-color-text-black)',
-    DEFAULT: 'var(--dw-color-text-default)',
+    DEFAULT: 'var(--dw-color-text-default)'
   },
   bgColor: {
     DEFAULT: 'var-(--dw-color-background)',
@@ -17,18 +17,18 @@ module.exports = {
     light: 'var(--dw-color-background-light)',
     white: 'var(--dw-color-background-white)',
     black: 'var(--dw-color-background-black)',
-    backdrop: 'var(--dw-color-background-backdrop)',
+    backdrop: 'var(--dw-color-background-backdrop)'
   },
   separator: {
     DEFAULT: 'var(--dw-color-border-separator-default)',
-    light: 'var(--dw-color-border-separator-light)',
+    light: 'var(--dw-color-border-separator-light)'
     // dark: 'var(--dw-color-border-separator-dark)',
   },
   // 品牌色
   brand: {
     primary: 'var(--dw-color-brand-primary)',
     hover: 'var(--dw-color-brand-primary-hover)',
-    secondary: 'var(--dw-color-brand-secondary)',
+    secondary: 'var(--dw-color-brand-secondary)'
   },
   // 功能色
   info: {
@@ -37,7 +37,7 @@ module.exports = {
     active: 'var(--dw-color-function-info-active)',
     border: 'var(--dw-color-function-info-border)',
     bg: 'var(--dw-color-function-info-bg)',
-    light: 'var(--dw-color-function-info-light)',
+    light: 'var(--dw-color-function-info-light)'
   },
   // 成功色
   success: {
@@ -45,7 +45,7 @@ module.exports = {
     hover: 'var(--dw-color-function-success-hover)',
     active: 'var(--dw-color-function-success-active)',
     border: 'var(--dw-color-function-success-border)',
-    bg: 'var(--dw-color-function-success-bg)',
+    bg: 'var(--dw-color-function-success-bg)'
   },
   // 警示色
   error: {
@@ -53,7 +53,7 @@ module.exports = {
     hover: 'var(--dw-color-function-error-hover)',
     active: 'var(--dw-color-function-error-active)',
     border: 'var(--dw-color-function-error-border)',
-    bg: 'var(--dw-color-function-error-bg)',
+    bg: 'var(--dw-color-function-error-bg)'
   },
   // 提醒色
   warning: {
@@ -61,12 +61,12 @@ module.exports = {
     hover: 'var(--dw-color-function-warning-hover)',
     active: 'var(--dw-color-function-warning-active)',
     border: 'var(--dw-color-function-warning-border)',
-    bg: 'var(--dw-color-function-warning-bg)',
+    bg: 'var(--dw-color-function-warning-bg)'
   },
   // 链接色
   link: {
     DEFAULT: 'var(--dw-color-function-link-default)',
-    hover: 'var(--dw-color-function-link-hover)',
+    hover: 'var(--dw-color-function-link-hover)'
   },
   // 组件色
   icon: {
@@ -77,7 +77,7 @@ module.exports = {
       info: 'var(--dw-color-icon-single-info)',
       warning: 'var(--dw-color-icon-single-warning)',
       error: 'var(--dw-color-icon-single-error)',
-      white: 'var(--dw-color-icon-single-white)',
+      white: 'var(--dw-color-icon-single-white)'
     },
     double: {
       darkgray: 'var(--dw-color-icon-double-dark-gray)',
@@ -85,43 +85,43 @@ module.exports = {
       darkgreen: 'var(--dw-color-icon-double-dark-green)',
       lightgreen: 'var(--dw-color-icon-double-light-green)',
       darkwhite: 'var(--dw-color-icon-double-dark-white)',
-      lightwhite: 'var(--dw-color-icon-double-light-white)',
-    },
+      lightwhite: 'var(--dw-color-icon-double-light-white)'
+    }
   },
   button: {
     primary: {
       DEFAULT: 'var(--dw-color-button-primary-default)',
       hover: 'var(--dw-color-button-primary-hover)',
       active: 'var(--dw-color-button-primary-active)',
-      text: 'var(--dw-color-button-primary-text)',
+      text: 'var(--dw-color-button-primary-text)'
     },
     secondary: {
       DEFAULT: 'var(--dw-color-button-secondary-default)',
       hover: 'var(--dw-color-button-secondary-hover)',
       active: 'var(--dw-color-button-secondary-active)',
-      text: 'var(--dw-color-button-secondary-text)',
+      text: 'var(--dw-color-button-secondary-text)'
     },
     thirdly: {
       DEFAULT: 'var(--dw-color-button-thirdly-default)',
       hover: 'var(--dw-color-button-thirdly-hover)',
       active: 'var(--dw-color-button-thirdly-active)',
-      text: 'var(--dw-color-button-thirdly-text)',
+      text: 'var(--dw-color-button-thirdly-text)'
     },
     ghost: {
       DEFAULT: 'var(--dw-color-button-ghost-default)',
       hover: 'var(--dw-color-button-ghost-hover)',
       active: 'var(--dw-color-button-ghost-active)',
-      text: 'var(--dw-color-button-ghost-text)',
+      text: 'var(--dw-color-button-ghost-text)'
     },
     dangerous: {
       DEFAULT: 'var(--dw-color-button-danger-default)',
       hover: 'var(--dw-color-button-danger-hover)',
       active: 'var(--dw-color-button-danger-active)',
-      text: 'var(--dw-color-button-danger-text)',
+      text: 'var(--dw-color-button-danger-text)'
     },
     disabled: {
       DEFAULT: 'var(--dw-color-button-disabled-default)',
-      text: 'var(--dw-color-button-disabled-text)',
-    },
-  },
+      text: 'var(--dw-color-button-disabled-text)'
+    }
+  }
 }

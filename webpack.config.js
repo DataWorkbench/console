@@ -19,9 +19,10 @@ const envConfigPath = {
   test: resolve('./env/.env.test'),
 }
 
-dotenv.config({
-  path: envConfigPath[process.env.CURRENT_ENV],
-})
+// dotenv.config({
+//   path: envConfigPath[process.env.CURRENT_ENV],
+// })
+
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
@@ -195,10 +196,6 @@ let config = {
         changeOrigin: true,
       },
       '/captcha': {
-        target: apiUrl,
-        changeOrigin: true,
-      },
-      '/global_api': {
         target: apiUrl,
         changeOrigin: true,
       },
