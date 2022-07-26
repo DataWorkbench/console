@@ -512,7 +512,7 @@ export const testPublishApi = ({
   cancel,
   ...rest
 }: any) => {
-  const url = `http://${host}/${uri}`
+  const url = `http://${host}${uri}`
   return customRequest({
     url,
     method,

@@ -4,7 +4,7 @@ import { MoreAction, FlexBox, Center, Modal, TextEllipsis, StatusBar } from 'com
 
 import { useQueryClient } from 'react-query'
 import { observer } from 'mobx-react-lite'
-import { get, omitBy } from 'lodash-es'
+import { get, merge, omitBy } from 'lodash-es'
 import tw, { css } from 'twin.macro'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
@@ -39,25 +39,25 @@ const { ColumnsSetting } = ToolBar as any
 const getName = (name: MappingKey<typeof ClusterFieldMapping>) =>
   ClusterFieldMapping.get(name)!.apiField
 
-const getOptionText = (option: OP, id: string | undefined) => {
+const getOptionText = (option: OP, id: string | undefined, name: string | undefined) => {
   let text = '删除'
   let desc = ''
   switch (option) {
     case 'start':
       text = '启动'
-      desc = `确认启用服务集群名称（ID: ${id}）`
+      desc = `确认启用服务集群${name}（${id}）`
       break
     case 'stop':
       text = '停用'
-      desc = `确认停用服务集群名称（ID: ${id}）`
+      desc = `确认停用服务集群${name}（${id}）`
       break
     case 'reload':
       text = '重启'
-      desc = `重启过程中相关 API 不可访问，确认重启服务集群名称（ID :${id}）`
+      desc = `重启过程中相关 API 不可访问，确认重启服务集群${name}（${id}）`
       break
     default:
       text = '删除'
-      desc = `删除后无法恢复，确认删除服务集群名称（ID :${id}）`
+      desc = `删除后无法恢复，确认删除服务集群${name}（${id}）`
       break
   }
   return { text, desc }
@@ -164,20 +164,28 @@ const ClusterTable = observer((props: ClusterTableProps) => {
         value: row
       },
       {
-        text: '修改',
-        icon: 'edit',
-        key: 'update',
-        disabled: [StatusEnum.RUNNING].includes(row.status),
-        value: row,
-        help: '如需修改，请先停用服务集群'
+        ...merge(
+          {
+            text: '修改',
+            icon: 'edit',
+            key: 'update',
+            disabled: [StatusEnum.RUNNING].includes(row.status),
+            value: row
+          },
+          ![StatusEnum.STOPPED].includes(row.status) && { help: '如需修改，请先停用服务集群' }
+        )
       },
       {
-        text: '删除',
-        icon: 'if-trash',
-        disabled: [StatusEnum.RUNNING].includes(row.status),
-        key: 'delete',
-        value: row,
-        help: '如需删除，请先停用服务集群'
+        ...merge(
+          {
+            text: '删除',
+            icon: 'if-trash',
+            disabled: [StatusEnum.RUNNING].includes(row.status),
+            key: 'delete',
+            value: row
+          },
+          ![StatusEnum.STOPPED].includes(row.status) && { help: '如需删除，请先停用服务集群' }
+        )
       }
     ]
 
@@ -340,7 +348,7 @@ const ClusterTable = observer((props: ClusterTableProps) => {
                 loading={mutation.isLoading}
                 onClick={mutateData}
               >
-                {getOptionText(dataServiceOp, opClusterList?.id).text}
+                {getOptionText(dataServiceOp, opClusterList?.id, opClusterList?.name).text}
               </Button>
             </FlexBox>
           }
@@ -359,10 +367,10 @@ const ClusterTable = observer((props: ClusterTableProps) => {
               {(() => (
                 <>
                   <div tw="font-medium mb-2 text-base">{`${
-                    getOptionText(dataServiceOp, opClusterList?.id).text
-                  }服务集群${opClusterList?.id}(ID)`}</div>
+                    getOptionText(dataServiceOp, opClusterList?.id, opClusterList?.name).text
+                  }服务集群${opClusterList?.name}（${opClusterList?.id}）`}</div>
                   <div className="modal-content-message" tw="text-neut-9">
-                    {getOptionText(dataServiceOp, opClusterList?.id).desc}
+                    {getOptionText(dataServiceOp, opClusterList?.id, opClusterList?.name).desc}
                   </div>
                 </>
               ))()}

@@ -83,11 +83,11 @@ export const StatusEnum = createEnhancedEnum<IStatusEnum>({
 
 export const resourceSpecState = createEnhancedEnum<EnhanceState>({
   BASE: {
-    label: '基础版',
+    label: '入门版',
     value: 1
   },
   CROSS: {
-    label: '入门版',
+    label: '基础版',
     value: 2
   },
   VIP: {
