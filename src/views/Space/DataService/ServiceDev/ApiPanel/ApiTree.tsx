@@ -332,12 +332,7 @@ export const ApiTree = observer(
           </TreeWrapper>
         </Tippy>
         {showApiModal && (
-          <ApiModal
-            isEdit={curOp === 'editAPI'}
-            currentApi={currentApi}
-            currentGroup={currentGroup}
-            onClose={() => setShowApiModal(false)}
-          />
+          <ApiModal currentGroup={currentGroup} onClose={() => setShowApiModal(false)} />
         )}
         {showDeleteModal && (
           <DelModal
