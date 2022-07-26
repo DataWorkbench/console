@@ -261,7 +261,6 @@ const ResponseSettingModal = observer(() => {
       minWidth={800}
       maxWidth={1200}
       maskClosable={false}
-      closable={false}
       enableResizing={{ left: true }}
       orient="fullright"
       visible
