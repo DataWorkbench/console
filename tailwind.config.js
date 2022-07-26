@@ -95,7 +95,6 @@ module.exports = {
         '2xs': ['14px', '24px'],
       },
       gridTemplateColumns: {
-        // Simple 8 row grid
         'workspace': 'repeat(auto-fill, minmax(440px, 1fr))',
       },
     },
