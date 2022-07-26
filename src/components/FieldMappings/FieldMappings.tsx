@@ -240,6 +240,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka
   const isKafkaTarget = (rightTypeName as any).getType() === SourceType.Kafka
   const isHbaseTarget = (rightTypeName as any).getType() === SourceType.HBase
+  const isHbaseSource = (leftTypeName as any).getType() === SourceType.HBase
 
   useImperativeHandle(ref, () => ({
     rowMapping: () => {
@@ -741,6 +742,19 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     return leftFields
   }
 
+  function renderHbaseRowKey() {
+    if (!isHbaseSource) {
+      return null
+    }
+    return (
+      <FieldRow tw="cursor-default">
+        <div>STRING</div>
+        <div>rowkey</div>
+        <div tw="text-neut-8">不可编辑</div>
+      </FieldRow>
+    )
+  }
+
   return (
     <Root>
       <div tw="relative">
@@ -839,6 +853,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <div>类型</div>
                 <div>来源表字段</div>
               </FieldRow>
+              {renderHbaseRowKey()}
               {getLeftFields().map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
