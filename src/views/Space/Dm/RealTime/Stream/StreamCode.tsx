@@ -387,10 +387,12 @@ const StreamCode = observer(({ tp }: IProp) => {
               <Icon name="remark" type="light" />
               语法检查
             </Button>
-            <Button disabled={btnDisabled} type="black" onClick={handleRun} loading={runLoading}>
-              <Icon name="triangle-right" type="light" />
-              运行
-            </Button>
+            {tp === 2 && (
+              <Button disabled={btnDisabled} type="black" onClick={handleRun} loading={runLoading}>
+                <Icon name="triangle-right" type="light" />
+                运行
+              </Button>
+            )}
             <Button
               disabled={btnDisabled}
               onClick={() => mutateCodeData('codeSave')}
