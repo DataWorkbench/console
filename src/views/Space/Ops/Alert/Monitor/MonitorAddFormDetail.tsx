@@ -17,7 +17,7 @@ const FieldItem = styled.div`
     &:not(:last-child) {
       ${tw`mb-2 `}
     }
-    & > div:first-child {
+    & > div:first-of-type {
       ${tw`w-20 label-required flex-none`}
     }
     & > div:last-child {
@@ -74,8 +74,8 @@ const MonitorAddFormDetail = observer((props: IMonitorAddProps) => {
         <FieldItem>
           <div>绑定作业</div>
           <FlexBox tw="gap-1">
-            {(data?.job_ids ?? []).map((v, k) => (
-              <JobItem key={k.toString()}>
+            {(data?.job_ids ?? []).map((v) => (
+              <JobItem key={v}>
                 <Icons
                   tw="text-green-11"
                   name={data?.monitor_object === 1 ? 'DownloadBoxFill' : 'LayerFill'}
