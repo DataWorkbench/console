@@ -609,7 +609,35 @@ const SyncJob = () => {
 
     try {
       set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping?.[0])
-      set(resource, `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`, mapping?.[1])
+      if (curJob?.target_type === SourceType.HBase) {
+        const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
+          mappingRef.current!.getOther()
+
+        set(
+          resource,
+          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
+          setRowExp(rowkeyExpress)
+        )
+        set(
+          resource,
+          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_index`,
+          versionColumnIndex
+        )
+        set(
+          resource,
+          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_value`,
+          versionColumnValue
+        )
+      }
+      if (curJob?.target_type !== SourceType.Kafka) {
+        set(resource, `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`, mapping[1])
+      } else {
+        set(
+          resource,
+          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.tableFields`,
+          mapping[1]
+        )
+      }
 
       set(resource, 'cluster_id', cluster?.id)
       set(resource, 'job_mode', 1)
@@ -620,15 +648,12 @@ const SyncJob = () => {
       // return
     }
     const filterResouce = removeUndefined(resource)
-    mutationConvert.mutate(
-      { data: { conf: filterResouce }, uri: { job_id: curJob?.id! } },
-      {
-        onSuccess: (resp) => {
-          setDefaultJobContent(resp.job)
-          setMode(2)
-        }
+    mutationConvert.mutate({ data: { conf: filterResouce }, uri: { job_id: curJob?.id! } } as any, {
+      onSuccess: (resp) => {
+        setDefaultJobContent(resp.job)
+        setMode(2)
       }
-    )
+    })
   }
 
   return (
