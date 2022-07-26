@@ -61,8 +61,8 @@ export default {
     ],
 
     describePublishedApiHttpDetails: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/version/httpdetails/{ver_id}'
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/httpdetails/{ver_id}'
     ],
 
     describeServiceDataSourceKinds: ['GET', '/v1/workspace/{space_id}/dataservice/kinds'],
