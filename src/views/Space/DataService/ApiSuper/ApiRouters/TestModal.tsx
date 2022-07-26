@@ -149,7 +149,7 @@ export const TestModal = observer((props: TestModalProps) => {
       footer={null}
     >
       <ModalContent tw="h-full">
-        <div tw="mb-3">API Path: {currentRow?.proxy_uri}</div>
+        <div tw="mb-3">API Path: {currentRow?.uri}</div>
         <FlexBox tw="h-full">
           <div tw="flex-1 mr-5">
             <TitleItem>请求参数</TitleItem>
