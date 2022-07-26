@@ -112,6 +112,7 @@ interface MappingItemProps {
   getDeleteField?: (name: string) => TMappingField | undefined
   exist?: (name: string) => boolean
   isLeft?: boolean
+  readonly?: boolean
 }
 
 const MappingItem = (props: MappingItemProps) => {
@@ -130,7 +131,8 @@ const MappingItem = (props: MappingItemProps) => {
     onCancel = noop,
     getDeleteField,
     exist,
-    isLeft = true
+    isLeft = true,
+    readonly = false
   } = props
   const [isTop, setIsTop] = useState(false)
   const [item, setItem] = useImmer(itemProps)
@@ -264,6 +266,15 @@ const MappingItem = (props: MappingItemProps) => {
       setPopuState(key)
     }
     setShowMoreMenu(false)
+  }
+
+  if (readonly) {
+    return (
+      <FieldRow ref={ref} className={className} isReverse>
+        <div>{item.type}</div>
+        <div>{item.name}</div>
+      </FieldRow>
+    )
   }
 
   const renderMore = () => {
