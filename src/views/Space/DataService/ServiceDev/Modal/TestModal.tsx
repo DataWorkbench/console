@@ -26,7 +26,8 @@ const TestModal = observer(() => {
     dtsDevStore
   } = useStore()
   const [testSource, setTestSource] = useImmer<any[]>([])
-  const [testApiContent, setApiTestContent] = useImmer<any>(null)
+  const [testRequest, setTestRequest] = useImmer<string>('')
+  const [testResponse, setTestResponse] = useImmer<string>('')
   const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
 
   useEffect(() => {
@@ -52,7 +53,16 @@ const TestModal = observer(() => {
       {
         onSuccess: (res) => {
           if (res.ret_code === 0) {
-            setApiTestContent(res)
+            let logs = ''
+            let content = ''
+            try {
+              logs = res.logs
+              content = JSON.stringify(JSON.parse(res.response_content), null, 2)
+              setTestRequest(logs)
+              setTestResponse(content)
+            } catch (error) {
+              console.log(error)
+            }
           }
         }
       }
@@ -153,15 +163,17 @@ const TestModal = observer(() => {
               <div tw="flex-1">
                 <TitleItem>请求详情</TitleItem>
                 <TestContent>
-                  {testApiContent?.logs ? testApiContent?.logs : '点击开始测试后会有返回详情'}
+                  <code tw="break-words whitespace-pre-wrap bg-transparent text-white">
+                    {testRequest || '点击开始测试后会有返回详情'}
+                  </code>
                 </TestContent>
               </div>
               <div tw="flex-1">
                 <TitleItem>响应详情</TitleItem>
                 <TestContent>
-                  {testApiContent?.response_content
-                    ? testApiContent?.response_content
-                    : '点击开始测试后会有返回详情'}
+                  <code tw="break-words whitespace-pre-wrap bg-transparent text-white">
+                    {testResponse || '点击开始测试后会有返回详情'}
+                  </code>
                 </TestContent>
               </div>
             </FlexBox>

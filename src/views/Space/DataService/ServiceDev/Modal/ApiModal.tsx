@@ -170,7 +170,7 @@ const ApiModal = observer((props: JobModalProps) => {
   }
 
   useEffect(() => {
-    if (currentApi) {
+    if (currentApi && isEdit) {
       const group = apiGroupList.find((item) => item.id === currentApi.group_id)
       const path = get(currentApi, 'api_path', '').split('/').splice(-1).join()
 
@@ -188,12 +188,13 @@ const ApiModal = observer((props: JobModalProps) => {
         date.timeout = currentApi.timeout
       })
     } else if (currentGroup) {
+      const group2 = apiGroupList.find((item) => item.id === currentGroup.id)
       setParams((date) => {
-        date.group_path = currentGroup?.group_path || '/'
-        date.group_name = currentGroup?.name || ''
+        date.group_path = group2?.group_path || '/'
+        date.group_name = group2?.name || ''
       })
     }
-  }, [apiGroupList, currentApi, setParams, currentGroup])
+  }, [apiGroupList, currentApi, setParams, currentGroup, isEdit])
 
   return (
     <Modal
@@ -246,14 +247,12 @@ const ApiModal = observer((props: JobModalProps) => {
                 ))}
               </Control>
             </Field>
-            {isEdit ? (
+            {isEdit || currentGroup?.id ? (
               <Field>
                 <Label tw="items-start!">
                   <AffixLabel required>API 服务组</AffixLabel>
                 </Label>
-                <Control tw="items-center">
-                  {apiGroupList.find((item) => item.id === currentApi?.group_id)?.name}
-                </Control>
+                <Control tw="items-center">{params.group_name}</Control>
               </Field>
             ) : (
               <SelectField
@@ -314,10 +313,7 @@ const ApiModal = observer((props: JobModalProps) => {
                 }
               ]}
               help={
-                <>
-                  必须唯一，支持汉字、英文字母、数字、英文格式的下划线，必须以英文字母或汉字开头，4~50
-                  个字符
-                </>
+                <>支持中文、英文、数字、下划线（_），且只能以英文或中文开头，长度为 4~50 个字符</>
               }
             />
             <ApiPathField
@@ -332,20 +328,18 @@ const ApiModal = observer((props: JobModalProps) => {
               }
               validateOnChange
               placeholder="请输入API路径"
-              maxLength={50}
+              maxLength={200}
               schemas={[
                 {
                   rule: (value: string) => {
-                    const reg = /^[a-zA-Z0-9_]{4,50}$/
+                    const reg = /^[a-zA-Z0-9_]{1,200}$/
                     return reg.test(value)
                   },
-                  help: '请输入4~50 个字符，英文字母、数字、英文格式的下划线',
+                  help: '请输入1~200 个字符，英文字母、数字、英文格式的下划线',
                   status: 'error'
                 }
               ]}
-              help="填入路径将作为 API
-                二级路径。支持英文、数字、下划线（_）、连字符（-），不超过
-                200 个字符"
+              help="填入路径将作为 API 二级路径。支持英文、数字、下划线（_）、连字符（-），不超过 200 个字符"
             />
             <Field>
               <Label tw="items-start!">
