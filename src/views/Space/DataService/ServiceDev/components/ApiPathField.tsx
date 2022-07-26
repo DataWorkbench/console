@@ -14,6 +14,7 @@ import { PathInput } from '../styled'
 
 export interface IInputProps extends InputProps {
   groupPath?: string
+  showGroupPath?: boolean
 }
 
 interface IElement {
@@ -49,7 +50,7 @@ const Wrapper = styled('div')(({ 'data-focused': focused }: { 'data-focused': bo
 export const InputField = forwardRef<IControlRef, IInputProps>((props, ref) => {
   const [focused, setFocused] = useState(false)
   const inputRef = useRef()
-  const { groupPath, onBlur, onFocus, className, ...rest } = props
+  const { groupPath, onBlur, onFocus, className, showGroupPath = true, ...rest } = props
 
   const handleBlur: FocusEventHandler = useCallback(
     (e) => {
@@ -74,7 +75,7 @@ export const InputField = forwardRef<IControlRef, IInputProps>((props, ref) => {
 
   return (
     <InputWrapper className={className} data-focused={focused}>
-      <PathInput tw="w-[150px]! mr-2 rounded-sm!">{groupPath}</PathInput>
+      {showGroupPath && <PathInput tw="w-[150px]! mr-2 rounded-sm!">{groupPath}</PathInput>}
       <Wrapper data-focused={focused}>
         <PathInput tw="w-[30px]! h-[30px]!">/</PathInput>
         <LInput {...rest} onBlur={handleBlur} onFocus={handleFocus} ref={ref} />

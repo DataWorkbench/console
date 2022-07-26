@@ -507,6 +507,7 @@ export const testPublishApi = ({
   host,
   uri,
   headers,
+  token,
   method,
   requestContent,
   cancel,
@@ -516,9 +517,12 @@ export const testPublishApi = ({
   return customRequest({
     url,
     method,
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: merge(
+      {
+        'Content-Type': 'application/json'
+      },
+      token ? { Authorization: `Bearer ${token}` } : {}
+    ),
     params: requestContent,
     ...rest
   }).catch(() => null)

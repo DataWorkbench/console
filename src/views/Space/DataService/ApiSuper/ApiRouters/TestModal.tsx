@@ -35,6 +35,7 @@ export const TestModal = observer((props: TestModalProps) => {
 
   const [testSource, setTestSource] = useImmer<any[]>([])
   const [testAuthKey, setTestAuthKey] = useImmer<string>('')
+  const [testResponse, setTestResponse] = useImmer<string>('')
   const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
   const mutationPublishApiDetail = useMutationPublishedApiHttpDetails()
 
@@ -53,7 +54,6 @@ export const TestModal = observer((props: TestModalProps) => {
           const config = dataSource.filter(
             (item: { column_name: string }) => !['limit', 'offset'].includes(item.column_name)
           )
-          console.log(config, '历史版本')
           setTestSource(config)
         }
       })
@@ -71,7 +71,6 @@ export const TestModal = observer((props: TestModalProps) => {
       {
         onSuccess: (res) => {
           try {
-            console.log(res, '历史版本22')
             const method = get(res, 'request_method') === 1 ? 'GET' : 'POST'
             const requestContent = JSON.parse(get(res, 'request_content', ''))
             const host = get(currentRow, 'host', '')
@@ -80,9 +79,12 @@ export const TestModal = observer((props: TestModalProps) => {
               uri,
               host,
               method,
+              token: testAuthKey,
               requestContent
             }
-            testPublishApi(omitBy(params, isEmpty))
+            testPublishApi(omitBy(params, isEmpty)).then((data: any) => {
+              setTestResponse(JSON.stringify(data, null, 2))
+            })
           } catch (error) {
             console.log(error)
           }
@@ -148,7 +150,7 @@ export const TestModal = observer((props: TestModalProps) => {
       onCancel={onClose}
       footer={null}
     >
-      <ModalContent tw="h-full">
+      <ModalContent tw="h-full overflow-hidden">
         <div tw="mb-3">API Path: {currentRow?.uri}</div>
         <FlexBox tw="h-full">
           <div tw="flex-1 mr-5">
@@ -173,10 +175,12 @@ export const TestModal = observer((props: TestModalProps) => {
           </div>
           <div tw="flex-1 h-full">
             <FlexBox orient="column" tw="h-full overflow-hidden">
-              <div tw="flex-row flex-1">
-                <TitleItem>响应详情</TitleItem>
-                <TestContent tw="h-[90%]">点击开始测试后会有返回详情</TestContent>
-              </div>
+              <TitleItem>响应详情</TitleItem>
+              <TestContent tw="h-[90%]">
+                <code tw="break-words whitespace-pre-wrap bg-transparent text-white">
+                  {testResponse || '点击开始测试后会有返回详情'}
+                </code>
+              </TestContent>
             </FlexBox>
           </div>
         </FlexBox>
