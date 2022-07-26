@@ -165,6 +165,13 @@ interface ValueItem {
   type: string
 }
 
+const getRowExp = (exp: string) => {
+  return exp
+    .split('_')
+    .map((i) => i.slice(2, -1))
+    .join('_')
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   const { sourceColumns = [] } = props
@@ -186,7 +193,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
             }
           }
           return {
-            rowKeyString: e.data.rowkey_express ?? '',
+            rowKeyString: getRowExp(e.data.rowkey_express) ?? '',
             versionIndex: e.data.version_column_index,
             versionTime: e.data.version_column_value ?? undefined
           }
@@ -577,7 +584,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           <MoreAction<'edit' | 'del'>
             childClick={() => setShowValueIndex(index)}
             onHide={() => setShowValueIndex(null)}
-            onMenuClick={handleEditValue}
+            onMenuClick={handleEditValue as any}
             items={[
               {
                 icon: 'if-pen',
@@ -717,7 +724,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
         </div>
         {rowKeys.map((column, index) => (
           <Item
-            key={index.toString()}
+            key={`${index.toString()}:${column.name}`}
             item={column}
             index={index}
             deleteItem={(s: number) => {
@@ -740,9 +747,13 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           <span>原理：</span>
           {new Array(Math.max(0, 2 * (rowKeys || []).length - 1)).fill(0).map((_, index) =>
             index % 2 === 1 ? (
-              <span tw="inline-flex">_</span>
+              // eslint-disable-next-line react/no-array-index-key
+              <span key={index} tw="inline-flex">
+                _
+              </span>
             ) : (
-              <Center tw="inline-flex" key={index.toString()} css={styles.iconNumber}>
+              // eslint-disable-next-line react/no-array-index-key
+              <Center tw="inline-flex" key={index} css={styles.iconNumber}>
                 {index / 2 + 1}
               </Center>
             )

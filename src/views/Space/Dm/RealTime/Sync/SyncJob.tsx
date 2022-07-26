@@ -147,6 +147,13 @@ export const intTypes = new Set([
   'INT IDENTITY'
 ])
 
+function setRowExp(rowkeyExpress: string) {
+  return rowkeyExpress
+    .split('_')
+    .map((i) => `$(${i})`)
+    .join('_')
+}
+
 const SyncJob = () => {
   const mutation = useMutationSyncJobConf()
   const { data: scheData } = useQueryJobSchedule()
@@ -314,7 +321,7 @@ const SyncJob = () => {
           set(
             resource,
             `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
-            rowkeyExpress
+            setRowExp(rowkeyExpress)
           )
           set(
             resource,

@@ -212,7 +212,6 @@ const clearSourceColumns$ = source$.pipe(
   pairwise(),
   changeTableName(),
   map(() => {
-    console.log(3333333333)
     return []
   })
 )
