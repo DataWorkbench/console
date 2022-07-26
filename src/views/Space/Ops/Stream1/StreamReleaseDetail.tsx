@@ -22,7 +22,7 @@ import { AlertStoreProvider } from 'views/Space/Ops/Alert/AlertStore'
 import emitter from 'utils/emitter'
 import {
   useQuerySteamJobVersionArgs,
-  useQuerySteamJobVersionCode,
+  // useQuerySteamJobVersionCode,
   useQueryStreamJobVersionDetail,
   useQueryStreamJobVersionSchedule
 } from 'hooks'
@@ -31,7 +31,7 @@ import { JobMode } from 'views/Space/Dm/RealTime/Job/JobUtils'
 
 import { observer } from 'mobx-react-lite'
 import Depends from 'views/Space/Ops/components/Depends'
-import StreamDevContent from '../components/StreamDevContent'
+// import StreamDevContent from '../components/StreamDevContent'
 
 const { TabPanel } = Tabs as any
 
@@ -114,10 +114,10 @@ const StreamReleaseDetail = observer(({ id, version }: { id: string; version: st
     versionId: version
   })
 
-  const { data: code } = useQuerySteamJobVersionCode({
-    jobId: id,
-    versionId: version
-  })
+  // const { data: code } = useQuerySteamJobVersionCode({
+  //   jobId: id,
+  //   versionId: version
+  // })
 
   const history = useHistory()
   const { search } = useLocation()
@@ -274,9 +274,9 @@ const StreamReleaseDetail = observer(({ id, version }: { id: string; version: st
         <TabPanel label="监控告警" name="alarm">
           <Monitor />
         </TabPanel>
-        <TabPanel label="开发内容" name="dev">
-          <StreamDevContent data={code} language="sql" />
-        </TabPanel>
+        {/* <TabPanel label="开发内容" name="dev"> */}
+        {/*   <StreamDevContent data={code} language="sql" /> */}
+        {/* </TabPanel> */}
         <TabPanel label="计算集群" name="cluster">
           <Cluster clusterId={args?.cluster_id} />
         </TabPanel>
