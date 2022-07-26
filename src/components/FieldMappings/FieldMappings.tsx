@@ -665,6 +665,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
     }
 
+    const targetReadonly = [
+      SourceType.Mysql,
+      SourceType.PostgreSQL,
+      SourceType.SqlServer,
+      SourceType.ClickHouse,
+      SourceType.SapHana,
+      SourceType.DB2
+    ].includes((rightTypeName as any)?.getType?.())
+
     return (
       <div css={styles.wrapper}>
         <div css={styles.borderX}>
@@ -672,36 +681,39 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             <div>类型</div>
             <div>目标表字段</div>
           </FieldRow>
-          {rightFields.map((item, i) => (
-            <MappingItem
-              jsplumb={jsPlumbInstRef.current}
-              key={item.uuid}
-              anchor="Left"
-              item={item}
-              index={i}
-              hasConnection={!!mappings.find(([, r]) => r === item?.name)}
-              typeName={rightTypeName}
-              moveItem={moveItemRight}
-              onOk={(info, index) => {
-                keepEditingFieldRight(info, index)
-              }}
-              onCancel={cancelAddCustomFieldRight}
-              deleteItem={(field) => {
-                setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
-                setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
-              }}
-              exist={(name: string) => !!rightFields.find((f) => f.name === name)}
-              getDeleteField={(name: string) => {
-                const delItem = rightFieldsProp.find((f) => f.name === name)
-                const existItem = rightFields.find((f) => f.name === name)
-                if (delItem && !existItem) {
-                  return delItem
-                }
-                return undefined
-              }}
-            />
-          ))}
-          {!readonly && (
+          {rightFields.map((item, i) => {
+            return (
+              <MappingItem
+                jsplumb={jsPlumbInstRef.current}
+                key={item.uuid}
+                anchor="Left"
+                item={item}
+                index={i}
+                hasConnection={!!mappings.find(([, r]) => r === item?.name)}
+                typeName={rightTypeName}
+                moveItem={moveItemRight}
+                onOk={(info, index) => {
+                  keepEditingFieldRight(info, index)
+                }}
+                onCancel={cancelAddCustomFieldRight}
+                deleteItem={(field) => {
+                  setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
+                  setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
+                }}
+                exist={(name: string) => !!rightFields.find((f) => f.name === name)}
+                getDeleteField={(name: string) => {
+                  const delItem = rightFieldsProp.find((f) => f.name === name)
+                  const existItem = rightFields.find((f) => f.name === name)
+                  if (delItem && !existItem) {
+                    return delItem
+                  }
+                  return undefined
+                }}
+                readonly={targetReadonly}
+              />
+            )
+          })}
+          {!readonly && !targetReadonly && (
             <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomFieldRight}>
               <Icon name="add" type="light" />
               添加字段
