@@ -6,7 +6,7 @@ import { Card } from 'components/Card'
 import { Center } from 'components/Center'
 import { Circle, JobInstanceStatusCmp } from 'views/Space/Ops/styledComponents'
 import dayjs from 'dayjs'
-import DevContent from 'views/Space/Ops/components/DevContent'
+// import DevContent from 'views/Space/Ops/components/DevContent'
 import Cluster from 'views/Space/Ops/components/Cluster'
 import Schedule from 'views/Space/Ops/components/Schedule'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
@@ -275,16 +275,16 @@ const StreamInstanceDetail = ({ id }: { id: string }) => {
         <TabPanel label="监控告警" name="alarm">
           <Monitor />
         </TabPanel>
-        <TabPanel label="开发内容" name="dev">
-          <DevContent
-            data={
-              {
-                // TODO: config
-              }
-            }
-            curJob={data}
-          />
-        </TabPanel>
+        {/* <TabPanel label="开发内容" name="dev"> */}
+        {/*   <DevContent */}
+        {/*     data={ */}
+        {/*       { */}
+        {/*         // TODO: config */}
+        {/*       } */}
+        {/*     } */}
+        {/*     curJob={data} */}
+        {/*   /> */}
+        {/* </TabPanel> */}
         <TabPanel label="计算集群" name="cluster">
           <Cluster
             clusterId={

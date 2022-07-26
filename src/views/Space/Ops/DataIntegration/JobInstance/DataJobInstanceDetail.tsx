@@ -26,7 +26,7 @@ import {
   useDescribeInstanceWithFlinkUIByInstanceId,
   useMutationJobInstance
 } from 'hooks'
-import DevContent from 'views/Space/Ops/components/DevContent'
+// import DevContent from 'views/Space/Ops/components/DevContent'
 import { Circle, DbTypeCmp, JobInstanceStatusCmp, JobTypeCmp } from '../../styledComponents'
 import AlertModal from '../../Alert/Modal'
 import Schedule from '../../components/Schedule'
@@ -444,11 +444,11 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         <TabPanel label="监控告警" name="Monitor">
           <Monitor />
         </TabPanel>
-        <TabPanel label="开发内容" name="Develop">
-          {/* <div>3</div> */}
+        {/* <TabPanel label="开发内容" name="Develop"> */}
+        {/*   /!* <div>3</div> *!/ */}
 
-          <DevContent data={get(data, 'sync_job_property.conf')} curJob={get(data, 'sync_job')} />
-        </TabPanel>
+        {/*   <DevContent data={get(data, 'sync_job_property.conf')} curJob={get(data, 'sync_job')} /> */}
+        {/* </TabPanel> */}
         <TabPanel label="计算集群" name="Cluster">
           <Cluster clusterId={get(data, 'sync_job_property.conf.cluster_id')} />
         </TabPanel>
