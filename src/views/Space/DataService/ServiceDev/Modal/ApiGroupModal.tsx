@@ -1,14 +1,16 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useImmer } from 'use-immer'
 import { AffixLabel, Modal, ModalContent } from 'components'
 import { Form, Button } from '@QCFE/qingcloud-portal-ui'
-import { get } from 'lodash-es'
+import { get, merge } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useMutationApiService, getQueryKeyListApiGroups } from 'hooks'
 import { strlen } from 'utils'
 import { useQueryClient } from 'react-query'
 import { useStore } from 'stores/index'
+import type { CurrentGroupApiProps } from '../ApiPanel/ApiTree'
+import ApiPathField from '../components/ApiPathField'
 
 const { TextField, TextAreaField } = Form
 
@@ -48,11 +50,12 @@ export interface JobModalData {
 
 interface JobModalProps {
   isEdit?: boolean
+  currentGroup?: CurrentGroupApiProps
   onClose?: (data?: JobModalData) => void
 }
 
 const ApiGroupModal = observer((props: JobModalProps) => {
-  const { isEdit = false, onClose } = props
+  const { isEdit = false, currentGroup, onClose } = props
   const {
     dtsDevStore: { resetTreeData }
   } = useStore()
@@ -60,19 +63,34 @@ const ApiGroupModal = observer((props: JobModalProps) => {
   const form = useRef<Form>(null)
   const [params, setParams] = useImmer(() => ({
     name: '',
-    group_path: '/',
+    group_path: '',
     desc: ''
   }))
+
+  useEffect(() => {
+    if (currentGroup) {
+      const path = get(currentGroup, 'group_path', '').split('/').splice(-1).join()
+      setParams((date) => {
+        date.group_path = path
+        date.name = currentGroup?.name || ''
+        date.desc = currentGroup.desc || ''
+      })
+    }
+  }, [currentGroup, setParams])
 
   const queryClient = useQueryClient()
   const mutation = useMutationApiService()
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      const paramsData = {
-        option: 'createApiGroup' as const,
-        ...params
-      }
+      const paramsData = merge(
+        {
+          option: isEdit ? 'updateApiGroup' : ('createApiGroup' as const),
+          ...params,
+          group_path: `/${params.group_path}`
+        },
+        isEdit ? { groupId: currentGroup?.id } : {}
+      )
       mutation.mutate(paramsData, {
         onSuccess: () => {
           queryClient.invalidateQueries(getQueryKeyListApiGroups())
@@ -96,7 +114,7 @@ const ApiGroupModal = observer((props: JobModalProps) => {
         <div tw="flex justify-end space-x-2">
           <Button onClick={() => onClose?.()}>取消</Button>
           <Button type="primary" loading={mutation.isLoading} onClick={handleOK}>
-            创建
+            {isEdit ? '保存' : '创建'}
           </Button>
         </div>
       }
@@ -133,11 +151,12 @@ const ApiGroupModal = observer((props: JobModalProps) => {
                 </>
               }
             />
-            <TextField
+            <ApiPathField
+              showGroupPath={false}
               name="group_path"
               label={<AffixLabel>API服务组路径</AffixLabel>}
-              value={get(params, 'group_path', '/')}
-              onChange={(v: string | number) =>
+              value={get(params, 'group_path', '')}
+              onChange={(v) =>
                 setParams((draft) => {
                   draft.group_path = String(v)
                 })
@@ -147,20 +166,14 @@ const ApiGroupModal = observer((props: JobModalProps) => {
               schemas={[
                 {
                   rule: (value: string) => {
-                    const l = strlen(value)
-                    return l >= 1 && l <= 20
+                    const reg = /^[a-zA-Z0-9_]{1,20}$/
+                    return reg.test(value)
                   },
-                  help: '允许包含字母、数字或下划线（_）,不能以（_）开始结尾',
+                  help: '请输入1~20 个字符，英文字母、数字、英文格式的下划线',
                   status: 'error'
                 }
               ]}
-              help={
-                <>
-                  此路径将作为 API
-                  一级路径。支持英文、数字、下划线（_）、连字符（-），且只能以正斜线（/）开头，不超过
-                  200 个字符
-                </>
-              }
+              help="此路径将作为 API 一级路径。支持英文、数字、下划线（_）、连字符（-），不超过 20 个字符"
             />
             <TextAreaField
               name="desc"

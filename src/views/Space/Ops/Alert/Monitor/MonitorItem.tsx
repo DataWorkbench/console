@@ -58,6 +58,7 @@ const MonitorItem = (props: IMonitorItemProps) => {
       <FlexBox tw="gap-2">
         {data?.notifications?.map((item) => (
           <Tooltip
+            key={item.id}
             hasPadding
             theme="light"
             content={
@@ -89,7 +90,7 @@ const MonitorItem = (props: IMonitorItemProps) => {
               </div>
             }
           >
-            <Tag>{item.name}</Tag>
+            <Tag key={`tag_${item.id}`}>{item.name}</Tag>
           </Tooltip>
         ))}
       </FlexBox>

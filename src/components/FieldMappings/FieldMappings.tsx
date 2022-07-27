@@ -24,6 +24,8 @@ import { Tooltip } from 'components/Tooltip'
 import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { KafkaFieldMappings } from 'components/FieldMappings/KafkaFieldMappings'
+// eslint-disable-next-line import/no-cycle
+import { kafkaSource$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import MappingItem, { FieldRow, TMappingField } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
@@ -237,9 +239,12 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const kafkaRef = useRef<{ rowMapping: () => Record<string, any>[] }>(null)
   const hbaseRef = useRef<{ getData: () => Record<string, any>[] }>(null)
 
-  const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka
+  const kafkaReadType = kafkaSource$.getValue()?.readType
+  const isKafkaSource =
+    (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 'text'
   const isKafkaTarget = (rightTypeName as any).getType() === SourceType.Kafka
   const isHbaseTarget = (rightTypeName as any).getType() === SourceType.HBase
+  const isHbaseSource = (leftTypeName as any).getType() === SourceType.HBase
 
   useImperativeHandle(ref, () => ({
     rowMapping: () => {
@@ -665,6 +670,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
     }
 
+    const targetReadonly = [
+      SourceType.Mysql,
+      SourceType.PostgreSQL,
+      SourceType.SqlServer,
+      SourceType.ClickHouse,
+      SourceType.SapHana,
+      SourceType.DB2
+    ].includes((rightTypeName as any)?.getType?.())
+
     return (
       <div css={styles.wrapper}>
         <div css={styles.borderX}>
@@ -672,36 +686,39 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             <div>类型</div>
             <div>目标表字段</div>
           </FieldRow>
-          {rightFields.map((item, i) => (
-            <MappingItem
-              jsplumb={jsPlumbInstRef.current}
-              key={item.uuid}
-              anchor="Left"
-              item={item}
-              index={i}
-              hasConnection={!!mappings.find(([, r]) => r === item?.name)}
-              typeName={rightTypeName}
-              moveItem={moveItemRight}
-              onOk={(info, index) => {
-                keepEditingFieldRight(info, index)
-              }}
-              onCancel={cancelAddCustomFieldRight}
-              deleteItem={(field) => {
-                setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
-                setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
-              }}
-              exist={(name: string) => !!rightFields.find((f) => f.name === name)}
-              getDeleteField={(name: string) => {
-                const delItem = rightFieldsProp.find((f) => f.name === name)
-                const existItem = rightFields.find((f) => f.name === name)
-                if (delItem && !existItem) {
-                  return delItem
-                }
-                return undefined
-              }}
-            />
-          ))}
-          {!readonly && (
+          {rightFields.map((item, i) => {
+            return (
+              <MappingItem
+                jsplumb={jsPlumbInstRef.current}
+                key={item.uuid}
+                anchor="Left"
+                item={item}
+                index={i}
+                hasConnection={!!mappings.find(([, r]) => r === item?.name)}
+                typeName={rightTypeName}
+                moveItem={moveItemRight}
+                onOk={(info, index) => {
+                  keepEditingFieldRight(info, index)
+                }}
+                onCancel={cancelAddCustomFieldRight}
+                deleteItem={(field) => {
+                  setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
+                  setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
+                }}
+                exist={(name: string) => !!rightFields.find((f) => f.name === name)}
+                getDeleteField={(name: string) => {
+                  const delItem = rightFieldsProp.find((f) => f.name === name)
+                  const existItem = rightFields.find((f) => f.name === name)
+                  if (delItem && !existItem) {
+                    return delItem
+                  }
+                  return undefined
+                }}
+                readonly={targetReadonly}
+              />
+            )
+          })}
+          {!readonly && !targetReadonly && (
             <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomFieldRight}>
               <Icon name="add" type="light" />
               添加字段
@@ -716,17 +733,20 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }
 
   const getLeftFields = () => {
-    if (isKafkaSource) {
-      return [
-        {
-          type: 'STRING',
-          name: 'message',
-          is_primary_key: false,
-          uuid: `source--message`
-        }
-      ]
-    }
     return leftFields
+  }
+
+  function renderHbaseRowKey() {
+    if (!isHbaseSource) {
+      return null
+    }
+    return (
+      <FieldRow tw="cursor-default">
+        <div>STRING</div>
+        <div>rowkey</div>
+        <div tw="text-neut-8">不可编辑</div>
+      </FieldRow>
+    )
   }
 
   return (
@@ -827,9 +847,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <div>类型</div>
                 <div>来源表字段</div>
               </FieldRow>
+              {renderHbaseRowKey()}
               {getLeftFields().map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
+                  hasMoreAction={!isKafkaSource}
                   item={item}
                   key={item.name}
                   index={i}

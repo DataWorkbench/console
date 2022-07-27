@@ -14,7 +14,7 @@ import useIcon from 'hooks/useHooks/useIcon'
 import Schedule from 'views/Space/Ops/components/Schedule'
 import Monitor from 'views/Space/Ops/components/Monitor'
 import LinkInstance from 'views/Space/Ops/components/LinkInstance'
-import DevContent from 'views/Space/Ops/components/DevContent'
+// import DevContent from 'views/Space/Ops/components/DevContent'
 import { observer } from 'mobx-react-lite'
 import AlertModal from 'views/Space/Ops/Alert/Modal'
 import DataSourceModal from 'views/Space/Ops/DataIntegration/DataRelease/DataSourceModal'
@@ -369,9 +369,9 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
         <TabPanel label="监控告警" name="alarm">
           <Monitor />
         </TabPanel>
-        <TabPanel label="开发内容" name="dev">
-          <DevContent data={config} curJob={data} />
-        </TabPanel>
+        {/* <TabPanel label="开发内容" name="dev"> */}
+        {/*   <DevContent data={config} curJob={data} /> */}
+        {/* </TabPanel> */}
         <TabPanel label="计算集群" name="cluster">
           <Cluster clusterId={config?.cluster_id} />
         </TabPanel>

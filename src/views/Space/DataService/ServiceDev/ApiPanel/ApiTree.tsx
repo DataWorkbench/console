@@ -15,6 +15,7 @@ import qs from 'qs'
 import { getNewTreeData, renderIcon, renderSwitcherIcon } from './ApiUtils'
 import ApiModal from '../Modal/ApiModal'
 import DelModal from '../Modal/DelModal'
+import ApiGroupModal from '../Modal/ApiGroupModal'
 
 const { MenuItem } = Menu as any
 
@@ -54,6 +55,7 @@ export interface CurrentGroupApiProps {
   name: string
   id: string
   group_path: string
+  desc: string
 }
 
 export const ApiTree = observer(
@@ -68,7 +70,7 @@ export const ApiTree = observer(
 
     const {
       dtsDevStore,
-      dtsDevStore: { treeData, loadedKeys, curApi }
+      dtsDevStore: { treeData, loadedKeys, curApi, addPanel }
     } = useStore()
 
     const [expandedKeys, setExpandedKeys] = useState<string[]>(expandedKeysProp || [])
@@ -82,6 +84,7 @@ export const ApiTree = observer(
     const [currentGroup, setCurrentGroup] = useState<CurrentGroupApiProps>()
     const [showApiModal, setShowApiModal] = useState<boolean>()
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>()
+    const [showApiGroupModal, setShowApiGroupModal] = useState<boolean>()
 
     const [search, setSearch] = useState('')
 
@@ -124,14 +127,14 @@ export const ApiTree = observer(
     const onRightMenuClick = useCallback(
       (e, key: string, val: CurOpProps, api?: ApiProps | null, Group?: CurrentGroupApiProps) => {
         if (Group) {
-          const groupData = pick(Group, ['name', 'id', 'group_path'])
+          const groupData = pick(Group, ['name', 'id', 'group_path', 'desc'])
           setCurrentGroup(groupData)
         }
         if (api) {
-          setCurrentApi(api)
-
+          // 操作 api 时, panel 选中当前 api
+          addPanel(api)
+          dtsDevStore.set({ curApi: api })
           const apiId = get(api, 'api_id')
-
           fetchApiConfig({ apiId }).then((res) => {
             const dataSource = cloneDeep(get(res, 'data_source'))
             const Api = merge(get(res, 'api_config'), { datasource_id: dataSource.id })
@@ -146,7 +149,7 @@ export const ApiTree = observer(
         } else if (val === 'deleteApi') {
           setShowDeleteModal(true)
         } else if (val === 'editAPI') {
-          setShowApiModal(true)
+          dtsDevStore.set({ showBaseSetting: true })
         } else if (val === 'showCluster') {
           dtsDevStore.set({ showClusterSetting: true })
         } else if (val === 'showRequest') {
@@ -155,10 +158,12 @@ export const ApiTree = observer(
           dtsDevStore.set({ showResponseSetting: true })
         } else if (val === 'showVersions') {
           dtsDevStore.set({ showVersions: true })
+        } else if (val === 'editApiGroup') {
+          setShowApiGroupModal(true)
         }
         setVisible(false)
       },
-      [dtsDevStore, fetchApiConfig]
+      [addPanel, dtsDevStore, fetchApiConfig]
     )
 
     const fetchJobTreeData = (node: any, movingNode = null) => {
@@ -192,8 +197,12 @@ export const ApiTree = observer(
               }
             >
               <MenuItem value="createAPI">
-                <Icon name="edit" size={14} type="light" />
+                <Icon name="q-apiFill" size={14} type="light" />
                 <span>创建API</span>
+              </MenuItem>
+              <MenuItem value="editApiGroup">
+                <Icon name="edit" size={14} type="light" />
+                <span>编辑信息</span>
               </MenuItem>
               <MenuItem value="deleteApiGroup">
                 <Icon name="delete" size={14} type="light" />
@@ -323,12 +332,7 @@ export const ApiTree = observer(
           </TreeWrapper>
         </Tippy>
         {showApiModal && (
-          <ApiModal
-            isEdit={curOp === 'editAPI'}
-            currentApi={currentApi}
-            currentGroup={currentGroup}
-            onClose={() => setShowApiModal(false)}
-          />
+          <ApiModal currentGroup={currentGroup} onClose={() => setShowApiModal(false)} />
         )}
         {showDeleteModal && (
           <DelModal
@@ -336,6 +340,13 @@ export const ApiTree = observer(
             currentApi={currentApi}
             currentGroup={currentGroup}
             isApiGroup={curOp === 'deleteApiGroup'}
+          />
+        )}
+        {showApiGroupModal && (
+          <ApiGroupModal
+            isEdit={curOp === 'editApiGroup'}
+            currentGroup={currentGroup}
+            onClose={() => setShowApiGroupModal(false)}
           />
         )}
       </>

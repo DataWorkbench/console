@@ -310,11 +310,11 @@ export const dataReleaseActions = [
     text: '关联实例',
     key: 'link'
   },
-  {
-    icon: 'q-terminalBoxFill',
-    text: '开发内容',
-    key: 'dev'
-  },
+  // {
+  //   icon: 'q-terminalBoxFill',
+  //   text: '开发内容',
+  //   key: 'dev'
+  // },
   {
     icon: 'q-clusterFill',
     text: '计算集群',

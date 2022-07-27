@@ -50,6 +50,8 @@ export default {
 
     describeApiConfig: ['GET', '/v1/workspace/{space_id}/dataservice/config/{api_id}'],
 
+    describeApiGroup: ['GET', '/v1/workspace/{space_id}/dataservice/group/{group_id}'],
+
     describeDataServiceApiVersion: [
       'GET',
       '/v1/workspace/{space_id}/dataservice/version/{api_id}/{ver_id}'
@@ -61,8 +63,8 @@ export default {
     ],
 
     describePublishedApiHttpDetails: [
-      'GET',
-      '/v1/workspace/{space_id}/dataservice/version/httpdetails/{ver_id}'
+      'POST',
+      '/v1/workspace/{space_id}/dataservice/httpdetails/{ver_id}'
     ],
 
     describeServiceDataSourceKinds: ['GET', '/v1/workspace/{space_id}/dataservice/kinds'],
@@ -93,7 +95,11 @@ export default {
 
     testDataServiceApi: ['POST', '/v1/workspace/{space_id}/dataservice/config/{api_id}/test'],
 
+    updateApiBaseConfig: ['PUT', '/v1/workspace/{space_id}/dataservice/config/base/{api_id}'],
+
     updateApiConfig: ['PUT', '/v1/workspace/{space_id}/dataservice/config/{api_id}'],
+
+    updateApiGroup: ['PUT', '/v1/workspace/{space_id}/dataservice/group/{group_id}'],
 
     updateDataServiceCluster: ['PUT', '/v1/workspace/{space_id}/dataservice/cluster/{cluster_id}']
   },

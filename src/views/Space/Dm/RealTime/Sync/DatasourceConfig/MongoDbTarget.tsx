@@ -17,7 +17,7 @@ import { AffixLabel, Center, FlexBox, HelpCenterLink, SelectWithRefresh } from '
 import { useQuerySourceTables } from 'hooks'
 import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
-import { source$ } from '../common/subjects'
+import { target$ } from '../common/subjects'
 
 type FieldKeys = 'id' | 'collectionName' | 'writeMode' | 'replaceKey' | 'batchSize'
 
@@ -30,7 +30,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
   const [showAdvanced, setShowAdvanced] = useState(false)
   const { refetch } = useTableColumns(dbInfo?.id, dbInfo?.collectionName, 'target')
   useLayoutEffect(() => {
-    const sub = source$
+    const sub = target$
       .pipe(
         map((e) => {
           if (!e) {
@@ -81,7 +81,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
   }, [dbInfo])
   return (
     <Form css={styles.form} ref={sourceForm}>
-      <BaseConfigCommon from="source" />
+      <BaseConfigCommon from="target" />
       {dbInfo?.id && (
         <>
           <SelectWithRefresh

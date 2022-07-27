@@ -1,4 +1,4 @@
-import { Button, Icon, Table } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Loading, Table } from '@QCFE/qingcloud-portal-ui'
 import { Center, Confirm, FlexBox, TextEllipsis } from 'components'
 import {
   useMutationDataServiceCluster,
@@ -121,7 +121,9 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
   return (
     <>
       <Confirm
-        title={`${cluster.id ? `停用服务集群:${cluster.id}(ID)` : '停用服务集群注意事项'}`}
+        title={`${
+          cluster.id ? `停用服务集群${cluster.name}（${cluster.id}）` : '停用服务集群注意事项'
+        }`}
         visible={showConfirm}
         css={css`
           .modal-card-head {
@@ -141,7 +143,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           <div tw="flex justify-end space-x-2">
             <Button onClick={() => handleCancel()}>取消</Button>
             <Button type="danger" onClick={handleConfirmOK}>
-              停用
+              {publishApi?.length === 0 ? '停用' : '全部下线并停用集群'}
             </Button>
           </div>
         }
@@ -150,10 +152,11 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           <div tw=" mt-3 ml-9 mb-3">
             {publishApi && publishApi?.length > 0
               ? `当前集群存在以下已发布 API ，如需停用服务集群，将以下已发布 API 下线，否则以下 API 将不能测试、访问，请谨慎操作。`
-              : `确认停用服务集群名称:${cluster.name}（${cluster.id}）？`}
+              : `确认停用服务集群${cluster.name}（${cluster.id}）?`}
           </div>
           {publishApi && publishApi?.length > 0 && (
             <Table
+              tw="mt-6"
               dataSource={publishApi}
               columns={columns}
               pagination={{
@@ -196,7 +199,14 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
                 onClick={shopApiServerConfirmOk}
                 disabled={serviceApisMutation.isLoading}
               >
-                全部下线并停用集群
+                {serviceApisMutation.isLoading ? (
+                  <div tw="flex items-center">
+                    <Loading size={16} tw="h-4 w-4 mr-1" />
+                    停用中
+                  </div>
+                ) : (
+                  '全部下线并停用集群'
+                )}
               </Button>
             </div>
           }

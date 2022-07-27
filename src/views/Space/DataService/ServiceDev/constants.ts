@@ -268,7 +268,7 @@ export const paramsDataType: (type: string) => number | undefined = (type: strin
 export const configMapData = (filedData: SchemaMap[], configData: any[], defaultData: any) => {
   const configMap = new Map()
   configData?.forEach((item) => {
-    configMap.set(item.param_name, item)
+    configMap.set(item.column_name, item)
   })
 
   return filedData?.map((item) => {

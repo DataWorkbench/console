@@ -9,8 +9,6 @@ import { strlen } from 'utils'
 import { Control, Field, Form, Label, Radio, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
 import { useParams } from 'react-router-dom'
-import { ApiProps } from 'stores/DtsDevStore'
-import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import ModelItem from './ModeItem'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 import type { CurrentGroupApiProps } from '../ApiPanel/ApiTree'
@@ -61,8 +59,6 @@ export interface JobModalData {
 }
 
 interface JobModalProps {
-  isEdit?: boolean
-  currentApi?: ApiProps
   currentGroup?: CurrentGroupApiProps
   onClose?: (data?: JobModalData) => void
 }
@@ -97,7 +93,7 @@ const modelSource = [
 ]
 
 const ApiModal = observer((props: JobModalProps) => {
-  const { isEdit = false, onClose, currentApi, currentGroup } = props
+  const { onClose, currentGroup } = props
   const { spaceId } = useParams<{ spaceId: string }>()
   const {
     dtsDevStore: { setTreeData, treeData }
@@ -122,11 +118,11 @@ const ApiModal = observer((props: JobModalProps) => {
     api_name: '',
     api_path: '',
     protocols: Protocol.HTTP,
-    cross_domain: false,
+    cross_domain: true,
     request_method: RequestMethods.GET,
     response_type: ResponseMethods.JSON,
     api_description: '',
-    timeout: '0'
+    timeout: 1
   }))
 
   const mutation = useMutationApiService()
@@ -136,29 +132,14 @@ const ApiModal = observer((props: JobModalProps) => {
   const handleOK = () => {
     if (form.current?.validateForm()) {
       const groupId = apiGroupList.find((item) => item.name === params.group_name)?.id || ''
-      if (isEdit && !currentApi?.datasource_id) {
-        Notify.warning({
-          title: '操作提示',
-          content: '请先选择数据源',
-          placement: 'bottomRight'
-        })
-        return
-      }
 
-      const paramsData = merge(
-        {
-          option: isEdit ? 'updateApi' : ('createApi' as const),
-          ...pickBy(params, (v, k) => !['group_path', 'group_name'].includes(k)),
-          api_path: `/${params.api_path}`,
-          group_id: groupId,
-          space_id: spaceId
-        },
-        isEdit && {
-          apiId: currentApi?.api_id,
-          datasource_id: currentApi?.datasource_id,
-          table_name: currentApi?.table_name
-        }
-      )
+      const paramsData = merge({
+        option: 'createApi' as const,
+        ...pickBy(params, (v, k) => !['group_path', 'group_name'].includes(k)),
+        api_path: `/${params.api_path}`,
+        group_id: groupId,
+        space_id: spaceId
+      })
 
       mutation.mutate(paramsData, {
         onSuccess: () => {
@@ -170,35 +151,19 @@ const ApiModal = observer((props: JobModalProps) => {
   }
 
   useEffect(() => {
-    if (currentApi) {
-      const group = apiGroupList.find((item) => item.id === currentApi.group_id)
-      const path = get(currentApi, 'api_path', '').split('/').splice(-1).join()
-
+    if (currentGroup) {
+      const group2 = apiGroupList.find((item) => item.id === currentGroup.id)
       setParams((date) => {
-        date.api_mode = currentApi.api_mode
-        date.group_path = group?.group_path || '/'
-        date.group_name = group?.name || ''
-        date.api_name = currentApi.api_name
-        date.api_path = path
-        date.protocols = currentApi.protocols
-        date.cross_domain = currentApi.cross_domain
-        date.request_method = currentApi.request_method
-        date.response_type = currentApi.response_type
-        date.api_description = currentApi.api_description
-        date.timeout = currentApi.timeout
-      })
-    } else if (currentGroup) {
-      setParams((date) => {
-        date.group_path = currentGroup?.group_path || '/'
-        date.group_name = currentGroup?.name || ''
+        date.group_path = group2?.group_path || '/'
+        date.group_name = group2?.name || ''
       })
     }
-  }, [apiGroupList, currentApi, setParams, currentGroup])
+  }, [apiGroupList, setParams, currentGroup])
 
   return (
     <Modal
       visible
-      title={`${isEdit ? '修改' : '创建'}API`}
+      title="创建API"
       width={900}
       maskClosable={false}
       appendToBody
@@ -208,7 +173,7 @@ const ApiModal = observer((props: JobModalProps) => {
         <div tw="flex justify-end space-x-2">
           <Button onClick={() => onClose?.()}>取消</Button>
           <Button type="primary" loading={mutation.isLoading} onClick={handleOK}>
-            {isEdit ? '保存' : '创建并配置'}
+            创建并配置
           </Button>
         </div>
       }
@@ -246,14 +211,12 @@ const ApiModal = observer((props: JobModalProps) => {
                 ))}
               </Control>
             </Field>
-            {isEdit ? (
+            {currentGroup?.id ? (
               <Field>
                 <Label tw="items-start!">
                   <AffixLabel required>API 服务组</AffixLabel>
                 </Label>
-                <Control tw="items-center">
-                  {apiGroupList.find((item) => item.id === currentApi?.group_id)?.name}
-                </Control>
+                <Control tw="items-center">{params.group_name}</Control>
               </Field>
             ) : (
               <SelectField
@@ -314,10 +277,7 @@ const ApiModal = observer((props: JobModalProps) => {
                 }
               ]}
               help={
-                <>
-                  必须唯一，支持汉字、英文字母、数字、英文格式的下划线，必须以英文字母或汉字开头，4~50
-                  个字符
-                </>
+                <>支持中文、英文、数字、下划线（_），且只能以英文或中文开头，长度为 4~50 个字符</>
               }
             />
             <ApiPathField
@@ -332,20 +292,18 @@ const ApiModal = observer((props: JobModalProps) => {
               }
               validateOnChange
               placeholder="请输入API路径"
-              maxLength={50}
+              maxLength={200}
               schemas={[
                 {
                   rule: (value: string) => {
-                    const reg = /^[a-zA-Z0-9_]{4,50}$/
+                    const reg = /^[a-zA-Z0-9_]{1,200}$/
                     return reg.test(value)
                   },
-                  help: '请输入4~50 个字符，英文字母、数字、英文格式的下划线',
+                  help: '请输入1~200 个字符，英文字母、数字、英文格式的下划线',
                   status: 'error'
                 }
               ]}
-              help="填入路径将作为 API
-                二级路径。支持英文、数字、下划线（_）、连字符（-），不超过
-                200 个字符"
+              help="填入路径将作为 API 二级路径。支持英文、数字、下划线（_）、连字符（-），不超过 200 个字符"
             />
             <Field>
               <Label tw="items-start!">
@@ -376,7 +334,7 @@ const ApiModal = observer((props: JobModalProps) => {
               value={get(params, 'timeout', '')}
               onChange={(v) =>
                 setParams((draft) => {
-                  draft.timeout = (Number(v) || 0) as unknown as string
+                  draft.timeout = (Number(v) || '') as unknown as number
                 })
               }
               maxLength={3}
@@ -384,14 +342,14 @@ const ApiModal = observer((props: JobModalProps) => {
                 {
                   rule: (value: number) => {
                     const l = Number(value)
-                    return l >= 2 && l <= 300
+                    return l >= 1 && l <= 300
                   },
-                  help: '请输入范围0-300',
+                  help: '请输入范围1-300',
                   status: 'error'
                 }
               ]}
-              help="0-300"
-              suffix={<div tw="ml-1">S</div>}
+              help="1-300"
+              suffix={<div tw="ml-1">s</div>}
             />
             <Field>
               <Label>

@@ -97,7 +97,7 @@ const MonitorModal = observer((props: IMonitorModalProps) => {
           onClick={() => set({ showAddMonitor: true, disabledIds: arr.map((v) => v.id) })}
         >
           <Icon name="add" size={14} type="light" />
-          <span tw="text-xs">添加告警策略</span>
+          <span tw="text-xs">绑定告警策略</span>
         </Button>
         <Collapse
           css={collapseStyle.wrapper}

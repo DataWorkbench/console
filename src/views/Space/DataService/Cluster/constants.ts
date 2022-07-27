@@ -27,7 +27,7 @@ function getField<T>(mapping: Mapping<T>): IColumn[] {
 export const StopClusterTableFieldMapping: Mapping<
   'name' | 'version_id' | 'api_path' | 'path' | 'desc'
 > = new Map()
-  .set('name', { label: 'APP名称 / ID', apiField: 'api_name' })
+  .set('name', { label: 'API名称 / ID', apiField: 'api_name' })
   .set('version_id', { label: '版本ID', apiField: 'version_id' })
   .set('api_path', { label: 'API服务组', apiField: 'group_path' })
   .set('path', { label: 'API访问路径', apiField: 'api_path' })
@@ -83,11 +83,11 @@ export const StatusEnum = createEnhancedEnum<IStatusEnum>({
 
 export const resourceSpecState = createEnhancedEnum<EnhanceState>({
   BASE: {
-    label: '基础版',
+    label: '入门版',
     value: 1
   },
   CROSS: {
-    label: '入门版',
+    label: '基础版',
     value: 2
   },
   VIP: {
