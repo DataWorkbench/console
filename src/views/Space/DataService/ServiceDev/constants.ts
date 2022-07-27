@@ -88,7 +88,7 @@ export const serviceDevRequestSettingMapping: Mapping<
 > = new Map()
   .set('param_name', { label: '参数名称', apiField: 'param_name' })
   .set('column_name', { label: '绑定字段', apiField: 'column_name' })
-  .set('type', { label: '参数字段', apiField: 'type' })
+  .set('type', { label: '参数类型', apiField: 'type' })
   .set('param_operator', { label: '操作符', apiField: 'param_operator' })
   .set('param_position', { label: '参数位置', apiField: 'param_position' })
   .set('is_required', { label: '必填', apiField: 'is_required' })
@@ -103,7 +103,7 @@ export const serviceDevResponseSettingMapping: Mapping<
 > = new Map()
   .set('param_name', { label: '参数名称', apiField: 'param_name' })
   .set('column_name', { label: '绑定字段', apiField: 'column_name' })
-  .set('type', { label: '参数字段', apiField: 'type' })
+  .set('type', { label: '参数类型', apiField: 'type' })
   .set('example_value', { label: '示例值', apiField: 'example_value' })
   .set('param_description', { label: '描述', apiField: 'param_description' })
 
@@ -218,15 +218,15 @@ export const ParameterPosition = createEnhancedEnum<IStatusEnum>({
   QUERY: {
     label: 'QUERY',
     value: 2
-  },
-  PATH: {
-    label: 'PATH',
-    value: 3
-  },
-  HEAD: {
-    label: 'HEAD',
-    value: 4
   }
+  // PATH: {
+  //   label: 'PATH',
+  //   value: 3
+  // },
+  // HEAD: {
+  //   label: 'HEAD',
+  //   value: 4
+  // }
 })
 
 export const OrderMode = createEnhancedEnum<IStatusEnum>({
