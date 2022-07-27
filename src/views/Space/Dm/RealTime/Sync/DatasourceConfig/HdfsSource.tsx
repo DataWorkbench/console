@@ -185,7 +185,7 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
             <div css={styles.line} />
           </FlexBox>
           <TextField
-            label={<AffixLabel>文件正则</AffixLabel>}
+            label={<AffixLabel required={false}>文件正则</AffixLabel>}
             name="reg"
             value={dbInfo?.filterRegex}
             onChange={(e) => {
