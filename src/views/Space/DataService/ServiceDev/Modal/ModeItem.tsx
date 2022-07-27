@@ -63,7 +63,7 @@ const ModeItem = ({ modeData, selected, onClick }: ModeItemProps) => {
     >
       <div
         css={[
-          tw`bg-neut-16 group-hover:bg-neut-15 py-3 px-3 2xl:py-5 2xl:pl-5 text-base flex-1 relative`,
+          tw`bg-neut-16 group-hover:bg-neut-15 py-2 px-3 text-base flex-1 relative`,
           selected && tw`bg-[rgba(21, 166, 117, 0.1)]`
         ]}
       >

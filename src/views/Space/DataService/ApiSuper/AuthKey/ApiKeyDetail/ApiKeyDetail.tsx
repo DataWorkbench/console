@@ -121,7 +121,7 @@ const ApiServiceDetail = (props: { id: string }) => {
           <Center tw="flex-auto">
             <Circle tw="w-10! h-10!">
               <Icon
-                name="q-downloadBoxFill"
+                name="q-kmsFill"
                 type="light"
                 size={28}
                 css={css`

@@ -143,7 +143,7 @@ const ApiServiceDetail = (props: { id: string }) => {
         <TabPanel label="已发布 API" name="api" tw="pt-5">
           <ApiRouterTable apiServiceId={detail?.id} />
         </TabPanel>
-        <TabPanel label="已绑定秘钥" name="authKey" tw="mt-5">
+        <TabPanel label="已绑定密钥" name="authKey" tw="mt-5">
           <AuthKeyTable authKeyId={detail?.auth_key_id} apiServiceId={detail?.id} />
         </TabPanel>
       </HorizonTabs>
