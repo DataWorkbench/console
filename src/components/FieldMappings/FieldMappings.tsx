@@ -851,6 +851,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               {getLeftFields().map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
+                  hasMoreAction={!isKafkaSource}
                   item={item}
                   key={item.name}
                   index={i}
