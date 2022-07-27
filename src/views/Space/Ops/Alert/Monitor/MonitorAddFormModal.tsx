@@ -270,7 +270,18 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
               }}
               schemas={[
                 {
-                  rule: (v) => !(!v.instance_run_failed_flag && !v.instance_run_timeout_flag),
+                  rule: (v) => {
+                    if (v.instance_run_timeout_flag && v.instance_run_timeout === undefined) {
+                      return false
+                    }
+                    if (v.instance_run_timeout !== undefined && !v.instance_run_timeout_flag) {
+                      return false
+                    }
+                    if (!v.instance_run_timeout_flag && !v.instance_run_failed_flag) {
+                      return false
+                    }
+                    return true
+                  },
                   help: '监控项不能为空',
                   status: 'error'
                 }
