@@ -129,7 +129,6 @@ const ClusterSettingModal = observer(() => {
       width={800}
       onCancel={onClose}
       maskClosable={false}
-      closable={false}
       footer={
         <div tw="flex justify-end space-x-2">
           <Button onClick={onClose}>取消</Button>

@@ -345,7 +345,6 @@ const RequestSettingModal = observer(() => {
     <ResizeModal
       orient="fullright"
       maskClosable={false}
-      closable={false}
       visible
       maxWidth={1500}
       enableResizing={{ left: true }}
