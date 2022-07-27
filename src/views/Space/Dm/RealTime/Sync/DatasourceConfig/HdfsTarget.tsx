@@ -194,6 +194,13 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                 rule: { required: true },
                 help: '请选择文件类型',
                 status: 'error'
+              },
+              {
+                rule: (v) => {
+                  return !!v
+                },
+                help: '请选择文件类型',
+                status: 'error'
               }
             ]}
           />
@@ -234,7 +241,7 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
               />
             </>
           )}
-          {dbInfo?.fileType && (
+          {!!dbInfo?.fileType && (
             <SelectField
               label={<AffixLabel required>压缩类型</AffixLabel>}
               value={dbInfo?.compress}
