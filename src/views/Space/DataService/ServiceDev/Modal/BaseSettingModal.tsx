@@ -4,7 +4,7 @@ import { AffixLabel, DarkModal, ModalContent, InputField } from 'components'
 import { cloneDeep, get } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
-import { useStore, useMutationUpdateApiConfig } from 'hooks'
+import { useStore, useMutationUpdateApiBaseConfig } from 'hooks'
 import { strlen, formatDate } from 'utils'
 import { Control, Field, Form, Label, Radio, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
@@ -72,7 +72,7 @@ const BaseSettingModal = observer(() => {
     dtsDevStore: { apiConfigData, treeData, setTreeData, curApi },
     dtsDevStore
   } = useStore()
-  const mutation = useMutationUpdateApiConfig()
+  const mutation = useMutationUpdateApiBaseConfig()
   const isHistory = get(curApi, 'is_history', false) || false
 
   const onClose = () => {
@@ -141,22 +141,9 @@ const BaseSettingModal = observer(() => {
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      const dataSource = cloneDeep(get(apiConfigData, 'data_source'))
-      const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
-      if (!dataSource?.id) {
-        Notify.warning({
-          title: '操作提示',
-          content: '请先选择数据源',
-          placement: 'bottomRight'
-        })
-        return
-      }
-
       mutation.mutate(
         {
           apiId: params.api_id,
-          datasource_id: dataSource.id,
-          table_name: apiConfig?.table_name,
           ...params,
           api_path: `/${params.api_path.trim()}`
         },
@@ -241,6 +228,7 @@ const BaseSettingModal = observer(() => {
             />
             <ApiPathField
               label={<AffixLabel required>API路径</AffixLabel>}
+              disabled={isHistory}
               groupPath={get(params, 'group_path', '')}
               name="api_path"
               value={get(params, 'api_path', '')}
@@ -290,6 +278,7 @@ const BaseSettingModal = observer(() => {
             <InputField
               name="timeout"
               className="inputField"
+              disabled={isHistory}
               label={<AffixLabel required>超时时间</AffixLabel>}
               validateOnChange
               value={get(params, 'timeout', '')}
