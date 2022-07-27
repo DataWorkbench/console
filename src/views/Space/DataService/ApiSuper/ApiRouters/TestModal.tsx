@@ -50,7 +50,7 @@ export const TestModal = observer((props: TestModalProps) => {
       }
       mutationApiVersion.mutate(params, {
         onSuccess: (res) => {
-          const dataSource = get(res, 'api_version.request_params.request_params', []) || []
+          const dataSource = get(res, 'api_config.request_params.request_params', []) || []
           const config = dataSource.filter(
             (item: { column_name: string }) => !['limit', 'offset'].includes(item.column_name)
           )

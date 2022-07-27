@@ -28,6 +28,10 @@ const TestModal = observer(() => {
   const [testSource, setTestSource] = useImmer<any[]>([])
   const [testRequest, setTestRequest] = useImmer<string>('')
   const [testResponse, setTestResponse] = useImmer<string>('')
+  const [testMessage, setTestMessage] = useImmer<{ test_status: string; item_out: number }>({
+    test_status: '',
+    item_out: 0
+  })
   const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
 
   useEffect(() => {
@@ -60,6 +64,10 @@ const TestModal = observer(() => {
               content = JSON.stringify(JSON.parse(res.response_content), null, 2)
               setTestRequest(logs)
               setTestResponse(content)
+              setTestMessage({
+                test_status: res.test_status,
+                item_out: res.item_out
+              })
             } catch (error) {
               console.log(error)
             }
@@ -148,14 +156,18 @@ const TestModal = observer(() => {
               开始测试
             </Button>
             <div>
-              <MessageBox>
-                <Icon name="success" color={{ secondary: 'green' }} type="dark" />
-                测试通过，API 调用延迟 180ms
-              </MessageBox>
-              <MessageBox color="red">
-                <Icon name="error" color={{ secondary: 'red' }} type="dark" />
-                测试通过，API 调用延迟 180ms
-              </MessageBox>
+              {testMessage.test_status === 'pass' && (
+                <MessageBox>
+                  <Icon name="success" color={{ secondary: 'green' }} type="dark" />
+                  测试通过，API 调用延迟 {testMessage.item_out}ms
+                </MessageBox>
+              )}
+              {testMessage.test_status === 'failed' && (
+                <MessageBox color="red">
+                  <Icon name="error" color={{ secondary: 'red' }} type="dark" />
+                  测试通过，API 调用延迟 {testMessage.item_out}ms
+                </MessageBox>
+              )}
             </div>
           </div>
           <div tw="flex-1">

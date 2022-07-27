@@ -29,7 +29,7 @@ import {
   ServiceGatewayListRoutesType
 } from '../types/response'
 
-type Options = 'createApiGroup' | 'createApi' | 'updateApi'
+type Options = 'createApiGroup' | 'createApi' | 'updateApi' | 'updateApiGroup'
 type AuthKeyOp = 'create' | 'update' | 'delete' | 'bind' | 'unbind'
 interface IParams {
   regionId: string
@@ -202,6 +202,11 @@ export const UpdateApiConfig = async ({ regionId, spaceId, apiId, ...rest }: IPa
   return apiRequest('dataServiceManage', 'updateApiConfig')(params)
 }
 
+export const UpdateApiGroup = async ({ regionId, spaceId, groupId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, group_id: groupId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'updateApiGroup')(params)
+}
+
 export const useMutationUpdateApiConfig = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
 
@@ -214,6 +219,27 @@ export const useMutationUpdateApiConfig = () => {
       ...rest
     }
     ret = await UpdateApiConfig(params)
+    return ret
+  })
+}
+
+export const UpdateApiBaseConfig = async ({ regionId, spaceId, apiId, ...rest }: IParams) => {
+  const params = merge({ regionId, uri: { space_id: spaceId, api_id: apiId } }, { data: rest })
+  return apiRequest('dataServiceManage', 'updateApiBaseConfig')(params)
+}
+
+export const useMutationUpdateApiBaseConfig = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+
+  return useMutation(async ({ apiId, ...rest }: Record<string, any>) => {
+    let ret = null
+    const params = {
+      apiId,
+      regionId,
+      spaceId,
+      ...rest
+    }
+    ret = await UpdateApiBaseConfig(params)
     return ret
   })
 }
@@ -247,6 +273,8 @@ export const useMutationApiService = () => {
       ret = await CreateApiConfig(params)
     } else if (op === 'updateApi') {
       ret = await UpdateApiConfig(params)
+    } else if (op === 'updateApiGroup') {
+      ret = await UpdateApiGroup(params)
     }
     return ret
   })
