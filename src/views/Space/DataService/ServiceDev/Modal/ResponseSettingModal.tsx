@@ -32,9 +32,9 @@ const defaultHighSource = [
     data_type: 1,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
-    example_value: '',
-    default_value: '',
-    param_description: ''
+    example_value: '245',
+    default_value: '245',
+    param_description: '数据总数'
   },
   {
     param_name: 'limit',
@@ -43,9 +43,9 @@ const defaultHighSource = [
     data_type: 1,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
-    example_value: '',
-    default_value: '',
-    param_description: ''
+    example_value: '100',
+    default_value: '100',
+    param_description: '单次请求返回数据的最大条数,最大值100'
   },
   {
     param_name: 'offset',
@@ -54,9 +54,9 @@ const defaultHighSource = [
     data_type: 1,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
-    example_value: '',
-    default_value: '',
-    param_description: ''
+    example_value: '200',
+    default_value: '200',
+    param_description: '数据的偏移量'
   },
   {
     param_name: 'next_offset',
@@ -65,9 +65,9 @@ const defaultHighSource = [
     data_type: 1,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
-    example_value: '',
-    default_value: '',
-    param_description: ''
+    example_value: '0',
+    default_value: '0',
+    param_description: '作为下次请求的 offset 值, 0 表示遍历结束'
   }
 ]
 
