@@ -218,8 +218,11 @@ export const tableSelectStyled = [
 
 export const TitleInformation = styled('div')(() => [
   css`
-    .css-1gwa5h8-Center-IconBoxWithTootip-IconBoxWithTootip {
-      ${tw` w-2`}
+    .title {
+      ${tw`w-8! h-9! text-xs text-white mb-0 leading-9!`}
+    }
+    .css-1uiywl4-TitleInformation-TitleInformation {
+      ${tw`w-6! flex items-center`}
     }
     .css-d0n3c1-Center {
       ${tw`m-2! mr-0!`}

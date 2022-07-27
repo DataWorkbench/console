@@ -80,7 +80,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     const result = [
       {
         text: '查看详情',
-        icon: 'q-pingFill',
+        icon: 'q-noteFill',
         key: 'detail',
         value: row
       },
@@ -109,7 +109,9 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
         <NameWrapper
           isHover={!apiServiceId}
           onClick={() => {
-            toServiceDev(row)
+            if (!apiServiceId) {
+              toServiceDev(row)
+            }
           }}
         >
           <FlexBox tw="items-center space-x-1 truncate">

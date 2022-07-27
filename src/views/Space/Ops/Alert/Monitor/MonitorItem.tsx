@@ -33,7 +33,7 @@ const MonitorItem = (props: IMonitorItemProps) => {
       <Line />
       {monitorItem?.instance_run_failed && (
         <FlexBox tw="gap-2">
-          <span css={itemStyle.itemText}>作业实例失败数</span>
+          <span css={itemStyle.itemText}>实例运行失败时告警</span>
         </FlexBox>
       )}
       {monitorItem?.instance_run_timeout && (

@@ -41,9 +41,9 @@ const defaultHighSource = [
     param_position: ParameterPosition.QUERY,
     is_required: true,
     field_category: FieldCategory.PAGECONFIG,
-    example_value: '',
-    default_value: '',
-    param_description: ''
+    example_value: '200',
+    default_value: '200',
+    param_description: '单次请求返回数据的最大条数,最大值200'
   },
   {
     column_name: 'offset',
@@ -54,9 +54,9 @@ const defaultHighSource = [
     param_position: ParameterPosition.QUERY,
     is_required: true,
     field_category: FieldCategory.PAGECONFIG,
-    example_value: '',
-    default_value: '',
-    param_description: ''
+    example_value: '0',
+    default_value: '0',
+    param_description: '数据的偏移量'
   }
 ]
 

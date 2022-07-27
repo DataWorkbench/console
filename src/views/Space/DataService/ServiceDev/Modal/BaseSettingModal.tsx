@@ -130,7 +130,8 @@ const BaseSettingModal = observer(() => {
       ...cloneDeep(apiConfigData),
       api_config: {
         ...cloneDeep(apiConfigData?.api_config),
-        ...params
+        ...params,
+        api_path: `/${params.api_path.trim()}`
       }
     }
     dtsDevStore.set({

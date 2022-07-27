@@ -57,7 +57,7 @@ const formStyle = {
       .radioBox {
         ${tw`flex-row h-full`}
         .title {
-          ${tw`text-lg w-[164px] h-[53px]  text-neut-0 mb-0 text-left border-neut-13 border-b leading-[53px] mb-[8px]`}
+          ${tw`text-xs w-[164px] h-[53px]  text-neut-0 mb-0 text-left border-neut-13 border-b leading-[53px] mb-[8px]`}
         }
         div {
           ${tw`text-left pl-3 text-neut-8`}

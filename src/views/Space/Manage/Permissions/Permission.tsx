@@ -152,7 +152,10 @@ const Permission = (props: IPermissionProps) => {
   return (
     <div css={tw`mb-5 last:mb-0`}>
       <div css={permissionStyle.title}>
-        <div tw="text-sm">{dataProp.name}</div>
+        <div tw="text-sm">
+          {dataProp.name}
+          {hidden && <span tw="text-neut-8 ml-3">{`(${data.length} 项权限点)`}</span>}
+        </div>
         <div tw="text-xs cursor-pointer" onClick={() => setHidden(!hidden)}>
           {hidden ? '展开' : '收起'}
         </div>

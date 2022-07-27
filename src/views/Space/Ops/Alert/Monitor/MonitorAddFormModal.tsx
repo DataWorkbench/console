@@ -227,7 +227,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                       })
                     }}
                   >
-                    作业实例失败数
+                    实例运行失败时告警
                   </Checkbox>
                 </FlexBox>
                 <FlexBox css={formStyle.itemWrapper}>
@@ -271,10 +271,16 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
               schemas={[
                 {
                   rule: (v) => {
-                    return !(
-                      !v.instance_run_failed_flag &&
-                      (!v.instance_run_timeout_flag || v.instance_run_timeout === undefined)
-                    )
+                    if (v.instance_run_timeout_flag && v.instance_run_timeout === undefined) {
+                      return false
+                    }
+                    if (v.instance_run_timeout !== undefined && !v.instance_run_timeout_flag) {
+                      return false
+                    }
+                    if (!v.instance_run_timeout_flag && !v.instance_run_failed_flag) {
+                      return false
+                    }
+                    return true
                   },
                   help: '监控项不能为空',
                   status: 'error'

@@ -136,6 +136,13 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                 rule: { required: true },
                 help: '请选择文件类型',
                 status: 'error'
+              },
+              {
+                rule: (v) => {
+                  return !!v
+                },
+                help: '请选择文件类型',
+                status: 'error'
               }
             ]}
           />
@@ -185,7 +192,7 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
             <div css={styles.line} />
           </FlexBox>
           <TextField
-            label={<AffixLabel>文件正则</AffixLabel>}
+            label={<AffixLabel required={false}>文件正则</AffixLabel>}
             name="reg"
             value={dbInfo?.filterRegex}
             onChange={(e) => {
