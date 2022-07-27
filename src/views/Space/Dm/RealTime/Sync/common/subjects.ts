@@ -1,5 +1,5 @@
 import { camelCase, get, keys, trim } from 'lodash-es'
-import { BehaviorSubject, pairwise, Subject } from 'rxjs'
+import { BehaviorSubject, distinctUntilChanged, Subject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 // eslint-disable-next-line import/no-cycle
 import {
@@ -185,23 +185,16 @@ source$
   .subscribe(baseSource$)
 
 const changeTableName = () =>
-  filter(([pervValue, value]) => {
-    const oldId = get(pervValue, 'data.id', '')
+  distinctUntilChanged<any>((prevValue, value) => {
+    const oldId = get(prevValue, 'data.id', '')
     const id = get(value, 'data.id', '')
     const name = get(value, 'data.table[0]') || get(value, 'data.table_list[0]')
-    const oldName = get(pervValue, 'data.table[0]') || get(pervValue, 'data.table_list[0]')
+    const oldName = get(prevValue, 'data.table[0]') || get(prevValue, 'data.table_list[0]')
 
-    if (!name || !oldName) {
-      return true
-    }
-    if (oldId !== id || oldName !== name) {
-      return true
-    }
-    return false
+    return oldName === name && oldId === id
   })
 
 const clearTargetColumns$ = target$.pipe(
-  pairwise(),
   changeTableName(),
   map(() => [])
 )
@@ -209,11 +202,44 @@ clearTargetColumns$.subscribe(targetColumns$)
 clearTargetColumns$.subscribe(mapping$)
 
 const clearSourceColumns$ = source$.pipe(
-  pairwise(),
   changeTableName(),
   map(() => {
     return []
   })
 )
+
+export const kafkaSource$ = new BehaviorSubject<Partial<Record<string, any>>>({})
+
+source$
+  .pipe(
+    filter((e) => {
+      return e?.sourceType?.type === SourceType.Kafka
+    }),
+    map((e) => {
+      if (!e) {
+        return {}
+      }
+      return {
+        id: get(e, 'data.id'),
+        topic: get(e, 'data.topic'),
+        consumer: get(e, 'data.mode', 'group-offsets'),
+        consumerId: get(e, 'data.group_id', 'default'),
+        charset: get(e, 'data.encoding', 'UTF-8'),
+        readType: get(e, 'data.codec', 'text'),
+        config: get(e, 'data.config')
+      }
+    })
+  )
+  .subscribe(kafkaSource$)
+
+const kafkaSourceReadType$ = kafkaSource$.pipe(
+  distinctUntilChanged((prev, cur) => {
+    console.log(prev, cur)
+    return prev?.id === cur?.id && prev?.readType === cur?.readType
+  })
+)
+
+kafkaSourceReadType$.pipe(map(() => [])).subscribe(mapping$)
+
 clearSourceColumns$.subscribe(sourceColumns$)
 clearSourceColumns$.subscribe(mapping$)

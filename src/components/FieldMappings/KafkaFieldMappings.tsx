@@ -153,19 +153,21 @@ const Item = (props: any) => {
 export const KafkaFieldMappings = forwardRef((props: any, ref) => {
   const { sourceColumns, ids } = props
 
+  const idsRef = useRef(ids ?? [])
   const [rowKeyIds, setRowKeyIds] = useImmer<string[]>(ids ?? [])
 
   useEffect(() => {
     const v = ids ?? []
-    if (!isEqual(v, rowKeyIds)) {
+    if (!isEqual(v, idsRef.current)) {
       setRowKeyIds(v)
+      idsRef.current = v
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ids, setRowKeyIds])
 
   const rowKeys = useMemo(
     () =>
-      Array.from(new Set(rowKeyIds))
+      rowKeyIds
         .map((id) => {
           const item = sourceColumns.find((i) => i.uuid === id)
           if (item) {
@@ -237,7 +239,7 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
         </div>
         {rowKeys.map((column, index) => (
           <Item
-            key={index.toString()}
+            key={column.uuid}
             item={column}
             index={index}
             deleteItem={(s: number) => {
@@ -262,7 +264,7 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
             index % 2 === 1 ? (
               <span tw="inline-flex">_</span>
             ) : (
-              <Center tw="inline-flex" key={index.toString()} css={styles.iconNumber}>
+              <Center tw="inline-flex" key={Math.random()} css={styles.iconNumber}>
                 {index / 2 + 1}
               </Center>
             )

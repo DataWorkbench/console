@@ -24,6 +24,8 @@ import { Tooltip } from 'components/Tooltip'
 import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { KafkaFieldMappings } from 'components/FieldMappings/KafkaFieldMappings'
+// eslint-disable-next-line import/no-cycle
+import { kafkaSource$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import MappingItem, { FieldRow, TMappingField } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
@@ -237,7 +239,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const kafkaRef = useRef<{ rowMapping: () => Record<string, any>[] }>(null)
   const hbaseRef = useRef<{ getData: () => Record<string, any>[] }>(null)
 
-  const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka
+  const kafkaReadType = kafkaSource$.getValue()?.readType
+  const isKafkaSource =
+    (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 'text'
   const isKafkaTarget = (rightTypeName as any).getType() === SourceType.Kafka
   const isHbaseTarget = (rightTypeName as any).getType() === SourceType.HBase
   const isHbaseSource = (leftTypeName as any).getType() === SourceType.HBase
@@ -729,16 +733,6 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }
 
   const getLeftFields = () => {
-    if (isKafkaSource) {
-      return [
-        {
-          type: 'STRING',
-          name: 'message',
-          is_primary_key: false,
-          uuid: `source--message`
-        }
-      ]
-    }
     return leftFields
   }
 
@@ -857,6 +851,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               {getLeftFields().map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
+                  hasMoreAction={!isKafkaSource}
                   item={item}
                   key={item.name}
                   index={i}
