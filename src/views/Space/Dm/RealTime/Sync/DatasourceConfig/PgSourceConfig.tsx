@@ -338,7 +338,7 @@ const PgSourceConfig = forwardRef(
                     draft.temp = e
                   })
                 }}
-                help="临时的 slot 当实时同步结束后删除"
+                help={dbInfo?.temp && '临时的 slot 当实时同步结束后删除'}
               />
             </>
             <FlexBox>
