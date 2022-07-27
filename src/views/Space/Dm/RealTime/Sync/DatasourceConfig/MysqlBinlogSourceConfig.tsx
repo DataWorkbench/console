@@ -16,7 +16,7 @@ import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { map } from 'rxjs'
 
-import { AffixLabel, FlexBox, Center, SelectWithRefresh } from 'components'
+import { AffixLabel, FlexBox, Center, SelectWithRefresh, HelpCenterLink } from 'components'
 import { useQuerySourceTables } from 'hooks'
 import {
   IDataSourceConfigProps,
@@ -299,10 +299,23 @@ const MysqlBinlogSourceConfig = forwardRef(
                 schemas={[
                   {
                     rule: { required: true },
-                    help: '请选择数据源表',
+                    help: (
+                      <div>
+                        <span>不能为空, </span>
+                        <span tw="text-font-placeholder mr-1">详见</span>
+                        <HelpCenterLink hasIcon isIframe={false} href="###">
+                          MySQL（MySQL Binlog）Source 配置文档
+                        </HelpCenterLink>
+                      </div>
+                    ),
                     status: 'error'
                   }
                 ]}
+                help={
+                  <HelpCenterLink hasIcon isIframe={false} href="##">
+                    MySQL（MySQL Binlog）Source 配置文档
+                  </HelpCenterLink>
+                }
               />
             )}
             {dbInfo?.filterType === 2 && (
