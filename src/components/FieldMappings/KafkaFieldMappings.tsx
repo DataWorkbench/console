@@ -211,7 +211,7 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
         ]}
         ref={leftRef}
       >
-        请从左侧拖拽需要用连接符拼接写入 rowkey 的列
+        请从左侧拖拽需要用连接符拼接写入 message 的列
       </div>
     )
   }
