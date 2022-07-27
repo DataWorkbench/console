@@ -313,11 +313,14 @@ const SyncJob = () => {
           showConfWarn('未配置数据源信息')
           return
         }
-        set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping[0])
+        set(
+          resource,
+          `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
+          mapping?.[0]
+        )
         if (curJob?.target_type === SourceType.HBase) {
           const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
             mappingRef.current!.getOther()
-
           set(
             resource,
             `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
@@ -338,13 +341,13 @@ const SyncJob = () => {
           set(
             resource,
             `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-            mapping[1]
+            mapping?.[1]
           )
         } else {
           set(
             resource,
             `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.tableFields`,
-            mapping[1]
+            mapping?.[1]
           )
         }
 
@@ -609,44 +612,34 @@ const SyncJob = () => {
 
     try {
       set(resource, `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`, mapping?.[0])
+
+      const targetKey = sourceTypeNames[1].toLowerCase()
       if (curJob?.target_type === SourceType.HBase) {
         const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
           mappingRef.current!.getOther()
 
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
-          setRowExp(rowkeyExpress)
-        )
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_index`,
-          versionColumnIndex
-        )
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_value`,
-          versionColumnValue
-        )
+        set(resource, `sync_resource.${targetKey}_target.rowkey_express`, setRowExp(rowkeyExpress))
+        set(resource, `sync_resource.${targetKey}_target.version_column_index`, versionColumnIndex)
+        set(resource, `sync_resource.${targetKey}_target.version_column_value`, versionColumnValue)
       }
       if (curJob?.target_type !== SourceType.Kafka) {
-        set(resource, `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`, mapping[1])
+        set(resource, `sync_resource.${targetKey}_target.column`, mapping?.[1])
       } else {
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.tableFields`,
-          mapping[1]
-        )
+        set(resource, `sync_resource.${targetKey}_target.tableFields`, mapping?.[1])
       }
 
       set(resource, 'cluster_id', cluster?.id)
-      set(resource, 'job_mode', 1)
-      set(resource, 'job_content', '')
+
       set(resource, 'channel_control', channel)
     } catch (e) {
       // showConfWarn(e.message)
       // return
+      console.log(sourceTypeNames)
+      console.error(e)
     }
+
+    set(resource, 'job_mode', 1)
+    set(resource, 'job_content', '')
     const filterResouce = removeUndefined(resource)
     mutationConvert.mutate({ data: { conf: filterResouce }, uri: { job_id: curJob?.id! } } as any, {
       onSuccess: (resp) => {
