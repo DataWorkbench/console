@@ -61,15 +61,13 @@ export const Confirm = ({ title, children, type, ...otherProps }: ConfirmProps &
   }
   return (
     <ModalWrapper {...otherProps}>
-      <>
-        {title && (
-          <div tw="flex items-center text-base font-semibold">
-            {getIcon()}
-            <div tw="ml-3">{title}</div>
-          </div>
-        )}
-        <div tw="ml-9 mt-2 leading-5 text-neut-8">{children}</div>
-      </>
+      <div tw="flex space-x-3 mb-3">
+        {getIcon()}
+        <section tw="flex-1">
+          {title && <div tw="flex items-center text-base font-semibold">{title}</div>}
+          <div tw="ml-9 mt-2 leading-5 text-neut-8">{children}</div>
+        </section>
+      </div>
     </ModalWrapper>
   )
 }

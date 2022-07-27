@@ -143,7 +143,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           <div tw="flex justify-end space-x-2">
             <Button onClick={() => handleCancel()}>取消</Button>
             <Button type="danger" onClick={handleConfirmOK}>
-              停用
+              {publishApi?.length === 0 ? '停用' : '全部下线并停用集群'}
             </Button>
           </div>
         }
