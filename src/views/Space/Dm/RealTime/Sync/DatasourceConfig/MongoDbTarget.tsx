@@ -81,7 +81,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
   }, [dbInfo])
   return (
     <Form css={styles.form} ref={sourceForm}>
-      <BaseConfigCommon from="source" />
+      <BaseConfigCommon from="target" />
       {dbInfo?.id && (
         <>
           <SelectWithRefresh
