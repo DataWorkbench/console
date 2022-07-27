@@ -227,7 +227,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                       })
                     }}
                   >
-                    作业实例失败数
+                    实例运行失败时告警
                   </Checkbox>
                 </FlexBox>
                 <FlexBox css={formStyle.itemWrapper}>
