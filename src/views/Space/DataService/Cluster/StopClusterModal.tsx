@@ -1,4 +1,4 @@
-import { Button, Icon, Table } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Loading, Table } from '@QCFE/qingcloud-portal-ui'
 import { Center, Confirm, FlexBox, TextEllipsis } from 'components'
 import {
   useMutationDataServiceCluster,
@@ -143,7 +143,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           <div tw="flex justify-end space-x-2">
             <Button onClick={() => handleCancel()}>取消</Button>
             <Button type="danger" onClick={handleConfirmOK}>
-              停用
+              {publishApi?.length === 0 ? '停用' : '全部下线并停用集群'}
             </Button>
           </div>
         }
@@ -156,6 +156,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           </div>
           {publishApi && publishApi?.length > 0 && (
             <Table
+              tw="mt-6"
               dataSource={publishApi}
               columns={columns}
               pagination={{
@@ -198,7 +199,14 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
                 onClick={shopApiServerConfirmOk}
                 disabled={serviceApisMutation.isLoading}
               >
-                全部下线并停用集群
+                {serviceApisMutation.isLoading ? (
+                  <div tw="flex items-center">
+                    <Loading size={16} tw="h-4 w-4 mr-1" />
+                    停用中
+                  </div>
+                ) : (
+                  '全部下线并停用集群'
+                )}
               </Button>
             </div>
           }
