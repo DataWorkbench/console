@@ -71,7 +71,7 @@ const KafkaTargetConfig = forwardRef(
             return {
               id: get(e, 'data.id'),
               topic: get(e, 'data.topic'),
-              config: get(e, 'data.config')
+              config: get(e, 'data.config', `"batch.size": "16384",\n"request.timeout.ms": "30000"`)
             }
           })
         )
@@ -100,7 +100,7 @@ const KafkaTargetConfig = forwardRef(
             <TextField
               label={<AffixLabel required>Topic</AffixLabel>}
               name="topic"
-              value={dbInfo?.topic}
+              defaultValue={dbInfo?.topic}
               onChange={(e) => {
                 setDbInfo((draft) => {
                   draft.topic = e

@@ -48,7 +48,7 @@ const ServiceDev = observer(() => {
       }
       mutationApiVersion.mutate(params, {
         onSuccess: (res) => {
-          const apiConfig = get(res, 'api_version')
+          const apiConfig = get(res, 'api_config')
           const VerApi = {
             key: `${apiConfig.api_id}_${verId}`, // key 和 api_id 是panel 的唯一标识， 区分当前版本和历史版本
             api_id: apiConfig.api_id,

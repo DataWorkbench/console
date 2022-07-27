@@ -16,9 +16,7 @@ import {
 import { useImmer } from 'use-immer'
 import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
 import { Icon } from '@QCFE/lego-ui'
-import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
-import { map } from 'rxjs'
-import { get } from 'lodash-es'
+import { kafkaSource$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 
 type FieldKeys = 'topic' | 'id' | 'consumer' | 'consumerId' | 'charset' | 'readType' | 'config'
@@ -94,27 +92,13 @@ const KafkaSourceConfig = forwardRef(
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
 
-    const { refetch } = useSetRealtimeColumns(dbInfo?.id, [['message', 'STRING']])
+    const { refetch } = useSetRealtimeColumns(
+      dbInfo?.id,
+      dbInfo?.readType === 'text' ? [['message', 'STRING']] : []
+    )
     const [showAdvanced, setShowAdvanced] = useState(false)
     useLayoutEffect(() => {
-      const sub = source$
-        .pipe(
-          map((e) => {
-            if (!e) {
-              return {}
-            }
-            return {
-              id: get(e, 'data.id'),
-              topic: get(e, 'data.topic'),
-              consumer: get(e, 'data.mode', 'group-offsets'),
-              consumerId: get(e, 'data.group_id', 'default'),
-              charset: get(e, 'data.encoding', 'UTF-8'),
-              readType: get(e, 'data.codec', 'text'),
-              config: get(e, 'data.config')
-            }
-          })
-        )
-        .subscribe((e) => setDbInfo(e))
+      const sub = kafkaSource$.subscribe((e) => setDbInfo(e))
       return () => {
         sub.unsubscribe()
       }
@@ -154,7 +138,7 @@ const KafkaSourceConfig = forwardRef(
           <>
             <TextField
               label={<AffixLabel required>Topic</AffixLabel>}
-              value={dbInfo?.topic}
+              defaultValue={dbInfo?.topic}
               name="topic"
               onChange={(e) => {
                 setDbInfo((draft) => {
@@ -229,6 +213,7 @@ const KafkaSourceConfig = forwardRef(
               ]}
             />
             <RadioGroupField
+              name="charset"
               label={<AffixLabel required>字符编码</AffixLabel>}
               options={[
                 {
@@ -261,9 +246,11 @@ const KafkaSourceConfig = forwardRef(
               name="readType"
               value={dbInfo?.readType}
               onChange={(e) => {
-                setDbInfo((draft) => {
-                  draft.readType = e
-                })
+                kafkaSource$.next({ ...dbInfo, readType: e })
+                // setDbInfo((draft) => {
+                //   draft.readType = e
+                // })
+                // console.log(444444, e)
               }}
               validateOnChange
               schemas={[

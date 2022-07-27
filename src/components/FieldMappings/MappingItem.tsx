@@ -113,6 +113,7 @@ interface MappingItemProps {
   exist?: (name: string) => boolean
   isLeft?: boolean
   readonly?: boolean
+  hasMoreAction?: boolean
 }
 
 const MappingItem = (props: MappingItemProps) => {
@@ -132,7 +133,8 @@ const MappingItem = (props: MappingItemProps) => {
     getDeleteField,
     exist,
     isLeft = true,
-    readonly = false
+    readonly = false,
+    hasMoreAction = true
   } = props
   const [isTop, setIsTop] = useState(false)
   const [item, setItem] = useImmer(itemProps)
@@ -278,6 +280,9 @@ const MappingItem = (props: MappingItemProps) => {
   }
 
   const renderMore = () => {
+    if (!hasMoreAction) {
+      return null
+    }
     let menuItems: { key: string; icon: string; text: string }[] = []
     if (item.custom) {
       menuItems = [

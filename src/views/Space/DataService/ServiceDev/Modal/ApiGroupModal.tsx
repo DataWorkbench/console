@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useImmer } from 'use-immer'
 import { AffixLabel, Modal, ModalContent } from 'components'
 import { Form, Button } from '@QCFE/qingcloud-portal-ui'
-import { get } from 'lodash-es'
+import { get, merge } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useMutationApiService, getQueryKeyListApiGroups } from 'hooks'
@@ -83,11 +83,14 @@ const ApiGroupModal = observer((props: JobModalProps) => {
 
   const handleOK = () => {
     if (form.current?.validateForm()) {
-      const paramsData = {
-        option: 'createApiGroup' as const,
-        ...params,
-        group_path: `/${params.group_path}`
-      }
+      const paramsData = merge(
+        {
+          option: isEdit ? 'updateApiGroup' : ('createApiGroup' as const),
+          ...params,
+          group_path: `/${params.group_path}`
+        },
+        isEdit ? { groupId: currentGroup?.id } : {}
+      )
       mutation.mutate(paramsData, {
         onSuccess: () => {
           queryClient.invalidateQueries(getQueryKeyListApiGroups())
@@ -111,7 +114,7 @@ const ApiGroupModal = observer((props: JobModalProps) => {
         <div tw="flex justify-end space-x-2">
           <Button onClick={() => onClose?.()}>取消</Button>
           <Button type="primary" loading={mutation.isLoading} onClick={handleOK}>
-            创建
+            {isEdit ? '保存' : '创建'}
           </Button>
         </div>
       }

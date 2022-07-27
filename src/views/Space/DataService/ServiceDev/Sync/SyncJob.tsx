@@ -1,9 +1,9 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, Notification as Notify, Message } from '@QCFE/qingcloud-portal-ui'
-import { HelpCenterLink } from 'components'
+import { RouterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { cloneDeep, get } from 'lodash-es'
 import {
   useMutationUpdateApiConfig,
@@ -13,7 +13,7 @@ import {
   useMutationDescribeDataServiceApiVersion
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import qs from 'qs'
 import { JobToolBar } from '../styled'
 import SyncDataSource, { ISourceData } from './SyncDataSource'
@@ -96,16 +96,20 @@ const styles = {
   stepText: tw`ml-2 inline-block border-green-11 text-green-11`
 }
 
-const stepsData = [
+const getStepsData = (regionId: string, spaceId: string) => [
   {
     key: 'p0',
     title: '选择数据源',
     desc: (
       <>
-        在这里配置数据的来源端和目的端；仅支持在
-        <HelpCenterLink hasIcon isIframe={false} href="/xxx" onClick={(e) => e.stopPropagation()}>
+        仅支持在
+        <RouterLink
+          to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+          target="_blank"
+          color="blue"
+        >
           数据源管理
-        </HelpCenterLink>
+        </RouterLink>
         创建的数据源。
       </>
     )
@@ -134,6 +138,7 @@ const SyncJob = observer(() => {
   } = useStore()
 
   const isHistory = get(curApi, 'is_history', false) || false
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
 
   const { search } = useLocation()
   const { verId } = qs.parse(search.slice(1))
@@ -328,6 +333,7 @@ const SyncJob = observer(() => {
 
     dtsDevStore.set({ showTestModal: true })
   }
+  const stepsData = useMemo(() => getStepsData(regionId, spaceId), [regionId, spaceId])
 
   const renderGuideMode = () => (
     <CollapseWrapper>
