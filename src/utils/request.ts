@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import Cookies from 'js-cookie'
-import { get, isFunction } from 'lodash-es'
+import { get, isFunction, set } from 'lodash-es'
 import emitter from 'utils/emitter'
 
 const baseConfig: AxiosRequestConfig = {
@@ -22,7 +22,7 @@ function getMessage(ret: {}) {
 
 const client = axios.create(baseConfig)
 
-let loginMdalVisible = false
+set(window, 'loginMdalVisible', false)
 
 const axiosList = new Map()
 
@@ -31,7 +31,7 @@ client.interceptors.response.use(
     axiosList.delete(response.config)
     const { status, ret_code: retCode } = response.data
     if (retCode === 2000) {
-      loginMdalVisible = true
+      set(window, 'loginMdalVisible', true)
       const message1 = getMessage(response.data)
       response.data.message = message1
       emitter.emit('error', {
@@ -88,7 +88,7 @@ const request = async (
   data: { method?: string; [params: string]: unknown },
   options: { cancel?: (_: any) => void; [params: string]: unknown } = {}
 ) => {
-  if (loginMdalVisible) {
+  if (get(window, 'loginMdalVisible')) {
     return Promise.reject(new Error('登录会话已过期，请重新登录'))
   }
   const { method = 'GET', action = 'Forward', ...params } = data
