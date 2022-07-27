@@ -210,7 +210,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
             <Field name="user_id">
               <Label>成员</Label>
               <DisableTextField>
-                <span>{get(data, 'user_info.user_name')}</span>
+                <span>{get(data, 'user_info.name')}</span>
                 <span>{`(${get(data, 'user_id')})`}</span>
               </DisableTextField>
             </Field>
