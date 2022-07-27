@@ -25,7 +25,7 @@ const Auth = ({ children }: { children: ReactElement }) => {
 
   const handleLogin = (userInfo: Record<string, any>) => {
     set(window, 'USER', userInfo)
-    set(window, 'loginMdalVisible', true)
+    set(window, 'loginMdalVisible', false)
     setHasLogin(true)
     setLoading(false)
   }
