@@ -634,7 +634,6 @@ const SyncJob = () => {
     } catch (e) {
       // showConfWarn(e.message)
       // return
-      console.log(sourceTypeNames)
       console.error(e)
     }
 
