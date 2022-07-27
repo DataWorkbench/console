@@ -156,7 +156,7 @@ const FieldOrder = observer(
       [getName('index')]: {
         title: (
           <TitleInformation>
-            <span>序号</span>
+            <span className="title">序号</span>
             <Tooltip
               theme="light"
               hasPadding
@@ -168,7 +168,7 @@ const FieldOrder = observer(
             </Tooltip>
           </TitleInformation>
         ),
-        width: 120,
+        width: 160,
         render: (_: any, record: any, index: number) => <OrderText>{index + 1}</OrderText>
       },
       [getName('name')]: {
