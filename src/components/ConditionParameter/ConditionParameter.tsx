@@ -290,8 +290,8 @@ export const ConditionParameter = React.forwardRef(
               <span>生成条件参数</span>
               <div tw="text-neut-8">
                 [{value?.startValue || '开始条件'}] [{value?.startCondition ?? '关系符号'}] [
-                {value?.column ?? '列名'}] [{value?.endCondition ?? '关系符号'}] [
-                {value?.endValue || '结束条件'}]
+                {value?.column ?? '列名'}] && [{value?.column ?? '列名'}] [
+                {value?.endCondition ?? '关系符号'}] [{value?.endValue || '结束条件'}]
               </div>
             </FlexBox>
           </SimpleWrapper>
