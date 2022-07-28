@@ -27,8 +27,8 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
           }
           return {
             id: get(e, 'data.id'),
-            nullMode: get(e, 'data.null_mode', 'skip'),
-            encoding: get(e, 'data.encoding', 'utf-8'),
+            nullMode: get(e, 'data.null_mode', 1),
+            encoding: get(e, 'data.encoding', 'UTF-8'),
             walFlag: get(e, 'data.wal_flag', false),
             writeBufferSize: get(e, 'data.write_buffer_size', 8388608),
             table: get(e, 'data.table')
