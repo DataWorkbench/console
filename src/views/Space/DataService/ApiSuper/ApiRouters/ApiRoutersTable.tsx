@@ -150,7 +150,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
   }
 
   const tableColums = apiServiceId
-    ? apiRouterTableColumns.filter((item) => item.dataIndex !== 'proxy_uri')
+    ? apiRouterTableColumns.filter((item) => !['api_service_id'].includes(item.dataIndex as string))
     : apiRouterTableColumns
   const { columns, setColumnSettings } = useColumns(
     columnSettingsKey,
