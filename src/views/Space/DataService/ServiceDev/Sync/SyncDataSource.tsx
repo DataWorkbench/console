@@ -19,7 +19,8 @@ import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSource
 import { cloneDeep, findKey, get, isEmpty, pick } from 'lodash-es'
 import { useParams } from 'react-router-dom'
 import { useStore } from 'stores'
-import { configMapFieldData, dataSourceTypes } from '../constants'
+import { dataSourceTypes } from '../constants'
+import { configMapFieldData } from './SyncUtil'
 import { tableSelectStyled, FormWrapper } from '../styled'
 
 type SourceDataType = { id: string; name: string; networkId?: string } | null

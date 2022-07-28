@@ -6,7 +6,8 @@ import { useQueryClient } from 'react-query'
 import { useMemo, useState } from 'react'
 import { PbmodelAuthKeyEntity } from 'types/types'
 import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import ApiGroupTable from '../ApiService/ApiGroupTable'
+// eslint-disable-next-line import/no-cycle
+import ApiGroupTable from '../../ApiService/ApiGroupTable'
 
 interface AuthKeyModalProps {
   onCancel?: () => void

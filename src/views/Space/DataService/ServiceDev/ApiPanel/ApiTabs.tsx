@@ -123,16 +123,11 @@ const ApiTabs = observer(() => {
                   }}
                 />
                 <div tw="pointer-events-auto">
-                  调度作业发布成功，您可前往
-                  <RouterLink
-                    color="blue"
-                    to={`/${regionId}/workspace/${spaceId}/ops/${
-                      curApi?.jobMode === 'DI' ? 'data-' : ''
-                    }release`}
-                  >
-                    运维中心-已发布作业
+                  API布成功，您可前往
+                  <RouterLink color="blue" to={`/${regionId}/workspace/${spaceId}/dts/routers`}>
+                    API 管理-已发布API
                   </RouterLink>{' '}
-                  查看作业详情
+                  查看详情
                 </div>
               </div>
             </div>
