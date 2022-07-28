@@ -131,7 +131,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     },
     [getName('uri')]: {
       render: (v: number, row: any) => (
-        <span tw="dark:text-neut-0">{`${row?.host}${row?.uri}`}</span>
+        <span tw="dark:text-neut-0">{`http://${row?.host}${row?.uri}`}</span>
       )
     },
     [getName('create_time')]: {
