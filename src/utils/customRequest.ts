@@ -45,18 +45,31 @@ client.interceptors.response.use(
         content: error.message
       })
     } else if (error.response) {
-      const msg = getMessage(error.response.data)
-      if (msg) {
-        error.response.data.message = msg
+      if (error.response.config.url === '/global_api/v1/sessions') {
+        let message1 = '登录失败，请重新登录'
+        if (error.response.data.status === 404) {
+          message1 = '账户不存在'
+        } else if (error.response.data.status === 400) {
+          message1 = '密码错误'
+        }
+        emitter.emit('error', {
+          title: `登录失败`,
+          content: message1
+        })
+      } else {
+        const msg = getMessage(error.response.data)
+        if (msg) {
+          error.response.data.message = msg
+        }
+        const {
+          response: { status },
+          message
+        } = error
+        emitter.emit('error', {
+          title: `网络错误: [${status}]`,
+          content: message
+        })
       }
-      const {
-        response: { status },
-        message
-      } = error
-      emitter.emit('error', {
-        title: `网络错误: [${status}]`,
-        content: message
-      })
     }
     return Promise.reject(error)
   }
