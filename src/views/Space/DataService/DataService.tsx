@@ -14,7 +14,7 @@ function Dts() {
   return (
     <div tw="flex-1 flex h-full w-full">
       <Sider funcMod="dts" />
-      <div tw="flex-1 h-full">
+      <div tw="flex-1 overflow-y-auto">
         {(mod === 'cluster' || !mod) && <Cluster />}
         {mod === 'serviceDev' && <ServiceDev />}
         {mod === 'apiService' && !detail && <ApiService />}
