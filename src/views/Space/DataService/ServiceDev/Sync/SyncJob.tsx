@@ -1,6 +1,6 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { Button, Icon, Notification as Notify, Message } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { RouterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useMemo, useRef } from 'react'
@@ -293,8 +293,8 @@ const SyncJob = observer(() => {
         {
           onSuccess: (res) => {
             if (res.ret_code === 0) {
-              Message.success({
-                content: `API 发布成功，您可前往API 管理-已发布API 查看详情`
+              dtsDevStore.set({
+                showNotify: true
               })
             }
           }
