@@ -392,7 +392,12 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
             {
               ...host,
               label: null,
-              help: '例：jdbc:hive2://127.0.0.1:10000/testdb',
+              help: (
+                <div>
+                  <div>例：jdbc:hive2://127.0.0.1:10000/testdb</div>
+                  <div>注：只支持 hive 2.x</div>
+                </div>
+              ),
               component: InputField,
               placeholder: '请输入 IP 地址',
               prefix: 'jdbc:hive2://',
@@ -777,8 +782,8 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           title: 'IP:Port',
           label: '访问地址（Host：Port）',
           placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
-localhost:6379
-1.1.1.1:6379
+localhost: 27017
+1.1.1.1: 27017
           `,
           css: tw`w-full`,
           validateOnBlur: true,

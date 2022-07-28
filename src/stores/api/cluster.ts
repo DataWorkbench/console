@@ -6,30 +6,29 @@ interface IParams {
   [k: string]: unknown
 }
 
-export const listAvailableFlinkVersions = ({ regionId, spaceId }: IParams) =>
+export const listAvailableFlinkVersions = ({ regionId, spaceId, type }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink/versions`,
+    query: {
+      source_kind: type
+    }
   })
 
-export const describeResourceBinding = ({
-  regionId,
-  spaceId,
-  ids = [],
-}: IParams) =>
+export const describeResourceBinding = ({ regionId, spaceId, ids = [] }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/binding/resources?${(ids as string[])
       .map((id) => `ids=${id}`)
       .join('&')}`,
-    method: 'GET',
+    method: 'GET'
   })
 
 export const listFlinkClusters = ({ regionId, spaceId, ...rest }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink`,
-    query: rest,
+    query: rest
   })
 
 export const createFlinkCluster = ({ regionId, spaceId, ...rest }: IParams) =>
@@ -37,20 +36,15 @@ export const createFlinkCluster = ({ regionId, spaceId, ...rest }: IParams) =>
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink`,
     body: rest,
-    method: 'POST',
+    method: 'POST'
   })
 
-export const updateFlinkCluster = ({
-  regionId,
-  spaceId,
-  clusterId,
-  ...rest
-}: IParams) =>
+export const updateFlinkCluster = ({ regionId, spaceId, clusterId, ...rest }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink/${clusterId}`,
     body: rest,
-    method: 'PUT',
+    method: 'PUT'
   })
 
 export const stopFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
@@ -58,40 +52,28 @@ export const stopFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink/stops`,
     body: { cluster_ids: clusterIds },
-    method: 'POST',
+    method: 'POST'
   })
 
-export const startFlinkClusters = ({
-  regionId,
-  spaceId,
-  clusterIds,
-}: IParams) =>
+export const startFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink/starts`,
     body: { cluster_ids: clusterIds },
-    method: 'POST',
+    method: 'POST'
   })
 
-export const deleteFlinkClusters = ({
-  regionId,
-  spaceId,
-  clusterIds,
-}: IParams) =>
+export const deleteFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink/deletes`,
     body: { cluster_ids: clusterIds },
-    method: 'POST',
+    method: 'POST'
   })
 
-export const getDescribeFlinkCluster = ({
-  regionId,
-  spaceId,
-  clusterId,
-}: IParams) =>
+export const getDescribeFlinkCluster = ({ regionId, spaceId, clusterId }: IParams) =>
   request({
     region: regionId,
     uri: `/v1/workspace/${spaceId}/cluster/flink/${clusterId}`,
-    method: 'GET',
+    method: 'GET'
   })

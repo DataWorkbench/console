@@ -558,6 +558,7 @@ const SyncJob = () => {
             )}
             {index === 2 && (
               <SyncCluster
+                flinkType={2}
                 ref={clusterRef}
                 clusterId={get(confData, 'cluster_id')}
                 defaultClusterName={get(confData, 'cluster_info.name')}
