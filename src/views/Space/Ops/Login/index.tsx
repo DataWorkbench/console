@@ -20,7 +20,7 @@ const Login = ({ onLogin }: { onLogin: (d: Record<string, any>, jump: boolean) =
     mutateAsync({
       op: 'login',
       password,
-      username
+      username: (username || '').trim()
     }).then((e) => {
       if (e.session_id) {
         setSk(e.session_id)
