@@ -27,7 +27,8 @@ import { useState } from 'react'
 import { formatDate } from 'utils'
 import { authKeyTableFieldMapping, authKeyTableColumns } from '../constants'
 import AuthKeyModal from './AuthKeyModal'
-import SelectApiServiceModal from './SelectApiServiceModal'
+// eslint-disable-next-line import/no-cycle
+import SelectApiServiceModal from './ApiKeyDetail/SelectApiServiceModal'
 import { NameWrapper } from '../styles'
 
 interface AuthKeyTableProps {

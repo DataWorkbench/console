@@ -3,12 +3,14 @@ import { MoreAction, FlexBox, Center } from 'components'
 import { useQueryListApiServices, getQueryKeyListApiServices } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import useFilter from 'hooks/useHooks/useFilter'
-import { assign, get, omitBy } from 'lodash-es'
+import { assign, get, merge, omitBy } from 'lodash-es'
 import { useState } from 'react'
 import { useQueryClient } from 'react-query'
 import { useParams, useHistory } from 'react-router-dom'
 import { formatDate } from 'utils'
 import { MappingKey } from 'utils/types'
+// eslint-disable-next-line import/no-cycle
+import SelectAuthKeyModal from './ApiServiceDetail/SelectAuthKeyModal'
 import { apiGroupTableFieldMapping, apiGroupTableColumns } from '../constants'
 import { NameWrapper } from '../styles'
 
@@ -35,6 +37,8 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
   const queryClient = useQueryClient()
   const { spaceId } = useParams<IRouteParams>()
   const history = useHistory()
+  const [curOp, setCurOp] = useState<string>()
+  const [curApiServiceId, setCurApiServiceId] = useState<string>()
 
   const {
     filter,
@@ -81,7 +85,12 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
   }
 
   const handleMenuClick = (row: Record<string, any>, key: string) => {
-    goDetail({ id: row.id, key })
+    if (key === 'bindKey') {
+      setCurOp('bindKey')
+      setCurApiServiceId(row.id)
+    } else {
+      goDetail({ id: row.id, key })
+    }
   }
 
   const getActions = (row: Record<string, any>) => {
@@ -93,10 +102,16 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
         value: row
       },
       {
-        text: '绑定密钥',
-        icon: 'q-kmsFill',
-        key: 'bingKey',
-        value: row
+        ...merge(
+          {
+            text: '绑定密钥',
+            icon: 'q-kmsFill',
+            key: 'bindKey',
+            value: row,
+            disabled: row.auth_key_id !== ''
+          },
+          row.auth_key_id ? { help: '已绑定密钥（只支持绑定一个密钥）' } : {}
+        )
       }
     ]
     return result
@@ -126,6 +141,11 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
             </div>
           </FlexBox>
         </NameWrapper>
+      )
+    },
+    [getName('domain')]: {
+      render: (v: number, row: any) => (
+        <span tw="dark:text-neut-0">{`http://${v}${row.pre_path}`}</span>
       )
     },
     [getName('update_time')]: {
@@ -212,6 +232,9 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
         onSort={sort}
         {...tablePropsData}
       />
+      {curOp === 'bindKey' && (
+        <SelectAuthKeyModal apiServiceId={curApiServiceId} onCancel={() => setCurOp('')} />
+      )}
     </FlexBox>
   )
 }
