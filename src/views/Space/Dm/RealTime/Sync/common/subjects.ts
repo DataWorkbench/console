@@ -133,10 +133,10 @@ target$
         sourceType: e.sourceType,
         data: {
           id: dbTarget?.id,
-          tableName: get(dbTarget, 'table[0]', ''),
-          writeMode: get(dbTarget, 'write_mode', ''),
-          semantic: get(dbTarget, 'semantic', ''),
-          batchSize: get(dbTarget, 'batch_size', ''),
+          tableName: get(dbTarget, 'table[0]'),
+          writeMode: get(dbTarget, 'write_mode'),
+          semantic: get(dbTarget, 'semantic'),
+          batchSize: get(dbTarget, 'batch_size'),
           postSql: get(dbTarget, 'post_sql', ['']),
           preSql: get(dbTarget, 'pre_sql', [''])
         }

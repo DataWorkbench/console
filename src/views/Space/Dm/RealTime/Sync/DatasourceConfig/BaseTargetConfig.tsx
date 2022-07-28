@@ -279,7 +279,7 @@ const BaseTargetConfig = forwardRef(
               ]}
             />
             <TextField
-              label={<AffixLabel>批量写入条数</AffixLabel>}
+              label={<AffixLabel required={false}>批量写入条数</AffixLabel>}
               name="batchSize"
               help="范围: 1~65535, 该值可减少网络交互次数, 过大会造成 OOM"
               validateOnChange
@@ -293,11 +293,11 @@ const BaseTargetConfig = forwardRef(
                 handleUpdate({ batchSize: +v })
               }}
               schemas={[
-                {
-                  help: '批量写入条数不能为空',
-                  status: 'error',
-                  rule: { required: true }
-                },
+                // {
+                //   help: '批量写入条数不能为空',
+                //   status: 'error',
+                //   rule: { required: true }
+                // },
                 {
                   help: '范围: 1~65535, 批量写入条数不能小于 1',
                   status: 'error',
