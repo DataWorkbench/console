@@ -79,7 +79,8 @@ const ClusterSettingModal = observer(() => {
       }
     }
     dtsDevStore.set({
-      apiConfigData: config
+      apiConfigData: config,
+      showClusterErrorTip: false
     })
   }
 
