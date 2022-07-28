@@ -11,7 +11,7 @@ import { PbmodelAuthKeyEntity } from 'types/types'
 import { useParams } from 'react-router-dom'
 import { formatDate } from 'utils'
 import { apiGroupTableFieldMapping, apiGroupTableColumns } from '../../constants'
-import SelectApiServiceModal from '../SelectApiServiceModal'
+import SelectApiServiceModal from './SelectApiServiceModal'
 import UnBindApiModal from './UnBindApiModal'
 import { NameWrapper } from '../../styles'
 

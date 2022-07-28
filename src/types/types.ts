@@ -89,8 +89,8 @@ export type PbiaasRouter =
     base_vxnet: string
     vpc_ipv6_network: string
   }
-export type PbmodelStreamJobCode =
-  // ref: #/definitions/pbmodel.StreamJobCode
+export type PbrequestAlertPolicyUnboundJobs =
+  // ref: #/definitions/pbrequest.AlertPolicyUnboundJobs
   {
     jar: PbflinkFlinkJar
     python_code: PbflinkFlinkPythonCode
@@ -107,7 +107,11 @@ export type PbrequestOfflineReleaseStreamJob =
 export type PbrequestJobUnboundAlertPolicies =
   // ref: #/definitions/pbrequest.JobUnboundAlertPolicies
   {
-    alert_ids: string[]
+    batch_size: number
+    index: string
+    column: PbsyncjobColumn[]
+    key_delimiter: string
+    version: string
   }
 export type PbmodelInstanceStatusStat =
   // ref: #/definitions/pbmodel.InstanceStatusStat
@@ -300,6 +304,7 @@ export type PbresponseListWorkspaces =
     has_more: boolean
     infos: PbmodelWorkspace[]
     total: number
+    infos: PbmodelNotification[]
   }
 export type PbresponseCreateFlinkCluster =
   // ref: #/definitions/pbresponse.CreateFlinkCluster
@@ -454,10 +459,10 @@ export type PbresponseDescribeNetworkConfig =
     router: PbiaasRouter
     vxnets: PbiaasVXNet[]
   }
-export type PbrequestDeleteApiGroups =
-  // ref: #/definitions/pbrequest.DeleteApiGroups
+export type PbmodelQuotaSetStreamJob =
+  // ref: #/definitions/pbmodel.QuotaSetStreamJob
   {
-    group_ids: string[]
+    limit: number
   }
 export type PbsyncjobCondition =
   // ref: #/definitions/pbsyncjob.Condition
@@ -480,6 +485,10 @@ export type PbmodelStreamInstance =
     id: string
     message: string
     status: number
+    type: number
+    space_id: string
+    sync_job: PbmodelSyncJob
+    sync_job_property: PbmodelSyncJobProperty
   }
 export type PbdatasourceElasticSearchURL =
   // ref: #/definitions/pbdatasource.ElasticSearchURL
@@ -677,6 +686,8 @@ export type PbresponseListRoutes =
     total: number
     entities: PbmodelRoute[]
     has_more: boolean
+    total: number
+    infos: PbmodelSyncJobRelease[]
   }
 export type PbrequestDeleteMembers =
   // ref: #/definitions/pbrequest.DeleteMembers
@@ -864,10 +875,12 @@ export type PbmodelStreamJob =
     name: string
     space_id: string
   }
-export type PbflinkHavingOperator =
-  // ref: #/definitions/pbflink.HavingOperator
+export type PbresponseListDataServiceApiVersions =
+  // ref: #/definitions/pbresponse.ListDataServiceApiVersions
   {
-    having: string
+    total: number
+    has_more: boolean
+    infos: PbmodelApiVersion[]
   }
 export type PbrequestDisableWorkspaces =
   // ref: #/definitions/pbrequest.DisableWorkspaces
@@ -1431,7 +1444,20 @@ export type PbmodelStreamJobSchedule =
 export type PbflinkFlinkSQL =
   // ref: #/definitions/pbflink.FlinkSQL
   {
-    code: string
+    is_directory: boolean
+    etag: string
+    created_by: string
+    version: string
+    space_id: string
+    updated: number
+    pid: string
+    desc: string
+    status: number
+    size: number
+    type: number
+    created: number
+    name: string
+    id: string
   }
 export type PbmodelDataSourceURL =
   // ref: #/definitions/pbmodel.DataSource_URL
@@ -1525,6 +1551,9 @@ export type PbmodelQuotaSetDataSource =
 export type PbmodelQuotaSetCustomRole =
   // ref: #/definitions/pbmodel.QuotaSetCustomRole
   {
+    reverse: boolean
+    offset: number
+    sort_by: string
     limit: number
   }
 export type PbrequestUpdateFileMeta =
@@ -1802,11 +1831,11 @@ export type PbrequestAlertPolicyBoundJobs =
   {
     job_ids: string[]
   }
-export type PbdatasourceHost =
-  // ref: #/definitions/pbdatasource.Host
+export type PbmodelHostAliasesItem =
+  // ref: #/definitions/pbmodel.HostAliases_Item
   {
-    host: string
-    port: number
+    hostname: string
+    ip: string
   }
 export type PbdatasourceOracleURL =
   // ref: #/definitions/pbdatasource.OracleURL
@@ -1833,11 +1862,12 @@ export type PbrequestOfflineReleaseSyncJob =
   {
     stop_running: boolean
   }
-export type PbrequestConvertSyncJobMode =
-  // ref: #/definitions/pbrequest.ConvertSyncJobMode
+export type PbrequestPingSyncJobConnection =
+  // ref: #/definitions/pbrequest.PingSyncJobConnection
   {
-    job_id: string
-    conf: PbmodelSyncJobConf
+    source_id: string
+    target_id: string
+    cluster_id: string
   }
 export type PbrequestDeleteDataSources =
   // ref: #/definitions/pbrequest.DeleteDataSources
@@ -2303,8 +2333,8 @@ export type PbresponseListApiServices =
     total: number
     entities: PbmodelApiServiceEntity[]
   }
-export type PbmodelSyncResource =
-  // ref: #/definitions/pbmodel.SyncResource
+export type PbresponseDescribeApiConfig =
+  // ref: #/definitions/pbresponse.DescribeApiConfig
   {
     pg_wal_source: PbsyncjobPgWalSource
     logminer_source: PbsyncjobLogMinerSource

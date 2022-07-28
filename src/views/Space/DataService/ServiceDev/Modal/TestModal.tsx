@@ -33,16 +33,14 @@ const TestModal = observer(() => {
     item_out: 0
   })
   const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
+  const apiCroup = cloneDeep(get(apiConfigData, 'api_group'))
 
   useEffect(() => {
     const requestConfig = cloneDeep(get(apiConfigData, 'api_config.request_params.request_params'))
 
     if (requestConfig) {
-      const config = requestConfig.filter(
-        (item: { column_name: string }) => !['limit', 'offset'].includes(item.column_name)
-      )
       // 如果有默认值，就填充默认值，没有默认值就填充示例值，都没有才置空
-      const configData = config.map((item: { default_value: any; example_value: any }) => {
+      const configData = requestConfig.map((item: { default_value: any; example_value: any }) => {
         let value = item.default_value ? item.default_value : ''
         value = value === '' ? item.example_value : value
         return {
@@ -93,7 +91,7 @@ const TestModal = observer(() => {
     [getName('is_required')]: {
       width: 60,
       title: '是否必填',
-      render: () => <span>否</span>
+      render: (text: boolean) => <span>{text ? '是' : '否'}</span>
     },
     [getName('type')]: {
       width: 60,
@@ -144,7 +142,10 @@ const TestModal = observer(() => {
       footer={null}
     >
       <ModalContent tw="overflow-hidden">
-        <div tw="mb-3">API Path: {apiConfig?.api_path}</div>
+        <div tw="mb-3">
+          API Path: {apiCroup?.group_path === '/' ? '' : apiCroup?.group_path}
+          {apiConfig?.api_path}
+        </div>
         <FlexBox tw="h-full">
           <div tw="flex-1 mr-5">
             <TitleItem>请求参数</TitleItem>

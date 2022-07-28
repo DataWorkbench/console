@@ -79,7 +79,8 @@ const ClusterSettingModal = observer(() => {
       }
     }
     dtsDevStore.set({
-      apiConfigData: config
+      apiConfigData: config,
+      showClusterErrorTip: false
     })
   }
 
@@ -132,9 +133,11 @@ const ClusterSettingModal = observer(() => {
       footer={
         <div tw="flex justify-end space-x-2">
           <Button onClick={onClose}>取消</Button>
-          <Button type="primary" onClick={handleOK}>
-            保存
-          </Button>
+          {!isHistory && (
+            <Button type="primary" onClick={handleOK}>
+              保存
+            </Button>
+          )}
         </div>
       }
     >
