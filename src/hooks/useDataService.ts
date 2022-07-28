@@ -549,7 +549,7 @@ export const testPublishApi = ({
       {
         'Content-Type': 'application/json'
       },
-      token ? { Authorization: `Bearer ${token}` } : {}
+      token ? { Authorization: `${token}` } : {}
     ),
     params: requestContent,
     ...rest
@@ -612,16 +612,15 @@ export const MutationListRoutes = async ({
   apiVersionId,
   ...rest
 }: IParams) => {
-  const params = merge(
-    { regionId, uri: { space_id: spaceId } },
-    {
-      data: {
-        ...rest,
-        api_service_id: apiServiceId,
-        api_version_id: apiVersionId
-      }
+  const params = merge({
+    regionId,
+    uri: { space_id: spaceId },
+    params: {
+      ...rest,
+      api_service_id: apiServiceId,
+      api_version_id: apiVersionId
     }
-  )
+  })
   return apiRequest('serviceGateway', 'listRoutes')(params)
 }
 export const useMutationListRoutes = () => {

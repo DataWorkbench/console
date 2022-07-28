@@ -1,6 +1,6 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
-import { Button, Icon, Notification as Notify, Message } from '@QCFE/qingcloud-portal-ui'
+import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { RouterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useMemo, useRef } from 'react'
@@ -133,7 +133,7 @@ const SyncJob = observer(() => {
   const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
 
   const {
-    dtsDevStore: { curApi, apiConfigData },
+    dtsDevStore: { curApi, apiConfigData, apiRequestData, apiResponseData },
     dtsDevStore
   } = useStore()
 
@@ -225,7 +225,7 @@ const SyncJob = observer(() => {
 
       if (orderSourceData) {
         if (orderSourceData?.some((item) => item.name === '')) {
-          showConfWarn('字段名称不能为空')
+          showConfWarn('字段排序名称不能为空')
           return
         }
       }
@@ -236,20 +236,14 @@ const SyncJob = observer(() => {
         dtsDevStore.set({
           showClusterErrorTip: true
         })
-        Notify.warning({
-          title: '操作提示',
-          content: '请先选择服务集群',
-          placement: 'bottomRight'
-        })
+        showConfWarn('请先选择服务集群')
         return
       }
 
       // 映射字段排序字段到返回参数中
-      const responseConfig = cloneDeep(
-        get(apiConfigData, 'api_config.response_params.response_params', [])
-      )
-      const response = orderMapRequestData(orderSourceData, responseConfig)
+      const responseConfig = cloneDeep(apiResponseData) as any[]
 
+      const response = orderMapRequestData(orderSourceData, responseConfig)
       const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
       const apiId = get(curApi, 'api_id')
 
@@ -268,6 +262,9 @@ const SyncJob = observer(() => {
           apiId,
           datasource_id: dataSourceData?.source?.id,
           table_name: dataSourceData?.tableName,
+          request_params: {
+            request_params: apiRequestData
+          },
           response_params: {
             response_params: response
           }
@@ -296,8 +293,8 @@ const SyncJob = observer(() => {
         {
           onSuccess: (res) => {
             if (res.ret_code === 0) {
-              Message.success({
-                content: `API 发布成功，您可前往API 管理-已发布API 查看详情`
+              dtsDevStore.set({
+                showNotify: true
               })
             }
           }

@@ -161,6 +161,9 @@ export const intTypes = new Set([
 ])
 
 function setRowExp(rowkeyExpress: string) {
+  if (!rowkeyExpress) {
+    return rowkeyExpress
+  }
   return rowkeyExpress
     .split('_')
     .map((i) => `$(${i})`)
@@ -555,6 +558,7 @@ const SyncJob = () => {
             )}
             {index === 2 && (
               <SyncCluster
+                flinkType={2}
                 ref={clusterRef}
                 clusterId={get(confData, 'cluster_id')}
                 defaultClusterName={get(confData, 'cluster_info.name')}

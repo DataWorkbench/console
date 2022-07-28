@@ -94,10 +94,7 @@ const VersionsModal = observer(() => {
   }
 
   const toDetail = (row: any | undefined) => {
-    const key =
-      row?.publish_status === publishStatus.ABOLISHED
-        ? `${row?.api_id}_${row?.version_id}`
-        : row.api_id
+    const key = `${row?.api_id}_${row?.version_id}`
     const VerApi = {
       key, // key 和 api_id 是panel 的唯一标识， 区分当前版本和历史版本
       api_id: row?.api_id,
@@ -108,7 +105,7 @@ const VersionsModal = observer(() => {
       status: row?.status,
       group_id: row?.group_id,
       version_id: row?.version_id, // 历史版本号
-      is_history: row?.publish_status === publishStatus.ABOLISHED
+      is_history: true
     }
 
     dtsDevStore.set({
@@ -120,8 +117,11 @@ const VersionsModal = observer(() => {
 
   const handelTestModal = (row: any | undefined) => {
     const rowData = {
-      apiVersionId: row?.group_id,
-      apiServiceId: row?.version_id
+      apiVersionId: row?.version_id,
+      apiServiceId: row?.group_id,
+      curr_status: 1,
+      limit: 10,
+      offset: 0
     }
     routesMutation.mutate(rowData, {
       onSuccess: (res) => {
