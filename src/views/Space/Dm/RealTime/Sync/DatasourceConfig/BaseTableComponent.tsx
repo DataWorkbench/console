@@ -1,7 +1,8 @@
-import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
+import { AffixLabel, HelpCenterLink, RouterLink, SelectWithRefresh } from 'components'
 import tw, { css } from 'twin.macro'
 import { get, isEmpty } from 'lodash-es'
 import { useQuerySourceTables } from 'hooks'
+import { useParams } from 'react-router-dom'
 
 const styles = {
   tableSelect: [
@@ -35,6 +36,7 @@ const BaseTableComponent = (props: IBaseTableComponentProps) => {
     { enabled: !!sourceId && from === 'target' }
   )
 
+  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
   const isSelected = !isEmpty(sourceId)
   const tablesRet = from === 'source' ? sourceTablesRet : targetTablesRet
   const tables = (get(tablesRet, 'data.items', []) || []) as string[]
@@ -64,9 +66,13 @@ const BaseTableComponent = (props: IBaseTableComponentProps) => {
             validateHelp: (
               <div>
                 当前数据源不可用，请前往{' '}
-                <HelpCenterLink hasIcon isIframe={false} href="/manual/source_data/add_data/">
+                <RouterLink
+                  to={`/${regionId}/workspace/${spaceId}/upcloud/dsl`}
+                  target="_blank"
+                  color="blue"
+                >
                   数据源管理
-                </HelpCenterLink>{' '}
+                </RouterLink>
                 页面配置
               </div>
             ) as any
