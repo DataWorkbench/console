@@ -117,8 +117,11 @@ const VersionsModal = observer(() => {
 
   const handelTestModal = (row: any | undefined) => {
     const rowData = {
-      apiVersionId: row?.group_id,
-      apiServiceId: row?.version_id
+      apiVersionId: row?.version_id,
+      apiServiceId: row?.group_id,
+      curr_status: 1,
+      limit: 10,
+      offset: 0
     }
     routesMutation.mutate(rowData, {
       onSuccess: (res) => {

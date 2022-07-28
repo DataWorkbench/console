@@ -33,6 +33,7 @@ const TestModal = observer(() => {
     item_out: 0
   })
   const apiConfig = cloneDeep(get(apiConfigData, 'api_config'))
+  const apiCroup = cloneDeep(get(apiConfigData, 'api_group'))
 
   useEffect(() => {
     const requestConfig = cloneDeep(get(apiConfigData, 'api_config.request_params.request_params'))
@@ -144,7 +145,10 @@ const TestModal = observer(() => {
       footer={null}
     >
       <ModalContent tw="overflow-hidden">
-        <div tw="mb-3">API Path: {apiConfig?.api_path}</div>
+        <div tw="mb-3">
+          API Path: {apiCroup?.group_path === '/' ? '' : apiCroup?.group_path}
+          {apiConfig?.api_path}
+        </div>
         <FlexBox tw="h-full">
           <div tw="flex-1 mr-5">
             <TitleItem>请求参数</TitleItem>
