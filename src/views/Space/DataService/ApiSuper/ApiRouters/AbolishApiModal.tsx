@@ -117,7 +117,7 @@ const AbolishApiModal = (props: AbolishApiModalProps) => {
       }
     >
       <div>
-        <div tw=" mt-3 ml-9 mb-3">
+        <div tw="mb-3">
           {selectKey.length === 1
             ? `下线后， API将不可调用， 确认下线API ${selectKey[0]}`
             : `下线后，与以下 ${
