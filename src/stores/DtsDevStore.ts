@@ -1,9 +1,13 @@
 import { makeAutoObservable, observable, set } from 'mobx'
 import { findIndex } from 'lodash-es'
 import emitter from 'utils/emitter'
+import { PbmodelApiConfig } from 'types/types'
 import { DataServiceManageDescribeApiConfigType } from 'types/response'
-import { FieldSettingData } from 'views/Space/DataService/ServiceDev/constants'
+import { FieldSettingData } from 'views/Space/DataService/ServiceDev/Sync/SyncUtil'
 import type RootStore from './RootStore'
+
+type ReqDataSourceProp = PbmodelApiConfig['request_params']['request_params']
+type ResDataSourceProp = PbmodelApiConfig['response_params']['response_params']
 
 export interface ApiProps {
   key: string
@@ -36,6 +40,10 @@ class WorkFlowStore {
   curApi: null | ApiProps = null
 
   apiConfigData: DataServiceManageDescribeApiConfigType | null = null
+
+  apiRequestData: null | ReqDataSourceProp = null
+
+  apiResponseData: null | ResDataSourceProp = null
 
   fieldSettingData: FieldSettingData[] = []
 

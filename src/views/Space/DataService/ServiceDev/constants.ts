@@ -1,19 +1,12 @@
 import { IColumn } from 'hooks/useHooks/useColumns'
 import { Mapping } from 'utils/types'
 import { createEnhancedEnum } from 'utils'
-import { DataServiceManageDescribeApiConfigType } from 'types/response'
-import { get } from 'lodash-es'
 import { StatusBarEnum } from 'components/StatusBar'
 
 export interface Schema {
   type: string
   name: string
   is_primary: boolean
-}
-
-interface SchemaMap {
-  param_name: string
-  type: string
 }
 
 interface IPublishStatusEnum {
@@ -28,15 +21,6 @@ interface IStatusEnum {
     label: string
     value: any
   }
-}
-
-export interface FieldSettingData {
-  key: string
-  field: string
-  isRequest: boolean
-  isResponse: boolean
-  type: string
-  isPrimary: boolean
 }
 
 function getField<T>(mapping: Mapping<T>): IColumn[] {
@@ -128,18 +112,6 @@ export const dataSourceTypes: { [key in string]?: number } = {
   // Redis: 16,
   // ElasticSearch: 14,
 }
-
-export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[] = (
-  schema: Schema[]
-) =>
-  schema.map((column) => ({
-    key: column.name,
-    field: column.name,
-    isRequest: false,
-    isResponse: false,
-    type: column.type,
-    isPrimary: column.is_primary
-  }))
 
 export enum RequestMethods {
   MethodUnSet = 0,
@@ -244,48 +216,6 @@ export const OrderMode = createEnhancedEnum<IStatusEnum>({
   }
 })
 
-// 字段类型映射
-const fieldTypeMapping: Map<string, number> = new Map()
-  .set('char', 1)
-  .set('vachar', 1)
-  .set('int', 2)
-  .set('number', 2)
-  .set('double', 3)
-  .set('boolean', 4)
-
-export const paramsDataType: (type: string) => number | undefined = (type: string) => {
-  const lowerType = type.toLocaleLowerCase()
-  return fieldTypeMapping.get(lowerType)
-}
-
-/**
- * 请求参数配置 和 响应参数配置字段映射函数
- * @param filedData 字段数据
- * @param configData 配置数据
- * @param defaultData 默认数据
- * @returns
- */
-export const configMapData = (filedData: SchemaMap[], configData: any[], defaultData: any) => {
-  const configMap = new Map()
-  configData?.forEach((item) => {
-    configMap.set(item.column_name, item)
-  })
-
-  return filedData?.map((item) => {
-    const configItem = configMap.get(item.param_name)
-    const type = paramsDataType(item.type) || 1
-
-    if (configItem) {
-      return {
-        ...item,
-        data_type: type,
-        ...configItem
-      }
-    }
-    return { ...item, ...defaultData, data_type: type }
-  })
-}
-
 export const FieldCategory = createEnhancedEnum<IStatusEnum>({
   // CATEGORYUNSET: {
   //   label: 'UNSET',
@@ -300,42 +230,6 @@ export const FieldCategory = createEnhancedEnum<IStatusEnum>({
     value: 2
   }
 })
-
-/**
- * 根据请求参数和响应参数进行处理字段设置的请求和返回数据
- * @param apiConfig api配置
- * @param schema 数据源表字段
- * @returns
- */
-export const configMapFieldData = (
-  apiConfig: DataServiceManageDescribeApiConfigType | null,
-  schema: Schema[]
-) => {
-  const requestConfig = get(apiConfig, 'api_config.request_params.request_params', [])
-  const responseConfig = get(apiConfig, 'api_config.response_params.response_params', [])
-
-  const requestMap = new Map()
-  const responseMap = new Map()
-  requestConfig?.forEach((item: { column_name: any }) => {
-    requestMap.set(item.column_name, true)
-  })
-  responseConfig?.forEach((item: { column_name: any }) => {
-    responseMap.set(item.column_name, true)
-  })
-
-  const fieldSettingData = getFieldSettingParamsData(schema)
-
-  return fieldSettingData?.map((item) => {
-    const isRequest = requestMap.get(item.field)
-    const isResponse = responseMap.get(item.field)
-
-    return {
-      ...item,
-      isRequest: !!isRequest,
-      isResponse: !!isResponse
-    }
-  })
-}
 
 export const orderMapRequestData = (orderSourceData: any[], responseData: any[]) => {
   const orderMap = new Map()

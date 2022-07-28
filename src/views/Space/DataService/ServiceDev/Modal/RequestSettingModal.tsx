@@ -12,10 +12,9 @@ import {
   RequestSettingColumns,
   serviceDevRequestSettingMapping,
   ParameterOperator,
-  ParameterPosition,
-  configMapData,
-  FieldCategory
+  ParameterPosition
 } from '../constants'
+
 import { CollapseWrapper, TableWrapper } from '../styled'
 
 type DataSourceProp = DataServiceManageDescribeApiConfig['request_params']['request_params']
@@ -31,43 +30,28 @@ const dataServiceDataLimitSettingKey = 'DATA_SERVICE_DATA_REQUEST_HIGH'
 const getName = (name: MappingKey<typeof serviceDevRequestSettingMapping>) =>
   serviceDevRequestSettingMapping.get(name)!.apiField
 
-const defaultHighSource = [
-  {
-    column_name: 'limit',
-    param_name: 'limit',
-    data_type: 1,
-    type: 'INT',
-    param_operator: ParameterOperator.EQUAL,
-    param_position: ParameterPosition.QUERY,
-    is_required: true,
-    field_category: FieldCategory.PAGECONFIG,
-    example_value: '200',
-    default_value: '200',
-    param_description: '单次请求返回数据的最大条数,最大值200'
-  },
-  {
-    column_name: 'offset',
-    param_name: 'offset',
-    data_type: 1,
-    type: 'INT',
-    param_operator: ParameterOperator.EQUAL,
-    param_position: ParameterPosition.QUERY,
-    is_required: true,
-    field_category: FieldCategory.PAGECONFIG,
-    example_value: '0',
-    default_value: '0',
-    param_description: '数据的偏移量'
-  }
-]
+interface IHighSource {
+  column_name: string
+  param_name: string
+  data_type: number
+  type: string
+  param_operator: number
+  param_position: number
+  is_required: boolean
+  field_category: number
+  example_value: string
+  default_value: string
+  param_description: string
+}
 
 const { CollapseItem } = Collapse
 
 const RequestSettingModal = observer(() => {
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
-  const [highSource, setHighSource] = useImmer(defaultHighSource)
+  const [highSource, setHighSource] = useImmer<IHighSource[]>([])
 
   const {
-    dtsDevStore: { apiConfigData, fieldSettingData, curApi },
+    dtsDevStore: { apiConfigData, curApi, apiRequestData },
     dtsDevStore
   } = useStore()
   const isHistory = get(curApi, 'is_history', false) || false
@@ -75,35 +59,18 @@ const RequestSettingModal = observer(() => {
   const mutation = useMutationUpdateApiConfig()
 
   useEffect(() => {
-    if (apiConfigData) {
-      const filedData = cloneDeep(fieldSettingData)
-        .filter((item) => item.isRequest)
-        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
-      const config = cloneDeep(get(apiConfigData, 'api_config.request_params.request_params', []))
-      const hightConfig = config?.filter(
-        (item: any) => item.param_name === 'limit' || item.param_name === 'offset'
+    if (apiRequestData) {
+      const config = cloneDeep(apiRequestData)
+      const configData = config?.filter(
+        (item: any) => !['limit', 'offset'].includes(item.param_name)
       )
-      if (filedData.length) {
-        // 拼数据
-        const defaultValue = {
-          data_type: 1, // 字段类型 映射函数configMapData中赋值
-          param_operator: ParameterOperator.EQUAL,
-          param_position: ParameterPosition.QUERY,
-          is_required: false,
-          example_value: '',
-          default_value: '',
-          param_description: '',
-          field_category: FieldCategory.DATABASECOLUMN
-        }
-        const newRequestData = configMapData(filedData, config, defaultValue)
-        setDataSource(newRequestData)
-      }
-      if (hightConfig.length) {
-        const hConfig = hightConfig.map((item: any) => ({ ...item, type: 'INT' }))
-        setHighSource(hConfig)
-      }
+      const hightConfig = config?.filter((item: any) =>
+        ['limit', 'offset'].includes(item.param_name)
+      )
+      setDataSource(configData)
+      setHighSource(hightConfig as IHighSource[])
     }
-  }, [apiConfigData, setDataSource, fieldSettingData, setHighSource])
+  }, [setDataSource, setHighSource, apiRequestData])
 
   const onClose = () => {
     dtsDevStore.set({ showRequestSetting: false })

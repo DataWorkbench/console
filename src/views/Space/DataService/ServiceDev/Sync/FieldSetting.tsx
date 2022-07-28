@@ -8,12 +8,14 @@ import tw, { styled } from 'twin.macro'
 import { MappingKey } from 'utils/types'
 
 import { useColumns } from 'hooks/useHooks/useColumns'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, get } from 'lodash-es'
+import { useCallback, useEffect } from 'react'
+import { FieldSettingColumns, serviceDevVersionFieldSettingMapping } from '../constants'
 import {
-  FieldSettingColumns,
-  serviceDevVersionFieldSettingMapping,
-  FieldSettingData
-} from '../constants'
+  FieldSettingData as IFieldSettingData,
+  fieldDataToResponseData,
+  fieldDataToRequestData
+} from './SyncUtil'
 
 interface IFieldOrderProps {
   disabled?: boolean
@@ -26,14 +28,53 @@ const getName = (name: MappingKey<typeof serviceDevVersionFieldSettingMapping>) 
   serviceDevVersionFieldSettingMapping.get(name)!.apiField
 
 const dataServiceDataSettingKey = 'DATA_SERVICE_DATA__SETTING'
+
 const FieldOrder = observer((props: IFieldOrderProps) => {
   const {
-    dtsDevStore: { fieldSettingData },
+    dtsDevStore: { fieldSettingData, apiConfigData },
     dtsDevStore
   } = useStore()
   const { disabled = false } = props
 
-  const setFieldSettingData = (fn: (fieldData: FieldSettingData[]) => void) => {
+  // 同步store
+  const handleSyncStore = useCallback(
+    (request: any, response: any) => {
+      dtsDevStore.set({
+        apiRequestData: request,
+        apiResponseData: response
+      })
+    },
+    [dtsDevStore]
+  )
+
+  const changeField = useCallback(
+    (fieldData: IFieldSettingData[]) => {
+      const data = cloneDeep(fieldData)
+
+      const responseConfig = cloneDeep(
+        get(apiConfigData, 'api_config.response_params.response_params', [])
+      )
+      const requestConfig = cloneDeep(
+        get(apiConfigData, 'api_config.request_params.request_params', [])
+      )
+      const fieldResponse = cloneDeep(data)
+        .filter((item) => item.isResponse)
+        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
+      const filedRequest = cloneDeep(data)
+        .filter((item) => item.isRequest)
+        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
+      const dd = fieldDataToResponseData(fieldResponse, responseConfig)
+      const aa = fieldDataToRequestData(filedRequest, requestConfig)
+      handleSyncStore(aa, dd)
+    },
+    [apiConfigData, handleSyncStore]
+  )
+
+  useEffect(() => {
+    changeField(fieldSettingData)
+  }, [changeField, fieldSettingData])
+
+  const setFieldSettingData = (fn: (fieldData: IFieldSettingData[]) => void) => {
     const data = cloneDeep(fieldSettingData)
     fn(data)
     dtsDevStore.set({

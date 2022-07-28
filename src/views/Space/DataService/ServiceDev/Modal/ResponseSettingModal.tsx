@@ -9,110 +9,52 @@ import { useImmer } from 'use-immer'
 import { cloneDeep, get } from 'lodash-es'
 import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 
-import {
-  configMapData,
-  FieldCategory,
-  ResponseSettingColumns,
-  serviceDevResponseSettingMapping
-} from '../constants'
+import { ResponseSettingColumns, serviceDevResponseSettingMapping } from '../constants'
 import { CollapseWrapper, TableWrapper } from '../styled'
 
 type DataSourceProp = DataServiceManageDescribeApiConfig['response_params']['response_params']
-
+interface IHightData {
+  param_name: string
+  column_name: string
+  type: string
+  data_type: number
+  is_required: boolean
+  field_category: number
+  example_value: string
+  default_value: string
+  param_description: string
+}
 const dataServiceDataSettingKey = 'DATA_SERVICE_DATA__RESPONSE'
 const dataServiceDataTotalSettingKey = 'DATA_SERVICE_DATA__RESPONSE_HIGH'
 const getName = (name: MappingKey<typeof serviceDevResponseSettingMapping>) =>
   serviceDevResponseSettingMapping.get(name)!.apiField
 
-const defaultHighSource = [
-  {
-    param_name: 'total',
-    column_name: 'total',
-    type: 'INT',
-    data_type: 1,
-    is_required: false,
-    field_category: FieldCategory.PAGECONFIG,
-    example_value: '245',
-    default_value: '245',
-    param_description: '数据总数'
-  },
-  {
-    param_name: 'limit',
-    column_name: 'limit',
-    type: 'INT',
-    data_type: 1,
-    is_required: false,
-    field_category: FieldCategory.PAGECONFIG,
-    example_value: '100',
-    default_value: '100',
-    param_description: '单次请求返回数据的最大条数,最大值100'
-  },
-  {
-    param_name: 'offset',
-    column_name: 'offset',
-    type: 'INT',
-    data_type: 1,
-    is_required: false,
-    field_category: FieldCategory.PAGECONFIG,
-    example_value: '200',
-    default_value: '200',
-    param_description: '数据的偏移量'
-  },
-  {
-    param_name: 'next_offset',
-    column_name: 'next_offset',
-    type: 'INT',
-    data_type: 1,
-    is_required: false,
-    field_category: FieldCategory.PAGECONFIG,
-    example_value: '0',
-    default_value: '0',
-    param_description: '作为下次请求的 offset 值, 0 表示遍历结束'
-  }
-]
-
 const { CollapseItem } = Collapse
 
 const ResponseSettingModal = observer(() => {
   const {
-    dtsDevStore: { apiConfigData, fieldSettingData, curApi },
+    dtsDevStore: { apiConfigData, curApi, apiResponseData },
     dtsDevStore
   } = useStore()
   const isHistory = get(curApi, 'is_history', false) || false
 
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
-  const [highDataSource, setHighDataSource] = useImmer(defaultHighSource)
+  const [highDataSource, setHighDataSource] = useImmer<IHightData[]>([])
   const mutation = useMutationUpdateApiConfig()
 
   useEffect(() => {
-    if (apiConfigData) {
-      const filedData = cloneDeep(fieldSettingData)
-        .filter((item) => item.isResponse)
-        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
-      const config = cloneDeep(get(apiConfigData, 'api_config.response_params.response_params', []))
+    if (apiResponseData) {
+      const config = cloneDeep(apiResponseData)
       const hightConfig = config?.filter((item: any) =>
         ['total', 'limit', 'offset', 'next_offset'].includes(item.param_name)
       )
-
-      if (filedData.length) {
-        // 拼数据
-        const defaultValue = {
-          data_type: 1, // TODO: 暂时写死 字段映射表
-          is_required: false,
-          example_value: '',
-          default_value: '',
-          param_description: '',
-          field_category: FieldCategory.DATABASECOLUMN
-        }
-        const newRequestData = configMapData(filedData, config, defaultValue)
-        setDataSource(newRequestData)
-      }
-      if (hightConfig?.length) {
-        const hConfig = hightConfig.map((item: any) => ({ ...item, type: 'INT' }))
-        setHighDataSource(hConfig)
-      }
+      const configData = config?.filter(
+        (item: any) => !['total', 'limit', 'offset', 'next_offset'].includes(item.param_name)
+      )
+      setDataSource(configData)
+      setHighDataSource(hightConfig as unknown as IHightData[])
     }
-  }, [apiConfigData, setDataSource, fieldSettingData, setHighDataSource])
+  }, [setDataSource, setHighDataSource, apiResponseData])
 
   const onClose = () => {
     dtsDevStore.set({ showResponseSetting: false })
@@ -145,7 +87,6 @@ const ResponseSettingModal = observer(() => {
       })
       return
     }
-
     mutation.mutate(
       {
         ...apiConfig,

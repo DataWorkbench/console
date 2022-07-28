@@ -133,7 +133,7 @@ const SyncJob = observer(() => {
   const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
 
   const {
-    dtsDevStore: { curApi, apiConfigData },
+    dtsDevStore: { curApi, apiConfigData, apiRequestData, apiResponseData },
     dtsDevStore
   } = useStore()
 
@@ -225,7 +225,7 @@ const SyncJob = observer(() => {
 
       if (orderSourceData) {
         if (orderSourceData?.some((item) => item.name === '')) {
-          showConfWarn('字段名称不能为空')
+          showConfWarn('字段排序名称不能为空')
           return
         }
       }
@@ -236,20 +236,14 @@ const SyncJob = observer(() => {
         dtsDevStore.set({
           showClusterErrorTip: true
         })
-        Notify.warning({
-          title: '操作提示',
-          content: '请先选择服务集群',
-          placement: 'bottomRight'
-        })
+        showConfWarn('请先选择服务集群')
         return
       }
 
       // 映射字段排序字段到返回参数中
-      const responseConfig = cloneDeep(
-        get(apiConfigData, 'api_config.response_params.response_params', [])
-      )
-      const response = orderMapRequestData(orderSourceData, responseConfig)
+      const responseConfig = cloneDeep(apiResponseData) as any[]
 
+      const response = orderMapRequestData(orderSourceData, responseConfig)
       const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
       const apiId = get(curApi, 'api_id')
 
@@ -268,6 +262,9 @@ const SyncJob = observer(() => {
           apiId,
           datasource_id: dataSourceData?.source?.id,
           table_name: dataSourceData?.tableName,
+          request_params: {
+            request_params: apiRequestData
+          },
           response_params: {
             response_params: response
           }
