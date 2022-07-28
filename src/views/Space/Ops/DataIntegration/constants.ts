@@ -339,12 +339,13 @@ export const dataReleaseActions = [
     icon: 'q-upload2Fill',
     text: '重新发布',
     key: 'resume'
-  },
-  {
-    icon: 'stop',
-    text: '暂停',
-    key: 'suspend'
   }
+  // ,
+  // {
+  //   icon: 'stop',
+  //   text: '暂停',
+  //   key: 'suspend'
+  // }
 ] as const
 
 // suspend 暂停 xxx
