@@ -13,10 +13,18 @@ interface SyncClusterProps {
   targetId?: string
   clusterId?: string
   defaultClusterName?: string
+  flinkType?: number
 }
 
 const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
-  const { onChange, sourceId, targetId, clusterId: clusterIdProps, defaultClusterName = '' } = props
+  const {
+    onChange,
+    sourceId,
+    targetId,
+    clusterId: clusterIdProps,
+    defaultClusterName = '',
+    flinkType
+  } = props
   const [visible, setVisible] = useState(false)
   const [cluster, setCluster] = useState<{ id: string; name?: string } | null>()
   const clusterId = get(cluster, 'id', '')
@@ -130,6 +138,7 @@ const SyncCluster = forwardRef((props: SyncClusterProps, ref) => {
             onChange(v)
           }
         }}
+        flinkType={flinkType}
         selectedIds={isEmpty(clusterId) ? [] : [clusterId]}
         onCancel={() => setVisible(false)}
       />
