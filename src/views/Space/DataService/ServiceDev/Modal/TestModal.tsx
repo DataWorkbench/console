@@ -91,7 +91,7 @@ const TestModal = observer(() => {
     [getName('is_required')]: {
       width: 60,
       title: '是否必填',
-      render: () => <span>否</span>
+      render: (text: boolean) => <span>{text ? '是' : '否'}</span>
     },
     [getName('type')]: {
       width: 60,

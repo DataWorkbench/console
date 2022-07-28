@@ -549,7 +549,7 @@ export const testPublishApi = ({
       {
         'Content-Type': 'application/json'
       },
-      token ? { Authorization: `Bearer ${token}` } : {}
+      token ? { Authorization: `${token}` } : {}
     ),
     params: requestContent,
     ...rest
