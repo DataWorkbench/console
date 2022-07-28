@@ -777,8 +777,8 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           title: 'IP:Port',
           label: '访问地址（Host：Port）',
           placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
-localhost:6379
-1.1.1.1:6379
+localhost: 27017
+1.1.1.1: 27017
           `,
           css: tw`w-full`,
           validateOnBlur: true,
