@@ -244,7 +244,6 @@ source$
 
 const kafkaSourceReadType$ = kafkaSource$.pipe(
   distinctUntilChanged((prev, cur) => {
-    console.log(prev, cur)
     return prev?.id === cur?.id && prev?.readType === cur?.readType
   })
 )
