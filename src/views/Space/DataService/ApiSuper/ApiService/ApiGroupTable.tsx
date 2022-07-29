@@ -162,11 +162,10 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
       <MoreAction theme="darker" items={getActions(record)} onMenuClick={handleMenuClick} />
     )
   }
-  console.log('apiGroupTableColumns', apiGroupTableColumns)
 
   const TableColumns = onSelect
     ? apiGroupTableColumns.filter(
-        (item) => !['api_count', 'pre_path', 'domain'].includes(item.dataIndex as string)
+        (item) => !['api_count', 'pre_path'].includes(item.dataIndex as string)
       )
     : apiGroupTableColumns
 
