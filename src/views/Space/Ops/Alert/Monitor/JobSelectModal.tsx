@@ -129,7 +129,12 @@ const JobSelectModal = (props: IJobSelectProps) => {
       }
     },
     [getName('ID')]: {
-      render: (text: string) => <span tw="text-neut-8">{text}</span>
+      render: (text: string) => {
+        if (text === 'root') {
+          return null
+        }
+        return <span tw="text-neut-8">{text}</span>
+      }
     },
     [getName('description')]: {
       render: (text: string) => <span tw="text-neut-8">{text}</span>

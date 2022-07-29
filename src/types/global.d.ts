@@ -24,4 +24,5 @@ declare global {
     | 'view'
     | 'detail'
     | 'reload'
+    | 'restart'
 }

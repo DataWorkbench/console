@@ -116,7 +116,7 @@ const PgSourceConfig = forwardRef(
             return {
               id: e?.data?.id,
               tableName: get(e, 'data.table_list[0]'),
-              updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
+              updateType: get(e, 'data.cat', 'insert,update,delete').split(',').filter(Boolean),
               slot: get(e, 'data.slot_name'),
               lsn: get(e, 'data.lsn', 0),
               heartBeatPack: get(e, 'data.heart_beat_pack', 10),
@@ -151,6 +151,8 @@ const PgSourceConfig = forwardRef(
         if (!sourceForm.current) {
           return false
         }
+        console.log(sourceForm.current?.getFieldsValue())
+        console.log(111111111, sourceForm.current?.validateForm())
         return sourceForm.current?.validateForm()
       },
       getData: () => ({
@@ -277,11 +279,12 @@ const PgSourceConfig = forwardRef(
               placeholder="请选择数据源表"
             />
             <CheckboxGroupField
-              name={dbInfo?.updateType}
+              name="updateType"
               label={<AffixLabel required>更新类型</AffixLabel>}
               options={updateTypes}
               value={dbInfo?.updateType}
               onChange={(v) => {
+                console.log(v)
                 setDbInfo((draft) => {
                   draft.updateType = v
                 })
