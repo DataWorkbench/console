@@ -34,16 +34,14 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
   const authMutation = useMutationAuthKey()
 
   useMount(() => {
-    if (selectKey.length > 1) {
-      mutation.mutate(
-        { ids: selectKey, ...filter },
-        {
-          onSuccess: (source) => {
-            setSourceData(source)
-          }
+    mutation.mutate(
+      { ids: selectKey, ...filter },
+      {
+        onSuccess: (source) => {
+          setSourceData(source)
         }
-      )
-    }
+      }
+    )
   })
 
   const handleCancel = () => {
@@ -103,7 +101,13 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
   return (
     <Confirm
       title={`${
-        selectKey.length === 1 ? `解绑 API 服务组:${selectKey[0]}(ID)` : '解绑 API 服务组注意事项'
+        selectKey.length === 1
+          ? `解绑 API 服务组:${get(dataSource, 'entities[0].name', '')}(${get(
+              dataSource,
+              'entities[0].id',
+              ''
+            )})`
+          : '解绑 API 服务组注意事项'
       }`}
       visible
       css={css`
@@ -130,10 +134,13 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
       }
     >
       <div>
-        <div tw=" mt-3 ml-9 mb-3">
+        <div tw="mb-3">
           {selectKey.length === 1
-            ? `与解绑 API 服务组后，密钥将不在限制访问，请谨慎操作。确认解绑API 服务组 ${selectKey[0]}`
-            : `与以下 ${infos.length} 个 API 服务组解绑后，密钥将不在限制访问，请谨慎操作。确认解绑以下 API 服务组?`}
+            ? `解绑API服务组后，密钥将不再限制访问，请谨慎操作。确认解绑API 服务组 ${get(
+                dataSource,
+                'entities[0].name'
+              )}？`
+            : `解绑以下 ${infos.length} 个 API 服务组解绑后，密钥将不在限制访问，请谨慎操作。确认解绑以下 API 服务组?`}
         </div>
         {selectKey.length > 1 && (
           <Table

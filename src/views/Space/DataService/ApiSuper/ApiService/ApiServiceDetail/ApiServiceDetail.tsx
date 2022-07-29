@@ -113,7 +113,7 @@ const ApiServiceDetail = (props: { id: string }) => {
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem labelWidth={60}>
               <span>域名:</span>
-              <span>{detail?.id}</span>
+              <span>{detail?.domain}</span>
               <span>路径:</span>
               <span>{detail?.pre_path}</span>
             </GridItem>

@@ -32,10 +32,10 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
   }
 
   const handleOk = () => {
-    if (selectedRowKeys?.length === 0) {
+    if (!selectedRowKeys?.length) {
       Notify.warning({
         title: '操作提示',
-        content: '请选择至少一个API服务组',
+        content: '未选择任何服务组',
         placement: 'bottomRight'
       })
       return
