@@ -86,6 +86,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
   const handleCancel = () => {
     setOp('')
     refetchData()
+    setSelectedRowKeys([])
   }
 
   const getActions = (row: Record<string, any>) => {
