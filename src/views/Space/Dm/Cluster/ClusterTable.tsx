@@ -371,6 +371,7 @@ const ClusterTable = observer(
                           <MenuItem key="stop">停用</MenuItem>
                         )}
                         {row.status === 3 && <MenuItem key="start">启动</MenuItem>}
+                        {row.status === 5 && <MenuItem key="restart">重启</MenuItem>}
                         <MenuItem key="update" disabled={[2, 4].includes(row.status)}>
                           <AffixLabel
                             required={false}
@@ -500,7 +501,7 @@ const ClusterTable = observer(
           o.checked && columns.find((col) => col.dataIndex === o.key)
       )
       .filter((o) => o)
-    const opWordInfo = { start: '启动', stop: '停用', delete: '删除' }
+    const opWordInfo = { start: '启动', stop: '停用', restart: '重启', delete: '删除' }
     const { data: bindResData } = bindResourceRet
 
     const bindResDataJobs = useMemo(() => {
@@ -509,6 +510,7 @@ const ClusterTable = observer(
       return concat(streamJob, syncJob)
     }, [bindResData])
     const hasBindRes = bindResDataJobs.length > 0
+    console.log(op)
     return (
       <FlexBox tw="w-full flex-1" orient="column">
         <div tw="mb-3">
@@ -637,7 +639,7 @@ const ClusterTable = observer(
           <ClusterModal opCluster={opclusterList[0]} />
         )}
 
-        {(op === 'start' || op === 'stop' || op === 'delete') && (
+        {(op === 'start' || op === 'stop' || op === 'delete' || op === 'restart') && (
           <Modal
             noBorder
             visible
@@ -646,11 +648,13 @@ const ClusterTable = observer(
             onCancel={() => setOp('')}
             footer={
               <>
-                {(op === 'start' || (!bindResourceRet.isFetching && !hasBindRes)) && (
+                {(op === 'start' ||
+                  op === 'restart' ||
+                  (!bindResourceRet.isFetching && !hasBindRes)) && (
                   <div tw="flex justify-end">
                     <Button onClick={() => setOp('')}>取消</Button>
                     <Button
-                      type={op === 'start' ? 'primary' : 'danger'}
+                      type={op === 'start' || op === 'restart' ? 'primary' : 'danger'}
                       onClick={mutateData}
                       loading={mutation.isLoading}
                     >
