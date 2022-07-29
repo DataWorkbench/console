@@ -65,7 +65,7 @@ export const Confirm = ({ title, children, type, ...otherProps }: ConfirmProps &
         {getIcon()}
         <section tw="flex-1">
           {title && <div tw="flex items-center text-base font-semibold">{title}</div>}
-          <div tw="ml-9 mt-2 leading-5 text-neut-8">{children}</div>
+          <div tw="leading-5 text-neut-8">{children}</div>
         </section>
       </div>
     </ModalWrapper>

@@ -9,6 +9,7 @@ import { useMutationApiService, getQueryKeyListApiGroups } from 'hooks'
 import { strlen } from 'utils'
 import { useQueryClient } from 'react-query'
 import { useStore } from 'stores/index'
+import { nameMatchRegexMin4Char } from 'utils/convert'
 import type { CurrentGroupApiProps } from '../ApiPanel/ApiTree'
 import ApiPathField from '../components/ApiPathField'
 
@@ -136,20 +137,12 @@ const ApiGroupModal = observer((props: JobModalProps) => {
               maxLength={50}
               schemas={[
                 {
-                  rule: (value: string) => {
-                    const l = strlen(value)
-                    return l >= 4 && l <= 50
-                  },
-                  help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
+                  rule: (value: string) => nameMatchRegexMin4Char.test(value),
+                  help: '请输入英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符',
                   status: 'error'
                 }
               ]}
-              help={
-                <>
-                  必须唯一，支持汉字、英文字母、数字、英文格式的下划线，必须以英文字母或汉字开头，4~50
-                  个字符
-                </>
-              }
+              help="支持英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符"
             />
             <ApiPathField
               showGroupPath={false}
@@ -166,10 +159,10 @@ const ApiGroupModal = observer((props: JobModalProps) => {
               schemas={[
                 {
                   rule: (value: string) => {
-                    const reg = /^[a-zA-Z0-9_]{1,20}$/
+                    const reg = /^[a-zA-Z0-9_-]{1,20}$/
                     return reg.test(value)
                   },
-                  help: '请输入1~20 个字符，英文字母、数字、英文格式的下划线',
+                  help: '请输入1~20 个字符，英文字母、数字、下划线（_）、连字符（-）',
                   status: 'error'
                 }
               ]}

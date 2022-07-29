@@ -54,6 +54,8 @@ export const strlen = (str: string) => {
 // /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/
 export const nameMatchRegex = /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/
 
+export const nameMatchRegexMin4Char = /^(?!_)(?!.*?_$)[a-zA-Z0-9_]{4,50}$/
+
 export const formatBytes = (bytes: number, decimals: number) => {
   if (bytes === 0) return '0 Bytes'
   const k = 1024

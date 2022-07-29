@@ -61,7 +61,7 @@ const BaseSettingModal = observer(() => {
     request_method: RequestMethods.GET,
     response_type: ResponseMethods.JSON,
     api_description: '',
-    timeout: '',
+    timeout: 1,
     created: 0,
     updated: 0,
     api_mode: 0,
@@ -287,7 +287,7 @@ const BaseSettingModal = observer(() => {
               value={get(params, 'timeout', '')}
               onChange={(v) =>
                 setParams((draft) => {
-                  draft.timeout = (Number(v) || 0) as unknown as string
+                  draft.timeout = (Number(v) || '') as unknown as number
                 })
               }
               maxLength={3}
@@ -295,14 +295,14 @@ const BaseSettingModal = observer(() => {
                 {
                   rule: (value: number) => {
                     const l = Number(value)
-                    return l >= 2 && l <= 300
+                    return l >= 1 && l <= 300
                   },
-                  help: '请输入范围0-300',
+                  help: '请输入范围1-300',
                   status: 'error'
                 }
               ]}
               help="0-300"
-              suffix={<div tw="ml-1">S</div>}
+              suffix={<div tw="ml-1">s</div>}
             />
             <Field>
               <Label>
