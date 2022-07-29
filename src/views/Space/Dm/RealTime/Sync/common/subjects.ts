@@ -190,7 +190,9 @@ const changeTableName = () =>
     const id = get(value, 'data.id', '')
     const name = get(value, 'data.table[0]') || get(value, 'data.table_list[0]')
     const oldName = get(prevValue, 'data.table[0]') || get(prevValue, 'data.table_list[0]')
-
+    if (!oldName && name) {
+      return true
+    }
     return oldName === name && oldId === id
   })
 

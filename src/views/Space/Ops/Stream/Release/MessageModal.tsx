@@ -3,6 +3,7 @@ import { Collapse, Icon } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
 import dayjs from 'dayjs'
 import SimpleBar from 'simplebar-react'
+import { useParams } from 'react-router-dom'
 import { InstanceState } from '../constants'
 
 const { CollapseItem } = Collapse
@@ -38,6 +39,7 @@ const CollapseWrap = styled(Collapse)(() => [
 ])
 
 export default function MessageModal({ visible, cancel, webUI, row = {} }: any) {
+  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
   return (
     <DarkModal
       orient="fullright"
@@ -65,7 +67,17 @@ export default function MessageModal({ visible, cancel, webUI, row = {} }: any) 
                 </div>
                 <div tw="flex">
                   <span tw="text-neut-8 w-14 mr-3">所属作业: </span>
-                  <span tw="text-green-11 cursor-pointer">{row.job_id}</span>
+                  <span
+                    tw="text-green-11 cursor-pointer"
+                    onClick={() => {
+                      window.open(
+                        `/dataomnis/${regionId}/workspace/${spaceId}/ops/release/${row.job_id}?version=${row.version}`,
+                        '_blank'
+                      )
+                    }}
+                  >
+                    {row.job_id}
+                  </span>
                 </div>
               </div>
               <div>
