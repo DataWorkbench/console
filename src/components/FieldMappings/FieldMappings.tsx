@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useReducer,
   useRef,
   useState
 } from 'react'
@@ -159,17 +160,22 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   const [containerRef, rect] = useMeasure<HTMLDivElement>()
 
+  const [atomKey, forceUpdate] = useReducer((x) => x + 1, 1)
+
   useEffect(() => {
     setLeftFields(leftFieldsProp)
+    forceUpdate()
   }, [leftFieldsProp])
 
   useEffect(() => {
     setRightFields(rightFieldsProp)
+    forceUpdate()
   }, [rightFieldsProp])
 
   useEffect(() => {
     if (mappingsProp) {
       setMappings(mappingsProp)
+      forceUpdate()
     }
   }, [mappingsProp])
 
@@ -230,7 +236,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       // console.log('in this.....')
       setMappings([])
     }
-  }, [columns])
+  }, [columns, atomKey])
 
   useEffect(() => {
     jsPlumbInstRef.current?.repaintEverything()
@@ -323,7 +329,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     if (!jsPlumbInst) {
       return
     }
-    if (jsPlumbInst.getAllConnections().length === 0 && mappings.length > 0) {
+    // if (jsPlumbInst.getAllConnections().length === 0 && mappings.length > 0) {
+    if (mappings.length > 0) {
       mappings.forEach(([left, right]) => {
         const leftField = leftFields.find((f) => f.name === left)
         const rightField = rightFields.find((f) => f.name === right)
@@ -524,6 +531,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   // console.log(leftFields)
 
   const keepEditingField = (field: TMappingField, index?: number) => {
+    const old = leftFields[index!]
     setLeftFields((fields) => {
       const newFields = [...fields]
       const itemIndex = index === undefined ? newFields.length - 1 : index
@@ -537,9 +545,19 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
       return newFields
     })
+    setMappings((item) => {
+      return item.map(([l, r]) => {
+        if (l === old.name) {
+          return [field.name, r]
+        }
+        return [l, r]
+      })
+    })
   }
+  // console.log(222222222222, leftFields, leftFieldsProp, mappingsProp, mappings)
 
   const keepEditingFieldRight = (field: TMappingField, index?: number) => {
+    const old = rightFields[index!]
     setRightFields((fields) => {
       const newFields = [...fields]
       const itemIndex = index === undefined ? newFields.length - 1 : index
@@ -552,6 +570,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         field.custom ? ['isEditing'] : ['isEditing', 'custom', 'default']
       )
       return newFields
+    })
+    setMappings((item) => {
+      return item.map(([l, r]) => {
+        if (r === old.name) {
+          return [l, field.name]
+        }
+        return [l, r]
+      })
     })
   }
 
