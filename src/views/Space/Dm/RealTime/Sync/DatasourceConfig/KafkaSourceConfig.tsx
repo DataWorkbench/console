@@ -103,7 +103,7 @@ const KafkaSourceConfig = forwardRef(
 
     const { refetch } = useSetRealtimeColumns(
       dbInfo?.id,
-      dbInfo?.readType === 'text' ? [['message', 'STRING']] : []
+      dbInfo?.readType === 1 ? [['message', 'STRING']] : []
     )
     const [showAdvanced, setShowAdvanced] = useState(false)
     useLayoutEffect(() => {
