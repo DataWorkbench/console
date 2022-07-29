@@ -51,7 +51,7 @@ const defaultFuncList = [
       { name: 'general-view', title: '运维概览', icon: 'blockchain' },
       {
         name: 'stream',
-        title: '流式计算运维',
+        title: '数据开发运维',
         icon: 'q-event2Duotone',
         items: [
           { name: 'release', title: '已发布作业' },
