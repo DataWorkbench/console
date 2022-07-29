@@ -17,7 +17,7 @@ import { isDarkTheme } from 'utils/theme'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { HbaseNameField } from 'components/FieldMappings/HbaseNameField'
 import { fieldChangeSubject$ } from 'components/FieldMappings/Subjects'
-import { fieldTypeMapper } from './constant'
+import { getFieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
 const { MenuItem } = Menu as any
@@ -423,7 +423,7 @@ const MappingItem = (props: MappingItemProps) => {
         ]}
         options={
           typeName
-            ? fieldTypeMapper.get(typeName.toLowerCase())?.map((v) => ({ label: v, value: v }))
+            ? getFieldTypeMapper(typeName.toLowerCase())?.map((v) => ({ label: v, value: v }))
             : []
         }
         onChange={(v: string) =>

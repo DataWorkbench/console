@@ -191,44 +191,6 @@ export const fieldTypeMapper = new Map([
       'BYTE'
     ]
   ],
-  [
-    'kafka',
-    [
-      'SMALLINT',
-      'SMALLSERIAL',
-      'INT2',
-      'INT',
-      'INTEGER',
-      'SERIAL',
-      'INT4',
-      'BIGINT',
-      'BIGSERIAL',
-      'OID',
-      'INT8',
-      'REAL',
-      'FLOAT4',
-      'FLOAT',
-      'DOUBLE PRECISION',
-      'FLOAT8',
-      'DECIMAL',
-      'NUMERIC',
-      'CHARACTER VARYING',
-      'VARCHAR',
-      'CHARACTER',
-      'CHAR',
-      'TEXT',
-      'NAME',
-      'BPCHAR',
-      'BYTEA',
-      'TIMESTAMP',
-      'TIMESTAMPTZ',
-      'DATE',
-      'TIME',
-      'TIMETZ',
-      'BOOLEAN',
-      'BOOL'
-    ]
-  ],
   ['binlog', mysql],
   ['pg_wal', pg],
   ['sql_server_cdc', sqlServer],
@@ -288,5 +250,79 @@ export const fieldTypeMapper = new Map([
     ]
   ]
 ])
+
+export const fieldTypeMapper2Target = new Map([
+  [
+    'kafka',
+    [
+      'SMALLINT',
+      'SMALLSERIAL',
+      'INT2',
+      'INT',
+      'INTEGER',
+      'SERIAL',
+      'INT4',
+      'BIGINT',
+      'BIGSERIAL',
+      'OID',
+      'INT8',
+      'REAL',
+      'FLOAT4',
+      'FLOAT',
+      'DOUBLE PRECISION',
+      'FLOAT8',
+      'DECIMAL',
+      'NUMERIC',
+      'CHARACTER VARYING',
+      'VARCHAR',
+      'CHARACTER',
+      'CHAR',
+      'TEXT',
+      'NAME',
+      'BPCHAR',
+      'BYTEA',
+      'TIMESTAMP',
+      'TIMESTAMPTZ',
+      'DATE',
+      'TIME',
+      'TIMETZ',
+      'BOOLEAN',
+      'BOOL'
+    ]
+  ]
+])
+
+export const fieldTypeMapper2Source = new Map([
+  [
+    'kafka',
+    [
+      // BOOLEAN、TINYINT、SMALLINT、INT、BIGINT、FLOAT、DOUBLE、DECIMAL、STRING、VARCHAR、CHAR、TIMESTAMP、DATE、BINARY、ARRAY、MAP、STRUCT、LIST、ROW
+      'BOOLEAN',
+      'TINYINT',
+      'SMALLINT',
+      'INT',
+      'BIGINT',
+      'FLOAT',
+      'DOUBLE',
+      'DECIMAL',
+      'STRING',
+      'VARCHAR',
+      'CHAR',
+      'TIMESTAMP',
+      'DATE',
+      'BINARY',
+      'ARRAY',
+      'MAP',
+      'STRUCT',
+      'LIST',
+      'ROW'
+    ]
+  ]
+])
+
+export const getFieldTypeMapper = (type: string, isSource = true) => {
+  const map = isSource ? fieldTypeMapper2Source : fieldTypeMapper2Target
+  return map.get(type) ?? fieldTypeMapper.get(type)
+}
 
 export default {}
