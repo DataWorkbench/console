@@ -6,6 +6,7 @@ import { assign } from 'lodash-es'
 
 import { useQueryClient } from 'react-query'
 import { useState } from 'react'
+// eslint-disable-next-line import/no-cycle
 import AuthKeyTable from '../../AuthKey/AuthKeyTable'
 
 interface AuthKeyModalProps {
@@ -31,6 +32,14 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
   }
 
   const handleOk = () => {
+    if (!selectedRowKeys?.length) {
+      Notify.warning({
+        title: '操作提示',
+        content: '未选择任何密钥',
+        placement: 'bottomRight'
+      })
+      return
+    }
     const paramsData = assign({
       option: 'bind' as any,
       auth_key_id: selectedRowKeys,

@@ -52,6 +52,9 @@ const formStyle = {
 const getData = (data: Record<string, any>) => {
   const d: Record<string, any> = toJS(data) ?? {}
   let type = ''
+  if (d.monitor_object === undefined) {
+    d.monitor_object = 2
+  }
   if (d?.monitor_object === 1) {
     type = 'stream_job'
   } else if (d?.monitor_object === 2) {
@@ -209,8 +212,8 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                     }
                   ]}
                 >
-                  <RadioButton value={1}>流式计算作业</RadioButton>
                   <RadioButton value={2}>数据集成作业</RadioButton>
+                  <RadioButton value={1}>流式计算作业</RadioButton>
                 </RadioGroupField>
               ))}
 

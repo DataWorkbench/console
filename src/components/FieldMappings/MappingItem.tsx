@@ -16,6 +16,7 @@ import { TextEllipsis } from 'components/TextEllipsis'
 import { isDarkTheme } from 'utils/theme'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { HbaseNameField } from 'components/FieldMappings/HbaseNameField'
+import { fieldChangeSubject$ } from 'components/FieldMappings/Subjects'
 import { fieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
@@ -503,6 +504,7 @@ const MappingItem = (props: MappingItemProps) => {
                   if (formRef.current?.validateFields()) {
                     if (!isEmpty(item.type) && !isEmpty(item.name)) {
                       onOk(item, index)
+                      fieldChangeSubject$.next([itemProps.name, item.name])
                     }
                   }
                 }}

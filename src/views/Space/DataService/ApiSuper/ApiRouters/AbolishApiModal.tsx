@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom'
 import { apiRoutersTableFieldMapping, apiRouterTableColumns } from '../constants'
 
 interface AbolishApiModalProps {
-  selectKey: string[]
+  selectKey: { id: string; name: string }[]
   onCancel: () => void
 }
 
@@ -33,7 +33,7 @@ const AbolishApiModal = (props: AbolishApiModalProps) => {
   const abolishMutation = useMutationAbolishDataServiceApis()
   const { isRefetching, data } = useQueryListRoutes({
     uri: { space_id: spaceId },
-    params: { ids: selectKey, ...filter } as any
+    params: { ids: selectKey.map((item) => item.id), ...filter } as any
   })
 
   const handleCancel = () => {
@@ -56,7 +56,8 @@ const AbolishApiModal = (props: AbolishApiModalProps) => {
   }
 
   const handleConfirmOK = () => {
-    abolishApi(selectKey)
+    const keys = selectKey.map((item) => item.id)
+    abolishApi(keys)
   }
 
   const columnsRender = {
@@ -79,7 +80,7 @@ const AbolishApiModal = (props: AbolishApiModalProps) => {
   }
 
   const tableColumns = apiRouterTableColumns.filter(
-    (item) => !['proxy_uri', 'create_time'].includes(item.dataIndex as string)
+    (item) => !['api_service_id', 'create_time'].includes(item.dataIndex as string)
   )
   const { columns } = useColumns(columnSettingsKey, tableColumns, columnsRender)
 
@@ -89,7 +90,7 @@ const AbolishApiModal = (props: AbolishApiModalProps) => {
     <Confirm
       title={`${
         selectKey.length === 1
-          ? `下线 API:${selectKey[0]}(ID)`
+          ? `下线 API: ${selectKey[0].name}(${selectKey[0].id})`
           : `下线以下${selectKey.length}个 API 注意事项`
       }`}
       visible
@@ -117,12 +118,10 @@ const AbolishApiModal = (props: AbolishApiModalProps) => {
       }
     >
       <div>
-        <div tw=" mt-3 ml-9 mb-3">
+        <div tw="mb-3">
           {selectKey.length === 1
-            ? `下线后， API将不可调用， 确认下线API ${selectKey[0]}`
-            : `下线后，与以下 ${
-                get(dataSource, 'entities', [])?.length
-              } 个 API 将不可调用。确认下线？`}
+            ? `下线后， API将不可调用， 确认下线 ${selectKey[0].name} (${selectKey[0].id})`
+            : `下线后，与以下 ${selectKey.length} 个 API 将不可调用。确认下线？`}
         </div>
         {selectKey.length > 1 && (
           <Table

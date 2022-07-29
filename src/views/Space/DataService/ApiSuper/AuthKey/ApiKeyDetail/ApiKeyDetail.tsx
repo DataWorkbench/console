@@ -4,12 +4,18 @@ import tw, { css } from 'twin.macro'
 import { Button, Loading, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 
 import { useState } from 'react'
-import { useQueryListAuthKeys, useMutationListApiServices, useMutationAuthKey } from 'hooks'
+import {
+  useQueryListAuthKeys,
+  useMutationListApiServices,
+  useMutationAuthKey,
+  getQueryKeyListApiServices
+} from 'hooks'
 import { get } from 'lodash-es'
 import { PbmodelAuthKeyEntity } from 'types/types'
 
 import { useParams, useHistory } from 'react-router-dom'
 import { formatDate } from 'utils'
+import { useQueryClient } from 'react-query'
 import { ApiKeyDetailActions } from '../../constants'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
 import BindApiTable from './BindApiTable'
@@ -23,7 +29,7 @@ const { TabPanel } = Tabs as any
 const ApiServiceDetail = (props: { id: string }) => {
   const { id } = props
 
-  const { spaceId } = useParams<{ spaceId: string }>()
+  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
   const history = useHistory()
 
   const [isOpen, setOpen] = useState(true)
@@ -39,8 +45,14 @@ const ApiServiceDetail = (props: { id: string }) => {
 
   const mutation = useMutationListApiServices()
   const authMutation = useMutationAuthKey()
+  const queryClient = useQueryClient()
+
+  const refetchData = () => {
+    queryClient.invalidateQueries(getQueryKeyListApiServices())
+  }
 
   const handleCancel = () => {
+    refetchData()
     setCurOp('')
   }
 
@@ -59,7 +71,7 @@ const ApiServiceDetail = (props: { id: string }) => {
           })
           handleCancel()
           // 回退到列表
-          window.open(`./authKey`)
+          history.push(`/${regionId}/workspace/${spaceId}/dts/authKey`)
         }
       }
     })

@@ -6,7 +6,7 @@ import { Form } from '@QCFE/lego-ui'
 
 import { useQueryClient } from 'react-query'
 import { useRef } from 'react'
-import { nameMatchRegex } from 'utils/convert'
+import { nameMatchRegexMin4Char } from 'utils/convert'
 import { useImmer } from 'use-immer'
 import { PbmodelAuthKeyEntity } from 'types/types'
 import { FormWrapper } from '../styles'
@@ -86,6 +86,7 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
               name="name"
               validateOnBlur
               value={params.name}
+              validateOnChange
               onChange={(v: string) => {
                 setParams((draft) => {
                   draft.name = v
@@ -93,17 +94,12 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
               }}
               schemas={[
                 {
-                  rule: {
-                    required: true,
-                    matchRegex: nameMatchRegex,
-                    maxLength: 50,
-                    minLength: 2
-                  },
+                  rule: (value: string) => nameMatchRegexMin4Char.test(value),
                   status: 'error',
-                  help: '不能为空，长度为 2～50 位。字母、数字或下划线（_）,不能以（_）开始结尾'
+                  help: '请输入英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符'
                 }
               ]}
-              help="最长 50 个字符，支持字母、数字、下划线、中划线。"
+              help="支持英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符"
             />
           </Form>
         </FormWrapper>

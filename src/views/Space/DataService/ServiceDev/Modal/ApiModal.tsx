@@ -9,6 +9,7 @@ import { strlen } from 'utils'
 import { Control, Field, Form, Label, Radio, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
 import { useParams } from 'react-router-dom'
+import { nameMatchRegexMin4Char } from 'utils/convert'
 import ModelItem from './ModeItem'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 import type { CurrentGroupApiProps } from '../ApiPanel/ApiTree'
@@ -268,17 +269,12 @@ const ApiModal = observer((props: JobModalProps) => {
               maxLength={50}
               schemas={[
                 {
-                  rule: (value: string) => {
-                    const l = strlen(value)
-                    return l >= 4 && l <= 50
-                  },
-                  help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
+                  rule: (value: string) => nameMatchRegexMin4Char.test(value),
+                  help: '请输入英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符',
                   status: 'error'
                 }
               ]}
-              help={
-                <>支持中文、英文、数字、下划线（_），且只能以英文或中文开头，长度为 4~50 个字符</>
-              }
+              help="支持英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符"
             />
             <ApiPathField
               label={<AffixLabel required>API路径</AffixLabel>}
@@ -296,10 +292,10 @@ const ApiModal = observer((props: JobModalProps) => {
               schemas={[
                 {
                   rule: (value: string) => {
-                    const reg = /^[a-zA-Z0-9_]{1,200}$/
+                    const reg = /^[a-zA-Z0-9_-]{1,200}$/
                     return reg.test(value)
                   },
-                  help: '请输入1~200 个字符，英文字母、数字、英文格式的下划线',
+                  help: '请输入1~200 个字符，英文字母、数字、下划线（_）、连字符（-）',
                   status: 'error'
                 }
               ]}

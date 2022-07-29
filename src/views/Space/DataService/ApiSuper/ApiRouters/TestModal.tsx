@@ -1,8 +1,11 @@
 import { DargTable, Modal, FlexBox, ModalContent } from 'components'
+import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+
 import {
   useMutationDescribeDataServiceApiVersion,
   useMutationPublishedApiHttpDetails,
-  testPublishApi
+  testPublishApi,
+  useQueryListApiServices
 } from 'hooks'
 import { Button, Input } from '@QCFE/lego-ui'
 import { useColumns } from 'hooks/useHooks/useColumns'
@@ -12,6 +15,7 @@ import { get, isEmpty, omitBy } from 'lodash-es'
 import { PbmodelRoute } from 'types/types'
 import { useMount } from 'react-use'
 import { observer } from 'mobx-react-lite'
+import { useParams } from 'react-router-dom'
 import { TitleItem, TestContent, TableWrapper } from '../../ServiceDev/styled'
 
 import {
@@ -33,17 +37,22 @@ const dataServiceDataLimitSettingKey = 'DATA_SERVICE_API_ROUTER_TEST'
 export const TestModal = observer((props: TestModalProps) => {
   const { onCancel, currentRow } = props
 
+  const { spaceId } = useParams<{ spaceId: string }>()
   const [testSource, setTestSource] = useImmer<any[]>([])
   const [testAuthKey, setTestAuthKey] = useImmer<string>('')
   const [testResponse, setTestResponse] = useImmer<string>('')
   const mutationApiVersion = useMutationDescribeDataServiceApiVersion()
   const mutationPublishApiDetail = useMutationPublishedApiHttpDetails()
+  const { data: serviceData } = useQueryListApiServices({
+    uri: { space_id: spaceId },
+    params: { ids: currentRow?.api_service_id }
+  })
+  const currentService = get(serviceData, 'entities[0]', {})
 
   useMount(() => {
     if (currentRow) {
       const apiId = get(currentRow, 'id')
       const verId = get(currentRow, 'api_version_id')
-
       const params = {
         apiId,
         verId
@@ -76,6 +85,15 @@ export const TestModal = observer((props: TestModalProps) => {
       { verId, request_params: testSource },
       {
         onSuccess: (res) => {
+          if (currentService.auth_key_id !== '' && testAuthKey.length === 0) {
+            Notify.warning({
+              title: '操作提示',
+              content: '请填写密钥',
+              placement: 'bottomRight'
+            })
+            return
+          }
+
           try {
             const method = get(res, 'request_method') === 1 ? 'GET' : 'POST'
             const requestContent = JSON.parse(get(res, 'request_content', ''))
@@ -169,12 +187,14 @@ export const TestModal = observer((props: TestModalProps) => {
                 rowKey="column_name"
               />
             </TableWrapper>
-            <Input
-              tw="mb-3"
-              placeholder="请输入密钥（API所属API服务组详情可查看已绑密钥）"
-              value={testAuthKey}
-              onChange={(_, v) => setTestAuthKey(v as string)}
-            />
+            {currentService.auth_key_id && (
+              <Input
+                tw="mb-3"
+                placeholder="请输入密钥（API所属API服务组详情可查看已绑密钥）"
+                value={testAuthKey}
+                onChange={(_, v) => setTestAuthKey(v as string)}
+              />
+            )}
             <Button type="primary" size="small" onClick={startTest}>
               开始测试
             </Button>

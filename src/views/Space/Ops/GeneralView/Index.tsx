@@ -43,7 +43,7 @@ const Index = () => {
       setCuTotal(calcCluster?.cu_total ?? 0)
       setClusterTotal(calcCluster?.cluster_total ?? 0)
 
-      const commonRelease = [{ name: '调度中' }, { name: '已暂停' }, { name: '已完成' }]
+      const commonRelease = [{ name: '调度中' }, { name: '已下线' }, { name: '已完成' }]
       const statusRelease = ['inline', 'offline', 'finished']
       const devReleaseVal = commonRelease.map((item, index) => ({
         ...item,
