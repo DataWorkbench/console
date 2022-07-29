@@ -16,7 +16,8 @@ import { TextEllipsis } from 'components/TextEllipsis'
 import { isDarkTheme } from 'utils/theme'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { HbaseNameField } from 'components/FieldMappings/HbaseNameField'
-import { fieldTypeMapper } from './constant'
+import { fieldChangeSubject$ } from 'components/FieldMappings/Subjects'
+import { getFieldTypeMapper } from './constant'
 
 const { SelectField, TextField } = Form
 const { MenuItem } = Menu as any
@@ -422,7 +423,7 @@ const MappingItem = (props: MappingItemProps) => {
         ]}
         options={
           typeName
-            ? fieldTypeMapper.get(typeName.toLowerCase())?.map((v) => ({ label: v, value: v }))
+            ? getFieldTypeMapper(typeName.toLowerCase())?.map((v) => ({ label: v, value: v }))
             : []
         }
         onChange={(v: string) =>
@@ -503,6 +504,7 @@ const MappingItem = (props: MappingItemProps) => {
                   if (formRef.current?.validateFields()) {
                     if (!isEmpty(item.type) && !isEmpty(item.name)) {
                       onOk(item, index)
+                      fieldChangeSubject$.next([itemProps.name, item.name])
                     }
                   }
                 }}

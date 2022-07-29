@@ -5,7 +5,9 @@ import {
   HelpCenterLink,
   Modal,
   RouterLink,
-  PopConfirm
+  PopConfirm,
+  Center,
+  ArrowLine
   // TextLink,
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
@@ -63,7 +65,18 @@ const CollapseWrapper = styled('div')(() => [
   `
 ])
 
+const Label = styled('div')(() => [tw`border border-white px-2 py-1 leading-none rounded-[3px]`])
+const getJobTypeName = (type: 1 | 2 | 3) => {
+  const typeNameMap = new Map([
+    [1, '离线 - 全量'],
+    [2, '离线 - 增量'],
+    [3, '实时同步']
+  ])
+  return typeNameMap.get(type)
+}
+
 const styles = {
+  arrowBox: tw`space-x-2 bg-transparent w-[70%] z-10 text-white`,
   stepTag: tw`flex items-center text-left border border-green-11 rounded-r-2xl pr-4 mr-3 h-7 leading-5`,
   stepNum: tw`inline-block text-white bg-green-11 w-5 h-5 text-center rounded-full -ml-2.5`,
   stepText: tw`ml-2 inline-block border-green-11 text-green-11`
@@ -148,6 +161,9 @@ export const intTypes = new Set([
 ])
 
 function setRowExp(rowkeyExpress: string) {
+  if (!rowkeyExpress) {
+    return rowkeyExpress
+  }
   return rowkeyExpress
     .split('_')
     .map((i) => `$(${i})`)
@@ -542,6 +558,7 @@ const SyncJob = () => {
             )}
             {index === 2 && (
               <SyncCluster
+                flinkType={2}
                 ref={clusterRef}
                 clusterId={get(confData, 'cluster_id')}
                 defaultClusterName={get(confData, 'cluster_info.name')}
@@ -560,6 +577,15 @@ const SyncJob = () => {
     const step = stepsData[2]
     return (
       <div tw="h-full">
+        <Center>
+          <Center css={styles.arrowBox}>
+            <Label>来源: {sourceTypeName}</Label>
+            <ArrowLine />
+            <Label>{curJob && getJobTypeName(curJob.type)}</Label>
+            <ArrowLine />
+            <Label>目的: {targetTypeName}</Label>
+          </Center>
+        </Center>
         <div tw="pt-2 flex-1 pb-2 h-[calc(100% - 156px)] overflow-y-auto ">
           <Editor
             language="json"
@@ -673,7 +699,23 @@ const SyncJob = () => {
               脚本模式
             </Button>
           </PopConfirm>
-        ) : null}
+        ) : (
+          <Button
+            onClick={() => {
+              const syncJobScript = editorRef.current?.getValue() ?? ''
+              try {
+                if (typeof JSON.parse(syncJobScript) !== 'object') {
+                  showConfWarn('脚本格式不正确')
+                }
+              } catch (e) {
+                showConfWarn('脚本格式不正确')
+              }
+              // TODO: 调接口
+            }}
+          >
+            语法检查
+          </Button>
+        )}
         <Button onClick={() => save()} loading={mutation.isLoading}>
           <Icon name="data" type="dark" />
           保存

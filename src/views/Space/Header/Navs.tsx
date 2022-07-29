@@ -57,7 +57,7 @@ export const Navs = ({ mod }: NavsProps) => {
           <FuncWrapper key={name} current={mod === name}>
             <Link
               tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
-              to={`/${regionId}/workspace/${spaceId}/${name === 'ops' ? 'ops/release' : name}`}
+              to={`/${regionId}/workspace/${spaceId}/${name === 'ops' ? 'ops/general-view' : name}`}
             >
               {title}
             </Link>

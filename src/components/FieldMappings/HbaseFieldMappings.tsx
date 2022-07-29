@@ -15,6 +15,8 @@ import { useDrag, useDrop, XYCoord } from 'react-dnd'
 // eslint-disable-next-line import/no-cycle
 import { target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { map } from 'rxjs'
+import { fieldChangeSubject$ } from 'components/FieldMappings/Subjects'
+import { filter } from 'rxjs/operators'
 import { AffixLabel } from '../AffixLabel'
 import { FlexBox } from '../Box'
 import { Center } from '../Center'
@@ -166,6 +168,9 @@ interface ValueItem {
 }
 
 const getRowExp = (exp: string) => {
+  if (!exp) {
+    return exp
+  }
   return exp
     .split('_')
     .map((i) => i.slice(2, -1))
@@ -175,7 +180,7 @@ const getRowExp = (exp: string) => {
 // eslint-disable-next-line import/prefer-default-export
 export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   const { sourceColumns = [] } = props
-  const [{ rowKeyString, versionTime, versionIndex }, setJob] = useState({
+  const [{ rowKeyString, versionTime, versionIndex }, setJob] = useImmer({
     rowKeyString: '',
     versionTime: undefined,
     versionIndex: -1
@@ -223,15 +228,12 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   const [rowKeyIds, setRowKeyIds] = useImmer<string[]>([])
 
   useEffect(() => {
-    const r = rowKeyIds.join('_')
     const list = rowKeyString.split('_')
-    if (rowKeyString !== r) {
-      setRowKeyIds(() =>
-        sourceColumns
-          .filter((column: Record<string, any>) => list.includes(column.name))
-          .map((item: Record<string, any>) => item.uuid)
-      )
-    }
+    setRowKeyIds(() =>
+      sourceColumns
+        .filter((column: Record<string, any>) => list.includes(column.name))
+        .map((item: Record<string, any>) => item.uuid)
+    )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowKeyString, setRowKeyIds, sourceColumns])
 
@@ -264,6 +266,30 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
         .filter(Boolean),
     [rowKeyIds, sourceColumns]
   )
+
+  useLayoutEffect(() => {
+    const sub = fieldChangeSubject$
+      .pipe(filter(Boolean))
+      .subscribe(([prev, cur]: [string, string]) => {
+        if (prev === cur || !prev) {
+          return
+        }
+        setJob((draft) => {
+          draft.rowKeyString = draft.rowKeyString
+            .split('_')
+            .map((i) => {
+              if (i === prev) {
+                return cur
+              }
+              return i
+            })
+            .join('_')
+        })
+      })
+    return () => {
+      sub.unsubscribe()
+    }
+  }, [setJob])
 
   useImperativeHandle(ref, () => ({
     getData: () => ({
@@ -361,7 +387,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   }
 
   const [{ isOver: isVersionOver }, versionRef] = useDrop<
-    { uuid: string },
+    { uuid: string; index: number },
     void,
     { isOver: boolean }
   >(() => ({
@@ -369,9 +395,12 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     collect: (monitor) => ({
       isOver: monitor.isOver()
     }),
-    drop: ({ uuid }) => {
+    drop: ({ uuid, index }) => {
       setVersion((draft) => {
         draft.column = uuid
+      })
+      setJob((draft) => {
+        draft.versionIndex = index
       })
     }
   }))
@@ -611,17 +640,22 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     )
   }
 
-  const [{ isOver }, leftRef] = useDrop<{ uuid: string }, void, { isOver: boolean }>(() => ({
-    accept: leftDndType,
-    collect: (monitor) => ({
-      isOver: monitor.isOver()
-    }),
-    drop: ({ uuid }) => {
-      setRowKeyIds((draft) => {
-        draft.push(uuid)
-      })
-    }
-  }))
+  const [{ isOver }, leftRef] = useDrop<{ uuid: string; name: string }, void, { isOver: boolean }>(
+    () => ({
+      accept: leftDndType,
+      collect: (monitor) => ({
+        isOver: monitor.isOver()
+      }),
+      drop: ({ uuid, name }) => {
+        setRowKeyIds((draft) => {
+          draft.push(uuid)
+        })
+        setJob((draft) => {
+          draft.rowKeyString = `${draft.rowKeyString}_${name}`
+        })
+      }
+    })
+  )
 
   function renderAddRowKey() {
     return (

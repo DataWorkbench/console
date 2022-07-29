@@ -133,10 +133,10 @@ target$
         sourceType: e.sourceType,
         data: {
           id: dbTarget?.id,
-          tableName: get(dbTarget, 'table[0]', ''),
-          writeMode: get(dbTarget, 'write_mode', ''),
-          semantic: get(dbTarget, 'semantic', ''),
-          batchSize: get(dbTarget, 'batch_size', ''),
+          tableName: get(dbTarget, 'table[0]'),
+          writeMode: get(dbTarget, 'write_mode'),
+          semantic: get(dbTarget, 'semantic'),
+          batchSize: get(dbTarget, 'batch_size'),
           postSql: get(dbTarget, 'post_sql', ['']),
           preSql: get(dbTarget, 'pre_sql', [''])
         }
@@ -190,7 +190,9 @@ const changeTableName = () =>
     const id = get(value, 'data.id', '')
     const name = get(value, 'data.table[0]') || get(value, 'data.table_list[0]')
     const oldName = get(prevValue, 'data.table[0]') || get(prevValue, 'data.table_list[0]')
-
+    if (!oldName && name) {
+      return true
+    }
     return oldName === name && oldId === id
   })
 
@@ -224,9 +226,17 @@ source$
         topic: get(e, 'data.topic'),
         consumer: get(e, 'data.mode', 'group-offsets'),
         consumerId: get(e, 'data.group_id', 'default'),
-        charset: get(e, 'data.encoding', 'UTF-8'),
-        readType: get(e, 'data.codec', 'text'),
-        config: get(e, 'data.config')
+        charset: get(e, 'data.encoding', 1),
+        readType: get(e, 'data.codec', 1),
+        config: JSON.stringify(
+          get(e, 'data.consumer_settings', {
+            'auto.commit.enable': 'false'
+          }),
+          null,
+          2
+        ),
+        timestamp: get(e, 'data.timestamp'),
+        offset: get(e, 'data.offset')
       }
     })
   )
@@ -234,7 +244,6 @@ source$
 
 const kafkaSourceReadType$ = kafkaSource$.pipe(
   distinctUntilChanged((prev, cur) => {
-    console.log(prev, cur)
     return prev?.id === cur?.id && prev?.readType === cur?.readType
   })
 )

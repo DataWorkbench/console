@@ -71,7 +71,14 @@ const KafkaTargetConfig = forwardRef(
             return {
               id: get(e, 'data.id'),
               topic: get(e, 'data.topic'),
-              config: get(e, 'data.config', `"batch.size": "16384",\n"request.timeout.ms": "30000"`)
+              config: JSON.stringify(
+                get(e, 'data.producer_settings', {
+                  'batch.size': '16384',
+                  'request.timeout.ms': '30000'
+                }),
+                null,
+                2
+              )
             }
           })
         )
@@ -84,9 +91,19 @@ const KafkaTargetConfig = forwardRef(
         }
         return targetForm.current?.validateForm()
       },
-      getData: () => ({
-        ...dbInfo
-      }),
+      getData: () => {
+        let config
+        try {
+          config = JSON.parse(dbInfo?.config)
+        } catch (_) {
+          config = {}
+        }
+        return {
+          id: dbInfo.id,
+          topic: dbInfo.topic,
+          producer_settings: config
+        }
+      },
       refetchColumn: () => {}
     }))
 
@@ -139,6 +156,18 @@ const KafkaTargetConfig = forwardRef(
                 })
               }}
               placeholder="请输入"
+              schemas={[
+                {
+                  rule(v: string) {
+                    try {
+                      JSON.parse(v)
+                    } catch (e) {
+                      return false
+                    }
+                    return true
+                  }
+                }
+              ]}
               help={
                 <HelpCenterLink hasIcon isIframe={false} href="###">
                   参考文档

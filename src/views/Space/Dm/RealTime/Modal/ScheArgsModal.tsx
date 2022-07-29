@@ -324,6 +324,7 @@ const ScheArgsModal = ({ onCancel }: { onCancel: () => void }) => {
         </Loading>
       </DarkModal>
       <ClusterTableModal
+        flinkType={1}
         visible={showCluster}
         selectedIds={[params.clusterId]}
         onCancel={() => setShowCluster(false)}

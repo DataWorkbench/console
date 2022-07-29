@@ -14,6 +14,7 @@ import {
   useMutationAlert,
   useQueryListAlertPolicies
 } from 'hooks/useAlert'
+import { difference } from 'lodash-es'
 
 interface IMonitorAddProps {
   onCancel: () => void
@@ -73,7 +74,7 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
     { pagination: true; sort: true }
   >({ monitor_object: jobType }, { pagination: true, sort: true })
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>(disabledIds ?? [])
   const { data, isFetching, refetch } = useQueryListAlertPolicies({
     uri: {
       space_id: spaceId
@@ -143,9 +144,14 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
       okType={selectedRowKeys.length ? 'primary' : 'hidden'}
       onCancel={onCancel}
       onOk={() => {
+        const ids = difference(selectedRowKeys, disabledIds)
+        if (!ids.length) {
+          onCancel()
+          return
+        }
         mutateAsync({
           op: 'bound',
-          data: { alert_ids: selectedRowKeys },
+          data: { alert_ids: ids },
           uri: { job_id: jobId, space_id: spaceId },
           regionId
         }).then(() => {

@@ -126,11 +126,13 @@ const ClusterTable = observer(
   ({
     selectMode = false,
     onSelect,
-    selectedIds = []
+    selectedIds = [],
+    flinks = []
   }: {
     selectMode?: boolean
     onSelect?: (clusterId?: any[]) => void
     selectedIds?: string[]
+    flinks?: string[]
   }) => {
     const { width } = useWindowSize()
     const {
@@ -438,6 +440,10 @@ const ClusterTable = observer(
       omitBy(filter, (v) => v === '')
     )
     const infos = get(data, 'infos', []) || []
+
+    const disabledIds = selectMode
+      ? infos.filter((i) => !flinks?.includes(i.version)).map((i) => i.id)
+      : []
     // const filterClusterInfos =
     //   infos.filter(
     //     (info: any) =>
@@ -591,6 +597,7 @@ const ClusterTable = observer(
         </div>
         <TableWrapper
           // selectType={selectMode ? 'radio' : 'checkbox'}
+          disabledRowKeys={disabledIds}
           selectType={selectMode && 'radio'}
           dataSource={infos || []}
           loading={isFetching}

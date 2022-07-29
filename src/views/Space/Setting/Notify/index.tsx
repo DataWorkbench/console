@@ -115,7 +115,7 @@ const Notify = observer(() => {
             <InputSearch
               placeholder="请输入关键词进行搜索"
               tw="dark:border-2 dark:rounded-sm dark:border-separator-light"
-              value={filter.search}
+              defaultValue={filter.search}
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
                   draft.search = (e.target as HTMLInputElement).value

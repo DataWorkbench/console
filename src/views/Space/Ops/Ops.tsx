@@ -29,7 +29,7 @@ export const Ops = () => {
       <Sider funcMod="ops" />
       <div tw="flex-1 overflow-y-auto">
         {(mod === 'overview' || !mod) && <OverView />}
-        {((mod === 'release' && !detail) || !mod) && (
+        {mod === 'release' && !detail && (
           <DataReleaseStoreProvider>
             <StreamRelease />
           </DataReleaseStoreProvider>

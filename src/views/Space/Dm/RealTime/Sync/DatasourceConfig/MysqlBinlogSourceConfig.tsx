@@ -16,7 +16,7 @@ import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { map } from 'rxjs'
 
-import { AffixLabel, FlexBox, Center, SelectWithRefresh } from 'components'
+import { AffixLabel, FlexBox, Center, SelectWithRefresh, HelpCenterLink } from 'components'
 import { useQuerySourceTables } from 'hooks'
 import {
   IDataSourceConfigProps,
@@ -139,12 +139,16 @@ const MysqlBinlogSourceConfig = forwardRef(
               filterType: e?.data?.filter ? 2 : 1,
               tableName: get(e, 'data.table[0]', ''),
               updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
-              charset: get(e, 'data.connection-charset', 1),
+              charset: get(e, 'data.connection_charset', 1),
               bufNumber: get(e, 'data.buffer-size', 1024),
               threads: get(e, 'data.parallel-thread-size', 2),
               isGtidMode: get(e, 'data.is_gtid_mode', false),
-              // eslint-disable-next-line no-nested-ternary
-              startType: e?.data?.start?.journal_name ? 2 : e?.data?.start?.timestamp ? 1 : 3,
+              startType: get(
+                e,
+                'data.start_type',
+                // eslint-disable-next-line no-nested-ternary
+                e?.data?.start?.journal_name ? 2 : e?.data?.start?.timestamp ? 1 : 3
+              ),
               startTime: get(e, 'data.start.timestamp'),
               startFile: get(e, 'data.start.journal_name'),
               startPosition: get(e, 'data.start.position')
@@ -187,6 +191,7 @@ const MysqlBinlogSourceConfig = forwardRef(
             position: dbInfo?.startPosition,
             timestamp: parseInt(dbInfo?.startTime, 10)
           },
+          start_type: dbInfo?.startType,
           connection_charset: dbInfo?.charset,
           parallel_thread_size: dbInfo?.threads,
           is_gtid_mode: dbInfo?.isGtidMode
@@ -277,7 +282,7 @@ const MysqlBinlogSourceConfig = forwardRef(
         {renderCommon()}
         {!!dbInfo?.id && (
           <>
-            {true && (
+            {
               <SelectWithRefresh
                 name="tableName"
                 label={
@@ -299,12 +304,25 @@ const MysqlBinlogSourceConfig = forwardRef(
                 schemas={[
                   {
                     rule: { required: true },
-                    help: '请选择数据源表',
+                    help: (
+                      <div>
+                        <span>不能为空, </span>
+                        <span tw="text-font-placeholder mr-1">详见</span>
+                        <HelpCenterLink hasIcon isIframe={false} href="###">
+                          MySQL（MySQL Binlog）Source 配置文档
+                        </HelpCenterLink>
+                      </div>
+                    ),
                     status: 'error'
                   }
                 ]}
+                help={
+                  <HelpCenterLink hasIcon isIframe={false} href="##">
+                    MySQL（MySQL Binlog）Source 配置文档
+                  </HelpCenterLink>
+                }
               />
-            )}
+            }
             {dbInfo?.filterType === 2 && (
               <TextField
                 name="filter"
@@ -360,9 +378,12 @@ const MysqlBinlogSourceConfig = forwardRef(
               ]}
             />
             {dbInfo?.startType === 1 && (
-              <TextField
+              <NumberField
                 label={<AffixLabel required={false}>指定时间戳</AffixLabel>}
                 name="startTime"
+                min={1}
+                step={1}
+                showButton={false}
                 value={dbInfo?.startTime}
                 onChange={(e: string) => {
                   setDbInfo((draft) => {

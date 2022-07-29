@@ -26,10 +26,11 @@ interface ITagsProps {
   list: Record<string, any>[]
   handleAdd: (record: Record<string, any>, roleId: string) => void
   handleRemove: (record: Record<string, any>, roleId: string, reset: Function) => void
+  isOwner?: boolean
 }
 
 const Tags = (props: ITagsProps) => {
-  const { handleRemove, data, list, handleAdd } = props
+  const { handleRemove, data, list, handleAdd, isOwner = false } = props
   const { system_roles: systemRoles } = data
   const addTag = (text?: string | number, tagStyle?: SerializedStyles) => (
     <Tag
@@ -95,7 +96,7 @@ const Tags = (props: ITagsProps) => {
               </div>
             ))}
 
-            {!!rest.length && (
+            {isOwner && !!rest.length && (
               <Tooltip
                 theme="light"
                 interactive
