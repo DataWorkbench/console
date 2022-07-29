@@ -14,30 +14,21 @@ import {
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { set, range, trim, filter, assign, flatten, pick, keys } from 'lodash-es'
+import { set, range, trim, filter, assign, pick, keys } from 'lodash-es'
 import { useQueryClient } from 'react-query'
 import Tippy from '@tippyjs/react'
 import dayjs from 'dayjs'
-import {
-  useStore,
-  useQueryFlinkVersions,
-  useInfiniteQueryNetworks,
-  useMutationCluster,
-  getFlinkClusterKey,
-  getNetworkKey
-} from 'hooks'
+import { useStore, useQueryFlinkVersions, useMutationCluster, getFlinkClusterKey } from 'hooks'
 import {
   Modal,
   FlexBox,
   Center,
   KVTextAreaField,
   AffixLabel,
-  SelectWithRefresh,
   HelpCenterLink,
   TextLink
 } from 'components'
 import { strlen, nameMatchRegex } from 'utils/convert'
-import { NetworkModal } from 'views/Space/Dm/Network'
 import { Button } from '@QCFE/qingcloud-portal-ui'
 
 const { CollapseItem } = Collapse
@@ -140,24 +131,18 @@ const defaultParams = {
 
 const ClusterModal = observer(({ opCluster }: { opCluster: typeof defaultParams }) => {
   const {
-    dmStore: { setOp, op },
-    dmStore
+    dmStore: { setOp, op }
   } = useStore()
 
   const [params, setParams] = useImmer(
     opCluster ? pick(opCluster, keys(defaultParams).concat(['created'])) : defaultParams
   )
   const baseFormRef = useRef<Form>(null)
-  const networkFormRef = useRef<Form>(null)
   const optFormRef = useRef<Form>(null)
 
   const queryClient = useQueryClient()
   const { data: flinkVersions } = useQueryFlinkVersions()
-  const networksRet = useInfiniteQueryNetworks({
-    offset: 0,
-    limit: 100
-  })
-  const networks = flatten(networksRet.data?.pages.map((page) => page.infos || []))
+
   const mutation = useMutationCluster()
   const totalCU = params.task_num * params.task_cu + params.job_cu
   const viewMode = op === 'view'
@@ -639,79 +624,6 @@ const ClusterModal = observer(({ opCluster }: { opCluster: typeof defaultParams 
                 </Field>
               </Form>
             </CollapseItem>
-            {false && (
-              <CollapseItem
-                key="p3"
-                label={
-                  <FlexBox tw="items-center space-x-1">
-                    <Icon name="record" tw="(relative top-0 left-0)!" type="light" />
-                    <span>网络配置</span>
-                  </FlexBox>
-                }
-              >
-                <Form ref={networkFormRef} layout="column">
-                  <SelectWithRefresh
-                    label={<AffixLabel tw="font-medium text-sm">网络配置</AffixLabel>}
-                    name="network_id"
-                    value={params.network_id}
-                    validateOnChange
-                    disabled={viewMode}
-                    onChange={(v: string) => {
-                      setParams((draft) => {
-                        draft.network_id = v
-                      })
-                    }}
-                    onRefresh={() => {
-                      queryClient.invalidateQueries(getNetworkKey())
-                    }}
-                    schemas={[
-                      {
-                        rule: {
-                          required: true,
-                          isExisty: false
-                        },
-                        status: 'error',
-                        help: (
-                          <>
-                            请选择网络,如需选择新的 VPC，您可以
-                            <span
-                              tw="text-green-11 cursor-pointer"
-                              onClick={() => dmStore.setNetWorkOp('create')}
-                            >
-                              绑定 VPC
-                            </span>
-                          </>
-                        )
-                      }
-                    ]}
-                    options={networks.map(({ name, id }) => ({
-                      label: name,
-                      value: id
-                    }))}
-                    isLoading={networksRet.isFetching}
-                    isLoadingAtBottom
-                    searchable={false}
-                    onMenuScrollToBottom={() => {
-                      if (networksRet.hasNextPage) {
-                        networksRet.fetchNextPage()
-                      }
-                    }}
-                    bottomTextVisible
-                    help={
-                      <div>
-                        如需选择新的 VPC，您可以
-                        <span
-                          tw="text-green-11 cursor-pointer"
-                          onClick={() => dmStore.setNetWorkOp('create')}
-                        >
-                          绑定 VPC
-                        </span>
-                      </div>
-                    }
-                  />
-                </Form>
-              </CollapseItem>
-            )}
             <CollapseItem
               key="p4"
               label={
@@ -940,7 +852,6 @@ key02:value02`}
           )}
         </div>
       </FlexBox>
-      {dmStore.networkOp === 'create' && <NetworkModal appendToBody />}
     </Modal>
   )
 })
