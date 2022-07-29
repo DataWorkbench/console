@@ -230,6 +230,7 @@ const Member = observer(
             <div tw="overflow-auto">
               <Tags
                 data={record}
+                isOwner={isOwner}
                 list={roleList?.infos || []}
                 handleAdd={handleAddRole}
                 handleRemove={handleRemoveRole}
@@ -249,6 +250,7 @@ const Member = observer(
         }
       }),
       [
+        isOwner,
         filter.filter,
         filter.reverse,
         filter.sort_by,
