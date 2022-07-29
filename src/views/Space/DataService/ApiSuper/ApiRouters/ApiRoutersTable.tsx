@@ -46,6 +46,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     columnSettingsKey
   )
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+  const [selectedRows, setSelectedRows] = useState<{ id: string; name: string }[]>([])
 
   const { isRefetching, data } = useQueryListRoutes({
     uri: { space_id: spaceId },
@@ -64,6 +65,12 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
   const handleMenuClick = (row: PbmodelRoute, key: string) => {
     if (key === 'stop') {
       setSelectedRowKeys([row.id])
+      setSelectedRows([
+        {
+          id: row.id,
+          name: row.name
+        }
+      ])
     } else if (key === 'detail') {
       window.open(`../serviceDev`, '_blank')
     }
@@ -218,8 +225,9 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
       <Table
         selectType="checkbox"
         selectedRowKeys={selectedRowKeys}
-        onSelect={(keys: string[]) => {
+        onSelect={(keys: string[], row: any[]) => {
           setSelectedRowKeys(keys)
+          setSelectedRows(row.map((item) => ({ id: item.id, name: item.name })))
         }}
         dataSource={dataSource}
         loading={isRefetching}
@@ -232,7 +240,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
         onSort={sort}
       />
 
-      {curOp === 'stop' && <AbolishApiModal selectKey={selectedRowKeys} onCancel={handleCancel} />}
+      {curOp === 'stop' && <AbolishApiModal selectKey={selectedRows} onCancel={handleCancel} />}
       {curOp === 'test' && <TestModal currentRow={currentRow} onCancel={handleCancel} />}
     </FlexBox>
   )
