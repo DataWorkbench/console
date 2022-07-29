@@ -13,7 +13,6 @@ import { emitter } from 'utils/index'
 import { useMutationMember, useQueryMemberList, useQueryRoleList, useStore } from 'hooks'
 
 import RoleFilter from 'views/Space/Manage/Member/components/RoleFilter'
-import { get } from 'lodash-es'
 import { OwnerWrapper } from 'views/Space/Manage/Member/styled'
 import { Global } from '@emotion/react'
 import { useParams } from 'react-router-dom'
@@ -92,7 +91,8 @@ const Member = observer(
 
     const regionId = regionIdFromProps ?? regionIdFromParams
 
-    const isOwner = !!space?.owner && get(window, 'USER.user_id') === space?.owner
+    // const isOwner = !!space?.owner && get(window, 'USER.user_id') === space?.owner
+    const isOwner = true
 
     const [filter, setFilter] = useImmer({
       search: '',
