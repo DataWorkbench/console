@@ -143,11 +143,11 @@ const ApiGroupTable = (props: ApiGroupTableProps) => {
         </NameWrapper>
       )
     },
-    [getName('domain')]: {
-      render: (v: number, row: any) => (
-        <span tw="dark:text-neut-0">{`http://${v}${row.pre_path}`}</span>
-      )
-    },
+    // [getName('domain')]: {
+    //   render: (v: number, row: any) => (
+    //     <span tw="dark:text-neut-0">{`http://${v}${row.pre_path}`}</span>
+    //   )
+    // },
     [getName('update_time')]: {
       ...getSort(getName('update_time')),
       render: (v: number) => <span tw="dark:text-neut-0">{formatDate(v)}</span>

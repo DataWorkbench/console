@@ -38,8 +38,6 @@ const ServiceDev = observer(() => {
     })
   })
   useMount(() => {
-    console.log('detail', detail)
-
     // 存在历史版本
     if (detail) {
       const params = {
