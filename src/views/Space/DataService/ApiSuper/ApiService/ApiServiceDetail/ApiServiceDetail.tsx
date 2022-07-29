@@ -112,7 +112,7 @@ const ApiServiceDetail = (props: { id: string }) => {
         <CollapsePanel visible={isOpen} tw="bg-transparent">
           <div tw="flex-auto grid grid-cols-3 border-t border-neut-15 py-3">
             <GridItem labelWidth={60}>
-              <span>域名 ID:</span>
+              <span>域名:</span>
               <span>{detail?.id}</span>
               <span>路径:</span>
               <span>{detail?.pre_path}</span>

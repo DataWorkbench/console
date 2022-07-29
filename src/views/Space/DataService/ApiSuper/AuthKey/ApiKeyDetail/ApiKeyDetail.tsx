@@ -13,7 +13,7 @@ import { formatDate } from 'utils'
 import { ApiKeyDetailActions } from '../../constants'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
 import BindApiTable from './BindApiTable'
-import SelectApiServiceModal from '../SelectApiServiceModal'
+import SelectApiServiceModal from './SelectApiServiceModal'
 import AuthKeyModal from '../AuthKeyModal'
 
 const { CollapsePanel } = Collapse
