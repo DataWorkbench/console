@@ -4,12 +4,18 @@ import tw, { css } from 'twin.macro'
 import { Button, Loading, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 
 import { useState } from 'react'
-import { useQueryListAuthKeys, useMutationListApiServices, useMutationAuthKey } from 'hooks'
+import {
+  useQueryListAuthKeys,
+  useMutationListApiServices,
+  useMutationAuthKey,
+  getQueryKeyListApiServices
+} from 'hooks'
 import { get } from 'lodash-es'
 import { PbmodelAuthKeyEntity } from 'types/types'
 
 import { useParams, useHistory } from 'react-router-dom'
 import { formatDate } from 'utils'
+import { useQueryClient } from 'react-query'
 import { ApiKeyDetailActions } from '../../constants'
 import { HorizonTabs, GridItem, Circle, CopyTextWrapper, Root } from '../../styles'
 import BindApiTable from './BindApiTable'
@@ -39,8 +45,14 @@ const ApiServiceDetail = (props: { id: string }) => {
 
   const mutation = useMutationListApiServices()
   const authMutation = useMutationAuthKey()
+  const queryClient = useQueryClient()
+
+  const refetchData = () => {
+    queryClient.invalidateQueries(getQueryKeyListApiServices())
+  }
 
   const handleCancel = () => {
+    refetchData()
     setCurOp('')
   }
 
