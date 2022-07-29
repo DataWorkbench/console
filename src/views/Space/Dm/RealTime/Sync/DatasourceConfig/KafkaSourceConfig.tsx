@@ -19,7 +19,16 @@ import { Icon } from '@QCFE/lego-ui'
 import { kafkaSource$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 
-type FieldKeys = 'topic' | 'id' | 'consumer' | 'consumerId' | 'charset' | 'readType' | 'config'
+type FieldKeys =
+  | 'topic'
+  | 'id'
+  | 'consumer'
+  | 'consumerId'
+  | 'charset'
+  | 'readType'
+  | 'config'
+  | 'offset'
+  | 'timestamp'
 
 const consumers = {
   'group-offsets': '从 ZK/Kafka borders 中指定的消费组已经提交的 offset 开始消费',
@@ -29,17 +38,17 @@ const consumers = {
   'specific-offsets': '从每个分区的指定偏移量开始'
 }
 
-const readType = ['text', 'json'].map((i) => ({
+const readType = ['text', 'json'].map((i, index) => ({
   label: i,
-  value: i
+  value: index + 1
 }))
 
-const consumerOptions = Object.keys(consumers).map((i) => ({
+const consumerOptions = Object.keys(consumers).map((i, index) => ({
   label: i,
-  value: i
+  value: index + 1
 }))
 
-const { TextField, SelectField, RadioGroupField, TextAreaField } = Form
+const { TextField, SelectField, RadioGroupField, NumberField, TextAreaField } = Form
 const styles = {
   arrowBox: tw`space-x-2 bg-neut-17 w-[70%] z-10`,
   dashedBox: tw`border border-dashed rounded-md border-neut-13 py-0`,
@@ -111,14 +120,24 @@ const KafkaSourceConfig = forwardRef(
         }
         return sourceForm.current?.validateForm()
       },
-      getData: () => ({
-        topic: dbInfo.topic,
-        mode: dbInfo.consumer,
-        group_id: dbInfo.consumerId,
-        encoding: dbInfo.charset,
-        codec: dbInfo.readType,
-        config: dbInfo.config
-      }),
+      getData: () => {
+        let config
+        try {
+          config = JSON.parse(dbInfo?.config)
+        } catch (_) {
+          config = {}
+        }
+        return {
+          topic: dbInfo.topic,
+          mode: dbInfo.consumer,
+          group_id: dbInfo.consumerId,
+          encoding: dbInfo.charset,
+          codec: dbInfo.readType,
+          consumer_settings: config,
+          offset: dbInfo.offset,
+          timestamp: dbInfo.timestamp
+        }
+      },
       refetchColumn: () => {
         if (dbInfo?.id) {
           refetch()
@@ -192,6 +211,50 @@ const KafkaSourceConfig = forwardRef(
                 }
               ]}
             />
+            {dbInfo?.consumer === 'timestamp' && (
+              <NumberField
+                label={<AffixLabel required>timestamp</AffixLabel>}
+                name="timestamp"
+                min={0}
+                step={1}
+                validateOnChange
+                showButton={false}
+                value={dbInfo?.timestamp}
+                onChange={(e) => {
+                  setDbInfo((draft) => {
+                    draft.timestamp = e
+                  })
+                }}
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请输入 timestamp',
+                    status: 'error'
+                  }
+                ]}
+              />
+            )}
+            {dbInfo.consumer === 'specific-offsets' && (
+              <TextField
+                label={<AffixLabel required>offset</AffixLabel>}
+                name="offset"
+                value={dbInfo?.offset}
+                onChange={(e) => {
+                  setDbInfo((draft) => {
+                    draft.offset = e
+                  })
+                }}
+                placeholder="partition:0,offset:42;partition:1,offset:300;partition:2,offset:30"
+                validateOnChange
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '请输入 offset',
+                    status: 'error'
+                  }
+                ]}
+              />
+            )}
             <TextField
               label={<AffixLabel required>消费组 ID</AffixLabel>}
               name="consumerId"
@@ -218,11 +281,11 @@ const KafkaSourceConfig = forwardRef(
               options={[
                 {
                   label: 'UTF-8',
-                  value: 'UTF-8'
+                  value: 1
                 },
                 {
                   label: 'GBK',
-                  value: 'BGK'
+                  value: 2
                 }
               ]}
               value={dbInfo?.charset}
