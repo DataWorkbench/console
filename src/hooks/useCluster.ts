@@ -9,7 +9,8 @@ import {
   startFlinkClusters,
   stopFlinkClusters,
   describeResourceBinding,
-  getDescribeFlinkCluster
+  getDescribeFlinkCluster,
+  restartFlinkClusters
 } from 'stores/api'
 import { get, omit } from 'lodash-es'
 
@@ -109,6 +110,8 @@ export const useMutationCluster = () => {
       ret = await startFlinkClusters(params)
     } else if (op === 'stop') {
       ret = await stopFlinkClusters(params)
+    } else if (op === 'restart') {
+      ret = await restartFlinkClusters(params)
     }
     return ret
   })

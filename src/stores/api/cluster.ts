@@ -55,6 +55,14 @@ export const stopFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
     method: 'POST'
   })
 
+export const restartFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/cluster/flink/restarts`,
+    body: { cluster_ids: clusterIds },
+    method: 'POST'
+  })
+
 export const startFlinkClusters = ({ regionId, spaceId, clusterIds }: IParams) =>
   request({
     region: regionId,
