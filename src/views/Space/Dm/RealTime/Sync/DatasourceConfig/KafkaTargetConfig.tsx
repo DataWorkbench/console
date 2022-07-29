@@ -71,13 +71,13 @@ const KafkaTargetConfig = forwardRef(
             return {
               id: get(e, 'data.id'),
               topic: get(e, 'data.topic'),
-              config: get(
-                e,
-                'data.producer_settings',
-                `{
-  "batch.size": "16384",
-  "request.timeout.ms": "30000"
-}`
+              config: JSON.stringify(
+                get(e, 'data.producer_settings', {
+                  'batch.size': '16384',
+                  'request.timeout.ms': '30000'
+                }),
+                null,
+                2
               )
             }
           })

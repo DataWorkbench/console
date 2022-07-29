@@ -226,9 +226,15 @@ source$
         topic: get(e, 'data.topic'),
         consumer: get(e, 'data.mode', 'group-offsets'),
         consumerId: get(e, 'data.group_id', 'default'),
-        charset: get(e, 'data.encoding', 'UTF-8'),
-        readType: get(e, 'data.codec', 'text'),
-        config: get(e, 'data.config')
+        charset: get(e, 'data.encoding', 1),
+        readType: get(e, 'data.codec', 1),
+        config: JSON.stringify(
+          get(e, 'data.consumer_settings', {
+            'auto.commit.enable': 'false'
+          }),
+          null,
+          2
+        )
       }
     })
   )
