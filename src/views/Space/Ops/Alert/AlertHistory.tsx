@@ -79,7 +79,7 @@ const AlertHistory = () => {
           name={text}
           css={instanceNameStyle}
           onClick={() => {
-            history.push(`../alert-policy/${text}`)
+            history.push(`./alert-policy/${text}`)
           }}
         />
       )
@@ -87,7 +87,7 @@ const AlertHistory = () => {
     [getName('job_id')]: {
       render: (id: string, record: Record<string, any>) => {
         const pathType = record.monitor_object === 1 ? 'release' : 'data-release'
-        const path = `../${pathType}/${id}?version=${record.version}`
+        const path = `./${pathType}/${id}?version=${record.version}`
         return (
           <InstanceName
             theme="dark"
@@ -101,7 +101,7 @@ const AlertHistory = () => {
     },
     [getName('instance_id')]: {
       render: (id: string, record: Record<string, any>) => {
-        const path = `../data-job/${id}`
+        const path = `./data-job/${id}`
         return (
           <InstanceName
             theme="dark"
