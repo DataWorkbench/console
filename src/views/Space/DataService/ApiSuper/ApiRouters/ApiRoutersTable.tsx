@@ -58,8 +58,13 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     queryClient.invalidateQueries(getQueryKeyListRoutes())
   }
 
-  const toServiceDev = (row: any) => {
-    window.open(`./serviceDev/${row.id}?verId=${row.api_version_id}`)
+  const toServiceDev = (row: any, isHaveServeId: boolean) => {
+    if (isHaveServeId) {
+      window.open(`./serviceDev/${row.id}?verId=${row.api_version_id}`)
+    } else {
+      // api 服务组中 已发布api 跳转地址
+      window.open(`../serviceDev/${row.id}?verId=${row.api_version_id}`)
+    }
   }
 
   const handleMenuClick = (row: PbmodelRoute, key: string) => {
@@ -72,7 +77,7 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
         }
       ])
     } else if (key === 'detail') {
-      window.open(`../serviceDev`, '_blank')
+      window.open(`../serviceDev/${row.id}?verId=${row.api_version_id}`)
     }
     setOp(key)
     setCurrentRow(row)
@@ -114,11 +119,8 @@ const ApiGroupTable = ({ apiServiceId }: ApiRouterTableProps) => {
     [getName('name')]: {
       render: (v: any, row: any) => (
         <NameWrapper
-          isHover={!apiServiceId}
           onClick={() => {
-            if (!apiServiceId) {
-              toServiceDev(row)
-            }
+            toServiceDev(row, !apiServiceId)
           }}
         >
           <FlexBox tw="items-center space-x-1 truncate">

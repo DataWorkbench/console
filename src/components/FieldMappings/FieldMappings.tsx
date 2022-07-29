@@ -246,8 +246,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const hbaseRef = useRef<{ getData: () => Record<string, any>[] }>(null)
 
   const kafkaReadType = kafkaSource$.getValue()?.readType
-  const isKafkaSource =
-    (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 'text'
+  const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 1
   const isKafkaTarget = (rightTypeName as any).getType() === SourceType.Kafka
   const isHbaseTarget = (rightTypeName as any).getType() === SourceType.HBase
   const isHbaseSource = (leftTypeName as any).getType() === SourceType.HBase

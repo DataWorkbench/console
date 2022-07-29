@@ -136,6 +136,7 @@ const SyncJob = observer(() => {
     dtsDevStore: { curApi, apiConfigData, apiRequestData, apiResponseData },
     dtsDevStore
   } = useStore()
+  const requestConfig = cloneDeep(apiRequestData) as any[]
 
   const isHistory = get(curApi, 'is_history', false) || false
   const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
@@ -199,6 +200,9 @@ const SyncJob = observer(() => {
       ...cloneDeep(apiConfigData),
       api_config: {
         ...cloneDeep(apiConfigData?.api_config),
+        request_params: {
+          request_params: requestConfig
+        },
         response_params: {
           response_params: response
         }
@@ -263,7 +267,7 @@ const SyncJob = observer(() => {
           datasource_id: dataSourceData?.source?.id,
           table_name: dataSourceData?.tableName,
           request_params: {
-            request_params: apiRequestData
+            request_params: requestConfig
           },
           response_params: {
             response_params: response
