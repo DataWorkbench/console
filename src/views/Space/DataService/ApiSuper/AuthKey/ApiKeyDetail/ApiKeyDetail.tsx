@@ -29,7 +29,7 @@ const { TabPanel } = Tabs as any
 const ApiServiceDetail = (props: { id: string }) => {
   const { id } = props
 
-  const { spaceId } = useParams<{ spaceId: string }>()
+  const { spaceId, regionId } = useParams<{ spaceId: string; regionId: string }>()
   const history = useHistory()
 
   const [isOpen, setOpen] = useState(true)
@@ -71,7 +71,7 @@ const ApiServiceDetail = (props: { id: string }) => {
           })
           handleCancel()
           // 回退到列表
-          window.open(`./authKey`)
+          history.push(`/${regionId}/workspace/${spaceId}/dts/authKey`)
         }
       }
     })
