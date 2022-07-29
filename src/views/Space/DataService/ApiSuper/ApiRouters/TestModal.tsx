@@ -80,20 +80,20 @@ export const TestModal = observer((props: TestModalProps) => {
   }
 
   const startTest = () => {
+    if (currentService.auth_key_id !== '' && testAuthKey.length === 0) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请填写密钥',
+        placement: 'bottomRight'
+      })
+      return
+    }
+
     const verId = get(currentRow, 'api_version_id')
     mutationPublishApiDetail.mutate(
       { verId, request_params: testSource },
       {
         onSuccess: (res) => {
-          if (currentService.auth_key_id !== '' && testAuthKey.length === 0) {
-            Notify.warning({
-              title: '操作提示',
-              content: '请填写密钥',
-              placement: 'bottomRight'
-            })
-            return
-          }
-
           try {
             const method = get(res, 'request_method') === 1 ? 'GET' : 'POST'
             const requestContent = JSON.parse(get(res, 'request_content', ''))

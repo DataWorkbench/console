@@ -81,7 +81,7 @@ const AuthKeyModal = (props: AuthKeyModalProps) => {
       width={1200}
       height={800}
       draggable
-      okText="确认"
+      okText="绑定"
       appendToBody
     >
       <ApiGroupTable onSelect={onSelect} selectRowKeys={rowKeys} />
