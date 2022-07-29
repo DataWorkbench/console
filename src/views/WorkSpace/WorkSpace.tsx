@@ -71,7 +71,7 @@ const getMapPlatformRoute =
   }
 
 // const adminRoutes = ['network', 'members', 'permissions']
-const unAdminRoutes = ['network', 'permissions']
+const unAdminRoutes = ['network', 'members', 'permissions']
 const getMapAdminRoute =
   (isAdmin: boolean) =>
   (item: RouteListType): RouteListType => {

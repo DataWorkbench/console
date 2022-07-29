@@ -236,7 +236,7 @@ source$
           2
         ),
         timestamp: get(e, 'data.timestamp'),
-        offset: get(e, 'data.timestamp')
+        offset: get(e, 'data.offset')
       }
     })
   )
