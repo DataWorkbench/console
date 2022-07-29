@@ -211,7 +211,7 @@ const KafkaSourceConfig = forwardRef(
                 }
               ]}
             />
-            {dbInfo?.consumer === 'timestamp' && (
+            {dbInfo?.consumer === 4 && (
               <NumberField
                 label={<AffixLabel required>timestamp</AffixLabel>}
                 name="timestamp"
@@ -234,7 +234,7 @@ const KafkaSourceConfig = forwardRef(
                 ]}
               />
             )}
-            {dbInfo.consumer === 'specific-offsets' && (
+            {dbInfo.consumer === 5 && (
               <TextField
                 label={<AffixLabel required>offset</AffixLabel>}
                 name="offset"
