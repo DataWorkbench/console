@@ -355,10 +355,8 @@ export const JobModal = observer((props: JobModalProps) => {
                               {
                                 rule: (value: SyncTypeVal) => {
                                   if (
-                                    (value.type === 'full' &&
-                                      (value.fullSource === '' || value.fullSink === '')) ||
-                                    (value.type === 'incr' &&
-                                      (value.incrSource === '' || value.incrSink === ''))
+                                    (value.type === 'full' && value.fullSource === '') ||
+                                    (value.type === 'incr' && value.incrSource === '')
                                   ) {
                                     return false
                                   }
@@ -366,7 +364,31 @@ export const JobModal = observer((props: JobModalProps) => {
                                 },
                                 help: (
                                   <Center>
-                                    <div tw="mr-1.5 pt-[1px]">请选择同步数据源信息</div>
+                                    <div tw="mr-1.5 pt-[1px]">请选择同步来源数据源信息</div>
+                                    <HelpCenterLink
+                                      hasIcon
+                                      isIframe={false}
+                                      href="/manual/integration_job/sync_type/#全量同步与增量同步支持的数据源类型"
+                                    >
+                                      支持数据源
+                                    </HelpCenterLink>
+                                  </Center>
+                                ),
+                                status: 'error'
+                              },
+                              {
+                                rule: (value: SyncTypeVal) => {
+                                  if (
+                                    (value.type === 'full' && value.fullSink === '') ||
+                                    (value.type === 'incr' && value.incrSink === '')
+                                  ) {
+                                    return false
+                                  }
+                                  return true
+                                },
+                                help: (
+                                  <Center>
+                                    <div tw="mr-1.5 pt-[1px]">请选择同步目的数据源信息</div>
                                     <HelpCenterLink
                                       hasIcon
                                       isIframe={false}
@@ -395,18 +417,30 @@ export const JobModal = observer((props: JobModalProps) => {
                             schemas={[
                               {
                                 rule: ({
-                                  sourceType,
-                                  targetType
+                                  sourceType
                                 }: {
                                   sourceType?: string
-                                  targetType?: string
                                 } = {}) => {
-                                  if (!sourceType || !targetType) {
+                                  if (!sourceType) {
                                     return false
                                   }
                                   return true
                                 },
-                                help: '请选择同步数据源信息',
+                                help: '请选择同步来源数据源信息',
+                                status: 'error'
+                              },
+                              {
+                                rule: ({
+                                  targetType
+                                }: {
+                                  targetType?: string
+                                } = {}) => {
+                                  if (!targetType) {
+                                    return false
+                                  }
+                                  return true
+                                },
+                                help: '请选择同步目的数据源信息',
                                 status: 'error'
                               }
                             ]}
