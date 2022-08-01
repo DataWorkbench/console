@@ -50,7 +50,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
             startRowKey: get(e, 'data.start_row_key'),
             endRowKey: get(e, 'data.end_row_key'),
             isBinaryRowKey: get(e, 'data.is_binary_rowkey', true),
-            encoding: get(e, 'data.encoding', 'UTF-8'),
+            encoding: get(e, 'data.encoding', 1),
             scanCacheSize: get(e, 'data.scan_cache_size', 256),
             scanBatchSize: get(e, 'data.scan_batch_size', 100),
             readMode: get(e, 'data.read_mode', 'normal')
@@ -239,8 +239,8 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                * GBK = 2;
                */
               [
-                { label: 'UTF-8', value: 'UTF-8' },
-                { label: 'GBK', value: 'GBK' }
+                { label: 'UTF-8', value: 1 },
+                { label: 'GBK', value: 2 }
               ]
             }
             validateOnChange
