@@ -1,9 +1,9 @@
 import { DataServiceManageDescribeApiConfigType } from 'types/response'
 import { get } from 'lodash-es'
-import { FieldCategory, ParameterOperator, ParameterPosition } from '../constants'
+import { FieldCategory, ParameterOperator, ParameterPosition, typeStatus } from '../constants'
 
 export interface Schema {
-  type: string
+  param_type: string
   name: string
   is_primary: boolean
 }
@@ -26,7 +26,7 @@ const defaultRequestHighSource = [
   {
     column_name: 'limit',
     param_name: 'limit',
-    data_type: 1,
+    data_type: 2,
     type: 'INT',
     param_operator: ParameterOperator.EQUAL,
     param_position: ParameterPosition.QUERY,
@@ -39,7 +39,7 @@ const defaultRequestHighSource = [
   {
     column_name: 'offset',
     param_name: 'offset',
-    data_type: 1,
+    data_type: 2,
     type: 'INT',
     param_operator: ParameterOperator.EQUAL,
     param_position: ParameterPosition.QUERY,
@@ -56,7 +56,7 @@ const defaultResponseHighSource = [
     param_name: 'total',
     column_name: 'total',
     type: 'INT',
-    data_type: 1,
+    data_type: 2,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
     example_value: '245',
@@ -67,7 +67,7 @@ const defaultResponseHighSource = [
     param_name: 'limit',
     column_name: 'limit',
     type: 'INT',
-    data_type: 1,
+    data_type: 2,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
     example_value: '100',
@@ -78,7 +78,7 @@ const defaultResponseHighSource = [
     param_name: 'offset',
     column_name: 'offset',
     type: 'INT',
-    data_type: 1,
+    data_type: 2,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
     example_value: '200',
@@ -89,7 +89,7 @@ const defaultResponseHighSource = [
     param_name: 'next_offset',
     column_name: 'next_offset',
     type: 'INT',
-    data_type: 1,
+    data_type: 2,
     is_required: false,
     field_category: FieldCategory.PAGECONFIG,
     example_value: '0',
@@ -106,7 +106,7 @@ export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[]
     field: column.name,
     isRequest: false,
     isResponse: false,
-    type: column.type,
+    type: column.param_type,
     isPrimary: column.is_primary
   }))
 
@@ -114,11 +114,13 @@ export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[]
  * 根据请求参数和响应参数进行处理字段设置的请求和返回数据
  * @param apiConfig api配置
  * @param schema 数据源表字段
+ * @param isMapReqOrRes 是否需要映射请求参数和响应参数
  * @returns
  */
 export const configMapFieldData = (
   apiConfig: DataServiceManageDescribeApiConfigType | null,
-  schema: Schema[]
+  schema: Schema[],
+  isMapReqOrRes: boolean
 ) => {
   const requestConfig = get(apiConfig, 'api_config.request_params.request_params', [])
   const responseConfig = get(apiConfig, 'api_config.response_params.response_params', [])
@@ -134,6 +136,11 @@ export const configMapFieldData = (
 
   const fieldSettingData = getFieldSettingParamsData(schema)
 
+  // 已经更换了数据源表  apiConfigData.api_config.Table_Name ！== oldApiTableNam 了
+  if (!isMapReqOrRes) {
+    return fieldSettingData
+  }
+
   return fieldSettingData?.map((item) => {
     const isRequest = requestMap.get(item.field)
     const isResponse = responseMap.get(item.field)
@@ -147,17 +154,17 @@ export const configMapFieldData = (
 }
 
 // 字段类型映射
-const fieldTypeMapping: Map<string, number> = new Map()
-  .set('char', 1)
-  .set('vachar', 1)
-  .set('int', 2)
-  .set('number', 2)
-  .set('double', 3)
-  .set('boolean', 4)
-
 export const paramsDataType: (type: string) => number | undefined = (type: string) => {
   const lowerType = type.toLocaleLowerCase()
-  return fieldTypeMapping.get(lowerType)
+  let typeValue = 1
+
+  try {
+    typeValue = typeStatus.getEnum(lowerType).value
+  } catch (error) {
+    console.log(error)
+  }
+
+  return typeValue
 }
 
 /**

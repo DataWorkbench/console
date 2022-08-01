@@ -385,7 +385,10 @@ export default {
   },
 
   dataSourceManage: {
-    disableDataSources: ['POST', '/v1/workspace/{space_id}/datasource/disables'],
+    describeTableSchemaDataServiceApi: [
+      'GET',
+      '/v1/workspace/{space_id}/datasource/{source_id}/table/{table_name}/schemafords'
+    ],
 
     createDataSource: ['POST', '/v1/workspace/{space_id}/datasource'],
 
@@ -401,6 +404,8 @@ export default {
     describeDataSourceTables: ['GET', '/v1/workspace/{space_id}/datasource/{source_id}/tables'],
 
     deleteDataSources: ['POST', '/v1/workspace/{space_id}/datasource/deletes'],
+
+    disableDataSources: ['POST', '/v1/workspace/{space_id}/datasource/disables'],
 
     enableDataSources: ['POST', '/v1/workspace/{space_id}/datasource/enables'],
 

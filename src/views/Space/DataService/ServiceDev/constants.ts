@@ -268,3 +268,22 @@ export const publishStatus = createEnhancedEnum<IPublishStatusEnum>({
     style: StatusBarEnum.gray
   }
 })
+
+export const typeStatus = createEnhancedEnum<IStatusEnum>({
+  STRING: {
+    label: 'string',
+    value: 1
+  },
+  INT: {
+    label: 'int',
+    value: 2
+  },
+  DOUBLE: {
+    label: 'double',
+    value: 3
+  },
+  BOOLEAN: {
+    label: 'boolean',
+    value: 4
+  }
+})

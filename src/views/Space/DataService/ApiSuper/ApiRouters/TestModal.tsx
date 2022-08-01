@@ -21,7 +21,8 @@ import { TitleItem, TestContent, TableWrapper } from '../../ServiceDev/styled'
 import {
   serviceDevRequestSettingMapping,
   ParameterPosition,
-  RequestSettingColumns
+  RequestSettingColumns,
+  typeStatus
 } from '../../ServiceDev/constants'
 
 interface TestModalProps {
@@ -61,14 +62,23 @@ export const TestModal = observer((props: TestModalProps) => {
         onSuccess: (res) => {
           const dataSource = get(res, 'api_config.request_params.request_params', []) || []
           // 如果有默认值，就填充默认值，没有默认值就填充示例值，都没有才置空
-          const configData = dataSource.map((item: { default_value: any; example_value: any }) => {
-            let value = item.default_value ? item.default_value : ''
-            value = value === '' ? item.example_value : value
-            return {
-              ...item,
-              default_value: value
+          const configData = dataSource.map(
+            (item: { default_value: any; example_value: any; data_type: string }) => {
+              let value = item.default_value ? item.default_value : ''
+              value = value === '' ? item.example_value : value
+              let type = 'INT'
+              try {
+                type = typeStatus.getLabel(item.data_type) as string
+              } catch (error) {
+                console.log(error)
+              }
+              return {
+                ...item,
+                type: type.toLocaleUpperCase(),
+                default_value: value
+              }
             }
-          })
+          )
           setTestSource(configData)
         }
       })
