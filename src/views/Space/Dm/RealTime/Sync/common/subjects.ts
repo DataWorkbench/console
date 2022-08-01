@@ -228,13 +228,16 @@ source$
         consumerId: get(e, 'data.group_id', 'default'),
         charset: get(e, 'data.encoding', 1),
         readType: get(e, 'data.codec', 1),
-        config: JSON.stringify(
-          get(e, 'data.consumer_settings', {
-            'auto.commit.enable': 'false'
-          }),
-          null,
-          2
-        ),
+        config:
+          e?.data?.consumer_settings !== null
+            ? JSON.stringify(
+                get(e, 'data.consumer_settings', {
+                  'auto.commit.enable': 'false'
+                }),
+                null,
+                2
+              )
+            : '',
         timestamp: get(e, 'data.timestamp'),
         offset: get(e, 'data.offset')
       }
