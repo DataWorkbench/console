@@ -8,6 +8,7 @@ import { useStore, useMutationUpdateApiBaseConfig } from 'hooks'
 import { strlen, formatDate } from 'utils'
 import { Control, Field, Form, Label, Radio, Button, Toggle } from '@QCFE/lego-ui'
 import { HelpCenterLink } from 'components/Link'
+import { nameMatchRegexMin4Char } from 'utils/convert'
 import { Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { Protocol, RequestMethods, ResponseMethods } from '../constants'
 import ApiPathField from '../components/ApiPathField'
@@ -214,20 +215,12 @@ const BaseSettingModal = observer(() => {
               maxLength={50}
               schemas={[
                 {
-                  rule: (value: string) => {
-                    const l = strlen(value)
-                    return l >= 4 && l <= 50
-                  },
-                  help: '请输入4~50 个字符，支持汉字、英文字母、数字、英文格式的下划线',
+                  rule: (value: string) => nameMatchRegexMin4Char.test(value),
+                  help: '请输入英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符',
                   status: 'error'
                 }
               ]}
-              help={
-                <>
-                  必须唯一，支持汉字、英文字母、数字、英文格式的下划线，必须以英文字母或汉字开头，4~50
-                  个字符
-                </>
-              }
+              help="支持英文字母、数字、下划线(_)，不能以下划线(_)开头或结尾，4~50 个字符"
             />
             <ApiPathField
               label={<AffixLabel required>API路径</AffixLabel>}
@@ -246,16 +239,14 @@ const BaseSettingModal = observer(() => {
               schemas={[
                 {
                   rule: (value: string) => {
-                    const reg = /^[a-zA-Z0-9_]{4,50}$/
+                    const reg = /^[a-zA-Z0-9_-]{1,200}$/
                     return reg.test(value)
                   },
-                  help: '请输入4~50 个字符，英文字母、数字、英文格式的下划线',
+                  help: '请输入1~200 个字符，英文字母、数字、下划线（_）、连字符（-）',
                   status: 'error'
                 }
               ]}
-              help="填入路径将作为 API
-                二级路径。支持英文、数字、下划线（_）、连字符（-），不超过
-                200 个字符"
+              help="填入路径将作为 API 二级路径。支持英文、数字、下划线（_）、连字符（-），不超过 200 个字符"
             />
             <Field>
               <Label tw="items-start!">
