@@ -301,7 +301,13 @@ const BaseTargetConfig = forwardRef(
                 {
                   help: '范围: 1~65535, 批量写入条数不能小于 1',
                   status: 'error',
-                  rule: (v: any) => /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535
+                  rule: (v: any) => {
+                    console.log(222222222, v)
+                    if (!v) {
+                      return true
+                    }
+                    return /^[1-9]+[0-9]*$/.test(`${v}`) && v > 0 && v <= 65535
+                  }
                 }
               ]}
             />

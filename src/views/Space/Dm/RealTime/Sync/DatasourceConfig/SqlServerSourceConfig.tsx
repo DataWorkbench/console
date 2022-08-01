@@ -178,7 +178,7 @@ const SqlServerSourceConfig = forwardRef(
         <>
           <Field>
             <Label className="label">
-              <AffixLabel>心跳间隔</AffixLabel>
+              <AffixLabel>采集时间间隔</AffixLabel>
             </Label>
             <Control>
               <InputNumber
@@ -258,7 +258,7 @@ const SqlServerSourceConfig = forwardRef(
               placeholder="请选择数据源表"
             />
             <CheckboxGroupField
-              name={dbInfo?.updateType}
+              name="updateType"
               label={<AffixLabel required>更新类型</AffixLabel>}
               options={updateTypes}
               value={dbInfo?.updateType}
