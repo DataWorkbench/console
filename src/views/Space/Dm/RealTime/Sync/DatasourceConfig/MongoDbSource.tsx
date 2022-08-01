@@ -116,7 +116,7 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
             label={<AffixLabel required>集合</AffixLabel>}
             name="collectionName"
             onRefresh={tableRefetch}
-            multi
+            // multi
             options={tableList?.items?.map((i) => ({ label: i, value: i })) ?? []}
             value={dbInfo?.collectionName}
             onChange={(e) => {
