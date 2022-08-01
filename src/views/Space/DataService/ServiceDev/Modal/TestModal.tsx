@@ -7,7 +7,8 @@ import { useColumns } from 'hooks/useHooks/useColumns'
 import { MappingKey } from 'utils/types'
 import { useImmer } from 'use-immer'
 import { cloneDeep, get } from 'lodash-es'
-import { Icon } from '@QCFE/qingcloud-portal-ui'
+import { Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
+
 import { TitleItem, TestContent, MessageBox, TableWrapper } from '../styled'
 import {
   RequestSettingColumns,
@@ -51,7 +52,13 @@ const TestModal = observer(() => {
       })
       const filedRequest = cloneDeep(fieldSettingData)
         .filter((item) => item.isRequest)
-        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
+        .map((item) => ({
+          item,
+          param_name: item.field,
+          column_name: item.field,
+          type: item.type,
+          customType: item.customType
+        }))
       const config = fieldDataToRequestData(filedRequest, configData)
       setTestSource(config)
     }
@@ -64,6 +71,19 @@ const TestModal = observer(() => {
   }
 
   const startTest = () => {
+    const requiredParams = testSource.filter((item) => item.is_required)
+
+    const allRequired = requiredParams.every((item) => item.default_value !== '')
+
+    if (!allRequired) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请填写必填的请求参数',
+        placement: 'bottomRight'
+      })
+      return
+    }
+
     testMutation.mutate(
       { apiId: apiConfig?.api_id, request_params: testSource },
       {
