@@ -28,7 +28,7 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
           return {
             id: get(e, 'data.id'),
             nullMode: get(e, 'data.null_mode', 1),
-            encoding: get(e, 'data.encoding', 'UTF-8'),
+            encoding: get(e, 'data.encoding', 1),
             walFlag: get(e, 'data.wal_flag', false),
             writeBufferSize: get(e, 'data.write_buffer_size', 8388608),
             table: get(e, 'data.table')
@@ -151,8 +151,8 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                * GBK = 2;
                */
               [
-                { label: 'UTF-8', value: 'UTF-8' },
-                { label: 'GBK', value: 'GBK' }
+                { label: 'UTF-8', value: 1 },
+                { label: 'GBK', value: 2 }
               ]
             }
             validateOnChange
