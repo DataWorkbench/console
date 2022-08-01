@@ -54,7 +54,7 @@ const SyncDataSource = observer(
 
     const {
       dtsDevStore,
-      dtsDevStore: { setSchemaColumns, apiConfigData }
+      dtsDevStore: { setSchemaColumns, apiConfigData, oldApiTableNam }
     } = useStore()
 
     const paramsTable = { uri: { space_id: spaceId, source_id: sourceData.source?.id || '' } }
@@ -77,13 +77,19 @@ const SyncDataSource = observer(
       enabled: !!sourceData.source?.id && !!sourceData.tableName
     })
 
+    // 重新设置 schema 字段
     useEffect(() => {
       const columns = get(TableSchema.data, 'schema', [])
+      const configTableName = get(apiConfigData, 'api_config.table_name', '')
       if (!columns) return
-      const columnsData = configMapFieldData(cloneDeep(apiConfigData), columns)
+      const columnsData = configMapFieldData(
+        cloneDeep(apiConfigData),
+        columns,
+        configTableName === oldApiTableNam
+      )
 
       setSchemaColumns(columnsData)
-    }, [TableSchema.data, apiConfigData, setSchemaColumns])
+    }, [TableSchema.data, apiConfigData, oldApiTableNam, setSchemaColumns])
 
     // 启动后回显数据
     useEffect(() => {

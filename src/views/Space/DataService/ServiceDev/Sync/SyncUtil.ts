@@ -114,11 +114,13 @@ export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[]
  * 根据请求参数和响应参数进行处理字段设置的请求和返回数据
  * @param apiConfig api配置
  * @param schema 数据源表字段
+ * @param isMapReqOrRes 是否需要映射请求参数和响应参数
  * @returns
  */
 export const configMapFieldData = (
   apiConfig: DataServiceManageDescribeApiConfigType | null,
-  schema: Schema[]
+  schema: Schema[],
+  isMapReqOrRes: boolean
 ) => {
   const requestConfig = get(apiConfig, 'api_config.request_params.request_params', [])
   const responseConfig = get(apiConfig, 'api_config.response_params.response_params', [])
@@ -133,6 +135,11 @@ export const configMapFieldData = (
   })
 
   const fieldSettingData = getFieldSettingParamsData(schema)
+
+  // 已经更换了数据源表  apiConfigData.api_config.Table_Name ！== oldApiTableNam 了
+  if (!isMapReqOrRes) {
+    return fieldSettingData
+  }
 
   return fieldSettingData?.map((item) => {
     const isRequest = requestMap.get(item.field)
@@ -150,6 +157,7 @@ export const configMapFieldData = (
 export const paramsDataType: (type: string) => number | undefined = (type: string) => {
   const lowerType = type.toLocaleLowerCase()
   let typeValue = 1
+
   try {
     typeValue = typeStatus.getEnum(lowerType).value
   } catch (error) {

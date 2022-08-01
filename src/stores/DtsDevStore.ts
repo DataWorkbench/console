@@ -41,9 +41,11 @@ class WorkFlowStore {
 
   apiConfigData: DataServiceManageDescribeApiConfigType | null = null
 
-  apiRequestData: null | ReqDataSourceProp = null
+  apiRequestData: null | ReqDataSourceProp = null // 编辑状态api配置
 
-  apiResponseData: null | ResDataSourceProp = null
+  apiResponseData: null | ResDataSourceProp = null // 编辑状态api配置
+
+  oldApiTableNam: null | string = null // 接口请求出的api 表名称
 
   fieldSettingData: FieldSettingData[] = []
 
