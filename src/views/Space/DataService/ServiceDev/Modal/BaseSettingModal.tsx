@@ -301,7 +301,7 @@ const BaseSettingModal = observer(() => {
                   status: 'error'
                 }
               ]}
-              help="0-300"
+              help="1-300"
               suffix={<div tw="ml-1">s</div>}
             />
             <Field>
