@@ -24,7 +24,7 @@ import {
   DataSourceManageCreateDataSourceType,
   DataServiceManageDescribeServiceDataSourceKindsType,
   DataSourceManageDescribeDataSourceTablesType,
-  DataSourceManageDescribeDataSourceTableSchemaType,
+  DataSourceManageDescribeTableSchemaDataServiceApiType,
   ServiceGatewayListApiServicesType,
   ServiceGatewayListRoutesType
 } from '../types/response'
@@ -572,8 +572,8 @@ export const useQueryDescribeDataSourceTables = apiHooks<
 export const useQueryDescribeDataSourceTableSchema = apiHooks<
   'dataSourceManage',
   DescribeDataSourceTableSchemaRequestType,
-  DataSourceManageDescribeDataSourceTableSchemaType
->('dataSourceManage', 'describeDataSourceTableSchema')
+  DataSourceManageDescribeTableSchemaDataServiceApiType
+>('dataSourceManage', 'describeTableSchemaDataServiceApi')
 
 // 数据源类型
 

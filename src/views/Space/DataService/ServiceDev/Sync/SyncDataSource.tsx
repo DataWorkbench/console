@@ -57,6 +57,34 @@ const SyncDataSource = observer(
       dtsDevStore: { setSchemaColumns, apiConfigData }
     } = useStore()
 
+    const paramsTable = { uri: { space_id: spaceId, source_id: sourceData.source?.id || '' } }
+    const tablesRet = useQueryDescribeDataSourceTables(paramsTable, {
+      enabled: !!sourceData.source?.id
+    })
+
+    const { data: kindsData } = useQueryDescribeServiceDataSourceKinds({
+      uri: { space_id: spaceId }
+    })
+
+    const paramsTableSchema = {
+      uri: {
+        space_id: spaceId,
+        source_id: sourceData.source?.id || '',
+        table_name: sourceData.tableName
+      }
+    }
+    const TableSchema = useQueryDescribeDataSourceTableSchema(paramsTableSchema, {
+      enabled: !!sourceData.source?.id && !!sourceData.tableName
+    })
+
+    useEffect(() => {
+      const columns = get(TableSchema.data, 'schema', [])
+      if (!columns) return
+      const columnsData = configMapFieldData(cloneDeep(apiConfigData), columns)
+
+      setSchemaColumns(columnsData)
+    }, [TableSchema.data, apiConfigData, setSchemaColumns])
+
     // 启动后回显数据
     useEffect(() => {
       if (apiConfigData) {
@@ -71,10 +99,6 @@ const SyncDataSource = observer(
       }
     }, [apiConfigData, setSourceData])
 
-    const { data: kindsData } = useQueryDescribeServiceDataSourceKinds({
-      uri: { space_id: spaceId }
-    })
-
     const dataSourceOption = useMemo(
       () =>
         kindsData?.kinds.map(({ type, name }: { type: number; name: string }) => ({
@@ -84,21 +108,6 @@ const SyncDataSource = observer(
       [kindsData?.kinds]
     )
 
-    const paramsTable = { uri: { space_id: spaceId, source_id: sourceData.source?.id || '' } }
-    const tablesRet = useQueryDescribeDataSourceTables(paramsTable, {
-      enabled: !!sourceData.source?.id
-    })
-
-    const paramsTableSchema = {
-      uri: {
-        space_id: spaceId,
-        source_id: sourceData.source?.id || '',
-        table_name: sourceData.tableName
-      }
-    }
-    const TableSchema = useQueryDescribeDataSourceTableSchema(paramsTableSchema, {
-      enabled: !!sourceData.source?.id && !!sourceData.tableName
-    })
     const tables = useMemo(() => {
       const da = get(tablesRet.data, 'items', [])
       const option = da.map((tabName) => ({
@@ -107,14 +116,6 @@ const SyncDataSource = observer(
       }))
       return option
     }, [tablesRet.data])
-
-    useEffect(() => {
-      const columns = get(TableSchema.data, 'schema.columns', [])
-      if (!columns) return
-      const columnsData = configMapFieldData(cloneDeep(apiConfigData), columns)
-
-      setSchemaColumns(columnsData)
-    }, [TableSchema.data, apiConfigData, setSchemaColumns])
 
     const handleClick = () => {
       setVisible(true)
