@@ -90,7 +90,7 @@ const MemberModal = observer((props: IMemberModalProps) => {
     queryClient.invalidateQueries(getMemberKeys())
   }, [queryClient])
   const handleOk = useCallback(() => {
-    if (!ref.current?.validateForm()) {
+    if (!ref.current?.validateForm() || !value?.system_role_ids?.length) {
       return
     }
     mutation.mutate(
