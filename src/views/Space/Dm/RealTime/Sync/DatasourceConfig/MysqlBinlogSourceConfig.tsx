@@ -423,13 +423,16 @@ const MysqlBinlogSourceConfig = forwardRef(
                   ]}
                 />
 
-                <TextField
+                <NumberField
                   label={<AffixLabel required>指定位置</AffixLabel>}
                   name="startPosition"
+                  min={0}
+                  step={1}
+                  showButton={false}
                   value={dbInfo?.startPosition}
-                  onChange={(e: string) => {
+                  onChange={(e) => {
                     setDbInfo((draft) => {
-                      draft.startPosition = e
+                      draft.startPosition = parseInt(e, 10)
                     })
                   }}
                   placeholder="指定位置（position），采集起点从指定文件的指定位置处消费"

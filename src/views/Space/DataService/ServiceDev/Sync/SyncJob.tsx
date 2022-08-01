@@ -161,7 +161,8 @@ const SyncJob = observer(() => {
           onSuccess: (res) => {
             if (res.ret_code === 0) {
               dtsDevStore.set({
-                apiConfigData: res
+                apiConfigData: res,
+                oldApiTableNam: get(res, 'api_config.table_name') // 旧表名
               })
             }
           }
@@ -171,7 +172,8 @@ const SyncJob = observer(() => {
         fetchApi({ apiId }).then((res) => {
           if (res) {
             dtsDevStore.set({
-              apiConfigData: res
+              apiConfigData: res,
+              oldApiTableNam: get(res, 'api_config.table_name') // 旧表名
             })
           }
         })

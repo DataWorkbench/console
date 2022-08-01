@@ -14,6 +14,7 @@ import {
   serviceDevRequestSettingMapping,
   ParameterPosition
 } from '../constants'
+import { fieldDataToRequestData } from '../Sync/SyncUtil'
 
 const getName = (name: MappingKey<typeof serviceDevRequestSettingMapping>) =>
   serviceDevRequestSettingMapping.get(name)!.apiField
@@ -22,7 +23,7 @@ const dataServiceDataLimitSettingKey = 'DATA_SERVICE_DATA_REQUEST_HIGH'
 
 const TestModal = observer(() => {
   const {
-    dtsDevStore: { apiConfigData },
+    dtsDevStore: { apiConfigData, fieldSettingData },
     dtsDevStore
   } = useStore()
   const [testSource, setTestSource] = useImmer<any[]>([])
@@ -48,9 +49,13 @@ const TestModal = observer(() => {
           default_value: value
         }
       })
-      setTestSource(configData)
+      const filedRequest = cloneDeep(fieldSettingData)
+        .filter((item) => item.isRequest)
+        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
+      const config = fieldDataToRequestData(filedRequest, configData)
+      setTestSource(config)
     }
-  }, [apiConfigData, setTestSource])
+  }, [apiConfigData, fieldSettingData, setTestSource])
 
   const testMutation = useMutationTestDataServiceApi()
 

@@ -54,8 +54,42 @@ const SyncDataSource = observer(
 
     const {
       dtsDevStore,
-      dtsDevStore: { setSchemaColumns, apiConfigData }
+      dtsDevStore: { setSchemaColumns, apiConfigData, oldApiTableNam }
     } = useStore()
+
+    const paramsTable = { uri: { space_id: spaceId, source_id: sourceData.source?.id || '' } }
+    const tablesRet = useQueryDescribeDataSourceTables(paramsTable, {
+      enabled: !!sourceData.source?.id
+    })
+
+    const { data: kindsData } = useQueryDescribeServiceDataSourceKinds({
+      uri: { space_id: spaceId }
+    })
+
+    const paramsTableSchema = {
+      uri: {
+        space_id: spaceId,
+        source_id: sourceData.source?.id || '',
+        table_name: sourceData.tableName
+      }
+    }
+    const TableSchema = useQueryDescribeDataSourceTableSchema(paramsTableSchema, {
+      enabled: !!sourceData.source?.id && !!sourceData.tableName
+    })
+
+    // 重新设置 schema 字段
+    useEffect(() => {
+      const columns = get(TableSchema.data, 'schema', [])
+      const configTableName = get(apiConfigData, 'api_config.table_name', '')
+      if (!columns) return
+      const columnsData = configMapFieldData(
+        cloneDeep(apiConfigData),
+        columns,
+        configTableName === oldApiTableNam
+      )
+
+      setSchemaColumns(columnsData)
+    }, [TableSchema.data, apiConfigData, oldApiTableNam, setSchemaColumns])
 
     // 启动后回显数据
     useEffect(() => {
@@ -71,10 +105,6 @@ const SyncDataSource = observer(
       }
     }, [apiConfigData, setSourceData])
 
-    const { data: kindsData } = useQueryDescribeServiceDataSourceKinds({
-      uri: { space_id: spaceId }
-    })
-
     const dataSourceOption = useMemo(
       () =>
         kindsData?.kinds.map(({ type, name }: { type: number; name: string }) => ({
@@ -84,21 +114,6 @@ const SyncDataSource = observer(
       [kindsData?.kinds]
     )
 
-    const paramsTable = { uri: { space_id: spaceId, source_id: sourceData.source?.id || '' } }
-    const tablesRet = useQueryDescribeDataSourceTables(paramsTable, {
-      enabled: !!sourceData.source?.id
-    })
-
-    const paramsTableSchema = {
-      uri: {
-        space_id: spaceId,
-        source_id: sourceData.source?.id || '',
-        table_name: sourceData.tableName
-      }
-    }
-    const TableSchema = useQueryDescribeDataSourceTableSchema(paramsTableSchema, {
-      enabled: !!sourceData.source?.id && !!sourceData.tableName
-    })
     const tables = useMemo(() => {
       const da = get(tablesRet.data, 'items', [])
       const option = da.map((tabName) => ({
@@ -107,14 +122,6 @@ const SyncDataSource = observer(
       }))
       return option
     }, [tablesRet.data])
-
-    useEffect(() => {
-      const columns = get(TableSchema.data, 'schema.columns', [])
-      if (!columns) return
-      const columnsData = configMapFieldData(cloneDeep(apiConfigData), columns)
-
-      setSchemaColumns(columnsData)
-    }, [TableSchema.data, apiConfigData, setSchemaColumns])
 
     const handleClick = () => {
       setVisible(true)
