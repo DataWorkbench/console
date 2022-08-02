@@ -16,12 +16,13 @@ const select = <T extends Partial<Record<string, any>>>(subject: BehaviorSubject
   return (selector: (state: any) => any = (d) => d) =>
     () => {
       const [value, setValue] = useState(selector(subject.getValue()))
-
       useEffect(() => {
         const sub = state
           .pipe(
             map(selector),
-            distinctUntilChanged((previous, current) => isEqual(previous, current))
+            distinctUntilChanged((previous, current) => {
+              return isEqual(previous, current)
+            })
           )
           .subscribe(setValue)
         return () => {

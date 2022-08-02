@@ -51,7 +51,13 @@ export const getMappingConfig = () => fieldConfigSubject$.getValue()
 
 export const useFieldConfig = select(fieldConfigSubject$)()
 
+export const hbaseSourceType$ = new BehaviorSubject({ text: 'BINARY' })
+export const useHbaseSourceType = select(hbaseSourceType$)((e) => e.text)
+export const updateHbaseSourceType = (type: { text: string }) => {
+  hbaseSourceType$.next(type)
+}
+
 export const useFieldConfigRealSqlKafka = select(fieldConfigSubject$)((e) => {
-  const { isReal, isSqlSource, isKafkaTarget } = e.is
+  const { isReal, isSqlSource, isKafkaTarget } = e?.is ?? {}
   return isReal && isSqlSource && isKafkaTarget
 })
