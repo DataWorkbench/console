@@ -95,10 +95,6 @@ const ClusterTable = observer((props: ClusterTableProps) => {
     {
       uri: { space_id: spaceId },
       params: omitBy(filter, (v) => v === '')
-      // merge(omitBy(filter, (v) => v === ''),
-      //   selectMode && {
-      //     status: StatusEnum.RUNNING
-      //   })
     },
     {
       refetchInterval: 60 * 1000
