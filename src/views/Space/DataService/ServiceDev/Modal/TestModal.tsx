@@ -194,13 +194,13 @@ const TestModal = observer(() => {
               {testMessage.test_status === 'pass' && (
                 <MessageBox>
                   <Icon name="success" color={{ secondary: 'green' }} type="dark" />
-                  测试通过，API 调用延迟 {testMessage.item_out}ms
+                  测试通过，API 调用延迟 <span tw="text-white ml-2">{testMessage.item_out}ms</span>
                 </MessageBox>
               )}
               {testMessage.test_status === 'failed' && (
                 <MessageBox color="red">
                   <Icon name="error" color={{ secondary: 'red' }} type="dark" />
-                  测试通过，API 调用延迟 {testMessage.item_out}ms
+                  测试失败，API 调用延迟 <span tw="text-white ml-2">{testMessage.item_out}ms</span>
                 </MessageBox>
               )}
             </div>

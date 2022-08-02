@@ -357,12 +357,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
               <AffixLabel
                 required={false}
                 theme="green"
-                help={
-                  '指定写入 HBase 的时间戳，选择指定时间列，需要填写列索引（index）' +
-                  '：指定对应 reader 端 column 的索引，从 0 开始，需保证能转换为 long ,' +
-                  '若是 Date 类型，会尝试用 yyyy-MM-dd HH:mm:ss 和yyyy-MM-dd HH:mm:ss SSS 去解析；' +
-                  '若不指定 index？？？（这后面是不是少了描述？）'
-                }
+                help="指定写入 HBase 的时间戳，选择指定时间列。"
               >
                 指定时间列
               </AffixLabel>
@@ -374,8 +369,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
               <AffixLabel
                 required={false}
                 theme="green"
-                help="指定写入 HBase 的时间戳，选择指定时间，需要填写指定时间（value）
-                ：指定时间的值，类型为字符串。配置格式如下：这里是不是没配置格式？？？"
+                help="指定写入 HBase 的时间戳，选择指定时间，需要填写指定时间（value）：指定时间的值，类型为字符串。"
               >
                 指定时间
               </AffixLabel>
@@ -387,7 +381,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   }
 
   const [{ isOver: isVersionOver }, versionRef] = useDrop<
-    { uuid: string; index: number },
+    { uuid: string; index: number; type: string },
     void,
     { isOver: boolean }
   >(() => ({
@@ -395,7 +389,10 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     collect: (monitor) => ({
       isOver: monitor.isOver()
     }),
-    drop: ({ uuid, index }) => {
+    drop: ({ uuid, index, type }) => {
+      if (!type.toLowerCase().includes('time') && !type.toLowerCase().includes('date')) {
+        return
+      }
       setVersion((draft) => {
         draft.column = uuid
       })
@@ -413,7 +410,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
       <div css={[styles.versions, styles.table]}>
         <div
           ref={versionRef}
-          css={[styles.dndWrapper, styles.versions, tw`h-6`, isVersionOver && tw`bg-green-4/10!`]}
+          css={[styles.dndWrapper, styles.versions, tw`h-6`, !isVersionOver && tw`bg-green-4/10!`]}
         >
           {!version.column && (
             <div
