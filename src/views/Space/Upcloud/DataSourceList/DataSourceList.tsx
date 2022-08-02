@@ -118,6 +118,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
       // sourceKinds,
       showPingHistories,
       addEmptyHistories,
+      updateItemHistory,
       addItemHistories,
       removeItemHistories,
       itemLoadingHistories,
@@ -174,6 +175,7 @@ const DataSourceList = observer((props: DataSourceListProps) => {
     addEmpty: addEmptyHistories,
     addItem: addItemHistories,
     updateEmpty: addEmptyHistories,
+    updateItem: updateItemHistory,
     removeItem
   })
 
@@ -427,6 +429,9 @@ const DataSourceList = observer((props: DataSourceListProps) => {
               content={
                 <Menu
                   onClick={(e: React.SyntheticEvent, key: any) => {
+                    if (key === 'update') {
+                      updateItemHistory(info.id, info.last_connection)
+                    }
                     if (key !== 'ping') {
                       mutateOperation(key, [info])
                     } else {

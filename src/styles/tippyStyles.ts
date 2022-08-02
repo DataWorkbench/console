@@ -154,6 +154,14 @@ const tippyStyles = css`
       ${tw`border-t-white`}
     }
   }
+  
+  .notify-wrapper .notice-content {
+   ${tw`overflow-auto`}
+   max-height: calc(100vh - 80px);
+   & .notify-content {
+      ${tw`break-all`}
+  }
+  
 `
 
 export default tippyStyles
