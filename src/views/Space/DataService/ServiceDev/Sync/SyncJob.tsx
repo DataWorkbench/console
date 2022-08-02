@@ -1,9 +1,9 @@
 import { Collapse } from '@QCFE/lego-ui'
 import { observer } from 'mobx-react-lite'
 import { Button, Icon, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { RouterLink } from 'components'
+import { Confirm, RouterLink } from 'components'
 import tw, { css, styled } from 'twin.macro'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { cloneDeep, get } from 'lodash-es'
 import {
   useMutationUpdateApiConfig,
@@ -137,6 +137,7 @@ const SyncJob = observer(() => {
     dtsDevStore
   } = useStore()
   const requestConfig = cloneDeep(apiRequestData) as any[]
+  const [showConfirm, setShowConfirm] = useState<boolean>(false)
 
   const isHistory = get(curApi, 'is_history', false) || false
   const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
@@ -216,7 +217,7 @@ const SyncJob = observer(() => {
     })
   }
 
-  const save = () =>
+  const save = (showTip: boolean) =>
     new Promise((resolve) => {
       if (!orderRef.current || !dataSourceRef.current) {
         return
@@ -279,11 +280,13 @@ const SyncJob = observer(() => {
         {
           onSuccess: (res) => {
             if (res.ret_code === 0) {
-              Notify.success({
-                title: '操作提示',
-                content: '配置保存成功',
-                placement: 'bottomRight'
-              })
+              if (showTip) {
+                Notify.success({
+                  title: '操作提示',
+                  content: '配置保存成功',
+                  placement: 'bottomRight'
+                })
+              }
               handleSyncStore(response)
             }
             resolve(res)
@@ -292,21 +295,30 @@ const SyncJob = observer(() => {
       )
     })
   const release = async () => {
-    const saveRes: any = await save()
+    const saveRes: any = await save(false)
     if (saveRes.ret_code === 0) {
       const apiId = get(curApi, 'api_id')
-      publishMutation.mutate(
-        { apiId },
-        {
-          onSuccess: (res) => {
-            if (res.ret_code === 0) {
-              dtsDevStore.set({
-                showNotify: true
-              })
-            }
+      fetchApi({ apiId }).then((res) => {
+        if (res.ret_code === 0) {
+          const status = get(res, 'api_config.status')
+          if (status !== 3) {
+            setShowConfirm(true)
+          } else {
+            publishMutation.mutate(
+              { apiId },
+              {
+                onSuccess: (response) => {
+                  if (response.ret_code === 0) {
+                    dtsDevStore.set({
+                      showNotify: true
+                    })
+                  }
+                }
+              }
+            )
           }
         }
-      )
+      })
     }
   }
 
@@ -369,7 +381,7 @@ const SyncJob = observer(() => {
       <JobToolBar>
         {!isHistory ? (
           <>
-            <Button onClick={save} loading={mutation.isLoading}>
+            <Button onClick={() => save(true)} loading={mutation.isLoading}>
               <Icon name="data" type="dark" />
               保存
             </Button>
@@ -393,6 +405,42 @@ const SyncJob = observer(() => {
       <div tw="flex-1 overflow-hidden">
         <SimpleBar tw="h-full">{renderGuideMode()}</SimpleBar>
       </div>
+      {showConfirm && (
+        <Confirm
+          title="发布注意"
+          visible
+          css={css`
+            .modal-card-head {
+              ${tw`border-0`}
+            }
+            .css-1pd8ijf-Confirm {
+              ${tw`m-0`}
+            }
+          `}
+          type="warn"
+          width={400}
+          maskClosable={false}
+          appendToBody
+          draggable
+          onCancel={() => setShowConfirm(false)}
+          footer={
+            <div tw="flex justify-end space-x-2">
+              <Button onClick={() => setShowConfirm(false)}>取消</Button>
+              <Button
+                type="primary"
+                onClick={() => {
+                  test()
+                  setShowConfirm(false)
+                }}
+              >
+                测试
+              </Button>
+            </div>
+          }
+        >
+          <div tw=" mt-3">发布 API 前, 请先测试 API, 测试成功后才可发布。</div>
+        </Confirm>
+      )}
     </SyncJobWrapper>
   )
 })
