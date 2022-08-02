@@ -9,7 +9,7 @@ const pageTabsData = [
     description:
       '通过 API 服务组可以高效、便捷地管理一组相关联的 API。在 API 管理模块可以进行 API 的完整生命周期管理。',
     icon: 'q-apps3Duotone',
-    helpLink: getHelpCenterLink('/manual/data_development/network/create_network/')
+    helpLink: getHelpCenterLink('/manual/data_service/mgt_api/api_group/')
   }
 ]
 

@@ -9,7 +9,7 @@ const pageTabsData = [
     description:
       '开发调试好的数据服务 API，可以一键发布到 API 网关，通过绑定的域名使用 API 工具或代码来调用。',
     icon: 'q-apiDuotone',
-    helpLink: getHelpCenterLink('/manual/data_development/network/create_network/')
+    helpLink: getHelpCenterLink('/manual/data_service/mgt_api/released_api/')
   }
 ]
 
