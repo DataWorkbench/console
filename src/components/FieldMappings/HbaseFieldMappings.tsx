@@ -381,7 +381,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   }
 
   const [{ isOver: isVersionOver }, versionRef] = useDrop<
-    { uuid: string; index: number },
+    { uuid: string; index: number; type: string },
     void,
     { isOver: boolean }
   >(() => ({
@@ -389,7 +389,10 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     collect: (monitor) => ({
       isOver: monitor.isOver()
     }),
-    drop: ({ uuid, index }) => {
+    drop: ({ uuid, index, type }) => {
+      if (!type.toLowerCase().includes('time') && !type.toLowerCase().includes('date')) {
+        return
+      }
       setVersion((draft) => {
         draft.column = uuid
       })
@@ -407,7 +410,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
       <div css={[styles.versions, styles.table]}>
         <div
           ref={versionRef}
-          css={[styles.dndWrapper, styles.versions, tw`h-6`, isVersionOver && tw`bg-green-4/10!`]}
+          css={[styles.dndWrapper, styles.versions, tw`h-6`, !isVersionOver && tw`bg-green-4/10!`]}
         >
           {!version.column && (
             <div
