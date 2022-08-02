@@ -154,11 +154,11 @@ export const compInfo = {
   }
 }
 
-export const hadoopLink = '/manual/data_up_cloud/add_data/#连接信息-hdfs'
+export const hadoopLink = '/manual/source_data/add_data/hdfs/#Hadoop参数说明'
 
 export const networkLink = '/manual/data_development/network/create_network/'
 
-export const hbaseLink = '/manual/data_up_cloud/add_data/#连接信息-hbase'
+export const hbaseLink = '/manual/source_data/add_data/hive/#HBase参数说明'
 
 export const ftpProtocolValue = 1
 export const sFtpProtocolValue = 2
@@ -480,7 +480,7 @@ export const tabs = [
     description:
       '数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。',
     icon: 'blockchain',
-    helpLink: getHelpCenterLink('/manual/data_up_cloud/data_summary/')
+    helpLink: getHelpCenterLink('/manual/source_data/summary/')
   }
 ]
 
