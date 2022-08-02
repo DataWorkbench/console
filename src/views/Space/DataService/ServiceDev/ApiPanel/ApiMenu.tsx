@@ -179,12 +179,12 @@ const ApiMenu = observer((props: JobMenuProps) => {
               </div>
               <ul tw="pt-2">
                 <li>
-                  <HelpCenterLink href="/manual/data_development/job/summary/">
+                  <HelpCenterLink href="/manual/data_service/summary/">
                     数据服务是什么？
                   </HelpCenterLink>
                 </li>
                 <li>
-                  <HelpCenterLink href="/manual/data_development/job/create_job_sql/">
+                  <HelpCenterLink href="/manual/data_service/service_api/create_api_group/">
                     数据服务的操作指南
                   </HelpCenterLink>
                 </li>

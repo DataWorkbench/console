@@ -55,8 +55,6 @@ const ClusterTableModal = ({
         selectMode
         selectedIds={selectedIds}
         onSelect={(clusters) => {
-          console.log(clusters)
-
           setCluster(get(clusters, '[0]'))
         }}
       />

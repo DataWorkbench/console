@@ -73,9 +73,13 @@ const ClusterSettingModal = observer(() => {
   const handleSyncStore = () => {
     const config = {
       ...cloneDeep(apiConfigData),
+      api_config: {
+        ...cloneDeep(apiConfigData?.api_config),
+        cluster_id: clusterId
+      },
       service_cluster: {
-        ...cloneDeep(apiConfigData?.service_cluster),
-        ...cluster
+        id: clusterId,
+        name: clusterName
       }
     }
     dtsDevStore.set({
@@ -88,14 +92,6 @@ const ClusterSettingModal = observer(() => {
     if (form.current?.validateForm()) {
       const configSource = cloneDeep(get(apiConfigData, 'data_source'))
       const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
-      if (!configSource?.id) {
-        Notify.warning({
-          title: '操作提示',
-          content: '请先选择数据源',
-          placement: 'bottomRight'
-        })
-        return
-      }
 
       mutation.mutate(
         {
