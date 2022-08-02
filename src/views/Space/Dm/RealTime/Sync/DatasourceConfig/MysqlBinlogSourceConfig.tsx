@@ -392,13 +392,18 @@ const MysqlBinlogSourceConfig = forwardRef(
                 }}
                 placeholder="时间戳（timestamp），采集起点从指定的时间戳处消费"
                 validateOnChange
-                // schemas={[
-                //   {
-                //     rule: { required: true },
-                //     help: '请输入时间戳',
-                //     status: 'error'
-                //   }
-                // ]}
+                schemas={[
+                  {
+                    rule: { required: true },
+                    help: '起始位置为指定时间戳时，时间戳不能为空',
+                    status: 'error'
+                  },
+                  {
+                    rule: (v: number) => v.toString().match(/^\d{13}$/),
+                    help: '时间戳必须为 13 位数字',
+                    status: 'error'
+                  }
+                ]}
               />
             )}
             {dbInfo?.startType === 2 && (
