@@ -25,7 +25,7 @@ class OverViewStore {
       xlink: 'icon_service_0',
       desc: '数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。',
       enabled: true,
-      moreLink: '/manual/data_up_cloud/data_summary/'
+      moreLink: '/manual/source_data/summary/'
     },
     {
       name: 'dm',
@@ -34,7 +34,7 @@ class OverViewStore {
       xlink: 'icon_service_1',
       desc: '在云上的大数据开发环境，采用全托管式的Flink加工您的数据。您只需配置计算集群的大小、并发度，即可开始数据加工流程。\n根据您的业务需求，提供高兼容性的SQL开发模式，降低数据开发门槛。',
       enabled: true,
-      moreLink: '/manual/data_development/summary/'
+      moreLink: '/manual/mgt_job/summary/'
     },
     {
       text: '数据资产',
@@ -50,8 +50,8 @@ class OverViewStore {
       icon: 'resist',
       xlink: 'icon_service_3',
       desc: '根据企业数据仓库的结构，数据服务可生成自定义、可扩展的restfulAPI，提供数据权限、数据操作、数据查询等服务，助力企业构建轻量化的业务中台。',
-      enabled: true
-      // moreLink: '##',
+      enabled: true,
+      moreLink: '/manual/data_service/summary/'
     },
     {
       text: '数据治理',
@@ -68,7 +68,7 @@ class OverViewStore {
       xlink: 'icon_service_5',
       desc: '实时监测数据加工的任务状态，监测实时任务实例的运行情况。\n未来，我们将支持更多的监控维度，帮助您监测资源调度的分配、工作耗时的情况，并及时发出预警。',
       enabled: true,
-      moreLink: '/manual/operation_maintence/summary/'
+      moreLink: '/manual/operation_center/summary/'
     }
   ]
 
