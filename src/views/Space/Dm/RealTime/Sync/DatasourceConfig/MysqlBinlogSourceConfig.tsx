@@ -356,6 +356,21 @@ const MysqlBinlogSourceConfig = forwardRef(
                   draft.updateType = v
                 })
               }}
+              validateOnChange
+              schemas={[
+                {
+                  rule: { required: true },
+                  help: '请选择更新类型',
+                  status: 'error'
+                },
+                {
+                  rule: (v) => {
+                    return v.filter(Boolean).length > 0
+                  },
+                  help: '请至少选择一种更新类型',
+                  status: 'error'
+                }
+              ]}
             />
 
             <SelectField
