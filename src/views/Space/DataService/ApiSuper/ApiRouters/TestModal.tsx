@@ -127,9 +127,14 @@ export const TestModal = observer((props: TestModalProps) => {
               token: testAuthKey,
               requestContent
             }
-            testPublishApi(omitBy(params, isEmpty)).then((data: any) => {
-              setTestResponse(JSON.stringify(data, null, 2))
-            })
+            testPublishApi(omitBy(params, isEmpty))
+              .then((data: any) => {
+                setTestResponse(JSON.stringify(data, null, 2))
+              })
+              .catch((err) => {
+                const { message } = err
+                setTestResponse(message)
+              })
           } catch (error) {
             console.log(error)
           }
