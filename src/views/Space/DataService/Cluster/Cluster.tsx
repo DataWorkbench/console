@@ -8,7 +8,7 @@ const pageTabsData = [
     title: '服务集群',
     description: '数据服务的 API 调用运行时所使用的计算资源，以集群的形式展现。',
     icon: 'q-dockerHubDuotone',
-    helpLink: getHelpCenterLink('/manual/data_development/network/create_network/')
+    helpLink: getHelpCenterLink('/manual/data_service/service_cluster/create_cluster/')
   }
 ]
 

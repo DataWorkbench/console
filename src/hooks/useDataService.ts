@@ -15,7 +15,8 @@ import {
   DescribeDataSourceTableSchemaRequestType,
   ListDataServiceClustersRequestType,
   ListApiServicesRequestType,
-  ListRoutesRequestType
+  ListRoutesRequestType,
+  ListPublishedApiVersionsByClusterIdRequestType
 } from '../types/request'
 import {
   DataServiceManageListDataServiceClustersType,
@@ -26,7 +27,8 @@ import {
   DataSourceManageDescribeDataSourceTablesType,
   DataSourceManageDescribeTableSchemaDataServiceApiType,
   ServiceGatewayListApiServicesType,
-  ServiceGatewayListRoutesType
+  ServiceGatewayListRoutesType,
+  DataServiceManageListPublishedApiVersionsByClusterIdType
 } from '../types/response'
 
 type Options = 'createApiGroup' | 'createApi' | 'updateApi' | 'updateApiGroup'
@@ -129,6 +131,13 @@ export const useMutationDataServiceCluster = () => {
     return ret
   })
 }
+
+export const useQueryListPublishedApiVersionsByClusterId = apiHooks<
+  'dataServiceManage',
+  ListPublishedApiVersionsByClusterIdRequestType,
+  DataServiceManageListPublishedApiVersionsByClusterIdType
+>('dataServiceManage', 'listPublishedApiVersionsByClusterId')
+
 export const listPublishedApiVersionsByClusterId = async ({
   regionId,
   spaceId,
