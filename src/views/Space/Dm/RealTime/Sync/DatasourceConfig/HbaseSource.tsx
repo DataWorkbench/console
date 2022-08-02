@@ -7,6 +7,7 @@ import { map } from 'rxjs'
 import { get } from 'lodash-es'
 import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
 import { Control, Field, Icon, InputNumber, Label, Notification as Notify } from '@QCFE/lego-ui'
+import { updateHbaseSourceType } from 'components/FieldMappings/Subjects'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { source$ } from '../common/subjects'
 
@@ -178,6 +179,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
               setDbInfo((draft) => {
                 draft.isBinaryRowKey = e
               })
+              updateHbaseSourceType({ text: e ? 'BINARY' : 'STRING' })
             }}
             options={
               /**

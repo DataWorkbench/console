@@ -1,13 +1,12 @@
 import { useEffect, useRef, useMemo } from 'react'
 import { useImmer } from 'use-immer'
-import { AffixLabel, Modal, ModalContent, TextLink, InputField } from 'components'
+import { AffixLabel, Modal, ModalContent, HelpCenterLink, InputField } from 'components'
 import { get, merge, pickBy } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 import { observer } from 'mobx-react-lite'
 import { useMutationApiService, useQueryListApiGroups, useStore, useFetchApi } from 'hooks'
 import { strlen } from 'utils'
 import { Control, Field, Form, Label, Radio, Button, Toggle } from '@QCFE/lego-ui'
-import { HelpCenterLink } from 'components/Link'
 import { useParams } from 'react-router-dom'
 import { nameMatchRegexMin4Char } from 'utils/convert'
 import ModelItem from './ModeItem'
@@ -71,9 +70,9 @@ const modelSource = [
     desc: (
       <div className="des">
         即可视化配置，快速将结构化数据和半结构化数据表生成数据API。您无需具备编码能力，即可快速配置一个数据API。
-        <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
+        <HelpCenterLink href="/manual/data_service/service_api/create_api_1/" isIframe={false}>
           查看详情
-        </TextLink>
+        </HelpCenterLink>
       </div>
     )
   },
@@ -85,9 +84,9 @@ const modelSource = [
       <div className="des">
         为满足高阶用户的个性化查询需求，为您提供自定义 SQL 的脚本，您可以自行编写 API 的查询 SQL
         。支持多表关联、复杂查询和聚合函数等功能。
-        <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
+        <HelpCenterLink href="/manual/data_service/service_api/create_api_2/" isIframe={false}>
           查看详情
-        </TextLink>
+        </HelpCenterLink>
       </div>
     )
   }
@@ -362,7 +361,10 @@ const ApiModal = observer((props: JobModalProps) => {
                 />
               </Control>
               <div className="help">
-                <HelpCenterLink isIframe={false} href="/xxx">
+                <HelpCenterLink
+                  isIframe={false}
+                  href="/manual/data_service/service_api/create_api_1/#创建-api"
+                >
                   跨域功能说明
                 </HelpCenterLink>
               </div>

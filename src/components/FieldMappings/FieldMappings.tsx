@@ -25,7 +25,11 @@ import { Tooltip } from 'components/Tooltip'
 import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { KafkaFieldMappings } from 'components/FieldMappings/KafkaFieldMappings'
-import { useFieldConfig, useFieldConfigRealSqlKafka } from 'components/FieldMappings/Subjects'
+import {
+  useFieldConfig,
+  useFieldConfigRealSqlKafka,
+  useHbaseSourceType
+} from 'components/FieldMappings/Subjects'
 import MappingItem, { FieldRow, TMappingField } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
@@ -250,7 +254,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   const [isRealSqlKafka] = useFieldConfigRealSqlKafka()
   const [config] = useFieldConfig()
-
+  const [hbaseSourceType] = useHbaseSourceType()
   // const kafkaReadType = kafkaSource$.getValue()?.readType
   // const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 1
   const {
@@ -775,7 +779,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     }
     return (
       <FieldRow tw="cursor-default">
-        <div>STRING</div>
+        <div>{hbaseSourceType}</div>
         <div>rowkey</div>
         <div tw="text-neut-8">不可编辑</div>
       </FieldRow>

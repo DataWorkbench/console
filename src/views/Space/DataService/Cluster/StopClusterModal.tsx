@@ -3,17 +3,17 @@ import { Center, Confirm, FlexBox, TextEllipsis } from 'components'
 import {
   useMutationDataServiceCluster,
   useMutationAbolishDataServiceApis,
-  useMutationListPublishedApiVersionsByClusterId
+  useQueryListPublishedApiVersionsByClusterId
 } from 'hooks'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import tw, { css } from 'twin.macro'
 import { MappingKey } from 'utils/types'
 import { useState } from 'react'
-import { get } from 'lodash-es'
+import { get, omitBy } from 'lodash-es'
 import { ClusterListInfo, getQueryKeyListDataServiceClusters } from 'hooks/useDataService'
-import { useMount } from 'react-use'
 import useFilter from 'hooks/useHooks/useFilter'
 import { useQueryClient } from 'react-query'
+import { useParams } from 'react-router-dom'
 import { StopClusterTableFieldMapping, StopClusterTableColumns } from './constants'
 
 interface UnBindApiModalProps {
@@ -29,10 +29,8 @@ const columnSettingsKey = 'DATA_SERVICE_STOP_CLUSTER_TAB'
 const UnBindApiModal = (props: UnBindApiModalProps) => {
   const { cluster, onCancel } = props
 
+  const { spaceId } = useParams<{ spaceId: string }>()
   const [showStopApiConfirm, setStopApiConfirm] = useState<boolean>(false)
-  const [publishApiData, setPublishApiData] = useState() // 集群已发布 API
-  const [showConfirm, setShowConfirm] = useState<boolean>(false)
-  const publishApi = get(publishApiData, 'infos', []) || []
 
   const { filter, pagination } = useFilter<
     Record<ReturnType<typeof getName>, number | string | boolean>,
@@ -41,21 +39,15 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
 
   const clusterMutation = useMutationDataServiceCluster()
   const serviceApisMutation = useMutationAbolishDataServiceApis()
-  const mutationListPublishedApi = useMutationListPublishedApiVersionsByClusterId()
+  const { data, isLoading } = useQueryListPublishedApiVersionsByClusterId({
+    uri: { space_id: spaceId, cluster_id: cluster.id },
+    params: omitBy(filter, (v) => v === '')
+  })
+
+  const publishApi = get(data, 'infos', []) || []
 
   const queryClient = useQueryClient()
 
-  useMount(() => {
-    mutationListPublishedApi.mutate(
-      { clusterId: cluster.id, ...filter },
-      {
-        onSuccess: (source) => {
-          setPublishApiData(source)
-          setShowConfirm(true)
-        }
-      }
-    )
-  })
   const handleCancel = () => {
     onCancel()
   }
@@ -124,7 +116,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
         title={`${
           cluster.id ? `停用服务集群${cluster.name}（${cluster.id}）` : '停用服务集群注意事项'
         }`}
-        visible={showConfirm}
+        visible={!isLoading}
         css={css`
           .modal-card-head {
             ${tw`border-0`}
@@ -160,7 +152,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
               dataSource={publishApi}
               columns={columns}
               pagination={{
-                total: get(publishApiData, 'total', 0),
+                total: get(data, 'total', 0),
                 ...pagination
               }}
               rowKey="api_id"

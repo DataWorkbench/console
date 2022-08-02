@@ -7,8 +7,12 @@ import {
   datasourceTypeObjs
 } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
-import { defaultConfig, getMappingConfig, updateConfig } from 'components/FieldMappings/Subjects'
-import { TargetType } from 'dnd-core'
+import {
+  defaultConfig,
+  getMappingConfig,
+  updateConfig,
+  updateHbaseSourceType
+} from 'components/FieldMappings/Subjects'
 
 interface IJob {
   id: string
@@ -217,6 +221,23 @@ export const kafkaSource$ = new BehaviorSubject<Partial<Record<string, any>>>({}
 source$
   .pipe(
     filter((e) => {
+      return e?.sourceType?.type === SourceType.HBase
+    }),
+    map((e) => {
+      return e?.data?.is_binary_rowkey
+    }),
+    distinctUntilChanged(),
+    map((e) => {
+      return {
+        text: e ? 'BINARY' : 'STRING'
+      }
+    })
+  )
+  .subscribe(updateHbaseSourceType)
+
+source$
+  .pipe(
+    filter((e) => {
       return e?.sourceType?.type === SourceType.Kafka
     }),
     map((e) => {
@@ -269,7 +290,7 @@ const sql = new Set([
 ])
 
 const configStrategy: {
-  find: (jobType: 2 | 3, sourceType: SourceType, targetType: TargetType) => boolean
+  find: (jobType: 2 | 3, sourceType: SourceType, targetType: SourceType) => boolean
   value: () => Partial<typeof defaultConfig>
 }[] = [
   {
@@ -307,7 +328,7 @@ const configStrategy: {
   },
   // [实时同步 来源关系型数据库 且 目的 kafka]： 来源表字段是固定的结构，不可增删改
   {
-    find: (jobType: 2 | 3, sourceType: SourceType, targetType: TargetType) => {
+    find: (jobType: 2 | 3, sourceType: SourceType, targetType) => {
       return jobType === 3 && sql.has(sourceType) && targetType === SourceType.Kafka
     },
     value: () => {

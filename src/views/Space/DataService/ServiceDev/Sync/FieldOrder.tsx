@@ -235,7 +235,11 @@ const FieldOrder = observer(
               message="提示：排序字段非必须，如你需要排序字段，请在下方添加并选择需要排序的字段。"
               type="info"
               linkBtn={
-                <HelpCenterLink href="###" isIframe={false} hasIcon={false}>
+                <HelpCenterLink
+                  href="/manual/data_service/service_api/create_api_1/#字段排序"
+                  isIframe={false}
+                  hasIcon={false}
+                >
                   查看详情 →
                 </HelpCenterLink>
               }

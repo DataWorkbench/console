@@ -5,7 +5,7 @@ import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
 import { useQueryClient } from 'react-query'
 import { assign } from 'lodash-es'
-import { Modal, FlexBox, AffixLabel, TextLink } from 'components'
+import { Modal, FlexBox, AffixLabel, HelpCenterLink } from 'components'
 
 import { useStore, useMutationDataServiceCluster, getQueryKeyListDataServiceClusters } from 'hooks'
 
@@ -203,9 +203,12 @@ const ClusterModal = observer(
                 help={
                   <>
                     请参考
-                    <TextLink href="/iaas/vpc/create" target="_blank" hasIcon>
+                    <HelpCenterLink
+                      href="/manual/data_service/service_cluster/create_cluster/#cu-规格"
+                      isIframe={false}
+                    >
                       服务集群性能指标
-                    </TextLink>
+                    </HelpCenterLink>
                   </>
                 }
               >
