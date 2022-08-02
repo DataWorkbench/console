@@ -91,15 +91,15 @@ const TestModal = observer(() => {
           if (res.ret_code === 0) {
             let logs = ''
             let content = ''
+            setTestMessage({
+              test_status: res.test_status,
+              item_out: res.time_out
+            })
             try {
               logs = res.logs
               content = JSON.stringify(JSON.parse(res.response_content), null, 2)
               setTestRequest(logs)
               setTestResponse(content)
-              setTestMessage({
-                test_status: res.test_status,
-                item_out: res.item_out
-              })
             } catch (error) {
               console.log(error)
             }

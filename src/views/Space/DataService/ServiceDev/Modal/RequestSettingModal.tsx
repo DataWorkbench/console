@@ -96,15 +96,6 @@ const RequestSettingModal = observer(() => {
     const configSource = cloneDeep(get(apiConfigData, 'data_source'))
     const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
 
-    if (!configSource?.id) {
-      Notify.warning({
-        title: '操作提示',
-        content: '请先选择数据源',
-        placement: 'bottomRight'
-      })
-      return
-    }
-
     mutation.mutate(
       {
         ...apiConfig,

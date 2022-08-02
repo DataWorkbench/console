@@ -94,7 +94,7 @@ const ClusterTable = observer((props: ClusterTableProps) => {
   const { isRefetching, isLoading, data } = useQueryListDataServiceClusters(
     {
       uri: { space_id: spaceId },
-      params: omitBy(filter, (v) => v === '') as any
+      params: omitBy(filter, (v) => v === '')
     },
     {
       refetchInterval: 60 * 1000
