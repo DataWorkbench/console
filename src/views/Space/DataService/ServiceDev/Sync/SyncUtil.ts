@@ -9,6 +9,7 @@ export interface Schema {
 }
 
 export interface FieldSettingData {
+  customType?: string
   key: string
   field: string
   isRequest: boolean
@@ -20,6 +21,7 @@ export interface FieldSettingData {
 interface SchemaMap {
   param_name: string
   type: string
+  customType?: string
 }
 
 const defaultRequestHighSource = [
@@ -30,7 +32,7 @@ const defaultRequestHighSource = [
     type: 'INT',
     param_operator: ParameterOperator.EQUAL,
     param_position: ParameterPosition.QUERY,
-    is_required: true,
+    is_required: false,
     field_category: FieldCategory.PAGECONFIG,
     example_value: '200',
     default_value: '200',
@@ -43,7 +45,7 @@ const defaultRequestHighSource = [
     type: 'INT',
     param_operator: ParameterOperator.EQUAL,
     param_position: ParameterPosition.QUERY,
-    is_required: true,
+    is_required: false,
     field_category: FieldCategory.PAGECONFIG,
     example_value: '0',
     default_value: '0',
@@ -107,6 +109,7 @@ export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[]
     isRequest: false,
     isResponse: false,
     type: column.param_type,
+    customType: column.param_type,
     isPrimary: column.is_primary
   }))
 
@@ -128,10 +131,10 @@ export const configMapFieldData = (
   const requestMap = new Map()
   const responseMap = new Map()
   requestConfig?.forEach((item: { column_name: any }) => {
-    requestMap.set(item.column_name, true)
+    requestMap.set(item.column_name, item)
   })
   responseConfig?.forEach((item: { column_name: any }) => {
-    responseMap.set(item.column_name, true)
+    responseMap.set(item.column_name, item)
   })
 
   const fieldSettingData = getFieldSettingParamsData(schema)
@@ -142,11 +145,22 @@ export const configMapFieldData = (
   }
 
   return fieldSettingData?.map((item) => {
+    let { type } = item
+    const requestDataType = requestMap.get(item.field)?.data_type
+    const responseDataType = responseMap.get(item.field)?.data_type
     const isRequest = requestMap.get(item.field)
     const isResponse = responseMap.get(item.field)
+    // 根据请求参数和响应参数的数据类型来判断字段的类型
+    if (type === '' && requestDataType !== 0) {
+      type = typeStatus.getLabel(requestDataType) || ('' as string)
+    }
+    if (type === '' && responseDataType !== 0) {
+      type = typeStatus.getLabel(responseDataType) || ('' as string)
+    }
 
     return {
       ...item,
+      type,
       isRequest: !!isRequest,
       isResponse: !!isResponse
     }
@@ -155,9 +169,8 @@ export const configMapFieldData = (
 
 // 字段类型映射
 export const paramsDataType: (type: string) => number | undefined = (type: string) => {
-  const lowerType = type.toLocaleLowerCase()
-  let typeValue = 1
-
+  const lowerType = type
+  let typeValue = 0
   try {
     typeValue = typeStatus.getEnum(lowerType).value
   } catch (error) {
@@ -182,13 +195,16 @@ export const configMapData = (filedData: SchemaMap[], configData: any[], default
 
   return filedData?.map((item) => {
     const configItem = configMap.get(item.param_name)
-    const type = paramsDataType(item.type) || 1
+
+    const value = item.customType || (item.type as string)
+
+    const type = paramsDataType(value) || 0
 
     if (configItem) {
       return {
         ...item,
-        data_type: type,
-        ...configItem
+        ...configItem,
+        data_type: type
       }
     }
     return { ...item, ...defaultData, data_type: type }
@@ -215,7 +231,7 @@ export const fieldDataToResponseData = (filedData: SchemaMap[], configData: any[
   if (filedData) {
     // 拼数据
     const defaultValue = {
-      data_type: 1, // 字段类型 映射函数configMapData中赋值
+      data_type: 0, // 字段类型 映射函数configMapData中赋值
       param_operator: ParameterOperator.EQUAL,
       param_position: ParameterPosition.QUERY,
       is_required: false,
@@ -251,7 +267,7 @@ export const fieldDataToRequestData = (filedData: SchemaMap[], configData: any[]
   if (filedData) {
     // 拼数据
     const defaultValue = {
-      data_type: 1, // 字段类型 映射函数configMapData中赋值
+      data_type: 0, // 字段类型 映射函数configMapData中赋值
       param_operator: ParameterOperator.EQUAL,
       param_position: ParameterPosition.QUERY,
       is_required: false,

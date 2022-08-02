@@ -1,4 +1,4 @@
-import { camelCase, get, keys, trim } from 'lodash-es'
+import { camelCase, get, keys, merge, trim } from 'lodash-es'
 import { BehaviorSubject, distinctUntilChanged, Subject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 // eslint-disable-next-line import/no-cycle
@@ -7,6 +7,8 @@ import {
   datasourceTypeObjs
 } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
+import { defaultConfig, getMappingConfig, updateConfig } from 'components/FieldMappings/Subjects'
+import { TargetType } from 'dnd-core'
 
 interface IJob {
   id: string
@@ -14,7 +16,7 @@ interface IJob {
   /**
    * 1 => "OfflineFull" 2 => "OfflineIncrement" 3 => "RealTime"
    *  */
-  type: 1 | 2 | 3
+  type: 2 | 3 | 3
   desc: string
   version: string
   source_type?: number
@@ -255,3 +257,139 @@ kafkaSourceReadType$.pipe(map(() => [])).subscribe(mapping$)
 
 clearSourceColumns$.subscribe(sourceColumns$)
 clearSourceColumns$.subscribe(mapping$)
+
+const sql = new Set([
+  SourceType.Mysql,
+  SourceType.PostgreSQL,
+  SourceType.Oracle,
+  SourceType.SqlServer,
+  SourceType.TiDB,
+  SourceType.SapHana,
+  SourceType.DB2
+])
+
+const configStrategy: {
+  find: (jobType: 2 | 3, sourceType: SourceType, targetType: TargetType) => boolean
+  value: () => Partial<typeof defaultConfig>
+}[] = [
+  {
+    // 目的 关系型数据库 不可以增删改
+    find: (jobType, sourceType, targetType) => {
+      return sql.has(targetType)
+    },
+    value: () => {
+      return {
+        target: {
+          readonly: true,
+          add: false
+        } as any
+      }
+    }
+  },
+  {
+    // 关系型数据库 可增删改
+    find: (jobType: 2 | 3, sourceType: SourceType) => {
+      return sql.has(sourceType)
+    },
+    value: () => {
+      return {
+        source: {
+          readonly: false,
+          edit: true,
+          add: true,
+          delete: true,
+          sort: true,
+          mapping: true,
+          time: true
+        }
+      }
+    }
+  },
+  // [实时同步 来源关系型数据库 且 目的 kafka]： 来源表字段是固定的结构，不可增删改
+  {
+    find: (jobType: 2 | 3, sourceType: SourceType, targetType: TargetType) => {
+      return jobType === 3 && sql.has(sourceType) && targetType === SourceType.Kafka
+    },
+    value: () => {
+      return {
+        source: {
+          readonly: true,
+          add: false
+        }
+      } as any
+    }
+  },
+  // [ 非关系型数据库 ] 目的表字段有新增
+  {
+    find: (jobType, sourceType, targetType) => {
+      return !sql.has(targetType)
+    },
+    value: () => {
+      return {
+        target: {
+          readonly: false,
+          add: true,
+          edit: true,
+          sort: true,
+          mapping: true,
+          time: true,
+          showValue: false
+        }
+      }
+    }
+  }
+]
+
+kafkaSourceReadType$
+  .pipe(
+    filter(Boolean),
+    map((e: any) => {
+      let v: any
+      if (e.readType === 1) {
+        v = {
+          readonly: true,
+          add: false,
+          edit: false,
+          sort: false,
+          mapping: true,
+          showValue: false
+        }
+      } else {
+        v = {
+          readonly: false,
+          add: true,
+          edit: true,
+          sort: true,
+          mapping: true,
+          showValue: true
+        }
+      }
+      return merge(getMappingConfig(), { source: v })
+    })
+  )
+  .subscribe(updateConfig)
+
+curJobDbConfSubject$
+  .pipe(
+    filter(Boolean),
+    map((e: any) => {
+      const { sourceType, targetType, jobType } = e
+      const fn = configStrategy.filter((item) => item.find(jobType, sourceType, targetType))
+      let v = defaultConfig
+      if (fn.length !== 0) {
+        v = fn?.reduce((previousValue, currentValue) => {
+          return merge(previousValue, currentValue.value())
+        }, defaultConfig)
+      }
+      return merge(v, {
+        is: {
+          isKafkaTarget: targetType === SourceType.Kafka,
+          isHbaseSource: sourceType === SourceType.HBase,
+          isHbaseTarget: targetType === SourceType.HBase,
+          isReal: jobType === 3,
+          isSqlSource: sql.has(sourceType)
+        }
+      })
+    })
+  )
+  .subscribe(updateConfig)

@@ -66,7 +66,7 @@ export const TestModal = observer((props: TestModalProps) => {
             (item: { default_value: any; example_value: any; data_type: string }) => {
               let value = item.default_value ? item.default_value : ''
               value = value === '' ? item.example_value : value
-              let type = 'INT'
+              let type = ''
               try {
                 type = typeStatus.getLabel(item.data_type) as string
               } catch (error) {
@@ -74,7 +74,7 @@ export const TestModal = observer((props: TestModalProps) => {
               }
               return {
                 ...item,
-                type: type.toLocaleUpperCase(),
+                type,
                 default_value: value
               }
             }
@@ -94,6 +94,17 @@ export const TestModal = observer((props: TestModalProps) => {
       Notify.warning({
         title: '操作提示',
         content: '请填写密钥',
+        placement: 'bottomRight'
+      })
+      return
+    }
+
+    const requiredParams = testSource.filter((item) => item.is_required)
+    const allRequired = requiredParams.every((item) => item.default_value !== '')
+    if (!allRequired) {
+      Notify.warning({
+        title: '操作提示',
+        content: '请填写必填的请求参数',
         placement: 'bottomRight'
       })
       return

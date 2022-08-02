@@ -211,7 +211,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
             </div>
           }
         >
-          <div tw=" mt-3 ml-9 mb-3">API 下线后不可访问，请谨慎操作。</div>
+          <div tw=" mt-3">API 下线后不可访问，请谨慎操作。</div>
         </Confirm>
       )}
     </>

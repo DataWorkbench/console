@@ -1,4 +1,4 @@
-import { Alert } from '@QCFE/lego-ui'
+import { Alert, Select } from '@QCFE/lego-ui'
 import { HelpCenterLink, DargTable } from 'components'
 import { observer } from 'mobx-react-lite'
 import { useStore } from 'stores'
@@ -10,7 +10,7 @@ import { MappingKey } from 'utils/types'
 import { useColumns } from 'hooks/useHooks/useColumns'
 import { cloneDeep, get } from 'lodash-es'
 import { useCallback, useEffect } from 'react'
-import { FieldSettingColumns, serviceDevVersionFieldSettingMapping } from '../constants'
+import { FieldSettingColumns, serviceDevVersionFieldSettingMapping, typeStatus } from '../constants'
 import {
   FieldSettingData as IFieldSettingData,
   fieldDataToResponseData,
@@ -59,10 +59,20 @@ const FieldOrder = observer((props: IFieldOrderProps) => {
       )
       const fieldResponse = cloneDeep(data)
         .filter((item) => item.isResponse)
-        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
+        .map((item) => ({
+          param_name: item.field,
+          column_name: item.field,
+          type: item.type,
+          customType: item.customType
+        }))
       const filedRequest = cloneDeep(data)
         .filter((item) => item.isRequest)
-        .map((item) => ({ param_name: item.field, column_name: item.field, type: item.type }))
+        .map((item) => ({
+          param_name: item.field,
+          column_name: item.field,
+          type: item.type,
+          customType: item.customType
+        }))
       const dd = fieldDataToResponseData(fieldResponse, responseConfig)
       const aa = fieldDataToRequestData(filedRequest, requestConfig)
       handleSyncStore(aa, dd)
@@ -122,7 +132,40 @@ const FieldOrder = observer((props: IFieldOrderProps) => {
       render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
     },
     [getName('type')]: {
-      render: (text: string) => <FlexBox tw="items-center gap-2">{text}</FlexBox>
+      render: (text: string, record: any, index: number) => {
+        if (record.type === '') {
+          return (
+            <Select
+              tw="w-24"
+              options={typeStatus.getList()}
+              value={text}
+              onChange={(v) => {
+                const value = typeStatus.getLabel(v) as string
+                setFieldSettingData((draft) => {
+                  draft[index].type = value
+                })
+              }}
+            />
+          )
+        }
+        return (
+          <>
+            <FlexBox tw="items-center gap-2">{text}</FlexBox>
+            {record.customType === '' && (
+              <FlexBox
+                tw="items-center gap-2 ml-2 hover:text-green-13 text-green-11 cursor-pointer"
+                onClick={() => {
+                  setFieldSettingData((draft) => {
+                    draft[index].type = ''
+                  })
+                }}
+              >
+                更改
+              </FlexBox>
+            )}
+          </>
+        )
+      }
     }
   }
 

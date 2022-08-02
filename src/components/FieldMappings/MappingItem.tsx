@@ -113,8 +113,18 @@ interface MappingItemProps {
   getDeleteField?: (name: string) => TMappingField | undefined
   exist?: (name: string) => boolean
   isLeft?: boolean
-  readonly?: boolean
-  hasMoreAction?: boolean
+  // readonly?: boolean
+  // hasMoreAction?: boolean
+  config: {
+    readonly: boolean
+    edit: boolean
+    add: boolean
+    delete: boolean
+    sort: boolean
+    mapping: boolean
+    time: boolean
+    showValue: boolean
+  }
 }
 
 const MappingItem = (props: MappingItemProps) => {
@@ -134,8 +144,8 @@ const MappingItem = (props: MappingItemProps) => {
     getDeleteField,
     exist,
     isLeft = true,
-    readonly = false,
-    hasMoreAction = true
+    // hasMoreAction = true,
+    config
   } = props
   const [isTop, setIsTop] = useState(false)
   const [item, setItem] = useImmer(itemProps)
@@ -271,7 +281,7 @@ const MappingItem = (props: MappingItemProps) => {
     setShowMoreMenu(false)
   }
 
-  if (readonly) {
+  if (config.readonly) {
     return (
       <FieldRow ref={ref} className={className} isReverse>
         <div>{item.type}</div>
@@ -281,13 +291,10 @@ const MappingItem = (props: MappingItemProps) => {
   }
 
   const renderMore = () => {
-    if (!hasMoreAction) {
-      return null
-    }
     let menuItems: { key: string; icon: string; text: string }[] = []
     if (item.custom) {
       menuItems = [
-        {
+        config.edit && {
           key: 'edit',
           icon: 'if-pen',
           text: '编辑'
@@ -297,18 +304,24 @@ const MappingItem = (props: MappingItemProps) => {
         //   icon: 'q-counterFill',
         //   text: '设置常量',
         // },
-        {
+        config.time && {
           key: 'parse',
           icon: 'q-textFill',
           text: '时间转换'
         }
-      ]
+      ].filter(Boolean) as any
     }
-    menuItems.push({
-      key: 'delete',
-      icon: 'if-trash',
-      text: '删除'
-    })
+
+    if (config.delete) {
+      menuItems.push({
+        key: 'delete',
+        icon: 'if-trash',
+        text: '删除'
+      })
+    }
+    if (menuItems.length === 0) {
+      return null
+    }
     return (
       <Tippy
         content={
@@ -329,7 +342,7 @@ const MappingItem = (props: MappingItemProps) => {
         interactive
         onClickOutside={() => setShowMoreMenu(false)}
         placement="bottom-start"
-        // appendTo={document.body}
+        appendTo={document.body}
       >
         <FlexBox
           tw="items-center justify-end cursor-pointer mr-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-150"
@@ -484,7 +497,7 @@ const MappingItem = (props: MappingItemProps) => {
         <FieldRow isEditing tw="p-0 ">
           <div>{isLeft ? name1 : type1}</div>
           <FlexBox>{isLeft ? type1 : name1}</FlexBox>
-          <Center css={[tw`space-x-3`, item.custom && tw`translate-y-4`]}>
+          <Center css={[tw`space-x-3`, item.custom && config.showValue && tw`translate-y-4`]}>
             <Tooltip theme="light" content="关闭" hasPadding twChild={tw`flex items-center`}>
               <Icon
                 name="close"
@@ -511,7 +524,7 @@ const MappingItem = (props: MappingItemProps) => {
               />
             </Tooltip>
           </Center>
-          {item.custom && (
+          {config.showValue && item.custom && (
             <TextField
               name="fieldValue"
               defaultValue={item.default}
