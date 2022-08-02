@@ -9,6 +9,7 @@ import { useDrag, useDrop, XYCoord } from 'react-dnd'
 import { DragItem } from 'components/FieldMappings/MappingItem'
 import { PopConfirm } from 'components/PopConfirm'
 import { isEqual } from 'lodash-es'
+import { useFieldConfigRealSqlKafka } from 'components/FieldMappings/Subjects'
 
 const styles = {
   versionHeader: tw`bg-neut-16`,
@@ -62,7 +63,7 @@ const styles = {
 }
 
 const Item = (props: any) => {
-  const { item, index, moveItem, deleteItem } = props
+  const { item, index, moveItem, deleteItem, isRealSql } = props
   const dndType = 'item'
   const [isTop, setIsTop] = useState(false)
 
@@ -140,9 +141,11 @@ const Item = (props: any) => {
         </FlexBox>
         <div>{item.type}</div>
         <div tw="flex justify-end">
-          <PopConfirm content="确认删除?" onOk={() => deleteItem(index)}>
-            <Icon name="if-trash" size={16} />
-          </PopConfirm>
+          {!isRealSql && (
+            <PopConfirm content="确认删除?" onOk={() => deleteItem(index)}>
+              <Icon name="if-trash" size={16} />
+            </PopConfirm>
+          )}
         </div>
       </div>
     </div>
@@ -155,6 +158,8 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
 
   const idsRef = useRef(ids ?? [])
   const [rowKeyIds, setRowKeyIds] = useImmer<string[]>(ids ?? [])
+
+  const [isRealSql] = useFieldConfigRealSqlKafka()
 
   useEffect(() => {
     const v = ids ?? []
@@ -247,6 +252,7 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
                 draft.splice(s, 1)
               })
             }}
+            isRealSql={isRealSql}
             moveItem={(s: number, t: number, isTop: boolean) => {
               setRowKeyIds((draft) => {
                 const newFields = [...draft]
@@ -257,7 +263,8 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
             }}
           />
         ))}
-        <div css={[styles.table]}>{renderAddRowKey()}</div>
+        {!isRealSql && <div css={[styles.table]}>{renderAddRowKey()}</div>}
+
         <FlexBox css={[styles.table, tw`flex bg-neut-18 items-center`]}>
           <span>原理：</span>
           {new Array(Math.max(0, 2 * (rowKeys || []).length - 1)).fill(0).map((_, index) =>

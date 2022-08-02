@@ -25,8 +25,7 @@ import { Tooltip } from 'components/Tooltip'
 import { HbaseFieldMappings } from 'components/FieldMappings/HbaseFieldMappings'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { KafkaFieldMappings } from 'components/FieldMappings/KafkaFieldMappings'
-// eslint-disable-next-line import/no-cycle
-import { kafkaSource$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { useFieldConfig, useFieldConfigRealSqlKafka } from 'components/FieldMappings/Subjects'
 import MappingItem, { FieldRow, TMappingField } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
@@ -197,7 +196,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           const field = fields.find((f) => f.name === c.name)
           const uuid = `source--${c.name}`
           if (field) {
-            return { ...field, uuid: field.uuid || uuid }
+            return {
+              ...field,
+              uuid: field.uuid || uuid,
+              custom: !leftFieldsProp.find((f) => f.name === c.name)
+            }
           }
           return {
             type: c.type,
@@ -218,7 +221,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           const field = fields.find((f) => f.name === c.name)
           const uuid = `target--${c.name}`
           if (field) {
-            return { ...field, uuid }
+            return { ...field, uuid, custom: !rightFieldsProp.find((f) => f.name === c.name) }
           }
           return {
             type: c.type,
@@ -236,7 +239,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       // console.log('in this.....')
       setMappings([])
     }
-  }, [columns, atomKey])
+  }, [columns, atomKey, leftFieldsProp, rightFieldsProp])
 
   useEffect(() => {
     jsPlumbInstRef.current?.repaintEverything()
@@ -245,11 +248,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const kafkaRef = useRef<{ rowMapping: () => Record<string, any>[] }>(null)
   const hbaseRef = useRef<{ getData: () => Record<string, any>[] }>(null)
 
-  const kafkaReadType = kafkaSource$.getValue()?.readType
-  const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 1
-  const isKafkaTarget = (rightTypeName as any).getType() === SourceType.Kafka
-  const isHbaseTarget = (rightTypeName as any).getType() === SourceType.HBase
-  const isHbaseSource = (leftTypeName as any).getType() === SourceType.HBase
+  const [isRealSqlKafka] = useFieldConfigRealSqlKafka()
+  const [config] = useFieldConfig()
+
+  // const kafkaReadType = kafkaSource$.getValue()?.readType
+  // const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 1
+  const {
+    is: { isKafkaTarget, isHbaseTarget, isHbaseSource }
+  } = config
 
   useImperativeHandle(ref, () => ({
     rowMapping: () => {
@@ -682,14 +688,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       return <EmptyFieldWrapper>选择目的端数据源表（可获取表结构）后显示字段</EmptyFieldWrapper>
     }
     if (isKafkaTarget) {
+      const filter = isRealSqlKafka
+        ? leftFields
+        : leftFields?.filter((field) => (mappings ?? []).map(([, i]) => i).includes(field.name))
       return (
         <div css={[styles.wrapper, styles.borderX]}>
           <KafkaFieldMappings
             sourceColumns={leftFields}
             ref={kafkaRef}
-            ids={leftFields
-              ?.filter((field) => (mappings ?? []).map(([, i]) => i).includes(field.name))
-              .map((i) => i.uuid)}
+            ids={filter.map((i) => i.uuid)}
           />
         </div>
       )
@@ -725,6 +732,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 onOk={(info, index) => {
                   keepEditingFieldRight(info, index)
                 }}
+                config={config.target}
                 onCancel={cancelAddCustomFieldRight}
                 deleteItem={(field) => {
                   setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
@@ -743,7 +751,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               />
             )
           })}
-          {!readonly && !targetReadonly && (
+          {!readonly && config.target.add && (
             <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomFieldRight}>
               <Icon name="add" type="light" />
               添加字段
@@ -876,10 +884,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               {getLeftFields().map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
-                  hasMoreAction={!isKafkaSource}
+                  // hasMoreAction={!isKafkaSource}
                   item={item}
                   key={item.name}
                   index={i}
+                  config={config.source}
                   isLeft={false}
                   hasConnection={!!mappings.find(([l]) => l === item?.name)}
                   anchor="Right"
@@ -904,7 +913,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   }}
                 />
               ))}
-              {!readonly && !isKafkaSource && (
+              {!readonly && config.source.add && (
                 <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomField}>
                   <Icon name="add" type="light" />
                   添加字段

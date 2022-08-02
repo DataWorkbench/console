@@ -227,7 +227,6 @@ const BaseTargetConfig = forwardRef(
               ]}
               validateOnChange
               onChange={(v: WriteMode) => {
-                console.log(v)
                 handleUpdate({ writeMode: +v })
               }}
               help={(() => {
@@ -302,7 +301,6 @@ const BaseTargetConfig = forwardRef(
                   help: '范围: 1~65535, 批量写入条数不能小于 1',
                   status: 'error',
                   rule: (v: any) => {
-                    console.log(222222222, v)
                     if (!v) {
                       return true
                     }

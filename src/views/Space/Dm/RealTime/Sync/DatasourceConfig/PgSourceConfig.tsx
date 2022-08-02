@@ -151,8 +151,6 @@ const PgSourceConfig = forwardRef(
         if (!sourceForm.current) {
           return false
         }
-        console.log(sourceForm.current?.getFieldsValue())
-        console.log(111111111, sourceForm.current?.validateForm())
         return sourceForm.current?.validateForm()
       },
       getData: () => ({
@@ -284,7 +282,6 @@ const PgSourceConfig = forwardRef(
               options={updateTypes}
               value={dbInfo?.updateType}
               onChange={(v) => {
-                console.log(v)
                 setDbInfo((draft) => {
                   draft.updateType = v
                 })
