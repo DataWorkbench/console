@@ -13,7 +13,7 @@ const questions = [
   },
   {
     title: '使用大数据工作台的准备工作',
-    link: '/prepare/create_account/'
+    link: '/prepare/create_workspace/'
   },
   {
     title: '数据开发的基本流程',
@@ -23,7 +23,7 @@ const questions = [
   // { title: '大数据工作台监控与运维', link: '' },
   // { title: '大数据工作台的计费概述11', link: '' },
   { title: '使用限制', link: '/intro/restriction/' },
-  { title: '其他常见问题', link: '/databench/faq/' }
+  { title: '其他常见问题', link: '/faq/consult/' }
 ]
 
 const Question = styled('div')(() => [
