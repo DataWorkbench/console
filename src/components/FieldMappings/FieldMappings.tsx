@@ -30,6 +30,7 @@ import {
   useFieldConfigRealSqlKafka,
   useHbaseSourceType
 } from 'components/FieldMappings/Subjects'
+import { AffixLabel } from 'components/AffixLabel'
 import MappingItem, { FieldRow, TMappingField } from './MappingItem'
 import icons from './icons'
 import { PopConfirm } from '../PopConfirm'
@@ -719,8 +720,20 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       <div css={styles.wrapper}>
         <div css={styles.borderX}>
           <FieldRow isHeader isReverse>
-            <div>类型</div>
-            <div>目标表字段</div>
+            <div>
+              {isHbaseTarget ? (
+                <AffixLabel
+                  theme="green"
+                  required={false}
+                  help="来源字段连线到当前 rowkey 时，通过该连接符连接多个来源字段值，作为一行的 rowkey 写入 HBase "
+                >
+                  类型
+                </AffixLabel>
+              ) : (
+                '类型'
+              )}
+            </div>
+            <div>{isHbaseTarget ? 'valueColumn 字段' : '目标表字段'}</div>
           </FieldRow>
           {rightFields.map((item, i) => {
             return (
