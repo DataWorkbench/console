@@ -22,6 +22,7 @@ function renderBottomArrow(elem) {
   const r = 5
   const spoint = [10, 4]
   const len = el.offsetWidth - r * 2
+
   draw
     .circle(r * 2)
     .attr(attr)
@@ -140,7 +141,7 @@ const Flow = ({ items }) => {
                 ref={(el) => {
                   arrowEl.current[i] = el
                 }}
-                css={[tw`flex pt-6`, i === 1 ? tw`flex-[2]` : tw`flex-1`]}
+                css={[tw`flex pt-6`, tw`flex-1`]}
               />
             )}
           </React.Fragment>
