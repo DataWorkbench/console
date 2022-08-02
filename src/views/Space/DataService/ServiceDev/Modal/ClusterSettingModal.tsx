@@ -73,9 +73,13 @@ const ClusterSettingModal = observer(() => {
   const handleSyncStore = () => {
     const config = {
       ...cloneDeep(apiConfigData),
+      api_config: {
+        ...cloneDeep(apiConfigData?.api_config),
+        cluster_id: clusterId
+      },
       service_cluster: {
-        ...cloneDeep(apiConfigData?.service_cluster),
-        ...cluster
+        id: clusterId,
+        name: clusterName
       }
     }
     dtsDevStore.set({
