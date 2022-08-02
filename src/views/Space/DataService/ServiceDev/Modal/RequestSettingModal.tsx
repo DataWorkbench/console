@@ -87,7 +87,8 @@ const RequestSettingModal = observer(() => {
       }
     }
     dtsDevStore.set({
-      apiConfigData: config
+      apiConfigData: config,
+      oldApiTableNam: get(config, 'api_config.table_name') // 旧表名
     })
   }
 

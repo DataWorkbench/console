@@ -270,20 +270,24 @@ export const publishStatus = createEnhancedEnum<IPublishStatusEnum>({
 })
 
 export const typeStatus = createEnhancedEnum<IStatusEnum>({
+  EMPTY: {
+    label: '',
+    value: 0
+  },
   STRING: {
-    label: 'string',
+    label: 'STRING',
     value: 1
   },
   INT: {
-    label: 'int',
+    label: 'INT',
     value: 2
   },
   DOUBLE: {
-    label: 'double',
+    label: 'DOUBLE',
     value: 3
   },
   BOOLEAN: {
-    label: 'boolean',
+    label: 'BOOLEAN',
     value: 4
   }
 })

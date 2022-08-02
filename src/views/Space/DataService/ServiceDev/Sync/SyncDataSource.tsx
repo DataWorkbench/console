@@ -87,7 +87,6 @@ const SyncDataSource = observer(
         columns,
         configTableName === oldApiTableNam
       )
-
       setSchemaColumns(columnsData)
     }, [TableSchema.data, apiConfigData, oldApiTableNam, setSchemaColumns])
 
