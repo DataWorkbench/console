@@ -127,9 +127,24 @@ export const TestModal = observer((props: TestModalProps) => {
               token: testAuthKey,
               requestContent
             }
-            testPublishApi(omitBy(params, isEmpty)).then((data: any) => {
-              setTestResponse(JSON.stringify(data, null, 2))
-            })
+            testPublishApi(omitBy(params, isEmpty))
+              .then((data: any) => {
+                setTestResponse(JSON.stringify(data, null, 2))
+              })
+              .catch((err) => {
+                const {
+                  response: { status },
+                  message
+                } = err
+                setTestResponse(message)
+                if (status === 401) {
+                  Notify.warning({
+                    title: '操作提示',
+                    content: '密钥错误',
+                    placement: 'bottomRight'
+                  })
+                }
+              })
           } catch (error) {
             console.log(error)
           }
