@@ -2,11 +2,11 @@ import { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } fr
 import styles from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/styles'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import { useImmer } from 'use-immer'
-import { Form } from '@QCFE/qingcloud-portal-ui'
+import { Form, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { map } from 'rxjs'
 import { get } from 'lodash-es'
 import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
-import { Control, Field, Icon, InputNumber, Label, Notification as Notify } from '@QCFE/lego-ui'
+import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
 import { updateHbaseSourceType } from 'components/FieldMappings/Subjects'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { source$ } from '../common/subjects'
@@ -66,7 +66,11 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
 
   useImperativeHandle(ref, () => ({
     validate: () => {
-      if (dbInfo?.startRowKey && dbInfo?.endRowKey && dbInfo?.startRowKey > dbInfo?.endRowKey) {
+      if (
+        dbInfo?.startRowKey &&
+        dbInfo?.endRowKey &&
+        parseInt(dbInfo?.startRowKey, 10) > parseInt(dbInfo?.endRowKey, 10)
+      ) {
         showConfWarn('开始主键不能大于结束主键')
         return false
       }
