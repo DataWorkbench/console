@@ -238,16 +238,6 @@ const SyncJob = observer(() => {
         }
       }
 
-      // 检测是否有服务集群
-      const clusterId = get(apiConfigData, 'service_cluster.id')
-      if (!clusterId) {
-        dtsDevStore.set({
-          showClusterErrorTip: true
-        })
-        showConfWarn('请先选择服务集群')
-        return
-      }
-
       // 映射字段排序字段到返回参数中
       const responseConfig = cloneDeep(apiResponseData) as any[]
 
@@ -295,15 +285,15 @@ const SyncJob = observer(() => {
       )
     })
   const release = async () => {
-    const saveRes: any = await save(false)
-    if (saveRes.ret_code === 0) {
-      const apiId = get(curApi, 'api_id')
-      fetchApi({ apiId }).then((res) => {
-        if (res.ret_code === 0) {
-          const status = get(res, 'api_config.status')
-          if (status !== 3) {
-            setShowConfirm(true)
-          } else {
+    const apiId = get(curApi, 'api_id')
+    fetchApi({ apiId }).then(async (res) => {
+      if (res.ret_code === 0) {
+        const status = get(res, 'api_config.status')
+        if (status !== 3) {
+          setShowConfirm(true)
+        } else {
+          const saveRes: any = await save(false)
+          if (saveRes.ret_code === 0) {
             publishMutation.mutate(
               { apiId },
               {
@@ -318,8 +308,8 @@ const SyncJob = observer(() => {
             )
           }
         }
-      })
-    }
+      }
+    })
   }
 
   const test = () => {
