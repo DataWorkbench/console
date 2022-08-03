@@ -15,7 +15,7 @@ export const usePingEvent = (params: {
   removeEmpty?: (uuid: string) => void
   removeItem: (sourceId: string, item: Record<'uuid' & string, any>) => void
 }) => {
-  const { addEmpty, addItem, updateEmpty, removeItem } = params
+  const { addEmpty, addItem, updateEmpty, removeItem, updateItem } = params
 
   const add = (item: PingEvent) => {
     const { uuid, sourceId } = item
@@ -32,6 +32,7 @@ export const usePingEvent = (params: {
     if (isCreate) {
       updateEmpty(uuid, item)
     } else {
+      updateItem?.(sourceId!, item.last_connection)
       removeItem(sourceId!, item)
     }
   }

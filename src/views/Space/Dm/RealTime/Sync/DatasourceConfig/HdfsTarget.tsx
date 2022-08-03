@@ -149,8 +149,8 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                * overwrite = 2;
                */
               [
-                { label: 'append', value: 1 },
-                { label: 'overwrite', value: 2 }
+                { label: 'append：追加', value: 1 },
+                { label: 'overwrite：覆盖（此模式会删除 hdfs 当前目录下的所有文件）', value: 2 }
               ]
             }
             placeholder="请选择写入模式"

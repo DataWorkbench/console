@@ -353,8 +353,9 @@ const configStrategy: {
           edit: true,
           sort: true,
           mapping: true,
-          time: true,
-          showValue: false
+          time: false,
+          showValue: false,
+          delete: true
         }
       }
     }

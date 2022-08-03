@@ -35,6 +35,7 @@ const DataSourceModal = observer(({ onHide = () => {} }: DataSourceModalProp) =>
       opSourceList,
       // sourceKinds,
       emptyHistories,
+      itemHistories,
       clearEmptyHistories
     }
   } = useStore()
@@ -72,9 +73,10 @@ const DataSourceModal = observer(({ onHide = () => {} }: DataSourceModalProp) =>
         }
         if (op === 'update') {
           params.sourceId = opSourceList[0].id
+          params.last_connection = toJS(itemHistories[params.sourceId])
         }
         if (op === 'create' && emptyHistories.size) {
-          params.last_connection = toJS(Array.from(emptyHistories.values()).pop()?.last_connection)
+          params.last_connection = toJS(Array.from(emptyHistories.values()).at(-1)?.last_connection)
         }
 
         mutation.mutate(params, {
@@ -112,7 +114,10 @@ const DataSourceModal = observer(({ onHide = () => {} }: DataSourceModalProp) =>
       />
       <Modal
         visible
-        onCancel={onHide}
+        onCancel={() => {
+          onHide()
+          clearEmptyHistories()
+        }}
         orient="fullright"
         width={800}
         title={`${opTxt}数据源: ${curkind ? curkind.showname || curkind.name : ''}`}
@@ -121,7 +126,14 @@ const DataSourceModal = observer(({ onHide = () => {} }: DataSourceModalProp) =>
         footer={
           <div tw="flex justify-end space-x-2">
             {state.step === 0 ? (
-              <Button onClick={onHide}>取消</Button>
+              <Button
+                onClick={() => {
+                  onHide()
+                  clearEmptyHistories()
+                }}
+              >
+                取消
+              </Button>
             ) : (
               <>
                 {op === 'create' && (
