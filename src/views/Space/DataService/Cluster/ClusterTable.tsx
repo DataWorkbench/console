@@ -274,7 +274,7 @@ const ClusterTable = observer((props: ClusterTableProps) => {
               placeholder="请输入关键词进行搜索"
               onPressEnter={(e: React.SyntheticEvent) => {
                 setFilter((draft) => {
-                  draft.name = (e.target as HTMLInputElement).value
+                  draft.search = (e.target as HTMLInputElement).value
                   draft.offset = 0
                 })
               }}
@@ -282,7 +282,7 @@ const ClusterTable = observer((props: ClusterTableProps) => {
                 setFilter((draft) => {
                   if (draft.search) {
                     draft.offset = 0
-                    draft.name = ''
+                    draft.search = ''
                   }
                 })
               }}
