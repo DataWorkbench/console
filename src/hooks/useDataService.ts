@@ -562,7 +562,7 @@ export const testPublishApi = ({
     ),
     params: requestContent,
     ...rest
-  }).catch(() => null)
+  })
 }
 
 export const useQueryListDataSources = apiHooks<
