@@ -16,8 +16,9 @@ import {
 import { useImmer } from 'use-immer'
 import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
 import { Icon } from '@QCFE/lego-ui'
-import { kafkaSource$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import {kafkaSource$, target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 type FieldKeys =
   | 'topic'
@@ -38,7 +39,12 @@ const consumers = {
   'specific-offsets': '从每个分区的指定偏移量开始'
 }
 
-const readType = ['text', 'json'].map((i, index) => ({
+const kafkaReadType = ['text', 'json'].map((i, index) => ({
+  label: i,
+  value: index + 1
+}))
+
+const readType = ['json'].map((i, index) => ({
   label: i,
   value: index + 1
 }))
@@ -100,6 +106,8 @@ const KafkaSourceConfig = forwardRef(
     const sourceForm = useRef<Form>()
 
     const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
+    const isKafkaTarget = target$.getValue()?.sourceType?.type === SourceType.Kafka
+    const readTypes = isKafkaTarget ? kafkaReadType : readType
 
     const { refetch } = useSetRealtimeColumns(
       dbInfo?.id,
@@ -305,7 +313,7 @@ const KafkaSourceConfig = forwardRef(
             />
             <RadioGroupField
               label={<AffixLabel required>读取模式</AffixLabel>}
-              options={readType}
+              options={readTypes}
               name="readType"
               value={dbInfo?.readType}
               onChange={(e) => {

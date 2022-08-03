@@ -161,13 +161,14 @@ export const intTypes = new Set([
 ])
 
 function setRowExp(rowkeyExpress: string) {
-  if (!rowkeyExpress) {
-    return rowkeyExpress
-  }
   return rowkeyExpress
-    .split('_')
-    .map((i) => `$(${i})`)
-    .join('_')
+  // if (!rowkeyExpress) {
+  //   return rowkeyExpress
+  // }
+  // return rowkeyExpress
+  //   .split('_')
+  //   .map((i) => `$(${i})`)
+  //   .join('_')
 }
 
 const SyncJob = () => {
