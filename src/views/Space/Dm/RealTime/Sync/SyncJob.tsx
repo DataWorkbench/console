@@ -252,6 +252,8 @@ const SyncJob = () => {
   useEffect(() => {
     if (confData?.job_mode && confData?.job_mode !== mode) {
       setMode(confData?.job_mode)
+    }
+    if (confData?.job_mode === 2) {
       setDefaultJobContent(get(confData, 'job_content'))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
