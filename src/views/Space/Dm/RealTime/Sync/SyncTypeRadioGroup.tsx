@@ -181,7 +181,10 @@ const SyncTypeRadioGroup = forwardRef<React.ReactElement, SyncTypeRadioGroupProp
           <div tw="font-medium mb-1">全量同步</div>
           <div tw="text-neut-8 mb-1">
             周期性或一次性将来源数据源中全量数据同步到目标数据源中。
-            <HelpCenterLink href="/manual/integration_job/sync_type/#全量同步" isIframe={false}>
+            <HelpCenterLink
+              href="/manual/integration_job/offline/sync_type/#全量同步"
+              isIframe={false}
+            >
               了解更多
             </HelpCenterLink>
           </div>
@@ -207,7 +210,10 @@ const SyncTypeRadioGroup = forwardRef<React.ReactElement, SyncTypeRadioGroupProp
           <div tw="font-medium mb-1">增量同步</div>
           <div tw="text-neut-8 mb-1">
             增量的基础是全量，先将数据全量同步，再周期性将来源数据源中新增及变化的数据同步到目标数据源中。
-            <HelpCenterLink href="/manual/integration_job/sync_type/#增量同步" isIframe={false}>
+            <HelpCenterLink
+              href="/manual/integration_job/offline/sync_type/#增量同步"
+              isIframe={false}
+            >
               了解更多
             </HelpCenterLink>
           </div>

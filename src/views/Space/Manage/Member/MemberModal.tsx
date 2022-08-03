@@ -284,7 +284,9 @@ const MemberModal = observer((props: IMemberModalProps) => {
               <span>
                 不同的角色拥有不同的操作权限，把角色授予成员后，成员即具有了角色的所有权限。每位成员至少要拥有一个角色，并且可以同时拥有多种角色。
               </span>
-              <HelpCenterLink isIframe={false}>角色权限详情</HelpCenterLink>
+              <HelpCenterLink href="/manual/mgt_workspace/permission/summary/" isIframe={false}>
+                角色权限详情
+              </HelpCenterLink>
             </div>
             <FlexBox>
               <div tw="my-4 flex-1 border-t border-neut-2 translate-y-1/2" />

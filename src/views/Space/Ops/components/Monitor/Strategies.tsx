@@ -46,7 +46,7 @@ const useQueryListAlertPoliciesByJob = apiHooks<
 const Strategies = observer(() => {
   // const arr = [{ name: '1 xxxx' }, { name: '2 asdfasdf' }]
 
-  const { spaceId, detail } = useParams<{ spaceId: string; detail: string }>()
+  const { regionId, spaceId, detail } = useParams<{ spaceId: string; regionId: string; detail: string }>()
   const { data } = useQueryListAlertPoliciesByJob({
     uri: { space_id: spaceId, job_id: detail }
   })
@@ -56,6 +56,18 @@ const Strategies = observer(() => {
   const [activeKeys, setActiveKeys] = useState(defaultKeys)
 
   const { set } = useAlertStore()
+
+  const handleClick = () => {
+    set({
+      showAddMonitor: true,
+      jobDetail: {
+        jobId: detail,
+        spaceId,
+        regionId,
+        jobType: 1
+      }
+    })
+  }
 
   return (
     <>
@@ -75,7 +87,7 @@ const Strategies = observer(() => {
           }
           type="info"
         />
-        <Button size="large" tw="w-full mt-3 mb-4" onClick={() => set({ showAddMonitor: true })}>
+        <Button size="large" tw="w-full mt-3 mb-4" onClick={handleClick}>
           <Icon name="add" size={14} type="light" />
           <span tw="text-xs">添加告警策略</span>
         </Button>

@@ -17,7 +17,7 @@ const permissionTabs = [
     title: '权限列表',
     description: '通过给空间成员分配不同的角色来实现权限控制管理.',
     icon: 'licenses',
-    helpLink: getHelpCenterLink('/manual/data_development/flink_cluster/create_cluster/')
+    helpLink: getHelpCenterLink('/manual/mgt_workspace/permission/summary/')
   }
 ]
 

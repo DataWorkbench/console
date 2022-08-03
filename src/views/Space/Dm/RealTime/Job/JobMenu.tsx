@@ -105,14 +105,10 @@ const JobMenu = observer((props: JobMenuProps) => {
           </div>
           <ul tw="pt-2">
             <li>
-              <HelpCenterLink href="/manual/data_development/job/summary/">
-                作业是什么？
-              </HelpCenterLink>
+              <HelpCenterLink href="/manual/mgt_job/summary/">作业是什么？</HelpCenterLink>
             </li>
             <li>
-              <HelpCenterLink href="/manual/data_development/job/create_job_sql/">
-                作业的操作指南
-              </HelpCenterLink>
+              <HelpCenterLink href="/manual/mgt_job/create_job/">作业的操作指南</HelpCenterLink>
             </li>
           </ul>
         </motion.div>

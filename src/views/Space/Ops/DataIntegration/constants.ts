@@ -17,7 +17,7 @@ export const dataJobInstanceTab: ITab[] = [
     title: '数据集成-作业实例',
     description: '作业实例是任务达到启用调度所配置的周期性运行时间时，被自动调度的实例快照。',
     icon: 'q-mergeFillDuotone',
-    helpLink: getHelpCenterLink('data-job-instance')
+    helpLink: getHelpCenterLink('/manual/operation_center/integration/job_instance/')
   }
 ]
 
@@ -237,7 +237,7 @@ export const dataReleaseTabs: ITab[] = [
     description:
       '数据集成任务提交和发布后，即可在周期任务列表中对任务进行运维操作。包括查看任务运行详情、暂停任务、下线任务等。',
     icon: 'q-iot2Duotone',
-    helpLink: getHelpCenterLink('data-job-release')
+    helpLink: getHelpCenterLink('/manual/operation_center/integration/released_job/')
   }
 ]
 
