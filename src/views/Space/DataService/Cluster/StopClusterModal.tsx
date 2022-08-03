@@ -76,7 +76,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
     serviceApisMutation.mutate(apiIds, {
       onSuccess: () => {
         stopCluster()
-        handleCancel()
+        setStopApiConfirm(false)
       }
     })
   }
@@ -134,7 +134,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
         footer={
           <div tw="flex justify-end space-x-2">
             <Button onClick={() => handleCancel()}>取消</Button>
-            <Button type="danger" onClick={handleConfirmOK}>
+            <Button type="danger" onClick={handleConfirmOK} loading={clusterMutation.isLoading}>
               {publishApi?.length === 0 ? '停用' : '全部下线并停用集群'}
             </Button>
           </div>
@@ -177,7 +177,7 @@ const UnBindApiModal = (props: UnBindApiModalProps) => {
           maskClosable={false}
           appendToBody
           draggable
-          onCancel={handleCancel}
+          onCancel={() => setStopApiConfirm(false)}
           footer={
             <div tw="flex justify-end space-x-2">
               <Button
