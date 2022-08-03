@@ -155,6 +155,7 @@ const ApiGroupModal = observer((props: JobModalProps) => {
                 })
               }
               validateOnChange
+              disabled={isEdit}
               maxLength={20}
               schemas={[
                 {
