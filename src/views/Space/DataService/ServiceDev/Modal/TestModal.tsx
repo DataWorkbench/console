@@ -101,7 +101,11 @@ const TestModal = observer(() => {
               setTestRequest(logs)
               setTestResponse(content)
             } catch (error) {
-              console.log(error)
+              Notify.warning({
+                title: '操作提示',
+                content: '响应详细解析错误,请正确配置请求参数和返回参数',
+                placement: 'bottomRight'
+              })
             }
           }
         }
