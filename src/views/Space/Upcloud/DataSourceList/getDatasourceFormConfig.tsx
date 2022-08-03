@@ -429,7 +429,11 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
           help: (
             <div>
               <span tw="mr-0.5">可参考</span>
-              <HelpCenterLink href="/manual/network/create_network/" hasIcon isIframe={false}>
+              <HelpCenterLink
+                href="/manual/source_data/add_data/hive/#Hadoop参数说明"
+                hasIcon
+                isIframe={false}
+              >
                 网络配置选择说明文档
               </HelpCenterLink>
             </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from 'mobx-react-lite'
 import { PageTab } from '@QCFE/qingcloud-portal-ui'
 import { get } from 'lodash-es'
@@ -69,8 +70,8 @@ function Overview() {
           <FAQ tw="w-4/12 2xl:w-[360px]" />
         </FlexBox>
         <FlexBox>
-          <Practice tw="flex-1 mr-4" />
-          <Card tw="w-4/12 2xl:w-[360px]" hasBoxShadow>
+          <Practice tw="flex-1" />
+          {/* <Card tw="w-4/12 2xl:w-[360px]" hasBoxShadow>
             <CardHeader title="视频介绍" />
             <CardContent>
               <HelpCenterLink
@@ -87,7 +88,7 @@ function Overview() {
                 />
               </HelpCenterLink>
             </CardContent>
-          </Card>
+          </Card> */}
         </FlexBox>
         {showSpaceModal && <SpaceListModal />}
       </div>
