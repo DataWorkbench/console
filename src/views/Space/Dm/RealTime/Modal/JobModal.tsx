@@ -15,7 +15,13 @@ import { useWindowSize } from 'react-use'
 import tw, { css, styled } from 'twin.macro'
 import { TreeNodeProps } from 'rc-tree'
 import { observer } from 'mobx-react-lite'
-import { useFetchJob, useMutationStreamJob, useStore } from 'hooks'
+import {
+  useFetchJob,
+  useMutationStreamJob,
+  useMutationSyncJobConf1,
+  useMutationSyncJobConvert,
+  useStore
+} from 'hooks'
 import { Control, Field, Label } from '@QCFE/lego-ui'
 import ClusterTableModal from 'views/Space/Dm/Cluster/ClusterTableModal'
 import { nameMatchRegex, strlen } from 'utils/convert'
@@ -24,9 +30,11 @@ import {
   RealTimeSyncTypeVal
 } from 'views/Space/Dm/RealTime/Sync/RealTimeRadioGroup'
 // import { sourceTypes } from 'views/Space/Ops/DataIntegration/constants'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { JobModeItem } from './JobModeItem'
 import {
   filterFolderOfTreeData,
+  getDataSourceTypes,
   getDiJobType,
   getJobMode,
   getNewTreeData,
@@ -168,6 +176,8 @@ export const JobModal = observer((props: JobModalProps) => {
     })
   }
 
+  const mutationConvert = useMutationSyncJobConvert()
+  const mutationSyncJob = useMutationSyncJobConf1()
   const handleNext = () => {
     if (params.step === 0) {
       setParams((draft) => {
@@ -213,17 +223,57 @@ export const JobModal = observer((props: JobModalProps) => {
           data.target_type = realTimeInfo.targetType
         }
       }
-      mutation.mutate(data, {
-        onSuccess: (ret) => {
-          onClose?.({
-            id: ret.id as string,
-            pid: String(data.pid),
-            pNode,
-            jobMode: params.jobMode,
-            type: data.type,
-            isEdit
-          })
+      mutation.mutateAsync(data).then((ret) => {
+        if (data.target_type === SourceType.Oracle || data.source_type === SourceType.Oracle) {
+          const close = () => {
+            onClose?.({
+              id: ret.id as string,
+              pid: String(data.pid),
+              pNode,
+              jobMode: params.jobMode,
+              type: data.type,
+              isEdit
+            })
+          }
+          const isReal = params.jobMode === JobMode.DI && params.jobType === JobType.REALTIME
+          mutationConvert
+            .mutateAsync({
+              data: {
+                conf: {
+                  sync_resource: {
+                    [`${(
+                      getDataSourceTypes(data.source_type, isReal) as any
+                    )?.toLowerCase()}_source`]: {},
+                    [`${(
+                      getDataSourceTypes(data.target_type, isReal) as any
+                    )?.toLowerCase()}_target`]: {}
+                  },
+                  job_content: '',
+                  job_mode: 1
+                }
+              },
+              uri: { job_id: ret?.id! }
+            })
+            .then((res) => {
+              return mutationSyncJob.mutateAsync({
+                jobId: ret?.id!,
+                job_mode: 2,
+                job_content: res?.job
+              })
+            }, close)
+            .finally(close)
+        } else {
+          close()
         }
+
+        // onClose?.({
+        //   id: ret.id as string,
+        //   pid: String(data.pid),
+        //   pNode,
+        //   jobMode: params.jobMode,
+        //   type: data.type,
+        //   isEdit
+        // })
       })
     }
   }

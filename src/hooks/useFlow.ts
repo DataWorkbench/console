@@ -254,6 +254,18 @@ export const useMutationSyncJobConf = () => {
   })
 }
 
+export const useMutationSyncJobConf1 = () => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  return useMutation(async (params: Record<string, any>) => {
+    const ret = await setSyncJobConf({
+      ...params,
+      regionId,
+      spaceId
+    })
+    return ret
+  })
+}
+
 export const useQuerySyncJobConf = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const {
