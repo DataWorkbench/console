@@ -1,5 +1,14 @@
 import { Button, Form, Icon, InputNumber } from '@QCFE/qingcloud-portal-ui'
-import { AffixLabel, Center, FlexBox, Modal, ModalContent, Tooltip } from 'components/index'
+import {
+  AffixLabel,
+  Center,
+  FlexBox,
+  Modal,
+  ModalContent,
+  Tooltip,
+  PopConfirm,
+  RadioGroupWithProp
+} from 'components/index'
 import { Checkbox, Field, Label, RadioButton } from '@QCFE/lego-ui'
 import tw, { css, styled } from 'twin.macro'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -18,7 +27,7 @@ import { observer } from 'mobx-react-lite'
 import { useAlertStore } from 'views/Space/Ops/Alert/AlertStore'
 import JobSelectModal from './JobSelectModal'
 
-const { TextField, TextAreaField, RadioGroupField, SelectField } = Form
+const { TextField, TextAreaField, SelectField } = Form
 
 const HiddenTextField = styled(TextField)`
   .control {
@@ -193,14 +202,35 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                   <span>{monitorObjectTypes[value?.monitor_object as 1]?.label}</span>
                 </Field>
               ) : (
-                <RadioGroupField
+                <RadioGroupWithProp
                   label={<AffixLabel required>监控对象</AffixLabel>}
                   name="monitor-object"
+                  popConfirm={
+                    <PopConfirm
+                      type="warning"
+                      content="切换监控对象会清空下方的监控项,已绑定作业，确认切换？"
+                    />
+                  }
+                  showPopConfirm={
+                    value?.instance_run_timeout_flag === true ||
+                    value?.instance_run_failed_flag === true ||
+                    value?.job_ids?.length > 0
+                  }
                   onChange={(e) => {
+                    console.log(getData(data as any))
+
                     setValue((draft) => {
                       draft.monitor_object = e
                       draft.job_ids = []
                     })
+
+                    if (e !== value.monitor_object) {
+                      setValue((draft) => {
+                        draft.instance_run_timeout_flag = undefined
+                        draft.instance_run_failed_flag = undefined
+                        draft.instance_run_timeout = 0
+                      })
+                    }
                   }}
                   validateOnChange
                   value={value?.monitor_object}
@@ -214,7 +244,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                 >
                   <RadioButton value={2}>数据集成作业</RadioButton>
                   <RadioButton value={1}>流式计算作业</RadioButton>
-                </RadioGroupField>
+                </RadioGroupWithProp>
               ))}
 
             <Field>
