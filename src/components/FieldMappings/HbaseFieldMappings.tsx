@@ -168,13 +168,14 @@ interface ValueItem {
 }
 
 const getRowExp = (exp: string) => {
-  if (!exp) {
-    return exp
-  }
   return exp
-    .split('_')
-    .map((i) => i.slice(2, -1))
-    .join('_')
+  // if (!exp) {
+  //   return exp
+  // }
+  // return exp
+  //   .split('_')
+  //   .map((i) => i.slice(2, -1))
+  //   .join('_')
 }
 
 // eslint-disable-next-line import/prefer-default-export
