@@ -23,7 +23,7 @@
       <script src="<%=htmlWebpackPlugin.files.publicPath %>static/js/config.js"></script>
     <% } %>
   </head>
-  <body>
+  <body id="body">
     <div id="root"></div>
     <% for (var js in htmlWebpackPlugin.files.js) { %>
     <script defer="defer" src="<%=htmlWebpackPlugin.files.js[js] %>"></script>
