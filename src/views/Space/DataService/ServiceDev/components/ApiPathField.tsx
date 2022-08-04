@@ -32,7 +32,7 @@ const InputWrapper = styled(Control)(({ 'data-focused': focused }: { 'data-focus
       ${tw`border-red-10`}
     }
   `,
-  focused && tw`border-green-11`
+  focused && tw`border-green-11!`
 ])
 
 const Wrapper = styled('div')(({ 'data-focused': focused }: { 'data-focused': boolean }) => [
@@ -44,7 +44,7 @@ const Wrapper = styled('div')(({ 'data-focused': focused }: { 'data-focused': bo
       ${tw`border-0`}
     }
   `,
-  focused && tw`border-green-11`
+  focused && tw`border-green-11!`
 ])
 
 export const InputField = forwardRef<IControlRef, IInputProps>((props, ref) => {

@@ -153,7 +153,7 @@ const FieldOrder = observer((props: IFieldOrderProps) => {
             <FlexBox tw="items-center gap-2">{text}</FlexBox>
             {record.customType === '' && (
               <FlexBox
-                tw="items-center gap-2 ml-2 hover:text-green-13 text-green-11 cursor-pointer"
+                tw="items-center gap-2 ml-2 hover:text-green-13 text-green-11! cursor-pointer"
                 onClick={() => {
                   setFieldSettingData((draft) => {
                     draft[index].type = ''
