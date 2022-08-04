@@ -39,7 +39,8 @@ const useQueryListAlertLogs = apiHooks<
 
 const itemSettingKey = 'ITEM_MONITOR_HISTORY'
 
-const MonitorHistory = () => {
+const MonitorHistory = ({ jobId }: { jobId?: string }) => {
+  console.log(jobId)
   const { spaceId, detail } = useParams<{ spaceId: string; detail: string }>()
 
   const {

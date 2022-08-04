@@ -275,7 +275,7 @@ const StreamReleaseDetail = observer(({ id, version }: { id: string; version: st
           <LinkInstance jobId={id} version={version} type={JobMode.RT} />
         </TabPanel>
         <TabPanel label="监控告警" name="alarm">
-          <Monitor />
+          <Monitor jobId={id} showAdd jobType={1} />
         </TabPanel>
         <TabPanel label="开发内容" name="dev">
           <StreamDevContent data={code} language="sql" />
