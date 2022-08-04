@@ -462,12 +462,14 @@ const SyncJob = () => {
       setTargetColumns(e)
     })
     const confSub = confColumns$.subscribe((e) => {
-      setColumns(e)
+      setColumns(e as any)
     })
+    // const mappings = mapping$.subscribe((e) => setColumns(e as any))
     return () => {
       sourceColumnsSub.unsubscribe()
       targetColumnsSub.unsubscribe()
       confSub.unsubscribe()
+      // mappings.unsubscribe()
     }
   }, [])
 
