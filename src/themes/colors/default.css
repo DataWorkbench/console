@@ -235,7 +235,7 @@
   --dw-color-button-disabled-text: #939ea9; /* N8 */
 }
 
-body {
+body#body {
   font-size: 12px;
 }
 
