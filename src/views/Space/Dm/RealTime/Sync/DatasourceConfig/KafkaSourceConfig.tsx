@@ -16,7 +16,7 @@ import {
 import { useImmer } from 'use-immer'
 import { AffixLabel, Center, FlexBox, HelpCenterLink } from 'components'
 import { Icon } from '@QCFE/lego-ui'
-import {kafkaSource$, target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { confColumns$, kafkaSource$, target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import useSetRealtimeColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useSetRealtimeColumns'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
@@ -44,10 +44,12 @@ const kafkaReadType = ['text', 'json'].map((i, index) => ({
   value: index + 1
 }))
 
-const readType = ['json'].map((i, index) => ({
-  label: i,
-  value: index + 1
-}))
+const readType = [
+  {
+    label: 'json',
+    value: 2
+  }
+]
 
 const consumerOptions = Object.keys(consumers).map((i, index) => ({
   label: i,
@@ -318,6 +320,7 @@ const KafkaSourceConfig = forwardRef(
               value={dbInfo?.readType}
               onChange={(e) => {
                 kafkaSource$.next({ ...dbInfo, readType: e })
+                confColumns$.next([])
                 // setDbInfo((draft) => {
                 //   draft.readType = e
                 // })
