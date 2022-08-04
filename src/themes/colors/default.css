@@ -295,3 +295,68 @@ input[type='number']:focus {
 .textarea:focus {
   border-color: #85b0d6 !important;
 }
+
+.side-content .selected-row .m-l-8 {
+  color: #024d8e !important;
+}
+
+/* 菜单栏 */
+
+.side-menu .selected-row .icon-title .qicon {
+  color: #024d8e !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+.icon-li.selected .icon .qicon {
+  color: #024d8e !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+.dark .icon-li.selected .icon .qicon {
+  color: #85b0d6 !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+.dark .side-menu .selected-row .icon-title .qicon {
+  color: #85b0d6 !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+
+.side-menu .level-row:not(.level-row-disabled):hover .icon-title {
+  color: #024d8e !important;
+}
+.side-menu .level-row:not(.level-row-disabled):hover .icon-title .qicon {
+  fill: rgba(133, 176, 214, 0.1) !important;
+  color: #024d8e !important;
+}
+
+.dark .side-menu .level-row:not(.level-row-disabled):hover .icon-title .qicon {
+  fill: rgba(133, 176, 214, 0.1) !important;
+  color: #85b0d6 !important;
+}
+.level-row.selected-row {
+  border-color: #024d8e !important;
+}
+
+/* 数据源管理 side-content */
+.css-1lt25qe-SideMenuWrapper-SideMenuWrapper.e1ovpvsa0 .side-content .selected-row .m-l-8 {
+  color: #fff !important;
+}
+.css-1lt25qe-SideMenuWrapper-SideMenuWrapper.e1ovpvsa0 .side-content .level-row:hover {
+  color: #fff !important;
+}
+.css-1lt25qe-SideMenuWrapper-SideMenuWrapper
+  .side-menu-wrap
+  .side-menu
+  .selected-row
+  .icon-title
+  svg.qicon {
+  fill: #fff !important;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* 选中图标样式 */
+.icon-li.selected {
+  border-color: #024d8e;
+}
+
+.side-menu-pickup .side-content .icon-li.selected {
+  border-color: #024d8e;
+}
