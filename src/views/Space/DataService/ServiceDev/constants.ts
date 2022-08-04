@@ -55,7 +55,8 @@ export const serviceDevVersionFieldSettingMapping: Mapping<
   .set('field', { label: '字段名', apiField: 'field' })
   .set('isRequest', { label: '设为请求参数', apiField: 'isRequest' })
   .set('isResponse', { label: '设为返回参数', apiField: 'isResponse' })
-  .set('type', { label: '字段类型', apiField: 'type' })
+  .set('column_type', { label: '字段类型', apiField: 'column_type' })
+  .set('type', { label: '参数类型', apiField: 'type' })
 
 export const FieldSettingColumns: IColumn[] = getField(serviceDevVersionFieldSettingMapping)
 

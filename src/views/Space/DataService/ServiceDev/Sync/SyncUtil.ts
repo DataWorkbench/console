@@ -4,6 +4,7 @@ import { FieldCategory, ParameterOperator, ParameterPosition, typeStatus } from 
 
 export interface Schema {
   param_type: string
+  column_type: string
   name: string
   is_primary: boolean
 }
@@ -108,6 +109,7 @@ export const getFieldSettingParamsData: (schema: Schema[]) => FieldSettingData[]
     field: column.name,
     isRequest: false,
     isResponse: false,
+    column_type: column.column_type,
     type: column.param_type,
     customType: column.param_type,
     isPrimary: column.is_primary
