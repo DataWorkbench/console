@@ -5,7 +5,6 @@ import { useImmer } from 'use-immer'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import { map } from 'rxjs'
 import { camelCase, get, isEmpty, isEqual, keys } from 'lodash-es'
-import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import {
   AffixLabel,
   ConditionParameterField,
@@ -17,15 +16,13 @@ import { useQuerySourceTables } from 'hooks'
 import tw, { css } from 'twin.macro'
 import { nanoid } from 'nanoid'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
-import { source$, sourceColumns$ } from '../common/subjects'
+import { source$ } from '../common/subjects'
 
 type FieldKeys = 'id' | 'collectionName' | 'condition'
 
 const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => {
   const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
   const sourceForm = useRef<Form>()
-
-  const { refetch, loading } = useTableColumns(dbInfo?.id, dbInfo?.collectionName, 'source')
 
   const [conditionKey, setCondition] = useState('1')
 
@@ -93,11 +90,7 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
         }
       }
     },
-    refetchColumn: () => {
-      if (dbInfo?.id && dbInfo?.collectionName) {
-        refetch()
-      }
-    }
+    refetchColumn: () => {}
   }))
 
   const { data: tableList, refetch: tableRefetch } = useQuerySourceTables(
@@ -150,13 +143,10 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
           <ConditionParameterField
             key={conditionKey}
             name="condition"
-            columns={(sourceColumns$.getValue() || []).map((c) => c.name)}
-            label={<AffixLabel>条件参数配置</AffixLabel>}
-            loading={loading}
+            isInput
+            // columns={(sourceColumns$.getValue() || []).map((c) => c.name)}
+            label={<AffixLabel required={false}>条件参数配置</AffixLabel>}
             helpStr="可在条件参数中填写增量同步条件"
-            onRefresh={() => {
-              refetch()
-            }}
             value={dbInfo?.condition}
             onChange={(v: any) => {
               setDbInfo((draft) => {
@@ -195,19 +185,27 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
                 status: 'error'
               },
               {
-                help: '条件参数未配置',
+                help: '条件参数未正确配置',
                 status: 'error',
                 rule: (v: TConditionParameterVal) => {
                   let valid = false
                   if (v.type === 2) {
                     valid = !isEmpty(v.expression)
-                  } else {
+                  } else if (
+                    !!v.startCondition ||
+                    !!v.endValue ||
+                    !!v.startValue ||
+                    v.column ||
+                    v.endCondition
+                  ) {
                     valid =
                       !isEmpty(v.startValue) &&
                       !isEmpty(v.endValue) &&
                       !isEmpty(v.startCondition) &&
                       !isEmpty(v.endCondition) &&
                       !isEmpty(v.column)
+                  } else {
+                    valid = true
                   }
 
                   return valid
