@@ -27,7 +27,7 @@ const TabWrapper = styled(Tabs)(() => [
             ${tw`border border-neut-13 text-neut-8  bg-transparent`}
           }
           &.is-active {
-            ${tw`text-white border-b-green-11!`}
+            ${tw`text-white border-b-green-11`}
             .tag {
               ${tw`text-neut-13 bg-white border-0`}
             }
