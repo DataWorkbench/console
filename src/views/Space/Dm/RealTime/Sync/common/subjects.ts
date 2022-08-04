@@ -250,7 +250,7 @@ source$
         consumer: get(e, 'data.mode', 'group-offsets'),
         consumerId: get(e, 'data.group_id', 'default'),
         charset: get(e, 'data.encoding', 1),
-        readType: get(e, 'data.codec', 1),
+        readType: get(e, 'data.codec', 2),
         config:
           e?.data?.consumer_settings !== null
             ? JSON.stringify(
