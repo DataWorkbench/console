@@ -258,16 +258,17 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
               }
             ]}
           />
-          <FlexBox>
-            <div css={styles.line} />
-            <Center tw="px-1 cursor-pointer" onClick={() => setShowAdvanced((prev) => !prev)}>
-              <Icon name={`chevron-${showAdvanced ? 'up' : 'down'}`} type="light" />
-              高级配置
-            </Center>
-            <div css={styles.line} />
-          </FlexBox>
-          {showAdvanced && (
+
+          {false && (
             <>
+              <FlexBox>
+                <div css={styles.line} />
+                <Center tw="px-1 cursor-pointer" onClick={() => setShowAdvanced((prev) => !prev)}>
+                  <Icon name={`chevron-${showAdvanced ? 'up' : 'down'}`} type="light" />
+                  高级配置
+                </Center>
+                <div css={styles.line} />
+              </FlexBox>
               <Field>
                 <Label
                   className="label"
