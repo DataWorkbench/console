@@ -152,6 +152,13 @@ const Item = (props: any) => {
   )
 }
 
+const setIndex = (i: Record<string, any>, index1: number) => {
+  return {
+    ...i,
+    index: index1 + f
+  }
+}
+
 // eslint-disable-next-line import/prefer-default-export
 export const KafkaFieldMappings = forwardRef((props: any, ref) => {
   const { sourceColumns, ids } = props
@@ -185,11 +192,10 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
   )
 
   useImperativeHandle(ref, () => ({
-    rowMapping: () => [rowKeys, rowKeys]
+    rowMapping: () => [rowKeys.map(setIndex), rowKeys.map(setIndex)]
   }))
 
   const leftDndType = String('Right')
-
   const [{ isOver }, leftRef] = useDrop<{ uuid: string }, void, { isOver: boolean }>(() => ({
     accept: leftDndType,
     collect: (monitor) => ({
