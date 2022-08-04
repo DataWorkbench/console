@@ -528,7 +528,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                       ]}
                     >
                       <Radio value={2}>执行一次</Radio>
-                      <Radio value={1}>重复执行</Radio>
+                      {curJob?.type !== 3 && <Radio value={1}>重复执行</Radio>}
                     </RadioGroupField>
                     {params.schedulePolicy === 1 && (
                       <>
