@@ -41,6 +41,7 @@ interface IConditionParameterProps {
   columns: string[]
   loading?: boolean
   onRefresh?: () => void
+  isInput?: boolean
 }
 
 const SimpleWrapper = styled.div`
@@ -90,6 +91,7 @@ export const ConditionParameter = React.forwardRef(
       className,
       width,
       columns,
+      isInput = false,
       loading = false,
       onRefresh
     } = props
@@ -200,37 +202,52 @@ export const ConditionParameter = React.forwardRef(
           <SimpleWrapper>
             <FlexBox>
               <span tw="label-required">列名</span>
-              <Select
-                tw="flex-auto"
-                value={value?.column}
-                onChange={(v) => {
-                  setValue((draft) => {
-                    draft.column = v
-                  })
-                }}
-                isLoading={loading}
-                options={(columns || []).map((item) => ({
-                  label: item,
-                  value: item
-                }))}
-              />
-              <Button
-                tw="w-8 ml-3 p-0 dark:bg-neut-16! flex-none"
-                disabled={loading}
-                onClick={() => onRefresh && onRefresh()}
-              >
-                <Icon
-                  name="refresh"
-                  tw="text-white"
-                  css={css`
-                    svg {
-                      ${tw`fill-current`}
-                    }
-                  `}
-                  type="light"
-                  size={20}
+              {!isInput ? (
+                <>
+                  <Select
+                    tw="flex-auto"
+                    value={value?.column}
+                    onChange={(v) => {
+                      setValue((draft) => {
+                        draft.column = v
+                      })
+                    }}
+                    isLoading={loading}
+                    options={(columns || []).map((item) => ({
+                      label: item,
+                      value: item
+                    }))}
+                  />
+                  <Button
+                    tw="w-8 ml-3 p-0 dark:bg-neut-16! flex-none"
+                    disabled={loading}
+                    onClick={() => onRefresh && onRefresh()}
+                  >
+                    <Icon
+                      name="refresh"
+                      tw="text-white"
+                      css={css`
+                        svg {
+                          ${tw`fill-current`}
+                        }
+                      `}
+                      type="light"
+                      size={20}
+                    />
+                  </Button>
+                </>
+              ) : (
+                <Input
+                  tw="flex-auto"
+                  value={value?.column}
+                  onChange={(_, v) => {
+                    setValue((draft) => {
+                      draft.column = v
+                    })
+                  }}
+                  isLoading={false}
                 />
-              </Button>
+              )}
             </FlexBox>
             <FlexBox>
               <span tw="label-required">开始条件</span>
