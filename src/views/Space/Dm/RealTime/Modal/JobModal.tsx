@@ -224,17 +224,17 @@ export const JobModal = observer((props: JobModalProps) => {
         }
       }
       mutation.mutateAsync(data).then((ret) => {
+        const close = () => {
+          onClose?.({
+            id: ret.id as string,
+            pid: String(data.pid),
+            pNode,
+            jobMode: params.jobMode,
+            type: data.type,
+            isEdit
+          })
+        }
         if (data.target_type === SourceType.Oracle || data.source_type === SourceType.Oracle) {
-          const close = () => {
-            onClose?.({
-              id: ret.id as string,
-              pid: String(data.pid),
-              pNode,
-              jobMode: params.jobMode,
-              type: data.type,
-              isEdit
-            })
-          }
           const isReal = params.jobMode === JobMode.DI && params.jobType === JobType.REALTIME
           mutationConvert
             .mutateAsync({
