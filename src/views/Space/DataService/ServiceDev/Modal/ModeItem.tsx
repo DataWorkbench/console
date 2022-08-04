@@ -21,7 +21,7 @@ const Root = styled('div')(
     disabled ? tw`cursor-not-allowed` : tw`cursor-pointer`,
     selected &&
       css`
-        ${tw`border-green-11 rounded-sm!`}
+        ${tw`border-green-11 rounded-sm! `}
       `
   ]
 )
@@ -37,12 +37,12 @@ const Triangle = styled('div')(() => [
       right: 0;
       width: 0;
       height: 0;
-      border-color: #15a675 #15a675 transparent transparent;
+      border-color: #85b0d6 #85b0d6 transparent transparent;
       border-width: 14px 14px 14px 14px;
       border-style: solid;
     }
     .icon {
-      ${tw`hover:bg-[#15a675]!`}
+      ${tw`hover:bg-[#85b0d6]!`}
     }
   `
 ])
@@ -64,7 +64,7 @@ const ModeItem = ({ modeData, selected, onClick }: ModeItemProps) => {
       <div
         css={[
           tw`bg-neut-16 group-hover:bg-neut-15 py-2 px-3 text-base flex-1 relative`,
-          selected && tw`bg-[rgba(21, 166, 117, 0.1)]`
+          selected && tw`bg-[rgba(133, 176, 214, 0.1)]`
         ]}
       >
         {selected && (

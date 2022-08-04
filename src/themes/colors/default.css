@@ -232,3 +232,66 @@
   --dw-color-button-disabled-default: #f5f7fa; /* N1 */
   --dw-color-button-disabled-text: #939ea9; /* N8 */
 }
+
+/*  enfi 项目颜色改变 */
+.lego-toggles.checked {
+  background-color: #85b0d6 !important;
+}
+.dark
+  .radio-button.is-default.button.radio-button-wrapper.radio-button-wrapper-checked.checked.is-default.button {
+  background-color: rgb(133, 176, 214, 0.1) !important;
+  color: #85b0d6 !important;
+  border-color: #85b0d6 !important;
+}
+.dark .radio-button.is-default.button.radio-button-wrapper.is-default.button:hover {
+  color: #85b0d6 !important;
+}
+.dark .radio.radio-wrapper.radio-wrapper-checked.checked::before {
+  background-color: #85b0d6 !important;
+}
+.checkbox.checkbox-wrapper.checkbox-wrapper-checked.checked::before {
+  background-color: #85b0d6 !important;
+}
+.checkbox.checkbox-wrapper.indeterminate::before {
+  background-color: #85b0d6 !important;
+}
+.radio.radio-wrapper:hover::before {
+  border-color: #85b0d6 !important;
+}
+input[type='text']:focus {
+  border-color: #85b0d6 !important;
+}
+input[type='number']:focus {
+  border-color: #85b0d6 !important;
+}
+.button.is-primary {
+  background-color: #014581 !important;
+}
+.button.is-primary:hover {
+  background-color: #024d8e !important;
+}
+.radio-button.is-default:hover {
+  color: #024d8e !important;
+}
+.radio-button.is-default.checked {
+  border-color: #024d8e !important;
+  color: #024d8e !important;
+  background-color: #d2e9ff !important;
+}
+
+.button.is-outlined.css-1bjjqy2-OutlinedGreenButton.e1ac0nrt1 {
+  border-color: #85b0d6 !important;
+  color: #85b0d6 !important;
+}
+.button.is-outlined.css-1bjjqy2-OutlinedGreenButton.e1ac0nrt1:hover {
+  background-color: rgb(133, 176, 214, 0.1) !important;
+}
+
+.button.is-outlined.css-1bjjqy2-OutlinedGreenButton.e1ac0nrt1:disabled {
+  background-color: rgba(76, 94, 112, var(--tw-bg-opacity)) !important;
+  border-color: rgba(76, 94, 112, var(--tw-border-opacity)) !important;
+  color: #939ea9 !important;
+}
+.textarea:focus {
+  border-color: #85b0d6 !important;
+}

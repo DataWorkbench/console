@@ -79,7 +79,7 @@ const styles = {
   arrowBox: tw`space-x-2 bg-transparent w-[70%] z-10 text-white`,
   stepTag: tw`flex items-center text-left border border-green-11 rounded-r-2xl pr-4 mr-3 h-7 leading-5`,
   stepNum: tw`inline-block text-white bg-green-11 w-5 h-5 text-center rounded-full -ml-2.5`,
-  stepText: tw`ml-2 inline-block border-green-11 text-green-11`
+  stepText: tw`ml-2 inline-block border-green-11 text-green-11!`
 }
 
 const getStepsData = (regionId: string, spaceId: string) => [

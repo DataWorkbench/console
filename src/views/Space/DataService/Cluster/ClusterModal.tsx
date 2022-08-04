@@ -69,8 +69,9 @@ const formStyle = {
     }
     .checked {
       .radioBox {
+        ${tw`bg-neut-16! border-green-11 border-[1px]! rounded-sm`}
         .title {
-          ${tw`bg-[rgba(21, 166, 117, 0.1)] border-b-0 rounded-sm`}
+          ${tw`bg-[rgba(133, 176, 214, 0.1)] border-b-0 rounded-sm`}
         }
         div {
           ${tw``}

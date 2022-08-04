@@ -27,8 +27,8 @@ import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { KafkaFieldMappings } from 'components/FieldMappings/KafkaFieldMappings'
 import {
   useFieldConfig,
-  useFieldConfigRealSqlKafka,
-  useHbaseSourceType
+  useFieldConfigRealSqlKafka
+  // useHbaseSourceType
 } from 'components/FieldMappings/Subjects'
 import { AffixLabel } from 'components/AffixLabel'
 import MappingItem, { FieldRow, TMappingField } from './MappingItem'
@@ -255,7 +255,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   const [isRealSqlKafka] = useFieldConfigRealSqlKafka()
   const [config] = useFieldConfig()
-  const [hbaseSourceType] = useHbaseSourceType()
+  // const [hbaseSourceType] = useHbaseSourceType()
   // const kafkaReadType = kafkaSource$.getValue()?.readType
   // const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 1
   const {
@@ -790,18 +790,19 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     return leftFields
   }
 
-  function renderHbaseRowKey() {
-    if (!isHbaseSource) {
-      return null
-    }
-    return (
-      <FieldRow tw="cursor-default">
-        <div>{hbaseSourceType}</div>
-        <div>rowkey</div>
-        <div tw="text-neut-8">不可编辑</div>
-      </FieldRow>
-    )
-  }
+  // function renderHbaseRowKey() {
+  //   return null
+  //   // if (!isHbaseSource) {
+  //   //   return null
+  //   // }
+  //   // return (
+  //   //   <FieldRow tw="cursor-default">
+  //   //     <div>{hbaseSourceType}</div>
+  //   //     <div>rowkey</div>
+  //   //     <div tw="text-neut-8">不可编辑</div>
+  //   //   </FieldRow>
+  //   // )
+  // }
 
   return (
     <Root>
@@ -901,7 +902,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <div>类型</div>
                 <div>来源表字段</div>
               </FieldRow>
-              {renderHbaseRowKey()}
+              {/* {renderHbaseRowKey()} */}
               {getLeftFields().map((item, i) => (
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
@@ -939,6 +940,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   <Icon name="add" type="light" />
                   添加字段
                 </Center>
+              )}
+              {isHbaseSource && (
+                <div tw="text-neut-8 mt-4 ml-2 mb-1">
+                  {`注：如需同步 rowkey 内容，请添加字段：类型 "STRING"，类族 "row"，类名 "rowkey"`}
+                </div>
               )}
             </div>
           ) : (

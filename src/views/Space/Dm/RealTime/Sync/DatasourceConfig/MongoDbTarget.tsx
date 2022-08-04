@@ -61,7 +61,10 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
     },
     getData: () => ({
       id: dbInfo?.id,
-      collection_name: dbInfo?.collectionName
+      collection_name: dbInfo?.collectionName,
+      write_mode: dbInfo?.writeMode,
+      replace_key: dbInfo?.replaceKey,
+      batch_size: dbInfo?.batchSize
     }),
     refetchColumn: () => {
       // refetch()
@@ -191,7 +194,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
               <Field>
                 <Label className="label" theme="green">
                   <AffixLabel
-                    required
+                    required={false}
                     theme="green"
                     help="批量写入的条数，该值可减少网络交互次数，过大会造成 OOM"
                   >
