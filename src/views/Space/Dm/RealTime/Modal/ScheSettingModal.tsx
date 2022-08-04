@@ -482,8 +482,8 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             .split(/[\r\n]/)
                             .filter((str) => !isEmpty(str))
                             .every((str) => {
-                              const [key, val] = str.split('=')
-                              if (isEmpty(key) || val === undefined || isEmpty(val)) {
+                              const [key] = str.split('=')
+                              if (!key) {
                                 return false
                               }
                               if (keys.includes(key)) {
