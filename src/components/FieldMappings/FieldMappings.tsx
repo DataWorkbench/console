@@ -664,8 +664,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       [
         SourceType.Mysql,
         SourceType.PostgreSQL,
-        SourceType.SqlServer,
-        SourceType.MongoDB
+        SourceType.SqlServer
         // @ts-ignore
       ].includes(rightTypeName?.getType?.()) &&
       !rightFields.length
