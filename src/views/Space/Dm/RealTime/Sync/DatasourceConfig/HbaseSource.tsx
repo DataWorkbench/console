@@ -69,9 +69,9 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
       if (
         dbInfo?.startRowKey &&
         dbInfo?.endRowKey &&
-        parseInt(dbInfo?.startRowKey, 10) > parseInt(dbInfo?.endRowKey, 10)
+        parseInt(dbInfo?.startRowKey, 10) >= parseInt(dbInfo?.endRowKey, 10)
       ) {
-        showConfWarn('开始主键不能大于结束主键')
+        showConfWarn('开始主键不能大于等于结束主键')
         return false
       }
       if (!sourceForm.current) {
