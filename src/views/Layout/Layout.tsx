@@ -6,6 +6,7 @@ import { FlexBox, ContentBox } from 'components'
 import { useStore } from 'stores'
 import { MenuType } from 'stores/GlobalStore'
 import { EnFiHeader } from 'views/Space/Header/EnFiHeader'
+import EnfiLayout from './EnfiLayout'
 
 const getLinks = (items: MenuType[]): any =>
   items.map((item) => (item.items ? getLinks(item.items) : `/${item.name}`))
@@ -19,6 +20,9 @@ const MainLayout = observer(({ children }) => {
   } = useStore()
 
   const match = useRouteMatch(flattenDeep(getLinks(menus)))
+  if (isPrivate) {
+    return <EnfiLayout>{children}</EnfiLayout>
+  }
   return (
     <FlexBox orient="column" tw="h-screen bg-neut-2">
       {!isPrivate && <GlobalNav zoneNotSwitch />}
