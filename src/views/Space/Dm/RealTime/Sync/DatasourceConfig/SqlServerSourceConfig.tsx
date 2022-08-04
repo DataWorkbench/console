@@ -25,7 +25,7 @@ import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks
 const {
   // RadioGroupField,
   CheckboxGroupField,
-  TextField,
+  // TextField,
   ToggleField,
   NumberField
 } = Form
@@ -117,7 +117,7 @@ const SqlServerSourceConfig = forwardRef(
               id: e?.data?.id,
               tableName: get(e, 'data.table_list[0]'),
               updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
-              slot: get(e, 'data.slot_name'),
+              // slot: get(e, 'data.slot_name'),
               lsn: get(e, 'data.lsn', 0),
               time: get(e, 'data.poll_interval', 120),
               autoCreate: get(e, 'data.allow_create_slot', true),
@@ -144,7 +144,7 @@ const SqlServerSourceConfig = forwardRef(
         id: dbInfo?.id,
         lsn: dbInfo?.lsn.toString(),
         poll_interval: dbInfo?.time,
-        slot_name: dbInfo?.slot,
+        // slot_name: dbInfo?.slot,
         table_list: [dbInfo?.tableName],
         cat: dbInfo?.updateType.join(',')
         // allow_create_slot: dbInfo?.autoCreate,
@@ -279,25 +279,6 @@ const SqlServerSourceConfig = forwardRef(
                     return v.filter(Boolean).length > 0
                   },
                   help: '请至少选择一种更新类型',
-                  status: 'error'
-                }
-              ]}
-            />
-            <TextField
-              name="slot"
-              label={<AffixLabel required>slot 名称</AffixLabel>}
-              placeholder="请输入 slot 名称"
-              value={dbInfo?.slot}
-              onChange={(e) => {
-                setDbInfo((draft) => {
-                  draft.slot = e
-                })
-              }}
-              validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请输入 slot 名称',
                   status: 'error'
                 }
               ]}
