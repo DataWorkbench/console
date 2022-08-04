@@ -12,7 +12,7 @@ import { useImmer } from 'use-immer'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import { map } from 'rxjs'
 import { get } from 'lodash-es'
-import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
+// import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import { AffixLabel, Center, FlexBox, HelpCenterLink, SelectWithRefresh } from 'components'
 import { useQuerySourceTables } from 'hooks'
 import { Control, Field, Icon, InputNumber, Label } from '@QCFE/lego-ui'
@@ -28,7 +28,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
   const sourceForm = useRef<Form>()
 
   const [showAdvanced, setShowAdvanced] = useState(false)
-  const { refetch } = useTableColumns(dbInfo?.id, dbInfo?.collectionName, 'target')
+  // const { refetch } = useTableColumns(dbInfo?.id, dbInfo?.collectionName, 'target')
   useLayoutEffect(() => {
     const sub = target$
       .pipe(
@@ -64,7 +64,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
       collection_name: dbInfo?.collectionName
     }),
     refetchColumn: () => {
-      refetch()
+      // refetch()
     }
   }))
 
