@@ -28,7 +28,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
           }
           return {
             id: get(e, 'data.id'),
-            batchSize: get(e, 'data.batch_size', 1),
+            batchSize: get(e, 'data.batch_size'),
             keyDelimiter: get(e, 'data.key_delimiter'),
             type: get(e, 'data.type'),
             index: get(e, 'data.index')
@@ -118,7 +118,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
             />
           )}
           <TextField
-            label={<AffixLabel>分隔符号</AffixLabel>}
+            label={<AffixLabel required={false}>分隔符号</AffixLabel>}
             name="keyDelimiter"
             value={dbInfo?.keyDelimiter}
             onChange={(v) => {

@@ -179,16 +179,18 @@ export const fieldTypeMapper = new Map([
     'elastic_search',
     [
       // INTEGER,SMALLINT,DECIMAL,TIMESTAM DOUBLE,FLOAT,DATE,VARCHAR,VARCHAR,TIMESTAMP,TIME,BYTE
+      'BOOLEAN',
+      'BYTE',
+      'SHORT',
       'INTEGER',
-      'SMALLINT',
-      'DECIMAL',
-      'TIMESTAMP',
-      'DOUBLE',
+      'LONG',
       'FLOAT',
+      'DOUBLE',
+      'TEXT',
+      'BINARY',
       'DATE',
-      'VARCHAR',
-      'TIME',
-      'BYTE'
+      'OBJECT',
+      'NESTED'
     ]
   ],
   ['binlog', mysql],

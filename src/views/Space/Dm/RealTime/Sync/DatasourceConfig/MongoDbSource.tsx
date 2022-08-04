@@ -76,11 +76,29 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
     },
     getData: () => {
       const { condition } = dbInfo
+      console.log(
+        condition,
+        !!condition?.startCondition ||
+          !!condition?.startCondition ||
+          !!condition?.endCondition ||
+          !!condition?.endValue ||
+          !!condition?.column
+      )
       return {
         id: dbInfo?.id,
         collection_name: dbInfo?.collectionName,
         schema: '',
-        condition_type: condition?.type,
+        condition_type:
+          // eslint-disable-next-line no-nested-ternary
+          condition?.type === 2
+            ? 2
+            : !!condition?.startCondition ||
+              !!condition?.startCondition ||
+              !!condition?.endCondition ||
+              !!condition?.endValue ||
+              !!condition?.column
+            ? 1
+            : 0,
         visualization: {
           column: condition?.column,
           start_condition: condition?.startCondition,

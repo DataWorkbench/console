@@ -28,7 +28,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
           }
           return {
             id: get(e, 'data.id'),
-            batchSize: get(e, 'data.batch_size', 1),
+            batchSize: get(e, 'data.batch_size'),
             type: get(e, 'data.type'),
             index: get(e, 'data.index')
           }
@@ -126,7 +126,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
 
           {showAdvanced && (
             <NumberField
-              label={<AffixLabel required>批量大小</AffixLabel>}
+              label={<AffixLabel required={false}>批量大小</AffixLabel>}
               name="batchSize"
               value={dbInfo?.batchSize}
               onChange={(v) => {
@@ -140,13 +140,6 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
               help="1-65535"
               placeholder="批量大小"
               validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请设置批量大小',
-                  status: 'error'
-                }
-              ]}
               showButton={false}
             />
           )}
