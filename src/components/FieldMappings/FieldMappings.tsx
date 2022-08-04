@@ -296,7 +296,13 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       if (leftColumns.length === 0 && rightColumns.length === 0) {
         return null
       }
-      return [leftColumns, rightColumns]
+      const setIndex = (i: Record<string, any>, index1: number) => {
+        return {
+          ...i,
+          index: index1 + 1
+        }
+      }
+      return [leftColumns.map(setIndex), rightColumns.map(setIndex)]
     },
     getOther: () => {
       if (!isHbaseTarget || !hbaseRef.current) {
