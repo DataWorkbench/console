@@ -3,7 +3,7 @@ import Strategies from 'views/Space/Ops/components/Monitor/Strategies'
 import { useState } from 'react'
 import MonitorHistory from 'views/Space/Ops/components/Monitor/MonitorHistory'
 
-const Monitor = () => {
+const Monitor = (props: { jobId?: string; showAdd: boolean; jobType: 1 | 2 }) => {
   const [value, setValue] = useState('0')
   return (
     <div tw="w-full mt-5">
@@ -11,8 +11,8 @@ const Monitor = () => {
         <RadioButton value="0"> 告警策略 </RadioButton>
         <RadioButton value="1"> 告警记录 </RadioButton>
       </RadioGroup>
-      {value === '0' && <Strategies />}
-      {value === '1' && <MonitorHistory />}
+      {value === '0' && <Strategies {...props} />}
+      {value === '1' && <MonitorHistory {...props} />}
     </div>
   )
 }
