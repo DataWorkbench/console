@@ -20,26 +20,35 @@ const GridItem = styled.div(({ labelWidth = 188 }: { labelWidth?: number }) => [
   `
 ])
 export default function StreamDevContent({
-  data,
-  language
+  data
 }: {
   data?: Record<string, any>
-  language?: string
+  // language?: string
 }) {
   if (!data) {
     return <Loading size="large" />
   }
   if (data.type === 2) {
     return (
-      <DevContentJSON data={{ job_content: data.sql.code }} showStep={false} language={language} />
+      <DevContentJSON
+        data={{ job_content: data?.sql?.code ?? '' }}
+        showStep={false}
+        language="sql"
+      />
     )
   }
   if (data.type === 4) {
-    return <DevContentJSON data={{ job_content: data.python.code }} showStep={false} />
+    return (
+      <DevContentJSON
+        data={{ job_content: data?.python_code?.code ?? '' }}
+        language="python"
+        showStep={false}
+      />
+    )
   }
   if (data.type === 3) {
     return (
-      <div>
+      <div tw="p-5">
         <GridItem>
           <span>JAR 程序包</span>
           <span tw="flex">
