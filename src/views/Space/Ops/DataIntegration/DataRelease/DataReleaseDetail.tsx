@@ -367,7 +367,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
           <LinkInstance jobId={id} version={version} />
         </TabPanel>
         <TabPanel label="监控告警" name="alarm">
-          <Monitor />
+          <Monitor jobId={id} showAdd jobType={2} />
         </TabPanel>
         {/* <TabPanel label="开发内容" name="dev"> */}
         {/*   <DevContent data={config} curJob={data} /> */}
