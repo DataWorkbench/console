@@ -113,7 +113,11 @@ const HiveTargetConfig = forwardRef(
                     <div>
                       <span>不能为空, </span>
                       <span tw="text-font-placeholder mr-1">详见</span>
-                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                      <HelpCenterLink
+                        hasIcon
+                        isIframe={false}
+                        href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hive/"
+                      >
                         Hive Sink 配置文档
                       </HelpCenterLink>
                     </div>
@@ -122,7 +126,11 @@ const HiveTargetConfig = forwardRef(
                 }
               ]}
               help={
-                <HelpCenterLink hasIcon isIframe={false} href="###">
+                <HelpCenterLink
+                  hasIcon
+                  isIframe={false}
+                  href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hive/"
+                >
                   Hive Sink 配置文档
                 </HelpCenterLink>
               }

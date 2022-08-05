@@ -81,7 +81,11 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                   <div>
                     <span>不能为空, </span>
                     <span tw="text-font-placeholder mr-1">详见</span>
-                    <HelpCenterLink hasIcon isIframe={false} href="###">
+                    <HelpCenterLink
+                      hasIcon
+                      isIframe={false}
+                      href="/bigdata/dataomnis/manual/integration_job/cfg_slink/elasticsearch/"
+                    >
                       ElasticSearch Sink 配置文档
                     </HelpCenterLink>
                   </div>
@@ -90,7 +94,11 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
               }
             ]}
             help={
-              <HelpCenterLink hasIcon isIframe={false} href="###">
+              <HelpCenterLink
+                hasIcon
+                isIframe={false}
+                href="/bigdata/dataomnis/manual/integration_job/cfg_slink/elasticsearch/"
+              >
                 ElasticSearch Sink 配置文档
               </HelpCenterLink>
             }
