@@ -111,7 +111,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/bigdata/dataomnis/manual/integration_job/cfg_sink/mongodb/"
+                      href="/manual/integration_job/cfg_sink/mongodb/"
                     >
                       MongoDb Slink 配置文档
                     </HelpCenterLink>
@@ -124,7 +124,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
               <HelpCenterLink
                 isIframe={false}
                 hasIcon
-                href="/bigdata/dataomnis/manual/integration_job/cfg_sink/mongodb/"
+                href="/manual/integration_job/cfg_sink/mongodb/"
               >
                 MongoDb Slink 配置文档
               </HelpCenterLink>

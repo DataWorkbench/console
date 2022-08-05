@@ -84,7 +84,7 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hbase/"
+                      href="/manual/integration_job/cfg_sink/hbase/"
                     >
                       HBase Sink 配置文档
                     </HelpCenterLink>
@@ -97,7 +97,7 @@ const HbaseTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
               <HelpCenterLink
                 isIframe={false}
                 hasIcon
-                href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hbase/"
+                href="/manual/integration_job/cfg_sink/hbase/"
               >
                 HBase Sink 配置文档
               </HelpCenterLink>

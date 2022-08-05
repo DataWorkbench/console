@@ -90,7 +90,7 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
               <HelpCenterLink
                 hasIcon
                 isIframe={false}
-                href="/bigdata/dataomnis/manual/integration_job/cfg_source/hdfs/"
+                href="/manual/integration_job/cfg_source/hdfs/"
               >
                 HDFS Source 配置文档
               </HelpCenterLink>
@@ -106,7 +106,7 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/bigdata/dataomnis/manual/integration_job/cfg_source/hdfs/"
+                      href="/manual/integration_job/cfg_source/hdfs/"
                     >
                       HDFS Source 配置文档
                     </HelpCenterLink>

@@ -125,7 +125,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/bigdata/dataomnis/manual/integration_job/cfg_source/hbase/"
+                      href="/manual/integration_job/cfg_source/hbase/"
                     >
                       HBase Source 配置文档
                     </HelpCenterLink>
@@ -138,7 +138,7 @@ const HbaseSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) 
               <HelpCenterLink
                 isIframe={false}
                 hasIcon
-                href="/bigdata/dataomnis/manual/integration_job/cfg_source/hbase/"
+                href="/manual/integration_job/cfg_source/hbase/"
               >
                 HBase Source 配置文档
               </HelpCenterLink>

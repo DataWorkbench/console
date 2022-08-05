@@ -186,7 +186,7 @@ const KafkaSourceConfig = forwardRef(
                       <HelpCenterLink
                         hasIcon
                         isIframe={false}
-                        href="/bigdata/dataomnis/manual/integration_job/cfg_source/kafka/"
+                        href="/manual/integration_job/cfg_source/kafka/"
                       >
                         Kafka Source 配置文档
                       </HelpCenterLink>
@@ -199,7 +199,7 @@ const KafkaSourceConfig = forwardRef(
                 <HelpCenterLink
                   hasIcon
                   isIframe={false}
-                  href="/bigdata/dataomnis/manual/integration_job/cfg_source/kafka/"
+                  href="/manual/integration_job/cfg_source/kafka/"
                 >
                   Kafka Source 配置文档
                 </HelpCenterLink>
