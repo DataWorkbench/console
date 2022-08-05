@@ -70,7 +70,7 @@ export const Header = observer(() => {
   }, [regionId, set, space, spaceIndex, workSpaceStore?.space?.id])
 
   return (
-    <Root tw="z-[100]">
+    <Root tw="z-[100] relative">
       <Center tw="space-x-3">
         <BackMenu />
         <Center

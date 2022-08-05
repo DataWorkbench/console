@@ -50,7 +50,7 @@ export const Navs = ({ mod }: NavsProps) => {
     }
   }, [location, globalStore, setDarkMode])
   return (
-    <div tw="flex gap-6">
+    <div tw="flex gap-6 absolute left-1/2 ml-[-150px]">
       {funcList
         .filter((i) => !i.hideInHeader)
         .map(({ title, name }) => (
