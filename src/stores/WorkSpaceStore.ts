@@ -48,7 +48,7 @@ const defaultFuncList = [
     subFuncList: [
       // { name: 'overview', title: '运维大屏', icon: 'blockchain' },
       // { name: 'login', title: '登录', icon: 'blockchain' },
-      { name: 'general-view', title: '运维概览', icon: 'blockchain' },
+      { name: 'general-view', title: '运维概览', icon: 'q-dashboardDuotone' },
       {
         name: 'stream',
         title: '数据开发运维',
