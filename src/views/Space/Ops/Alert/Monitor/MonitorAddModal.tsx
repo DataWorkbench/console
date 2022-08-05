@@ -107,7 +107,7 @@ const MonitorAddModal = observer((props: IMonitorAddProps) => {
       },
       monitor_object: {
         render: (type: 1 | 2) => (
-          <span tw="text-neut-8">{{ 1: '数据集成作业', 2: '数据开发作业' }[type]}</span>
+          <span tw="text-neut-8">{{ 2: '数据集成', 1: '实时计算' }[type]}</span>
         )
       },
       desc: {

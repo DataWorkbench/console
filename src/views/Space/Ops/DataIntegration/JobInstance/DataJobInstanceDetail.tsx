@@ -442,7 +442,7 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
           </div>
         </TabPanel>
         <TabPanel label="监控告警" name="Monitor">
-          <Monitor />
+          <Monitor jobId={data?.job_id} showAdd={false} jobType={2} />
         </TabPanel>
         {/* <TabPanel label="开发内容" name="Develop"> */}
         {/*   /!* <div>3</div> *!/ */}
