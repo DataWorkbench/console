@@ -101,7 +101,11 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                   <div>
                     <span>不能为空, </span>
                     <span tw="text-font-placeholder mr-1">详见</span>
-                    <HelpCenterLink hasIcon isIframe={false} href="###">
+                    <HelpCenterLink
+                      hasIcon
+                      isIframe={false}
+                      href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hdfs/"
+                    >
                       HDFS Sink 配置文档
                     </HelpCenterLink>
                   </div>
@@ -110,7 +114,11 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
               }
             ]}
             help={
-              <HelpCenterLink hasIcon isIframe={false} href="###">
+              <HelpCenterLink
+                hasIcon
+                isIframe={false}
+                href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hdfs/"
+              >
                 HDFS Sink 配置文档
               </HelpCenterLink>
             }
@@ -183,7 +191,7 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                 draft.compress = map1[e as 1]
               })
             }}
-            options={['text', 'orc', 'parquet'].map((i, index) => ({
+            options={['text'].map((i, index) => ({
               label: i,
               value: index + 1
             }))}

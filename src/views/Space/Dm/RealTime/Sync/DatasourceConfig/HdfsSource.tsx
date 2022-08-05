@@ -87,7 +87,11 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
             }}
             placeholder="请输入文件路径"
             help={
-              <HelpCenterLink hasIcon isIframe={false} href="###">
+              <HelpCenterLink
+                hasIcon
+                isIframe={false}
+                href="/bigdata/dataomnis/manual/integration_job/cfg_source/hdfs/"
+              >
                 HDFS Source 配置文档
               </HelpCenterLink>
             }
@@ -99,7 +103,11 @@ const HdfsSource = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                   <div>
                     <span>不能为空, </span>
                     <span tw="text-font-placeholder mr-1">详见</span>
-                    <HelpCenterLink hasIcon isIframe={false} href="###">
+                    <HelpCenterLink
+                      hasIcon
+                      isIframe={false}
+                      href="/bigdata/dataomnis/manual/integration_job/cfg_source/hdfs/"
+                    >
                       HDFS Source 配置文档
                     </HelpCenterLink>
                   </div>

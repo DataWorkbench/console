@@ -907,7 +907,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
                   // hasMoreAction={!isKafkaSource}
-                  item={item}
+                  item={{ ...item, unEditable: isHbaseSource && item.name === 'rowkey' }}
                   key={item.name}
                   index={i}
                   config={config.source}
@@ -941,9 +941,27 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   添加字段
                 </Center>
               )}
-              {isHbaseSource && (
+              {isHbaseSource && !leftFields.find((i) => i.name === 'rowkey') && (
                 <div tw="text-neut-8 mt-4 ml-2 mb-1">
-                  {`注：如需同步 rowkey 内容，请添加字段：类型 "STRING"，类族 "row"，类名 "rowkey"`}
+                  注：如需同步 rowkey 内容，请点击：
+                  <span
+                    tw="text-white cursor-pointer"
+                    onClick={() => {
+                      setLeftFields((fields) => [
+                        ...fields,
+                        {
+                          name: 'rowkey',
+                          type: 'STRING',
+                          custom: false,
+                          default: '',
+                          isEditing: false,
+                          uuid: nanoid()
+                        }
+                      ])
+                    }}
+                  >
+                    添加 rowkey
+                  </span>
                 </div>
               )}
             </div>
