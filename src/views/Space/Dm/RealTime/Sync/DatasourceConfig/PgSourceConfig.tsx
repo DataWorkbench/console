@@ -264,7 +264,7 @@ const PgSourceConfig = forwardRef(
                       <HelpCenterLink
                         hasIcon
                         isIframe={false}
-                        href="/bigdata/dataomnis/manual/integration_job/cfg_source/postgres_cdc/"
+                        href="/manual/integration_job/cfg_source/postgres_cdc/"
                       >
                         Postgres（ Postgres CDC）Source 配置文档
                       </HelpCenterLink>
@@ -277,7 +277,7 @@ const PgSourceConfig = forwardRef(
                 <HelpCenterLink
                   hasIcon
                   isIframe={false}
-                  href="/bigdata/dataomnis/manual/integration_job/cfg_source/postgres_cdc/"
+                  href="/manual/integration_job/cfg_source/postgres_cdc/"
                 >
                   Postgres（ Postgres CDC）Source 配置文档
                 </HelpCenterLink>
