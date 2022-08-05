@@ -404,6 +404,7 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
               validateOnChange
               valueKey="id"
               clearable
+              closeOnSelect={false}
               schemas={[
                 {
                   rule: (v) => Array.isArray(v) && v.length,

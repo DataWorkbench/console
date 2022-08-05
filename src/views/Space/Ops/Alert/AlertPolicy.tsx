@@ -93,14 +93,14 @@ const AlertPolicy = () => {
         render: (type: keyof typeof monitorObjectTypes) => monitorObjectTypes[type]?.label
       },
       [getName('desc')]: {
-        render: (desc: string) => <span tw="text-font-placeholder">{desc} </span>
+        render: (desc: string) => <span tw="text-font-placeholder text-white">{desc} </span>
       },
       [getName('updated')]: {
         ...getColumnSort(getName('updated')),
         render: (time: number) => {
           if (time) {
             return (
-              <span tw="text-font-placeholder">
+              <span tw="text-font-placeholder text-white">
                 {dayjs(time * 1000).format('YYYY-MM-DD HH:mm:ss')}
               </span>
             )
