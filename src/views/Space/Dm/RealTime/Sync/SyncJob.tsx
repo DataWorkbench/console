@@ -51,7 +51,7 @@ const CollapseWrapper = styled('div')(() => [
     li.collapse-item {
       ${tw`mb-2 rounded-[3px] overflow-hidden`}
       .collapse-item-label {
-        ${tw`h-11 border-none hover:bg-neut-16`}
+        ${tw`h-11 border-none hover:bg-neut-16 pl-[10px]`}
       }
 
       .collapse-item-content {
@@ -751,7 +751,8 @@ const SyncJob = () => {
         {/* </Button> */}
         {!!confData?.updated && (
           <span tw="flex-auto text-right text-font">
-            最后更新时间：{timeFormat(confData.updated * 1000)}
+            最后更新时间：
+            {timeFormat(confData.updated * 1000)}
           </span>
         )}
       </JobToolBar>
