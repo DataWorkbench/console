@@ -23,6 +23,8 @@ const { SelectField, TextField } = Form
 const { MenuItem } = Menu as any
 
 export type TMappingField = {
+  unEditable?: boolean
+  disabled?: Boolean
   type: string
   name: string
   uuid: string
@@ -281,9 +283,13 @@ const MappingItem = (props: MappingItemProps) => {
     setShowMoreMenu(false)
   }
 
-  if (config.readonly) {
+  if (config.sort) {
+    drag(drop(ref))
+  }
+
+  if (item.disabled || config.readonly) {
     return (
-      <FieldRow ref={ref} className={className} isReverse>
+      <FieldRow ref={ref} className={className} isReverse={isLeft}>
         <div>{item.type}</div>
         <div>{item.name}</div>
       </FieldRow>
@@ -294,11 +300,12 @@ const MappingItem = (props: MappingItemProps) => {
     let menuItems: { key: string; icon: string; text: string }[] = []
     if (item.custom) {
       menuItems = [
-        config.edit && {
-          key: 'edit',
-          icon: 'if-pen',
-          text: '编辑'
-        },
+        !item.unEditable &&
+          config.edit && {
+            key: 'edit',
+            icon: 'if-pen',
+            text: '编辑'
+          },
         // {
         //   key: 'constant',
         //   icon: 'q-counterFill',
@@ -591,7 +598,6 @@ const MappingItem = (props: MappingItemProps) => {
   //     </FieldRow>
   //   )
   // }
-  drag(drop(ref))
   return (
     <Tippy
       content={renderConfirmContent()}
