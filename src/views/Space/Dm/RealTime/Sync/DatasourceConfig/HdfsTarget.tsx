@@ -183,7 +183,7 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                 draft.compress = map1[e as 1]
               })
             }}
-            options={['text', 'orc', 'parquet'].map((i, index) => ({
+            options={['text'].map((i, index) => ({
               label: i,
               value: index + 1
             }))}
