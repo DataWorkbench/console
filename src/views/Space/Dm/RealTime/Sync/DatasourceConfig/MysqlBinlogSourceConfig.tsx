@@ -308,7 +308,11 @@ const MysqlBinlogSourceConfig = forwardRef(
                       <div>
                         <span>不能为空, </span>
                         <span tw="text-font-placeholder mr-1">详见</span>
-                        <HelpCenterLink hasIcon isIframe={false} href="###">
+                        <HelpCenterLink
+                          hasIcon
+                          isIframe={false}
+                          href="/bigdata/dataomnis/manual/integration_job/cfg_source/mysql_binlog/"
+                        >
                           MySQL（MySQL Binlog）Source 配置文档
                         </HelpCenterLink>
                       </div>
@@ -317,7 +321,11 @@ const MysqlBinlogSourceConfig = forwardRef(
                   }
                 ]}
                 help={
-                  <HelpCenterLink hasIcon isIframe={false} href="##">
+                  <HelpCenterLink
+                    hasIcon
+                    isIframe={false}
+                    href="/bigdata/dataomnis/manual/integration_job/cfg_source/mysql_binlog/"
+                  >
                     MySQL（MySQL Binlog）Source 配置文档
                   </HelpCenterLink>
                 }

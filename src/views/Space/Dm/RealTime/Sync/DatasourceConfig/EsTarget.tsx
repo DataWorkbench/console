@@ -28,7 +28,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
           }
           return {
             id: get(e, 'data.id'),
-            batchSize: get(e, 'data.batch_size', 1),
+            batchSize: get(e, 'data.batch_size'),
             keyDelimiter: get(e, 'data.key_delimiter'),
             type: get(e, 'data.type'),
             index: get(e, 'data.index')
@@ -81,7 +81,11 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                   <div>
                     <span>不能为空, </span>
                     <span tw="text-font-placeholder mr-1">详见</span>
-                    <HelpCenterLink hasIcon isIframe={false} href="###">
+                    <HelpCenterLink
+                      hasIcon
+                      isIframe={false}
+                      href="/bigdata/dataomnis/manual/integration_job/cfg_slink/elasticsearch/"
+                    >
                       ElasticSearch Sink 配置文档
                     </HelpCenterLink>
                   </div>
@@ -90,7 +94,11 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
               }
             ]}
             help={
-              <HelpCenterLink hasIcon isIframe={false} href="###">
+              <HelpCenterLink
+                hasIcon
+                isIframe={false}
+                href="/bigdata/dataomnis/manual/integration_job/cfg_slink/elasticsearch/"
+              >
                 ElasticSearch Sink 配置文档
               </HelpCenterLink>
             }
@@ -118,7 +126,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
             />
           )}
           <TextField
-            label={<AffixLabel>分隔符号</AffixLabel>}
+            label={<AffixLabel required={false}>分隔符号</AffixLabel>}
             name="keyDelimiter"
             value={dbInfo?.keyDelimiter}
             onChange={(v) => {

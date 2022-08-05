@@ -76,11 +76,29 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
     },
     getData: () => {
       const { condition } = dbInfo
+      console.log(
+        condition,
+        !!condition?.startCondition ||
+          !!condition?.startCondition ||
+          !!condition?.endCondition ||
+          !!condition?.endValue ||
+          !!condition?.column
+      )
       return {
         id: dbInfo?.id,
         collection_name: dbInfo?.collectionName,
         schema: '',
-        condition_type: condition?.type,
+        condition_type:
+          // eslint-disable-next-line no-nested-ternary
+          condition?.type === 2
+            ? 2
+            : !!condition?.startCondition ||
+              !!condition?.startCondition ||
+              !!condition?.endCondition ||
+              !!condition?.endValue ||
+              !!condition?.column
+            ? 1
+            : 0,
         visualization: {
           column: condition?.column,
           start_condition: condition?.startCondition,
@@ -126,8 +144,12 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
                   <div>
                     <span>不能为空, </span>
                     <span tw="text-font-placeholder mr-1">详见</span>
-                    <HelpCenterLink hasIcon isIframe={false} href="###">
-                      HDFS Source 配置文档
+                    <HelpCenterLink
+                      hasIcon
+                      isIframe={false}
+                      href="/bigdata/dataomnis/manual/integration_job/cfg_source/mongodb/"
+                    >
+                      MongoDb Source 配置文档
                     </HelpCenterLink>
                   </div>
                 ),
@@ -135,7 +157,11 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
               }
             ]}
             help={
-              <HelpCenterLink isIframe={false} hasIcon href="###">
+              <HelpCenterLink
+                isIframe={false}
+                hasIcon
+                href="/bigdata/dataomnis/manual/integration_job/cfg_source/mongodb/"
+              >
                 MongoDb Source 配置文档
               </HelpCenterLink>
             }

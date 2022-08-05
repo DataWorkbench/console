@@ -28,7 +28,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
           }
           return {
             id: get(e, 'data.id'),
-            batchSize: get(e, 'data.batch_size', 1),
+            batchSize: get(e, 'data.batch_size'),
             type: get(e, 'data.type'),
             index: get(e, 'data.index')
           }
@@ -80,7 +80,11 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                   <div>
                     <span>不能为空, </span>
                     <span tw="text-font-placeholder mr-1">详见</span>
-                    <HelpCenterLink hasIcon isIframe={false} href="###">
+                    <HelpCenterLink
+                      hasIcon
+                      isIframe={false}
+                      href="/bigdata/dataomnis/manual/integration_job/cfg_source/elasticsearch/"
+                    >
                       ElasticSearch Source 配置文档
                     </HelpCenterLink>
                   </div>
@@ -89,7 +93,11 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
               }
             ]}
             help={
-              <HelpCenterLink hasIcon isIframe={false} href="###">
+              <HelpCenterLink
+                hasIcon
+                isIframe={false}
+                href="/bigdata/dataomnis/manual/integration_job/cfg_source/elasticsearch/"
+              >
                 ElasticSearch Source 配置文档
               </HelpCenterLink>
             }
@@ -126,7 +134,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
 
           {showAdvanced && (
             <NumberField
-              label={<AffixLabel required>批量大小</AffixLabel>}
+              label={<AffixLabel required={false}>批量大小</AffixLabel>}
               name="batchSize"
               value={dbInfo?.batchSize}
               onChange={(v) => {
@@ -140,13 +148,6 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
               help="1-65535"
               placeholder="批量大小"
               validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请设置批量大小',
-                  status: 'error'
-                }
-              ]}
               showButton={false}
             />
           )}

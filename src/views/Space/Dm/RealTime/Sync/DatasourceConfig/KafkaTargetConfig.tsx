@@ -128,7 +128,11 @@ const KafkaTargetConfig = forwardRef(
               }}
               placeholder="请输入 Topic"
               help={
-                <HelpCenterLink hasIcon href="###" isIframe={false}>
+                <HelpCenterLink
+                  hasIcon
+                  href="/bigdata/dataomnis/manual/integration_job/cfg_sink/kafka/"
+                  isIframe={false}
+                >
                   Kafka Sink 配置文档
                 </HelpCenterLink>
               }
@@ -140,7 +144,11 @@ const KafkaTargetConfig = forwardRef(
                     <div>
                       <span>不能为空, </span>
                       <span tw="text-font-placeholder mr-1">详见</span>
-                      <HelpCenterLink hasIcon isIframe={false} href="###">
+                      <HelpCenterLink
+                        hasIcon
+                        isIframe={false}
+                        href="/bigdata/dataomnis/manual/integration_job/cfg_sink/kafka/"
+                      >
                         Kafka Sink 配置文档
                       </HelpCenterLink>
                     </div>
