@@ -30,7 +30,8 @@ const TableHeader = styled('div')(() => [
   `
 ])
 
-export const TableBody = styled('div')(() => [
+export const TableBody = styled('div')(({ overflow }: { overflow: boolean }) => [
+  overflow && tw`max-h-[640px] overflow-y-scroll`,
   css`
     .group {
       & > div {
@@ -204,7 +205,7 @@ export const DargTable = (props: DargTableProps<any>) => {
           </div>
         ))}
       </TableHeader>
-      <TableBody className="darg-table-body">
+      <TableBody className="darg-table-body" overflow={dataSource.length >= 15}>
         {dataSource.length > 0
           ? dataSource.map((item: any, i) => {
               if (runDarg && moveRow && !disabled) {
