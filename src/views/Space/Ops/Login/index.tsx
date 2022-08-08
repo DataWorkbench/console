@@ -57,6 +57,7 @@ const Login = ({ onLogin }: { onLogin: (d: Record<string, any>, jump: boolean) =
       </FlexBox>
       <FlexBox tw="bg-[#f1f5f9] w-[50%] h-[100%] items-center justify-center">
         <FlexBox
+          className="login-form"
           orient="column"
           tw="h-[408px] w-[100%] max-w-[500px] bg-[white] shadow-[0px 4px 30px rgba(126, 137, 149, 0.05)]"
         >

@@ -1,3 +1,5 @@
+@import '~antd/dist/antd.css';
+
 :root {
   /* brand */
   --dw-color-brand-primary: #15a675; /* green 11 */
@@ -233,6 +235,10 @@
   --dw-color-button-disabled-text: #939ea9; /* N8 */
 }
 
+body#body {
+  font-size: 12px;
+}
+
 /*  enfi 项目颜色改变 */
 .lego-toggles.checked {
   background-color: #85b0d6 !important;
@@ -279,15 +285,15 @@ input[type='number']:focus {
   background-color: #d2e9ff !important;
 }
 
-.button.is-outlined.css-1bjjqy2-OutlinedGreenButton.e1ac0nrt1 {
+.button.is-outlined {
   border-color: #85b0d6 !important;
   color: #85b0d6 !important;
 }
-.button.is-outlined.css-1bjjqy2-OutlinedGreenButton.e1ac0nrt1:hover {
+.button.is-outlined:hover {
   background-color: rgb(133, 176, 214, 0.1) !important;
 }
 
-.button.is-outlined.css-1bjjqy2-OutlinedGreenButton.e1ac0nrt1:disabled {
+.button.is-outlined:disabled {
   background-color: rgba(76, 94, 112, var(--tw-bg-opacity)) !important;
   border-color: rgba(76, 94, 112, var(--tw-border-opacity)) !important;
   color: #939ea9 !important;
@@ -336,18 +342,14 @@ input[type='number']:focus {
 }
 
 /* 数据源管理 side-content */
-.css-1lt25qe-SideMenuWrapper-SideMenuWrapper.e1ovpvsa0 .side-content .selected-row .m-l-8 {
+.side-content .selected-row {
   color: #fff !important;
 }
-.css-1lt25qe-SideMenuWrapper-SideMenuWrapper.e1ovpvsa0 .side-content .level-row:hover {
+
+.side-content .level-row:hover {
   color: #fff !important;
 }
-.css-1lt25qe-SideMenuWrapper-SideMenuWrapper
-  .side-menu-wrap
-  .side-menu
-  .selected-row
-  .icon-title
-  svg.qicon {
+.side-menu-wrap .side-menu .selected-row .icon-title svg.qicon {
   fill: #fff !important;
   color: rgba(255, 255, 255, 0.4);
 }

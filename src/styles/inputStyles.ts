@@ -7,6 +7,13 @@ const inputStyles = css`
   .textarea[disabled] {
     opacity: 0.5;
   }
+  .login-form .form .control {
+    input:-internal-autofill-previewed,
+    input:-internal-autofill-selected {
+      -webkit-text-fill-color: #000 !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+    }
+  }
   .dark {
     .input,
     .input-search {
@@ -20,12 +27,18 @@ const inputStyles = css`
       &::placeholder {
         color: #939ea9;
       }
+
       &[disabled] {
         ${tw`bg-neut-13`}
       }
       &.is-danger {
         ${tw`border-red-10!`}
       }
+    }
+    input:-internal-autofill-previewed,
+    input:-internal-autofill-selected {
+      -webkit-text-fill-color: #ffffff !important;
+      transition: background-color 5000s ease-in-out 0s !important;
     }
     .input-number.is-mini {
       & > .input-number-controls {

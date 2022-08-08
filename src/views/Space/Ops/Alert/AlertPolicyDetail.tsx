@@ -259,16 +259,18 @@ const AlertPolicyDetail = observer(
                 key: 'name',
                 render: (name: string) => (
                   <FlexBox tw="items-center">
-                    <Icon
-                      name="q-downloadBoxFill"
-                      type="light"
-                      css={css`
-                        & .qicon {
-                          ${tw`text-white! fill-[#fff]!`}
-                        }
-                      `}
-                    />
-                    <span tw="text-white">{name}</span>
+                    <div tw=" w-5 h-5 p-1 bg-neut-13 rounded flex items-center">
+                      <Icon
+                        name="q-downloadBoxFill"
+                        type="light"
+                        css={css`
+                          & .qicon {
+                            ${tw`text-white! fill-[#fff]!`}
+                          }
+                        `}
+                      />
+                    </div>
+                    <span tw="text-white ml-1">{name}</span>
                   </FlexBox>
                 )
               },

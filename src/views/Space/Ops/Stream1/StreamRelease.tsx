@@ -117,6 +117,7 @@ const StreamRelease = observer(() => {
           <span
             tw="inline-block border px-1.5 text-white border-white rounded-sm"
             css={css`
+              transform-origin: 0 0;
               transform: scale(0.8);
             `}
           >
