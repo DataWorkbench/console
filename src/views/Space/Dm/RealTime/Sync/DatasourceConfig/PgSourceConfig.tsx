@@ -13,7 +13,7 @@ import { AffixLabel, Center, FlexBox, HelpCenterLink, SelectWithRefresh } from '
 import { useImmer } from 'use-immer'
 import { useQuerySourceTables } from 'hooks'
 import { Control, Field, Icon, Label } from '@QCFE/lego-ui'
-import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { clearMapping, source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { map } from 'rxjs'
 import {
   IDataSourceConfigProps,
@@ -252,6 +252,7 @@ const PgSourceConfig = forwardRef(
                 setDbInfo((draft) => {
                   draft.tableName = e
                 })
+                clearMapping()
               }}
               validateOnChange
               schemas={[

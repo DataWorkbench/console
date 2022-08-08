@@ -46,7 +46,7 @@ export const baseTarget$ = new BehaviorSubject<Record<string, any> | null>(null)
 export const sourceColumns$ = new BehaviorSubject<Record<string, any>[]>([])
 export const targetColumns$ = new BehaviorSubject<Record<string, any>[]>([])
 
-export const mapping$ = new BehaviorSubject<[string, string][]>([])
+export const clearMapping$ = new BehaviorSubject<[]>([])
 export const syncJobOp$ = new BehaviorSubject({
   op: 'source',
   visible: false
@@ -99,6 +99,11 @@ curJobConfSubject$
     })
   )
   .subscribe(confColumns$)
+
+clearMapping$.subscribe(confColumns$)
+export const clearMapping = () => {
+  clearMapping$.next([])
+}
 
 curJobConfSubject$
   .pipe(
@@ -207,7 +212,6 @@ const clearTargetColumns$ = target$.pipe(
   map(() => [])
 )
 clearTargetColumns$.subscribe(targetColumns$)
-clearTargetColumns$.subscribe(mapping$)
 
 const clearSourceColumns$ = source$.pipe(
   changeTableName(),
@@ -274,10 +278,7 @@ const kafkaSourceReadType$ = kafkaSource$.pipe(
   })
 )
 
-kafkaSourceReadType$.pipe(map(() => [])).subscribe(mapping$)
-
 clearSourceColumns$.subscribe(sourceColumns$)
-clearSourceColumns$.subscribe(mapping$)
 
 const sql = new Set([
   SourceType.Mysql,

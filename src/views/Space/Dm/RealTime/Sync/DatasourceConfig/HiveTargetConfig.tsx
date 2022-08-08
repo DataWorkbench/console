@@ -12,7 +12,7 @@ import { get } from 'lodash-es'
 import { map } from 'rxjs'
 import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
 import styles from './styles'
-import { target$ } from '../common/subjects'
+import { clearMapping, target$ } from '../common/subjects'
 
 const { TextField, SelectField, RadioGroupField } = Form
 type FieldKeys =
@@ -102,6 +102,7 @@ const HiveTargetConfig = forwardRef(
                 setDbInfo((draft) => {
                   draft.tableName = e
                 })
+                clearMapping()
               }}
               placeholder="请选择数据源表"
               validateOnChange

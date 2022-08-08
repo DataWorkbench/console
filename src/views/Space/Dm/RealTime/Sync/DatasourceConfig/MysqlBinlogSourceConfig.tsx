@@ -12,7 +12,7 @@ import { Form } from '@QCFE/qingcloud-portal-ui'
 import { Icon, Label } from '@QCFE/lego-ui'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import { useImmer } from 'use-immer'
-import { source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { clearMapping, source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { map } from 'rxjs'
 
@@ -298,6 +298,7 @@ const MysqlBinlogSourceConfig = forwardRef(
                   setDbInfo((draft) => {
                     draft.tableName = e
                   })
+                  clearMapping()
                 }}
                 placeholder="请选择数据源表"
                 validateOnChange
