@@ -16,7 +16,7 @@ import {
   DatePicker,
   Button
 } from '@QCFE/lego-ui'
-import { DarkModal, FlexBox, AffixLabel, KVTextAreaField } from 'components'
+import { DarkModal, FlexBox, AffixLabel, KVTextAreaField1 as KVTextAreaField } from 'components'
 import { useImmer } from 'use-immer'
 import { isEmpty, range, set } from 'lodash-es'
 import { useStore } from 'stores'
@@ -482,8 +482,8 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             .split(/[\r\n]/)
                             .filter((str) => !isEmpty(str))
                             .every((str) => {
-                              const [key] = str.split('=')
-                              if (!key) {
+                              const [key, val] = str.split('=')
+                              if (!key || !val) {
                                 return false
                               }
                               if (keys.includes(key)) {
