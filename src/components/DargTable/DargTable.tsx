@@ -54,15 +54,15 @@ export const TableBody = styled('div')(({ overflow }: { overflow: boolean }) => 
       }
     }
     .table-row {
-      ${tw`bg-neut-17! flex border-neut-13! p-0!`}
+      ${tw`bg-neut-17 flex border-neut-13 p-0!`}
       &:hover {
-        ${tw`dark:bg-[#1E2F41] border-b-0!`}
+        ${tw`dark:bg-[#1E2F41] border-b-0! shadow-none! `}
       }
       & > div {
         ${tw`flex items-center ml-6!`}
       }
       &:last-child {
-        ${tw`border-b-0!`}
+        ${tw`border-b-0`}
       }
     }
   `
@@ -82,10 +82,10 @@ export const DragTable = styled('div')(({ disabled }: { disabled?: boolean }) =>
       ${tw`dark:border-neut-13`}
     }
     .drop-over-downward {
-      border-bottom: 2px dashed #1890ff !important;
+      ${tw`border-dashed! border-b-2! border-t-0! border-green-11!`}
     }
     .drop-over-upward {
-      border-top: 2px dashed #1890ff !important;
+      ${tw`border-dashed! border-t-2! border-green-11! `}
     }
   `
 ])
