@@ -346,18 +346,23 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       return
     }
     // if (jsPlumbInst.getAllConnections().length === 0 && mappings.length > 0) {
-    if (mappings.length > 0) {
-      mappings.forEach(([left, right]) => {
-        const leftField = leftFields.find((f) => f.name === left)
-        const rightField = rightFields.find((f) => f.name === right)
-        if (leftField && rightField) {
-          jsPlumbInst.connect({
-            uuids: [leftField.uuid, rightField.uuid]
-          })
-        }
-      })
-    }
-    jsPlumbInst.repaintEverything()
+    jsPlumbInst.deleteEveryConnection()
+    setTimeout(() => {
+      if (mappings.length > 0) {
+        mappings.forEach(([left, right]) => {
+          const leftField = leftFields.find((f) => f.name === left)
+          const rightField = rightFields.find((f) => f.name === right)
+          if (leftField && rightField) {
+            jsPlumbInst.connect({
+              uuids: [leftField.uuid, rightField.uuid]
+            })
+          }
+        })
+      }
+      jsPlumbInst.repaintEverything()
+    })
+
+    // }
   }, [leftFields, rightFields, mappings])
 
   useMount(() => {
