@@ -237,6 +237,8 @@ export const fieldDataToResponseData = (filedData: SchemaMap[], configData: any[
       param_operator: ParameterOperator.EQUAL,
       param_position: ParameterPosition.QUERY,
       is_required: false,
+      order_mode: 1,
+      order_num: 0,
       example_value: '',
       default_value: '',
       param_description: '',

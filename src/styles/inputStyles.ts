@@ -7,6 +7,13 @@ const inputStyles = css`
   .textarea[disabled] {
     opacity: 0.5;
   }
+  .login-form .form .control {
+    input:-internal-autofill-previewed,
+    input:-internal-autofill-selected {
+      -webkit-text-fill-color: #000 !important;
+      transition: background-color 5000s ease-in-out 0s !important;
+    }
+  }
   .dark {
     .input,
     .input-search {
