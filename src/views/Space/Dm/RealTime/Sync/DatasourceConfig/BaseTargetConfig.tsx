@@ -9,7 +9,12 @@ import {
   useState
 } from 'react'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
-import { baseTarget$, target$, targetColumns$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import {
+  baseTarget$,
+  clearMapping,
+  target$,
+  targetColumns$
+} from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { AffixLabel, Center, FlexBox, SqlGroupField } from 'components'
 import { DbType, sourceKinds, SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
@@ -192,6 +197,7 @@ const BaseTargetConfig = forwardRef(
         tableName={dbInfo?.tableName}
         onChange={(v) => {
           baseTarget$.next({ data: { ...dbInfo, tableName: v }, sourceType })
+          clearMapping()
           // setDbInfo((draft) => {
           //   console.log(v)
           //   draft.tableName = v
