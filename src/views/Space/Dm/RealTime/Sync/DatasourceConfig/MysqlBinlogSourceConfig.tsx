@@ -187,9 +187,9 @@ const MysqlBinlogSourceConfig = forwardRef(
           filter: dbInfo?.filter,
           cat: dbInfo?.updateType.filter(Boolean)?.join(','),
           start: {
-            journal_name: dbInfo?.startFile,
-            position: dbInfo?.startPosition,
-            timestamp: parseInt(dbInfo?.startTime, 10)
+            journal_name: dbInfo?.startType === 2 ? dbInfo?.startFile : undefined,
+            position: dbInfo?.startType === 2 ? dbInfo?.startPosition : undefined,
+            timestamp: dbInfo?.startType === 1 ? parseInt(dbInfo?.startTime, 10) : undefined
           },
           start_type: dbInfo?.startType,
           connection_charset: dbInfo?.charset,
