@@ -155,9 +155,13 @@ const tippyStyles = css`
     }
   }
   
+  .notify-wrapper .notify .notice {
+    ${tw`min-h-[56px]`}
+  }
   .notify-wrapper .notice-content {
    ${tw`overflow-auto`}
    max-height: calc(100vh - 80px);
+   // min-height: 30px;
    & .notify-content {
       ${tw`break-all`}
   }
