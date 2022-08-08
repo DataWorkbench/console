@@ -54,7 +54,8 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
       batch_size: dbInfo?.batchSize,
       key_delimiter: dbInfo?.keyDelimiter,
       type: dbInfo?.type,
-      index: dbInfo?.index
+      index: dbInfo?.index,
+      version: get(sourceDetail, 'url.elastic_search.version')
     }),
     refetchColumn: () => {}
   }))
