@@ -1,4 +1,4 @@
-import { camelCase, get, keys, merge, trim } from 'lodash-es'
+import { camelCase, cloneDeep, get, keys, merge, trim } from 'lodash-es'
 import { BehaviorSubject, distinctUntilChanged, Subject } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 // eslint-disable-next-line import/no-cycle
@@ -397,11 +397,11 @@ curJobDbConfSubject$
     map((e: any) => {
       const { sourceType, targetType, jobType } = e
       const fn = configStrategy.filter((item) => item.find(jobType, sourceType, targetType))
-      let v = defaultConfig
+      let v = cloneDeep(defaultConfig)
       if (fn.length !== 0) {
         v = fn?.reduce((previousValue, currentValue) => {
           return merge(previousValue, currentValue.value())
-        }, defaultConfig)
+        }, v)
       }
       return merge(v, {
         is: {
