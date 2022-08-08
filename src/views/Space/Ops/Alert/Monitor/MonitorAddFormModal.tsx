@@ -217,20 +217,13 @@ const MonitorAddFormModal = observer((props: IMonitorAddProps) => {
                     value?.job_ids?.length > 0
                   }
                   onChange={(e) => {
-                    console.log(getData(data as any))
-
                     setValue((draft) => {
                       draft.monitor_object = e
                       draft.job_ids = []
+                      draft.instance_run_timeout_flag = undefined
+                      draft.instance_run_failed_flag = undefined
+                      draft.instance_run_timeout = undefined
                     })
-
-                    if (e !== value.monitor_object) {
-                      setValue((draft) => {
-                        draft.instance_run_timeout_flag = undefined
-                        draft.instance_run_failed_flag = undefined
-                        draft.instance_run_timeout = 0
-                      })
-                    }
                   }}
                   validateOnChange
                   value={value?.monitor_object}

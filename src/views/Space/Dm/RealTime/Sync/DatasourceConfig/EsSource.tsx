@@ -40,6 +40,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
     }
   }, [setDbInfo])
 
+  const { data: sourceDetail } = useDescribeDataSource(dbInfo.id)
   useImperativeHandle(ref, () => ({
     validate: () => {
       if (!sourceForm.current) {
@@ -51,12 +52,11 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
       id: dbInfo?.id,
       batchSize: dbInfo?.batchSize,
       type: dbInfo?.type,
-      index: dbInfo?.index
+      index: dbInfo?.index,
+      version: get(sourceDetail, 'url.elastic_search.version')
     }),
     refetchColumn: () => {}
   }))
-
-  const { data: sourceDetail } = useDescribeDataSource(dbInfo.id)
 
   return (
     <Form css={styles.form} ref={sourceForm}>
@@ -112,7 +112,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                   draft.type = e
                 })
               }}
-              placeholder="ElasticSearch 中的 Index 名"
+              placeholder="index 下的 type 名称"
               validateOnChange
               schemas={[
                 {

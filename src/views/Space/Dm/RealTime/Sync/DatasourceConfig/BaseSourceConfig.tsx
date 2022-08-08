@@ -22,7 +22,7 @@ import {
   IDataSourceConfigProps,
   ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
-import { baseSource$, source$, sourceColumns$ } from '../common/subjects'
+import { baseSource$, clearMapping, source$, sourceColumns$ } from '../common/subjects'
 import BaseConfigCommon from './BaseConfigCommon'
 
 const { TextField, TextAreaField } = Form
@@ -167,6 +167,7 @@ const BaseSourceConfig = forwardRef(
           //   draft.tableName = v
           // })
           baseSource$.next({ data: { ...dbInfo, tableName: v }, sourceType })
+          clearMapping()
         }}
       />
     )
