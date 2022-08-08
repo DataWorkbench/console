@@ -311,7 +311,7 @@ const MysqlBinlogSourceConfig = forwardRef(
                         <HelpCenterLink
                           hasIcon
                           isIframe={false}
-                          href="/bigdata/dataomnis/manual/integration_job/cfg_source/mysql_binlog/"
+                          href="/manual/integration_job/cfg_source/mysql_binlog/"
                         >
                           MySQL（MySQL Binlog）Source 配置文档
                         </HelpCenterLink>
@@ -324,7 +324,7 @@ const MysqlBinlogSourceConfig = forwardRef(
                   <HelpCenterLink
                     hasIcon
                     isIframe={false}
-                    href="/bigdata/dataomnis/manual/integration_job/cfg_source/mysql_binlog/"
+                    href="/manual/integration_job/cfg_source/mysql_binlog/"
                   >
                     MySQL（MySQL Binlog）Source 配置文档
                   </HelpCenterLink>

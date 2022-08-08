@@ -155,7 +155,7 @@ const Item = (props: any) => {
 const setIndex = (i: Record<string, any>, index1: number) => {
   return {
     ...i,
-    index: index1 + f
+    index: index1 + 1
   }
 }
 

@@ -147,7 +147,7 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/bigdata/dataomnis/manual/integration_job/cfg_source/mongodb/"
+                      href="/manual/integration_job/cfg_source/mongodb/"
                     >
                       MongoDb Source 配置文档
                     </HelpCenterLink>
@@ -160,7 +160,7 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
               <HelpCenterLink
                 isIframe={false}
                 hasIcon
-                href="/bigdata/dataomnis/manual/integration_job/cfg_source/mongodb/"
+                href="/manual/integration_job/cfg_source/mongodb/"
               >
                 MongoDb Source 配置文档
               </HelpCenterLink>

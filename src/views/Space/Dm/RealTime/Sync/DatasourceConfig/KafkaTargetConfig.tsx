@@ -130,7 +130,7 @@ const KafkaTargetConfig = forwardRef(
               help={
                 <HelpCenterLink
                   hasIcon
-                  href="/bigdata/dataomnis/manual/integration_job/cfg_sink/kafka/"
+                  href="/manual/integration_job/cfg_sink/kafka/"
                   isIframe={false}
                 >
                   Kafka Sink 配置文档
@@ -147,7 +147,7 @@ const KafkaTargetConfig = forwardRef(
                       <HelpCenterLink
                         hasIcon
                         isIframe={false}
-                        href="/bigdata/dataomnis/manual/integration_job/cfg_sink/kafka/"
+                        href="/manual/integration_job/cfg_sink/kafka/"
                       >
                         Kafka Sink 配置文档
                       </HelpCenterLink>

@@ -104,7 +104,7 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hdfs/"
+                      href="/manual/integration_job/cfg_sink/hdfs/"
                     >
                       HDFS Sink 配置文档
                     </HelpCenterLink>
@@ -117,7 +117,7 @@ const HdfsTarget = forwardRef((props: IDataSourceConfigProps, ref: ForwardedRef<
               <HelpCenterLink
                 hasIcon
                 isIframe={false}
-                href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hdfs/"
+                href="/manual/integration_job/cfg_sink/hdfs/"
               >
                 HDFS Sink 配置文档
               </HelpCenterLink>

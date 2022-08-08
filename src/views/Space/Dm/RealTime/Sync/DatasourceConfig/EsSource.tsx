@@ -83,7 +83,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/bigdata/dataomnis/manual/integration_job/cfg_source/elasticsearch/"
+                      href="/manual/integration_job/cfg_source/elasticsearch/"
                     >
                       ElasticSearch Source 配置文档
                     </HelpCenterLink>
@@ -96,7 +96,7 @@ const EsSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
               <HelpCenterLink
                 hasIcon
                 isIframe={false}
-                href="/bigdata/dataomnis/manual/integration_job/cfg_source/elasticsearch/"
+                href="/manual/integration_job/cfg_source/elasticsearch/"
               >
                 ElasticSearch Source 配置文档
               </HelpCenterLink>

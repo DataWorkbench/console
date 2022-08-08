@@ -245,7 +245,7 @@ const SqlServerSourceConfig = forwardRef(
                       <HelpCenterLink
                         hasIcon
                         isIframe={false}
-                        href="/bigdata/dataomnis/manual/integration_job/cfg_source/sqlserver_cdc/"
+                        href="/manual/integration_job/cfg_source/sqlserver_cdc/"
                       >
                         SqlServer （SqlServer CDC）Source 配置文档
                       </HelpCenterLink>
@@ -258,7 +258,7 @@ const SqlServerSourceConfig = forwardRef(
                 <HelpCenterLink
                   hasIcon
                   isIframe={false}
-                  href="/bigdata/dataomnis/manual/integration_job/cfg_source/sqlserver_cdc/"
+                  href="/manual/integration_job/cfg_source/sqlserver_cdc/"
                 >
                   SqlServer （SqlServer CDC）Source 配置文档
                 </HelpCenterLink>

@@ -116,7 +116,7 @@ const HiveTargetConfig = forwardRef(
                       <HelpCenterLink
                         hasIcon
                         isIframe={false}
-                        href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hive/"
+                        href="/manual/integration_job/cfg_sink/hive/"
                       >
                         Hive Sink 配置文档
                       </HelpCenterLink>
@@ -129,7 +129,7 @@ const HiveTargetConfig = forwardRef(
                 <HelpCenterLink
                   hasIcon
                   isIframe={false}
-                  href="/bigdata/dataomnis/manual/integration_job/cfg_sink/hive/"
+                  href="/manual/integration_job/cfg_sink/hive/"
                 >
                   Hive Sink 配置文档
                 </HelpCenterLink>
