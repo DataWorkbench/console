@@ -347,20 +347,20 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     }
     // if (jsPlumbInst.getAllConnections().length === 0 && mappings.length > 0) {
     jsPlumbInst.deleteEveryConnection()
-    setTimeout(() => {
-      if (mappings.length > 0) {
-        mappings.forEach(([left, right]) => {
-          const leftField = leftFields.find((f) => f.name === left)
-          const rightField = rightFields.find((f) => f.name === right)
-          if (leftField && rightField) {
-            jsPlumbInst.connect({
-              uuids: [leftField.uuid, rightField.uuid]
-            })
-          }
-        })
-      }
-      jsPlumbInst.repaintEverything()
-    })
+    // setTimeout(() => {
+    if (mappings.length > 0) {
+      mappings.forEach(([left, right]) => {
+        const leftField = leftFields.find((f) => f.name === left)
+        const rightField = rightFields.find((f) => f.name === right)
+        if (leftField && rightField) {
+          jsPlumbInst.connect({
+            uuids: [leftField.uuid, rightField.uuid]
+          })
+        }
+      })
+    }
+    jsPlumbInst.repaintEverything()
+    // })
 
     // }
   }, [leftFields, rightFields, mappings])
@@ -422,6 +422,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     const jsPlumbInst = jsPlumbInstRef.current
     if (jsPlumbInst) {
       jsPlumbInst.cleanupListeners()
+      jsPlumbInst.deleteEveryEndpoint()
+      jsPlumbInst.deleteEveryConnection()
       jsPlumbInst.reset()
       jsPlumbInstRef.current = undefined
     }
@@ -517,6 +519,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   const addCustomField = () => {
     const hasUnFinish = leftFields.find(() => false)
+    const uuid = nanoid()
     if (!hasUnFinish) {
       setLeftFields((fields) => [
         ...fields,
@@ -526,7 +529,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           custom: true,
           default: '',
           isEditing: true,
-          uuid: nanoid()
+          uuid
         }
       ])
     }
@@ -534,6 +537,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
 
   const addCustomFieldRight = () => {
     const hasUnFinish = rightFields.find(() => false)
+    const uuid = nanoid()
     if (!hasUnFinish) {
       setRightFields((fields) => [
         ...fields,
@@ -543,7 +547,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           custom: true,
           default: '',
           isEditing: true,
-          uuid: nanoid()
+          uuid
         }
       ])
     }
@@ -575,7 +579,6 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       })
     })
   }
-  // console.log(222222222222, leftFields, leftFieldsProp, mappingsProp, mappings)
 
   const keepEditingFieldRight = (field: TMappingField, index?: number) => {
     const old = rightFields[index!]
@@ -913,7 +916,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   jsplumb={jsPlumbInstRef.current}
                   // hasMoreAction={!isKafkaSource}
                   item={{ ...item, unEditable: isHbaseSource && item.name === 'rowkey' }}
-                  key={item.name}
+                  key={item.uuid}
                   index={i}
                   config={config.source}
                   isLeft={false}

@@ -197,7 +197,9 @@ const BaseTargetConfig = forwardRef(
         tableName={dbInfo?.tableName}
         onChange={(v) => {
           baseTarget$.next({ data: { ...dbInfo, tableName: v }, sourceType })
-          clearMapping()
+          if (dbInfo?.tableNme !== v) {
+            clearMapping()
+          }
           // setDbInfo((draft) => {
           //   console.log(v)
           //   draft.tableName = v

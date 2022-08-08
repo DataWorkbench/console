@@ -233,8 +233,9 @@ const SqlServerSourceConfig = forwardRef(
                 setDbInfo((draft) => {
                   draft.tableName = e
                 })
-
-                clearMapping()
+                if (dbInfo.tableName !== e) {
+                  clearMapping()
+                }
               }}
               validateOnChange
               schemas={[

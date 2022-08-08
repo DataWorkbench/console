@@ -298,7 +298,9 @@ const MysqlBinlogSourceConfig = forwardRef(
                   setDbInfo((draft) => {
                     draft.tableName = e
                   })
-                  clearMapping()
+                  if (e !== dbInfo.tableName) {
+                    clearMapping()
+                  }
                 }}
                 placeholder="请选择数据源表"
                 validateOnChange
