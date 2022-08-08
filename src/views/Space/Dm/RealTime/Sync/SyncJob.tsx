@@ -383,23 +383,26 @@ const SyncJob = () => {
     set(filterResouce, 'cluster_id', cluster?.id)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
+        confRefetch()
         if (isSubmit) {
+          let flag = false
           if (!cluster) {
             showConfWarn('未配置计算集群信息')
-            return
+            flag = true
           }
           if (mode === 1) {
             if (!dbRef.current?.validate()) {
               showConfWarn('未正确配置数据源信息')
               return
+              flag = true
             }
             if (!resource) {
               showConfWarn('未配置数据源信息')
-              return
+              flag = true
             }
             if (!mapping) {
               showConfWarn('未配置字段映射信息')
-              return
+              flag = true
             }
 
             // if (isSubmit && !clusterRef.current.checkPingSuccess()) {
@@ -408,12 +411,12 @@ const SyncJob = () => {
             // }
             if (!channel) {
               showConfWarn('未配置通道控制信息')
-              return
+              flag = true
             }
 
             if (parseInt(channel?.rate, 10) === 1 && !channel.bytes) {
               showConfWarn('通道控制未配置同步速率限流字节数')
-              return
+              flag = true
             }
 
             const splitKey = get(
@@ -429,21 +432,23 @@ const SyncJob = () => {
               )
             ) {
               showConfWarn('切分键必须为主键且为整型')
-              return
+              flag = true
             }
 
             // 如果并发数大于1  则切分键不能为空
             const parallelism = get(resource, 'channel_control.parallelism', 0)
             if (parallelism > 1 && !splitKey) {
               showConfWarn('并发数大于1时，切分键不能为空')
-              return
+              flag = true
             }
+          }
+          if (flag) {
+            return
           }
         }
         if (cb) {
           cb()
         } else {
-          confRefetch()
           Notify.success({
             title: '操作提示',
             content: '配置保存成功',
@@ -461,9 +466,17 @@ const SyncJob = () => {
     const targetColumnsSub = targetColumns$.subscribe((e) => {
       setTargetColumns(e)
     })
-    const confSub = confColumns$.subscribe((e) => {
-      setColumns(e as any)
-    })
+    const confSub = confColumns$
+      // .pipe(
+      // distinctUntilChanged((prev, next) => {
+      //   console.log(prev, next)
+      //   return isEqual(prev, next)
+      // })
+      // )
+      .subscribe((e) => {
+        setColumns(e as any)
+        // console.log(888888888)
+      })
     // const mappings = mapping$.subscribe((e) => setColumns(e as any))
     return () => {
       sourceColumnsSub.unsubscribe()
@@ -534,32 +547,34 @@ const SyncJob = () => {
           >
             {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob!} />}
 
-            {index === 1 && (
-              <FieldMappings
-                onReInit={() => {
-                  if (dbRef.current && dbRef.current?.refetchColumns) {
-                    dbRef.current?.refetchColumns()
+            {index === 1 && !isFetching && (
+              <div key={curJob?.id}>
+                <FieldMappings
+                  onReInit={() => {
+                    if (dbRef.current && dbRef.current?.refetchColumns) {
+                      dbRef.current?.refetchColumns()
+                    }
+                  }}
+                  ref={mappingRef}
+                  // mappings={[]}
+                  leftFields={sourceColumns as any}
+                  rightFields={targetColumns as any}
+                  sourceId={sourceId}
+                  targetId={targetId}
+                  leftTypeName={sourceTypeName}
+                  rightTypeName={targetTypeName}
+                  jobType={curJob?.type}
+                  columns={columns}
+                  topHelp={
+                    <HelpCenterLink
+                      href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+                      isIframe={false}
+                    >
+                      字段映射说明文档
+                    </HelpCenterLink>
                   }
-                }}
-                ref={mappingRef}
-                // mappings={[]}
-                leftFields={sourceColumns as any}
-                rightFields={targetColumns as any}
-                sourceId={sourceId}
-                targetId={targetId}
-                leftTypeName={sourceTypeName}
-                rightTypeName={targetTypeName}
-                jobType={curJob?.type}
-                columns={columns}
-                topHelp={
-                  <HelpCenterLink
-                    href="/manual/integration_job/create_job_offline_1/#配置字段映射"
-                    isIframe={false}
-                  >
-                    字段映射说明文档
-                  </HelpCenterLink>
-                }
-              />
+                />
+              </div>
             )}
             {index === 2 && (
               <SyncCluster
@@ -779,7 +794,9 @@ const SyncJob = () => {
               showNotify: true
             })
           }}
-          onCancel={() => setShowRelaseModal(false)}
+          onCancel={() => {
+            setShowRelaseModal(false)
+          }}
         />
       )}
       {showScheModal && (

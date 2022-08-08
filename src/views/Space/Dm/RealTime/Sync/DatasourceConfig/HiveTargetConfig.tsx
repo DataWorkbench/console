@@ -102,7 +102,9 @@ const HiveTargetConfig = forwardRef(
                 setDbInfo((draft) => {
                   draft.tableName = e
                 })
-                clearMapping()
+                if (dbInfo.tableName !== e) {
+                  clearMapping()
+                }
               }}
               placeholder="请选择数据源表"
               validateOnChange
