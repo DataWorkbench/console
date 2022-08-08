@@ -251,7 +251,7 @@ source$
       return {
         id: get(e, 'data.id'),
         topic: get(e, 'data.topic'),
-        consumer: get(e, 'data.mode', 'group-offsets'),
+        consumer: get(e, 'data.mode', 1),
         consumerId: get(e, 'data.group_id', 'default'),
         charset: get(e, 'data.encoding', 1),
         readType: get(e, 'data.codec', 2),
