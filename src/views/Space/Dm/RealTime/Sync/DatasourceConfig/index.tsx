@@ -3,8 +3,8 @@ import { FlexBox } from 'components/Box'
 import { Center } from 'components/Center'
 import { ArrowLine } from 'components/ArrowLine'
 import DataSourceSelectModal from 'views/Space/Upcloud/DataSourceList/DataSourceSelectModal'
-import { findKey, get, pick } from 'lodash-es'
-import { dataSourceTypes, getDataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
+import { get, pick } from 'lodash-es'
+import { getDataSourceTypes } from 'views/Space/Dm/RealTime/Job/JobUtils'
 import { observer } from 'mobx-react-lite'
 import tw, { css, styled } from 'twin.macro'
 import { useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -258,10 +258,11 @@ const DatasourceConfig = observer(
                 ? [source$.getValue()?.data?.id]
                 : [target$.getValue()?.data?.id]
             }
-            title={`选择${op.current === 'source' ? '来源' : '目的'}数据源（已选类型为 ${findKey(
-              dataSourceTypes,
-              (v) => v === get(curJob, `${op.current}_type`)
-            )})`}
+            title={`选择${op.current === 'source' ? '来源' : '目的'}数据源（已选类型为 ${
+              op.current === 'source'
+                ? source$.getValue()?.sourceType?.label
+                : target$.getValue()?.sourceType?.label
+            })`}
             visible={visible}
             sourceType={get(curJob, `${op.current}_type`)!}
             onCancel={() => handleVisible(false)}
