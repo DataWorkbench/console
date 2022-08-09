@@ -54,7 +54,8 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
       batch_size: dbInfo?.batchSize,
       key_delimiter: dbInfo?.keyDelimiter,
       type: dbInfo?.type,
-      index: dbInfo?.index
+      index: dbInfo?.index,
+      version: get(sourceDetail, 'url.elastic_search.version')
     }),
     refetchColumn: () => {}
   }))
@@ -84,7 +85,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                     <HelpCenterLink
                       hasIcon
                       isIframe={false}
-                      href="/manual/integration_job/cfg_slink/elasticsearch/"
+                      href="/manual/integration_job/cfg_sink/elasticsearch/"
                     >
                       ElasticSearch Sink 配置文档
                     </HelpCenterLink>
@@ -97,7 +98,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
               <HelpCenterLink
                 hasIcon
                 isIframe={false}
-                href="/manual/integration_job/cfg_slink/elasticsearch/"
+                href="/manual/integration_job/cfg_sink/elasticsearch/"
               >
                 ElasticSearch Sink 配置文档
               </HelpCenterLink>
