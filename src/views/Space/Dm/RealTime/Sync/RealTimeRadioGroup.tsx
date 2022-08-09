@@ -12,9 +12,9 @@ export interface RealTimeSyncTypeVal {
 }
 
 export interface RealTimeRadioGroupProps {
-  name: string
+  // name: string
   value?: RealTimeSyncTypeVal
-  label?: React.ReactElement
+  // label?: React.ReactElement
   onChange?: (value: RealTimeSyncTypeVal) => void
 }
 
@@ -22,7 +22,7 @@ const sources = [
   ...datasourceRealtimeTypeObjs,
   { type: SourceType.Kafka, name: 'kafka', label: 'Kafka' }
 ]
-const targets = datasourceTypeObjs
+const targets = datasourceTypeObjs.filter((i) => i.type !== SourceType.Oracle)
 
 const RealTimeRadioGroup = forwardRef<React.ReactElement, RealTimeRadioGroupProps>(
   ({ value, onChange }, ref) => {
