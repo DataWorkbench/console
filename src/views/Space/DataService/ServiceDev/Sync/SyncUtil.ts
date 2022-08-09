@@ -1,5 +1,5 @@
 import { DataServiceManageDescribeApiConfigType } from 'types/response'
-import { get } from 'lodash-es'
+import { get, intersectionBy } from 'lodash-es'
 import { FieldCategory, ParameterOperator, ParameterPosition, typeStatus } from '../constants'
 
 export interface Schema {
@@ -289,19 +289,22 @@ export const fieldDataToRequestData = (filedData: SchemaMap[], configData: any[]
 // 字段排序映射到对应的返回参数中
 export const orderMapRequestData = (orderSourceData: any[], responseData: any[]) => {
   const orderMap = new Map()
-  const orderData = orderSourceData?.map((item, index) => ({
-    ...item,
-    order_num: index + 1
-  }))
+  // 两个数字的求交集
+  const insectOrderConfig: any = intersectionBy(orderSourceData, responseData, 'column_name')
 
-  orderData?.forEach((item: any) => {
-    orderMap.set(item.name, item)
+  insectOrderConfig?.forEach((item: any, index: number) => {
+    orderMap.set(item.column_name, { ...item, order_num: index + 1 })
   })
 
   return responseData?.map((item: any) => {
     const orderItem = orderMap.get(item.column_name)
-    return {
+    const itemValue = {
       ...item,
+      order_mode: 0, // 置空
+      order_num: 0 // 置空
+    }
+    return {
+      ...itemValue,
       ...orderItem
     }
   })
