@@ -213,11 +213,11 @@ const MappingItem = (props: MappingItemProps) => {
     if (ref.current && jsplumb) {
       let endPoint = endPointRef.current
       const parameters = { [String(anchor)]: itemProps }
+
       if (endPoint) {
-        jsplumb.deleteEndpoint(endPoint)
         endPoint = null
       }
-      if (!endPoint) {
+      if (!endPoint || !jsplumb.getEndpoint(itemProps.uuid)) {
         endPoint = jsplumb.addEndpoint(ref.current, {
           anchor,
           parameters,
@@ -255,6 +255,7 @@ const MappingItem = (props: MappingItemProps) => {
       }
       endPoint.setParameters(parameters)
     }
+    jsplumb?.repaintEverything()
   }, [itemProps, jsplumb, anchor])
 
   useEffect(() => {

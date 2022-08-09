@@ -1,17 +1,18 @@
 import { get } from 'lodash-es'
 import { sourceColumns$, targetColumns$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { useQuerySourceTableSchema } from 'hooks'
+import { useEffect, useMemo } from 'react'
 
 const useTableColumns = (sourceId: string, tableName: string, type: 'source' | 'target') => {
+  const params = useMemo(() => {
+    return { sourceId, tableName }
+  }, [sourceId, tableName])
   const {
     data: re,
     isFetching,
     refetch: refetch1
   } = useQuerySourceTableSchema(
-    {
-      sourceId,
-      tableName
-    },
+    params,
     {
       enabled: !!(sourceId && tableName),
       onSuccess: (data: any) => {
@@ -27,6 +28,13 @@ const useTableColumns = (sourceId: string, tableName: string, type: 'source' | '
     },
     type
   )
+
+  useEffect(() => {
+    if (!(sourceId && tableName)) {
+      const subject = type === 'source' ? sourceColumns$ : targetColumns$
+      subject.next([])
+    }
+  }, [sourceId, tableName, type])
 
   return {
     data: re,

@@ -230,10 +230,11 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
 
   useEffect(() => {
     const list = rowKeyString.split('_')
-    setRowKeyIds(() =>
-      sourceColumns
-        .filter((column: Record<string, any>) => list.includes(column.name))
-        .map((item: Record<string, any>) => item.uuid)
+    setRowKeyIds(
+      list.map((name) => sourceColumns.find((c: any) => c.name === name)?.uuid).filter(Boolean)
+      // sourceColumns
+      //   .filter((column: Record<string, any>) => list.includes(column.name))
+      //   .map((item: Record<string, any>) => item.uuid)
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rowKeyString, setRowKeyIds, sourceColumns])
@@ -644,13 +645,13 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
       collect: (monitor) => ({
         isOver: monitor.isOver()
       }),
-      drop: ({ uuid, name }) => {
+      drop: ({ uuid }) => {
         setRowKeyIds((draft) => {
           draft.push(uuid)
         })
-        setJob((draft) => {
-          draft.rowKeyString = `${draft.rowKeyString}_${name}`
-        })
+        // setJob((draft) => {
+        //   draft.rowKeyString = `${draft.rowKeyString}_${name}`
+        // })
       }
     })
   )

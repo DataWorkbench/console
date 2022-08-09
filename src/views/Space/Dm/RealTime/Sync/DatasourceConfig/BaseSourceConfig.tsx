@@ -167,7 +167,9 @@ const BaseSourceConfig = forwardRef(
           //   draft.tableName = v
           // })
           baseSource$.next({ data: { ...dbInfo, tableName: v }, sourceType })
-          clearMapping()
+          if (v !== dbInfo.tableName) {
+            clearMapping()
+          }
         }}
       />
     )

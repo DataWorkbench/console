@@ -88,9 +88,9 @@ const BaseTableComponent = (props: IBaseTableComponentProps) => {
       ]}
       help={
         <HelpCenterLink
-          href={`/manual/integration_job/${
-            from === 'source' ? 'cfg_source' : 'cfg_sink'
-          }/${sourceType.toLowerCase()}/`}
+          href={`/manual/integration_job/${from === 'source' ? 'cfg_source' : 'cfg_sink'}/${(
+            sourceType ?? ''
+          ).toLowerCase()}/`}
           hasIcon
           isIframe={false}
         >
