@@ -48,7 +48,7 @@ const FieldOrder = observer(
     const { disabled = false } = props
     const [dataSource, setDataSource] = useImmer<IOrderDataSource[]>([])
     const {
-      dtsDevStore: { fieldSettingData, apiConfigData }
+      dtsDevStore: { fieldSettingData, apiConfigData, TableSchema }
     } = useStore()
 
     const FieldOptions = useMemo(
@@ -79,9 +79,9 @@ const FieldOrder = observer(
         get(apiConfigData, 'api_config.response_params.response_params', [])
       )
       if (responseConfig?.length) {
-        const filedData = cloneDeep(fieldSettingData).map((item) => ({
+        const filedData = cloneDeep(TableSchema as any[]).map((item) => ({
           ...item,
-          column_name: item.field
+          column_name: item.name
         }))
 
         const orderConfigData = responseConfig.filter(
@@ -95,24 +95,21 @@ const FieldOrder = observer(
           return
         }
 
-        const sortOrder = insectOrderConfig?.sort(
-          (a: { order_num: number }, b: { order_num: number }) => a.order_num - b.order_num
-        )
-        const orderData = sortOrder.map((item: { order_mode: number; column_name: string }) => {
-          const order = OrderMode.getLabel(item.order_mode)?.toLocaleLowerCase()
+        const orderData = insectOrderConfig
+          ?.sort((a: { order_num: number }, b: { order_num: number }) => a.order_num - b.order_num)
+          .map((item: { order_mode: number; column_name: string }) => {
+            const order = OrderMode.getLabel(item.order_mode)?.toLocaleLowerCase()
 
-          return {
-            name: item.column_name,
-            order,
-            order_mode: item.order_mode
-          }
-        })
+            return {
+              name: item.column_name,
+              order,
+              order_mode: item.order_mode
+            }
+          })
 
         setDataSource(orderData)
-      } else {
-        setDataSource([])
       }
-    }, [apiConfigData, fieldSettingData, setDataSource])
+    }, [TableSchema, apiConfigData, setDataSource])
 
     const delRow = useCallback(
       (index: number) => {
@@ -213,14 +210,15 @@ const FieldOrder = observer(
     }
 
     useImperativeHandle(ref, () => ({
-      getDataSource: () => dataSource
+      getDataSource: () =>
+        dataSource.map((item) => ({ column_name: item.name, order_mode: item.order_mode }))
     }))
 
     const { columns } = useColumns(columnSettingsKey, FieldOrderColumns, columnsRender as any)
 
     const Footer = React.memo(() => (
       <FlexBox tw="h-11 items-center justify-center border-t-[1px]! border-neut-13!">
-        <Button type="text" onClick={addRow}>
+        <Button type="text" tw="hover:text-green-11" onClick={addRow}>
           <Icon name="add" type="light" />
           添加字段
         </Button>

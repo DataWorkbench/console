@@ -87,7 +87,7 @@ const SyncDataSource = observer(
         columns,
         configTableName === oldApiTableNam
       )
-      setSchemaColumns(columnsData)
+      setSchemaColumns(columnsData, columns)
     }, [TableSchema.data, apiConfigData, oldApiTableNam, setSchemaColumns])
 
     // 启动后回显数据
