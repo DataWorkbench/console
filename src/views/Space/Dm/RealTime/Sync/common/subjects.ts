@@ -101,8 +101,39 @@ curJobConfSubject$
   .subscribe(confColumns$)
 
 clearMapping$.subscribe(confColumns$)
-export const clearMapping = () => {
+
+const clearTargetColumns$ = new Subject()
+const clearSourceColumns$ = new Subject()
+
+curJobDbConfSubject$
+  .pipe(
+    distinctUntilChanged((prev, next) => {
+      return prev?.id === next?.id
+    })
+  )
+  .subscribe(clearTargetColumns$)
+
+curJobDbConfSubject$
+  .pipe(
+    distinctUntilChanged((prev, next) => {
+      return prev?.id === next?.id
+    })
+  )
+  .subscribe(clearSourceColumns$)
+
+export const clearMapping = (
+  { clearSource, clearTarget }: { clearSource: boolean; clearTarget: boolean } = {
+    clearSource: false,
+    clearTarget: false
+  }
+) => {
   clearMapping$.next([])
+  if (clearSource) {
+    clearSourceColumns$.next([])
+  }
+  if (clearTarget) {
+    clearTargetColumns$.next([])
+  }
 }
 
 curJobConfSubject$
@@ -195,7 +226,7 @@ source$
   )
   .subscribe(baseSource$)
 
-const changeTableName = () =>
+export const changeTableName = () =>
   distinctUntilChanged<any>((prevValue, value) => {
     const oldId = get(prevValue, 'data.id', '')
     const id = get(value, 'data.id', '')
@@ -207,18 +238,9 @@ const changeTableName = () =>
     return oldName === name && oldId === id
   })
 
-const clearTargetColumns$ = target$.pipe(
-  changeTableName(),
-  map(() => [])
-)
-clearTargetColumns$.subscribe(targetColumns$)
+clearTargetColumns$.pipe(map(() => [])).subscribe(targetColumns$)
 
-const clearSourceColumns$ = source$.pipe(
-  changeTableName(),
-  map(() => {
-    return []
-  })
-)
+clearSourceColumns$.pipe(map(() => [])).subscribe(sourceColumns$)
 
 export const kafkaSource$ = new BehaviorSubject<Partial<Record<string, any>>>({})
 
@@ -277,8 +299,6 @@ const kafkaSourceReadType$ = kafkaSource$.pipe(
     return prev?.id === cur?.id && prev?.readType === cur?.readType
   })
 )
-
-clearSourceColumns$.subscribe(sourceColumns$)
 
 const sql = new Set([
   SourceType.Mysql,

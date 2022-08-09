@@ -301,7 +301,7 @@ const MappingItem = (props: MappingItemProps) => {
     let menuItems: { key: string; icon: string; text: string }[] = []
     if (item.custom) {
       menuItems = [
-        !item.unEditable &&
+        !(item.type === 'STRING' && item.name === 'rowkey') &&
           config.edit && {
             key: 'edit',
             icon: 'if-pen',

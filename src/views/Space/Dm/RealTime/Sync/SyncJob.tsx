@@ -189,7 +189,8 @@ const SyncJob = () => {
         ...confData,
         sourceType: curJob?.source_type,
         targetType: curJob?.target_type,
-        jobType: curJob?.type
+        jobType: curJob?.type,
+        id: curJob?.id
       })
     }
   }, [confData, curJob, isFetching])
