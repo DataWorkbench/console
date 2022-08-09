@@ -227,7 +227,14 @@ const KVTextArea1 = forwardRef((props: IKVTextArea, ref) => {
             <span tw="w-1/2">{kvs[1]}</span>
           </FlexBox>
           {(kvArr || []).map((kv, i) => (
-            <InputRow hasDivision={division !== ''} key={Math.random()} className="group">
+            <InputRow
+              hasDivision={division !== ''}
+              key={
+                // eslint-disable-next-line react/no-array-index-key
+                i
+              }
+              className="group"
+            >
               <Input
                 autoComplete="off"
                 disabled={disabled}
