@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Checkbox, Icon, Label } from '@QCFE/lego-ui'
 import { useCallback, useMemo } from 'react'
+import { random } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
 
 import DraggableRow, { Row } from './DraggableRow'
@@ -175,7 +176,7 @@ export const DargTable = (props: DargTableProps<any>) => {
       } catch (error) {
         throw new Error('rowKey必须是字符串')
       }
-      return keyStr
+      return keyStr + random(0, 100, true)
     },
     [rowKey]
   )

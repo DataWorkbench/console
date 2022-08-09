@@ -21,7 +21,7 @@ import SyncDataSource, { ISourceData } from './SyncDataSource'
 import FieldOrder, { IOrderDataSource } from './FieldOrder'
 
 import FieldSetting from './FieldSetting'
-import { orderMapRequestData } from '../constants'
+import { orderMapRequestData } from './SyncUtil'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [

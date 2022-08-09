@@ -73,9 +73,9 @@ const FieldOrder = observer((props: IFieldOrderProps) => {
           type: item.type,
           customType: item.customType
         }))
-      const dd = fieldDataToResponseData(fieldResponse, responseConfig)
-      const aa = fieldDataToRequestData(filedRequest, requestConfig)
-      handleSyncStore(aa, dd)
+      const req = fieldDataToRequestData(filedRequest, requestConfig)
+      const res = fieldDataToResponseData(fieldResponse, responseConfig)
+      handleSyncStore(req, res)
     },
     [apiConfigData, handleSyncStore]
   )

@@ -237,7 +237,7 @@ export const fieldDataToResponseData = (filedData: SchemaMap[], configData: any[
       param_operator: ParameterOperator.EQUAL,
       param_position: ParameterPosition.QUERY,
       is_required: false,
-      order_mode: 1,
+      order_mode: 0,
       order_num: 0,
       example_value: '',
       default_value: '',
@@ -284,4 +284,25 @@ export const fieldDataToRequestData = (filedData: SchemaMap[], configData: any[]
     return [...newRequestData, ...hConfig]
   }
   return hConfig
+}
+
+// 字段排序映射到对应的返回参数中
+export const orderMapRequestData = (orderSourceData: any[], responseData: any[]) => {
+  const orderMap = new Map()
+  const orderData = orderSourceData?.map((item, index) => ({
+    ...item,
+    order_num: index + 1
+  }))
+
+  orderData?.forEach((item: any) => {
+    orderMap.set(item.name, item)
+  })
+
+  return responseData?.map((item: any) => {
+    const orderItem = orderMap.get(item.column_name)
+    return {
+      ...item,
+      ...orderItem
+    }
+  })
 }
