@@ -32,6 +32,12 @@ export interface Schema {
   isPrimary: boolean
 }
 
+export interface ITableSchema {
+  column_type: string
+  name: string
+  is_primary_key: boolean
+  param_type: string
+}
 class WorkFlowStore {
   rootStore
 
@@ -48,6 +54,8 @@ class WorkFlowStore {
   oldApiTableNam: null | string = null // 接口请求出的api 表名称
 
   fieldSettingData: FieldSettingData[] = []
+
+  TableSchema: ITableSchema[] | undefined = [] // 表原始 schema 结构
 
   curVersion: null | ApiProps = null
 
@@ -182,8 +190,9 @@ class WorkFlowStore {
     }
   }
 
-  setSchemaColumns = (schema: Schema[]) => {
+  setSchemaColumns = (schema: Schema[], TableSchema?: ITableSchema[]) => {
     this.fieldSettingData = schema
+    this.TableSchema = TableSchema
   }
 
   setApiConfigData = (data: DataServiceManageDescribeApiConfigType) => {

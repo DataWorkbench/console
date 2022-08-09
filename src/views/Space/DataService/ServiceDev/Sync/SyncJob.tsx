@@ -18,10 +18,10 @@ import qs from 'qs'
 import { JobToolBar } from '../styled'
 import SyncDataSource, { ISourceData } from './SyncDataSource'
 
-import FieldOrder, { IOrderDataSource } from './FieldOrder'
+import FieldOrder from './FieldOrder'
 
 import FieldSetting from './FieldSetting'
-import { orderMapRequestData } from '../constants'
+import { orderMapRequestData } from './SyncUtil'
 
 const { CollapseItem } = Collapse
 const CollapseWrapper = styled('div')(() => [
@@ -184,7 +184,7 @@ const SyncJob = observer(() => {
   }, [curApi, dtsDevStore, fetchApi, verId, isHistory])
 
   const orderRef = useRef<{
-    getDataSource: () => IOrderDataSource[]
+    getDataSource: () => { column_name: string; order_mode: number }[]
   }>(null)
   const dataSourceRef = useRef<{
     getDataSource: () => ISourceData
@@ -232,7 +232,7 @@ const SyncJob = observer(() => {
       }
 
       if (orderSourceData) {
-        if (orderSourceData?.some((item) => item.name === '')) {
+        if (orderSourceData?.some((item) => item.column_name === '')) {
           showConfWarn('字段排序名称不能为空')
           return
         }
@@ -242,6 +242,7 @@ const SyncJob = observer(() => {
       const responseConfig = cloneDeep(apiResponseData) as any[]
 
       const response = orderMapRequestData(orderSourceData, responseConfig)
+
       const apiConfig: any = cloneDeep(get(apiConfigData, 'api_config', {}))
       const apiId = get(curApi, 'api_id')
 
