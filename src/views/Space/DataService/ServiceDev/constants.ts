@@ -232,26 +232,6 @@ export const FieldCategory = createEnhancedEnum<IStatusEnum>({
   }
 })
 
-export const orderMapRequestData = (orderSourceData: any[], responseData: any[]) => {
-  const orderMap = new Map()
-  const orderData = orderSourceData?.map((item, index) => ({
-    ...item,
-    order_num: index + 1
-  }))
-
-  orderData?.forEach((item: any) => {
-    orderMap.set(item.name, item)
-  })
-
-  return responseData?.map((item: any) => {
-    const orderItem = orderMap.get(item.column_name)
-    return {
-      ...item,
-      ...orderItem
-    }
-  })
-}
-
 export const publishStatus = createEnhancedEnum<IPublishStatusEnum>({
   // UNSET: {
   //   label: 'UNSET',
