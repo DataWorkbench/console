@@ -87,7 +87,7 @@ const Item = (props: any) => {
         isDragging: monitor.isDragging()
       })
     }),
-    [item.name, index]
+    [item, index]
   )
   const [{ isOver }, drop] = useDrop<any, any, any>(
     () => ({
@@ -125,7 +125,7 @@ const Item = (props: any) => {
         }
       }
     }),
-    [item.uuid, index]
+    [index]
   )
   drag(drop(ref))
   return (
@@ -181,11 +181,13 @@ const getRowExp = (exp: string) => {
 // eslint-disable-next-line import/prefer-default-export
 export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   const { sourceColumns = [] } = props
-  const [{ rowKeyString, versionTime, versionIndex }, setJob] = useImmer({
+  const [{ versionTime, versionIndex }, setJob] = useImmer({
     rowKeyString: '',
     versionTime: undefined,
     versionIndex: -1
   })
+
+  const [rowKeyIds, setRowKeyIds] = useImmer<string[]>([])
 
   useLayoutEffect(() => {
     const sub = target$
@@ -207,11 +209,12 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
       )
       .subscribe((e) => {
         setJob(e)
+        setRowKeyIds(e.rowKeyString.split('_'))
       })
     return () => {
       sub.unsubscribe()
     }
-  }, [setJob])
+  }, [setJob, setRowKeyIds])
 
   const [isEditingVersion, setIsEditingVersion] = useState(false)
   const [showVersionMoreAction, setShowVersionMoreAction] = useState(false)
@@ -226,24 +229,11 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     time?: string
   }>({ type: 1 })
 
-  const [rowKeyIds, setRowKeyIds] = useImmer<string[]>([])
-
-  useEffect(() => {
-    const list = rowKeyString.split('_')
-    setRowKeyIds(
-      list.map((name) => sourceColumns.find((c: any) => c.name === name)?.uuid).filter(Boolean)
-      // sourceColumns
-      //   .filter((column: Record<string, any>) => list.includes(column.name))
-      //   .map((item: Record<string, any>) => item.uuid)
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowKeyString, setRowKeyIds, sourceColumns])
-
   useEffect(() => {
     if (versionIndex !== -1 && sourceColumns[versionIndex]) {
       setVersion({
         type: 2,
-        column: sourceColumns[versionIndex].uuid
+        column: sourceColumns[versionIndex].name
       })
     } else if (versionTime) {
       setVersion({
@@ -259,7 +249,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     () =>
       rowKeyIds
         .map((id) => {
-          const item = sourceColumns.find((i) => i.uuid === id)
+          const item = sourceColumns.find((i) => i.name === id)
           if (item) {
             return item
           }
@@ -276,30 +266,26 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
         if (prev === cur || !prev) {
           return
         }
-        setJob((draft) => {
-          draft.rowKeyString = draft.rowKeyString
-            .split('_')
-            .map((i) => {
-              if (i === prev) {
-                return cur
-              }
-              return i
-            })
-            .join('_')
+        setRowKeyIds((draft) => {
+          return draft.map((i) => {
+            return i === prev ? cur : i
+          })
         })
       })
     return () => {
       sub.unsubscribe()
     }
-  }, [setJob])
+  }, [setRowKeyIds])
 
   useImperativeHandle(ref, () => ({
-    getData: () => ({
-      rowkeyExpress: rowKeys.map((item) => item.name).join('_'),
-      versionColumnIndex:
-        version.type === 2 ? sourceColumns.findIndex((i) => i.uuid === version.column) : -1,
-      versionColumnValue: version.type === 3 ? version.time : undefined
-    })
+    getData: () => {
+      return {
+        rowkeyExpress: rowKeys.map((item) => item.name).join('_'),
+        versionColumnIndex:
+          version.type === 2 ? sourceColumns.findIndex((i) => i.name === version.column) : -1,
+        versionColumnValue: version.type === 3 ? version.time : undefined
+      }
+    }
   }))
 
   const [editingValue, setEditingValue] = useImmer<{
@@ -383,7 +369,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
   }
 
   const [{ isOver: isVersionOver }, versionRef] = useDrop<
-    { uuid: string; index: number; type: string },
+    { name: string; index: number; type: string },
     void,
     { isOver: boolean }
   >(() => ({
@@ -391,12 +377,12 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     collect: (monitor) => ({
       isOver: monitor.isOver()
     }),
-    drop: ({ uuid, index, type }) => {
+    drop: ({ name, index, type }) => {
       if (!type.toLowerCase().includes('time') && !type.toLowerCase().includes('date')) {
         return
       }
       setVersion((draft) => {
-        draft.column = uuid
+        draft.column = name
       })
       setJob((draft) => {
         draft.versionIndex = index
@@ -427,8 +413,8 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           )}
           {version.column && (
             <>
-              <div>{sourceColumns.find((i) => i.uuid === version.column)?.name}</div>
-              <div>{sourceColumns.find((i) => i.uuid === version.column)?.type}</div>
+              <div>{sourceColumns.find((i) => i.name === version.column)?.name}</div>
+              <div>{sourceColumns.find((i) => i.name === version.column)?.type}</div>
             </>
           )}
         </div>
@@ -639,15 +625,15 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
     )
   }
 
-  const [{ isOver }, leftRef] = useDrop<{ uuid: string; name: string }, void, { isOver: boolean }>(
+  const [{ isOver }, leftRef] = useDrop<{ name: string; name: string }, void, { isOver: boolean }>(
     () => ({
       accept: leftDndType,
       collect: (monitor) => ({
         isOver: monitor.isOver()
       }),
-      drop: ({ uuid }) => {
+      drop: ({ name }) => {
         setRowKeyIds((draft) => {
-          draft.push(uuid)
+          draft.push(name)
         })
         // setJob((draft) => {
         //   draft.rowKeyString = `${draft.rowKeyString}_${name}`
@@ -763,6 +749,12 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
             deleteItem={(s: number) => {
               setRowKeyIds((draft) => {
                 draft.splice(s, 1)
+              })
+              setJob((draft) => {
+                draft.rowKeyString = draft.rowKeyString
+                  .split('_')
+                  .filter((_, i) => i !== index)
+                  .join('_')
               })
             }}
             moveItem={(s: number, t: number, isTop: boolean) => {

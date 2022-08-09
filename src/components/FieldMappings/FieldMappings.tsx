@@ -915,7 +915,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                 <MappingItem
                   jsplumb={jsPlumbInstRef.current}
                   // hasMoreAction={!isKafkaSource}
-                  item={{ ...item, unEditable: isHbaseSource && item.name === 'rowkey' }}
+                  item={item}
                   key={item.uuid}
                   index={i}
                   config={config.source}
@@ -925,6 +925,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
                   typeName={leftTypeName}
                   moveItem={moveItem}
                   onOk={(info, index) => {
+                    console.log(555555555555)
                     keepEditingField(info, index)
                   }}
                   onCancel={cancelAddCustomField}
