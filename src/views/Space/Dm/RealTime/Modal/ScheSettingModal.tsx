@@ -31,6 +31,9 @@ import {
   // useQueryJobSchedule,
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { emitter } from 'utils/index'
+import { useParams } from 'react-router-dom'
+import { apiRequest } from 'utils/api'
 import {
   ScheSettingForm,
   SmallDatePicker,
@@ -54,6 +57,7 @@ interface IScheSettingModal {
   onCancel?: () => void
   onSuccess?: () => void
   defaultschedulePolicy?: number
+  // getData?: () => Record<string, any>
 }
 
 type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -70,7 +74,7 @@ const ScheSettingModal = ({
 
   // const [period, setPeriod] = useState<TPeriodType>('minute')
   const [defCurDate] = useState(dayjs().hour(0).minute(20).toDate())
-  // const { regionId, spaceId } = useParams<IUseParams>()
+  const { regionId, spaceId } = useParams<IUseParams>()
   const [periodData, setPeriodData] = useImmer({
     minute: {
       startHour: 0,
@@ -140,6 +144,16 @@ const ScheSettingModal = ({
   const isStreamJob = curJob!.jobMode === JobMode.RT
 
   const useQueryJobSchedule = isStreamJob ? useQueryStreamJobSchedule : useQuerySyncJobSchedule
+
+  const getData = async () => {
+    emitter.emit('getSyncData')
+    return new Promise((resolve) => {
+      emitter.on('getSyncDataCb', (d) => {
+        resolve(d)
+        emitter.off('getSyncDataCb')
+      })
+    })
+  }
 
   const useMutationJobSchedule = isStreamJob
     ? useMutationStreamJobSchedule
@@ -495,6 +509,42 @@ var2=\${yyyy-mm-dd HH-1H}`}
                         }
                       }
                     ]}
+                    helpLink="/manual/schedule/para/"
+                    action={
+                      curJob!.jobMode === JobMode.DI ? (
+                        <span
+                          onClick={async () => {
+                            const data = await getData()
+                            apiRequest(
+                              'syncJobDevManage',
+                              'loadSyncJobScheduleParameters'
+                            )({
+                              regionId,
+                              uri: {
+                                space_id: spaceId,
+                                job_id: curJob?.id
+                              },
+                              data: {
+                                conf: data
+                              }
+                            }).then((e) => {
+                              if (Array.isArray(e?.items)) {
+                                setParams((draft) => {
+                                  draft.parameters = [
+                                    ...draft.parameters,
+                                    ...e.items.map((i: string) => ({ key: i, value: '' }))
+                                  ]
+                                })
+                              }
+                            })
+                          }}
+                          tw="cursor-pointer"
+                        >
+                          <Icon name="if-restart" type="light" />{' '}
+                          <span tw="ml-1">加载代码中的参数</span>
+                        </span>
+                      ) : undefined
+                    }
                   />
                 </CollapseItem>
               )}

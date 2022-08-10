@@ -118,7 +118,7 @@ const SqlServerSourceConfig = forwardRef(
               tableName: get(e, 'data.table_list[0]'),
               updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
               // slot: get(e, 'data.slot_name'),
-              lsn: get(e, 'data.lsn', 0),
+              lsn: get(e, 'data.lsn'),
               time: get(e, 'data.poll_interval', 120),
               autoCreate: get(e, 'data.allow_create_slot', true),
               temp: get(e, 'data.temporary', true)
