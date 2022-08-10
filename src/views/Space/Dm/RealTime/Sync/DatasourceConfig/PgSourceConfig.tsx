@@ -118,7 +118,7 @@ const PgSourceConfig = forwardRef(
               tableName: get(e, 'data.table_list[0]'),
               updateType: get(e, 'data.cat', 'insert,update,delete').split(',').filter(Boolean),
               slot: get(e, 'data.slot_name'),
-              lsn: get(e, 'data.lsn', 0),
+              lsn: get(e, 'data.lsn'),
               heartBeatPack: get(e, 'data.heart_beat_pack', 10),
               autoCreate: get(e, 'data.allow_create_slot', true),
               temp: get(e, 'data.temporary', true)

@@ -184,6 +184,7 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
                 ${tw`w-full`}
               }
             `}
+            helpLink="/manual/integration_job/cfg_source/mongodb/#参数说明"
             validateOnChange={
               dbInfo?.condition &&
               !isEqual(dbInfo.condition, { type: 1 }) &&

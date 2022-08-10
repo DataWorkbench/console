@@ -241,6 +241,10 @@ export const esPwdFilters = new Set(['__dbUrl', 'esAuth', 'version', 'user', 'pa
 
 export const esAnonymousFilters = new Set(['version', '__dbUrl', 'esAuth'])
 
+export const mongoDbPwdFilters = new Set(['hosts', 'database', 'auth', 'user', 'password'])
+
+export const mongoDbAnonymousFilters = new Set(['hosts', 'database', 'auth'])
+
 export enum DbType {
   Sql = '关系型数据库',
   Nosql = 'NoSQL 数据库',
