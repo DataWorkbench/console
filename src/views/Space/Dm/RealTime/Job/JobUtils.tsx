@@ -296,14 +296,14 @@ export const jobModeData = [
       //   disabled: true,
       // },
     ]
-  },
-  {
-    mode: JobMode.OLE,
-    title: '数据挖掘（敬请期待）',
-    desc: '使用基于内存计算的 Spark 大数据计算引擎进行数据挖掘和机器学习。',
-    icon: 'DownloadBox2Fill',
-    items: []
   }
+  // {
+  //   mode: JobMode.OLE,
+  //   title: '数据挖掘（敬请期待）',
+  //   desc: '使用基于内存计算的 Spark 大数据计算引擎进行数据挖掘和机器学习。',
+  //   icon: 'DownloadBox2Fill',
+  //   items: []
+  // }
 ]
 // 1 => "OfflineFull" 2 => "OfflineIncrement" 3 => "RealTimeFull" 3 => "RealTimeIncrement"
 type DiType = 1 | 2 | 3

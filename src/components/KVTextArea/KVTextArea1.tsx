@@ -1,9 +1,10 @@
-import React, { useState, forwardRef, useEffect } from 'react'
+import React, { useState, forwardRef, useEffect, ReactElement } from 'react'
 import { TextArea, Input, RadioGroup, RadioButton, Button, Icon } from '@QCFE/lego-ui'
 import { trim, filter } from 'lodash-es'
 import tw, { css, styled } from 'twin.macro'
-import { FlexBox } from 'components/Box'
+import { FlexBox } from '../Box'
 import { Tooltip } from '../Tooltip'
+import { HelpCenterLink } from '../Link'
 
 // eslint-disable react/no-array-index-key
 const Root = styled('div')(() => [
@@ -53,6 +54,8 @@ interface IKVTextArea {
   min?: number
   onChange?: (v: string) => void
   onBlur?: (v: string) => void
+  helpLink?: string
+  action?: ReactElement
 }
 
 type TKV = 'batch' | 'single'
@@ -127,7 +130,9 @@ const KVTextArea1 = forwardRef((props: IKVTextArea, ref) => {
     onChange,
     min = 0,
     reverse = false,
-    disabled = false
+    disabled = false,
+    helpLink,
+    action
   } = props
   const [type, setType] = useState<TKV>(typeProp)
   const [kvArr, setKvArr] = useState(parseToKV(value, division))
@@ -193,10 +198,18 @@ const KVTextArea1 = forwardRef((props: IKVTextArea, ref) => {
 
   return (
     <Root className={className}>
-      <RadioGroup label="Host别名" value={type} onChange={handleTypeChange}>
-        <RadioButton value={reverse ? 'single' : 'batch'}>{lables[0]}</RadioButton>
-        <RadioButton value={reverse ? 'batch' : 'single'}>{lables[1]}</RadioButton>
-      </RadioGroup>
+      <FlexBox tw="justify-between">
+        <RadioGroup label="Host别名" value={type} onChange={handleTypeChange}>
+          <RadioButton value={reverse ? 'single' : 'batch'}>{lables[0]}</RadioButton>
+          <RadioButton value={reverse ? 'batch' : 'single'}>{lables[1]}</RadioButton>
+        </RadioGroup>
+        <FlexBox tw="mb-6 items-center">
+          <HelpCenterLink tw="mr-1.5" isIframe={false} href={helpLink} hasIcon>
+            参数设置参考文档
+          </HelpCenterLink>
+          {action}
+        </FlexBox>
+      </FlexBox>
       {type === 'batch' ? (
         <div>
           {title && (

@@ -187,7 +187,11 @@ export default {
 
     setSyncJobSchedule: ['PUT', '/v1/workspace/{space_id}/sync/job/{job_id}/schedule'],
 
-    updateSyncJob: ['PUT', '/v1/workspace/{space_id}/sync/job/{job_id}']
+    updateSyncJob: ['PUT', '/v1/workspace/{space_id}/sync/job/{job_id}'],
+    loadSyncJobScheduleParameters: [
+      'POST',
+      '/v1/workspace/{space_id}/sync/job/{job_id}/schedule/parameters'
+    ]
   },
 
   roleManage: {

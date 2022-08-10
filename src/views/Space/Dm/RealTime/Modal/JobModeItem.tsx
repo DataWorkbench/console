@@ -14,7 +14,7 @@ interface JobModeItemProps {
 
 const Root = styled('div')(
   ({ selected = false, disabled = false }: { selected?: boolean; disabled?: boolean }) => [
-    tw`flex flex-col w-1/3 rounded border-2 border-neut-13 transition-colors ease-in-out duration-300`,
+    tw`flex flex-col w-1/2 rounded border-2 border-neut-13 transition-colors ease-in-out duration-300`,
     disabled ? tw`cursor-not-allowed` : tw`cursor-pointer`,
     selected &&
       css`

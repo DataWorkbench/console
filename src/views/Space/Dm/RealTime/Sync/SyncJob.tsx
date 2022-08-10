@@ -12,7 +12,7 @@ import {
 } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { TMappingField } from 'components/FieldMappings/MappingItem'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Editor from 'react-monaco-editor'
 import { get, isArray, isObject, isUndefined, set } from 'lodash-es'
 import {
@@ -38,6 +38,7 @@ import { useImmer } from 'use-immer'
 import { map, filter, pairwise } from 'rxjs'
 import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 import { useParams } from 'react-router-dom'
+import { emitter } from 'utils/index'
 import { JobToolBar } from '../styled'
 import SyncCluster from './SyncCluster'
 import SyncChannel from './SyncChannel'
@@ -299,89 +300,120 @@ const SyncJob = () => {
     })
   }
 
+  const getData = useCallback(
+    ({
+      isSubmit,
+      isValidateSource
+    }: {
+      isSubmit?: boolean
+      isValidateSource?: boolean
+    }): Record<any, any> | undefined => {
+      if (
+        mode === 1 &&
+        isSubmit &&
+        (!dbRef.current || !mappingRef.current || !clusterRef.current || !channelRef.current)
+      ) {
+        return undefined
+      }
+
+      const resource = dbRef.current?.getResource() ?? {}
+      const mapping = mappingRef.current?.rowMapping() ?? []
+      const sourceTypeNames = dbRef.current?.getTypeNames() ?? []
+      const cluster = clusterRef.current?.getCluster()
+      const channel = channelRef.current?.getChannel() ?? {}
+      const syncJobScript = editorRef.current?.getValue() ?? ''
+      try {
+        if (mode === 2) {
+          if (typeof JSON.parse(syncJobScript) !== 'object') {
+            showConfWarn('脚本格式不正确')
+            return undefined
+          }
+          set(resource, 'job_content', JSON.stringify(JSON.parse(syncJobScript)))
+        }
+      } catch (e) {
+        showConfWarn('脚本格式不正确')
+        return undefined
+      }
+      try {
+        if (mode === 1) {
+          set(resource, 'job_content', '')
+          if (!resource && isValidateSource) {
+            showConfWarn('未配置数据源信息')
+            return undefined
+          }
+          set(
+            resource,
+            `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
+            mapping?.[0]
+          )
+          if (curJob?.target_type === SourceType.HBase) {
+            const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
+              mappingRef.current!.getOther()
+            set(
+              resource,
+              `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
+              setRowExp(rowkeyExpress)
+            )
+            set(
+              resource,
+              `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_index`,
+              versionColumnIndex
+            )
+            set(
+              resource,
+              `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_value`,
+              versionColumnValue
+            )
+          }
+          if (curJob?.target_type !== SourceType.Kafka) {
+            set(
+              resource,
+              `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
+              mapping?.[1]
+            )
+          } else {
+            set(
+              resource,
+              `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.tableFields`,
+              mapping?.[1]
+            )
+          }
+
+          set(resource, 'channel_control', channel)
+        }
+      } catch (e) {
+        console.error(e.message)
+        // showConfWarn(e.message)
+        return undefined
+      }
+      const filterResouce = removeUndefined(resource)
+
+      set(filterResouce, 'job_mode', mode)
+      set(filterResouce, 'cluster_id', cluster?.id)
+      return filterResouce
+    },
+    [curJob?.target_type, mode]
+  )
+
+  useEffect(() => {
+    emitter.on('getSyncData', () => {
+      emitter.emit('getSyncDataCb', getData({ isSubmit: false, isValidateSource: false }))
+    })
+    return () => {
+      emitter.off('getSyncData')
+    }
+  }, [getData])
+
   const save = (isSubmit?: boolean, cb?: Function, isValidateSource?: boolean) => {
-    if (
-      mode === 1 &&
-      isSubmit &&
-      (!dbRef.current || !mappingRef.current || !clusterRef.current || !channelRef.current)
-    ) {
+    const filterResouce = getData({ isSubmit, isValidateSource })
+    if (!filterResouce) {
       return
     }
-
     const resource = dbRef.current?.getResource() ?? {}
     const mapping = mappingRef.current?.rowMapping() ?? []
-    const sourceTypeNames = dbRef.current?.getTypeNames() ?? []
     const cluster = clusterRef.current?.getCluster()
     const channel = channelRef.current?.getChannel() ?? {}
-    const syncJobScript = editorRef.current?.getValue() ?? ''
-    try {
-      if (mode === 2) {
-        if (typeof JSON.parse(syncJobScript) !== 'object') {
-          showConfWarn('脚本格式不正确')
-          return
-        }
-        set(resource, 'job_content', JSON.stringify(JSON.parse(syncJobScript)))
-      }
-    } catch (e) {
-      showConfWarn('脚本格式不正确')
-      return
-    }
-    try {
-      if (mode === 1) {
-        set(resource, 'job_content', '')
-        if (!resource && isValidateSource) {
-          showConfWarn('未配置数据源信息')
-          return
-        }
-        set(
-          resource,
-          `sync_resource.${sourceTypeNames[0].toLowerCase()}_source.column`,
-          mapping?.[0]
-        )
-        if (curJob?.target_type === SourceType.HBase) {
-          const { rowkeyExpress, versionColumnIndex, versionColumnValue } =
-            mappingRef.current!.getOther()
-          set(
-            resource,
-            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.rowkey_express`,
-            setRowExp(rowkeyExpress)
-          )
-          set(
-            resource,
-            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_index`,
-            versionColumnIndex
-          )
-          set(
-            resource,
-            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.version_column_value`,
-            versionColumnValue
-          )
-        }
-        if (curJob?.target_type !== SourceType.Kafka) {
-          set(
-            resource,
-            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.column`,
-            mapping?.[1]
-          )
-        } else {
-          set(
-            resource,
-            `sync_resource.${sourceTypeNames[1].toLowerCase()}_target.tableFields`,
-            mapping?.[1]
-          )
-        }
 
-        set(resource, 'channel_control', channel)
-      }
-    } catch (e) {
-      // console.log(e.message)
-      // showConfWarn(e.message)
-      // return
-    }
-    const filterResouce = removeUndefined(resource)
-
-    set(filterResouce, 'job_mode', mode)
-    set(filterResouce, 'cluster_id', cluster?.id)
     mutation.mutate(filterResouce, {
       onSuccess: () => {
         confRefetch()
