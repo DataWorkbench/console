@@ -16,7 +16,13 @@ import {
   DatePicker,
   Button
 } from '@QCFE/lego-ui'
-import { DarkModal, FlexBox, AffixLabel, KVTextAreaField1 as KVTextAreaField } from 'components'
+import {
+  DarkModal,
+  FlexBox,
+  AffixLabel,
+  KVTextAreaField1 as KVTextAreaField,
+  Center
+} from 'components'
 import { useImmer } from 'use-immer'
 import { isEmpty, range, set } from 'lodash-es'
 import { useStore } from 'stores'
@@ -512,7 +518,7 @@ var2=\${yyyy-mm-dd HH-1H}`}
                     helpLink="/manual/schedule/para/"
                     action={
                       curJob!.jobMode === JobMode.DI ? (
-                        <span
+                        <Center
                           onClick={async () => {
                             const data = await getData()
                             apiRequest(
@@ -538,11 +544,11 @@ var2=\${yyyy-mm-dd HH-1H}`}
                               }
                             })
                           }}
-                          tw="cursor-pointer"
+                          tw="cursor-pointer inline-flex leading-5"
                         >
-                          <Icon name="if-restart" type="light" />{' '}
+                          <Icon name="restart" type="light" />{' '}
                           <span tw="ml-1">加载代码中的参数</span>
-                        </span>
+                        </Center>
                       ) : undefined
                     }
                   />

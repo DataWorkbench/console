@@ -203,12 +203,12 @@ const KVTextArea1 = forwardRef((props: IKVTextArea, ref) => {
           <RadioButton value={reverse ? 'single' : 'batch'}>{lables[0]}</RadioButton>
           <RadioButton value={reverse ? 'batch' : 'single'}>{lables[1]}</RadioButton>
         </RadioGroup>
-        <div tw="mb-6">
-          <HelpCenterLink isIframe={false} href={helpLink} hasIcon>
+        <FlexBox tw="mb-6 items-center">
+          <HelpCenterLink tw="mr-1.5" isIframe={false} href={helpLink} hasIcon>
             参数设置参考文档
           </HelpCenterLink>
-          <span tw="ml-1">{action}</span>
-        </div>
+          {action}
+        </FlexBox>
       </FlexBox>
       {type === 'batch' ? (
         <div>
