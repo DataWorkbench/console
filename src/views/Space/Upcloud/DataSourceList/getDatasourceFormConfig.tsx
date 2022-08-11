@@ -807,6 +807,7 @@ localhost: 27017
           ]
         },
         { ...database },
+        { ...auth },
         user,
         { ...password, placeholder: '请输入访问密码（Password）' }
       ]
@@ -983,6 +984,16 @@ export const sourceStrategy = [
         return arr2str(get(sourceInfo, 'url.mongo_db.hosts'))
       }
       return ''
+    }
+  },
+  {
+    key: 'mongo_db.auth',
+    check: (type: SourceType, name: string) => type === SourceType.MongoDB && name === 'auth',
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'id')) {
+        return get(sourceInfo, 'url.mongo_db.user') ? 1 : 2
+      }
+      return 1
     }
   }
 ]

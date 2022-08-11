@@ -19,6 +19,8 @@ import {
   ftpProtocolValue,
   hiveAnonymousFilters,
   hivePwdFilters,
+  mongoDbAnonymousFilters,
+  mongoDbPwdFilters,
   sftpFiltersWithKey,
   sftpFiltersWithPwd,
   sFtpProtocolValue,
@@ -124,6 +126,9 @@ const getInitValue = (path: string) => {
       elastic_search: {
         version: '7',
         port: 9200
+      },
+      mongo_db: {
+        auth: 2
       }
     }
   }
@@ -193,6 +198,13 @@ const DataSourceForm = ({
       }
       return esPwdFilters
     }
+    if (urlType === 'mongo_db') {
+      console.log(sourceInfo)
+      if (get(sourceInfo, 'id')) {
+        return get(sourceInfo, 'url.mongo_db.user') ? mongoDbPwdFilters : mongoDbAnonymousFilters
+      }
+      return mongoDbPwdFilters
+    }
     return undefined
   })
 
@@ -260,6 +272,14 @@ const DataSourceForm = ({
         setFilters(esAnonymousFilters)
       } else {
         setFilters(esPwdFilters)
+      }
+      onChange?.(v)
+    },
+    mongo_db_auth: (onChange?: Function) => (v: number) => {
+      if (v === 2) {
+        setFilters(mongoDbAnonymousFilters)
+      } else {
+        setFilters(mongoDbPwdFilters)
       }
       onChange?.(v)
     }

@@ -41,7 +41,7 @@ const HiveTargetConfig = forwardRef(
             return {
               id: get(e, 'data.id'),
               tableName: get(e, 'data.table'),
-              partition: get(e, 'data.partition', 'pt'),
+              partition: get(e, 'data.partition', 'day'),
               usePartition: get(e, 'data.use_partition', false),
               type: get(e, 'data.partition_type', 1),
               fileType: get(e, 'data.file_type'),

@@ -45,7 +45,7 @@ interface IConditionParameterProps {
 }
 
 const SimpleWrapper = styled.div`
-  ${tw`bg-neut-16 p-2 w-[376px]`}
+  ${tw`bg-neut-16 p-2`}
   ${css`
     & > div {
       ${tw`flex-auto!`}
@@ -159,44 +159,50 @@ export const ConditionParameter = React.forwardRef(
         : ['expression']
     const hasChange = !!values(pick(value, keys)).find((i) => !isNil(i))
     return (
-      <div className={className} tw="flex-auto" style={{ width }}>
-        <FlexBox tw="mb-1">
-          <RadioGroup
-            value={value?.type}
-            onChange={hasChange ? undefined : handleTypeChange}
-            style={{ marginBottom: 0 }}
-          >
-            {types.map((item) => {
-              if (!hasChange) {
+      <div className={className} tw="flex-auto min-w-[370px] max-w-[500px]" style={{ width }}>
+        <FlexBox tw="mb-1 justify-between items-center mb-1.5">
+          <div tw="flex flex-auto">
+            <RadioGroup
+              value={value?.type}
+              onChange={hasChange ? undefined : handleTypeChange}
+              style={{ marginBottom: 0 }}
+            >
+              {types.map((item) => {
+                if (!hasChange) {
+                  return (
+                    <RadioButton key={item.value} value={item.value}>
+                      {item.label}
+                    </RadioButton>
+                  )
+                }
                 return (
-                  <RadioButton key={item.value} value={item.value}>
-                    {item.label}
-                  </RadioButton>
+                  <PopConfirm
+                    content={<div>切换输入模式会清空已输入内容，确认切换？</div>}
+                    type="warning"
+                    onOk={() => handleTypeChange(item.value)}
+                  >
+                    <RadioButton key={item.value} value={item.value}>
+                      {item.label}
+                    </RadioButton>
+                  </PopConfirm>
                 )
-              }
-              return (
-                <PopConfirm
-                  content={<div>切换输入模式会清空已输入内容，确认切换？</div>}
-                  type="warning"
-                  onOk={() => handleTypeChange(item.value)}
-                >
-                  <RadioButton key={item.value} value={item.value}>
-                    {item.label}
-                  </RadioButton>
-                </PopConfirm>
-              )
-            })}
-          </RadioGroup>
-          <div tw="flex flex-auto items-center ml-1">
-            {helpStr ? (
-              <Tooltip twChild={tw`inline-flex`} hasPadding theme="light" content={helpStr}>
-                <Icon name="information" />
-              </Tooltip>
-            ) : (
-              <div />
-            )}
-            {helpLink && <HelpCenterLink href={helpLink} />}
+              })}
+            </RadioGroup>
+            <div tw="inline-flex flex-auto items-center ml-1">
+              {helpStr ? (
+                <Tooltip twChild={tw`inline-flex`} hasPadding theme="light" content={helpStr}>
+                  <Icon name="information" />
+                </Tooltip>
+              ) : (
+                <div />
+              )}
+            </div>
           </div>
+          {helpLink && (
+            <HelpCenterLink href={helpLink} hasIcon isIframe={false}>
+              条件参数配置文档
+            </HelpCenterLink>
+          )}
         </FlexBox>
         {value?.type !== ConditionType.Express && (
           <SimpleWrapper>
