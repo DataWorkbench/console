@@ -21,10 +21,10 @@ import {
   FlexBox,
   AffixLabel,
   KVTextAreaField1 as KVTextAreaField,
-  Center
+  TextLink
 } from 'components'
 import { useImmer } from 'use-immer'
-import { isEmpty, range, set } from 'lodash-es'
+import { isEmpty, range, set, uniqBy } from 'lodash-es'
 import { useStore } from 'stores'
 import dayjs from 'dayjs'
 import { useQueryClient } from 'react-query'
@@ -152,12 +152,12 @@ const ScheSettingModal = ({
   const useQueryJobSchedule = isStreamJob ? useQueryStreamJobSchedule : useQuerySyncJobSchedule
 
   const getData = async () => {
-    emitter.emit('getSyncData')
     return new Promise((resolve) => {
       emitter.on('getSyncDataCb', (d) => {
         resolve(d)
         emitter.off('getSyncDataCb')
       })
+      emitter.emit('getSyncData')
     })
   }
 
@@ -518,7 +518,9 @@ var2=\${yyyy-mm-dd HH-1H}`}
                     helpLink="/manual/schedule/para/"
                     action={
                       curJob!.jobMode === JobMode.DI ? (
-                        <Center
+                        <TextLink
+                          hasIcon={false}
+                          color="white"
                           onClick={async () => {
                             const data = await getData()
                             apiRequest(
@@ -536,19 +538,36 @@ var2=\${yyyy-mm-dd HH-1H}`}
                             }).then((e) => {
                               if (Array.isArray(e?.items)) {
                                 setParams((draft) => {
-                                  draft.parameters = [
-                                    ...draft.parameters,
+                                  let arr = [
+                                    ...(params.parametersStr ?? '')
+                                      .split(/[\r\n]/)
+                                      .filter((v) => !isEmpty(v))
+                                      .map((v) => {
+                                        const o = v.split('=')
+                                        return {
+                                          key: o[0],
+                                          value: o[1]
+                                        }
+                                      }),
                                     ...e.items.map((i: string) => ({ key: i, value: '' }))
                                   ]
+                                  arr = uniqBy(arr, 'key')
+                                  draft.parameters = arr
+                                  draft.parametersStr = arr
+                                    .map(
+                                      (item: { key: string; value: string }) =>
+                                        `${item.key}=${item.value}`
+                                    )
+                                    .join('\r\n')
                                 })
                               }
                             })
                           }}
-                          tw="cursor-pointer inline-flex leading-5"
+                          tw="cursor-pointer items-center no-underline! inline-flex leading-5"
                         >
                           <Icon name="restart" type="light" />{' '}
                           <span tw="ml-1">加载代码中的参数</span>
-                        </Center>
+                        </TextLink>
                       ) : undefined
                     }
                   />

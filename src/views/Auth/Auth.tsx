@@ -1,7 +1,7 @@
-import { ReactElement, useEffect, useMemo, useRef, useState } from 'react'
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { get, omit, set } from 'lodash-es'
 import { LocaleProvider } from '@QCFE/lego-ui'
-import { Loading, PortalProvider } from '@QCFE/qingcloud-portal-ui'
+import { Loading, PortalProvider, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
 import { describeDataomnis } from 'stores/api'
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom'
 import { useCookie } from 'react-use'
@@ -16,12 +16,30 @@ const langMapping: { [key: string]: string | undefined } = {
 }
 
 const Auth = ({ children }: { children: ReactElement }) => {
-  const isLogin = useRef(window.location.pathname === '/dataomnis/login')
+  const isLoginPage = useRef(window.location.pathname === '/dataomnis/login')
   const isPrivate = useMemo(() => get(window, 'CONFIG_ENV.IS_PRIVATE', false), [])
-  const [loading, setLoading] = useState(!isLogin.current)
+  const [loading, setLoading] = useState(!isLoginPage.current)
   const [hasLogin, setHasLogin] = useState(false)
 
-  const [sk, setSk] = useCookie('sk')
+  const [sk, updateSk, deleteSk] = useCookie('sk')
+  const [loginUri, updateLoginUri] = useCookie('login-uri')
+
+  const setSk = useCallback(
+    (sk1: string) => {
+      if (!sk1) {
+        deleteSk()
+      } else {
+        updateSk(sk1)
+      }
+    },
+    [deleteSk, updateSk]
+  )
+
+  const loginBySk = (sk1: string) => {
+    isLoginPage.current = false
+    setLoading(true)
+    setSk(sk1)
+  }
 
   const handleLogin = (userInfo: Record<string, any>) => {
     set(window, 'USER', userInfo)
@@ -31,12 +49,22 @@ const Auth = ({ children }: { children: ReactElement }) => {
   }
 
   useValidateSession(sk!, {
-    enabled: isPrivate && !!sk && !isLogin.current,
+    enabled: isPrivate && !!sk && !isLoginPage.current,
     onSuccess: (e: Record<'user_set' | 'key_set', any>) => {
       handleLogin(omit(e.user_set, 'password'))
     },
     onError: () => {
-      setLoading(false)
+      if (loginUri) {
+        Notify.warning({
+          title: '获取用户信息失败，请重试',
+          placement: 'bottomRight'
+        })
+        setTimeout(() => {
+          window.location.href = loginUri
+        }, 1500)
+      } else {
+        setLoading(false)
+      }
     }
   })
 
@@ -73,15 +101,22 @@ const Auth = ({ children }: { children: ReactElement }) => {
 
   useEffect(() => {
     emitter.on('logout', () => {
+      setSk('')
       if (isPrivate) {
-        setSk('')
-        setHasLogin(false)
+        if (loginUri) {
+          setTimeout(() => {
+            window.location.href = loginUri
+          }, 1500)
+        } else {
+          setHasLogin(false)
+        }
       } else {
         window.location.href = `/login?redirect_uri=${window.location.pathname}`
       }
     })
-  }, [isPrivate, setSk])
+  }, [isPrivate, loginUri, setSk])
 
+  console.log(hasLogin, loading)
   const renderChildren = () => {
     if (loading) {
       return (
@@ -90,15 +125,15 @@ const Auth = ({ children }: { children: ReactElement }) => {
         </div>
       )
     }
+    if (!hasLogin) {
+      return <Login onLogin={handleLogin} setSk={loginBySk} updateLoginUri={updateLoginUri} />
+    }
     return (
       <Router basename="/dataomnis">
-        {!hasLogin && (
-          <Switch>
-            <Route path="/login" component={() => <Login onLogin={handleLogin} />} />
-            <Route path="/" component={() => <Redirect to="/login" />} />
-          </Switch>
-        )}
-        {hasLogin && children}
+        <Switch>
+          <Route path="/login" component={() => <Redirect to="/" />} />
+          {children}
+        </Switch>
       </Router>
     )
   }

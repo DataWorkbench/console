@@ -56,21 +56,15 @@ const App = () => {
           initialIsOpen={false}
           toggleButtonProps={{ style: { bottom: '36px' } }}
         />
-        {false ? (
-          <div tw="flex justify-center h-screen items-center">
-            <Loading size="large" />
-          </div>
-        ) : (
-          <Suspense
-            fallback={
-              <div tw="flex justify-center h-screen items-center">
-                <Loading />
-              </div>
-            }
-          >
-            <Routes />
-          </Suspense>
-        )}
+        <Suspense
+          fallback={
+            <div tw="flex justify-center h-screen items-center">
+              <Loading />
+            </div>
+          }
+        >
+          <Routes />
+        </Suspense>
       </StoreContext.Provider>
     </DndProvider>
   )
