@@ -54,7 +54,7 @@ const SideMenuWrapper = styled('div')(() => [
         .selected-row {
           ${tw`bg-neut-16 dark:(bg-neut-13) rounded-sm border-l-0`}
           .icon-title {
-            ${tw`text-white border-green-11!`}
+            ${tw`text-white border-green-11`}
             svg.qicon {
               ${tw`dark:text-white text-[#fff6] fill-[#fff] dark:fill-[#fff6]`}
 
