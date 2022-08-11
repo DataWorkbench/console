@@ -271,6 +271,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       const rightColumns: Record<string, any>[] = []
       mappings.forEach(([left, right], index) => {
         const leftField = leftFields.find(({ name }) => name === left)!
+        const sortIndex = leftFields.findIndex(({ name }) => name === left)!
         const rightField = rightFields.find(({ name }) => name === right)!
         if (leftField && rightField) {
           leftColumns.push({
@@ -280,7 +281,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             name: leftField.name,
             key: leftField.name,
             type: leftField.type,
-            value: leftField.default
+            value: leftField.default,
+            sort: sortIndex
           })
           rightColumns.push({
             format: rightField.formatter,
@@ -289,7 +291,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             name: rightField.name,
             key: rightField.name,
             type: rightField.type,
-            value: rightField.default
+            value: rightField.default,
+            sort: sortIndex
           })
         }
       })
@@ -299,10 +302,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       const setIndex = (i: Record<string, any>, index1: number) => {
         return {
           ...i,
-          index: index1 + 1
+          index: index1 + 1,
+          sort: undefined
         }
       }
-      return [leftColumns.map(setIndex), rightColumns.map(setIndex)]
+      return [
+        leftColumns.sort((x, y) => x.sort - y.sort).map(setIndex),
+        rightColumns.sort((x, y) => x.sort - y.sort).map(setIndex)
+      ]
     },
     getOther: () => {
       if (!isHbaseTarget || !hbaseRef.current) {
