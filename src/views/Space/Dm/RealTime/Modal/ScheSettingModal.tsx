@@ -21,7 +21,7 @@ import {
   FlexBox,
   AffixLabel,
   KVTextAreaField1 as KVTextAreaField,
-  Center
+  TextLink
 } from 'components'
 import { useImmer } from 'use-immer'
 import { isEmpty, range, set, uniqBy } from 'lodash-es'
@@ -518,7 +518,9 @@ var2=\${yyyy-mm-dd HH-1H}`}
                     helpLink="/manual/schedule/para/"
                     action={
                       curJob!.jobMode === JobMode.DI ? (
-                        <Center
+                        <TextLink
+                          hasIcon={false}
+                          color="white"
                           onClick={async () => {
                             const data = await getData()
                             apiRequest(
@@ -561,11 +563,11 @@ var2=\${yyyy-mm-dd HH-1H}`}
                               }
                             })
                           }}
-                          tw="cursor-pointer inline-flex leading-5"
+                          tw="cursor-pointer items-center no-underline! inline-flex leading-5"
                         >
                           <Icon name="restart" type="light" />{' '}
                           <span tw="ml-1">加载代码中的参数</span>
-                        </Center>
+                        </TextLink>
                       ) : undefined
                     }
                   />
