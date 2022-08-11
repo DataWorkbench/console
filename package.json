@@ -1,12 +1,12 @@
 {
   "name": "pitrix-webconsole-dataomnis",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0",
   "description": "QingCloud 大数据工作台",
   "author": "QingCloud F2E Group",
   "private": true,
   "scripts": {
-    "dev": "NODE_ENV=development webpack serve",
-    "build": "NODE_ENV=production webpack && cp -r configs ./dist",
+    "dev": "cross-env NODE_ENV=development webpack serve",
+    "build": "cross-env NODE_ENV=production webpack && cp -r configs ./dist",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
     "deploy:testing": "bash bin/deploy.sh testing",
@@ -60,6 +60,7 @@
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-plugin-twin": "^1.0.2",
     "copy-webpack-plugin": "^11.0.0",
+    "cross-env": "^7.0.3",
     "css-loader": "^5.2.6",
     "css-minimizer-webpack-plugin": "^3.0.1",
     "dotenv": "^10.0.0",
@@ -100,12 +101,12 @@
     "webpackbar": "^5.0.0-3"
   },
   "dependencies": {
-    "@QCFE/lego-ui": "^0.1.56",
-    "@QCFE/qingcloud-portal-ui": "^1.1.53",
     "@ant-design/icons": "^4.7.0",
     "@babel/runtime": "^7.14.0",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
+    "@QCFE/lego-ui": "^0.1.56",
+    "@QCFE/qingcloud-portal-ui": "^1.1.53",
     "@svgdotjs/svg.js": "^3.0.16",
     "@tippyjs/react": "^4.2.5",
     "@types/crypto-js": "^4.1.1",
