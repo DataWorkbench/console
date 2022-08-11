@@ -302,7 +302,7 @@ input[type='number']:focus {
   border-color: #85b0d6 !important;
 }
 
-.side-content .selected-row .m-l-8 {
+.dark .side-content .selected-row .m-l-8 {
   color: #024d8e !important;
 }
 
@@ -325,7 +325,7 @@ input[type='number']:focus {
   fill: rgba(133, 176, 214, 0.1) !important;
 }
 
-.side-menu .level-row:not(.level-row-disabled):hover .icon-title {
+.dark .side-menu .level-row:not(.level-row-disabled):hover .icon-title {
   color: #024d8e !important;
 }
 .side-menu .level-row:not(.level-row-disabled):hover .icon-title .qicon {
