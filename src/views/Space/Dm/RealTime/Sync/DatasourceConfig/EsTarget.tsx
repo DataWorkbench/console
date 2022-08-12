@@ -30,7 +30,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
             id: get(e, 'data.id'),
             batchSize: get(e, 'data.batch_size'),
             keyDelimiter: get(e, 'data.key_delimiter'),
-            type: get(e, 'data.type'),
+            // type: get(e, 'data.type'),
             index: get(e, 'data.index')
           }
         })
@@ -105,7 +105,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
             }
             placeholder="请输入索引"
           />
-          {get(sourceDetail, 'url.elastic_search.version') === '6' && (
+          {false && get(sourceDetail, 'url.elastic_search.version') === '6' && (
             <TextField
               label={<AffixLabel required>类型</AffixLabel>}
               name="type"
