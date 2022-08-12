@@ -22,7 +22,7 @@ const FlowCell: React.FC<FlowCellProps> = ({ item, placement }) => (
         tw`absolute z-20 h-[300px] opacity-100 scale-75`,
         placement === 'top' && tw`top-[-54px] left-[-68px] w-48`,
         placement === 'bottom' && tw`top-[-102px] left-[-60px] 2xl:left-[-68px] w-48`,
-        placement === 'right' && tw`top-[-80px] left-[0px] w-full`
+        placement === 'right' && tw`top-[-102px] left-[0px] w-full`
       ]}
     >
       <ItemCard item={item} />
