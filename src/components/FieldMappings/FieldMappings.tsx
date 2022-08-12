@@ -270,7 +270,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   // const kafkaReadType = kafkaSource$.getValue()?.readType
   // const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 1
   const {
-    is: { isKafkaTarget, isHbaseTarget, isHbaseSource }
+    is: { isKafkaTarget, isHbaseTarget, isHbaseSource, isReal }
   } = config
 
   useImperativeHandle(ref, () => ({
@@ -655,7 +655,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           type="info"
           linkBtn={
             <HelpCenterLink
-              href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+              href={
+                isReal
+                  ? '/manual/integration_job/online/create_job_online_1/#配置字段映射'
+                  : '/manual/integration_job/offline/create_job_offline_1/#配置字段映射'
+              }
               isIframe={false}
               hasIcon={false}
             >

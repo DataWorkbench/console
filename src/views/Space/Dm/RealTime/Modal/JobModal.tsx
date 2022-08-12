@@ -254,13 +254,15 @@ export const JobModal = observer((props: JobModalProps) => {
               },
               uri: { job_id: ret?.id! }
             })
-            .then((res) => {
-              return mutationSyncJob.mutateAsync({
-                jobId: ret?.id!,
-                job_mode: 2,
-                job_content: res?.job
-              })
-            }, close)
+            .then(
+              (res) =>
+                mutationSyncJob.mutateAsync({
+                  jobId: ret?.id!,
+                  job_mode: 2,
+                  job_content: res?.job
+                }),
+              close
+            )
             .finally(close)
         } else {
           close()

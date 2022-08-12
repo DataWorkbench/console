@@ -22,33 +22,34 @@ class OverViewStore {
       name: 'upcloud',
       text: '数据源管理',
       icon: 'edge-cloud',
-      xlink: 'icon_service_0',
+      xlink: 'icon_service_dataSource',
       desc: '数据源定义结构化数据库、非结构化数据库、半结构化数据库以及消息队列等多种数据类型，主要用于数据集成和数据加工。您可以在数据源列表进行编辑和停用/启用管理。',
       enabled: true,
       moreLink: '/manual/source_data/summary/'
     },
     {
       name: 'dm',
+      text: '数据集成',
+      icon: 'database',
+      xlink: 'icon_service_dataIntegration',
+      desc: '数据集成提供在复杂网络环境下，在多源异构的数据源之间进行实时数据同步、离线批量数据同步的功能。提供可视化向导开发模式，降低数据处理难度。根据您的业务需求，可以自定义同步内容、字段、写入模式。',
+      enabled: true,
+      moreLink: '/manual/integration_job/summary/'
+    },
+    {
+      name: 'dm',
       text: '数据开发',
       icon: 'smart-edge-configuration',
-      xlink: 'icon_service_1',
+      xlink: 'icon_service_dataDev',
       desc: '在云上的大数据开发环境，采用全托管式的Flink加工您的数据。您只需配置计算集群的大小、并发度，即可开始数据加工流程。\n根据您的业务需求，提供高兼容性的SQL开发模式，降低数据开发门槛。',
       enabled: true,
       moreLink: '/manual/mgt_job/summary/'
     },
     {
-      text: '数据资产',
-      icon: 'database',
-      xlink: 'icon_service_2',
-      desc: '数据开发与存储的过程中，大数据工作台可以协助您在数仓分层中厘清数据脉络，管理数据存储的业务流程。进一步为企业的运营和决策提供更清晰的数据支持。',
-      enabled: false
-      // moreLink: '##',
-    },
-    {
       name: 'dts',
       text: '数据服务',
       icon: 'resist',
-      xlink: 'icon_service_3',
+      xlink: 'icon_service_dataService',
       desc: '根据企业数据仓库的结构，数据服务可生成自定义、可扩展的restfulAPI，提供数据权限、数据操作、数据查询等服务，助力企业构建轻量化的业务中台。',
       enabled: true,
       moreLink: '/manual/data_service/summary/'
