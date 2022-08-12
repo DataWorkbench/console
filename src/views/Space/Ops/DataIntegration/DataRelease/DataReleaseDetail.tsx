@@ -232,7 +232,7 @@ const DataReleaseDetail = observer((props: IDataJobInstanceDetailProps) => {
               <div tw="text-white">
                 <span tw="mr-3">{data?.name}</span>
                 {/* // NOTE: 历史版本没有调度信息 */}
-                <JobInstanceStatusCmp type={data?.status as 1} tw="inline-flex" />
+                {false && <JobInstanceStatusCmp type={data?.status as 1} tw="inline-flex" />}
               </div>
               <div tw="text-neut-8">{data?.id}</div>
             </div>

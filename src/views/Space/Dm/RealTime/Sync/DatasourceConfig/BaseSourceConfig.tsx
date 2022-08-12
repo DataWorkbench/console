@@ -186,6 +186,7 @@ const BaseSourceConfig = forwardRef(
             label={<AffixLabel>条件参数配置</AffixLabel>}
             loading={sourceColumnRet.isFetching}
             helpStr="可在条件参数中填写增量同步条件"
+            helpLink={`/manual/integration_job/cfg_source/${sourceType?.name}/#条件参数配置`}
             onRefresh={() => {
               sourceColumnRet.refetch()
             }}

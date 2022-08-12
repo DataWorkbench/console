@@ -16,9 +16,15 @@ import {
   DatePicker,
   Button
 } from '@QCFE/lego-ui'
-import { DarkModal, FlexBox, AffixLabel, KVTextAreaField1 as KVTextAreaField } from 'components'
+import {
+  DarkModal,
+  FlexBox,
+  AffixLabel,
+  KVTextAreaField1 as KVTextAreaField,
+  TextLink
+} from 'components'
 import { useImmer } from 'use-immer'
-import { isEmpty, range, set } from 'lodash-es'
+import { isEmpty, range, set, uniqBy } from 'lodash-es'
 import { useStore } from 'stores'
 import dayjs from 'dayjs'
 import { useQueryClient } from 'react-query'
@@ -31,6 +37,9 @@ import {
   // useQueryJobSchedule,
 } from 'hooks'
 import SimpleBar from 'simplebar-react'
+import { emitter } from 'utils/index'
+import { useParams } from 'react-router-dom'
+import { apiRequest } from 'utils/api'
 import {
   ScheSettingForm,
   SmallDatePicker,
@@ -54,6 +63,7 @@ interface IScheSettingModal {
   onCancel?: () => void
   onSuccess?: () => void
   defaultschedulePolicy?: number
+  // getData?: () => Record<string, any>
 }
 
 type TPeriodType = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -70,7 +80,7 @@ const ScheSettingModal = ({
 
   // const [period, setPeriod] = useState<TPeriodType>('minute')
   const [defCurDate] = useState(dayjs().hour(0).minute(20).toDate())
-  // const { regionId, spaceId } = useParams<IUseParams>()
+  const { regionId, spaceId } = useParams<IUseParams>()
   const [periodData, setPeriodData] = useImmer({
     minute: {
       startHour: 0,
@@ -140,6 +150,16 @@ const ScheSettingModal = ({
   const isStreamJob = curJob!.jobMode === JobMode.RT
 
   const useQueryJobSchedule = isStreamJob ? useQueryStreamJobSchedule : useQuerySyncJobSchedule
+
+  const getData = async () => {
+    return new Promise((resolve) => {
+      emitter.on('getSyncDataCb', (d) => {
+        resolve(d)
+        emitter.off('getSyncDataCb')
+      })
+      emitter.emit('getSyncData')
+    })
+  }
 
   const useMutationJobSchedule = isStreamJob
     ? useMutationStreamJobSchedule
@@ -495,6 +515,61 @@ var2=\${yyyy-mm-dd HH-1H}`}
                         }
                       }
                     ]}
+                    helpLink="/manual/schedule/para/"
+                    action={
+                      curJob!.jobMode === JobMode.DI ? (
+                        <TextLink
+                          hasIcon={false}
+                          color="white"
+                          onClick={async () => {
+                            const data = await getData()
+                            apiRequest(
+                              'syncJobDevManage',
+                              'loadSyncJobScheduleParameters'
+                            )({
+                              regionId,
+                              uri: {
+                                space_id: spaceId,
+                                job_id: curJob?.id
+                              },
+                              data: {
+                                conf: data
+                              }
+                            }).then((e) => {
+                              if (Array.isArray(e?.items)) {
+                                setParams((draft) => {
+                                  let arr = [
+                                    ...(params.parametersStr ?? '')
+                                      .split(/[\r\n]/)
+                                      .filter((v) => !isEmpty(v))
+                                      .map((v) => {
+                                        const o = v.split('=')
+                                        return {
+                                          key: o[0],
+                                          value: o[1]
+                                        }
+                                      }),
+                                    ...e.items.map((i: string) => ({ key: i, value: '' }))
+                                  ]
+                                  arr = uniqBy(arr, 'key')
+                                  draft.parameters = arr
+                                  draft.parametersStr = arr
+                                    .map(
+                                      (item: { key: string; value: string }) =>
+                                        `${item.key}=${item.value}`
+                                    )
+                                    .join('\r\n')
+                                })
+                              }
+                            })
+                          }}
+                          tw="cursor-pointer items-center no-underline! inline-flex leading-5"
+                        >
+                          <Icon name="restart" type="light" />{' '}
+                          <span tw="ml-1">加载代码中的参数</span>
+                        </TextLink>
+                      ) : undefined
+                    }
                   />
                 </CollapseItem>
               )}

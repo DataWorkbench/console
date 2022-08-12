@@ -61,7 +61,7 @@ export default function StreamDevContent({
                 secondary: '#8EDABD'
               }}
             />
-            <span>{`(ID:${data?.jar?.file_id})`}</span>
+            <span>{`${data?.jar?.file_name ?? ''}(ID:${data?.jar?.file_id})`}</span>
           </span>
           <span>入口类（Entry Class）</span>
           <span>{data?.jar?.jar_entry}</span>

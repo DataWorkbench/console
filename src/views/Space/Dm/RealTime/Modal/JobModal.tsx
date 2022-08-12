@@ -282,11 +282,14 @@ export const JobModal = observer((props: JobModalProps) => {
 
   const isXl = winWidth >= 1280
   const modalWidth = useMemo(() => {
+    if (params.step === 0) {
+      return 850
+    }
     if (job && params.jobMode === JobMode.RT) {
       return 700
     }
     return isXl ? 1200 : 900
-  }, [isXl, job, params.jobMode])
+  }, [isXl, job, params.jobMode, params.step])
   return (
     <>
       <Modal

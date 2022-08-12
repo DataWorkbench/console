@@ -1,21 +1,40 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { FlexBox } from 'components/Box'
 import { Form, Button, Notification as Notify } from '@QCFE/qingcloud-portal-ui'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import LoginBg from 'assets/LoginBg.png'
 import LoginGroup from 'assets/loginGroup.svg'
-import { useHistory } from 'react-router-dom'
-import { useCookie } from 'react-use'
 import { css } from 'twin.macro'
 import { omit } from 'lodash-es'
+import qs from 'qs'
 import { useMutationUser } from '../../../../hooks/useGlobalAPI'
 import { InputField, PasswordField } from './components'
 
-const Login = ({ onLogin }: { onLogin: (d: Record<string, any>, jump: boolean) => void }) => {
-  const history = useHistory()
-  const [, setSk] = useCookie('sk')
+const Login = ({
+  onLogin,
+  setSk,
+  updateLoginUri: setUri
+}: {
+  onLogin: (d: Record<string, any>) => void
+  setSk?: (sk: string) => void
+  updateLoginUri?: (uri: string) => void
+}) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const { sk, login_uri: uri } = qs.parse(window.location.search.slice(1))
+
   const { mutateAsync } = useMutationUser()
+
+  useEffect(() => {
+    if (sk) {
+      setSk?.(sk as string)
+      setUri?.(uri as string)
+    }
+  }, [])
+  if (sk) {
+    return null
+  }
+
   const onFormSubmit = () => {
     mutateAsync({
       op: 'login',
@@ -23,16 +42,16 @@ const Login = ({ onLogin }: { onLogin: (d: Record<string, any>, jump: boolean) =
       username: (username || '').trim()
     }).then((e) => {
       if (e.session_id) {
-        setSk(e.session_id)
-        onLogin(omit(e.user_set, 'password'), true)
+        setSk?.(e.session_id)
+        onLogin(omit(e.user_set, 'password'))
         Notify.open({
           title: '登录成功',
           placement: 'bottomRight',
           type: 'success'
         })
-        setTimeout(() => {
-          history.push('/overview')
-        }, 2000)
+        // setTimeout(() => {
+        //   history.push('/overview')
+        // }, 2000)
       }
     })
   }
