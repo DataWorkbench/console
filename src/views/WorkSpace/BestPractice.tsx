@@ -1,11 +1,6 @@
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  IconCard,
-  HelpCenterLink,
-} from 'components'
+import { Card, CardHeader, CardContent, IconCard, HelpCenterLink } from 'components'
 import tw, { styled } from 'twin.macro'
+import { get } from 'lodash-es'
 
 const IconCardWrapper = styled(IconCard)(() => [tw`items-center w-[108px]`])
 
@@ -29,11 +24,10 @@ const BestPractice = () => (
                   css={{
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
+                    WebkitBoxOrient: 'vertical'
                   }}
                 >
-                  本实践为您介绍如何将 MySQL 数据实时（upsert 或 append）同步到
-                  Elasticsearch
+                  本实践为您介绍如何将 MySQL 数据实时（upsert 或 append）同步到 Elasticsearch
                 </div>
               }
             />
@@ -52,7 +46,7 @@ const BestPractice = () => (
                   css={{
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
+                    WebkitBoxOrient: 'vertical'
                   }}
                 >
                   本实践为您介绍如何通过
@@ -64,36 +58,34 @@ const BestPractice = () => (
         </div>
       </CardContent>
     </Card>
-    <Card tw="w-4/12 leading-5">
-      <CardHeader title="相关产品" />
-      <CardContent tw="pb-3 flex justify-center space-x-2 2xl:space-x-5">
-        <a
-          href="https://appcenter.qingcloud.com/apps/app-6iuoe9qs?name=QingMR"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <IconCardWrapper icon="qing-mr" title="QingMr" layout="vertical" />
-        </a>
-        <a
-          href="https://appcenter.qingcloud.com/apps/app-n9ro0xcp?name=Kafka"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <IconCardWrapper icon="kafka" title="Kafka" layout="vertical" />
-        </a>
-        <a
-          href="https://appcenter.qingcloud.com/apps/app-3k61fkmg?name=HBase"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <IconCardWrapper
-            icon="click-house"
-            title="ClickHouse"
-            layout="vertical"
-          />
-        </a>
-      </CardContent>
-    </Card>
+    {!get(window, 'CONFIG_ENV.IS_PRIVATE', false) && (
+      <Card tw="w-4/12 leading-5">
+        <CardHeader title="相关产品" />
+        <CardContent tw="pb-3 flex justify-center space-x-2 2xl:space-x-5">
+          <a
+            href="https://appcenter.qingcloud.com/apps/app-6iuoe9qs?name=QingMR"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <IconCardWrapper icon="qing-mr" title="QingMr" layout="vertical" />
+          </a>
+          <a
+            href="https://appcenter.qingcloud.com/apps/app-n9ro0xcp?name=Kafka"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <IconCardWrapper icon="kafka" title="Kafka" layout="vertical" />
+          </a>
+          <a
+            href="https://appcenter.qingcloud.com/apps/app-3k61fkmg?name=HBase"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <IconCardWrapper icon="click-house" title="ClickHouse" layout="vertical" />
+          </a>
+        </CardContent>
+      </Card>
+    )}
   </div>
 )
 

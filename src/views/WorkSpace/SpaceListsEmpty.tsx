@@ -3,6 +3,7 @@ import tw from 'twin.macro'
 import { useWorkSpaceContext } from 'contexts'
 import { Guide, GuideProps, HelpCenterLink } from 'components'
 import SexangleImg from 'assets/svgr/sexangle.svg'
+import { get } from 'lodash-es'
 
 const guideData: GuideProps = {
   title: '使用指引',
@@ -67,13 +68,17 @@ const SpaceListsEmpty = () => {
             </div>
             {!isModal && (
               <div css={[tw`space-x-3 mt-3`, !isModal && tw`mb-8`]}>
-                <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
+                <HelpCenterLink href="/manual/source_data/summary/" isIframe={!isModal}>
                   使用指南
                 </HelpCenterLink>
-                <span tw="text-deepblue-10">|</span>
-                <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
-                  介绍视频
-                </HelpCenterLink>
+                {!get(window, 'CONFIG_ENV.IS_PRIVATE', false) && (
+                  <>
+                    <span tw="text-deepblue-10">|</span>
+                    <HelpCenterLink href="/manual/overview/" isIframe={!isModal}>
+                      介绍视频
+                    </HelpCenterLink>
+                  </>
+                )}
               </div>
             )}
           </div>

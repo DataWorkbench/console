@@ -4,6 +4,7 @@ import { Icon } from '@QCFE/qingcloud-portal-ui'
 import tw, { css, styled, theme } from 'twin.macro'
 import useIcon from 'hooks/useHooks/useIcon'
 import qrcode from 'assets/qrcode.png'
+import { get } from 'lodash-es'
 import icons from './icons'
 
 const questions = [
@@ -19,7 +20,9 @@ const questions = [
     title: '数据开发的基本流程',
     link: '/intro/development_process/'
   },
-  { title: '大数据工作台的计费概述', link: '/billing/price/' },
+  !get(window, 'CONFIG_ENV.IS_PRIVATE', false)
+    ? { title: '大数据工作台的计费概述', link: '/billing/price/' }
+    : { title: '数据服务API开发流程', link: '/manual/data_service/summary/#api-开发流程' },
   // { title: '大数据工作台监控与运维', link: '' },
   // { title: '大数据工作台的计费概述11', link: '' },
   { title: '使用限制', link: '/intro/restriction/' },
@@ -102,7 +105,7 @@ const FAQ: FC = ({ className }: { className?: string }) => (
   <Card className={className} tw="leading-5" hasBoxShadow>
     <FlexBox tw="justify-between">
       <CardHeader title="常见问题" />
-      <JoinUs />
+      {!get(window, 'CONFIG_ENV.IS_PRIVATE', false) && <JoinUs />}
     </FlexBox>
     <CardContent>
       <div tw="rounded-sm border border-neut-2">

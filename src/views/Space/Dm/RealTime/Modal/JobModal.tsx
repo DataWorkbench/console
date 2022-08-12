@@ -421,7 +421,7 @@ export const JobModal = observer((props: JobModalProps) => {
                                     <HelpCenterLink
                                       hasIcon
                                       isIframe={false}
-                                      href="/manual/integration_job/sync_type/#全量同步与增量同步支持的数据源类型"
+                                      href="/manual/integration_job/offline/sync_type/#全量同步与增量同步支持的数据源类型"
                                     >
                                       支持数据源
                                     </HelpCenterLink>

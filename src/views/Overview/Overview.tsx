@@ -39,7 +39,9 @@ function getTabs() {
       description:
         '	大数据工作台提供一站式智能大数据开发平台，帮助传统企业专注于数据价值的挖掘和探索，提升客户数据洞察能力，并专注于解决业务计算问题，降低用户使用成本，将代码开发门槛降到最低',
       icon: 'dashboard',
-      newsLink: getHelpCenterLink('/news/product_news/'),
+      newsLink: get(window, 'CONFIG_ENV.IS_PRIVATE', false)
+        ? null
+        : getHelpCenterLink('/news/product_news/'),
       helpLink: getHelpCenterLink('/manual/overview/')
     }
   ]

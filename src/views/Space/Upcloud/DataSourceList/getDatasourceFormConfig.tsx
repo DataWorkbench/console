@@ -434,7 +434,7 @@ const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
                 hasIcon
                 isIframe={false}
               >
-                网络配置选择说明文档
+                Hadoop 参数说明文档
               </HelpCenterLink>
             </div>
           ),
