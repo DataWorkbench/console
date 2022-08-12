@@ -428,7 +428,7 @@ const ResourceTable: React.FC<{ className?: string }> = observer(({ className })
         />
       )}
 
-      {Object.keys(deleteData).length && (
+      {!!Object.keys(deleteData).length && (
         <DeleteModal
           visible={deleteVisible}
           deleteData={deleteData}

@@ -322,7 +322,7 @@ const HiveTargetConfig = forwardRef(
                 />
               </>
             )}
-            {dbInfo?.fileType && (
+            {!!dbInfo?.fileType && (
               <SelectField
                 label={<AffixLabel required>压缩类型</AffixLabel>}
                 value={dbInfo?.compress}

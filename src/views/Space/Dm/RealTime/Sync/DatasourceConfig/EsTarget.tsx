@@ -51,7 +51,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
     },
     getData: () => ({
       id: dbInfo?.id,
-      batch_size: dbInfo?.batchSize,
+      batch_size: dbInfo?.batchSize === 0 ? null : dbInfo?.batchSize,
       key_delimiter: dbInfo?.keyDelimiter,
       type: dbInfo?.type,
       index: dbInfo?.index,
@@ -159,7 +159,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
 
           {showAdvanced && (
             <NumberField
-              label={<AffixLabel>批量大小</AffixLabel>}
+              label={<AffixLabel required={false}>批量大小</AffixLabel>}
               name="batchSize"
               value={dbInfo?.batchSize}
               onChange={(v) => {
@@ -167,7 +167,7 @@ const EsTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => 
                   draft.batchSize = v
                 })
               }}
-              min={1}
+              min={0}
               max={65535}
               step={1}
               help="1-65535"

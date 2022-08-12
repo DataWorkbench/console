@@ -63,7 +63,7 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
   }
   return (
     <div>
-      {data?.files?.length &&
+      {!!data?.files?.length &&
         data.files.map((file: any) => (
           <div css={itemStyle(false)} key={file}>
             <Icon
@@ -78,7 +78,7 @@ export default function Depends({ data }: { data?: Record<string, any> }) {
             <span tw="text-white">{file}</span>
           </div>
         ))}
-      {data?.delete_files?.length && (
+      {!!data?.delete_files?.length && (
         <div>
           {data.delete_files.map((file: any) => (
             <div css={itemStyle(true)} key={file}>
