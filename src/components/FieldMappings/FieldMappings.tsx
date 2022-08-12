@@ -11,7 +11,7 @@ import {
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
 import { useMeasure, useMount, useUnmount } from 'react-use'
 import tw, { styled } from 'twin.macro'
-import { get, intersectionBy, isEmpty, omit } from 'lodash-es'
+import { debounce, get, intersectionBy, isEmpty, omit } from 'lodash-es'
 import { Alert, Button, Icon } from '@QCFE/lego-ui'
 import { nanoid } from 'nanoid'
 import Tippy from '@tippyjs/react'
@@ -75,6 +75,7 @@ const Container = styled.div`
     }
     &.point-Left,
     &.point-Right {
+      display: block !important;
       ${tw`opacity-0 transition-opacity ease-in-out duration-200 delay-150`}
       &.jtk-endpoint-connected {
         ${tw`opacity-0`}
@@ -155,6 +156,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   } = props
 
   useIcon(icons)
+
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
   const jsPlumbInstRef = useRef<jsPlumbInstance>()
@@ -165,6 +167,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const [containerRef, rect] = useMeasure<HTMLDivElement>()
 
   const [atomKey, forceUpdate] = useReducer((x) => x + 1, 1)
+  // const [, forceUpdate1] = useReducer((x) => x + 1, 1)
+  const repainRef = useRef(
+    debounce(() => {
+      jsPlumbInstRef.current?.repaintEverything()
+    }, 800)
+  )
+  const repaintEverything = useCallback(() => {
+    repainRef.current()
+  }, [])
 
   useEffect(() => {
     setLeftFields(leftFieldsProp)
@@ -247,8 +258,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }, [columns, atomKey, leftFieldsProp, rightFieldsProp])
 
   useEffect(() => {
-    jsPlumbInstRef.current?.repaintEverything()
-  }, [rect.width])
+    repaintEverything()
+  }, [rect.width, repaintEverything])
 
   const kafkaRef = useRef<{ rowMapping: () => Record<string, any>[] }>(null)
   const hbaseRef = useRef<{ getData: () => Record<string, any>[] }>(null)
@@ -366,11 +377,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         }
       })
     }
-    jsPlumbInst.repaintEverything()
+    repaintEverything()
     // })
 
     // }
-  }, [leftFields, rightFields, mappings])
+  }, [leftFields, rightFields, mappings, repaintEverything])
 
   useMount(() => {
     const instance = jsPlumb.getInstance({
@@ -758,6 +769,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             return (
               <MappingItem
                 jsplumb={jsPlumbInstRef.current}
+                repaintEverything={repaintEverything}
                 key={item.uuid}
                 anchor="Left"
                 item={item}
@@ -920,6 +932,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               {/* {renderHbaseRowKey()} */}
               {getLeftFields().map((item, i) => (
                 <MappingItem
+                  repaintEverything={repaintEverything}
                   jsplumb={jsPlumbInstRef.current}
                   // hasMoreAction={!isKafkaSource}
                   item={item}

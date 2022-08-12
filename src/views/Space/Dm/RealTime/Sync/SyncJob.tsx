@@ -416,7 +416,6 @@ const SyncJob = () => {
 
     mutation.mutate(filterResouce, {
       onSuccess: () => {
-        confRefetch()
         if (isSubmit) {
           let flag = false
           if (!cluster) {
@@ -476,12 +475,14 @@ const SyncJob = () => {
             }
           }
           if (flag) {
+            confRefetch()
             return
           }
         }
         if (cb) {
           cb()
         } else {
+          confRefetch()
           Notify.success({
             title: '操作提示',
             content: '配置保存成功',
@@ -580,7 +581,7 @@ const SyncJob = () => {
           >
             {index === 0 && <DatasourceConfig ref={dbRef} curJob={curJob!} />}
 
-            {index === 1 && !isFetching && (
+            {index === 1 && (
               <div key={curJob?.id}>
                 <FieldMappings
                   onReInit={() => {
@@ -827,9 +828,11 @@ const SyncJob = () => {
             workFlowStore.set({
               showNotify: true
             })
+            confRefetch()
           }}
           onCancel={() => {
             setShowRelaseModal(false)
+            confRefetch()
           }}
         />
       )}
