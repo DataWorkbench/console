@@ -12,6 +12,7 @@ import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/Base
 import {
   baseTarget$,
   clearMapping,
+  curJobDbConfSubject$,
   target$,
   targetColumns$
 } from 'views/Space/Dm/RealTime/Sync/common/subjects'
@@ -107,6 +108,9 @@ enum Semantic {
 }
 
 const getExactly = (types?: SourceType[]) => {
+  if (curJobDbConfSubject$.getValue()?.jobType === 3) {
+    return [Semantic.AtLeastOnce]
+  }
   const sql = new Set(sourceKinds.filter((i) => i.type === DbType.Sql).map((i) => i.source_type))
   if (types?.every((i) => sql.has(i))) {
     return [Semantic.ExactlyOnce, Semantic.AtLeastOnce]
