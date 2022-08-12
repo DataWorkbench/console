@@ -109,10 +109,7 @@ const DatasourceConfig = observer(
     const [sourceTypeName, targetTypeName] = useMemo(() => {
       const sourceType = curJob?.source_type
       const targetType = curJob?.target_type
-      return [
-        getDataSourceTypes(sourceType, curJob?.type === 3),
-        getDataSourceTypes(targetType, curJob?.type === 3)
-      ]
+      return [getDataSourceTypes(sourceType, curJob?.type === 3), getDataSourceTypes(targetType)]
     }, [curJob])
 
     const handleVisible = (v: boolean) => {

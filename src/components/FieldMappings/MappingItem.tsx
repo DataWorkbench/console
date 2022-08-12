@@ -101,6 +101,7 @@ export const FieldRow = styled('div')(
 )
 
 interface MappingItemProps {
+  repaintEverything: () => void
   anchor: AnchorSpec
   item: TMappingField
   index: number
@@ -133,6 +134,7 @@ const MappingItem = (props: MappingItemProps) => {
   const ref = useRef<HTMLDivElement>(null)
   const formRef = useRef<any>(null)
   const {
+    repaintEverything,
     jsplumb,
     anchor,
     index,
@@ -204,7 +206,7 @@ const MappingItem = (props: MappingItemProps) => {
       }
       if (draggedId !== item.uuid) {
         moveItem(draggedId, item.uuid, isTop)
-        jsplumb?.repaintEverything()
+        repaintEverything()
       }
     }
   })
@@ -214,10 +216,11 @@ const MappingItem = (props: MappingItemProps) => {
       let endPoint = endPointRef.current
       const parameters = { [String(anchor)]: itemProps }
 
-      if (endPoint) {
-        endPoint = null
-      }
+      // if (endPoint) {
+      //   endPoint = null
+      // }
       if (!endPoint || !jsplumb.getEndpoint(itemProps.uuid)) {
+        endPoint = null
         endPoint = jsplumb.addEndpoint(ref.current, {
           anchor,
           parameters,
@@ -252,11 +255,13 @@ const MappingItem = (props: MappingItemProps) => {
           uuid: itemProps.uuid
         } as any) as Endpoint
         endPointRef.current = endPoint
+        endPoint.setParameters(parameters)
+      } else {
+        endPoint.setParameters(parameters)
       }
-      endPoint.setParameters(parameters)
+      repaintEverything()
     }
-    jsplumb?.repaintEverything()
-  }, [itemProps, jsplumb, anchor])
+  }, [itemProps, jsplumb, anchor, repaintEverything])
 
   useEffect(() => {
     if (isEmpty(itemProps.name)) {

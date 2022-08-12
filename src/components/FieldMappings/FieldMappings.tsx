@@ -11,7 +11,7 @@ import {
 import { Connection, jsPlumb, jsPlumbInstance } from 'jsplumb'
 import { useMeasure, useMount, useUnmount } from 'react-use'
 import tw, { styled } from 'twin.macro'
-import { get, intersectionBy, isEmpty, omit } from 'lodash-es'
+import { debounce, get, intersectionBy, isEmpty, omit } from 'lodash-es'
 import { Alert, Button, Icon } from '@QCFE/lego-ui'
 import { nanoid } from 'nanoid'
 import Tippy from '@tippyjs/react'
@@ -75,6 +75,7 @@ const Container = styled.div`
     }
     &.point-Left,
     &.point-Right {
+      display: block !important;
       ${tw`opacity-0 transition-opacity ease-in-out duration-200 delay-150`}
       &.jtk-endpoint-connected {
         ${tw`opacity-0`}
@@ -155,6 +156,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   } = props
 
   useIcon(icons)
+
   const [leftFields, setLeftFields] = useState(leftFieldsProp)
   const [rightFields, setRightFields] = useState(rightFieldsProp)
   const jsPlumbInstRef = useRef<jsPlumbInstance>()
@@ -165,6 +167,15 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   const [containerRef, rect] = useMeasure<HTMLDivElement>()
 
   const [atomKey, forceUpdate] = useReducer((x) => x + 1, 1)
+  // const [, forceUpdate1] = useReducer((x) => x + 1, 1)
+  const repainRef = useRef(
+    debounce(() => {
+      jsPlumbInstRef.current?.repaintEverything()
+    }, 800)
+  )
+  const repaintEverything = useCallback(() => {
+    repainRef.current()
+  }, [])
 
   useEffect(() => {
     setLeftFields(leftFieldsProp)
@@ -247,8 +258,8 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   }, [columns, atomKey, leftFieldsProp, rightFieldsProp])
 
   useEffect(() => {
-    jsPlumbInstRef.current?.repaintEverything()
-  }, [rect.width])
+    repaintEverything()
+  }, [rect.width, repaintEverything])
 
   const kafkaRef = useRef<{ rowMapping: () => Record<string, any>[] }>(null)
   const hbaseRef = useRef<{ getData: () => Record<string, any>[] }>(null)
@@ -366,11 +377,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
         }
       })
     }
-    jsPlumbInst.repaintEverything()
+    repaintEverything()
     // })
 
     // }
-  }, [leftFields, rightFields, mappings])
+  }, [leftFields, rightFields, mappings, repaintEverything])
 
   useMount(() => {
     const instance = jsPlumb.getInstance({
@@ -577,14 +588,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
       return newFields
     })
-    setMappings((item) =>
-      item.map(([l, r]) => {
+    setMappings((item) => {
+      return item.map(([l, r]) => {
         if (l === old.name) {
           return [field.name, r]
         }
         return [l, r]
       })
-    )
+    })
   }
 
   const keepEditingFieldRight = (field: TMappingField, index?: number) => {
@@ -602,14 +613,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
       return newFields
     })
-    setMappings((item) =>
-      item.map(([l, r]) => {
+    setMappings((item) => {
+      return item.map(([l, r]) => {
         if (r === old.name) {
           return [l, field.name]
         }
         return [l, r]
       })
-    )
+    })
   }
 
   const cancelAddCustomField = (field: TMappingField, index: number) => {
@@ -758,37 +769,40 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             </div>
             <div>{isHbaseTarget ? 'valueColumn 字段' : '目标表字段'}</div>
           </FieldRow>
-          {rightFields.map((item, i) => (
-            <MappingItem
-              jsplumb={jsPlumbInstRef.current}
-              key={item.uuid}
-              anchor="Left"
-              item={item}
-              index={i}
-              hasConnection={!!mappings.find(([, r]) => r === item?.name)}
-              typeName={rightTypeName}
-              moveItem={moveItemRight}
-              onOk={(info, index) => {
-                keepEditingFieldRight(info, index)
-              }}
-              config={config.target}
-              onCancel={cancelAddCustomFieldRight}
-              deleteItem={(field) => {
-                setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
-                setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
-              }}
-              exist={(name: string) => !!rightFields.find((f) => f.name === name)}
-              getDeleteField={(name: string) => {
-                const delItem = rightFieldsProp.find((f) => f.name === name)
-                const existItem = rightFields.find((f) => f.name === name)
-                if (delItem && !existItem) {
-                  return delItem
-                }
-                return undefined
-              }}
-              readonly={targetReadonly}
-            />
-          ))}
+          {rightFields.map((item, i) => {
+            return (
+              <MappingItem
+                jsplumb={jsPlumbInstRef.current}
+                repaintEverything={repaintEverything}
+                key={item.uuid}
+                anchor="Left"
+                item={item}
+                index={i}
+                hasConnection={!!mappings.find(([, r]) => r === item?.name)}
+                typeName={rightTypeName}
+                moveItem={moveItemRight}
+                onOk={(info, index) => {
+                  keepEditingFieldRight(info, index)
+                }}
+                config={config.target}
+                onCancel={cancelAddCustomFieldRight}
+                deleteItem={(field) => {
+                  setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
+                  setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
+                }}
+                exist={(name: string) => !!rightFields.find((f) => f.name === name)}
+                getDeleteField={(name: string) => {
+                  const delItem = rightFieldsProp.find((f) => f.name === name)
+                  const existItem = rightFields.find((f) => f.name === name)
+                  if (delItem && !existItem) {
+                    return delItem
+                  }
+                  return undefined
+                }}
+                readonly={targetReadonly}
+              />
+            )
+          })}
           {!readonly && config.target.add && (
             <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomFieldRight}>
               <Icon name="add" type="light" />
@@ -803,7 +817,9 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     )
   }
 
-  const getLeftFields = () => leftFields
+  const getLeftFields = () => {
+    return leftFields
+  }
 
   // function renderHbaseRowKey() {
   //   return null
@@ -920,6 +936,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
               {/* {renderHbaseRowKey()} */}
               {getLeftFields().map((item, i) => (
                 <MappingItem
+                  repaintEverything={repaintEverything}
                   jsplumb={jsPlumbInstRef.current}
                   // hasMoreAction={!isKafkaSource}
                   item={item}

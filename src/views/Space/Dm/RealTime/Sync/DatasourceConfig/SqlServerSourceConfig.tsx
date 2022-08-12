@@ -142,7 +142,7 @@ const SqlServerSourceConfig = forwardRef(
       },
       getData: () => ({
         id: dbInfo?.id,
-        lsn: dbInfo?.lsn.toString(),
+        lsn: dbInfo?.lsn?.toString(),
         poll_interval: dbInfo?.time,
         // slot_name: dbInfo?.slot,
         table_list: [dbInfo?.tableName],
