@@ -22,7 +22,9 @@ const sources = [
   ...datasourceRealtimeTypeObjs,
   { type: SourceType.Kafka, name: 'kafka', label: 'Kafka' }
 ]
-const targets = datasourceTypeObjs.filter((i) => i.type !== SourceType.Oracle)
+const targets = datasourceTypeObjs.filter(
+  (i) => ![SourceType.Oracle, SourceType.HBase].includes(i.type)
+)
 
 const RealTimeRadioGroup = forwardRef<React.ReactElement, RealTimeRadioGroupProps>(
   ({ value, onChange }, ref) => {

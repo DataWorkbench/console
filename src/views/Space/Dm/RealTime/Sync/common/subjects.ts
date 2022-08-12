@@ -310,28 +310,26 @@ const sql = new Set([
   SourceType.DB2
 ])
 
+/**
+ * 来源
+ * 实时同步、非关系型  可增删改
+ * 实时同步、关系型 只读
+ * 离线同步、非关系型 可增删改
+ * 离线同步、关系型 可删、可增
+ *
+ * 目的
+ * 关系型 只读
+ * 非关系型 可增删改
+ */
 const configStrategy: {
   find: (jobType: 2 | 3, sourceType: SourceType, targetType: SourceType) => boolean
   value: () => Partial<typeof defaultConfig>
 }[] = [
+  /* ------------  非关系型  ------------------- */
+  // [ 来源 ][ 非关系型数据库 ]  可增删改, 显示 value 字段
   {
-    // 目的 关系型数据库 不可以增删改
-    find: (jobType, sourceType, targetType) => {
-      return sql.has(targetType)
-    },
-    value: () => {
-      return {
-        target: {
-          readonly: true,
-          add: false
-        } as any
-      }
-    }
-  },
-  {
-    // 关系型数据库 可增删改
     find: (jobType: 2 | 3, sourceType: SourceType) => {
-      return sql.has(sourceType)
+      return !sql.has(sourceType)
     },
     value: () => {
       return {
@@ -342,26 +340,13 @@ const configStrategy: {
           delete: true,
           sort: true,
           mapping: true,
-          time: true
+          time: true,
+          showValue: true
         }
       }
     }
   },
-  // [实时同步 来源关系型数据库 且 目的 kafka]： 来源表字段是固定的结构，不可增删改
-  {
-    find: (jobType: 2 | 3, sourceType: SourceType, targetType) => {
-      return jobType === 3 && sql.has(sourceType) && targetType === SourceType.Kafka
-    },
-    value: () => {
-      return {
-        source: {
-          readonly: true,
-          add: false
-        }
-      } as any
-    }
-  },
-  // [ 非关系型数据库 ] 目的表字段有新增
+  // [ 目的 ][ 非关系型数据库 ] 目的表字段可增删改，不显示 value 字段
   {
     find: (jobType, sourceType, targetType) => {
       return !sql.has(targetType)
@@ -376,6 +361,57 @@ const configStrategy: {
           mapping: true,
           time: false,
           showValue: false,
+          delete: true
+        }
+      }
+    }
+  },
+
+  /* ------------  关系型  ------------------- */
+  // [ 目的 ] [ 关系型数据库 ]：只读
+  {
+    find: (jobType, sourceType, targetType) => {
+      return sql.has(targetType)
+    },
+    value: () => {
+      return {
+        target: {
+          readonly: true,
+          add: false
+        } as any
+      }
+    }
+  },
+  // [ 来源 ][ 实时同步 ] [ 关系型数据库 ]： 来源表字段只读, 不可排序
+  {
+    find: (jobType: 2 | 3, sourceType: SourceType) => {
+      return jobType === 3 && sql.has(sourceType)
+    },
+    value: () => {
+      return {
+        source: {
+          readonly: true,
+          add: false,
+          sort: false
+        }
+      } as any
+    }
+  },
+  // [ 来源 ][ 离线同步 ][ 关系型数据库 ]： 来源表字段可增删，可显示 value 字段
+  {
+    find: (jobType, sourceType) => {
+      return jobType !== 3 && sql.has(sourceType)
+    },
+    value: () => {
+      return {
+        source: {
+          readonly: false,
+          add: true,
+          edit: false,
+          sort: true,
+          mapping: true,
+          time: false,
+          showValue: true,
           delete: true
         }
       }
