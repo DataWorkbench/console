@@ -158,7 +158,7 @@ export const hadoopLink = '/manual/source_data/add_data/hdfs/#Hadoop参数说明
 
 export const networkLink = '/manual/data_development/network/create_network/'
 
-export const hbaseLink = '/manual/source_data/add_data/hive/#HBase参数说明'
+export const hbaseLink = '/manual/source_data/add_data/hbase/#HBase参数说明'
 
 export const ftpProtocolValue = 1
 export const sFtpProtocolValue = 2

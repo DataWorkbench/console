@@ -254,13 +254,15 @@ export const JobModal = observer((props: JobModalProps) => {
               },
               uri: { job_id: ret?.id! }
             })
-            .then((res) => {
-              return mutationSyncJob.mutateAsync({
-                jobId: ret?.id!,
-                job_mode: 2,
-                job_content: res?.job
-              })
-            }, close)
+            .then(
+              (res) =>
+                mutationSyncJob.mutateAsync({
+                  jobId: ret?.id!,
+                  job_mode: 2,
+                  job_content: res?.job
+                }),
+              close
+            )
             .finally(close)
         } else {
           close()
@@ -418,7 +420,7 @@ export const JobModal = observer((props: JobModalProps) => {
                                     <HelpCenterLink
                                       hasIcon
                                       isIframe={false}
-                                      href="/manual/integration_job/sync_type/#全量同步与增量同步支持的数据源类型"
+                                      href="/manual/integration_job/offline/sync_type/#全量同步与增量同步支持的数据源类型"
                                     >
                                       支持数据源
                                     </HelpCenterLink>

@@ -259,7 +259,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
   // const kafkaReadType = kafkaSource$.getValue()?.readType
   // const isKafkaSource = (leftTypeName as any).getType() === SourceType.Kafka && kafkaReadType === 1
   const {
-    is: { isKafkaTarget, isHbaseTarget, isHbaseSource }
+    is: { isKafkaTarget, isHbaseTarget, isHbaseSource, isReal }
   } = config
 
   useImperativeHandle(ref, () => ({
@@ -296,12 +296,10 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       if (leftColumns.length === 0 && rightColumns.length === 0) {
         return null
       }
-      const setIndex = (i: Record<string, any>, index1: number) => {
-        return {
-          ...i,
-          index: index1 + 1
-        }
-      }
+      const setIndex = (i: Record<string, any>, index1: number) => ({
+        ...i,
+        index: index1 + 1
+      })
       return [leftColumns.map(setIndex), rightColumns.map(setIndex)]
     },
     getOther: () => {
@@ -570,14 +568,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
       return newFields
     })
-    setMappings((item) => {
-      return item.map(([l, r]) => {
+    setMappings((item) =>
+      item.map(([l, r]) => {
         if (l === old.name) {
           return [field.name, r]
         }
         return [l, r]
       })
-    })
+    )
   }
 
   const keepEditingFieldRight = (field: TMappingField, index?: number) => {
@@ -595,14 +593,14 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
       )
       return newFields
     })
-    setMappings((item) => {
-      return item.map(([l, r]) => {
+    setMappings((item) =>
+      item.map(([l, r]) => {
         if (r === old.name) {
           return [l, field.name]
         }
         return [l, r]
       })
-    })
+    )
   }
 
   const cancelAddCustomField = (field: TMappingField, index: number) => {
@@ -637,7 +635,11 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
           type="info"
           linkBtn={
             <HelpCenterLink
-              href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+              href={
+                isReal
+                  ? '/manual/integration_job/online/create_job_online_1/#配置字段映射'
+                  : '/manual/integration_job/offline/create_job_offline_1/#配置字段映射'
+              }
               isIframe={false}
               hasIcon={false}
             >
@@ -747,39 +749,37 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
             </div>
             <div>{isHbaseTarget ? 'valueColumn 字段' : '目标表字段'}</div>
           </FieldRow>
-          {rightFields.map((item, i) => {
-            return (
-              <MappingItem
-                jsplumb={jsPlumbInstRef.current}
-                key={item.uuid}
-                anchor="Left"
-                item={item}
-                index={i}
-                hasConnection={!!mappings.find(([, r]) => r === item?.name)}
-                typeName={rightTypeName}
-                moveItem={moveItemRight}
-                onOk={(info, index) => {
-                  keepEditingFieldRight(info, index)
-                }}
-                config={config.target}
-                onCancel={cancelAddCustomFieldRight}
-                deleteItem={(field) => {
-                  setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
-                  setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
-                }}
-                exist={(name: string) => !!rightFields.find((f) => f.name === name)}
-                getDeleteField={(name: string) => {
-                  const delItem = rightFieldsProp.find((f) => f.name === name)
-                  const existItem = rightFields.find((f) => f.name === name)
-                  if (delItem && !existItem) {
-                    return delItem
-                  }
-                  return undefined
-                }}
-                readonly={targetReadonly}
-              />
-            )
-          })}
+          {rightFields.map((item, i) => (
+            <MappingItem
+              jsplumb={jsPlumbInstRef.current}
+              key={item.uuid}
+              anchor="Left"
+              item={item}
+              index={i}
+              hasConnection={!!mappings.find(([, r]) => r === item?.name)}
+              typeName={rightTypeName}
+              moveItem={moveItemRight}
+              onOk={(info, index) => {
+                keepEditingFieldRight(info, index)
+              }}
+              config={config.target}
+              onCancel={cancelAddCustomFieldRight}
+              deleteItem={(field) => {
+                setRightFields((fields) => fields.filter((f) => f.uuid !== field.uuid))
+                setMappings((prevMappings) => prevMappings.filter(([, r]) => r !== field.name))
+              }}
+              exist={(name: string) => !!rightFields.find((f) => f.name === name)}
+              getDeleteField={(name: string) => {
+                const delItem = rightFieldsProp.find((f) => f.name === name)
+                const existItem = rightFields.find((f) => f.name === name)
+                if (delItem && !existItem) {
+                  return delItem
+                }
+                return undefined
+              }}
+              readonly={targetReadonly}
+            />
+          ))}
           {!readonly && config.target.add && (
             <Center tw="bg-neut-16 cursor-pointer h-8" onClick={addCustomFieldRight}>
               <Icon name="add" type="light" />
@@ -794,9 +794,7 @@ export const FieldMappings = forwardRef((props: IFieldMappingsProps, ref) => {
     )
   }
 
-  const getLeftFields = () => {
-    return leftFields
-  }
+  const getLeftFields = () => leftFields
 
   // function renderHbaseRowKey() {
   //   return null
