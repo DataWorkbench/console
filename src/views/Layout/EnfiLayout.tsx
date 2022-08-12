@@ -15,21 +15,37 @@ const { Sider, Content } = Layout
 
 const Root = styled.div`
   &.antd-layout {
+    background-color: #fff !important;
     .ant-layout-content {
       height: calc(100vh - 54px);
       overflow: auto;
     }
+    .ant-layout-sider-children {
+      background-color: #fff !important;
+    }
+    .ant-menu-root {
+      background-color: #fff !important;
+    }
     .ant-menu-item-selected {
-      background: #024d8e !important;
+      background: #f7fbff !important;
+      border-left: 2px solid #024d8e !important;
       &::after {
         opacity: 0 !important;
       }
       .icon .qicon {
-        color: rgba(255, 255, 255, 0.9) !important;
-        fill: rgba(255, 255, 255, 0.4) !important;
+        color: #024d8e !important;
+        fill: #b6c2cd !important;
       }
       .ant-menu-title-content {
-        color: #fff !important;
+        color: #024d8e !important;
+        font-weight: 600;
+      }
+    }
+    .ant-menu-item:hover {
+      color: #024d8e !important;
+      .icon .qicon {
+        color: #024d8e !important;
+        fill: #b6c2cd !important;
       }
     }
     .ant-menu-inline-collapsed {
