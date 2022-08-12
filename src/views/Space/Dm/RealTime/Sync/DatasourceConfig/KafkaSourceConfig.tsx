@@ -362,7 +362,11 @@ const KafkaSourceConfig = forwardRef(
                   })
                 }}
                 help={
-                  <HelpCenterLink hasIcon isIframe={false} href="###">
+                  <HelpCenterLink
+                    hasIcon
+                    isIframe={false}
+                    href="/manual/integration_job/cfg_source/kafka/消费者配置"
+                  >
                     参考文档
                   </HelpCenterLink>
                 }

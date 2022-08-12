@@ -14,7 +14,7 @@ import {
 import { observer } from 'mobx-react-lite'
 import tw, { styled, css } from 'twin.macro'
 import { useImmer } from 'use-immer'
-import { set, range, trim, filter, assign, pick, keys } from 'lodash-es'
+import { set, range, trim, filter, assign, pick, keys, get } from 'lodash-es'
 import { useQueryClient } from 'react-query'
 import Tippy from '@tippyjs/react'
 import dayjs from 'dayjs'
@@ -40,7 +40,7 @@ const MONTH_PRICE = 176
 
 const FormWrapper = styled('div')(() => [
   css`
-    ${tw`w-[686px] overflow-auto `}
+    ${tw`flex-auto overflow-auto `}
     form.is-horizon-layout {
       ${tw`pl-0`}
       > .field {
@@ -745,112 +745,115 @@ key02:value02`}
             </CollapseItem>
           </Collapse>
         </FormWrapper>
-        <div tw="w-80 px-5 pt-5 space-y-4">
-          {op === 'view' ? (
-            <div>
-              <div tw="text-base font-semibold mb-4">租赁信息</div>
-              <FlexBox>
-                <div tw="w-24 text-right">计费方式：</div>
-                <div tw="text-neut-8">按需计费</div>
-              </FlexBox>
-              <FlexBox>
-                <div tw="w-24 text-right">开始计费时间：</div>
-                <div tw="text-neut-8">
-                  {dayjs(params.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
-                </div>
-              </FlexBox>
-              <FlexBox>
-                <div tw="w-24 text-right">停止计费时间：</div>
-                <div tw="text-neut-8">使用中</div>
-              </FlexBox>
-              <FlexBox>
-                <div tw="w-24 text-right">价格：</div>
-                <div tw="text-neut-8">
-                  ¥0 <del>0.281</del> 每小时
-                  <span tw="text-[#B24B06] ml-1">限时免费</span>
-                </div>
-              </FlexBox>
-            </div>
-          ) : (
-            <>
-              <div tw="text-base font-semibold">费用预览</div>
-              <RadioGroup value={1}>
-                <RadioButton value={1}>按需计费</RadioButton>
-                <Tippy
-                  theme="light"
-                  animation="fade"
-                  arrow
-                  delay={100}
-                  offset={[60, 10]}
-                  content={<Center tw="h-9 px-3 text-neut-13">限时免费，预留合约敬请期待</Center>}
-                >
-                  <div>
-                    <RadioButton value={2} tw="bg-neut-13! text-neut-8! cursor-not-allowed">
-                      预留合约
-                    </RadioButton>
-                  </div>
-                </Tippy>
-              </RadioGroup>
+        {!get(window, 'CONFIG_ENV.IS_PRIVATE', false) && (
+          <div tw="w-80 px-5 pt-5 space-y-4">
+            {op === 'view' ? (
               <div>
-                <InDemandTitle tw="text-sm">
-                  TM 数量：<span>{params.task_num}</span>
-                </InDemandTitle>
-                <div tw="text-neut-8">Flink 的 TaskNumber 的数量</div>
-              </div>
-              <div>
-                <InDemandTitle tw="text-sm">
-                  TM 规格：<span>{params.task_cu}</span>
-                </InDemandTitle>
-                <div tw="text-neut-8">Flink 的 TaskManager 的 CPU 和内存设置</div>
-              </div>
-              <div>
-                <InDemandTitle tw="text-sm">
-                  JM 规格：<span>{params.job_cu}</span>
-                </InDemandTitle>
-                <div tw="text-neut-8">Flink 的 JobManager 的 CPU 和内存设置</div>
-              </div>
-              <div>
-                <InDemandTitle tw="text-sm">
-                  总计算资源 CU：
-                  <span css={[totalCU > 12 && tw`text-red-10!`]}>{totalCU}</span>
-                </InDemandTitle>
-                <div tw="text-neut-8">[总计算资源 CU=TM 数量 * TM 规格 + JM 规格]</div>
-              </div>
-              <div tw="pt-4 pb-2 border-b border-neut-13">
-                收费标准详见
-                {/* <a href="###" className="link"> */}
-                <HelpCenterLink href="/billing/price/" isIframe={false}>
-                  《大数据工作台计费说明》
-                </HelpCenterLink>
-                {/* <QIcon name="if-external-link" /> */}
-              </div>
-              <div>
-                <FlexBox tw="justify-between">
-                  <div tw="text-sm">总价</div>
+                <div tw="text-base font-semibold mb-4">租赁信息</div>
+                <FlexBox>
+                  <div tw="w-24 text-right">计费方式：</div>
+                  <div tw="text-neut-8">按需计费</div>
+                </FlexBox>
+                <FlexBox>
+                  <div tw="w-24 text-right">开始计费时间：</div>
                   <div tw="text-neut-8">
-                    <span tw="text-xl text-green-11">¥ 0</span>{' '}
-                    <del tw="">{(totalCU * UNIT_PRICE).toFixed(2)} /小时</del>
+                    {dayjs(params.created * 1000).format('YYYY-MM-DD HH:mm:ss')}
                   </div>
                 </FlexBox>
-                <FlexBox tw="justify-between">
-                  <div
-                    tw="rounded-sm px-1"
-                    css={css`
-                      background: #b34b06;
-                    `}
+                <FlexBox>
+                  <div tw="w-24 text-right">停止计费时间：</div>
+                  <div tw="text-neut-8">使用中</div>
+                </FlexBox>
+                <FlexBox>
+                  <div tw="w-24 text-right">价格：</div>
+                  <div tw="text-neut-8">
+                    ¥0 <del>0.281</del> 每小时
+                    <span tw="text-[#B24B06] ml-1">限时免费</span>
+                  </div>
+                </FlexBox>
+              </div>
+            ) : (
+              <>
+                <div tw="text-base font-semibold">费用预览</div>
+                <RadioGroup value={1}>
+                  <RadioButton value={1}>按需计费</RadioButton>
+                  <Tippy
+                    theme="light"
+                    animation="fade"
+                    arrow
+                    delay={100}
+                    offset={[60, 10]}
+                    content={<Center tw="h-9 px-3 text-neut-13">限时免费，预留合约敬请期待</Center>}
                   >
-                    限时免费，机不可失
-                  </div>
+                    <div>
+                      <RadioButton value={2} tw="bg-neut-13! text-neut-8! cursor-not-allowed">
+                        预留合约
+                      </RadioButton>
+                    </div>
+                  </Tippy>
+                </RadioGroup>
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    TM 数量：<span>{params.task_num}</span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">Flink 的 TaskNumber 的数量</div>
+                </div>
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    TM 规格：<span>{params.task_cu}</span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">Flink 的 TaskManager 的 CPU 和内存设置</div>
+                </div>
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    JM 规格：<span>{params.job_cu}</span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">Flink 的 JobManager 的 CPU 和内存设置</div>
+                </div>
+                <div>
+                  <InDemandTitle tw="text-sm">
+                    总计算资源 CU：
+                    <span css={[totalCU > 12 && tw`text-red-10!`]}>{totalCU}</span>
+                  </InDemandTitle>
+                  <div tw="text-neut-8">[总计算资源 CU=TM 数量 * TM 规格 + JM 规格]</div>
+                </div>
+                <div tw="pt-4 pb-2 border-b border-neut-13">
+                  收费标准详见
+                  {/* <a href="###" className="link"> */}
+                  <HelpCenterLink href="/billing/price/" isIframe={false}>
+                    《大数据工作台计费说明》
+                  </HelpCenterLink>
+                  {/* <QIcon name="if-external-link" /> */}
+                </div>
+                <div>
+                  <FlexBox tw="justify-between">
+                    <div tw="text-sm">总价</div>
+                    <div tw="text-neut-8">
+                      <span tw="text-xl text-green-11">¥ 0</span>{' '}
+                      <del tw="">{(totalCU * UNIT_PRICE).toFixed(2)} /小时</del>
+                    </div>
+                  </FlexBox>
+                  <FlexBox tw="justify-between">
+                    <div
+                      tw="rounded-sm px-1"
+                      css={css`
+                        background: #b34b06;
+                      `}
+                    >
+                      限时免费，机不可失
+                    </div>
 
-                  <div tw="text-neut-8">
-                    (合 <span tw="text-green-11">¥0</span>{' '}
-                    <del>{(totalCU * MONTH_PRICE).toFixed(2)}</del> 每月 )
-                  </div>
-                </FlexBox>
-              </div>
-            </>
-          )}
-        </div>
+                    <div tw="text-neut-8">
+                      (合 <span tw="text-green-11">¥0</span>{' '}
+                      <del>{(totalCU * MONTH_PRICE).toFixed(2)}</del>
+                      每月 )
+                    </div>
+                  </FlexBox>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </FlexBox>
     </Modal>
   )
