@@ -83,7 +83,7 @@ const styles = {
   stepText: tw`ml-2 inline-block border-green-11 text-green-11!`
 }
 
-const getStepsData = (regionId: string, spaceId: string) => [
+const getStepsData = (regionId: string, spaceId: string, type?: number) => [
   {
     key: 'p0',
     title: '选择数据源',
@@ -121,7 +121,11 @@ const getStepsData = (regionId: string, spaceId: string) => [
           hasIcon
           tw="ml-1.5"
           isIframe={false}
-          href="/manual/integration_job/create_job_offline_1/#通道控制"
+          href={
+            type === 3
+              ? '/manual/integration_job/online/create_job_online_1/#通道控制'
+              : '/manual/integration_job/offline/create_job_offline_1/#通道控制'
+          }
           onClick={(e) => e.stopPropagation()}
         >
           数据同步文档
@@ -196,7 +200,10 @@ const SyncJob = () => {
     }
   }, [confData, curJob, isFetching])
 
-  const stepsData = useMemo(() => getStepsData(regionId, spaceId), [regionId, spaceId])
+  const stepsData = useMemo(
+    () => getStepsData(regionId, spaceId, curJob?.type),
+    [curJob?.type, regionId, spaceId]
+  )
 
   const getInitMode = () => {
     if (confData?.job_mode) {
@@ -427,11 +434,6 @@ const SyncJob = () => {
             if (!dbRef.current?.validate()) {
               showConfWarn('未正确配置数据源信息')
               return
-              flag = true
-            }
-            if (!resource) {
-              showConfWarn('未配置数据源信息')
-              flag = true
             }
             if (!mapping) {
               showConfWarn('未配置字段映射信息')
@@ -600,7 +602,11 @@ const SyncJob = () => {
                   columns={columns}
                   topHelp={
                     <HelpCenterLink
-                      href="/manual/integration_job/create_job_offline_1/#配置字段映射"
+                      href={
+                        curJob?.type === 3
+                          ? '/manual/integration_job/online/create_job_online_1/#配置字段映射'
+                          : '/manual/integration_job/offline/create_job_offline_1/#配置字段映射'
+                      }
                       isIframe={false}
                     >
                       字段映射说明文档
