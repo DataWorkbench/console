@@ -12,7 +12,7 @@ import { Form } from '@QCFE/qingcloud-portal-ui'
 import { Icon, Label } from '@QCFE/lego-ui'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import { useImmer } from 'use-immer'
-import { clearMapping, source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { clearMapping, source$, target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { get, isEmpty } from 'lodash-es'
 import { map } from 'rxjs'
 
@@ -23,6 +23,7 @@ import {
   ISourceRef
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 const { CheckboxGroupField, SelectField, TextField, RadioGroupField, NumberField, ToggleField } =
   Form
@@ -118,6 +119,10 @@ type FieldKeys =
   | 'startFile'
   | 'startPosition'
 
+const isCkTarget = () => {
+  return target$.getValue()?.sourceType?.type === SourceType.ClickHouse
+}
+
 const MysqlBinlogSourceConfig = forwardRef(
   (props: IDataSourceConfigProps, ref: ForwardedRef<ISourceRef>) => {
     const sourceForm = useRef<Form>()
@@ -138,7 +143,11 @@ const MysqlBinlogSourceConfig = forwardRef(
               filter: get(e, 'data.filter', ''),
               filterType: e?.data?.filter ? 2 : 1,
               tableName: get(e, 'data.table[0]', ''),
-              updateType: get(e, 'data.cat', 'insert,update,delete').split(','),
+              updateType: get(
+                e,
+                'data.cat',
+                isCkTarget() ? 'insert' : 'insert,update,delete'
+              ).split(','),
               charset: get(e, 'data.connection_charset', 1),
               bufNumber: get(e, 'data.buffer-size', 1024),
               threads: get(e, 'data.parallel-thread-size', 2),
@@ -360,7 +369,7 @@ const MysqlBinlogSourceConfig = forwardRef(
             <CheckboxGroupField
               name="updateType"
               label={<AffixLabel required>更新类型</AffixLabel>}
-              options={updateTypes}
+              options={isCkTarget() ? [updateTypes[0]] : updateTypes}
               value={dbInfo?.updateType}
               onChange={(v) => {
                 setDbInfo((draft) => {
