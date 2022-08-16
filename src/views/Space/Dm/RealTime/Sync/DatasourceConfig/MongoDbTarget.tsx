@@ -168,7 +168,7 @@ const MongoDbTarget = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
               }
             ]}
           />
-          {dbInfo?.writeMode === 2 && (
+          {(dbInfo?.writeMode === 2 || dbInfo?.writeMode === 3) && (
             <TextField
               label={<AffixLabel required>业务主键</AffixLabel>}
               name="replaceKey"

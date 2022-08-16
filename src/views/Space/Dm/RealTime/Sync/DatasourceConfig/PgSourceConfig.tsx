@@ -13,7 +13,7 @@ import { AffixLabel, Center, FlexBox, HelpCenterLink, SelectWithRefresh } from '
 import { useImmer } from 'use-immer'
 import { useQuerySourceTables } from 'hooks'
 import { Control, Field, Icon, Label } from '@QCFE/lego-ui'
-import { clearMapping, source$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
+import { clearMapping, source$, target$ } from 'views/Space/Dm/RealTime/Sync/common/subjects'
 import { map } from 'rxjs'
 import {
   IDataSourceConfigProps,
@@ -21,6 +21,7 @@ import {
 } from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/interfaces'
 import { get } from 'lodash-es'
 import useTableColumns from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/hooks/useTableColumns'
+import { SourceType } from 'views/Space/Upcloud/DataSourceList/constant'
 
 const {
   // RadioGroupField,
@@ -43,6 +44,10 @@ const updateTypes = [
     value: 'delete'
   }
 ]
+
+const isCkTarget = () => {
+  return target$.getValue()?.sourceType?.type === SourceType.ClickHouse
+}
 
 const styles = {
   arrowBox: tw`space-x-2 bg-neut-17 w-[70%] z-10`,
@@ -116,7 +121,9 @@ const PgSourceConfig = forwardRef(
             return {
               id: e?.data?.id,
               tableName: get(e, 'data.table_list[0]'),
-              updateType: get(e, 'data.cat', 'insert,update,delete').split(',').filter(Boolean),
+              updateType: get(e, 'data.cat', isCkTarget() ? 'insert' : 'insert,update,delete')
+                .split(',')
+                .filter(Boolean),
               slot: get(e, 'data.slot_name'),
               lsn: get(e, 'data.lsn'),
               heartBeatPack: get(e, 'data.heart_beat_pack', 10),
@@ -290,7 +297,7 @@ const PgSourceConfig = forwardRef(
             <CheckboxGroupField
               name="updateType"
               label={<AffixLabel required>更新类型</AffixLabel>}
-              options={updateTypes}
+              options={isCkTarget() ? [updateTypes[0]] : updateTypes}
               value={dbInfo?.updateType}
               onChange={(v) => {
                 setDbInfo((draft) => {

@@ -411,6 +411,21 @@ const SyncJob = () => {
     }
   }, [getData])
 
+  const validateMappingLength = (list?: Record<string, any>[]) => {
+    if (
+      curJob?.type === 3 &&
+      [SourceType.Mysql, SourceType.PostgreSQL, SourceType.SqlServer].includes(
+        curJob?.source_type!
+      ) &&
+      ![SourceType.Mysql, SourceType.PostgreSQL, SourceType.SqlServer, SourceType.Kafka].includes(
+        curJob?.target_type!
+      ) &&
+      (!Array.isArray(list) || list.length !== sourceColumns.length)
+    ) {
+      return false
+    }
+    return true
+  }
   const save = (isSubmit?: boolean, cb?: Function, isValidateSource?: boolean) => {
     const filterResouce = getData({ isSubmit, isValidateSource })
     if (!filterResouce) {
@@ -434,8 +449,13 @@ const SyncJob = () => {
               showConfWarn('未正确配置数据源信息')
               return
             }
-            if (!mapping) {
+            if (!mapping || !mapping.length) {
               showConfWarn('未配置字段映射信息')
+              flag = true
+            }
+            console.log(mapping)
+            if (!validateMappingLength(mapping?.[0] as any)) {
+              showConfWarn('请映射来源表中全部字段')
               flag = true
             }
 
