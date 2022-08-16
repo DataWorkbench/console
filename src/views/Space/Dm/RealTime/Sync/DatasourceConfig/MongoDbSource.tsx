@@ -1,30 +1,21 @@
-import { forwardRef, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
+import { forwardRef, useImperativeHandle, useLayoutEffect, useRef } from 'react'
 import styles from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/styles'
 import BaseConfigCommon from 'views/Space/Dm/RealTime/Sync/DatasourceConfig/BaseConfigCommon'
 import { useImmer } from 'use-immer'
 import { Form } from '@QCFE/qingcloud-portal-ui'
 import { map } from 'rxjs'
-import { camelCase, get, isEmpty, isEqual, keys } from 'lodash-es'
-import {
-  AffixLabel,
-  ConditionParameterField,
-  HelpCenterLink,
-  SelectWithRefresh,
-  TConditionParameterVal
-} from 'components'
+import { camelCase, get, keys } from 'lodash-es'
+import { AffixLabel, HelpCenterLink, SelectWithRefresh } from 'components'
 import { useQuerySourceTables } from 'hooks'
-import tw, { css } from 'twin.macro'
-import { nanoid } from 'nanoid'
 import { IDataSourceConfigProps, ISourceRef } from './interfaces'
 import { source$ } from '../common/subjects'
 
-type FieldKeys = 'id' | 'collectionName' | 'condition'
+type FieldKeys = 'id' | 'collectionName' | 'filter'
 
+const { TextAreaField } = Form
 const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref) => {
   const [dbInfo, setDbInfo] = useImmer<Partial<Record<FieldKeys, any>>>({})
   const sourceForm = useRef<Form>()
-
-  const [conditionKey, setCondition] = useState('1')
 
   useLayoutEffect(() => {
     const sub = source$
@@ -53,13 +44,12 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
           return {
             id: get(e, 'data.id'),
             collectionName: get(e, 'data.collection_name'),
-            condition
+            filter: get(e, 'data.filter')
           }
         })
       )
       .subscribe((e) => {
         setDbInfo(e)
-        setCondition(nanoid())
       })
 
     return () => {
@@ -75,37 +65,10 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
       return sourceForm.current?.validateForm()
     },
     getData: () => {
-      const { condition } = dbInfo
-      console.log(
-        condition,
-        !!condition?.startCondition ||
-          !!condition?.startCondition ||
-          !!condition?.endCondition ||
-          !!condition?.endValue ||
-          !!condition?.column
-      )
       return {
         id: dbInfo?.id,
         collection_name: dbInfo?.collectionName,
-        schema: '',
-        condition_type:
-          // eslint-disable-next-line no-nested-ternary
-          condition?.type === 2
-            ? 2
-            : !!condition?.startCondition ||
-              !!condition?.startCondition ||
-              !!condition?.endCondition ||
-              !!condition?.endValue ||
-              !!condition?.column
-            ? 1
-            : 0,
-        visualization: {
-          column: condition?.column,
-          start_condition: condition?.startCondition,
-          start_value: condition?.startValue,
-          end_condition: condition?.endCondition,
-          end_value: condition?.endValue
-        }
+        filter: dbInfo?.filter
       }
     },
     refetchColumn: () => {}
@@ -166,79 +129,17 @@ const MongoDbSource = forwardRef<ISourceRef, IDataSourceConfigProps>((props, ref
               </HelpCenterLink>
             }
           />
-          <ConditionParameterField
-            key={conditionKey}
-            name="condition"
-            isInput
-            // columns={(sourceColumns$.getValue() || []).map((c) => c.name)}
-            label={<AffixLabel required={false}>条件参数配置</AffixLabel>}
-            helpStr="可在条件参数中填写增量同步条件"
-            value={dbInfo?.condition}
-            onChange={(v: any) => {
+          <TextAreaField
+            name="filter"
+            value={dbInfo?.filter || ''}
+            onChange={(v: string) => {
               setDbInfo((draft) => {
-                draft.condition = v
+                draft.filter = v
               })
             }}
-            css={css`
-              .help {
-                ${tw`w-full`}
-              }
-            `}
-            helpLink="/manual/integration_job/cfg_source/mongodb/#参数说明"
-            validateOnChange={
-              dbInfo?.condition &&
-              !isEqual(dbInfo.condition, { type: 1 }) &&
-              !isEqual(dbInfo.condition, { type: 2 })
-            }
-            schemas={[
-              {
-                rule: (re: TConditionParameterVal) => {
-                  if (re.type === 1) {
-                    return true
-                  }
-                  const v = re.expression
-                  if (!v) {
-                    return true
-                  }
-                  if (v?.includes('where ')) {
-                    return false
-                  }
-                  if (v.trim() && v.trim().split(';').filter(Boolean).length > 1) {
-                    return false
-                  }
-                  return true
-                },
-                help: '条件参数不能包含 where, 且只能包含一个 SQL 命令',
-                status: 'error'
-              },
-              {
-                help: '条件参数未正确配置',
-                status: 'error',
-                rule: (v: TConditionParameterVal) => {
-                  let valid = false
-                  if (v.type === 2) {
-                    valid = !isEmpty(v.expression)
-                  } else if (
-                    !!v.startCondition ||
-                    !!v.endValue ||
-                    !!v.startValue ||
-                    v.column ||
-                    v.endCondition
-                  ) {
-                    valid =
-                      !isEmpty(v.startValue) &&
-                      !isEmpty(v.endValue) &&
-                      !isEmpty(v.startCondition) &&
-                      !isEmpty(v.endCondition) &&
-                      !isEmpty(v.column)
-                  } else {
-                    valid = true
-                  }
-
-                  return valid
-                }
-              }
-            ]}
+            validateOnChange
+            label="过滤条件"
+            placeholder="请输入过滤条件"
           />
         </>
       )}
