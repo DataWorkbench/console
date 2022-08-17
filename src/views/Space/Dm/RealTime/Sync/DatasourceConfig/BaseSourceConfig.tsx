@@ -147,7 +147,8 @@ const BaseSourceConfig = forwardRef(
             start_value: condition?.startValue,
             end_condition: condition?.endCondition,
             end_value: condition?.endValue
-          }
+          },
+          express: condition?.expression
         }
       },
       refetchColumn: () => {
