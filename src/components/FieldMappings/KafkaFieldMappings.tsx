@@ -271,7 +271,9 @@ export const KafkaFieldMappings = forwardRef((props: any, ref) => {
         ))}
         {!isRealSql && <div css={[styles.table]}>{renderAddRowKey()}</div>}
 
-        <FlexBox css={[styles.table, tw`flex bg-neut-18 items-center`]}>
+        <FlexBox
+          css={[styles.table, tw`flex bg-neut-18 items-center min-h-[32px] h-auto py-3 flex-wrap`]}
+        >
           <span>原理：</span>
           {new Array(Math.max(0, 2 * (rowKeys || []).length - 1)).fill(0).map((_, index) =>
             index % 2 === 1 ? (
