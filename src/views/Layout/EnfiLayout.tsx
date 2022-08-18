@@ -81,8 +81,6 @@ const EnfiLayout = observer(({ children }) => {
   return (
     <Root className="antd-layout">
       <Layout style={{ height: '100vh' }}>
-        <EnFiHeader />
-
         <Layout className="site-layout">
           {match && (
             <Sider
@@ -119,7 +117,10 @@ const EnfiLayout = observer(({ children }) => {
               />
             </Sider>
           )}
-          <Content>{children}</Content>
+          <Layout>
+            <EnFiHeader />
+            <Content>{children}</Content>
+          </Layout>
         </Layout>
       </Layout>
     </Root>

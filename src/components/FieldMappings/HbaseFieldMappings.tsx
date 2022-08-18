@@ -405,7 +405,8 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
               css={[
                 css`
                   grid-column: 1 / -1;
-                `
+                `,
+                tw`ml-3`
               ]}
             >
               请从左侧拖拽指定时间列到此处
@@ -413,7 +414,7 @@ export const HbaseFieldMappings = forwardRef((props: any, ref) => {
           )}
           {version.column && (
             <>
-              <div>{sourceColumns.find((i) => i.name === version.column)?.name}</div>
+              <div tw="ml-3">{sourceColumns.find((i) => i.name === version.column)?.name}</div>
               <div>{sourceColumns.find((i) => i.name === version.column)?.type}</div>
             </>
           )}
