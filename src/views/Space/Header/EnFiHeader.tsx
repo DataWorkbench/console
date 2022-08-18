@@ -8,7 +8,7 @@ import useIcon from '../../../hooks/useHooks/useIcon'
 export const EnFiHeader = () => {
   useIcon(icons)
   return (
-    <Root tw="z-[100] h-[52px] bg-white text-white items-center">
+    <Root tw="z-[100] h-[64px] bg-white text-white items-center">
       <FlexBox tw="justify-between w-full">
         <Link to="/overview">
           <div
