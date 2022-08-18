@@ -92,7 +92,7 @@ const EnfiLayout = observer(({ children }) => {
             >
               <div className="logo">
                 <Center
-                  tw="bg-[#F5FAFF] p-5 text-[16px] font-medium"
+                  tw="bg-[#F5FAFF] p-5 text-[16px] font-medium h-[64px]"
                   css={!collapsed ? tw`justify-between` : tw`justify-center`}
                 >
                   {!collapsed && <div>大数据工作台</div>}
