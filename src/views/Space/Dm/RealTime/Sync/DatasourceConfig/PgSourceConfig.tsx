@@ -127,7 +127,7 @@ const PgSourceConfig = forwardRef(
               slot: get(e, 'data.slot_name'),
               lsn: get(e, 'data.lsn'),
               heartBeatPack: get(e, 'data.heart_beat_pack', 0),
-              autoCreate: get(e, 'data.allow_create_slot', true),
+              autoCreate: get(e, 'data.allow_created', true),
               temp: get(e, 'data.temporary', false)
             }
           })
@@ -166,7 +166,7 @@ const PgSourceConfig = forwardRef(
         slot_name: dbInfo?.slot,
         table_list: [dbInfo?.tableName],
         cat: dbInfo?.updateType.join(','),
-        allow_create_slot: dbInfo?.autoCreate,
+        allow_created: dbInfo?.autoCreate,
         temporary: dbInfo?.temp,
         heart_beat_pack: dbInfo?.heartBeatPack
       }),
