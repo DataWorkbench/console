@@ -126,9 +126,9 @@ const PgSourceConfig = forwardRef(
                 .filter(Boolean),
               slot: get(e, 'data.slot_name'),
               lsn: get(e, 'data.lsn'),
-              heartBeatPack: get(e, 'data.heart_beat_pack', 10),
+              heartBeatPack: get(e, 'data.heart_beat_pack', 0),
               autoCreate: get(e, 'data.allow_create_slot', true),
-              temp: get(e, 'data.temporary', true)
+              temp: get(e, 'data.temporary', false)
             }
           })
         )
@@ -185,7 +185,7 @@ const PgSourceConfig = forwardRef(
         <>
           <Field>
             <Label className="label">
-              <AffixLabel>心跳间隔</AffixLabel>
+              <AffixLabel required={false}>心跳间隔</AffixLabel>
             </Label>
             <Control>
               <InputNumber
@@ -202,13 +202,13 @@ const PgSourceConfig = forwardRef(
                   })
                 }}
                 validateOnChange
-                schemas={[
-                  {
-                    rule: { required: true },
-                    help: '请输入心跳间隔',
-                    status: 'error'
-                  }
-                ]}
+                // schemas={[
+                //   {
+                //     rule: { required: true },
+                //     help: '请输入心跳间隔',
+                //     status: 'error'
+                //   }
+                // ]}
                 placeholder="请输入心跳间隔"
               />
               <span tw="leading-7 ml-1.5"> 秒 </span>
@@ -323,7 +323,7 @@ const PgSourceConfig = forwardRef(
 
             <TextField
               name="slot"
-              label={<AffixLabel required>slot 名称</AffixLabel>}
+              label={<AffixLabel required={false}>slot 名称</AffixLabel>}
               placeholder="请输入 slot 名称"
               value={dbInfo?.slot}
               onChange={(e) => {
@@ -332,13 +332,13 @@ const PgSourceConfig = forwardRef(
                 })
               }}
               validateOnChange
-              schemas={[
-                {
-                  rule: { required: true },
-                  help: '请输入 slot 名称',
-                  status: 'error'
-                }
-              ]}
+              // schemas={[
+              //   {
+              //     rule: { required: true },
+              //     help: '请输入 slot 名称',
+              //     status: 'error'
+              //   }
+              // ]}
             />
             <>
               <ToggleField
@@ -357,7 +357,7 @@ const PgSourceConfig = forwardRef(
               <ToggleField
                 value={dbInfo?.temp}
                 name="temp"
-                label={<AffixLabel required>临时 slot</AffixLabel>}
+                label={<AffixLabel required={false}>临时 slot</AffixLabel>}
                 onChange={(e) => {
                   setDbInfo((draft) => {
                     draft.temp = e
