@@ -11,6 +11,9 @@ import {
   pingDataSource,
   pingDataSourceList,
   updateDataSource,
+  describeDataSourceTables,
+  describeDataSourceTableSchema,
+  dataSourceManage
 } from 'stores/api'
 import { get } from 'lodash-es'
 import { getIsFormalEnv } from 'utils/index'
@@ -18,11 +21,7 @@ import { getIsFormalEnv } from 'utils/index'
 let pingListKey: any
 export const getPingHistoriesKey = () => pingListKey
 
-export const useQuerySourceKind = (
-  regionId: string,
-  spaceId: string,
-  op?: string
-) => {
+export const useQuerySourceKind = (regionId: string, spaceId: string, op?: string) => {
   const queryKey = 'sourcekind'
   return useQuery(
     queryKey,
@@ -31,7 +30,7 @@ export const useQuerySourceKind = (
       return get(ret, 'kinds', [])
     },
     {
-      enabled: op === 'create',
+      enabled: op === 'create'
     }
   )
 }
@@ -44,7 +43,7 @@ export const useQuerySource = (filter: IDataSourceParams) => {
   queryKey = ['sources', filter]
   return useQuery(queryKey, async () => loadDataSource(filter), {
     keepPreviousData: true,
-    enabled: !getIsFormalEnv(),
+    enabled: !getIsFormalEnv()
   })
 }
 
@@ -53,8 +52,7 @@ export const useQuerySourceHistories = (
   filter: Record<string, any>,
   localList: Record<string, any>[]
 ) => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   pingListKey = ['sourceHistories', localList, filter]
   const { sourceId, offset = 0, limit = 10, ...rest } = filter
   return useQuery(
@@ -90,7 +88,7 @@ export const useQuerySourceHistories = (
         spaceId,
         regionId,
         sourceId,
-        ...rest,
+        ...rest
       })
       if (res.ret_code === 0) {
         return {
@@ -99,22 +97,51 @@ export const useQuerySourceHistories = (
             ...tempList,
             ...(res.infos || []).map((i: Record<string, any>) => ({
               ...i,
-              uuid: Math.random().toString(32).slice(2),
-            })),
+              uuid: Math.random().toString(32).slice(2)
+            }))
           ],
-          total: res.total + localList.length,
+          total: res.total + localList.length
         }
       }
       return {
         infos: tempList,
-        total: localList.length,
+        total: localList.length
       }
     },
     {
       keepPreviousData: true,
       // enabled: !!sourceId,
-      initialData: { infos: [] },
+      initialData: { infos: [] }
     }
+  )
+}
+
+export const useQuerySourceTables = ({ sourceId }: { sourceId: string }, options = {}) => {
+  const { regionId, spaceId } = useParams<IUseParams>()
+  const params = {
+    regionId,
+    spaceId,
+    sourceId
+  }
+  return useQuery(['tables', params], async () => describeDataSourceTables(params), options)
+}
+
+export const useQuerySourceTableSchema = (
+  { sourceId, tableName }: { sourceId: string; tableName: string },
+  options = {},
+  type: 'source' | 'target' = 'source'
+) => {
+  const { regionId, spaceId } = useParams<IUseParams>()
+  const params = {
+    regionId,
+    spaceId,
+    sourceId,
+    tableName
+  }
+  return useQuery(
+    [`${type}_tableSchema`, params],
+    async () => describeDataSourceTableSchema(params),
+    options
   )
 }
 
@@ -130,14 +157,13 @@ interface MutationSourceParams {
 }
 
 export const useMutationSource = () => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
   return useMutation(async ({ op, ...rest }: MutationSourceParams) => {
     let ret = null
     const params = {
       ...rest,
       regionId,
-      spaceId,
+      spaceId
     }
     if (op === 'create') {
       ret = await createDataSource(params)
@@ -153,5 +179,19 @@ export const useMutationSource = () => {
       ret = await pingDataSource(params)
     }
     return ret
+  })
+}
+
+export const useDescribeDataSource = (sourceId: string) => {
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
+  const params = {
+    space_id: spaceId,
+    regionId,
+    source_id: sourceId
+  }
+
+  const key: any = ['datasourceDetail', params]
+  return useQuery(key, async () => dataSourceManage.describeDataSource(params), {
+    enabled: !!sourceId
   })
 }

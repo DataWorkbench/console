@@ -5,7 +5,7 @@ declare global {
     USER: any
   }
 
-  interface IUseParms {
+  interface IUseParams {
     regionId: string
     spaceId: string
     [k: string]: string
@@ -23,4 +23,6 @@ declare global {
     | 'stop'
     | 'view'
     | 'detail'
+    | 'reload'
+    | 'restart'
 }

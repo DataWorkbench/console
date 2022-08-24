@@ -1,69 +1,66 @@
-import {
-  compInfo,
-  ftpConnectionMode,
-  ftpProtocol,
-  hadoopLink,
-  hbaseLink,
-} from 'views/Space/Upcloud/DataSourceList/constant'
-import { set, trim } from 'lodash-es'
+import { get, set, trim } from 'lodash-es'
 import { HelpCenterLink } from 'components/Link'
 import tw, { css, styled } from 'twin.macro'
 import { strlen } from 'utils/convert'
 import { InputField } from 'components/Input'
 import { Form } from '@QCFE/lego-ui'
 import { getKvTextAreaFieldByMap } from 'components/KVTextArea'
+import { ReactElement } from 'react'
+import {
+  compInfo,
+  ftpAuthMode,
+  ftpConnectionMode,
+  ftpProtocol,
+  hadoopLink,
+  hbaseLink,
+  hostReg,
+  ipReg,
+  SourceType
+} from './constant'
 
-const { TextAreaField, NumberField, RadioGroupField } = Form
+const { TextAreaField, TextField, SelectField, NumberField, RadioGroupField } = Form
 
 const TextAreaWrapper = styled(TextAreaField)(() => [
   css`
     & textarea.textarea {
       ${tw`w-auto min-w-[550px]! min-h-[160px]`}
     }
-  `,
+  `
 ])
 
 const division = ':'
-const mapProps = (props: Record<string, any>) => {
-  const parseValue = (arr: { host: string; port: number }[]) => {
-    if (!Array.isArray(arr)) {
-      return undefined
-    }
-    if (arr.length > 0) {
-      return arr
-        .map(({ host: k, port: v }) => {
-          if (!k || !v) {
-            return ''
-          }
-          return `${k}${division}${v}`
-        })
-        .filter((s) => s !== '')
-        .join('\r\n')
-    }
-    return ''
-  }
-  return {
-    ...props,
-    theme: 'light',
-    value: parseValue(props.value),
-    onChange: (v: string) => {
-      if (props.onChange) {
-        props.onChange(
-          trim(v)
-            .split(/[\r\n]/)
-            .filter((item) => item !== '')
-            .map((item) => {
-              const [host, p] = item.split(division)
-              const port = trim(p)
-              return {
-                host: trim(host),
-                port: /^\d+$/.test(port) ? parseInt(port, 10) : null,
-              }
-            })
-        )
+const mapProps = (props: Record<string, any>) => ({
+  ...props,
+  theme: 'light',
+  addText: '添加地址'
+})
+
+export const str2Arr = (v: string) =>
+  trim(v)
+    .split(/[\r\n]/)
+    .filter((item) => item !== '')
+    .map((item) => {
+      const [host, p] = item.split(division)
+      const port = trim(p)
+      try {
+        return {
+          host: trim(host),
+          port: /^\d+$/.test(port) ? parseInt(port, 10) : undefined
+        }
+      } catch (e) {
+        return {
+          host: trim(host),
+          port: undefined
+        }
       }
-    },
+    })
+
+const hostsRule = (v: string) => {
+  const value = str2Arr(v)
+  if (!value.length) {
+    return false
   }
+  return !value.find(({ host: h, port: p }) => !hostReg.test(h) || !p || p < 0 || p > 65536)
 }
 
 const KVTextAreaFieldWrapper = styled(getKvTextAreaFieldByMap(mapProps))(() => [
@@ -71,20 +68,385 @@ const KVTextAreaFieldWrapper = styled(getKvTextAreaFieldByMap(mapProps))(() => [
     & textarea.textarea {
       ${tw`w-auto! min-w-[500px]! min-h-[100px]`}
     }
-  `,
+  `
 ])
 
-const getFieldsInfo = (type: string, filters?: Set<string>) => {
-  const { database, host, password, port, user } = compInfo
+const getFieldsInfo = (type: SourceType, filters?: Set<string>) => {
+  const { database, host, password, port, user, auth } = compInfo
   let fieldsInfo: any[] = []
   let pwd = { name: '' }
   switch (type) {
-    case 'clickhouse':
-    case 'mysql':
-    case 'postgresql':
-      fieldsInfo = [host, port, database, user, password]
+    case SourceType.Mysql:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', '/'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:mysql://127.0.0.1:3306/testdb',
+              component: InputField,
+              prefix: 'jdbc:mysql://',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
       break
-    case 'ftp':
+    case SourceType.PostgreSQL:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', '/'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:postgresql://127.0.0.1:5432/testdb',
+              component: InputField,
+              prefix: 'jdbc:postgresql://',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
+      break
+    case SourceType.TiDB:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', '/'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:tidb://1.1.1.1',
+              component: InputField,
+              placeholder: '请输入 IP 地址',
+              prefix: 'jdbc:tidb://'
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
+      break
+    case SourceType.Oracle:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', ':'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:oracle:thin:@127.0.0.1:1521:testdb',
+              component: InputField,
+              prefix: 'jdbc:oracle:thin:@',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
+      break
+    case SourceType.SqlServer:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: ' JDBC 连接 URL（IP 地址 : 端口 ； DatabaseName）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', ';'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:jtds:sqlserver://0.0.0.1:1433;DatabaseName=testdb',
+              component: InputField,
+              placeholder: '请输入 IP 地址',
+              prefix: 'jdbc:jtds:sqlserver://',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              component: InputField,
+              prefix: 'DatabaseName=',
+              placeholder: 'Database',
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
+      break
+    case SourceType.DB2:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: 'JDBC 连接 URL（IP 地址 : 端口 / DatabaseName）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', '/'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:db2://127.0.0.1:50000/testdb',
+              component: InputField,
+              placeholder: '请输入 IP 地址',
+              prefix: 'jdbc:db2://',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
+      break
+    case SourceType.SapHana:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: 'JDBC 连接 URL（IP 地址 : 端口？SCHEMA）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', '?'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:sap://127.0.0.1:30015?currentschema=test',
+              component: InputField,
+              placeholder: '请输入 IP 地址',
+              prefix: 'jdbc:sap://',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              name: 'database',
+              label: null,
+              component: InputField,
+              prefix: 'currentschema=',
+              placeholder: '（选填）SCHEMA',
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
+      break
+    case SourceType.ClickHouse:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          label: 'JDBC 连接 URL（IP 地址 : 端口 / Database）',
+          labelClassName: 'label-required',
+          labelHelp: '基于 http 方式连接（http 默认端口是 8123，tcp 连接是 9000 端口）',
+          name: '__dbUrl',
+          space: [':', '/'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：jdbc:clickhouse://127.0.0.1:8123/testdb',
+              component: InputField,
+              placeholder: '请输入 IP 地址',
+              prefix: 'jdbc:clickhouse://',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        user,
+        password
+      ]
+      break
+    case SourceType.Hive:
+      fieldsInfo = [
+        {
+          name: 'defaultFS',
+          component: TextField,
+          label: '主节点地址（NameNode 节点地址）',
+          required: false,
+          placeholder: 'hdfs://127.0.0.1:9000',
+          help: 'hdfs://ServerIP:Port',
+          schemas: [
+            {
+              rule: (v: string) => {
+                if (!v) {
+                  return true
+                }
+                return /^hdfs:\/\/[\w.]+:[\d]+$/.test(v)
+              },
+              message: 'NameNode 节点地址格式不正确',
+              status: 'error'
+            }
+          ]
+        },
+        {
+          fieldType: 'dbUrl',
+          label: 'Hive 元数据库的 JDBC URL（IP 地址 : 端口 / Database）',
+          labelClassName: 'label-required',
+          name: '__dbUrl',
+          space: [':', '/'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: (
+                <div>
+                  <div>例：jdbc:hive2://127.0.0.1:10000/testdb</div>
+                  <div>注：只支持 hive 2.x</div>
+                </div>
+              ),
+              component: InputField,
+              placeholder: '请输入 IP 地址',
+              prefix: 'jdbc:hive2://',
+              css: tw`w-[328px]`
+            },
+            {
+              ...port,
+              label: null,
+              placeholder: '端口号'
+            },
+            {
+              ...database,
+              label: null,
+              help: '允许包含字母、数字 及 “_”',
+              css: tw`w-60`
+            }
+          ]
+        },
+        { ...auth, name: 'hiveAuth' },
+        user,
+        password,
+        {
+          name: 'config',
+          label: 'Hadoop 高级配置',
+          component: TextAreaWrapper,
+          placeholder:
+            'Hadoop 相关的高级参数，比如 HA 配置（集群 HA 模式时需要填写的 core-site.xml 及 hdfs-site.xml 中的配置，开启 kerberos 时包含 kerberos 相关配置）',
+          required: false,
+          help: (
+            <div>
+              <span tw="mr-0.5">可参考</span>
+              <HelpCenterLink
+                href="/manual/source_data/add_data/hive/#Hadoop参数说明"
+                hasIcon
+                isIframe={false}
+              >
+                Hadoop 参数说明文档
+              </HelpCenterLink>
+            </div>
+          ),
+          css: css`
+            & textarea.textarea {
+              ${tw`min-h-[84px]! min-w-[552px]!`}
+            }
+          `
+        }
+      ]
+      break
+    case SourceType.Ftp:
       pwd = { ...password }
       set(pwd, 'schemas[0].help', '请输入密码')
       fieldsInfo = [
@@ -96,12 +458,31 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
           schemas: [
             {
               rule: {
-                required: true,
+                required: true
               },
               help: '请选择协议',
-              status: 'error',
+              status: 'error'
+            }
+          ]
+        },
+
+        {
+          fieldType: 'dbUrl',
+          label: '主机别名和端口（Host : Port）',
+          name: '__dbUrl',
+          space: [':'],
+          items: [
+            {
+              ...host,
+              label: null,
+              help: '例：ftp://127.0.0.1:21',
+              placeholder: '请输入 FTP 的主机别名（Host）'
             },
-          ],
+            {
+              ...port,
+              label: null
+            }
+          ]
         },
         {
           name: 'connection_mode',
@@ -111,12 +492,27 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
           schemas: [
             {
               rule: {
-                required: true,
+                required: true
               },
               help: '请选择连接模式',
-              status: 'error',
-            },
-          ],
+              status: 'error'
+            }
+          ]
+        },
+        {
+          name: 'auth_mode',
+          label: '认证方式',
+          component: RadioGroupField,
+          options: Object.values(ftpAuthMode),
+          schemas: [
+            {
+              rule: {
+                required: true
+              },
+              help: '请选择认证方式',
+              status: 'error'
+            }
+          ]
         },
         {
           name: 'private_key',
@@ -134,7 +530,7 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
             {
               rule: { required: true },
               help: '请输入 SFTP 私钥（Private Key）',
-              status: 'error',
+              status: 'error'
             },
             {
               rule: (value: string) => {
@@ -142,93 +538,26 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
                 return l >= 1 && l <= 2048
               },
               help: '最大长度: 2048, 最小长度: 1',
-              status: 'error',
-            },
-          ],
-        },
-        {
-          fieldType: 'dbUrl',
-          label: '主机别名和端口（Host : Port）',
-          name: '__dbUrl',
-          space: [':'],
-          items: [
-            {
-              ...host,
-              label: null,
-              placeholder: '请输入 FTP 的主机别名（Host）',
-            },
-            {
-              ...port,
-              label: null,
-            },
-          ],
+              status: 'error'
+            }
+          ]
         },
 
         { ...user, placeholder: '请输入用户名' },
-        { ...pwd, placeholder: '请输入密码' },
+        { ...pwd, placeholder: '请输入密码' }
       ]
       break
-    case 'hbase': {
-      const help = (
+    case SourceType.HDFS: {
+      const help = (error?: ReactElement | string) => (
         <div>
-          <span tw="mr-0.5">
-            HBase 集群提供给客户端连接的配置信息。详情可参考
-          </span>
-          {/* <TextLink theme="blue">HBase 配置信息说明文档</TextLink> */}
-          <HelpCenterLink href={hbaseLink} isIframe={false}>
-            HBase 配置信息说明文档
+          {error && <span tw="mr-0.5">{error}</span>}
+          <span tw="mr-0.5 text-neut-8">可参考</span>
+          {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
+          <HelpCenterLink href={hadoopLink} isIframe={false}>
+            Hadoop 参数说明文档
           </HelpCenterLink>
         </div>
       )
-      fieldsInfo = [
-        {
-          component: TextAreaWrapper,
-          name: 'config',
-          label: '配置信息',
-          placeholder: `{
-   "hbase.zookeeper.property.clientPort": "2181",
-   "hbase.rootdir": "hdfs://ns1/hbase",
-   "hbase.cluster.distributed": "true",
-   "hbase.zookeeper.quorum": "node01,node02,node03",
-   "zookeeper.znode.parent": "/hbase"
-} 
-`,
-          help,
-          resize: true,
-          css: tw`w-auto`,
-          schemas: [
-            {
-              rule: {
-                required: true,
-                // matchRegex: hostReg,
-              },
-              help,
-              status: 'error',
-            },
-            {
-              rule: (value: string) => {
-                const l = strlen(value)
-                return l >= 1 && l <= 1048576
-              },
-              help: '最大长度: 16KB, 最小长度: 1',
-              status: 'error',
-            },
-            {
-              rule: (value: string) => {
-                try {
-                  return !!JSON.parse(value)['hbase.zookeeper.quorum']
-                } catch (e) {
-                  return false
-                }
-              },
-              help: '配置必须为 JSON 格式，且 hbase.zookeeper.quorum 不能为空',
-            },
-          ],
-        },
-      ]
-      break
-    }
-    case 'hdfs':
       fieldsInfo = [
         {
           fieldType: 'dbUrl',
@@ -236,22 +565,16 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
           name: '__dbUrl',
           items: [
             {
+              ...host,
               name: 'name_node',
               label: null,
               placeholder: '请输入主节点地址',
               css: tw`w-[330px]`,
               component: InputField,
-              prefix: 'hdfs://',
-              validateOnBlur: true,
-              schemas: [
-                {
-                  rule: { required: true },
-                  help: '请输入主节点地址',
-                  status: 'error',
-                },
-              ],
+              prefix: 'hdfs://'
             },
             {
+              ...port,
               name: 'port',
               label: null,
               placeholder: '请输入',
@@ -259,17 +582,17 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
               css: tw`w-24`,
               min: 1,
               max: 65536,
-              showButton: false,
-              schemas: [
-                {
-                  rule: { required: true },
-                  help: '请输入 port',
-                  status: 'error',
-                },
-              ],
-            },
+              showButton: false
+              // schemas: [
+              //   {
+              //     rule: { required: true },
+              //     help: '请输入 port',
+              //     status: 'error',
+              //   },
+              // ],
+            }
           ],
-          space: [':'],
+          space: [':']
         },
         {
           name: 'config',
@@ -293,23 +616,15 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
             }
           `,
           resize: true,
-          help: (
-            <div>
-              <span tw="mr-0.5">可参考</span>
-              {/* <TextLink color="blue">Hadoop 参数说明文档</TextLink> */}
-              <HelpCenterLink href={hadoopLink} isIframe={false}>
-                Hadoop 参数说明文档
-              </HelpCenterLink>
-            </div>
-          ),
+          help: help(),
           schemas: [
             {
               rule: (value: string) => {
                 const l = strlen(value)
                 return l >= 0 && l <= 1048576
               },
-              help: '最大长度: 16KB, 最小长度: 0',
-              status: 'error',
+              help: help('最大长度: 16KB, 最小长度: 0。'),
+              status: 'error'
             },
             {
               rule: (value: string) => {
@@ -322,13 +637,213 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
                   return false
                 }
               },
-              help: '配置必须为 JSON 格式',
-            },
-          ],
-        },
+              help: help('配置必须为 JSON 格式。')
+            }
+          ]
+        }
       ]
       break
-    case 'kafka':
+    }
+    case SourceType.HBase: {
+      // eslint-disable-next-line @typescript-eslint/no-redeclare
+      const help = (error?: ReactElement | string) => (
+        <div>
+          {error && <span tw="text-red-10">{error}</span>}
+          <span tw="mr-0.5 text-neut-8">HBase 集群提供给客户端连接的配置信息。详情可参考</span>
+          {/* <TextLink theme="blue">HBase 配置信息说明文档</TextLink> */}
+          <HelpCenterLink href={hbaseLink} isIframe={false}>
+            HBase 配置信息说明文档
+          </HelpCenterLink>
+        </div>
+      )
+      fieldsInfo = [
+        {
+          component: TextAreaWrapper,
+          name: 'config',
+          label: '配置信息',
+          placeholder: `{
+   "hbase.zookeeper.property.clientPort": "2181",
+   "hbase.rootdir": "hdfs://ns1/hbase",
+   "hbase.cluster.distributed": "true",
+   "hbase.zookeeper.quorum": "node01,node02,node03",
+   "zookeeper.znode.parent": "/hbase"
+} 
+`,
+          help: help(),
+          resize: true,
+          css: tw`w-auto`,
+          schemas: [
+            {
+              rule: {
+                required: true
+                // matchRegex: hostReg,
+              },
+              help: help('配置信息不能为空。'),
+              status: 'error'
+            },
+            {
+              rule: (value: string) => {
+                const l = strlen(value)
+                return l >= 1 && l <= 1048576
+              },
+              help: help('最大长度: 16KB, 最小长度: 1。'),
+              status: 'error'
+            },
+            {
+              rule: (value: string) => {
+                try {
+                  return !!JSON.parse(value)['hbase.zookeeper.quorum']
+                } catch (e) {
+                  return false
+                }
+              },
+              help: help('配置必须为 JSON 格式，且 hbase.zookeeper.quorum 不能为空。')
+            }
+          ]
+        }
+      ]
+      break
+    }
+    case SourceType.ElasticSearch:
+      fieldsInfo = [
+        {
+          fieldType: 'dbUrl',
+          name: '__dbUrl',
+          label: '连接地址（Host：Port）',
+          space: [':'],
+          items: [
+            {
+              name: 'host',
+              label: null,
+              component: TextField,
+              css: tw`w-[328px]`,
+              placeholder: 'localhost',
+              schemas: [
+                {
+                  rule: {
+                    required: true,
+                    matchRegex: ipReg
+                  },
+                  help: '请输入 ElasticSearch 地址',
+                  status: 'error'
+                }
+              ]
+            },
+            {
+              name: 'port',
+              component: NumberField,
+              css: tw`w-24`,
+              min: 1,
+              max: 65536,
+              placeholder: '9200',
+              showButton: false,
+              schemas: [
+                {
+                  rule: {
+                    required: true
+                  },
+                  help: '请输入 ElasticSearch 端口',
+                  status: 'error'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'version',
+          label: '版本',
+          component: SelectField,
+          options: [
+            {
+              label: '6.x',
+              value: '6'
+            },
+            {
+              label: '7.x',
+              value: '7'
+            }
+          ],
+          schemas: [
+            {
+              rule: {
+                required: true
+              },
+              help: '请选择 ElasticSearch 版本',
+              status: 'error'
+            }
+          ]
+        },
+        { ...auth, name: 'esAuth' },
+        user,
+        password
+      ]
+      break
+    case SourceType.MongoDB:
+      fieldsInfo = [
+        {
+          component: KVTextAreaFieldWrapper,
+          name: 'hosts',
+          title: 'IP:Port',
+          label: '访问地址（Host：Port）',
+          placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
+localhost: 27017
+1.1.1.1: 27017
+          `,
+          css: tw`w-full`,
+          validateOnBlur: true,
+          division: ':',
+          kvs: ['IP', 'Port'],
+          schemas: [
+            {
+              rule: { required: true },
+              help: '请输入访问地址（Host：Port）',
+              status: 'error'
+            },
+            {
+              rule: hostsRule,
+              help: 'Host 或者 Port 格式错误',
+              status: 'error'
+            }
+          ]
+        },
+        { ...database },
+        { ...auth },
+        user,
+        { ...password, placeholder: '请输入访问密码（Password）' }
+      ]
+      break
+    case SourceType.Redis:
+      fieldsInfo = [
+        {
+          component: KVTextAreaFieldWrapper,
+          name: 'hosts',
+          title: 'IP:Port',
+          label: '访问地址（Host：Port）',
+          placeholder: `请输入 IP:Port，多条配置之间换行输入。例如：
+localhost:6379
+1.1.1.1:6379
+          `,
+          css: tw`w-full`,
+          validateOnBlur: true,
+          division: ':',
+          kvs: ['IP', 'Port'],
+          schemas: [
+            {
+              rule: hostsRule,
+              help: 'Host 或者 Port 格式错误',
+              status: 'error'
+            },
+            {
+              rule: { required: true },
+              help: '请输入访问地址（Host：Port）',
+              status: 'error'
+            }
+          ]
+        },
+        { ...password, placeholder: '请输入访问密码（Password）' }
+      ]
+      break
+    case SourceType.Kafka:
       fieldsInfo = [
         {
           component: KVTextAreaFieldWrapper,
@@ -345,34 +860,142 @@ const getFieldsInfo = (type: string, filters?: Set<string>) => {
           kvs: ['IP', 'Port'],
           schemas: [
             {
-              rule: { required: true },
-              help: '请输入 kafkabrokers',
-              status: 'error',
+              rule: hostsRule,
+              help: 'IP 或者 Port 格式错误',
+              status: 'error'
             },
             {
-              rule: (value: { host: string; port: number }[]) => {
-                // const l = strlen(value)
-                // return l >= 1 && l <= 1024
-                if (!Array.isArray(value) || !value.length) {
-                  return false
-                }
-                return !value.find(({ host: h, port: p }) => {
-                  const l = strlen(h)
-                  return l < 1 || l > 64 || !h || !p
-                })
-              },
-              help: 'IP 不能为空且长度为 1 ～ 64，Port 不能为空且为整数，kafka_brokers 个数在 1 ～ 128 之内',
-              status: 'error',
+              rule: { required: true },
+              help: '请输入 kafkabrokers',
+              status: 'error'
             },
-          ],
-        },
+            {
+              rule: () => true,
+              help: 'IP 不能为空且长度为 1 ～ 64，Port 不能为空且为整数，kafka_brokers 个数在 1 ～ 128 之内',
+              status: 'error'
+            }
+          ]
+        }
       ]
-      break
-    case 's3':
       break
     default:
       break
   }
   return filters ? fieldsInfo.filter((i) => filters.has(i.name)) : fieldsInfo
 }
+
+const arr2str = (arr: { host: string; port: number }[]) => {
+  if (!Array.isArray(arr)) {
+    return undefined
+  }
+  if (arr.length > 0) {
+    return arr
+      .map(({ host: k, port: v }) => {
+        if (!k || !v) {
+          return ''
+        }
+        return `${k}${division}${v}`
+      })
+      .filter((s) => s !== '')
+      .join('\r\n')
+  }
+  return ''
+}
+
+export const source2DBStrategy = [
+  {
+    key: 'redis&mongo',
+    check: (source: SourceType) => new Set([SourceType.Redis, SourceType.MongoDB]).has(source),
+    value: (v: Record<string, any>) => ({ ...v, hosts: str2Arr(v.hosts) })
+  },
+  {
+    key: 'hdfs',
+    check: (source: SourceType) => source === SourceType.HDFS,
+    value: (v: Record<string, any>) => ({ ...v, default_fs: `hdfs://${v.name_node}:${v.port}` })
+  },
+  {
+    key: 'kafka',
+    check: (source: SourceType) => source === SourceType.Kafka,
+    value: (v: Record<string, any>) => ({ ...v, kafka_brokers: str2Arr(v.kafka_brokers) })
+  }
+]
+
+export const sourceStrategy = [
+  {
+    key: 'sftp.auth_mode',
+    check: (type: SourceType, name: string) => type === SourceType.Ftp && name === 'auth_mode',
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.ftp.private_key')) {
+        return 2
+      }
+      return 1
+    }
+  },
+  {
+    key: 'hive.hiveAuth',
+    check: (type: SourceType, name: string) => type === SourceType.Hive && name === 'hiveAuth',
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.hive.user')) {
+        return 1
+      }
+      return 2
+    }
+  },
+  {
+    key: 'elastic_search.esAuth',
+    check: (type: SourceType, name: string) =>
+      type === SourceType.ElasticSearch && name === 'esAuth',
+    value: (sourceInfo: Record<string, any>) => {
+      if (
+        get(sourceInfo, 'url.elastic_search.host') &&
+        !get(sourceInfo, 'url.elastic_search.user')
+      ) {
+        return 2
+      }
+      return 1
+    }
+  },
+  {
+    key: 'redis.hosts',
+    check: (type: SourceType, name: string) => type === SourceType.Redis && name === 'hosts',
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.redis.hosts')) {
+        return arr2str(get(sourceInfo, 'url.redis.hosts'))
+      }
+      return ''
+    }
+  },
+  {
+    key: 'kafka.kafka_brokers',
+    check: (type: SourceType, name: string) =>
+      type === SourceType.Kafka && name === 'kafka_brokers',
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.kafka.kafka_brokers')) {
+        return arr2str(get(sourceInfo, 'url.kafka.kafka_brokers'))
+      }
+      return ''
+    }
+  },
+  {
+    key: 'mongo_db.hosts',
+    check: (type: SourceType, name: string) => type === SourceType.MongoDB && name === 'hosts',
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'url.mongo_db.hosts')) {
+        return arr2str(get(sourceInfo, 'url.mongo_db.hosts'))
+      }
+      return ''
+    }
+  },
+  {
+    key: 'mongo_db.auth',
+    check: (type: SourceType, name: string) => type === SourceType.MongoDB && name === 'auth',
+    value: (sourceInfo: Record<string, any>) => {
+      if (get(sourceInfo, 'id')) {
+        return get(sourceInfo, 'url.mongo_db.user') ? 1 : 2
+      }
+      return 1
+    }
+  }
+]
+
 export default getFieldsInfo

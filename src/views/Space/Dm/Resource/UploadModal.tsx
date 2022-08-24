@@ -1,24 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import {
-  Button,
-  Form,
-  Field,
-  Label,
-  Control,
-  Icon,
-  Input,
-  Message,
-} from '@QCFE/lego-ui'
+import { Button, Form, Field, Label, Control, Icon, Input, Message } from '@QCFE/lego-ui'
 import { Loading } from '@QCFE/qingcloud-portal-ui'
 import { useMutationResource } from 'hooks'
-import {
-  DarkModal,
-  Tooltip,
-  Center,
-  AffixLabel,
-  PopConfirm,
-  FlexBox,
-} from 'components'
+import { DarkModal, Tooltip, Center, AffixLabel, PopConfirm, FlexBox } from 'components'
 import tw, { css, styled, theme } from 'twin.macro'
 import { formatBytes } from 'utils/convert'
 import axios from 'axios'
@@ -31,7 +15,7 @@ const ColoredIcon = styled(Icon)(() => [
     svg {
       color: ${theme('colors.green.11')} !important;
     }
-  `,
+  `
 ])
 
 const TextFieldWrapper = styled(TextField)(() => [
@@ -40,7 +24,7 @@ const TextFieldWrapper = styled(TextField)(() => [
     .help {
       ${tw`pl-6`}
     }
-  `,
+  `
 ])
 
 const TextAreaFieldWrapper = styled(TextAreaField)(() => [
@@ -52,13 +36,13 @@ const TextAreaFieldWrapper = styled(TextAreaField)(() => [
         width: 608px !important;
       }
     }
-  `,
+  `
 ])
 
 const InputWapper = styled(Input)(() => [
   css`
     width: 608px !important;
-  `,
+  `
 ])
 
 const ControlWrap = styled(Control)(() => [
@@ -71,7 +55,7 @@ const ControlWrap = styled(Control)(() => [
         ${tw`block`}
       }
     }
-  `,
+  `
 ])
 
 const LoadingWrap = styled(Loading)(() => [
@@ -80,7 +64,7 @@ const LoadingWrap = styled(Loading)(() => [
     span {
       ${tw`bg-white!`}
     }
-  `,
+  `
 ])
 
 interface IFormFields {
@@ -91,13 +75,13 @@ interface IFormFields {
 }
 
 const UploadModal = (props: any) => {
-  const { visible, operation, handleCancel, handleSuccess, initFields } = props
+  const { visible, operation, handleCancel, handleSuccess, initFields, size: sizeConf } = props
 
   const [fields, setFields] = useImmer<IFormFields>({
     id: undefined,
     file: undefined,
     name: '',
-    desc: '',
+    desc: ''
   })
   const [fileTip, setFileTip] = useState('')
   const [isFailed, setIsFailed] = useState(false)
@@ -156,11 +140,11 @@ const UploadModal = (props: any) => {
       Message.error('文件大小为0')
       return
     }
-    if (size > 100 * 1024 * 1024) {
+    if (size > sizeConf) {
       setFileTip('size')
       return
     }
-    if (!/.jar$/.test(name)) {
+    if (!/.(jar|py|zip)$/.test(name)) {
       setFileTip('type')
       return
     }
@@ -183,7 +167,7 @@ const UploadModal = (props: any) => {
         cancel: (c: any) => {
           setCancelUpload(c)
         },
-        ...fields,
+        ...fields
       },
       {
         onSuccess: async (data) => {
@@ -198,7 +182,7 @@ const UploadModal = (props: any) => {
           if (!axios.isCancel(error)) {
             setIsFailed(true)
           }
-        },
+        }
       }
     )
   }
@@ -212,9 +196,7 @@ const UploadModal = (props: any) => {
       maskClosable={false}
       title={
         <FlexBox>
-          <div className="modal-card-title">
-            {operation === 'edit' ? '编辑' : '上传'}程序包
-          </div>
+          <div className="modal-card-title">{operation === 'edit' ? '编辑' : '上传'}程序包</div>
           {!fields.file ? (
             <Icon name="close" tw="cursor-pointer" onClick={closeModal} />
           ) : (
@@ -250,11 +232,7 @@ const UploadModal = (props: any) => {
             </PopConfirm>
           )}
           {operation === 'edit' && (
-            <Button
-              type="primary"
-              onClick={handleOk}
-              loading={mutation.isLoading}
-            >
+            <Button type="primary" onClick={handleOk} loading={mutation.isLoading}>
               确认
             </Button>
           )}
@@ -263,11 +241,7 @@ const UploadModal = (props: any) => {
               theme="light"
               animation="fade"
               placement="top-end"
-              content={
-                <Center tw="h-9 px-3 text-neut-13">
-                  请先添加符合要求的程序包
-                </Center>
-              }
+              content={<Center tw="h-9 px-3 text-neut-13">请先添加符合要求的程序包</Center>}
             >
               <Button disabled tw="text-neut-8!">
                 上传
@@ -280,11 +254,7 @@ const UploadModal = (props: any) => {
               <Tooltip
                 theme="light"
                 animation="fade"
-                content={
-                  <Center tw="h-9 px-3 text-neut-13">
-                    上传完成后将自动关闭对话框
-                  </Center>
-                }
+                content={<Center tw="h-9 px-3 text-neut-13">上传完成后将自动关闭对话框</Center>}
               >
                 <Button type="primary" tw="cursor-not-allowed bg-green-11!">
                   <div>
@@ -312,12 +282,9 @@ const UploadModal = (props: any) => {
               className={fields.file ? 'has-icons-left has-icons-right' : ''}
             >
               {!fields.file ? (
-                <Button
-                  tw="bg-neut-16! border-green-11! text-green-11!"
-                  onClick={handleFile}
-                >
+                <Button tw="bg-neut-16! border-green-11! text-green-11!" onClick={handleFile}>
                   <input
-                    accept=".jar"
+                    accept=".jar,.py,.zip"
                     name="file"
                     type="file"
                     multiple={false}
@@ -330,24 +297,28 @@ const UploadModal = (props: any) => {
                 </Button>
               ) : (
                 <>
-                  <Icon className="is-left" name="jar" />
+                  <Icon
+                    className="is-left"
+                    name={
+                      // eslint-disable-next-line no-nested-ternary
+                      fields.file.name.includes('.jar')
+                        ? 'q-jar-duotone'
+                        : fields.file.name.includes('.py')
+                        ? 'q-python-duotone'
+                        : 'q-zip-duotone'
+                    }
+                  />
                   &nbsp;
                   <InputWapper />
                   <div tw="absolute left-8 top-1/2 -translate-y-1/2">
                     {fields.file.name}
-                    <span tw="text-neut-8 ml-2">
-                      ({formatBytes(fields.file.size, 2)})
-                    </span>
-                    {isFailed && (
-                      <span tw="text-red-10 ml-2">文件上传失败</span>
-                    )}
+                    <span tw="text-neut-8 ml-2">({formatBytes(fields.file.size, 2)})</span>
+                    {isFailed && <span tw="text-red-10 ml-2">文件上传失败</span>}
                   </div>
                   <Tooltip
                     theme="light"
                     placement="top"
-                    content={
-                      <Center tw="h-9 px-3 text-neut-13">移除资源</Center>
-                    }
+                    content={<Center tw="h-9 px-3 text-neut-13">移除资源</Center>}
                   >
                     <PopConfirm
                       type="warning"
@@ -380,7 +351,8 @@ const UploadModal = (props: any) => {
         {operation !== 'edit' && (
           <div tw="pb-3">
             <div tw="pl-28 ml-2 pt-1 text-neut-8">
-              仅支持 .jar 格式文件、大小不超过 100 MB、且仅支持单个上传
+              支持 JAR，PY，ZIP 格式文件、大小不超过 {Math.floor(sizeConf / (1024 * 1024))}{' '}
+              MB、且仅支持单个上传
             </div>
             {fileTip && (
               <div tw="text-red-10 ml-2 pl-28 align-middle mt-1">
@@ -390,11 +362,11 @@ const UploadModal = (props: any) => {
                   size="small"
                   color={{
                     primary: 'transparent',
-                    secondary: '#CF3B37',
+                    secondary: '#CF3B37'
                   }}
                 />
                 {fileTip === 'size'
-                  ? '已选文件超过 100 MB，请重新添加'
+                  ? `已选文件超过 ${Math.floor(sizeConf / (1024 * 1024))} MB，请重新添加`
                   : '已选文件格式不合规，请重新添加'}
               </div>
             )}
@@ -420,15 +392,16 @@ const UploadModal = (props: any) => {
             {
               rule: { required: true },
               help: '请输入程序包显示名',
-              status: 'error',
+              status: 'error'
             },
             {
               rule: {
-                matchRegex: /^(?!_)(?!.*?(_.jar)$)[a-zA-Z0-9_]+((\.jar)$)/,
+                matchRegex:
+                  /(^(?!_)(?!.*?(_.jar)$)[a-zA-Z0-9_]+((\.jar)$))|(^(?!_)(?!.*?(_.py)$)[a-zA-Z0-9_]+((\.py)$))|(^(?!_)(?!.*?(_.zip)$)[a-zA-Z0-9_]+((\.zip)$))/
               },
-              help: '只允许数字、字母或下划线(_) 且以(.jar)结尾 不能以(_)开头',
-              status: 'error',
-            },
+              help: '只允许数字、字母或下划线(_) 且以(.jar 或 .py 或 .zip)结尾 不能以(_)开头',
+              status: 'error'
+            }
           ]}
         />
         <TextAreaFieldWrapper

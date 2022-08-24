@@ -8,6 +8,15 @@ import tw, { css } from 'twin.macro'
  */
 
 const buttonStyles = css`
+  button.button {
+    &.is-outlined,
+    &.is-icon {
+      ${tw`text-button-thirdly-text bg-button-thirdly hover:bg-button-thirdly-hover active:bg-button-thirdly-active border-separator`}
+    }
+  }
+  .dark button.button.is-outlined {
+    ${tw`hover:bg-button-thirdly-hover active:bg-button-thirdly-active`}
+  }
   .dark {
     button.button {
       ${tw`text-white`}
@@ -41,7 +50,7 @@ const buttonStyles = css`
         ${tw`bg-transparent`}
       }
       &.is-black {
-        ${tw`bg-transparent border-neut-15`}
+        ${tw`bg-transparent border-neut-13`}
         &:hover {
           ${tw`bg-neut-13`}
         }

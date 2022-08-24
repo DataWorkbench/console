@@ -8,10 +8,21 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const WebpackBar = require('webpackbar')
 const path = require('path')
 const dotenv = require('dotenv')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
 dotenv.config()
 
 const resolve = (dir) => path.join(__dirname, dir)
 const { NODE_ENV } = process.env
+const envConfigPath = {
+  qa: resolve('./env/.env.qa'),
+  test: resolve('./env/.env.test'),
+}
+
+// dotenv.config({
+//   path: envConfigPath[process.env.CURRENT_ENV],
+// })
+
 const isDev = process.env.NODE_ENV !== 'production'
 const apiUrl = process.env.PROXY_API_URL || 'http://localhost:8888'
 
@@ -33,7 +44,17 @@ let config = {
       {
         test: /\.(t|j)sx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
+        use:[
+          {
+            loader:'babel-loader',
+            options: {
+              cacheDirectory: true,
+              cacheCompression: false,
+              sourceMaps: true,
+              inputSourceMap: true,
+            }
+          }
+        ]
       },
       {
         test: /\.css$/,
@@ -46,6 +67,22 @@ let config = {
             },
           },
         ],
+      },
+      {
+        test: /\.tpl$/,
+        use: [
+          {loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+              cacheCompression: false,
+              sourceMaps: true,
+              inputSourceMap: true,
+            }
+          },
+          {loader: resolve('./loaders/tpl-loader.js'), options: {
+               tplValue: { ...process.env },
+            }},
+        ]
       },
       {
         test: /\.svg$/i,
@@ -124,8 +161,8 @@ let config = {
   },
   optimization: {},
   devServer: {
-    host: 'localhost',
-    allowedHosts: ['local.testing.com'],
+    host: '0.0.0.0',
+    allowedHosts: ['local.testing.com', 'local.qacloud.com', 'local.test.data.qingcloud.link'],
     compress: true,
     hot: true,
     historyApiFallback: {
@@ -138,6 +175,10 @@ let config = {
       progress: true,
     },
     proxy: {
+      '/global_api': {
+        target: apiUrl,
+        changeOrigin: true,
+      },
       '/*_api': {
         target: apiUrl,
         changeOrigin: true,
@@ -160,8 +201,17 @@ let config = {
       },
     },
   },
+  cache: {
+      // 磁盘存储
+      type: "filesystem",
+      buildDependencies: {
+        // 当配置修改时，缓存失效
+        config: [__filename]
+      }
+    },
   plugins: [
     new HtmlWebpackPlugin({
+      favicon: path.resolve(__dirname, 'favicon.ico'),
       filename: 'index.html',
       inject: false,
       template: path.resolve(__dirname, 'index.html'),
@@ -172,7 +222,7 @@ let config = {
       profile: !isDev,
     }),
     new MonacoWebpackPlugin({
-      languages: ['sql', 'python', 'scala'],
+      languages: ['json', 'sql', 'python', 'scala'],
       filename: 'static/js/[name].worker.js',
     }),
   ].filter(Boolean),
@@ -189,6 +239,12 @@ if (isDev) {
 } else {
   config = merge(config, {
     plugins: [
+      new CopyWebpackPlugin({patterns:[
+          {
+            from: ('./config.js'),
+            to: ('./static/js/config.js'),
+          }
+        ]}),
       new MiniCssExtractPlugin({
         filename: 'static/css/[name].[contenthash:7].css',
         chunkFilename: 'static/css/[id].[contenthash:7].css',

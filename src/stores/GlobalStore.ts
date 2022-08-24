@@ -1,6 +1,7 @@
 import { makeAutoObservable, set } from 'mobx'
 // import { parseI18n } from 'utils/convert'
 import type RootStore from './RootStore'
+
 // import { loadRegion } from './api'
 
 export interface MenuType {
@@ -11,6 +12,7 @@ export interface MenuType {
   link?: string
   items?: MenuType[]
 }
+
 export interface MenuInfoType {
   title: string
   menus: MenuType[]
@@ -24,7 +26,7 @@ class GlobalStore {
 
   regionInfos = []
 
-  curRegionInfo = null
+  curRegionInfo: { id: string; name: string; [propName: string]: any } | null = null
 
   menuInfo: MenuInfoType = {
     title: '大数据工作台',
@@ -32,13 +34,13 @@ class GlobalStore {
       {
         name: 'overview',
         title: '概览',
-        icon: 'dashboard',
+        icon: 'dashboard'
       },
       {
         name: 'workspace',
         title: '工作空间',
-        icon: 'project',
-      },
+        icon: 'project'
+      }
       // {
       //   name: 'access_control_policy',
       //   title: '引擎管理',
@@ -80,18 +82,18 @@ class GlobalStore {
       //   icon: 'sub-account',
       //   link: 'https://console.qingcloud.com/',
       // },
-    ],
+    ]
   }
 
   constructor(rootStore: RootStore) {
     makeAutoObservable(this, {
       menuInfo: false,
-      rootStore: false,
+      rootStore: false
     })
     this.rootStore = rootStore
   }
 
-  set(params: { [key: string]: any }) {
+  set = (params: { [key: string]: any }) => {
     set(this, { ...params })
   }
 }

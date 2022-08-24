@@ -3,6 +3,8 @@ import { useStore } from 'stores'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import tw, { styled, css, theme } from 'twin.macro'
 import { useDarkMode } from 'hooks'
+import useIcon from 'hooks/useHooks/useIcon'
+import icons from './icons'
 
 interface NavsProps {
   mod?: string
@@ -25,43 +27,42 @@ const FuncWrapper = styled('div')(({ current }: { current: boolean }) => [
         bottom: 1px;
         background-color: ${theme('colors.green.11')};
       }
-    `,
+    `
 ])
 
 export const Navs = ({ mod }: NavsProps) => {
-  const { regionId, spaceId } =
-    useParams<{ regionId: string; spaceId: string }>()
+  const { regionId, spaceId } = useParams<{ regionId: string; spaceId: string }>()
+  useIcon(icons)
   const location = useLocation()
   const {
     workSpaceStore: { funcList },
-    globalStore,
+    globalStore
   } = useStore()
   const setDarkMode = useDarkMode()
   useEffect(() => {
     const matched = location.pathname.match(/workspace\/[^/]+\/([^/]+)/)
     if (matched && matched[1]) {
-      const darkMode = ['dm', 'ops'].includes(matched[1])
+      const darkMode = ['dm', 'ops', 'dts'].includes(matched[1])
       if (globalStore.darkMode !== darkMode) {
         setDarkMode(darkMode)
         globalStore.set({ darkMode })
       }
     }
   }, [location, globalStore, setDarkMode])
-
   return (
-    <div tw="flex gap-6">
-      {funcList.map(({ title, name }) => (
-        <FuncWrapper key={name} current={mod === name}>
-          <Link
-            tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
-            to={`/${regionId}/workspace/${spaceId}/${
-              name === 'ops' ? 'ops/release' : name
-            }`}
-          >
-            {title}
-          </Link>
-        </FuncWrapper>
-      ))}
+    <div tw="flex gap-6 absolute left-1/2 ml-[-150px]">
+      {funcList
+        .filter((i) => !i.hideInHeader)
+        .map(({ title, name }) => (
+          <FuncWrapper key={name} current={mod === name}>
+            <Link
+              tw="inline-block py-3 hover:text-neut-19 hover:dark:text-white hover:font-semibold"
+              to={`/${regionId}/workspace/${spaceId}/${name === 'ops' ? 'ops/general-view' : name}`}
+            >
+              {title}
+            </Link>
+          </FuncWrapper>
+        ))}
     </div>
   )
 }

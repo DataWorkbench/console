@@ -1,15 +1,92 @@
 import { observer } from 'mobx-react-lite'
+import { useState } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import tw, { css, styled } from 'twin.macro'
-import { Radio, Menu, Icon } from '@QCFE/lego-ui'
+import { Icon, Menu, Radio } from '@QCFE/lego-ui'
 import { useStore } from 'stores'
-import { FlexBox, Center, Box, Card, Tooltip, TextEllipsis } from 'components'
+import { Box, Card, Center, FlexBox, TextEllipsis, Tooltip, TextLink } from 'components'
 import { formatDate, getShortSpaceName } from 'utils/convert'
 import { useWorkSpaceContext } from 'contexts'
-import { OptButton } from './styled'
 
-const { MenuItem, SubMenu } = Menu
+// import { useMemberStore } from 'views/Space/Manage/Member/store'
 
+import { get } from 'lodash-es'
+import { OptButton, roleIcon, RoleNameWrapper } from './styled'
+
+const { MenuItem, SubMenu } = Menu as any
+
+const roleList = [
+  {
+    id: 1,
+    name: '管理员',
+    // icon: 'admin',
+    icon: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    color: '#00aa72',
+    email: 'ramones@yunify.com'
+  },
+  {
+    id: 2,
+    name: '普通用户',
+    // icon: 'user',
+    color: '#a16207',
+    email: 'ramones@yunify.com'
+  },
+  {
+    id: 3,
+    name: '访客',
+    // icon: 'guest',
+    color: '#a48a19',
+    email: 'ramones@yunify.com'
+  },
+  {
+    id: 4,
+    name: '禁用',
+    // icon: 'disable',
+    color: '#a48a19',
+    email: 'ramones@yunify.com'
+  }
+]
+
+const RoleIcons = ({ list }: { list: Record<string, any>[] }) => {
+  const [hoverIndex, setHoverIndex] = useState(0)
+
+  return (
+    <div tw="flex" onMouseLeave={() => setHoverIndex(0)}>
+      {list.slice(0, 3).map((item, idx) => (
+        <div
+          key={item.id}
+          css={roleIcon.item({
+            zIndex: list.length - Math.abs(hoverIndex - idx),
+            index: idx
+          })}
+          onMouseMove={() => setHoverIndex(idx)}
+        >
+          <Tooltip content={item.email} hasPadding theme="darker" twChild={tw`flex`}>
+            <Center tw="h-6 w-6">
+              {item.icon ? (
+                <img src={item.icon} alt="" width={24} />
+              ) : (
+                <Icon name="human" size={14} />
+              )}
+            </Center>
+          </Tooltip>
+        </div>
+      ))}
+      {list.length > 3 && (
+        <div
+          key="others"
+          css={roleIcon.item({
+            zIndex: list.length - Math.abs(hoverIndex - 3),
+            index: 3
+          })}
+          onMouseMove={() => setHoverIndex(3)}
+        >
+          {`+${list.length - 3}`}
+        </div>
+      )}
+    </div>
+  )
+}
 // const DarkTag = tw.span`bg-neut-13 rounded-2xl text-white px-2 py-0.5 inline-block`
 // const GrayTag = tw.span`bg-neut-2 text-neut-15 rounded-2xl px-2 py-0.5 inline-block`
 // const RoleIconWrapper = tw.div`w-6 h-6 bg-neut-3 rounded-full flex items-center justify-center mx-1`
@@ -21,6 +98,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
     : css`
         color: #a16207;
         background: #fffded;
+
         svg {
           color: #a48a19;
           fill: rgba(255, 209, 39, 0.2);
@@ -33,7 +111,7 @@ const StateTag = styled('span')(({ status }: { status: number }) => [
         fill: #dff7ed;
       }
     `,
-  status !== 1 && tw`w-24`,
+  status !== 1 && tw`w-24`
 ])
 
 // const Disp = tw.div`pt-0.5 pr-6 h-7 truncate`
@@ -47,13 +125,29 @@ interface IProps {
   className?: string
 }
 
+const isNetworkInit = (platform: Record<string, any>, space: Record<string, any>) =>
+  platform &&
+  platform.work_in_iaas &&
+  platform.enable_network &&
+  space.status !== 2 &&
+  !space.network_is_init
+
+function getSubName(funcName: string, subFuncList: Record<string, any>[]): string {
+  if (!Array.isArray(subFuncList) || subFuncList.length === 0) {
+    return funcName
+  }
+  return getSubName(subFuncList[0].name, subFuncList[0].subFuncList || subFuncList[0].items)
+}
+
 const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   const stateStore = useWorkSpaceContext()
-  const { isModal, curSpaceId, onItemCheck } = stateStore
+  const { isModal, curSpaceId, onItemCheck, platformConfig } = stateStore
   const history = useHistory()
   const {
-    workSpaceStore: { funcList },
+    workSpaceStore: { funcList }
   } = useStore()
+
+  // const memberStore = useMemberStore()
 
   const handleCardClick = () => {
     if (space.status !== 1) {
@@ -67,7 +161,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
     }
   }
 
-  const handleSpaceOpt = (e, k, v) => {
+  const handleSpaceOpt = (e: MouseEvent, _: never, v: any) => {
     e.stopPropagation()
     stateStore.set({ curSpaceOpt: v, optSpaces: [space] })
   }
@@ -83,16 +177,14 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           </Box> */}
           <Box>
             创建时间：
-            <span tw="text-neut-16">
-              {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
-            </span>
+            <span tw="text-neut-16">{formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}</span>
           </Box>
         </FlexBox>
       )
     }
     return (
       <>
-        {/*         
+        {/*
         <RowWrapper>
           <Box tw="space-x-1">
             <span>我的角色：</span>
@@ -124,12 +216,48 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
           <div>
             <span>
               创建时间：
-              <span tw="text-neut-16">
-                {formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}
-              </span>
+              <span tw="text-neut-16">{formatDate(space.created, 'YYYY-MM-DD HH:mm:ss')}</span>
             </span>
           </div>
         </FlexBox>
+
+        {space.owner === get(window, 'USER.user_id') && (
+          <FlexBox tw="justify-between mt-3 cursor-auto">
+            <div>
+              <div tw="inline">我的角色：</div>
+              <RoleNameWrapper>空间所有者</RoleNameWrapper>
+            </div>
+            {false && (
+              <div tw="flex items-center w-[180px] justify-end">
+                <div tw="inline">空间成员：</div>
+                {/* <RoleNameWrapper>空间所有者</RoleNameWrapper> */}
+                {space.roles ? (
+                  <RoleIcons list={space.roles ?? roleList} />
+                ) : (
+                  <FlexBox tw="gap-1">
+                    <span>无成员</span>
+                    <TextLink
+                      hasIcon={false}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        // memberStore.set({
+                        //   op: 'create',
+                        //   spaceItem: {
+                        //     id: space.id,
+                        //     name: space.name,
+                        //     regionId
+                        //   }
+                        // })
+                      }}
+                    >
+                      添加
+                    </TextLink>
+                  </FlexBox>
+                )}
+              </div>
+            )}
+          </FlexBox>
+        )}
       </>
     )
   }
@@ -138,22 +266,27 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
   return (
     <Card
       className={`${className} group`}
-      tw="rounded border border-t-4 text-neut-8 border-neut-2"
+      tw="rounded border border-t-4 text-neut-8 border-neut-2 relative"
       css={css`
         box-shadow: 0px 5px 15px rgba(3, 5, 7, 0.08);
       `}
       onClick={handleCardClick}
     >
+      {isNetworkInit(stateStore.platformConfig, space) && (
+        <div
+          tw="absolute inset-0 z-50"
+          title="请单击以绑定网络信息"
+          onClick={(e) => {
+            handleSpaceOpt(e as unknown as MouseEvent, undefined as never, 'network')
+          }}
+        />
+      )}
       <div
         tw="px-5 pt-4 pb-5 relative cursor-pointer"
         css={space.status !== 1 && tw`cursor-default`}
       >
         {isModal && (
-          <Radio
-            tw="absolute top-2 right-3"
-            value={space.id}
-            checked={space.id === curSpaceId}
-          />
+          <Radio tw="absolute top-2 right-3" value={space.id} checked={space.id === curSpaceId} />
         )}
         <FlexBox tw="mb-7 items-center">
           <FlexBox tw="space-x-3 w-full items-center">
@@ -180,12 +313,10 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                 </StateTag>
               </FlexBox>
               <div tw="pt-0.5 h-7 truncate" title={space.desc || ''}>
-                <TextEllipsis twStyle={tw`text-neut-8`}>
-                  {space.desc || '暂无描述'}
-                </TextEllipsis>
+                <TextEllipsis twStyle={tw`text-neut-8`}>{space.desc || '暂无描述'}</TextEllipsis>
               </div>
             </Box>
-            {!isModal && (
+            {!isModal && space.owner === get(window, 'USER.user_id') && (
               <div
                 tw="self-baseline"
                 onClick={(e: React.SyntheticEvent) => {
@@ -208,10 +339,7 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
                       </MenuItem>
                       {!disableStatus && (
                         <MenuItem value="disable" disabled={disableStatus}>
-                          <i
-                            className="if if-minus-square"
-                            tw="text-base mr-2"
-                          />
+                          <i className="if if-minus-square" tw="text-base mr-2" />
                           禁用工作空间
                         </MenuItem>
                       )}
@@ -244,89 +372,97 @@ const SpaceItem = observer(({ regionId, space, className }: IProps) => {
             e.stopPropagation()
           }}
         >
-          {funcList.map(({ name: funcName, title, subFuncList }) => (
-            <Tooltip
-              key={funcName}
-              theme={disableStatus ? 'darker' : 'light'}
-              placement={disableStatus ? 'top' : 'bottom'}
-              content={
-                <>
-                  {disableStatus ? (
-                    <div tw="px-3 py-2">
-                      该工作空间已被禁用，暂时无法操作其工作项
-                    </div>
-                  ) : (
-                    <Menu
-                      mode="inline"
-                      defaultExpandKeys={['stream']}
-                      onClick={(e: React.SyntheticEvent) => {
-                        e.stopPropagation()
-                      }}
-                    >
-                      {subFuncList.map((subFunc: any) => {
-                        const subItems = subFunc.items || []
-                        return subItems.length ? (
-                          <SubMenu
-                            key={subFunc.name}
-                            onClick={(e: React.SyntheticEvent) => {
-                              e.stopPropagation()
-                            }}
-                            title={
-                              <span>
-                                <Icon name={subFunc.icon} />
-                                <span>{subFunc.title}</span>
-                              </span>
-                            }
-                            overlayClassName="sub"
-                          >
-                            {subItems.map((secondMenu: any) => (
-                              <MenuItem key={secondMenu.name}>
-                                <Link
-                                  to={`/${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
-                                  tw="flex items-center py-2 pl-6! cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
-                                >
-                                  {secondMenu.title}
-                                </Link>
-                              </MenuItem>
-                            ))}
-                          </SubMenu>
-                        ) : (
-                          <MenuItem key={subFunc.name}>
-                            <Link
-                              to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
-                              tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+          {funcList.map(({ name: funcName, title, subFuncList }) => {
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            const disableStatus = space.status === 2 || subFuncList.length === 0
+            const disableMsg =
+              // eslint-disable-next-line no-nested-ternary
+              space.status === 2
+                ? '该工作空间已被禁用，暂时无法操作其工作项'
+                : !platformConfig?.work_in_iaas
+                ? '敬请期待'
+                : ''
+
+            return (
+              <Tooltip
+                key={funcName}
+                theme={disableStatus ? 'darker' : 'light'}
+                placement={disableStatus ? 'top' : 'bottom'}
+                content={
+                  <>
+                    {disableStatus ? (
+                      <div tw="px-3 py-2">{disableMsg}</div>
+                    ) : (
+                      <Menu
+                        mode="inline"
+                        defaultExpandKeys={['stream', 'sync', 'alert']}
+                        onClick={(e: React.SyntheticEvent) => {
+                          e.stopPropagation()
+                        }}
+                      >
+                        {subFuncList.map((subFunc: any) => {
+                          const subItems = subFunc.items || []
+                          return subItems.length ? (
+                            <SubMenu
+                              key={subFunc.name}
+                              onClick={(e: React.SyntheticEvent) => {
+                                e.stopPropagation()
+                              }}
+                              title={
+                                <span>
+                                  <Icon name={subFunc.icon} />
+                                  <span>{subFunc.title}</span>
+                                </span>
+                              }
+                              overlayClassName="sub"
                             >
-                              <Icon name={subFunc.icon} type="dark" tw="mr-1" />
-                              {subFunc.title}
-                            </Link>
-                          </MenuItem>
-                        )
-                      })}
-                    </Menu>
-                  )}
-                </>
-              }
-            >
-              <Link
-                to={`/${regionId}/workspace/${space.id}/${
-                  funcName === 'ops' ? 'ops/release' : funcName
-                }`}
-                onClick={(e) => {
-                  if (disableStatus) {
-                    e.preventDefault()
-                  }
-                }}
-                tw="inline-block"
+                              {subItems.map((secondMenu: any) => (
+                                <MenuItem key={secondMenu.name}>
+                                  <Link
+                                    to={`/${regionId}/workspace/${space.id}/${funcName}/${secondMenu.name}`}
+                                    tw="flex items-center py-2 pl-6! cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                                  >
+                                    {secondMenu.title}
+                                  </Link>
+                                </MenuItem>
+                              ))}
+                            </SubMenu>
+                          ) : (
+                            <MenuItem key={subFunc.name}>
+                              <Link
+                                to={`/${regionId}/workspace/${space.id}/${funcName}/${subFunc.name}`}
+                                tw="flex items-center py-2 px-5 cursor-pointer text-neut-15 hover:bg-neut-1 hover:text-current"
+                              >
+                                <Icon name={subFunc.icon} type="dark" tw="mr-1" />
+                                {subFunc.title}
+                              </Link>
+                            </MenuItem>
+                          )
+                        })}
+                      </Menu>
+                    )}
+                  </>
+                }
               >
-                <OptButton
-                  disabled={disableStatus}
-                  tw="px-6 xl:px-9 2xl:px-7 py-1"
+                <Link
+                  to={`/${regionId}/workspace/${space.id}/${funcName}/${getSubName(
+                    funcName,
+                    subFuncList
+                  )}`}
+                  onClick={(e) => {
+                    if (disableStatus) {
+                      e.preventDefault()
+                    }
+                  }}
+                  tw="inline-block"
                 >
-                  {title}
-                </OptButton>
-              </Link>
-            </Tooltip>
-          ))}
+                  <OptButton disabled={disableStatus} tw="py-1">
+                    {title}
+                  </OptButton>
+                </Link>
+              </Tooltip>
+            )
+          })}
         </div>
       )}
     </Card>
