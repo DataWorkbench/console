@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useMeasure } from 'react-use'
@@ -16,11 +17,12 @@ function renderBottomArrow(elem) {
     stroke: '#D5DEE7',
     'stroke-width': '2',
     'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
+    'stroke-linejoin': 'round'
   }
   const r = 5
   const spoint = [10, 4]
   const len = el.offsetWidth - r * 2
+
   draw
     .circle(r * 2)
     .attr(attr)
@@ -30,7 +32,7 @@ function renderBottomArrow(elem) {
     .polyline([
       [len - 8, spoint[1] + r - 8],
       [len, spoint[1] + r],
-      [len - 8, spoint[1] + r + 8],
+      [len - 8, spoint[1] + r + 8]
     ])
     .attr(attr)
 }
@@ -46,7 +48,7 @@ function renderBottomUpArrow(elem) {
     stroke: '#D5DEE7',
     'stroke-width': '2',
     'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
+    'stroke-linejoin': 'round'
   }
   draw.path(`M 28 6 v 60`).attr(attr)
   draw.circle(10).move(23, 66).attr(attr)
@@ -62,7 +64,7 @@ function renderTlArrow(elem) {
     stroke: '#D5DEE7',
     'stroke-width': '2',
     'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
+    'stroke-linejoin': 'round'
   }
   const arcr = 8
   const len = el.offsetWidth
@@ -80,7 +82,7 @@ function renderTrArrow(elem) {
     stroke: '#D5DEE7',
     'stroke-width': '2',
     'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
+    'stroke-linejoin': 'round'
   }
   const r = 5
   const len = el.offsetWidth
@@ -96,42 +98,42 @@ function renderTrArrow(elem) {
 
 const Flow = ({ items }) => {
   const arrowEl = useRef([])
-  const bmArrowEl = useRef([])
-  const tlArrowEl = useRef(null)
-  const trArrowEl = useRef(null)
+  // const bmArrowEl = useRef([])
+  // const tlArrowEl = useRef(null)
+  // const trArrowEl = useRef(null)
   const [rootRef, { width: rootWidth }] = useMeasure()
   const flowItems = items.slice(0, -1)
-  const opsItem = items.slice(-1)[0]
+  // const opsItem = items.slice(-1)[0]
   const flowItemsLen = flowItems.length
 
   useEffect(() => {
     arrowEl.current.forEach((el) => renderBottomArrow(el))
-    bmArrowEl.current.forEach((el) => renderBottomUpArrow(el))
-    renderTlArrow(tlArrowEl.current)
-    renderTrArrow(trArrowEl.current)
+    // bmArrowEl.current.forEach((el) => renderBottomUpArrow(el))
+    // renderTlArrow(tlArrowEl.current)
+    // renderTrArrow(trArrowEl.current)
   }, [rootWidth])
 
   return (
     <div tw="w-full" ref={rootRef}>
-      <div tw="flex justify-between h-24">
+      {/* <div tw="flex justify-between h-24">
         <div tw="flex-1" ref={tlArrowEl} />
         <div tw="relative">
           <FlowCell item={opsItem} placement="top" />
         </div>
         <div tw="flex-1" ref={trArrowEl} />
-      </div>
+      </div> */}
       <div tw="flex h-24">
         {flowItems.map((item, i) => (
           <React.Fragment key={item.text}>
             <div tw="relative">
-              {i !== 0 && i < flowItemsLen - 1 && (
+              {/* {i !== 0 && i < flowItemsLen - 1 && (
                 <div
                   ref={(el) => {
                     bmArrowEl.current.push(el)
                   }}
                   tw="absolute -top-20 bottom-24 left-0 right-0"
                 />
-              )}
+              )} */}
               <FlowCell item={item} placement="bottom" />
             </div>
             {i < flowItemsLen - 1 && (
@@ -139,7 +141,7 @@ const Flow = ({ items }) => {
                 ref={(el) => {
                   arrowEl.current[i] = el
                 }}
-                css={[tw`flex pt-6`, i === 1 ? tw`flex-[2]` : tw`flex-1`]}
+                css={[tw`flex pt-6`, tw`flex-1`]}
               />
             )}
           </React.Fragment>
@@ -150,7 +152,7 @@ const Flow = ({ items }) => {
 }
 
 Flow.propTypes = {
-  items: PropTypes.array,
+  items: PropTypes.array
 }
 
 export default Flow

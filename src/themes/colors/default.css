@@ -1,0 +1,378 @@
+@import '~antd/dist/antd.css';
+
+:root {
+  /* brand */
+  --dw-color-brand-primary: #15a675; /* green 11 */
+  --dw-color-brand-primary-hover: #13966a; /* green 12 */
+  --dw-color-brand-secondary: #9ddfc9; /* green 4 */
+
+  /* font */
+  --dw-color-text-h1: #09121a; /* N19 */
+  --dw-color-text-h2: #273849; /* N16 */
+  --dw-color-text-h3: #324558; /* N15 */
+  --dw-color-text-default: #324558; /* N15 */
+  --dw-color-text-secondary: #4c5e70; /* N13 */
+  --dw-color-text-placeholder: #939ea9; /* N8 */
+  --dw-color-text-white: #fff;
+  --dw-color-text-black: #020508; /* N20 */
+
+  /* bg */
+  --dw-color-background: #e4ebf1; /* N2 */
+  --dw-color-background-dark: #d5dee7; /* N3 */
+  --dw-color-background-light: #f5f7fa; /* N1 */
+  --dw-color-background-white: #fff;
+  --dw-color-background-black: #020508; /* N20 */
+  --dw-color-background-darkdrop: rgba(2, 5, 8, 0.5); /* N20, 0.5 */
+
+  /* border */
+
+  --dw-color-border-separator-default: #d5dee7; /* N3 */
+  --dw-color-border-separator-light: #e4ebf1; /* N2 */
+
+  /* info */
+  --dw-color-function-info-default: #2193d3; /* blue 11 */
+  --dw-color-function-info-hover: #1e85c7; /* blue 12 */
+  --dw-color-function-info-active: #0b75b7; /* blue 13 */
+  --dw-color-function-info-border: #2193d3; /* blue 11 */
+  --dw-color-function-info-bg: #f7fcff; /* N8 */
+  --dw-color-function-info-light: #e0f2fe;
+
+  /* success */
+  --dw-color-function-success-default: #15a675; /* green 11 */
+  --dw-color-function-success-hover: #13966a; /* green 12 */
+  --dw-color-function-success-active: #11865f; /* green 13 */
+  --dw-color-function-success-border: #15a675; /* green 11 */
+  --dw-color-function-success-bg: #f5fffd; /* green 0 */
+
+  /* error */
+  --dw-color-function-error-default: #cf3b37; /* red 10 */
+  --dw-color-function-error-hover: #bd3633; /* red 12 */
+  --dw-color-function-error-active: #992c2b; /* red 13 */
+  --dw-color-function-error-border: #ca2621; /* red 11 */
+  --dw-color-function-error-bg: #fff9fa; /* red 0 */
+
+  /* warning */
+  --dw-color-function-warning-default: #ffd127; /* y 11 */
+  --dw-color-function-warning-hover: #e9c322; /* y 12 */
+  --dw-color-function-warning-active: #a48a19; /* y 13 */
+  --dw-color-function-warning-border: #ffd127; /* y 11 */
+  --dw-color-function-warning-bg: #fffded; /* y 0 */
+
+  /* link */
+  --dw-color-function-link-default: #0366d6;
+  --dw-color-function-link-hover: #035cc1;
+
+  /* icon */
+  --dw-color-icon-single-dark: #324558; /* N15 */
+  --dw-color-icon-single-darkgray: #4c5e70; /* N13 */
+  --dw-color-icon-single-gray: #939ea9; /* N8 */
+  --dw-color-icon-single-info: #2193d3; /* blue 11 */
+  --dw-color-icon-single-success: #15a675; /* green 11 */
+  --dw-color-icon-single-warning: #ffd127; /* y 10 */
+  --dw-color-icon-single-error: #cf3b37; /* red 10 */
+  --dw-color-icon-single-white: #fff;
+
+  /* double-icon */
+  --dw-color-icon-double-dark-gray: #324558; /* N15 */
+  --dw-color-icon-double-light-gray: #b6c2cd; /* N5 */
+  --dw-color-icon-double-dark-green: #15a675; /* green 11 */
+  --dw-color-icon-double-light-green: #9ddfc9; /* green 4 */
+  --dw-color-icon-double-dark-white: #fff;
+  --dw-color-icon-double-light-white: #fff;
+
+  /* button */
+
+  /* button primary */
+  --dw-color-button-primary-default: #15a675; /* green 11 */
+  --dw-color-button-primary-hover: #13966a; /* green 12 */
+  --dw-color-button-primary-active: #11865f; /* green 13 */
+  --dw-color-button-primary-text: #fff;
+
+  /* button secondary */
+  --dw-color-button-secondary-default: #141f29; /* N18 */
+  --dw-color-button-secondary-hover: #09121a; /* N19 */
+  --dw-color-button-secondary-active: #020508; /* N20 */
+  --dw-color-button-secondary-text: #fff;
+
+  /* button thirdly */
+  --dw-color-button-thirdly-default: #fff;
+  --dw-color-button-thirdly-hover: #f5f7fa; /* N1 */
+  --dw-color-button-thirdly-active: #e4ebf1; /* N2 */
+  --dw-color-button-thirdly-text: #324558; /* N15 */
+
+  /* button ghost */
+  --dw-color-button-ghost-default: #fff;
+  --dw-color-button-ghost-hover: #f5fffd; /* g0 */
+  --dw-color-button-ghost-active: #dff7f0; /* g1 */
+  --dw-color-button-ghost-text: #15a675; /* green 11 */
+
+  /* button dangerous */
+  --dw-color-button-danger-default: #cf3b37; /* red 10 */
+  --dw-color-button-danger-hover: #bd3633; /* red 11 */
+  --dw-color-button-danger-active: #992c2b; /* red 13 */
+  --dw-color-button-danger-text: #fff;
+
+  /* button disabled */
+  --dw-color-button-disabled-default: #f5f7fa; /* N1 */
+  --dw-color-button-disabled-text: #939ea9; /* N8 */
+}
+
+.dark {
+  /* brand */
+  --dw-color-brand-primary: #15a675; /* green 11 */
+  --dw-color-brand-primary-hover: #13966a; /* green 12 */
+  --dw-color-brand-secondary: #9ddfc9; /* green 4 */
+
+  /* font */
+  --dw-color-text-h1: #fff;
+  --dw-color-text-h2: #d5dee7; /* N3 */
+  --dw-color-text-h3: #c6d1dc; /* N4 */
+  --dw-color-text-default: #fff;
+  --dw-color-text-secondary: #939ea9; /* N8 */
+  --dw-color-text-placeholder: #4c5e70; /* N13 */
+  --dw-color-text-white: #fff;
+  --dw-color-text-black: #09121b; /* N19 */
+
+  /* bg */
+  --dw-color-background: #1d2b3a; /* N17 */
+  --dw-color-background-dark: #141f29; /* N18 */
+  --dw-color-background-light: #273849; /* N16 */
+  --dw-color-background-secondary: #4c5e70; /* N13 */
+  --dw-color-background-white: #fff;
+  --dw-color-background-black: #020508; /* N20 */
+  --dw-color-background-darkdrop: rgba(20, 31, 41, 0.9); /* N18, 0.9 */
+
+  /* border */
+
+  --dw-color-border-separator-default: #4c5e70; /* N13 */
+  --dw-color-border-separator-light: #324558; /* N15 */
+
+  /* info */
+  --dw-color-function-info-default: #2193d3; /* blue 11 */
+  --dw-color-function-info-hover: #1e85c7; /* blue 12 */
+  --dw-color-function-info-active: #0b75b7; /* blue 13 */
+  --dw-color-function-info-border: #2193d3; /* blue 11 */
+  --dw-color-function-info-bg: rgba(33, 147, 211, 0.2); /* N11, 0.2 */
+  --dw-color-function-info-light: #e0f2fe;
+
+  /* success */
+  --dw-color-function-success-default: #15a675; /* green 11 */
+  --dw-color-function-success-hover: #13966a; /* green 12 */
+  --dw-color-function-success-active: #11865f; /* green 13 */
+  --dw-color-function-success-border: #15a675; /* green 11 */
+  --dw-color-function-success-bg: rgba(21, 166, 117, 0.2); /* green 11, 0.2 */
+
+  /* error */
+  --dw-color-function-error-default: #cf3b37; /* red 10 */
+  --dw-color-function-error-hover: #bd3633; /* red 12 */
+  --dw-color-function-error-active: #992c2b; /* red 13 */
+  --dw-color-function-error-border: #ca2621; /* red 11 */
+  --dw-color-function-error-bg: rgba(206, 59, 54, 0.2); /* red 11, 0.2 */
+
+  /* warning */
+  --dw-color-function-warning-default: #ffd127; /* y 11 */
+  --dw-color-function-warning-hover: #e9c322; /* y 12 */
+  --dw-color-function-warning-active: #a48a19; /* y 13 */
+  --dw-color-function-warning-border: #ffd127; /* y 11 */
+  --dw-color-function-warning-bg: rgba(255, 209, 39, 0.2); /* y11, 0.2 */
+
+  /* link */
+  --dw-color-function-link-default: #0366d6;
+  --dw-color-function-link-hover: #035cc1;
+
+  /* icon */
+  --dw-color-icon-single-dark: #324558; /* N15 */
+  --dw-color-icon-single-darkgray: #4c5e70; /* N13 */
+  --dw-color-icon-single-gray: #939ea9; /* N8 */
+  --dw-color-icon-single-info: #2193d3; /* blue 11 */
+  --dw-color-icon-single-success: #15a675; /* green 11 */
+  --dw-color-icon-single-warning: #ffd127; /* y 10 */
+  --dw-color-icon-single-error: #cf3b37; /* red 10 */
+  --dw-color-icon-single-white: #fff;
+
+  /* double-icon */
+  --dw-color-icon-double-dark-gray: #324558; /* N15 */
+  --dw-color-icon-double-light-gray: #b6c2cd; /* N5 */
+  --dw-color-icon-double-dark-green: #15a675; /* green 11 */
+  --dw-color-icon-double-light-green: #9ddfc9; /* green 4 */
+  --dw-color-icon-double-dark-white: #fff;
+  --dw-color-icon-double-light-white: rgba(255, 255, 255, 0.6); /* white, 0.6 */
+
+  /* button */
+
+  /* button primary */
+  --dw-color-button-primary-default: #15a675; /* green 11 */
+  --dw-color-button-primary-hover: #13966a; /* green 12 */
+  --dw-color-button-primary-active: #11865f; /* green 13 */
+  --dw-color-button-primary-text: #fff;
+
+  /* button secondary */
+  --dw-color-button-secondary-default: #4c5e70; /* N13 */
+  --dw-color-button-secondary-hover: #324558; /* N15 */
+  --dw-color-button-secondary-active: #1f3042; /* N?? */
+  --dw-color-button-secondary-text: #fff;
+
+  /* button thirdly */
+  --dw-color-button-thirdly-default: #273849; /* N16 */
+  --dw-color-button-thirdly-hover: #4c5e70; /* N13 */
+  --dw-color-button-thirdly-active: #324558; /* N15 */
+  --dw-color-button-thirdly-text: #fff;
+
+  /* button ghost */
+  --dw-color-button-ghost-default: #fff;
+  --dw-color-button-ghost-hover: #f5fffd; /* g0 */
+  --dw-color-button-ghost-active: #dff7f0; /* g1 */
+  --dw-color-button-ghost-text: #15a675; /* green 11 */
+
+  /* button dangerous */
+  --dw-color-button-danger-default: #cf3b37; /* red 10 */
+  --dw-color-button-danger-hover: #bd3633; /* red 11 */
+  --dw-color-button-danger-active: #992c2b; /* red 13 */
+  --dw-color-button-danger-text: #fff;
+
+  /* button disabled */
+  --dw-color-button-disabled-default: #f5f7fa; /* N1 */
+  --dw-color-button-disabled-text: #939ea9; /* N8 */
+}
+
+body#body {
+  font-size: 12px;
+}
+
+/*  enfi 项目颜色改变 */
+.lego-toggles.checked {
+  background-color: #85b0d6 !important;
+}
+.dark
+  .radio-button.is-default.button.radio-button-wrapper.radio-button-wrapper-checked.checked.is-default.button {
+  background-color: rgb(133, 176, 214, 0.1) !important;
+  color: #85b0d6 !important;
+  border-color: #85b0d6 !important;
+}
+.dark .radio-button.is-default.button.radio-button-wrapper.is-default.button:hover {
+  color: #85b0d6 !important;
+}
+.dark .radio.radio-wrapper.radio-wrapper-checked.checked::before {
+  background-color: #85b0d6 !important;
+}
+.checkbox.checkbox-wrapper.checkbox-wrapper-checked.checked::before {
+  background-color: #85b0d6 !important;
+}
+.checkbox.checkbox-wrapper.indeterminate::before {
+  background-color: #85b0d6 !important;
+}
+.radio.radio-wrapper:hover::before {
+  border-color: #85b0d6 !important;
+}
+input[type='text']:focus {
+  border-color: #85b0d6 !important;
+}
+input[type='number']:focus {
+  border-color: #85b0d6 !important;
+}
+.button.is-primary {
+  background-color: #014581 !important;
+}
+.button.is-primary:hover {
+  background-color: #024d8e !important;
+}
+.radio-button.is-default:hover {
+  color: #024d8e !important;
+}
+.radio-button.is-default.checked {
+  border-color: #024d8e !important;
+  color: #024d8e !important;
+  background-color: #d2e9ff !important;
+}
+
+.button.is-outlined {
+  border-color: #85b0d6 !important;
+  color: #85b0d6 !important;
+}
+.button.is-outlined:hover {
+  background-color: rgb(133, 176, 214, 0.1) !important;
+}
+
+.button.is-outlined:disabled {
+  background-color: rgba(76, 94, 112, var(--tw-bg-opacity)) !important;
+  border-color: rgba(76, 94, 112, var(--tw-border-opacity)) !important;
+  color: #939ea9 !important;
+}
+.textarea:focus {
+  border-color: #85b0d6 !important;
+}
+
+/* 数据源管理 side-content hover 样式 */
+.level-row:not(.level-row-disabled):hover .icon-title {
+  color: #024d8e !important;
+}
+
+.level-row:not(.level-row-disabled):hover .icon-title svg.qicon {
+  fill: #024d8e !important;
+  color: #9fc2e0 !important;
+}
+
+/* 数据源管理 side-content selected 样式 */
+.side-content .selected-row {
+  color: #fff !important;
+  background-color: #024d8e !important;
+}
+
+.side-menu-wrap .side-menu .selected-row .icon-title {
+  border-left: 2px solid #85b0d6 !important;
+}
+.side-menu .selected-row .icon-title .qicon {
+  fill: #9fc2e0 !important;
+  color: #fff !important;
+}
+
+.side-content .selected .icon .qicon {
+  color: #324558 !important;
+  fill: #b6c2cd !important;
+}
+
+.selected-row:not(.level-row-disabled):hover .icon-title {
+  color: #fff !important;
+}
+
+.side-menu .selected-row:not(.level-row-disabled):hover .icon-title svg.qicon {
+  fill: #9fc2e0 !important;
+  color: #fff !important;
+}
+
+/* dark 模式  菜单栏 */
+.dark .side-content .selected-row {
+  background-color: rgba(2, 77, 142, 0.4) !important;
+}
+
+.dark .side-content .selected-row .m-l-8 {
+  color: #d2e9ff !important;
+}
+
+.dark .side-menu .selected-row .icon-title .qicon {
+  color: #fff !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+
+.dark .icon-li.selected .icon .qicon {
+  color: #fff !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+
+.dark .side-menu .level-row:not(.level-row-disabled):hover .icon-title {
+  color: #d2e9ff !important;
+}
+
+.side-menu .level-row:not(.level-row-disabled):hover .icon-title .qicon {
+  color: #fff !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+
+.dark .side-menu .level-row:not(.level-row-disabled):hover .icon-title .qicon {
+  color: #fff !important;
+  fill: rgba(133, 176, 214, 0.1) !important;
+}
+
+.dark .level-row.selected-row {
+  border-color: #024d8e !important;
+}

@@ -10,10 +10,8 @@ const pageTabsData = [
     description:
       '提供全托管式的 Flink 集群管理，在计算集群中，您只需关注所需计算资源的大小、并发度。',
     icon: 'pod',
-    helpLink: getHelpCenterLink(
-      '/manual/data_development/flink_cluster/create_cluster/'
-    ),
-  },
+    helpLink: getHelpCenterLink('/manual/flink_cluster/create_cluster/')
+  }
 ]
 
 const PageTabWrap = styled('div')(() => [
@@ -21,20 +19,18 @@ const PageTabWrap = styled('div')(() => [
     .tab-description {
       ${tw`h-10!`}
     }
-  `,
+  `
 ])
 
-const Cluster = () => {
-  return (
-    <FlexBox orient="column" tw="p-5 min-h-full">
-      <PageTabWrap>
-        <PageTab tabs={pageTabsData} />
-      </PageTabWrap>
-      <div tw="flex flex-1 bg-neut-16 px-5 pt-3">
-        <ClusterTable />
-      </div>
-    </FlexBox>
-  )
-}
+const Cluster = () => (
+  <FlexBox orient="column" tw="p-5 min-h-full">
+    <PageTabWrap>
+      <PageTab tabs={pageTabsData} />
+    </PageTabWrap>
+    <div tw="flex flex-1 bg-neut-16 px-5 pt-3">
+      <ClusterTable />
+    </div>
+  </FlexBox>
+)
 
 export default Cluster

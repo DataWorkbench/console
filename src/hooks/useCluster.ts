@@ -9,6 +9,8 @@ import {
   startFlinkClusters,
   stopFlinkClusters,
   describeResourceBinding,
+  getDescribeFlinkCluster,
+  restartFlinkClusters
 } from 'stores/api'
 import { get, omit } from 'lodash-es'
 
@@ -17,11 +19,11 @@ interface IRouteParams {
   spaceId: string
 }
 
-export const useQueryFlinkVersions = () => {
+export const useQueryFlinkVersions = (type?: number) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  const queryKey = 'flinkVersions'
+  const queryKey = ['flinkVersions', {}]
   return useQuery(queryKey, async () => {
-    const ret = await listAvailableFlinkVersions({ spaceId, regionId })
+    const ret = await listAvailableFlinkVersions({ spaceId, regionId, type })
     return get(ret, 'items', [])
   })
 }
@@ -37,11 +39,11 @@ export const useQueryFlinkClusters = (filter: any) => {
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   queryKey = ['flinkCluster', params]
   return useQuery(queryKey, async () => listFlinkClusters(params), {
-    keepPreviousData: true,
+    keepPreviousData: true
   })
 }
 
@@ -50,79 +52,82 @@ export const useQueryBindResouce = (ids: string[], options = {}) => {
   const params = {
     regionId,
     spaceId,
-    ids,
+    ids
   }
   const key = ['bindResource', params]
   return {
     ret: useQuery(key, async () => describeResourceBinding(params), options),
-    key,
+    key
   }
 }
 
-export const useQueryInfiniteFlinkClusters = ({
-  filter = {},
-  enabled = true,
-}) => {
+export const useQueryInfiniteFlinkClusters = ({ filter = {}, enabled = true }) => {
   const { regionId, spaceId } = useParams<IRouteParams>()
   const params = {
     regionId,
     spaceId,
     limit: 10,
     offset: 0,
-    ...filter,
+    ...filter
   }
   const qryKey = ['flinkCluster', omit(params, 'offset')]
-  return useInfiniteQuery(
-    qryKey,
-    async ({ pageParam = params }) => listFlinkClusters(pageParam),
-    {
-      enabled,
-      getNextPageParam: (lastPage, allPages) => {
-        if (lastPage.has_more) {
-          const nextOffset = allPages.reduce(
-            (acc, cur) => acc + cur.infos.length,
-            0
-          )
+  return useInfiniteQuery(qryKey, async ({ pageParam = params }) => listFlinkClusters(pageParam), {
+    enabled,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.has_more) {
+        const nextOffset = allPages.reduce((acc, cur) => acc + cur.infos.length, 0)
 
-          if (nextOffset < lastPage.total) {
-            const nextParams = {
-              ...params,
-              offset: nextOffset,
-            }
-            return nextParams
+        if (nextOffset < lastPage.total) {
+          const nextParams = {
+            ...params,
+            offset: nextOffset
           }
+          return nextParams
         }
+      }
 
-        return undefined
-      },
+      return undefined
     }
-  )
+  })
 }
 
 export const useMutationCluster = () => {
   const { regionId, spaceId } = useParams<IRouteParams>()
-  return useMutation(
-    async ({ op, ...rest }: { op: OP; clusterIds?: string[] }) => {
-      let ret = null
-      const params = {
-        ...rest,
-        regionId,
-        spaceId,
-      }
-      if (op === 'create') {
-        ret = await createFlinkCluster(params)
-      } else if (op === 'update') {
-        ret = await updateFlinkCluster(params)
-      } else if (op === 'delete') {
-        ret = await deleteFlinkClusters(params)
-      } else if (op === 'start') {
-        ret = await startFlinkClusters(params)
-      } else if (op === 'stop') {
-        ret = await stopFlinkClusters(params)
-      }
-      return ret
+  return useMutation(async ({ op, ...rest }: { op: OP; clusterIds?: string[] }) => {
+    let ret = null
+    const params = {
+      ...rest,
+      regionId,
+      spaceId
     }
-  )
+    if (op === 'create') {
+      ret = await createFlinkCluster(params)
+    } else if (op === 'update') {
+      ret = await updateFlinkCluster(params)
+    } else if (op === 'delete') {
+      ret = await deleteFlinkClusters(params)
+    } else if (op === 'start') {
+      ret = await startFlinkClusters(params)
+    } else if (op === 'stop') {
+      ret = await stopFlinkClusters(params)
+    } else if (op === 'restart') {
+      ret = await restartFlinkClusters(params)
+    }
+    return ret
+  })
 }
 
-export default {}
+export const useQueryDescribeFlinkCluster = (
+  filter: Record<string, any>,
+  option: Record<string, any> = { enabled: true }
+) => {
+  const { regionId, spaceId } = useParams<IRouteParams>()
+  const params = {
+    regionId,
+    spaceId,
+    ...filter
+  }
+
+  const qky = ['describeFlinkCluster', params]
+  return useQuery(qky, async () => getDescribeFlinkCluster(params), option)
+}

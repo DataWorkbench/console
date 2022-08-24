@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios'
 import Cookies from 'js-cookie'
-import { get, isFunction } from 'lodash-es'
+import { get, isFunction, set } from 'lodash-es'
 import emitter from 'utils/emitter'
 
 const baseConfig: AxiosRequestConfig = {
@@ -11,7 +11,8 @@ const baseConfig: AxiosRequestConfig = {
   headers: {
     'X-Requested-With': 'XMLHttpRequest',
     'X-CSRFToken': Cookies.get('csrftoken'),
-  },
+    'Content-Type': 'application/json;charset=UTF-8'
+  }
 }
 
 function getMessage(ret: {}) {
@@ -21,7 +22,7 @@ function getMessage(ret: {}) {
 
 const client = axios.create(baseConfig)
 
-let loginMdalVisible = false
+set(window, 'loginMdalVisible', false)
 
 const axiosList = new Map()
 
@@ -30,12 +31,12 @@ client.interceptors.response.use(
     axiosList.delete(response.config)
     const { status, ret_code: retCode } = response.data
     if (retCode === 2000) {
-      loginMdalVisible = true
+      set(window, 'loginMdalVisible', true)
       const message1 = getMessage(response.data)
       response.data.message = message1
       emitter.emit('error', {
         title: `请求错误: 登录会话已过期，请重新登录`,
-        content: message1,
+        content: message1
       })
       axiosList.forEach((cancel) => {
         cancel()
@@ -43,7 +44,8 @@ client.interceptors.response.use(
 
       axiosList.clear()
       setTimeout(() => {
-        window.location.href = `/login?redirect_uri=${window.location.pathname}`
+        emitter.emit('logout')
+        // window.location.href = `/login?redirect_uri=${window.location.pathname}`
       }, 1200)
       throw new Error(message1)
     }
@@ -52,7 +54,7 @@ client.interceptors.response.use(
       response.data.message = message
       emitter.emit('error', {
         title: `请求错误: [${status || retCode}]`,
-        content: message,
+        content: message
       })
       throw new Error(message)
     }
@@ -61,21 +63,21 @@ client.interceptors.response.use(
   (error) => {
     if (axios.isCancel(error)) {
       emitter.emit('error', {
-        title: `已取消`,
+        title: `已取消`
       })
     } else if (error.code === 'ECONNABORTED') {
       emitter.emit('error', {
         title: `网络超时: [timeout]`,
-        content: error.message,
+        content: error.message
       })
     } else if (error.response) {
       const {
         response: { status },
-        message,
+        message
       } = error
       emitter.emit('error', {
         title: `网络错误: [${status}]`,
-        content: message,
+        content: message
       })
     }
     return Promise.reject(error)
@@ -86,7 +88,7 @@ const request = async (
   data: { method?: string; [params: string]: unknown },
   options: { cancel?: (_: any) => void; [params: string]: unknown } = {}
 ) => {
-  if (loginMdalVisible) {
+  if (get(window, 'loginMdalVisible')) {
     return Promise.reject(new Error('登录会话已过期，请重新登录'))
   }
   const { method = 'GET', action = 'Forward', ...params } = data
@@ -98,9 +100,9 @@ const request = async (
       action,
       userId,
       method,
-      ...params,
+      ...params
     },
-    ...config,
+    ...config
   }
   let tempCancel
 
@@ -110,11 +112,10 @@ const request = async (
       cancel(c)
     }
   })
+
   axiosList.set(axiosConfig, tempCancel)
 
-  return client.request(axiosConfig).then((response) => {
-    return response.data
-  })
+  return client.request(axiosConfig).then((response) => response.data)
   // .catch((e) => {
   //   if (axios.isCancel(e)) {
   //     return null

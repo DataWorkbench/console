@@ -20,3 +20,11 @@ npm run dev
 
 项目采用的 taiwindcss 框架,需要增加样式提示可参考项目`extensions.json`(默认第一次打开会提示安装)
 ```
+
+docker build
+```
+docker build -t dockerhub.dev.data.qingcloud.link/dataomnis/console:v1.0.0 -f ./docker/Dockerfile.no-builder .
+
+docker push dockerhub.dev.data.qingcloud.link/dataomnis/console:v1.0.0
+```
+

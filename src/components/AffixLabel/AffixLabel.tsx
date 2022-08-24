@@ -18,18 +18,17 @@ import tw, { styled, css } from 'twin.macro'
 //   `,
 // ])
 
-const IconBoxWithTootip = styled(Center)(() => {
-  return [
-    css`
-      &{
-        [aria-expanded='true'] {
-          .icon svg.qicon {
-            ${tw`fill-[#324558]  dark:fill-[#fff]`}
-          }
+const IconBoxWithTootip = styled(Center)(() => [
+  css`
+    & {
+      [aria-expanded='true'] {
+        .icon svg.qicon {
+          ${tw`fill-[#324558]  dark:fill-[#fff]`}
+        }
       }
-    `,
-  ]
-})
+    }
+  `
+])
 
 export const AffixLabel = ({
   required = true,
@@ -39,7 +38,7 @@ export const AffixLabel = ({
   trigger = 'mouseenter focus',
   disabled = false,
   theme = 'darker',
-  className,
+  className
 }: {
   required?: boolean
   help?: ReactNode
@@ -64,41 +63,39 @@ export const AffixLabel = ({
   disabled?: boolean
   theme?: 'light' | 'dark' | 'darker' | 'green'
   className?: string
-}) => {
-  return (
-    <div tw="flex items-center" className={className}>
-      {required && <b tw="text-red-10 mr-1">*</b>}
-      <div tw="mr-1 inline-block font-medium break-all">{children}</div>
-      {help && (
-        <IconBoxWithTootip>
-          <Tooltip
-            tw="break-all"
-            content={help}
-            placement={placement}
-            trigger={trigger}
-            theme={theme}
-            disabled={disabled}
-            hasPadding
-          >
-            <Center>
-              <Icon
-                name="information"
-                // tw="label-help-icon-light dark:label-help-icon-dark"
-                css={[
-                  css`
-                    svg {
-                      ${tw`text-white fill-[#939ea9] dark:text-[#000] dark:fill-[#939ea9]`}
-                    }
-                  `,
-                ]}
-                size={16}
-              />
-            </Center>
-          </Tooltip>
-        </IconBoxWithTootip>
-      )}
-    </div>
-  )
-}
+}) => (
+  <div tw="flex items-center" className={className}>
+    {required && <b tw="text-red-10 mr-1">*</b>}
+    <div tw="mr-1 inline-block font-medium break-all">{children}</div>
+    {help && (
+      <IconBoxWithTootip>
+        <Tooltip
+          tw="break-all"
+          content={help}
+          placement={placement}
+          trigger={trigger}
+          theme={theme}
+          disabled={disabled}
+          hasPadding
+        >
+          <Center>
+            <Icon
+              name="information"
+              // tw="label-help-icon-light dark:label-help-icon-dark"
+              css={[
+                css`
+                  svg {
+                    ${tw`text-white fill-[#939ea9] dark:text-[#000] dark:fill-[#939ea9]`}
+                  }
+                `
+              ]}
+              size={16}
+            />
+          </Center>
+        </Tooltip>
+      </IconBoxWithTootip>
+    )}
+  </div>
+)
 
 export default AffixLabel

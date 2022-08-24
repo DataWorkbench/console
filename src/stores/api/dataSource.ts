@@ -48,6 +48,29 @@ export const loadDataSource = ({
     query: rest,
   })
 
+export const describeDataSourceTables = ({
+  regionId,
+  spaceId,
+  sourceId,
+}: IDataSourceParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/datasource/${sourceId}/tables`,
+    method: 'GET',
+  })
+
+export const describeDataSourceTableSchema = ({
+  regionId,
+  spaceId,
+  sourceId,
+  tableName,
+}: IDataSourceParams) =>
+  request({
+    region: regionId,
+    uri: `/v1/workspace/${spaceId}/datasource/${sourceId}/table/${tableName}/schema`,
+    method: 'GET',
+  })
+
 export const disableDataSource = ({
   regionId,
   spaceId,

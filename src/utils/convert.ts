@@ -54,6 +54,8 @@ export const strlen = (str: string) => {
 // /^(?!_)(?!.*?_$)[a-zA-Z0-9_\u4e00-\u9fa5]+$/
 export const nameMatchRegex = /^(?!_)(?!.*?_$)[a-zA-Z0-9_]+$/
 
+export const nameMatchRegexMin4Char = /^(?!_)(?!.*?_$)[a-zA-Z0-9_]{4,50}$/
+
 export const formatBytes = (bytes: number, decimals: number) => {
   if (bytes === 0) return '0 Bytes'
   const k = 1024
@@ -64,12 +66,12 @@ export const formatBytes = (bytes: number, decimals: number) => {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
-export const timeFormat = (_time: number) => {
-  if (_time < 1000) {
-    return `${_time}毫秒`
-  }
-  const time = _time / 1000
-  const minute = Math.floor(time / 60)
-  const second = Math.floor(_time % 6000) / 1000
-  return minute ? `${minute} 分 ${second} 秒` : `${second} 秒`
-}
+export const timeFormat = (_time: number, bool?: boolean) =>
+  // if (_time < 1000) {
+  //   return `${_time}毫秒`
+  // }
+  // const time = _time / 1000
+  // const minute = Math.floor(time / 60)
+  // const second = Math.floor(_time % 6000) / 1000
+  // return minute ? `${minute} 分 ${second} 秒` : `${second} 秒`
+  dayjs(_time).fromNow(bool)

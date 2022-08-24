@@ -22,9 +22,9 @@ import { useQueryClient } from 'react-query'
 import dayjs from 'dayjs'
 import { omitBy, get } from 'lodash-es'
 import { useHistory, useParams } from 'react-router-dom'
+import ScheSettingModal from 'views/Space/Dm/RealTime/Modal/ScheSettingModal'
+import ReleaseModal from 'views/Space/Dm/RealTime/Modal/ReleaseModal'
 import { AssoiateModal } from './AssoiateModal'
-import ScheSettingModal from '../../../Dm/RealTime/ScheSettingModal'
-import ReleaseModal from '../../../Dm/RealTime/ReleaseModal'
 
 const { MenuItem } = Menu
 
@@ -208,7 +208,7 @@ export const ReleaseTable = observer(({ query }: any) => {
                 <Icons name="stream-release" size={16} />
               </Center>
               <div tw="flex-1 break-all">
-                <div>{row.name}</div>
+                <div tw="font-medium">{row.name}</div>
                 <div tw="text-neut-8">{row.id}</div>
               </div>
             </FlexBox>

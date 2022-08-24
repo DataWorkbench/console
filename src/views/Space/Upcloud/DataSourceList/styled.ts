@@ -7,6 +7,14 @@ import hbaseImg from 'assets/HBase.png'
 import kafkaImg from 'assets/Kafka.png'
 import ftpImg from 'assets/FTP.png'
 import hdfsImg from 'assets/Hadoop.png'
+import MongoDbImg from 'assets/MongoDB.png'
+import RedisImg from 'assets/Redis.png'
+import OracleImg from 'assets/Oracle.png'
+import ElasticSearchImg from 'assets/ElasticSearch.png'
+import SqlServerImg from 'assets/SQL-Server.png'
+import DB2Img from 'assets/DB2.png'
+import SapHanaImg from 'assets/SAP-HANA.png'
+import HiveImg from 'assets/Hive.png'
 
 type SourceType =
   | 'MySQL'
@@ -25,6 +33,15 @@ const kindImgObj: { [k: string]: any } = {
   Kafka: kafkaImg,
   Ftp: ftpImg,
   HDFS: hdfsImg,
+  // TiDB: hdfsImg,
+  Oracle: OracleImg,
+  SqlServer: SqlServerImg,
+  DB2: DB2Img,
+  SapHana: SapHanaImg,
+  Hive: HiveImg,
+  ElasticSearch: ElasticSearchImg,
+  Redis: RedisImg,
+  MongoDb: MongoDbImg,
 }
 
 export const SourceKindImg = styled('div')(({ type }: { type: SourceType }) => [

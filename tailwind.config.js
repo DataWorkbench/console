@@ -1,5 +1,6 @@
 const colors = require('tailwindcss/colors')
 const plugin = require('tailwindcss/plugin')
+const themes = require("./themes");
 
 const neut = {
   20: '#020508',
@@ -38,9 +39,21 @@ const green = {
 
 const red = {
   14: '#872727',
+  13: '#B24B06',
   11: '#bd3633',
   10: '#cf3b37',
   0: '#fff9fa',
+}
+
+const enfiBlue = {
+  13: '#014581',
+  12: '#024D8E',
+  11: '#85B0D6',
+  4: '#85B0D6',
+  3: '#9FC2E0',
+  2: '#D2E9FF',
+  1: '#D8E7F5',
+  0: '#F7FBFF',
 }
 
 module.exports = {
@@ -52,7 +65,7 @@ module.exports = {
       black: colors.black,
       white: colors.white,
       red,
-      green,
+      green: enfiBlue,
       neut,
       error: {
         DEFAULT: red[10],
@@ -74,10 +87,15 @@ module.exports = {
       line: {
         dark: '#4C5E70',
       },
+      ...themes,
     },
     extend: {
       fontSize: {
         xs: ['12px', '20px'],
+        '2xs': ['14px', '24px'],
+      },
+      gridTemplateColumns: {
+        'workspace': 'repeat(auto-fill, minmax(440px, 1fr))',
       },
     },
   },
@@ -100,6 +118,17 @@ module.exports = {
           top: 'calc(50vh)',
           transform: 'translateY(-50%) translateX(-50%)',
           left: 'calc(50vw)',
+        },
+        '.table-instance-name': {
+          fontSize: '12px',
+          lineHeight: '20px',
+          fontWeight: 600,
+          color: neut[15],
+        },
+        '.table-instance-id': {
+          color: neut[8],
+          fontSize: '12px',
+          lineHeight: '20px',
         },
       })
     }),
