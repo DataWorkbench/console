@@ -311,7 +311,8 @@ const JobInstanceTable = (props: IJobInstanceTable) => {
         mutation
           .mutateAsync({
             op: 'terminate',
-            ids: [record.id]
+            ids: [record.id],
+            type: type === JobMode.RT ? 'stream' : 'sync'
           })
           .then(() => {
             refetchData()

@@ -155,7 +155,8 @@ const DataJobInstanceDetail = (props: IDataJobInstanceDetailProps) => {
         mutation
           .mutateAsync({
             op: 'terminate',
-            ids: [record.id]
+            ids: [record.id],
+            type: 'sync'
           })
           .then(() => {
             refetchData()

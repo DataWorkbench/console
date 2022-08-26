@@ -13,11 +13,16 @@ export const listSyncInstances = ({ regionId, spaceId, apiType, ...rest }: ISync
     query: rest
   })
 
-export const terminateSyncInstances = ({ regionId, spaceId, ids }: ISyncInstanceParams) =>
+export const terminateSyncInstances = ({
+  regionId,
+  spaceId,
+  ids,
+  type = 'sync'
+}: ISyncInstanceParams) =>
   request({
     region: regionId,
     method: 'POST',
-    uri: `/v1/workspace/${spaceId}/sync/job/instance/terminates`,
+    uri: `/v1/workspace/${spaceId}/${type}/job/instance/terminates`,
     body: {
       instance_ids: ids
     }
