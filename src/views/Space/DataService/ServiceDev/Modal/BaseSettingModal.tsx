@@ -70,11 +70,13 @@ const BaseSettingModal = observer(() => {
   }))
 
   const {
-    dtsDevStore: { apiConfigData, treeData, setTreeData, curApi },
+    dtsDevStore: { apiConfigData, treeData, setTreeData, curApi, apiRequestData, apiResponseData },
     dtsDevStore
   } = useStore()
   const mutation = useMutationUpdateApiBaseConfig()
   const isHistory = get(curApi, 'is_history', false) || false
+  const requestConfig = cloneDeep(apiRequestData) as any[]
+  const responseConfig = cloneDeep(apiResponseData) as any[]
 
   const onClose = () => {
     dtsDevStore.set({ showBaseSetting: false })
@@ -132,11 +134,18 @@ const BaseSettingModal = observer(() => {
       api_config: {
         ...cloneDeep(apiConfigData?.api_config),
         ...params,
-        api_path: `/${params.api_path.trim()}`
+        api_path: `/${params.api_path.trim()}`,
+        request_params: {
+          request_params: requestConfig
+        },
+        response_params: {
+          response_params: responseConfig
+        }
       }
     }
     dtsDevStore.set({
-      apiConfigData: config
+      apiConfigData: config,
+      oldApiTableNam: get(config, 'api_config.table_name') // 旧表名
     })
     setTreeData(newTreeData)
   }
