@@ -51,10 +51,11 @@ const RequestSettingModal = observer(() => {
   const [highSource, setHighSource] = useImmer<IHighSource[]>([])
 
   const {
-    dtsDevStore: { apiConfigData, curApi, apiRequestData },
+    dtsDevStore: { apiConfigData, curApi, apiRequestData, apiResponseData },
     dtsDevStore
   } = useStore()
   const isHistory = get(curApi, 'is_history', false) || false
+  const responseConfig = cloneDeep(apiResponseData) as any[]
 
   const mutation = useMutationUpdateApiConfig()
 
@@ -83,6 +84,9 @@ const RequestSettingModal = observer(() => {
         ...cloneDeep(apiConfigData?.api_config),
         request_params: {
           request_params: [...dataSource, ...highSource]
+        },
+        response_params: {
+          response_params: responseConfig
         }
       }
     }
@@ -104,6 +108,9 @@ const RequestSettingModal = observer(() => {
         table_name: apiConfig?.table_name,
         request_params: {
           request_params: [...dataSource, ...highSource]
+        },
+        response_params: {
+          response_params: responseConfig
         }
       },
       {

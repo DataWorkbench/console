@@ -33,10 +33,11 @@ const { CollapseItem } = Collapse
 
 const ResponseSettingModal = observer(() => {
   const {
-    dtsDevStore: { apiConfigData, curApi, apiResponseData },
+    dtsDevStore: { apiConfigData, curApi, apiRequestData, apiResponseData },
     dtsDevStore
   } = useStore()
   const isHistory = get(curApi, 'is_history', false) || false
+  const requestConfig = cloneDeep(apiRequestData) as any[]
 
   const [dataSource, setDataSource] = useImmer<DataSourceProp>([])
   const [highDataSource, setHighDataSource] = useImmer<IHightData[]>([])
@@ -65,6 +66,9 @@ const ResponseSettingModal = observer(() => {
       ...cloneDeep(apiConfigData),
       api_config: {
         ...cloneDeep(apiConfigData?.api_config),
+        request_params: {
+          request_params: requestConfig
+        },
         response_params: {
           response_params: [...dataSource, ...highDataSource]
         }
@@ -86,6 +90,9 @@ const ResponseSettingModal = observer(() => {
         apiId: get(apiConfig, 'api_id', ''),
         datasource_id: configSource?.id,
         table_name: apiConfig?.table_name,
+        request_params: {
+          request_params: requestConfig
+        },
         response_params: {
           response_params: [...dataSource, ...highDataSource]
         }
