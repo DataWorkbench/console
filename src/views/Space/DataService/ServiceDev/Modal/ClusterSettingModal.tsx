@@ -55,9 +55,11 @@ const ClusterSettingModal = observer(() => {
 
   const {
     dtsDevStore,
-    dtsDevStore: { apiConfigData, curApi }
+    dtsDevStore: { apiConfigData, curApi, apiRequestData, apiResponseData }
   } = useStore()
   const isHistory = get(curApi, 'is_history', false) || false
+  const requestConfig = cloneDeep(apiRequestData) as any[]
+  const responseConfig = cloneDeep(apiResponseData) as any[]
 
   useEffect(() => {
     const serviceCluster = cloneDeep(get(apiConfigData, 'service_cluster'))
@@ -75,7 +77,13 @@ const ClusterSettingModal = observer(() => {
       ...cloneDeep(apiConfigData),
       api_config: {
         ...cloneDeep(apiConfigData?.api_config),
-        cluster_id: clusterId
+        cluster_id: clusterId,
+        request_params: {
+          request_params: requestConfig
+        },
+        response_params: {
+          response_params: responseConfig
+        }
       },
       service_cluster: {
         id: clusterId,
@@ -84,7 +92,8 @@ const ClusterSettingModal = observer(() => {
     }
     dtsDevStore.set({
       apiConfigData: config,
-      showClusterErrorTip: false
+      showClusterErrorTip: false,
+      oldApiTableNam: get(config, 'api_config.table_name') // 旧表名
     })
   }
 
@@ -99,7 +108,13 @@ const ClusterSettingModal = observer(() => {
           apiId: get(apiConfig, 'api_id', ''),
           datasource_id: configSource?.id,
           table_name: apiConfig?.table_name,
-          cluster_id: cluster?.id
+          cluster_id: cluster?.id,
+          request_params: {
+            request_params: requestConfig
+          },
+          response_params: {
+            response_params: responseConfig
+          }
         },
         {
           onSuccess: (res) => {
