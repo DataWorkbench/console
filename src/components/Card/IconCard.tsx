@@ -12,17 +12,17 @@ const Root = styled.div(({ layout }: { layout: string }) => [
         ${tw`text-green-11!`}
       }
     }
-  `,
+  `
 ])
 const IconWrapper = styled.div(({ layout }: { layout: string }) => [
-  tw`w-10 h-10 mt-1 flex items-center justify-center  bg-gradient-to-tr from-neut-15 to-neut-10 shadow-md`,
+  tw`w-10 h-10 mt-1 flex items-center justify-center  bg-[#024D8E] from-neut-15 to-neut-10 shadow-md rounded-md`,
   tw`group-hover:from-green-11 group-hover:to-green-3`,
-  layout !== 'vertical' && tw`mr-3`,
+  layout !== 'vertical' && tw`mr-3`
 ])
 
 const Title = styled.div(({ layout }: { layout: string }) => [
   tw`text-neut-15`,
-  layout === 'vertical' ? tw`pt-1` : tw`font-medium`,
+  layout === 'vertical' ? tw`pt-1` : tw`font-medium`
 ])
 
 export interface IconCardProps {

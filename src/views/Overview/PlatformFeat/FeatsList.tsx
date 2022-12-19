@@ -4,6 +4,7 @@ import Feat0 from 'assets/svgr/bench_feat_0.svg'
 import Feat1 from 'assets/svgr/bench_feat_1.svg'
 import Feat2 from 'assets/svgr/bench_feat_2.svg'
 import { Center } from 'components/Center'
+import { css } from 'twin.macro'
 
 const FeatComps = [Feat0, Feat1, Feat2]
 
@@ -20,7 +21,7 @@ function FeatList({ feats }) {
             {(() => {
               const FeatSVG = FeatComps[i]
               return (
-                <Center tw="h-[132px] bg-neut-1">
+                <Center tw="h-[132px] bg-[#F8FCFF]">
                   <FeatSVG />
                 </Center>
               )
@@ -36,8 +37,29 @@ function FeatList({ feats }) {
                   </div>
                 </div>
               </div>
-              <div tw="font-semibold">{title}</div>
-              <div tw="text-neut-8 mt-1 break-all">{subtitle}</div>
+              <div
+                css={css`
+                  font-weight: 700;
+                  font-size: 14px;
+                  line-height: 19px;
+                  letter-spacing: -0.03em;
+                  color: #333333;
+                `}
+              >
+                {title}
+              </div>
+              <div
+                tw="text-neut-8 mt-1 break-all"
+                css={css`
+                  font-weight: 400;
+                  font-size: 12px;
+                  line-height: 16px;
+                  letter-spacing: -0.03em;
+                  color: #666666;
+                `}
+              >
+                {subtitle}
+              </div>
             </div>
           </div>
         )
@@ -47,7 +69,7 @@ function FeatList({ feats }) {
 }
 
 FeatList.propTypes = {
-  feats: PropTypes.array,
+  feats: PropTypes.array
 }
 
 export default FeatList

@@ -10,43 +10,49 @@ import { Center } from 'components'
 import { useHistory, useRouteMatch } from 'react-router-dom'
 import { flattenDeep } from 'lodash-es'
 import { MenuType } from 'stores/GlobalStore'
+import logo from 'assets/enfi/logo.png'
 
 const { Sider, Content } = Layout
 
 const Root = styled.div`
+  .ant-layout {
+    background-color: #f0f2f5;
+  }
   &.antd-layout {
     background-color: #fff !important;
     .ant-layout-content {
       height: calc(100vh - 54px);
       overflow: auto;
     }
-    .ant-layout-sider-children {
-      background-color: #fff !important;
+    .ant-menu-item {
+      .icon .qicon {
+        fill: #333333;
+      }
     }
-    .ant-menu-root {
-      background-color: #fff !important;
+    .ant-menu-title-content {
+      font-weight: 400;
+      color: #666666;
     }
     .ant-menu-item-selected {
-      background: #f7fbff !important;
-      border-left: 2px solid #024d8e !important;
+      background: #024d8e !important;
+      // border-left: 2px solid #024d8e !important;
       &::after {
         opacity: 0 !important;
       }
       .icon .qicon {
-        color: #024d8e !important;
-        fill: #b6c2cd !important;
+        color: #fff !important;
       }
       .ant-menu-title-content {
-        color: #024d8e !important;
-        font-weight: 600;
+        font-weight: 400;
+        color: #fff !important;
       }
     }
     .ant-menu-item:hover {
       color: #024d8e !important;
-      .icon .qicon {
-        color: #024d8e !important;
-        fill: #b6c2cd !important;
-      }
+      // .icon .qicon {
+      //   color: #024d8e !important;
+      //   fill: #b6c2cd !important;
+      // }
     }
     .ant-menu-inline-collapsed {
       .ant-menu-item-icon {
@@ -60,13 +66,13 @@ const items = [
   {
     name: 'overview',
     label: '概览',
-    icon: <Icon name="dashboard" />,
+    icon: <Icon name="enfi-overview" size={20} />,
     key: 'overview'
   },
   {
     name: 'workspace',
     label: '工作空间',
-    icon: <Icon name="project" />,
+    icon: <Icon name="enfi-workspace" size={18} />,
     key: 'workspace'
   }
 ]
@@ -92,17 +98,22 @@ const EnfiLayout = observer(({ children }) => {
             >
               <div className="logo">
                 <Center
-                  tw="bg-[#F5FAFF] p-5 text-[16px] font-medium h-[64px]"
+                  tw="bg-[#F5FAFF] pl-3 pt-4 pr-3 pb-3 text-[16px] font-medium h-[56px]"
                   css={!collapsed ? tw`justify-between` : tw`justify-center`}
                 >
-                  {!collapsed && <div>大数据工作台</div>}
-                  {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                    className: 'trigger',
-                    style: {
-                      fontSize: 18
-                    },
-                    onClick: () => setCollapsed(!collapsed)
-                  })}
+                  {!collapsed && (
+                    <div>
+                      <img src={logo} alt="" />
+                    </div>
+                  )}
+                  {false &&
+                    React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                      className: 'trigger',
+                      style: {
+                        fontSize: 18
+                      },
+                      onClick: () => setCollapsed(!collapsed)
+                    })}
                 </Center>
               </div>
               <Menu

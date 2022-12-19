@@ -29,7 +29,7 @@ class OverViewStore {
     },
     {
       name: 'dm',
-      text: '数据集成',
+      text: '数据源集成',
       icon: 'database',
       xlink: 'icon_service_dataIntegration',
       desc: '数据集成提供在复杂网络环境下，在多源异构的数据源之间进行实时数据同步、离线批量数据同步的功能。提供可视化向导开发模式，降低数据处理难度。根据您的业务需求，可以自定义同步内容、字段、写入模式。',

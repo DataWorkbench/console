@@ -1,7 +1,7 @@
 import React from 'react'
-import tw from 'twin.macro'
+import tw, { css } from 'twin.macro'
 import { motion } from 'framer-motion'
-import { Icons } from 'components'
+import { Center, Icons } from 'components'
 import ItemCard from './ItemCard'
 
 interface FlowCellProps {
@@ -14,7 +14,7 @@ interface FlowCellProps {
 }
 
 const FlowCell: React.FC<FlowCellProps> = ({ item, placement }) => (
-  <div tw="w-14">
+  <div tw="w-[100px]">
     <motion.div
       initial={{ opacity: 0, scale: 0.75 }}
       whileHover={{ opacity: 1, scale: 1, transition: { duration: 0.25 } }}
@@ -28,8 +28,21 @@ const FlowCell: React.FC<FlowCellProps> = ({ item, placement }) => (
       <ItemCard item={item} />
     </motion.div>
     <div>
-      <Icons name={item.xlink} size={56} tw="pointer-events-none" />
-      <div tw="pt-3 w-20 -ml-3 text-center">{item.text}</div>
+      <Center tw="w-[100px] h-[114px] bg-white rounded-[4px] ">
+        <Icons name={item.xlink} size={56} tw="pointer-events-none" />
+      </Center>
+      <div
+        tw="pt-4 text-center"
+        css={css`
+          font-weight: 600;
+          font-size: 14px;
+          line-height: 19px;
+          letter-spacing: -0.03em;
+          color: #024d8e;
+        `}
+      >
+        {item.text}
+      </div>
     </div>
   </div>
 )

@@ -141,7 +141,7 @@ const Flow = ({ items }) => {
                 ref={(el) => {
                   arrowEl.current[i] = el
                 }}
-                css={[tw`flex pt-6`, tw`flex-1`]}
+                css={[tw`flex pt-12`, tw`flex-1`]}
               />
             )}
           </React.Fragment>

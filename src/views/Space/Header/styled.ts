@@ -5,7 +5,8 @@ import { Center } from 'components'
 export const Root = styled(Center)(() => [
   css`
     & {
-      box-shadow: 0px 5px 15px rgba(3, 5, 7, 0.08);
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.04);
+      // box-shadow: 0px 5px 15px rgba(3, 5, 7, 0.08);
     }
   `,
   tw`justify-between h-[60px] bg-white dark:text-neut-8 dark:bg-neut-16 transition-colors duration-500`

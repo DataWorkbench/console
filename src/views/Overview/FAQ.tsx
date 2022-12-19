@@ -104,29 +104,65 @@ const JoinUs = () => {
 const FAQ: FC = ({ className }: { className?: string }) => (
   <Card className={className} tw="leading-5" hasBoxShadow>
     <FlexBox tw="justify-between">
-      <CardHeader title="常见问题" />
+      <CardHeader
+        hasPrex={false}
+        title={
+          <span
+            css={css`
+              font-weight: 700;
+              font-size: 20px;
+              line-height: 27px;
+              letter-spacing: -0.03em;
+              color: #333333;
+            `}
+          >
+            常见问题
+          </span>
+        }
+      />
       {!get(window, 'CONFIG_ENV.IS_PRIVATE', false) && <JoinUs />}
     </FlexBox>
     <CardContent>
-      <div tw="rounded-sm border border-neut-2">
-        <div tw="text-neut-15 p-4 space-y-2">
+      <div
+        css={css`
+          background: #ffffff;
+          border: 1px solid #dfecff;
+          border-radius: 8px;
+        `}
+      >
+        <div tw="text-neut-15 p-4 space-y-4">
           {questions.map((quest) => (
             <Question key={quest.title}>
-              <Icon name="file" tw="mr-2" />
+              <Icon name="enfi-faq" tw="mr-2" />
               <HelpCenterLink
                 tw="text-neut-15 no-underline font-normal hover:text-green-11 hover:font-medium"
                 href={quest.link}
+                css={css`
+                  font-style: normal;
+                  font-weight: 400;
+                  font-size: 10px;
+                  line-height: 13px;
+                  letter-spacing: -0.03em;
+                  color: #333333;
+                `}
               >
                 {quest.title}
               </HelpCenterLink>
             </Question>
           ))}
         </div>
-        <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center border-t border-[#DEE6ED]">
+        <div tw="text-center bg-neut-1 py-2 font-medium flex align-middle justify-center border-t bg-[#f8fcff] border-[#dfecff] h-[46px]">
           <Question>
             <HelpCenterLink
               tw="mr-2 text-neut-15 no-underline font-medium hover:text-green-11"
               href="/intro/introduction/"
+              css={css`
+                font-weight: 600;
+                font-size: 14px;
+                line-height: 19px;
+                letter-spacing: -0.03em;
+                color: #333333;
+              `}
             >
               更多帮助指引
             </HelpCenterLink>

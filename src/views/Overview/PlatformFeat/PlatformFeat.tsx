@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { Card, CardHeader, CardContent } from 'components'
+import { css } from 'twin.macro'
 // import { useStore } from 'stores'
 import FeatsList from './FeatsList'
 
@@ -31,7 +32,20 @@ const PlatformFeat = ({ className }) => {
   return (
     <Card className={className} hasBoxShadow tw="w-full">
       <CardHeader
-        title="平台特性"
+        hasPrex={false}
+        title={
+          <span
+            css={css`
+              font-weight: 700;
+              font-size: 20px;
+              line-height: 27px;
+              letter-spacing: -0.03em;
+              color: #333333;
+            `}
+          >
+            平台特性
+          </span>
+        }
         subtitle="帮助您更加全面了解和使用大数据工作台，满足您的业务需求"
       />
       <CardContent>
