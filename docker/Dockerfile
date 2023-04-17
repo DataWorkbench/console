@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM dataomnis/console-builder:v0.9.0 as builder
-=======
 FROM dataomnis/console-builder:v1.0.0 as builder
->>>>>>> e4553b424ea25a5c2d47eded5f3265b07fab7b9c
 
 WORKDIR /root
 
