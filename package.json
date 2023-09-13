@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack serve",
-    "build": "cross-env NODE_ENV=production webpack && cp -r configs ./dist",
+    "build": "cross-env NODE_ENV=production webpack",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx src/",
     "stylelint": "stylelint 'src/**/*.{js,jsx,css}' --fix",
     "deploy:testing": "bash bin/deploy.sh testing",
@@ -23,13 +23,8 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,js,jsx}": [
-      "prettier --write",
-      "eslint --fix"
-    ],
-    "**/*.css": [
-      "stylelint --fix"
-    ]
+    "src/**/*.{ts,tsx,js,jsx}": ["prettier --write", "eslint --fix"],
+    "**/*.css": ["stylelint --fix"]
   },
   "devDependencies": {
     "@babel/cli": "^7.14.3",
@@ -146,11 +141,7 @@
     "twin.macro": "^2.8.2",
     "use-immer": "^0.6.0"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 10"
-  ],
+  "browserslist": ["> 1%", "last 2 versions", "not ie <= 10"],
   "babelMacros": {
     "twin": {
       "preset": "emotion"
